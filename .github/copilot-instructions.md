@@ -79,6 +79,58 @@ npm run preview         # Preview production build
 - Cyclomatic complexity limits enforced
 - TypeScript strict mode always on
 - Run `npm run lint` before committing
+- **Git Commits**: MUST follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+  - Format: `<type>(<scope>): <description>`
+  - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+  - Example: `feat(auth): add login page with Amplify UI`
+  - Example: `fix(i18n): correct French translation keys`
+  - Example: `refactor(layout): replace CSS classes with Nuxt UI components`
+
+## Critical Conventions
+
+### **MANDATORY: Internationalization (i18n)**
+
+🚨 **NO HARD-CODED STRINGS ALLOWED** 🚨
+
+- **ALL user-facing text MUST use i18n** - no exceptions
+- Translation files: `i18n/locales/{locale}.json`
+- Use `t('key.path')` for all strings in templates and code
+- Example: `{{ t('app.title') }}` NOT `"AI Career OS"`
+- Example: `t('errors.notFound')` NOT `"Not found"`
+- Add new translation keys to `i18n/locales/en.json` when adding features
+- Use nested keys for organization: `features.profile.title`
+
+**How to use i18n:**
+
+```vue
+<script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+</script>
+
+<template>
+  <h1>{{ t('page.title') }}</h1>
+  <p>{{ t('page.description') }}</p>
+</template>
+```
+
+### **MANDATORY: Nuxt UI Components**
+
+🚨 **USE NUXT UI COMPONENTS - NO RAW CSS CLASSES** 🚨
+
+- **NEVER write raw Tailwind CSS classes** unless absolutely necessary
+- Use Nuxt UI semantic components for ALL UI elements
+- Available components: `UButton`, `UCard`, `UContainer`, `UHeader`, `UMain`, `UPage`, `UPageHeader`, `UPageBody`, `UPageCard`, etc.
+- Example: Use `<UButton>` NOT `<button class="px-4 py-2 bg-blue-500">`
+- Example: Use `<UCard>` NOT `<div class="rounded-lg shadow-md p-4">`
+- Only use Tailwind classes for: spacing adjustments, custom layouts not covered by Nuxt UI
+- Refer to [Nuxt UI documentation](https://ui.nuxt.com) for available components
+
+**Component Priority:**
+
+1. First choice: Nuxt UI component (e.g., `<UButton>`, `<UCard>`)
+2. Second choice: Semantic HTML with minimal utility classes
+3. Last resort: Custom CSS (only if Nuxt UI doesn't provide the component)
 
 ## Critical Conventions
 

@@ -15,8 +15,10 @@
     "gen-model": "bin/gen-model.js"
   },
   "dependencies": {
+    "@aws-amplify/ui-vue": "^4.3.6",
     "@nuxt/eslint": "^1.11.0",
     "@nuxt/ui": "^4.2.1",
+    "@nuxtjs/i18n": "^10.2.1",
     "aws-amplify": "^6.15.8",
     "nuxt": "^4.2.1",
     "vue": "^3.5.25",

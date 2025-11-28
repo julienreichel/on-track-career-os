@@ -1,0 +1,35 @@
+{
+  "app": {
+    "title": "AI Career OS"
+  },
+  "auth": {
+    "signOut": "Sign Out",
+    "errorSigningOut": "Error signing out"
+  },
+  "home": {
+    "title": "Welcome to AI Career OS",
+    "description": "You are successfully authenticated!"
+  },
+  "features": {
+    "profile": {
+      "title": "Profile",
+      "description": "Build your professional profile and personal canvas"
+    },
+    "experiences": {
+      "title": "Experiences",
+      "description": "Document your work experiences and achievements"
+    },
+    "jobs": {
+      "title": "Jobs & Companies",
+      "description": "Research and analyze job opportunities"
+    },
+    "applications": {
+      "title": "Applications",
+      "description": "Generate tailored CVs and cover letters"
+    },
+    "interview": {
+      "title": "Interview Prep",
+      "description": "Prepare for interviews with AI assistance"
+    }
+  }
+}

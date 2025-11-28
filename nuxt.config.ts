@@ -8,17 +8,24 @@ export default defineNuxtConfig({
   // Use src/ as the source directory for Nuxt
   srcDir: 'src/',
 
-  modules: ['@nuxt/eslint', '@nuxt/test-utils', '@nuxt/ui'],
+  modules: ['@nuxt/eslint', '@nuxt/test-utils', '@nuxt/ui', '@nuxtjs/i18n'],
   ssr: false, // Disable server-side rendering
-  alias: {
-    '@amplify': resolve(__dirname, './amplify'),
-  },
-  imports: {
-    presets: [
+  css: ['~/assets/css/main.css'],
+
+  i18n: {
+    locales: [
       {
-        from: 'vue-i18n',
-        imports: ['useI18n'],
+        code: 'en',
+        file: 'en.json',
+        name: 'English',
       },
     ],
+    langDir: '../i18n/locales',
+    defaultLocale: 'en',
+    strategy: 'no_prefix',
+  },
+
+  alias: {
+    '@amplify': resolve(__dirname, './amplify'),
   },
 });
