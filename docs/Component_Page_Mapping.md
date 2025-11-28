@@ -2,19 +2,19 @@
 
 **Complete mapping of:**
 
-* UI Pages
-* Frontend Components
-* Composables
-* CDM Entities
-* AI Operations
+- UI Pages
+- Frontend Components
+- Composables
+- CDM Entities
+- AI Operations
 
 Each page includes:
 
-* UI Components (Nuxt UI)
-* Frontend Components
-* Composables (state + logic)
-* CDM Entities created/updated
-* AI Operations triggered on that page
+- UI Components (Nuxt UI)
+- Frontend Components
+- Composables (state + logic)
+- CDM Entities created/updated
+- AI Operations triggered on that page
 
 ---
 
@@ -26,23 +26,23 @@ Each page includes:
 
 ### UI
 
-* `<UCard>`
+- `<UCard>`
 
 ### Components
 
-* Auth UI component
+- Auth UI component
 
 ### Composables
 
-* None
+- None
 
 ### CDM Entities
 
-* **UserProfile** (created empty)
+- **UserProfile** (created empty)
 
 ### AI Ops
 
-* None
+- None
 
 ---
 
@@ -50,26 +50,26 @@ Each page includes:
 
 ### UI
 
-* `<USteps>`
-* `<UCard>`
-* `<UForm>`
+- `<USteps>`
+- `<UCard>`
+- `<UForm>`
 
 ### Components
 
-* User Profile Manager (initialization)
+- User Profile Manager (initialization)
 
 ### Composables
 
-* `useUserProfile()`
+- `useUserProfile()`
 
 ### CDM
 
-* UserProfile (goals, values)
-* Experience (later in onboarding)
+- UserProfile (goals, values)
+- Experience (later in onboarding)
 
 ### AI
 
-* Optional: `ai.parseCvText`
+- Optional: `ai.parseCvText`
 
 ---
 
@@ -81,30 +81,30 @@ Each page includes:
 
 ### UI
 
-* `<UGrid>`
-* `<UCard>`
+- `<UGrid>`
+- `<UCard>`
 
 ### Components
 
-* Dashboard Overview Component
+- Dashboard Overview Component
 
 ### Composables
 
-* `useUserProfile()`
-* `useExperienceStore()`
-* `useJobAnalysis()`
-* `useTailoringEngine()`
+- `useUserProfile()`
+- `useExperienceStore()`
+- `useJobAnalysis()`
+- `useTailoringEngine()`
 
 ### CDM Entities
 
-* UserProfile
-* Experiences
-* JobDescription
-* CVDocument (drafts)
+- UserProfile
+- Experiences
+- JobDescription
+- CVDocument (drafts)
 
 ### AI Ops
 
-* None (display-only)
+- None (display-only)
 
 ---
 
@@ -116,24 +116,24 @@ Each page includes:
 
 ### UI
 
-* `<UCard>`
-* `<UFormGroup>`
+- `<UCard>`
+- `<UFormGroup>`
 
 ### Components
 
-* User Profile Manager
+- User Profile Manager
 
 ### Composables
 
-* `useUserProfile()`
+- `useUserProfile()`
 
 ### CDM
 
-* UserProfile
+- UserProfile
 
 ### AI Ops
 
-* None
+- None
 
 ---
 
@@ -141,23 +141,23 @@ Each page includes:
 
 ### UI
 
-* `<UTable>`
+- `<UTable>`
 
 ### Components
 
-* Experience List Component
+- Experience List Component
 
 ### Composables
 
-* `useExperienceStore()`
+- `useExperienceStore()`
 
 ### CDM
 
-* Experience[]
+- Experience[]
 
 ### AI
 
-* None
+- None
 
 ---
 
@@ -165,26 +165,26 @@ Each page includes:
 
 ### UI
 
-* `<UForm>`
-* `<UTextarea>`
-* `<UButton>`
+- `<UForm>`
+- `<UTextarea>`
+- `<UButton>`
 
 ### Components
 
-* Experience Intake Component
+- Experience Intake Component
 
 ### Composables
 
-* `useExperienceStore()`
+- `useExperienceStore()`
 
 ### CDM
 
-* Experience
+- Experience
 
 ### AI Ops
 
-* `ai.extractExperienceBlocks` (if imported)
-* `ai.generateAchievementsAndKpis` (button-triggered)
+- `ai.extractExperienceBlocks` (if imported)
+- `ai.generateAchievementsAndKpis` (button-triggered)
 
 ---
 
@@ -192,27 +192,27 @@ Each page includes:
 
 ### UI
 
-* Custom `<UChat>`
-* `<UModal>` (suggestions)
+- Custom `<UChat>`
+- `<UModal>` (suggestions)
 
 ### Components
 
-* Story Builder Component
+- Story Builder Component
 
 ### Composables
 
-* `useStoryEngine()`
+- `useStoryEngine()`
 
 ### CDM
 
-* STARStory
-* Achievements
-* KPI Suggestions
+- STARStory
+- Achievements
+- KPI Suggestions
 
 ### AI Ops
 
-* `ai.generateStarStory`
-* `ai.generateAchievementsAndKpis`
+- `ai.generateStarStory`
+- `ai.generateAchievementsAndKpis`
 
 ---
 
@@ -220,26 +220,26 @@ Each page includes:
 
 ### UI
 
-* `<UDraggable>`
-* `<UCard>`
-* `<UContainer>`
+- `<UDraggable>`
+- `<UCard>`
+- `<UContainer>`
 
 ### Components
 
-* Personal Canvas Component
+- Personal Canvas Component
 
 ### Composables
 
-* `useCanvasEngine()`
-* `useUserProfile()`
+- `useCanvasEngine()`
+- `useUserProfile()`
 
 ### CDM
 
-* PersonalCanvas
+- PersonalCanvas
 
 ### AI Ops
 
-* `ai.generatePersonalCanvas`
+- `ai.generatePersonalCanvas`
 
 ---
 
@@ -247,23 +247,23 @@ Each page includes:
 
 ### UI
 
-* `<UCard>`
+- `<UCard>`
 
 ### Components
 
-* Communication Profile Module
+- Communication Profile Module
 
 ### Composables
 
-* `useUserProfile()`
+- `useUserProfile()`
 
 ### CDM
 
-* CommunicationProfile
+- CommunicationProfile
 
 ### AI Ops
 
-* Future (tone, psychology inference)
+- Future (tone, psychology inference)
 
 ---
 
@@ -275,23 +275,23 @@ Each page includes:
 
 ### UI
 
-* `<UTable>`
+- `<UTable>`
 
 ### Components
 
-* Job List Component
+- Job List Component
 
 ### Composables
 
-* `useJobAnalysis()`
+- `useJobAnalysis()`
 
 ### CDM
 
-* JobDescription[]
+- JobDescription[]
 
 ### AI
 
-* None
+- None
 
 ---
 
@@ -299,24 +299,24 @@ Each page includes:
 
 ### UI
 
-* `<UTextarea>`
-* `<UButton>`
+- `<UTextarea>`
+- `<UButton>`
 
 ### Components
 
-* Job Intake Component
+- Job Intake Component
 
 ### Composables
 
-* `useJobAnalysis()`
+- `useJobAnalysis()`
 
 ### CDM
 
-* JobDescription (raw text)
+- JobDescription (raw text)
 
 ### AI Ops
 
-* `ai.parseJobDescription`
+- `ai.parseJobDescription`
 
 ---
 
@@ -324,24 +324,24 @@ Each page includes:
 
 ### UI
 
-* `<UTabs>`
-* `<UCard>`
+- `<UTabs>`
+- `<UCard>`
 
 ### Components
 
-* Job Role Card Component
+- Job Role Card Component
 
 ### Composables
 
-* `useJobAnalysis()`
+- `useJobAnalysis()`
 
 ### CDM
 
-* JobRoleCard
+- JobRoleCard
 
 ### AI Ops
 
-* `ai.generateJobRoleCard`
+- `ai.generateJobRoleCard`
 
 ---
 
@@ -349,23 +349,23 @@ Each page includes:
 
 ### UI
 
-* `<UTable>`
+- `<UTable>`
 
 ### Components
 
-* Company List Component
+- Company List Component
 
 ### Composables
 
-* `useCanvasEngine()`
+- `useCanvasEngine()`
 
 ### CDM
 
-* Company[]
+- Company[]
 
 ### AI
 
-* None
+- None
 
 ---
 
@@ -373,24 +373,24 @@ Each page includes:
 
 ### UI
 
-* `<UForm>`
-* `<UTextarea>`
+- `<UForm>`
+- `<UTextarea>`
 
 ### Components
 
-* Company Intake Component
+- Company Intake Component
 
 ### Composables
 
-* `useCanvasEngine()`
+- `useCanvasEngine()`
 
 ### CDM
 
-* Company
+- Company
 
 ### AI Ops
 
-* `ai.analyzeCompanyInfo`
+- `ai.analyzeCompanyInfo`
 
 ---
 
@@ -398,24 +398,24 @@ Each page includes:
 
 ### UI
 
-* `<UDraggable>`
-* `<UCard>`
+- `<UDraggable>`
+- `<UCard>`
 
 ### Components
 
-* Company Canvas Component
+- Company Canvas Component
 
 ### Composables
 
-* `useCanvasEngine()`
+- `useCanvasEngine()`
 
 ### CDM
 
-* CompanyCanvas
+- CompanyCanvas
 
 ### AI Ops
 
-* `ai.generateCompanyCanvas`
+- `ai.generateCompanyCanvas`
 
 ---
 
@@ -427,29 +427,29 @@ Each page includes:
 
 ### UI
 
-* `<UCard>`
-* `<UAlert>`
-* `<UBadge>`
+- `<UCard>`
+- `<UAlert>`
+- `<UBadge>`
 
 ### Components
 
-* Matching Engine Component
+- Matching Engine Component
 
 ### Composables
 
-* `useMatchingEngine()`
-* `useUserProfile()`
-* `useExperienceStore()`
-* `useCanvasEngine()`
-* `useJobAnalysis()`
+- `useMatchingEngine()`
+- `useUserProfile()`
+- `useExperienceStore()`
+- `useCanvasEngine()`
+- `useJobAnalysis()`
 
 ### CDM
 
-* MatchingSummary
+- MatchingSummary
 
 ### AI Ops
 
-* `ai.generateMatchingSummary`
+- `ai.generateMatchingSummary`
 
 ---
 
@@ -461,27 +461,27 @@ Each page includes:
 
 ### UI
 
-* `<UEditor>`
-* `<USelect>`
-* `<UGrid>`
+- `<UEditor>`
+- `<USelect>`
+- `<UGrid>`
 
 ### Components
 
-* CV Builder Component
+- CV Builder Component
 
 ### Composables
 
-* `useTailoringEngine()`
-* `useUserProfile()`
-* `useExperienceStore()`
+- `useTailoringEngine()`
+- `useUserProfile()`
+- `useExperienceStore()`
 
 ### CDM
 
-* CVDocument
+- CVDocument
 
 ### AI Ops
 
-* `ai.generateTailoredCvBlocks` (tailored mode)
+- `ai.generateTailoredCvBlocks` (tailored mode)
 
 ---
 
@@ -489,27 +489,27 @@ Each page includes:
 
 ### UI
 
-* `<URadioGroup>`
-* `<UEditor>`
+- `<URadioGroup>`
+- `<UEditor>`
 
 ### Components
 
-* Cover Letter Generator Component
+- Cover Letter Generator Component
 
 ### Composables
 
-* `useTailoringEngine()`
-* `useStoryEngine()`
-* `useCanvasEngine()`
-* `useJobAnalysis()`
+- `useTailoringEngine()`
+- `useStoryEngine()`
+- `useCanvasEngine()`
+- `useJobAnalysis()`
 
 ### CDM
 
-* CoverLetter
+- CoverLetter
 
 ### AI Ops
 
-* `ai.generateCoverLetter`
+- `ai.generateCoverLetter`
 
 ---
 
@@ -517,24 +517,24 @@ Each page includes:
 
 ### UI
 
-* `<UTextarea>`
-* `<USteps>`
+- `<UTextarea>`
+- `<USteps>`
 
 ### Components
 
-* Speech Builder Component
+- Speech Builder Component
 
 ### Composables
 
-* `useTailoringEngine()`
+- `useTailoringEngine()`
 
 ### CDM
 
-* SpeechBlock
+- SpeechBlock
 
 ### AI Ops
 
-* `ai.generateTailoredSpeech`
+- `ai.generateTailoredSpeech`
 
 ---
 
@@ -542,24 +542,24 @@ Each page includes:
 
 ### UI
 
-* `<UCard>`
-* `<UBadge>`
+- `<UCard>`
+- `<UBadge>`
 
 ### Components
 
-* KPI Proposition Component
+- KPI Proposition Component
 
 ### Composables
 
-* `useTailoringEngine()`
+- `useTailoringEngine()`
 
 ### CDM
 
-* KPISet
+- KPISet
 
 ### AI Ops
 
-* `ai.generateTailoredKpis`
+- `ai.generateTailoredKpis`
 
 ---
 
@@ -571,25 +571,25 @@ Each page includes:
 
 ### UI
 
-* `<UAccordion>`
-* `<UCard>`
+- `<UAccordion>`
+- `<UCard>`
 
 ### Components
 
-* Interview Questions Component
+- Interview Questions Component
 
 ### Composables
 
-* `useInterviewEngine()`
-* `useStoryEngine()`
+- `useInterviewEngine()`
+- `useStoryEngine()`
 
 ### CDM
 
-* InterviewQuestionSet
+- InterviewQuestionSet
 
 ### AI Ops
 
-* `ai.generateInterviewQuestions`
+- `ai.generateInterviewQuestions`
 
 ---
 
@@ -597,25 +597,25 @@ Each page includes:
 
 ### UI
 
-* Custom `<ChatPane>`
-* `<UProgress>`
+- Custom `<ChatPane>`
+- `<UProgress>`
 
 ### Components
 
-* Interview Simulation Component
+- Interview Simulation Component
 
 ### Composables
 
-* `useInterviewEngine()`
+- `useInterviewEngine()`
 
 ### CDM
 
-* InterviewSession
+- InterviewSession
 
 ### AI Ops
 
-* `ai.simulateInterviewTurn`
-* `ai.evaluateInterviewAnswer`
+- `ai.simulateInterviewTurn`
+- `ai.evaluateInterviewAnswer`
 
 ---
 
@@ -627,23 +627,23 @@ Each page includes:
 
 ### UI
 
-* `<UCard>`
+- `<UCard>`
 
 ### Components
 
-* Template Library Component
+- Template Library Component
 
 ### Composables
 
-* `useTailoringEngine()`
+- `useTailoringEngine()`
 
 ### CDM
 
-* None (static)
+- None (static)
 
 ### AI
 
-* None
+- None
 
 ---
 
@@ -651,23 +651,23 @@ Each page includes:
 
 ### UI
 
-* `<UForm>`
+- `<UForm>`
 
 ### Components
 
-* Settings Component
+- Settings Component
 
 ### Composables
 
-* `useUserProfile()`
+- `useUserProfile()`
 
 ### CDM
 
-* UserProfile (updates)
+- UserProfile (updates)
 
 ### AI Ops
 
-* None
+- None
 
 ---
 

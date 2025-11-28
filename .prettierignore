@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.nuxt/
+.output/
+dist/
+.amplify/
+
+# Amplify generated
+amplify_outputs.json
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Package manager
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Documentation (optional - remove if you want to format docs)
+# docs/

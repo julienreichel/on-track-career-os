@@ -1,7 +1,6 @@
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 
 export const schema = a.schema({
-
   // =====================================================
   // 1. USER IDENTITY DOMAIN
   // =====================================================
@@ -23,17 +22,16 @@ export const schema = a.schema({
       languages: a.string().array(),
 
       // Relationships
-      experiences: a.hasMany("Experience", "userId"),
-      canvas: a.hasOne("PersonalCanvas", "userId"),
+      experiences: a.hasMany('Experience', 'userId'),
+      canvas: a.hasOne('PersonalCanvas', 'userId'),
 
-      cvs: a.hasMany("CVDocument", "userId"),
-      coverLetters: a.hasMany("CoverLetter", "userId"),
-      speechBlocks: a.hasMany("SpeechBlock", "userId"),
-      interviewSessions: a.hasMany("InterviewSession", "userId"),
-      matchingSummaries: a.hasMany("MatchingSummary", "userId"),
+      cvs: a.hasMany('CVDocument', 'userId'),
+      coverLetters: a.hasMany('CoverLetter', 'userId'),
+      speechBlocks: a.hasMany('SpeechBlock', 'userId'),
+      interviewSessions: a.hasMany('InterviewSession', 'userId'),
+      matchingSummaries: a.hasMany('MatchingSummary', 'userId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   PersonalCanvas: a
     .model({
@@ -50,7 +48,7 @@ export const schema = a.schema({
       needsUpdate: a.boolean().default(false),
 
       userId: a.id().required(),
-      user: a.belongsTo("UserProfile", "userId"),
+      user: a.belongsTo('UserProfile', 'userId'),
     })
     .authorization((allow) => [allow.owner()]),
 
@@ -67,15 +65,14 @@ export const schema = a.schema({
       responsibilities: a.string().array(),
       tasks: a.string().array(),
       rawText: a.string(),
-      status: a.enum(["draft", "complete"]),
+      status: a.enum(['draft', 'complete']),
 
       userId: a.id().required(),
-      user: a.belongsTo("UserProfile", "userId"),
+      user: a.belongsTo('UserProfile', 'userId'),
 
-      stories: a.hasMany("STARStory", "experienceId"),
+      stories: a.hasMany('STARStory', 'experienceId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   STARStory: a
     .model({
@@ -87,12 +84,11 @@ export const schema = a.schema({
       kpiSuggestions: a.string().array(),
 
       experienceId: a.id().required(),
-      experience: a.belongsTo("Experience", "experienceId"),
+      experience: a.belongsTo('Experience', 'experienceId'),
 
-      applicationMaterials: a.hasMany("ApplicationMaterialLink", "storyId"),
+      applicationMaterials: a.hasMany('ApplicationMaterialLink', 'storyId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   // =====================================================
   // 3. JOB & COMPANY DOMAIN
@@ -108,22 +104,21 @@ export const schema = a.schema({
       behaviours: a.string().array(),
       successCriteria: a.string().array(),
       explicitPains: a.string().array(),
-      status: a.enum(["draft", "analyzed", "complete"]),
+      status: a.enum(['draft', 'analyzed', 'complete']),
 
       companyId: a.id(),
-      company: a.belongsTo("Company", "companyId"),
+      company: a.belongsTo('Company', 'companyId'),
 
-      roleCard: a.hasOne("JobRoleCard", "jobId"),
-      coverLetters: a.hasMany("CoverLetter", "jobId"),
-      cvs: a.hasMany("CVDocument", "jobId"),
-      speechBlocks: a.hasMany("SpeechBlock", "jobId"),
-      kpiSets: a.hasMany("KPISet", "jobId"),
-      interviewQuestions: a.hasOne("InterviewQuestionSet", "jobId"),
-      interviewSessions: a.hasMany("InterviewSession", "jobId"),
-      matchingSummaries: a.hasMany("MatchingSummary", "jobId"),
+      roleCard: a.hasOne('JobRoleCard', 'jobId'),
+      coverLetters: a.hasMany('CoverLetter', 'jobId'),
+      cvs: a.hasMany('CVDocument', 'jobId'),
+      speechBlocks: a.hasMany('SpeechBlock', 'jobId'),
+      kpiSets: a.hasMany('KPISet', 'jobId'),
+      interviewQuestions: a.hasOne('InterviewQuestionSet', 'jobId'),
+      interviewSessions: a.hasMany('InterviewSession', 'jobId'),
+      matchingSummaries: a.hasMany('MatchingSummary', 'jobId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   JobRoleCard: a
     .model({
@@ -135,10 +130,9 @@ export const schema = a.schema({
       aiConfidenceScore: a.float(),
 
       jobId: a.id().required(),
-      job: a.belongsTo("JobDescription", "jobId"),
+      job: a.belongsTo('JobDescription', 'jobId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   Company: a
     .model({
@@ -149,12 +143,11 @@ export const schema = a.schema({
       marketPosition: a.string(),
       rawText: a.string(),
 
-      canvas: a.hasOne("CompanyCanvas", "companyId"),
-      jobs: a.hasMany("JobDescription", "companyId"),
-      matchingSummaries: a.hasMany("MatchingSummary", "companyId"),
+      canvas: a.hasOne('CompanyCanvas', 'companyId'),
+      jobs: a.hasMany('JobDescription', 'companyId'),
+      matchingSummaries: a.hasMany('MatchingSummary', 'companyId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   CompanyCanvas: a
     .model({
@@ -170,10 +163,9 @@ export const schema = a.schema({
       strategicPriorities: a.string().array(),
 
       companyId: a.id().required(),
-      company: a.belongsTo("Company", "companyId"),
+      company: a.belongsTo('Company', 'companyId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   MatchingSummary: a
     .model({
@@ -184,18 +176,17 @@ export const schema = a.schema({
       summaryParagraph: a.string(),
 
       userId: a.id().required(),
-      user: a.belongsTo("UserProfile", "userId"),
+      user: a.belongsTo('UserProfile', 'userId'),
 
       jobId: a.id().required(),
-      job: a.belongsTo("JobDescription", "jobId"),
+      job: a.belongsTo('JobDescription', 'jobId'),
 
       companyId: a.id().required(),
-      company: a.belongsTo("Company", "companyId"),
+      company: a.belongsTo('Company', 'companyId'),
 
-      kpis: a.hasMany("KPISet", "matchingSummaryId" )
+      kpis: a.hasMany('KPISet', 'matchingSummaryId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   // =====================================================
   // 4. APPLICATION MATERIALS DOMAIN
@@ -209,13 +200,12 @@ export const schema = a.schema({
       contentJSON: a.json(),
 
       userId: a.id().required(),
-      user: a.belongsTo("UserProfile", "userId"),
+      user: a.belongsTo('UserProfile', 'userId'),
 
       jobId: a.id(),
-      job: a.belongsTo("JobDescription", "jobId"),
+      job: a.belongsTo('JobDescription', 'jobId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   CoverLetter: a
     .model({
@@ -224,13 +214,12 @@ export const schema = a.schema({
       aiConfidenceScore: a.float(),
 
       userId: a.id().required(),
-      user: a.belongsTo("UserProfile", "userId"),
+      user: a.belongsTo('UserProfile', 'userId'),
 
       jobId: a.id().required(),
-      job: a.belongsTo("JobDescription", "jobId"),
+      job: a.belongsTo('JobDescription', 'jobId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   SpeechBlock: a
     .model({
@@ -239,13 +228,12 @@ export const schema = a.schema({
       whyMe: a.string(),
 
       userId: a.id().required(),
-      user: a.belongsTo("UserProfile", "userId"),
+      user: a.belongsTo('UserProfile', 'userId'),
 
       jobId: a.id(),
-      job: a.belongsTo("JobDescription", "jobId"),
+      job: a.belongsTo('JobDescription', 'jobId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   KPISet: a
     .model({
@@ -253,25 +241,23 @@ export const schema = a.schema({
       justificationList: a.string().array(),
 
       jobId: a.id().required(),
-      job: a.belongsTo("JobDescription", "jobId"),
+      job: a.belongsTo('JobDescription', 'jobId'),
 
       matchingSummaryId: a.id().required(),
-      matchingSummary: a.belongsTo("MatchingSummary", "matchingSummaryId"),
+      matchingSummary: a.belongsTo('MatchingSummary', 'matchingSummaryId'),
     })
     .authorization((allow) => [allow.owner()]),
 
-
   ApplicationMaterialLink: a
     .model({
-      materialType: a.enum(["cv", "coverletter", "kpiset", "speech"]),
+      materialType: a.enum(['cv', 'coverletter', 'kpiset', 'speech']),
 
       storyId: a.id().required(),
-      story: a.belongsTo("STARStory", "storyId"),
+      story: a.belongsTo('STARStory', 'storyId'),
 
       materialId: a.string().required(),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   // =====================================================
   // 5. INTERVIEW DOMAIN
@@ -285,10 +271,9 @@ export const schema = a.schema({
       painBasedQuestions: a.string().array(),
 
       jobId: a.id().required(),
-      job: a.belongsTo("JobDescription", "jobId"),
+      job: a.belongsTo('JobDescription', 'jobId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 
   InterviewSession: a
     .model({
@@ -298,15 +283,13 @@ export const schema = a.schema({
       createdAt: a.date(),
 
       userId: a.id().required(),
-      user: a.belongsTo("UserProfile", "userId"),
+      user: a.belongsTo('UserProfile', 'userId'),
 
       jobId: a.id().required(),
-      job: a.belongsTo("JobDescription", "jobId"),
+      job: a.belongsTo('JobDescription', 'jobId'),
     })
     .authorization((allow) => [allow.owner()]),
-
 });
-
 
 export type Schema = ClientSchema<typeof schema>;
 

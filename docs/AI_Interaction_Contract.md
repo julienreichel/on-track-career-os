@@ -6,27 +6,27 @@ The product relies on a **deterministic set of AI capabilities**, each encapsula
 
 Each operation must conform to:
 
-* **System prompt** (constant)
-* **User prompt** (variable, data-injection)
-* **Input schema** (validated before calling the AI)
-* **Output schema** (validated after AI returns)
-* **Fallback strategy** for malformed output
+- **System prompt** (constant)
+- **User prompt** (variable, data-injection)
+- **Input schema** (validated before calling the AI)
+- **Output schema** (validated after AI returns)
+- **Fallback strategy** for malformed output
 
-**No operation may return free-form text. All outputs *must* be structured JSON.**
+**No operation may return free-form text. All outputs _must_ be structured JSON.**
 
 ---
 
 ## 2. Naming Conventions
 
-* Operations: `ai.operationName` (camelCase)
-* JSON output: `snake_case`
-* Content blocks: arrays only (no raw paragraphs)
+- Operations: `ai.operationName` (camelCase)
+- JSON output: `snake_case`
+- Content blocks: arrays only (no raw paragraphs)
 
 **Examples:**
 
-* `ai.parseJobDescription`
-* `ai.generatePersonalCanvas`
-* `ai.generateAchievements`
+- `ai.parseJobDescription`
+- `ai.generatePersonalCanvas`
+- `ai.generateAchievements`
 
 ---
 
@@ -502,8 +502,8 @@ Produce the User × Job × Company Fit Summary.
 
 If AI output is **not valid JSON**:
 
-* Attempt to parse a JSON substring
-* If still invalid → retry with:
+- Attempt to parse a JSON substring
+- If still invalid → retry with:
 
 ```
 Return ONLY VALID JSON matching the schema:
@@ -512,19 +512,19 @@ Return ONLY VALID JSON matching the schema:
 
 If fields are **missing**:
 
-* Missing strings → empty string
-* Missing arrays → empty array
-* Missing objects → empty object
+- Missing strings → empty string
+- Missing arrays → empty array
+- Missing objects → empty object
 
 If **hallucinated** content:
 
-* Remove hallucinations
-* Keep only input-supported elements
-* If >80% invalid → ask user for clarification
+- Remove hallucinations
+- Keep only input-supported elements
+- If >80% invalid → ask user for clarification
 
 If repeated failure:
 
-* Show UI error:
+- Show UI error:
   **“AI cannot produce a stable answer. Please refine your input.”**
 
 ---
@@ -533,10 +533,10 @@ If repeated failure:
 
 Each AI operation must store:
 
-* timestamp
-* input JSON
-* output JSON
-* fallback steps used
-* confidence (if provided)
+- timestamp
+- input JSON
+- output JSON
+- fallback steps used
+- confidence (if provided)
 
 This enables **debuggability, traceability, reproducibility**.

@@ -1,7 +1,7 @@
 # EPIC ROADMAP (MVP → V1 → V2 → V3)
 
-*Non-technical — Strategic — Complete*
-*Source: EPIC Roadmap document* 
+_Non-technical — Strategic — Complete_
+_Source: EPIC Roadmap document_
 
 ---
 
@@ -22,19 +22,19 @@ Collect all raw information about the user without interpreting it yet. All futu
 
 ### Includes
 
-* Upload CV → extract text → segment experiences
-* Manual editing of extracted experiences
-* Create new experience blocks
-* Capture aspirations (future direction)
-* Capture professional goals
-* Capture personal values
-* Capture key strengths & weaknesses
+- Upload CV → extract text → segment experiences
+- Manual editing of extracted experiences
+- Create new experience blocks
+- Capture aspirations (future direction)
+- Capture professional goals
+- Capture personal values
+- Capture key strengths & weaknesses
 
 ### User Value
 
-* Gives users a simple, structured way to express who they are
-* Helps users feel “seen” and guided
-* Builds the foundational dataset for CVs, letters, tailoring, analysis
+- Gives users a simple, structured way to express who they are
+- Helps users feel “seen” and guided
+- Builds the foundational dataset for CVs, letters, tailoring, analysis
 
 ### Reason in MVP
 
@@ -52,26 +52,26 @@ Convert user experiences, aspirations, values, and strengths into a structured, 
 
 ### Includes
 
-* Auto-generate all Canvas sections from user data:
+- Auto-generate all Canvas sections from user data:
+  - Value Proposition
+  - Key Activities
+  - Strengths & Competitive Advantages
+  - Target Roles / Customers
+  - Channels
+  - Personal Resources (skills, assets)
+  - Career Direction
+  - Pain Relievers & Gain Creators
 
-  * Value Proposition
-  * Key Activities
-  * Strengths & Competitive Advantages
-  * Target Roles / Customers
-  * Channels
-  * Personal Resources (skills, assets)
-  * Career Direction
-  * Pain Relievers & Gain Creators
-* User editing & drag-and-drop
-* AI suggestions for weak sections
-* Save to backend
-* Regenerate anytime
+- User editing & drag-and-drop
+- AI suggestions for weak sections
+- Save to backend
+- Regenerate anytime
 
 ### User Value
 
-* Clear professional identity overview
-* Reveals insights users often miss
-* Central hub for consistency across CVs, letters, and stories
+- Clear professional identity overview
+- Reveals insights users often miss
+- Central hub for consistency across CVs, letters, and stories
 
 ### Reason in MVP
 
@@ -85,15 +85,15 @@ It is the conceptual backbone of the entire system.
 
 ### Includes
 
-* Guided STAR interviews
-* AI-generated achievements
-* AI-generated KPI suggestions
-* Editable story library
+- Guided STAR interviews
+- AI-generated achievements
+- AI-generated KPI suggestions
+- Editable story library
 
 ### User Value
 
-* Provides strong material for CVs, letters, and interviews
-* Helps users communicate achievements with clarity
+- Provides strong material for CVs, letters, and interviews
+- Helps users communicate achievements with clarity
 
 ### Reason in MVP
 
@@ -107,10 +107,10 @@ Generation features are useless without strong content.
 
 ### Includes
 
-* Basic 2-page layout
-* Block-based structure (experiences, skills, achievements)
-* Full editing
-* PDF export
+- Basic 2-page layout
+- Block-based structure (experiences, skills, achievements)
+- Full editing
+- PDF export
 
 ### User Value
 
@@ -128,10 +128,10 @@ A CV is an essential deliverable in any job search.
 
 ### Includes
 
-* Generate personal pitch
-* Generate career story
-* Generate “Why me?” statements
-* Editable speech blocks
+- Generate personal pitch
+- Generate career story
+- Generate “Why me?” statements
+- Editable speech blocks
 
 ### User Value
 
@@ -153,23 +153,23 @@ Focuses exclusively on the job itself: its role, expectations, and pains.
 
 ### Includes
 
-* Paste JD text
-* AI extracts:
+- Paste JD text
+- AI extracts:
+  - Responsibilities
+  - Required skills
+  - Required behaviours
+  - Seniority level
+  - Success criteria
+  - Explicit pains
 
-  * Responsibilities
-  * Required skills
-  * Required behaviours
-  * Seniority level
-  * Success criteria
-  * Explicit pains
-* Create a Job Role Card
-* Editing extracted fields
+- Create a Job Role Card
+- Editing extracted fields
 
 ### User Value
 
-* Clear understanding of what matters for each role
-* Reduces misinterpretation
-* Foundation for tailoring
+- Clear understanding of what matters for each role
+- Reduces misinterpretation
+- Foundation for tailoring
 
 ### Reason in MVP
 
@@ -187,26 +187,26 @@ Focuses on modeling the business context behind each job.
 
 ### Includes
 
-* Input company information:
+- Input company information:
+  - industry
+  - size
+  - products/services
+  - market position
 
-  * industry
-  * size
-  * products/services
-  * market position
-* Optional company description paste
-* AI generates:
+- Optional company description paste
+- AI generates:
+  - Company BMC
+  - Market challenges
+  - Internal pains
+  - Customer pains
+  - Strategic priorities
 
-  * Company BMC
-  * Market challenges
-  * Internal pains
-  * Customer pains
-  * Strategic priorities
-* Editable canvas
+- Editable canvas
 
 ### User Value
 
-* Understands the environment and strategic challenges
-* Helps user speak with confidence during interviews
+- Understands the environment and strategic challenges
+- Helps user speak with confidence during interviews
 
 ### Reason in MVP
 
@@ -224,25 +224,25 @@ Synthesis step to reveal where the user creates impact.
 
 ### Includes
 
-* Analyze overlaps between:
+- Analyze overlaps between:
+  - User strengths
+  - Achievements
+  - KPIs
+  - Job pains
+  - Company pains
 
-  * User strengths
-  * Achievements
-  * KPIs
-  * Job pains
-  * Company pains
-* Identify:
+- Identify:
+  - Competitive advantages
+  - Contributions
+  - Risks & mitigation
 
-  * Competitive advantages
-  * Contributions
-  * Risks & mitigation
-* Produce Fit Summary (impact & narrative)
-* Editable
+- Produce Fit Summary (impact & narrative)
+- Editable
 
 ### User Value
 
-* Clarity and confidence: “Now I understand how I fit.”
-* Drives tailored CV, letter, pitch, KPIs, and interview prep
+- Clarity and confidence: “Now I understand how I fit.”
+- Drives tailored CV, letter, pitch, KPIs, and interview prep
 
 ### Reason in MVP
 
@@ -256,10 +256,10 @@ Tailoring requires this synthesis.
 
 ### Includes
 
-* Tailored CV
-* Tailored cover letter
-* Tailored elevator pitch
-* Tailored KPI proposition
+- Tailored CV
+- Tailored cover letter
+- Tailored elevator pitch
+- Tailored KPI proposition
 
 ### User Value
 
@@ -277,11 +277,11 @@ Completes the full application workflow.
 
 ### Includes
 
-* Behavioral questions
-* Technical questions
-* Cultural questions
-* Pain-based questions
-* Suggested answers from user stories
+- Behavioral questions
+- Technical questions
+- Cultural questions
+- Pain-based questions
+- Suggested answers from user stories
 
 ### User Value
 
@@ -308,10 +308,10 @@ At this point the user can:
 
 ### Includes
 
-* Communication style
-* Work style
-* Strengths & blind spots
-* Integration into tailoring
+- Communication style
+- Work style
+- Strengths & blind spots
+- Integration into tailoring
 
 ### User Value
 
@@ -325,10 +325,10 @@ More authentic and personalized applications.
 
 ### Includes
 
-* Simulated recruiter
-* Answer scoring
-* Coaching feedback
-* Summary report
+- Simulated recruiter
+- Answer scoring
+- Coaching feedback
+- Summary report
 
 ### User Value
 
@@ -342,9 +342,9 @@ Improves confidence and interview mastery.
 
 ### Includes
 
-* Compare user canvas with JD
-* Score match
-* Suggest roles or industries
+- Compare user canvas with JD
+- Score match
+- Suggest roles or industries
 
 ### User Value
 
@@ -358,10 +358,10 @@ Career orientation, not only job application help.
 
 ### Includes
 
-* Industry patterns
-* Market maturity inference
-* Unstated needs
-* Stronger match scoring
+- Industry patterns
+- Market maturity inference
+- Unstated needs
+- Stronger match scoring
 
 ### User Value
 
@@ -375,10 +375,10 @@ More accurate and unique insights.
 
 ### Includes
 
-* More templates
-* Drag & drop layout
-* Design presets
-* ATS-friendly export
+- More templates
+- Drag & drop layout
+- Design presets
+- ATS-friendly export
 
 ### User Value
 
@@ -394,9 +394,9 @@ Professional-grade materials.
 
 ### Includes
 
-* Version snapshots
-* Compare versions
-* Restore versions
+- Version snapshots
+- Compare versions
+- Restore versions
 
 ### User Value
 
@@ -410,9 +410,9 @@ Power-user functionality for serious job hunters.
 
 ### Includes
 
-* Voice recognition
-* Pacing feedback
-* Filler-word detection
+- Voice recognition
+- Pacing feedback
+- Filler-word detection
 
 ### User Value
 

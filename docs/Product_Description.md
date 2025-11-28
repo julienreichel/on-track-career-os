@@ -10,11 +10,11 @@ This product is an **AI-powered platform** guiding individuals through the entir
 
 It combines:
 
-* **Self-discovery**
-* **Career modeling**
-* **Job & company analysis**
-* **Communication tools (CV, letter, speech, KPIs)**
-* **Interview preparation**
+- **Self-discovery**
+- **Career modeling**
+- **Job & company analysis**
+- **Communication tools (CV, letter, speech, KPIs)**
+- **Interview preparation**
 
 into a **single coherent system** — a **Personal AI Career Coach** whose mission is to help users:
 
@@ -41,10 +41,10 @@ Users discover strengths, motivations, values, and achievements through guided f
 
 Every document is built upon:
 
-* Company pains
-* Role challenges
-* Skills & experiences
-* KPI-driven impact
+- Company pains
+- Role challenges
+- Skills & experiences
+- KPI-driven impact
 
 ### ✔ Everything connects
 
@@ -56,16 +56,16 @@ User identity → Career Canvas → Job/Company Canvas → Materials → Intervi
 
 ### **Primary**
 
-* Job seekers
-* Career changers
-* Experienced professionals refining their narrative
-* Students entering the workforce
+- Job seekers
+- Career changers
+- Experienced professionals refining their narrative
+- Students entering the workforce
 
 ### **Secondary (Later)**
 
-* HR professionals
-* Career coaches
-* Universities & bootcamps
+- HR professionals
+- Career coaches
+- Universities & bootcamps
 
 ---
 
@@ -73,14 +73,14 @@ User identity → Career Canvas → Job/Company Canvas → Materials → Intervi
 
 Users can:
 
-* Build a structured, evolving portrait of their career
-* Extract achievements & KPIs from each experience
-* Craft compelling stories and narratives
-* Understand companies deeply
-* Generate strategic CVs & cover letters
-* Prepare for interviews with real-time AI feedback
-* Highlight measurable impact via tailored KPIs
-* Gain clarity and confidence through guided reflection
+- Build a structured, evolving portrait of their career
+- Extract achievements & KPIs from each experience
+- Craft compelling stories and narratives
+- Understand companies deeply
+- Generate strategic CVs & cover letters
+- Prepare for interviews with real-time AI feedback
+- Highlight measurable impact via tailored KPIs
+- Gain clarity and confidence through guided reflection
 
 ---
 
@@ -92,16 +92,16 @@ Users can:
 
 ### Inputs
 
-* PDF/DOC CV
-* (Later) LinkedIn import
-* (Later) Import user notes or posts
+- PDF/DOC CV
+- (Later) LinkedIn import
+- (Later) Import user notes or posts
 
 ### Outputs
 
-* Segmented experience blocks
-* Preliminary achievements
-* Roles, skills, date inference
-* Raw material for Experience Builder
+- Segmented experience blocks
+- Preliminary achievements
+- Roles, skills, date inference
+- Raw material for Experience Builder
 
 ---
 
@@ -109,29 +109,29 @@ Users can:
 
 Structured conversational flow:
 
-* “What was the objective?”
-* “What did you actually do?”
-* “What problem were you solving?”
-* “Who benefited?”
-* “What changed because of your work?”
+- “What was the objective?”
+- “What did you actually do?”
+- “What problem were you solving?”
+- “Who benefited?”
+- “What changed because of your work?”
 
 AI proposes:
 
-* Achievements in concise language
-* KPIs quantifying impact
-* Skills involved
-* Strengths demonstrated
+- Achievements in concise language
+- KPIs quantifying impact
+- Skills involved
+- Strengths demonstrated
 
 Users accept / edit / reject.
 
 This becomes foundational data for:
 
-* CV
-* Cover letter
-* Interview answers
-* Stories
-* KPIs
-* Personal Canvas
+- CV
+- Cover letter
+- Interview answers
+- Stories
+- KPIs
+- Personal Canvas
 
 ---
 
@@ -139,24 +139,24 @@ This becomes foundational data for:
 
 Users build stories about:
 
-* Success moments
-* Leadership situations
-* Conflict resolution
-* Motivation & purpose
-* Career direction
+- Success moments
+- Leadership situations
+- Conflict resolution
+- Motivation & purpose
+- Career direction
 
 AI assists with:
 
-* Story structure (STAR/SOAR)
-* Clarity
-* Impact
-* Emotional resonance
+- Story structure (STAR/SOAR)
+- Clarity
+- Impact
+- Emotional resonance
 
 Stories feed directly into:
 
-* Cover letters
-* Interview answers
-* Personal Canvas
+- Cover letters
+- Interview answers
+- Personal Canvas
 
 ---
 
@@ -166,15 +166,15 @@ Automatically generated, fully editable.
 
 ### Sections:
 
-* Value proposition
-* Key activities
-* Strengths & competitive advantages
-* Target roles (customer segments)
-* Channels (job search strategy)
-* Resources (skills, experiences, assets)
-* Career direction
-* Pain relievers
-* Gain creators
+- Value proposition
+- Key activities
+- Strengths & competitive advantages
+- Target roles (customer segments)
+- Channels (job search strategy)
+- Resources (skills, experiences, assets)
+- Career direction
+- Pain relievers
+- Gain creators
 
 Updated dynamically based on experiences and stories.
 
@@ -184,37 +184,37 @@ Updated dynamically based on experiences and stories.
 
 ### Inputs
 
-* Job description text
-* Company description or website snippets
+- Job description text
+- Company description or website snippets
 
 ### Outputs
 
 #### **Company Canvas**
 
-* Value proposition
-* Product/service summary
-* Customer segments
-* Market challenges
-* Internal & external pains
-* Risks & constraints
-* Growth opportunities
+- Value proposition
+- Product/service summary
+- Customer segments
+- Market challenges
+- Internal & external pains
+- Risks & constraints
+- Growth opportunities
 
 #### **Job Role Analysis**
 
-* Explicit pains
-* Hidden pains inferred by AI
-* Success metrics
-* Required behaviors
-* Cultural signals
+- Explicit pains
+- Hidden pains inferred by AI
+- Success metrics
+- Required behaviors
+- Cultural signals
 
 #### **Impact Mapping**
 
 AI connects:
 
-* User experiences
-* Strengths
-* Stories
-* KPIs
+- User experiences
+- Strengths
+- Stories
+- KPIs
 
 to company needs, highlighting:
 
@@ -226,23 +226,23 @@ to company needs, highlighting:
 
 A Notion-like live editor using structured blocks:
 
-* Experience blocks
-* Achievement/KPI blocks
-* Story elements
-* Skills
+- Experience blocks
+- Achievement/KPI blocks
+- Story elements
+- Skills
 
 ### MVP:
 
-* Two-page layout
-* 2–3 templates
-* PDF export
-* Fully editable
+- Two-page layout
+- 2–3 templates
+- PDF export
+- Fully editable
 
 ### Later:
 
-* Drag-and-drop
-* More templates
-* Brand customization
+- Drag-and-drop
+- More templates
+- Brand customization
 
 ---
 
@@ -250,11 +250,11 @@ A Notion-like live editor using structured blocks:
 
 User chooses:
 
-* Style (corporate, bold, storytelling, rebel, concise)
-* Tone
-* Key messages
-* Stories to leverage
-* Pain points to emphasize
+- Style (corporate, bold, storytelling, rebel, concise)
+- Tone
+- Key messages
+- Stories to leverage
+- Pain points to emphasize
 
 AI generates a coherent, tailored letter aligned with the Company Canvas.
 
@@ -266,30 +266,30 @@ Editable and exportable.
 
 ### Interview Types
 
-* Recruiter screening
-* Behavioral
-* Technical
-* Leadership
-* Stress/adversarial
+- Recruiter screening
+- Behavioral
+- Technical
+- Leadership
+- Stress/adversarial
 
 ### Flow
 
 1. AI asks questions
 2. User answers
 3. AI evaluates:
+   - clarity
+   - relevance
+   - confidence
+   - structure
+   - alignment with company pains
 
-   * clarity
-   * relevance
-   * confidence
-   * structure
-   * alignment with company pains
 4. AI produces improvement suggestions
 5. Generates summary report
 
 ### Later:
 
-* Voice-based simulation
-* Transcript scoring
+- Voice-based simulation
+- Transcript scoring
 
 ---
 
@@ -297,14 +297,14 @@ Editable and exportable.
 
 AI proposes KPIs grounded in:
 
-* Company pains
-* User experience
-* Industry benchmarks
+- Company pains
+- User experience
+- Industry benchmarks
 
 Example outputs:
 
-* “Increase onboarding completion rate by 20%…”
-* “Reduce deployment incidents by 30%…”
+- “Increase onboarding completion rate by 20%…”
+- “Reduce deployment incidents by 30%…”
 
 Goal: Present **credible, high-impact contributions** in interviews.
 
@@ -314,33 +314,32 @@ Goal: Present **credible, high-impact contributions** in interviews.
 
 ### Backend
 
-* AWS Amplify
-* GraphQL API
-* AWS Lambda for AI orchestration
-* DynamoDB for user data
+- AWS Amplify
+- GraphQL API
+- AWS Lambda for AI orchestration
+- DynamoDB for user data
 
 ### Frontend
 
-* Web app (Nuxt, Vue, or React)
-* Rich text editors
-* Canvas tools
-* Real-time editing
+- Web app (Nuxt, Vue, or React)
+- Rich text editors
+- Canvas tools
+- Real-time editing
 
 ### AI Layer
 
-* Orchestrated LLM prompts for:
-
-  * Extraction
-  * Synthesis
-  * Modeling
-  * Document generation
-  * Interview simulation
+- Orchestrated LLM prompts for:
+  - Extraction
+  - Synthesis
+  - Modeling
+  - Document generation
+  - Interview simulation
 
 ### Security
 
-* Cognito authentication
-* Encrypted data at rest and in transit
-* User-owned data (fully deletable)
+- Cognito authentication
+- Encrypted data at rest and in transit
+- User-owned data (fully deletable)
 
 ---
 
@@ -354,11 +353,11 @@ Goal: Present **credible, high-impact contributions** in interviews.
 6. Company Canvas → auto-generated
 7. Pain Mapping → impact alignment
 8. Generate materials:
+   - CV
+   - Cover letter
+   - KPIs
+   - Interview questions
 
-   * CV
-   * Cover letter
-   * KPIs
-   * Interview questions
 9. Interview simulator
 10. Export & apply
 
@@ -368,38 +367,38 @@ Goal: Present **credible, high-impact contributions** in interviews.
 
 ### **Included**
 
-* CV parsing
-* Experience Builder
-* Story Builder
-* Personal Canvas
-* Basic company modeling
-* Basic pain analysis
-* CV builder (limited templates)
-* Cover letter generator
-* KPI generator
-* Text-based interview simulator
+- CV parsing
+- Experience Builder
+- Story Builder
+- Personal Canvas
+- Basic company modeling
+- Basic pain analysis
+- CV builder (limited templates)
+- Cover letter generator
+- KPI generator
+- Text-based interview simulator
 
 ### **Excluded (future)**
 
-* LinkedIn API
-* Voice interviews
-* Competitor analysis
-* Revision history
-* Mobile app
-* Team/coach collaboration
-* Application tracking
+- LinkedIn API
+- Voice interviews
+- Competitor analysis
+- Revision history
+- Mobile app
+- Team/coach collaboration
+- Application tracking
 
 ---
 
 # 9. Product Values
 
-* **Accuracy** — Represent users truthfully
-* **Empathy** — Safe environment for expression
-* **Clarity** — Structured job search
-* **Empowerment** — Users feel capable
-* **Reflection** — Users learn about themselves
-* **Strategy** — Jobs approached with precision
-* **Personalization** — Unique output per user
+- **Accuracy** — Represent users truthfully
+- **Empathy** — Safe environment for expression
+- **Clarity** — Structured job search
+- **Empowerment** — Users feel capable
+- **Reflection** — Users learn about themselves
+- **Strategy** — Jobs approached with precision
+- **Personalization** — Unique output per user
 
 ---
 
@@ -407,11 +406,11 @@ Goal: Present **credible, high-impact contributions** in interviews.
 
 The moat is the **User Knowledge Base**, consisting of:
 
-* Stories
-* Achievements
-* KPIs
-* Reflections
-* Canvas models
+- Stories
+- Achievements
+- KPIs
+- Reflections
+- Canvas models
 
 This becomes a **long-term asset** that grows with the user — and no CV builder or ATS tool offers this today.
 
@@ -421,13 +420,12 @@ This becomes a **long-term asset** that grows with the user — and no CV builde
 
 Because it does what humans do best:
 
-* Understand stories
-* Extract meaning
-* Identify relevance
-* Build narratives
-* Map strengths to opportunities
+- Understand stories
+- Extract meaning
+- Identify relevance
+- Build narratives
+- Map strengths to opportunities
 
 **But at scale, privately, instantly, with unlimited patience.**
 
 This product unifies reflection, analysis, and communication — the hardest parts of job searching — into one coherent system.
-
