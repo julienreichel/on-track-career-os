@@ -1,44 +1,8 @@
-/* eslint-disable import/first */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { UserProfileRepository, type AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
+import type { UserProfileCreateInput, UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
 
-// NOTE: These tests are currently failing because UserProfileRepository uses Nuxt's auto-imported useNuxtApp()
-// which is difficult to mock properly in unit tests. The repository needs refactoring to accept
-// the Amplify client as a constructor parameter for better testability.
-//
-// For now, we have coverage at the Service and Composable layers, which mock the repository successfully.
-// TODO: Refactor UserProfileRepository to accept Amplify client via dependency injection
-
-// Create mocks in hoisted scope BEFORE imports
-const { mockModel, mockUseNuxtApp } = vi.hoisted(() => {
-  const mockModel = {
-    get: vi.fn(),
-    list: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  };
-
-  const mockUseNuxtApp = vi.fn(() => ({
-    $Amplify: {
-      GraphQL: {
-        client: {
-          models: {
-            UserProfile: mockModel,
-          },
-        },
-      },
-    },
-  }));
-
-  return { mockModel, mockUseNuxtApp };
-});
-
-// Mock #app BEFORE importing the repository
-vi.mock('#app', () => ({
-  useNuxtApp: mockUseNuxtApp,
-}));
-
-// Mock gqlOptions BEFORE importing the repository
+// Mock gqlOptions
 vi.mock('@/data/graphql/options', () => ({
   gqlOptions: (custom?: Record<string, unknown>) => ({
     authMode: 'userPool',
@@ -46,17 +10,22 @@ vi.mock('@/data/graphql/options', () => ({
   }),
 }));
 
-// NOW import the repository (after mocks are set up)
-import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
-import type { UserProfileCreateInput, UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
-
-describe.skip('UserProfileRepository', () => {
+describe('UserProfileRepository', () => {
   let repository: UserProfileRepository;
+  let mockModel: AmplifyUserProfileModel;
 
   beforeEach(() => {
-    vi.clearAllMocks();
-    // Create repository after mocks are cleared
-    repository = new UserProfileRepository();
+    // Create a fresh mock model for each test
+    mockModel = {
+      get: vi.fn(),
+      list: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    };
+
+    // Inject the mock model via constructor (dependency injection)
+    repository = new UserProfileRepository(mockModel);
   });
 
   describe('get', () => {

@@ -1,9 +1,37 @@
 import { gqlOptions } from '@/data/graphql/options';
-import type { UserProfileCreateInput, UserProfileUpdateInput } from './UserProfile';
+import type { UserProfileCreateInput, UserProfileUpdateInput, UserProfile } from './UserProfile';
+
+/**
+ * Type for the Amplify UserProfile model
+ * This allows us to inject a mock in tests while using the real model in production
+ */
+export type AmplifyUserProfileModel = {
+  get: (input: { id: string }, options?: Record<string, unknown>) => Promise<{ data: UserProfile | null }>;
+  list: (options?: Record<string, unknown>) => Promise<{ data: UserProfile[] }>;
+  create: (input: UserProfileCreateInput, options?: Record<string, unknown>) => Promise<{ data: UserProfile | null }>;
+  update: (input: UserProfileUpdateInput, options?: Record<string, unknown>) => Promise<{ data: UserProfile | null }>;
+  delete: (input: { id: string }, options?: Record<string, unknown>) => Promise<void>;
+};
 
 export class UserProfileRepository {
+  private readonly _model: AmplifyUserProfileModel;
+
+  /**
+   * Constructor with optional dependency injection for testing
+   * @param model - Optional Amplify model instance (for testing)
+   */
+  constructor(model?: AmplifyUserProfileModel) {
+    if (model) {
+      // Use injected model (for tests)
+      this._model = model;
+    } else {
+      // Use Nuxt's auto-imported useNuxtApp (for production)
+      this._model = useNuxtApp().$Amplify.GraphQL.client.models.UserProfile;
+    }
+  }
+
   private get model() {
-    return useNuxtApp().$Amplify.GraphQL.client.models.UserProfile;
+    return this._model;
   }
 
   async get(id: string) {
