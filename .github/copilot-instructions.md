@@ -76,9 +76,23 @@ npm run preview         # Preview production build
 ### Linting & Code Quality
 
 - ESLint strict mode + Prettier formatting
-- Cyclomatic complexity limits enforced
+- **Code Quality Enforced**:
+  - Max cyclomatic complexity: 16 (limit function complexity)
+  - Max nesting depth: 4 levels (prevent deeply nested code)
+  - Max lines per function: 100 (keep functions focused)
+  - Max function parameters: 4 (use objects for more params)
+  - No magic numbers (except 0, 1, -1)
 - TypeScript strict mode always on
+  - No `any` types allowed (`@typescript-eslint/no-explicit-any: error`)
+  - Use type imports (`import type { ... }`)
+  - No unused vars except those starting with `_`
+- Vue best practices enforced:
+  - Max 3 attributes per line (single-line), 1 per line (multi-line)
+  - Kebab-case component names in templates
+  - Default props required
+  - Prop types required
 - Run `npm run lint` before committing
+- **Test files have relaxed rules**: max 500 lines, complexity 30, allow `any` types
 - **Git Commits**: MUST follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
   - Format: `<type>(<scope>): <description>`
   - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`

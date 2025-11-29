@@ -65,11 +65,11 @@ This project follows [Nuxt testing best practices](https://nuxt.com/docs/getting
 # Run all tests
 npm test
 
-# Run unit tests (business logic, services, repositories)
+# Run unit tests (Node env - fast!)
 npm run test:unit
 
-# Run integration tests (components, pages, layouts)
-npm run test:integration
+# Run Nuxt tests (Nuxt runtime env - components, layouts)
+npm run test:nuxt
 
 # Watch mode for TDD
 npm run test:watch
@@ -82,8 +82,9 @@ npm run test:coverage
 ```
 
 **Test Structure:**
-- `test/unit/` - Pure business logic tests (domain, application, data layers)
-- `test/integration/` - Component and page tests requiring Nuxt context
+
+- `test/unit/` - Unit tests in Node environment (domain, application, data layers)
+- `test/nuxt/` - Tests requiring Nuxt runtime (components, layouts with i18n, routing, etc.)
 
 See [test/README.md](test/README.md) for detailed testing documentation.
 
@@ -107,6 +108,7 @@ npx vue-tsc --noEmit
 ```
 
 **Pre-commit checklist:**
+
 - ✅ All tests passing
 - ✅ 80%+ code coverage
 - ✅ No linting errors
@@ -138,17 +140,17 @@ on-track-career-os/
 
 ## 🛠️ Key Technologies
 
-| Category | Technology |
-|----------|-----------|
-| **Framework** | Nuxt 4.2.1 |
-| **Language** | TypeScript (strict mode) |
-| **UI** | Nuxt UI 4.2.1 + Tailwind CSS |
-| **Backend** | AWS Amplify Gen2 |
-| **Database** | DynamoDB (via Amplify Data) |
-| **Auth** | AWS Cognito |
-| **Testing** | Vitest 3.2.4 + @nuxt/test-utils |
-| **Linting** | ESLint + Prettier |
-| **i18n** | @nuxtjs/i18n 10.2.1 |
+| Category      | Technology                      |
+| ------------- | ------------------------------- |
+| **Framework** | Nuxt 4.2.1                      |
+| **Language**  | TypeScript (strict mode)        |
+| **UI**        | Nuxt UI 4.2.1 + Tailwind CSS    |
+| **Backend**   | AWS Amplify Gen2                |
+| **Database**  | DynamoDB (via Amplify Data)     |
+| **Auth**      | AWS Cognito                     |
+| **Testing**   | Vitest 3.2.4 + @nuxt/test-utils |
+| **Linting**   | ESLint + Prettier               |
+| **i18n**      | @nuxtjs/i18n 10.2.1             |
 
 ## 📚 Documentation
 
@@ -201,7 +203,9 @@ npm run preview
 
 ## 📄 License
 
-This project is private and proprietary.
+MIT License - see [license.txt](license.txt) for details.
+
+Copyright (c) 2024 Julien Reichel
 
 ## 👤 Author
 
