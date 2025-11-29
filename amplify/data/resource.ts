@@ -1,5 +1,17 @@
-import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
+import { type ClientSchema, a, defineData, defineFunction } from '@aws-amplify/backend';
 import { postConfirmation } from '../auth/post-confirmation/resource';
+
+// Bedrock model ID (Claude 3.5 Sonnet)
+export const MODEL_ID = 'anthropic.claude-3-5-sonnet-20241022-v2:0';
+
+// Define AI operation Lambda functions
+export const parseCvTextFunction = defineFunction({
+  entry: './ai-operations/parseCvText.ts',
+  environment: {
+    MODEL_ID,
+  },
+  timeoutSeconds: 60,
+});
 
 export const schema = a
   .schema({
@@ -291,6 +303,17 @@ export const schema = a
         job: a.belongsTo('JobDescription', 'jobId'),
       })
       .authorization((allow) => [allow.owner()]),
+
+    // =====================================================
+    // AI OPERATIONS (Custom Queries)
+    // =====================================================
+
+    parseCvText: a
+      .query()
+      .arguments({ cv_text: a.string().required() })
+      .returns(a.string())
+      .authorization((allow) => [allow.authenticated()])
+      .handler(a.handler.function(parseCvTextFunction)),
   })
   .authorization((allow) => [allow.resource(postConfirmation)]);
 
