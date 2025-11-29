@@ -67,7 +67,9 @@ interface InputSchema {
  * Build user prompt from experience text blocks
  */
 function buildUserPrompt(blocks: string[]): string {
-  const blocksText = blocks.map((block, index) => `[Experience ${index + 1}]\n${block}`).join('\n\n');
+  const blocksText = blocks
+    .map((block, index) => `[Experience ${index + 1}]\n${block}`)
+    .join('\n\n');
 
   return `Convert the following CV experience sections into experience blocks:
 
@@ -108,7 +110,9 @@ function validateOutput(output: unknown): OutputSchema {
         expObj.end_date === null || typeof expObj.end_date === 'string' ? expObj.end_date : null;
 
       // Array fields with fallbacks
-      const responsibilities = Array.isArray(expObj.responsibilities) ? expObj.responsibilities : [];
+      const responsibilities = Array.isArray(expObj.responsibilities)
+        ? expObj.responsibilities
+        : [];
       const tasks = Array.isArray(expObj.tasks) ? expObj.tasks : [];
 
       return {
@@ -116,7 +120,9 @@ function validateOutput(output: unknown): OutputSchema {
         company,
         start_date,
         end_date,
-        responsibilities: responsibilities.filter((r: unknown) => typeof r === 'string') as string[],
+        responsibilities: responsibilities.filter(
+          (r: unknown) => typeof r === 'string'
+        ) as string[],
         tasks: tasks.filter((t: unknown) => typeof t === 'string') as string[],
       };
     }
@@ -166,11 +172,7 @@ export const handler = async (event: { arguments: InputSchema }): Promise<Output
         input: { experience_text_blocks: truncatedInput },
       });
 
-      parsedOutput = await retryWithSchema<OutputSchema>(
-        SYSTEM_PROMPT,
-        userPrompt,
-        OUTPUT_SCHEMA
-      );
+      parsedOutput = await retryWithSchema<OutputSchema>(SYSTEM_PROMPT, userPrompt, OUTPUT_SCHEMA);
 
       console.log('AI Operation: extractExperienceBlocks (retry successful)', {
         timestamp: new Date().toISOString(),

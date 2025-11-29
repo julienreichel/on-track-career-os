@@ -94,8 +94,6 @@ No explanations. No markdown. Just pure JSON.`;
   try {
     return JSON.parse(responseText);
   } catch (error) {
-    throw new Error(
-      `AI cannot produce a stable answer. Last error: ${(error as Error).message}`
-    );
+    throw new Error(`AI cannot produce a stable answer. Last error: ${(error as Error).message}`);
   }
 }

@@ -39,20 +39,14 @@ describe('ai.extractExperienceBlocks', () => {
                       company: 'TechCorp Inc.',
                       start_date: '2020-03',
                       end_date: '2023-12',
-                      responsibilities: [
-                        'Lead development team',
-                        'Architecture decisions',
-                      ],
-                      tasks: [
-                        'Implemented microservices',
-                        'Mentored junior developers',
-                      ],
+                      responsibilities: ['Lead development team', 'Architecture decisions'],
+                      tasks: ['Implemented microservices', 'Mentored junior developers'],
                     },
                   ],
                 }),
               },
             ],
-          }),
+          })
         ),
       });
 
@@ -70,14 +64,8 @@ describe('ai.extractExperienceBlocks', () => {
         company: 'TechCorp Inc.',
         start_date: '2020-03',
         end_date: '2023-12',
-        responsibilities: [
-          'Lead development team',
-          'Architecture decisions',
-        ],
-        tasks: [
-          'Implemented microservices',
-          'Mentored junior developers',
-        ],
+        responsibilities: ['Lead development team', 'Architecture decisions'],
+        tasks: ['Implemented microservices', 'Mentored junior developers'],
       });
     });
 
@@ -109,7 +97,7 @@ describe('ai.extractExperienceBlocks', () => {
                 }),
               },
             ],
-          }),
+          })
         ),
       });
 
@@ -134,7 +122,8 @@ describe('ai.extractExperienceBlocks', () => {
           JSON.stringify({
             content: [
               {
-                text: '```json\n' +
+                text:
+                  '```json\n' +
                   JSON.stringify({
                     experiences: [
                       {
@@ -150,7 +139,7 @@ describe('ai.extractExperienceBlocks', () => {
                   '\n```',
               },
             ],
-          }),
+          })
         ),
       });
 
@@ -183,7 +172,7 @@ describe('ai.extractExperienceBlocks', () => {
                 }),
               },
             ],
-          }),
+          })
         ),
       });
 
@@ -217,7 +206,7 @@ describe('ai.extractExperienceBlocks', () => {
                 }),
               },
             ],
-          }),
+          })
         ),
       });
 
@@ -248,7 +237,7 @@ describe('ai.extractExperienceBlocks', () => {
                 }),
               },
             ],
-          }),
+          })
         ),
       });
 
@@ -282,7 +271,7 @@ describe('ai.extractExperienceBlocks', () => {
                 }),
               },
             ],
-          }),
+          })
         ),
       });
 
@@ -302,7 +291,7 @@ describe('ai.extractExperienceBlocks', () => {
           body: Buffer.from(
             JSON.stringify({
               content: [{ text: 'Invalid JSON here' }],
-            }),
+            })
           ),
         })
         .mockResolvedValueOnce({
@@ -324,7 +313,7 @@ describe('ai.extractExperienceBlocks', () => {
                   }),
                 },
               ],
-            }),
+            })
           ),
         });
 
@@ -344,14 +333,14 @@ describe('ai.extractExperienceBlocks', () => {
           body: Buffer.from(
             JSON.stringify({
               content: [{ text: 'Invalid JSON' }],
-            }),
+            })
           ),
         })
         .mockResolvedValueOnce({
           body: Buffer.from(
             JSON.stringify({
               content: [{ text: 'Still invalid' }],
-            }),
+            })
           ),
         });
 
@@ -377,7 +366,7 @@ describe('ai.extractExperienceBlocks', () => {
                 }),
               },
             ],
-          }),
+          })
         ),
       });
 
@@ -412,7 +401,7 @@ describe('ai.extractExperienceBlocks', () => {
                 }),
               },
             ],
-          }),
+          })
         ),
       });
 
@@ -431,7 +420,7 @@ describe('ai.extractExperienceBlocks', () => {
           body: Buffer.from(
             JSON.stringify({
               content: [{ text: 'invalid' }],
-            }),
+            })
           ),
         })
         .mockResolvedValueOnce({
@@ -453,7 +442,7 @@ describe('ai.extractExperienceBlocks', () => {
                   }),
                 },
               ],
-            }),
+            })
           ),
         });
 
