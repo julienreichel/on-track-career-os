@@ -294,7 +294,6 @@ export const schema = a
         transcript: a.string(),
         scores: a.json(),
         feedback: a.string(),
-        createdAt: a.date(),
 
         userId: a.id().required(),
         user: a.belongsTo('UserProfile', 'userId'),

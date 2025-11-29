@@ -14,6 +14,7 @@
     "lint:fix": "eslint -c ./eslint.config.mjs \"./{src,test,amplify}*/**/*.{ts,js,cjs,mjs,vue}\" --fix",
     "test": "vitest run",
     "test:unit": "vitest run --project unit",
+    "test:amplify": "vitest run --project amplify",
     "test:nuxt": "vitest run --project nuxt",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",

@@ -36,6 +36,25 @@ export default defineConfig({
           },
         },
       },
+      // Amplify tests - Lambda functions and backend logic
+      {
+        test: {
+          name: 'amplify',
+          include: ['test/amplify/**/*.spec.ts'],
+          environment: 'node',
+          coverage: {
+            provider: 'v8',
+            include: ['amplify/**/*.ts'],
+            exclude: [
+              'amplify/**/*.spec.ts',
+              'amplify/**/*.test.ts',
+              'amplify/backend.ts',
+              'amplify/data/resource.ts',
+              'amplify/auth/resource.ts',
+            ],
+          },
+        },
+      },
       // Nuxt tests - run in Nuxt runtime environment
       await defineVitestProject({
         test: {
@@ -58,18 +77,20 @@ export default defineConfig({
       provider: 'v8',
       reportsDirectory: './coverage',
       all: true,
-      include: ['src/**/*.{ts,vue}'],
+      include: ['src/**/*.{ts,vue}', 'amplify/**/*.ts'],
       exclude: [
         '**/*.spec.ts',
         '**/*.test.ts',
         '**/tests/**',
         'test/**',
-        'amplify/**',
         'node_modules/**',
         '**/*.d.ts',
         'src/data/amplify/**',
         '**/plugins/*.ts',
         '**/app.vue',
+        'amplify/backend.ts',
+        'amplify/data/resource.ts',
+        'amplify/auth/resource.ts',
       ],
     },
   },
