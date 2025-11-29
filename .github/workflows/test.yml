@@ -40,6 +40,9 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit
 
+      - name: Run Amplify tests
+        run: npm run test:amplify
+
       - name: Run Nuxt tests
         run: npm run test:nuxt
 
