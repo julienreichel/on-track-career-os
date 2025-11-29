@@ -66,16 +66,16 @@ function validateOutput(output: Partial<Output>): Output { ... }
 // 4. Main handler
 export const handler = async (event: Event): Promise<string> => {
   const { input } = event.arguments;
-  
+
   try {
     // Invoke Bedrock
     const aiResponse = await invokeBedrock(...);
     const parsed = JSON.parse(extractJson(aiResponse));
     const validated = validateOutput(parsed);
-    
+
     // Log for traceability (AIC section 7)
     console.log('AI Operation: operationName', { timestamp, input, output });
-    
+
     return JSON.stringify(validated);
   } catch (error) {
     // Fallback strategy (AIC section 6)
@@ -149,7 +149,7 @@ npm run test:unit -- ai-operations
 
 ## Model Configuration
 
-- **Model**: Anthropic Claude 3.5 Sonnet (`anthropic.claude-3-5-sonnet-20241022-v2:0`)
+- **Model**: Amazon Nova Lite (`amazon.nova-lite-v1:0`)
 - **Region**: Defaults to deployment region (must support Bedrock)
 - **Timeout**: 60 seconds per Lambda invocation
 - **Temperature**: 0.1-0.3 (deterministic parsing) to 0.5-0.7 (creative generation)

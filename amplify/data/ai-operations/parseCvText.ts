@@ -60,7 +60,8 @@ const OUTPUT_SCHEMA = {
  * Extract JSON from AI response (handles markdown code blocks)
  */
 function extractJson(aiResponse: string): string {
-  const jsonMatch = aiResponse.match(/```json\n?([\s\S]*?)\n?```/) || aiResponse.match(/({[\s\S]*})/);
+  const jsonMatch =
+    aiResponse.match(/```json\n?([\s\S]*?)\n?```/) || aiResponse.match(/({[\s\S]*})/);
   return jsonMatch ? jsonMatch[1] : aiResponse;
 }
 
@@ -99,7 +100,7 @@ function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOu
 async function invokeBedrock(
   userPrompt: string,
   maxTokens: number,
-  temperature: number,
+  temperature: number
 ): Promise<string> {
   const input: InvokeModelCommandInput = {
     modelId: process.env.MODEL_ID,

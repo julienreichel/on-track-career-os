@@ -18,5 +18,5 @@ backend.parseCvTextFunction.resources.lambda.addToRolePolicy(
     effect: Effect.ALLOW,
     actions: ['bedrock:InvokeModel'],
     resources: [`arn:aws:bedrock:*::foundation-model/${MODEL_ID}`],
-  }),
+  })
 );

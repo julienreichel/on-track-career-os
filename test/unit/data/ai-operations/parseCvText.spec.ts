@@ -250,7 +250,8 @@ Google Cloud Professional Developer
 
   describe('Error Messages', () => {
     it('should provide user-friendly error after all retries fail', () => {
-      const finalErrorMessage = 'AI cannot produce a stable answer. Please refine your input or try again.';
+      const finalErrorMessage =
+        'AI cannot produce a stable answer. Please refine your input or try again.';
 
       expect(finalErrorMessage).toContain('AI cannot produce');
       expect(finalErrorMessage).toContain('refine your input');

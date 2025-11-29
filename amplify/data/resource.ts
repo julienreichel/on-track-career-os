@@ -1,8 +1,8 @@
 import { type ClientSchema, a, defineData, defineFunction } from '@aws-amplify/backend';
 import { postConfirmation } from '../auth/post-confirmation/resource';
 
-// Bedrock model ID (Claude 3.5 Sonnet)
-export const MODEL_ID = 'anthropic.claude-3-5-sonnet-20241022-v2:0';
+// Bedrock model ID (Amazon Nova Lite)
+export const MODEL_ID = 'amazon.nova-lite-v1:0';
 
 // Define AI operation Lambda functions
 export const parseCvTextFunction = defineFunction({
