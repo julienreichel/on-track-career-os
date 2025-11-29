@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createI18n } from 'vue-i18n';
-import DefaultLayout from '~/layouts/default.vue';
+import DefaultLayout from '@/layouts/default.vue';
 
 // Create i18n instance for tests
 const i18n = createI18n({
@@ -37,7 +37,8 @@ const stubs = {
     template: '<div class="u-container" data-testid="container"><slot /></div>',
   },
   UHeader: {
-    template: '<div class="u-header" data-testid="header"><div class="left"><slot name="left" /></div><div class="right"><slot name="right" /></div></div>',
+    template:
+      '<div class="u-header" data-testid="header"><div class="left"><slot name="left" /></div><div class="right"><slot name="right" /></div></div>',
   },
   UMain: {
     template: '<div class="u-main" data-testid="main"><slot /></div>',
@@ -132,10 +133,9 @@ describe('default.vue layout', () => {
 
     const button = wrapper.find('[data-testid="button"]');
     expect(button.exists()).toBe(true);
-    
+
     // Button should be clickable
     await button.trigger('click');
     // Note: Full sign out flow requires e2e testing with Amplify Auth
   });
 });
-

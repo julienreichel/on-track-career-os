@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["src/*"],
+      "~/*": ["src/*"],
+      "#app": ["node_modules/nuxt/dist/app"],
+      "#app/*": ["node_modules/nuxt/dist/app/*"]
+    },
+    "types": ["vitest/globals", "@nuxt/test-utils", "node"]
+  },
+  "include": ["**/*.ts", "**/*.vue", "../src/**/*.ts", "../src/**/*.vue"],
+  "exclude": ["node_modules"]
+}

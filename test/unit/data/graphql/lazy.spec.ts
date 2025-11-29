@@ -121,9 +121,7 @@ describe('loadLazy', () => {
   it('should handle multiple sequential calls independently', async () => {
     const mockData1 = { id: '1' };
     const mockData2 = { id: '2' };
-    mockRelationFn
-      .mockResolvedValueOnce(mockData1)
-      .mockResolvedValueOnce(mockData2);
+    mockRelationFn.mockResolvedValueOnce(mockData1).mockResolvedValueOnce(mockData2);
 
     const result1 = await loadLazy(mockRelationFn, { id: '1' });
     const result2 = await loadLazy(mockRelationFn, { id: '2' });

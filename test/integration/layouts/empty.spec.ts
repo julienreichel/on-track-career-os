@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import EmptyLayout from '~/layouts/empty.vue';
+import EmptyLayout from '@/layouts/empty.vue';
 
 // Stub Nuxt UI components
 const stubs = {
@@ -60,7 +60,7 @@ describe('empty.vue layout', () => {
     // Should only have main and container
     expect(wrapper.find('[data-testid="main"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="container"]').exists()).toBe(true);
-    
+
     // Should not have any text content
     expect(wrapper.text().trim()).toBe('');
   });
