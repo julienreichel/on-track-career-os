@@ -1,10 +1,46 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
+import { resolve } from 'node:path';
+
+// Mock the AWS SDK
+vi.mock('@aws-sdk/client-bedrock-runtime', () => {
+  const mockSend = vi.fn();
+  return {
+    BedrockRuntimeClient: vi.fn(() => ({
+      send: mockSend,
+    })),
+    InvokeModelCommand: vi.fn(),
+  };
+});
 
 /**
  * Unit tests for ai.parseCvText Lambda function
- * Tests the AI operation contract compliance and error handling
+ * Tests the actual implementation with mocked Bedrock responses
  */
 describe('ai.parseCvText', () => {
+  let handler: (event: { arguments: { cv_text: string } }) => Promise<string>;
+  let mockSend: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    // Set environment variable for MODEL_ID
+    process.env.MODEL_ID = 'amazon.nova-lite-v1:0';
+
+    // Get the mock send function
+    const clientInstance = new BedrockRuntimeClient();
+    mockSend = clientInstance.send as ReturnType<typeof vi.fn>;
+
+    // Import handler after mocks are set up
+    const modulePath = resolve(__dirname, '../../../../amplify/data/ai-operations/parseCvText.ts');
+    const module = await import(modulePath);
+    handler = module.handler;
+  });
+
+  afterEach(() => {
+    vi.resetModules();
+  });
+
   const mockCvText = `
 John Doe
 Senior Software Engineer
@@ -31,81 +67,82 @@ AWS Certified Solutions Architect
 Google Cloud Professional Developer
   `.trim();
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  describe('Input Schema Validation', () => {
-    it('should require cv_text argument', async () => {
-      // This test verifies the GraphQL schema validation
-      // In practice, Amplify will enforce this at the API Gateway level
-      expect(mockCvText).toBeDefined();
-      expect(typeof mockCvText).toBe('string');
-    });
-
-    it('should accept long CV texts', () => {
-      const longCvText = 'Experience: ' + 'Lorem ipsum '.repeat(1000);
-      expect(longCvText.length).toBeGreaterThan(1000);
-      expect(typeof longCvText).toBe('string');
-    });
-  });
-
-  describe('Output Schema Validation', () => {
-    it('should match AI Interaction Contract output schema', () => {
-      // Expected output structure per AIC
-      const expectedOutput = {
-        sections: {
-          experiences: expect.any(Array),
-          education: expect.any(Array),
-          skills: expect.any(Array),
-          certifications: expect.any(Array),
-          raw_blocks: expect.any(Array),
-        },
-        confidence: expect.any(Number),
-      };
-
-      // Verify structure
-      expect(expectedOutput.sections).toHaveProperty('experiences');
-      expect(expectedOutput.sections).toHaveProperty('education');
-      expect(expectedOutput.sections).toHaveProperty('skills');
-      expect(expectedOutput.sections).toHaveProperty('certifications');
-      expect(expectedOutput.sections).toHaveProperty('raw_blocks');
-      expect(expectedOutput).toHaveProperty('confidence');
-    });
-
-    it('should validate experiences array contains strings', () => {
-      const mockOutput = {
+  describe('Handler Integration Tests', () => {
+    it('should successfully parse CV text with valid Bedrock response', async () => {
+      const mockBedrockResponse = {
         sections: {
           experiences: [
-            'Senior Software Engineer at TechCorp (2020-2023)',
-            'Software Engineer at StartupXYZ (2018-2020)',
+            'Senior Software Engineer at TechCorp (2020-2023)\n- Led development of cloud-native applications\n- Managed team of 5 developers\n- Implemented CI/CD pipelines',
+            'Software Engineer at StartupXYZ (2018-2020)\n- Built scalable microservices architecture\n- Developed RESTful APIs using Node.js',
           ],
-          education: ['Bachelor of Science in Computer Science'],
-          skills: ['JavaScript', 'TypeScript', 'React'],
-          certifications: ['AWS Certified Solutions Architect'],
+          education: [
+            'Bachelor of Science in Computer Science\nUniversity of Technology (2014-2018)',
+          ],
+          skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'AWS', 'Docker', 'Kubernetes'],
+          certifications: [
+            'AWS Certified Solutions Architect',
+            'Google Cloud Professional Developer',
+          ],
           raw_blocks: [],
         },
         confidence: 0.95,
       };
 
-      expect(Array.isArray(mockOutput.sections.experiences)).toBe(true);
-      mockOutput.sections.experiences.forEach((exp) => {
-        expect(typeof exp).toBe('string');
+      mockSend.mockResolvedValueOnce({
+        body: Buffer.from(
+          JSON.stringify({
+            content: [{ text: JSON.stringify(mockBedrockResponse) }],
+          }),
+        ),
       });
+
+      const result = await handler({
+        arguments: { cv_text: mockCvText },
+      });
+
+      const parsed = JSON.parse(result);
+      expect(parsed.sections.experiences).toHaveLength(2);
+      expect(parsed.sections.education).toHaveLength(1);
+      expect(parsed.sections.skills).toHaveLength(7);
+      expect(parsed.sections.certifications).toHaveLength(2);
+      expect(parsed.confidence).toBe(0.95);
     });
 
-    it('should validate confidence is between 0 and 1', () => {
-      const validConfidences = [0, 0.5, 0.95, 1];
-      validConfidences.forEach((conf) => {
-        expect(conf).toBeGreaterThanOrEqual(0);
-        expect(conf).toBeLessThanOrEqual(1);
-      });
-    });
-  });
+    it('should handle markdown-wrapped JSON from Bedrock', async () => {
+      const mockBedrockResponse = {
+        sections: {
+          experiences: ['Some experience'],
+          education: ['Some education'],
+          skills: ['JavaScript'],
+          certifications: [],
+          raw_blocks: [],
+        },
+        confidence: 0.8,
+      };
 
-  describe('Fallback Strategy (AIC Section 6)', () => {
-    it('should use default confidence when not provided', () => {
-      const outputWithoutConfidence = {
+      mockSend.mockResolvedValueOnce({
+        body: Buffer.from(
+          JSON.stringify({
+            content: [
+              {
+                text: '```json\n' + JSON.stringify(mockBedrockResponse) + '\n```',
+              },
+            ],
+          }),
+        ),
+      });
+
+      const result = await handler({
+        arguments: { cv_text: mockCvText },
+      });
+
+      const parsed = JSON.parse(result);
+      expect(parsed.sections.experiences).toEqual(['Some experience']);
+      expect(parsed.confidence).toBe(0.8);
+    });
+
+    it('should apply fallback for missing confidence', async () => {
+      const mockBedrockResponse = {
         sections: {
           experiences: [],
           education: [],
@@ -113,205 +150,207 @@ Google Cloud Professional Developer
           certifications: [],
           raw_blocks: [],
         },
+        // No confidence field
       };
 
-      const defaultConfidence = 0.5;
-      const validated = {
-        ...outputWithoutConfidence,
-        confidence: defaultConfidence,
-      };
+      mockSend.mockResolvedValueOnce({
+        body: Buffer.from(
+          JSON.stringify({
+            content: [{ text: JSON.stringify(mockBedrockResponse) }],
+          }),
+        ),
+      });
 
-      expect(validated.confidence).toBe(defaultConfidence);
+      const result = await handler({
+        arguments: { cv_text: mockCvText },
+      });
+
+      const parsed = JSON.parse(result);
+      expect(parsed.confidence).toBe(0.5); // DEFAULT_CONFIDENCE
     });
 
-    it('should convert missing arrays to empty arrays', () => {
-      const partialOutput = {
+    it('should apply fallback for missing array fields', async () => {
+      const mockBedrockResponse = {
         sections: {
           experiences: ['Some experience'],
           // Missing: education, skills, certifications, raw_blocks
         },
       };
 
-      const validated = {
-        sections: {
-          experiences: partialOutput.sections.experiences,
-          education: [],
-          skills: [],
-          certifications: [],
-          raw_blocks: [],
-        },
-        confidence: 0.5,
-      };
-
-      expect(Array.isArray(validated.sections.education)).toBe(true);
-      expect(validated.sections.education).toHaveLength(0);
-    });
-
-    it('should extract JSON from markdown code blocks', () => {
-      const markdownWrappedJson = '```json\n{"key": "value"}\n```';
-      const match = markdownWrappedJson.match(/```json\n?([\s\S]*?)\n?```/);
-      const extracted = match ? match[1] : markdownWrappedJson;
-      const parsed = JSON.parse(extracted);
-
-      expect(parsed).toEqual({ key: 'value' });
-    });
-
-    it('should handle JSON without markdown wrapping', () => {
-      const plainJson = '{"key": "value"}';
-      const match = plainJson.match(/```json\n?([\s\S]*?)\n?```/) || plainJson.match(/({[\s\S]*})/);
-      const extracted = match ? match[1] : plainJson;
-      const parsed = JSON.parse(extracted);
-
-      expect(parsed).toEqual({ key: 'value' });
-    });
-  });
-
-  describe('AI Interaction Contract Compliance', () => {
-    it('should follow AIC naming convention (snake_case for JSON)', () => {
-      const outputKeys = ['experiences', 'education', 'skills', 'certifications', 'raw_blocks'];
-      outputKeys.forEach((key) => {
-        // Check snake_case pattern
-        expect(key).toMatch(/^[a-z_]+$/);
+      mockSend.mockResolvedValueOnce({
+        body: Buffer.from(
+          JSON.stringify({
+            content: [{ text: JSON.stringify(mockBedrockResponse) }],
+          }),
+        ),
       });
-    });
 
-    it('should never return free-form text (structured JSON only)', () => {
-      const invalidOutputs = ['Just some text', 'Error: something went wrong', ''];
-
-      invalidOutputs.forEach((text) => {
-        expect(() => JSON.parse(text)).toThrow();
+      const result = await handler({
+        arguments: { cv_text: mockCvText },
       });
+
+      const parsed = JSON.parse(result);
+      expect(parsed.sections.education).toEqual([]);
+      expect(parsed.sections.skills).toEqual([]);
+      expect(parsed.sections.certifications).toEqual([]);
+      expect(parsed.sections.raw_blocks).toEqual([]);
     });
 
-    it('should use arrays for content blocks (no raw paragraphs)', () => {
-      const validOutput = {
-        sections: {
-          experiences: ['item1', 'item2'],
-          education: ['item1'],
-          skills: [],
-          certifications: [],
-          raw_blocks: [],
-        },
-        confidence: 0.8,
-      };
+    it('should retry with schema on JSON parse error', async () => {
+      // First call returns invalid JSON
+      mockSend
+        .mockResolvedValueOnce({
+          body: Buffer.from(
+            JSON.stringify({
+              content: [{ text: 'Invalid JSON response' }],
+            }),
+          ),
+        })
+        // Second call (retry) returns valid JSON
+        .mockResolvedValueOnce({
+          body: Buffer.from(
+            JSON.stringify({
+              content: [
+                {
+                  text: JSON.stringify({
+                    sections: {
+                      experiences: [],
+                      education: [],
+                      skills: [],
+                      certifications: [],
+                      raw_blocks: [],
+                    },
+                    confidence: 0.6,
+                  }),
+                },
+              ],
+            }),
+          ),
+        });
 
-      Object.values(validOutput.sections).forEach((section) => {
-        expect(Array.isArray(section)).toBe(true);
+      const result = await handler({
+        arguments: { cv_text: mockCvText },
       });
-    });
-  });
 
-  describe('Logging & Traceability (AIC Section 7)', () => {
-    it('should log with required fields', () => {
-      const logEntry = {
-        timestamp: new Date().toISOString(),
-        input: { cv_text: 'truncated...' },
-        output: {
-          sections: {
-            experiences: [],
-            education: [],
-            skills: [],
-            certifications: [],
-            raw_blocks: [],
-          },
-          confidence: 0.5,
-        },
-        fallbacksUsed: [],
-      };
-
-      expect(logEntry).toHaveProperty('timestamp');
-      expect(logEntry).toHaveProperty('input');
-      expect(logEntry).toHaveProperty('output');
-      expect(logEntry).toHaveProperty('fallbacksUsed');
+      const parsed = JSON.parse(result);
+      expect(parsed.confidence).toBe(0.6);
+      expect(mockSend).toHaveBeenCalledTimes(2);
     });
 
-    it('should truncate long inputs in logs', () => {
-      const longInput = 'x'.repeat(10000);
-      const maxLogLength = 100;
-      const truncated = longInput.substring(0, maxLogLength) + '...';
+    it('should throw error after retry fails', async () => {
+      // Both calls return invalid JSON
+      mockSend
+        .mockResolvedValueOnce({
+          body: Buffer.from(
+            JSON.stringify({
+              content: [{ text: 'Invalid JSON' }],
+            }),
+          ),
+        })
+        .mockResolvedValueOnce({
+          body: Buffer.from(
+            JSON.stringify({
+              content: [{ text: 'Still invalid' }],
+            }),
+          ),
+        });
 
-      expect(truncated.length).toBeLessThan(longInput.length);
-      expect(truncated.endsWith('...')).toBe(true);
+      await expect(
+        handler({
+          arguments: { cv_text: mockCvText },
+        }),
+      ).rejects.toThrow('AI cannot produce a stable answer');
     });
 
-    it('should track fallback strategies used', () => {
-      const scenarios = [
-        { fallbacks: [], expected: 0 },
-        { fallbacks: ['default_confidence'], expected: 1 },
-        { fallbacks: ['retry_with_schema'], expected: 1 },
-        { fallbacks: ['default_confidence', 'retry_with_schema'], expected: 2 },
-      ];
-
-      scenarios.forEach((scenario) => {
-        expect(scenario.fallbacks).toHaveLength(scenario.expected);
+    it('should throw error for missing sections field', async () => {
+      mockSend.mockResolvedValueOnce({
+        body: Buffer.from(
+          JSON.stringify({
+            content: [
+              {
+                text: JSON.stringify({
+                  // Missing sections field
+                  confidence: 0.5,
+                }),
+              },
+            ],
+          }),
+        ),
       });
+
+      await expect(
+        handler({
+          arguments: { cv_text: mockCvText },
+        }),
+      ).rejects.toThrow('Missing required field: sections');
     });
   });
 
-  describe('Error Messages', () => {
-    it('should provide user-friendly error after all retries fail', () => {
-      const finalErrorMessage =
-        'AI cannot produce a stable answer. Please refine your input or try again.';
+  describe('Bedrock API Call Verification', () => {
+    it('should call BedrockRuntimeClient.send once for successful parse', async () => {
+      mockSend.mockResolvedValueOnce({
+        body: Buffer.from(
+          JSON.stringify({
+            content: [
+              {
+                text: JSON.stringify({
+                  sections: {
+                    experiences: [],
+                    education: [],
+                    skills: [],
+                    certifications: [],
+                    raw_blocks: [],
+                  },
+                  confidence: 0.5,
+                }),
+              },
+            ],
+          }),
+        ),
+      });
 
-      expect(finalErrorMessage).toContain('AI cannot produce');
-      expect(finalErrorMessage).toContain('refine your input');
+      await handler({
+        arguments: { cv_text: 'test' },
+      });
+
+      expect(mockSend).toHaveBeenCalledTimes(1);
     });
 
-    it('should include error details in logs', () => {
-      const errorLog = {
-        timestamp: new Date().toISOString(),
-        error: 'SyntaxError: Unexpected token',
-        input: { cv_text: 'truncated...' },
-      };
+    it('should call BedrockRuntimeClient.send twice when retry is triggered', async () => {
+      mockSend
+        .mockResolvedValueOnce({
+          body: Buffer.from(
+            JSON.stringify({
+              content: [{ text: 'invalid' }],
+            }),
+          ),
+        })
+        .mockResolvedValueOnce({
+          body: Buffer.from(
+            JSON.stringify({
+              content: [
+                {
+                  text: JSON.stringify({
+                    sections: {
+                      experiences: [],
+                      education: [],
+                      skills: [],
+                      certifications: [],
+                      raw_blocks: [],
+                    },
+                    confidence: 0.5,
+                  }),
+                },
+              ],
+            }),
+          ),
+        });
 
-      expect(errorLog).toHaveProperty('error');
-      expect(errorLog.error).toContain('Error');
-    });
-  });
+      await handler({
+        arguments: { cv_text: 'test' },
+      });
 
-  describe('System Prompt Verification', () => {
-    it('should use constant system prompt per AIC', () => {
-      const systemPrompt = `You are a CV text parser.
-You MUST return structured JSON only.
-Extract distinct sections and normalize them.
-Never invent information.`;
-
-      expect(systemPrompt).toContain('CV text parser');
-      expect(systemPrompt).toContain('structured JSON only');
-      expect(systemPrompt).toContain('Never invent information');
-    });
-
-    it('should inject user data into user prompt', () => {
-      const userPrompt = `Extract structured sections from this CV text:
-${mockCvText}`;
-
-      expect(userPrompt).toContain('Extract structured sections');
-      expect(userPrompt).toContain(mockCvText);
-    });
-  });
-
-  describe('Model Configuration', () => {
-    it('should use appropriate temperature for parsing (0.1-0.3)', () => {
-      const initialTemperature = 0.3;
-      const retryTemperature = 0.1;
-
-      expect(initialTemperature).toBeGreaterThanOrEqual(0.1);
-      expect(initialTemperature).toBeLessThanOrEqual(0.3);
-      expect(retryTemperature).toBe(0.1);
-    });
-
-    it('should use sufficient max tokens for CV parsing', () => {
-      const maxTokens = 4000;
-      const minRequired = 1000;
-
-      expect(maxTokens).toBeGreaterThanOrEqual(minRequired);
-    });
-
-    it('should set appropriate timeout (60s)', () => {
-      const timeoutSeconds = 60;
-      const minTimeout = 30;
-
-      expect(timeoutSeconds).toBeGreaterThanOrEqual(minTimeout);
+      expect(mockSend).toHaveBeenCalledTimes(2);
     });
   });
 });
