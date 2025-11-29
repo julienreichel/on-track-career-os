@@ -6,8 +6,8 @@ import {
   getCurrentUser,
 } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/data';
-import outputs from '../amplify_outputs.json';
-import type { Schema } from '../amplify/data/resource';
+import outputs from '../../amplify_outputs.json';
+import type { Schema } from '../../amplify/data/resource';
 import { Amplify } from 'aws-amplify';
 import { defineNuxtPlugin } from 'nuxt/app';
 

@@ -9,7 +9,7 @@ export const auth = defineAuth({
   loginWith: {
     email: {
       verificationEmailStyle: 'CODE',
-      verificationEmailSubject: 'Welcome to Competency Hub!',
+      verificationEmailSubject: 'Welcome to On Track!',
       verificationEmailBody: (createCode) => `Your verification code is ${createCode()}`,
     },
   },

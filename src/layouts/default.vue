@@ -22,10 +22,14 @@
 // Default layout with header and sign out
 
 const { t } = useI18n();
-const { $Amplify } = useNuxtApp();
 
 const handleSignOut = async () => {
   try {
+    const { $Amplify } = useNuxtApp();
+    if (!$Amplify?.Auth?.signOut) {
+      console.error('Amplify Auth is not initialized');
+      return;
+    }
     await $Amplify.Auth.signOut();
     await navigateTo('/login');
   } catch (error) {
