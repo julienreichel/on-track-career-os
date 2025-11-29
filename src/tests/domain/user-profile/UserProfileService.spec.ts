@@ -97,7 +97,7 @@ describe('UserProfileService', () => {
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-01T00:00:00Z',
         owner: 'user-123::user-123',
-      } as UserProfile;
+      } as unknown as UserProfile;
 
       mockRepository.get.mockResolvedValue(profileWithEmptyArrays);
 

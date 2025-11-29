@@ -9,7 +9,7 @@
  *   src/application/<model>/use<Model>.ts
  *
  * Usage:
- *   npx gen-model UserProfile
+ *   npx gen-model ${modelName}
  */
 
 import fs from 'fs';
@@ -56,12 +56,48 @@ export type ${modelName}UpdateInput = Schema['${modelName}']['updateType'];
 // TEMPLATE: Repository (Nuxt + Amplify + gqlOptions)
 // ----------------------------------------------------------
 function templateRepository(modelName) {
-  return `import { gqlOptions } from '@/data/graphql/options'
-import type { ${modelName}CreateInput, ${modelName}UpdateInput } from './${modelName}';
+  return `import { gqlOptions } from '@/data/graphql/options';
+import type { ${modelName}CreateInput, ${modelName}UpdateInput, ${modelName} } from './${modelName}';
+
+export type Amplify${modelName}Model = {
+  get: (
+    input: { id: string },
+    options?: Record<string, unknown>
+  ) => Promise<{ data: ${modelName} | null }>;
+  list: (options?: Record<string, unknown>) => Promise<{ data: ${modelName}[] }>;
+  create: (
+    input: ${modelName}CreateInput,
+    options?: Record<string, unknown>
+  ) => Promise<{ data: ${modelName} | null }>;
+  update: (
+    input: ${modelName}UpdateInput,
+    options?: Record<string, unknown>
+  ) => Promise<{ data: ${modelName} | null }>;
+  delete: (
+    input: { id: string },
+    options?: Record<string, unknown>
+  ) => Promise<{ data: ${modelName} | null }>;
+};
 
 export class ${modelName}Repository {
+  private readonly _model: Amplify${modelName}Model;
+
+  /**
+   * Constructor with optional dependency injection for testing
+   * @param model - Optional Amplify model instance (for testing)
+   */
+  constructor(model?: Amplify${modelName}Model) {
+    if (model) {
+      // Use injected model (for tests)
+      this._model = model;
+    } else {
+      // Use Nuxt's auto-imported useNuxtApp (for production)
+      this._model = useNuxtApp().$Amplify.GraphQL.client.models.${modelName};
+    }
+  }
+
   private get model() {
-    return useNuxtApp().$Amplify.GraphQL.client.models.${modelName};
+    return this._model;
   }
 
   async get(id: string) {

@@ -1,16 +1,24 @@
 import { gqlOptions } from '@/data/graphql/options';
 import type { UserProfileCreateInput, UserProfileUpdateInput, UserProfile } from './UserProfile';
 
-/**
- * Type for the Amplify UserProfile model
- * This allows us to inject a mock in tests while using the real model in production
- */
 export type AmplifyUserProfileModel = {
-  get: (input: { id: string }, options?: Record<string, unknown>) => Promise<{ data: UserProfile | null }>;
+  get: (
+    input: { id: string },
+    options?: Record<string, unknown>
+  ) => Promise<{ data: UserProfile | null }>;
   list: (options?: Record<string, unknown>) => Promise<{ data: UserProfile[] }>;
-  create: (input: UserProfileCreateInput, options?: Record<string, unknown>) => Promise<{ data: UserProfile | null }>;
-  update: (input: UserProfileUpdateInput, options?: Record<string, unknown>) => Promise<{ data: UserProfile | null }>;
-  delete: (input: { id: string }, options?: Record<string, unknown>) => Promise<void>;
+  create: (
+    input: UserProfileCreateInput,
+    options?: Record<string, unknown>
+  ) => Promise<{ data: UserProfile | null }>;
+  update: (
+    input: UserProfileUpdateInput,
+    options?: Record<string, unknown>
+  ) => Promise<{ data: UserProfile | null }>;
+  delete: (
+    input: { id: string },
+    options?: Record<string, unknown>
+  ) => Promise<{ data: UserProfile | null }>;
 };
 
 export class UserProfileRepository {

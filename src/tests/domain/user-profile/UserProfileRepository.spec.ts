@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { UserProfileRepository, type AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
-import type { UserProfileCreateInput, UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
+import {
+  UserProfileRepository,
+  type AmplifyUserProfileModel,
+} from '@/domain/user-profile/UserProfileRepository';
+import type {
+  UserProfileCreateInput,
+  UserProfileUpdateInput,
+} from '@/domain/user-profile/UserProfile';
 
 // Mock gqlOptions
 vi.mock('@/data/graphql/options', () => ({
@@ -12,7 +18,13 @@ vi.mock('@/data/graphql/options', () => ({
 
 describe('UserProfileRepository', () => {
   let repository: UserProfileRepository;
-  let mockModel: AmplifyUserProfileModel;
+  let mockModel: {
+    get: ReturnType<typeof vi.fn>;
+    list: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     // Create a fresh mock model for each test
@@ -25,7 +37,7 @@ describe('UserProfileRepository', () => {
     };
 
     // Inject the mock model via constructor (dependency injection)
-    repository = new UserProfileRepository(mockModel);
+    repository = new UserProfileRepository(mockModel as AmplifyUserProfileModel);
   });
 
   describe('get', () => {
