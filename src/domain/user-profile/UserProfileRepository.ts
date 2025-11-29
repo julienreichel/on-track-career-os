@@ -1,4 +1,4 @@
-import { gqlOptions } from '@/data/graphql/options'
+import { gqlOptions } from '@/data/graphql/options';
 import type { UserProfileCreateInput, UserProfileUpdateInput } from './UserProfile';
 
 export class UserProfileRepository {

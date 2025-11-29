@@ -1,4 +1,4 @@
-import { UserProfileRepository } from './UserProfileRepository'
+import { UserProfileRepository } from './UserProfileRepository';
 import type { UserProfile } from './UserProfile';
 // import { loadLazy } from '@/data/graphql/lazy'
 
