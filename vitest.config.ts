@@ -1,16 +1,37 @@
 import { defineVitestConfig } from '@nuxt/test-utils/config';
-import { resolve } from 'node:path';
 
+/**
+ * Root Vitest configuration for Nuxt project
+ * See: https://nuxt.com/docs/getting-started/testing
+ */
 export default defineVitestConfig({
   test: {
-    environment: 'node', // Use node environment for unit tests, not full Nuxt environment
-  },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, './src'),
-      '~': resolve(__dirname, './src'),
-      '@amplify': resolve(__dirname, './amplify'),
-      '#app': resolve(__dirname, './node_modules/nuxt/dist/app'),
+    environment: 'nuxt',
+    environmentOptions: {
+      nuxt: {
+        domEnvironment: 'happy-dom',
+        rootDir: '.',
+      },
+    },
+    coverage: {
+      provider: 'v8',
+      reportsDirectory: './coverage',
+      all: true,
+      include: [
+        'src/domain/**/*.ts',
+        'src/application/**/*.ts',
+        'src/data/**/*.ts',
+      ],
+      exclude: [
+        '**/*.spec.ts',
+        '**/*.test.ts',
+        '**/tests/**',
+        'test/**',
+        'amplify/**',
+        'node_modules/**',
+        '**/*.d.ts',
+        'src/data/amplify/**',
+      ],
     },
   },
 });
