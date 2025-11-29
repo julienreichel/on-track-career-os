@@ -40,10 +40,7 @@ describe('post-confirmation handler', () => {
 
     // Dynamically import handler after mocks are set up
     const { resolve } = await import('node:path');
-    const modulePath = resolve(
-      __dirname,
-      '../../../../amplify/auth/post-confirmation/handler.ts'
-    );
+    const modulePath = resolve(__dirname, '../../../../amplify/auth/post-confirmation/handler.ts');
     const module = await import(modulePath);
     handler = module.handler;
   });

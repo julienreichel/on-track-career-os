@@ -13,6 +13,14 @@ export const parseCvTextFunction = defineFunction({
   timeoutSeconds: 60,
 });
 
+export const extractExperienceBlocksFunction = defineFunction({
+  entry: './ai-operations/extractExperienceBlocks.ts',
+  environment: {
+    MODEL_ID,
+  },
+  timeoutSeconds: 60,
+});
+
 export const schema = a
   .schema({
     // =====================================================
@@ -313,6 +321,13 @@ export const schema = a
       .returns(a.string())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(parseCvTextFunction)),
+
+    extractExperienceBlocks: a
+      .query()
+      .arguments({ experience_text_blocks: a.string().array().required() })
+      .returns(a.string())
+      .authorization((allow) => [allow.authenticated()])
+      .handler(a.handler.function(extractExperienceBlocksFunction)),
   })
   .authorization((allow) => [allow.resource(postConfirmation)]);
 
