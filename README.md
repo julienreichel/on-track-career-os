@@ -83,7 +83,6 @@ npm run preview
 
 Check out the [Nuxt deployment documentation](https://nuxt.com/docs/getting-started/deployment) for deployment information.
 
-
 ```bash
 # npm
 npm install

@@ -54,6 +54,7 @@ Unit tests focus on isolated business logic without full Nuxt context:
 - Utility functions
 
 **Example:**
+
 ```typescript
 // test/unit/domain/user-profile/UserProfileService.spec.ts
 import { describe, it, expect } from 'vitest';
@@ -76,6 +77,7 @@ Integration tests verify component interactions and page flows with full Nuxt co
 - API integration
 
 **Example:**
+
 ```typescript
 // test/integration/pages/login.spec.ts
 import { describe, it, expect } from 'vitest';

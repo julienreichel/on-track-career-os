@@ -17,11 +17,7 @@ export default defineVitestConfig({
       provider: 'v8',
       reportsDirectory: './coverage',
       all: true,
-      include: [
-        'src/domain/**/*.ts',
-        'src/application/**/*.ts',
-        'src/data/**/*.ts',
-      ],
+      include: ['**/*.ts', '**/*.vue'],
       exclude: [
         '**/*.spec.ts',
         '**/*.test.ts',
@@ -31,6 +27,8 @@ export default defineVitestConfig({
         'node_modules/**',
         '**/*.d.ts',
         'src/data/amplify/**',
+        '**/plugins/*.ts',
+        '**/app.vue',
       ],
     },
   },

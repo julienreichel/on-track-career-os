@@ -16,13 +16,7 @@ export default defineVitestConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,vue}'],
-      exclude: [
-        'src/**/*.spec.ts',
-        'src/**/*.test.ts',
-        'src/tests/**',
-        'test/**',
-        'amplify/**',
-      ],
+      exclude: ['src/**/*.spec.ts', 'src/**/*.test.ts', 'src/tests/**', 'test/**', 'amplify/**'],
     },
   },
 });
