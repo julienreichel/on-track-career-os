@@ -11,6 +11,10 @@ export default defineVitestConfig({
     environmentOptions: {
       nuxt: {
         domEnvironment: 'happy-dom',
+        overrides: {
+          // Ensure i18n module is loaded for integration tests
+          modules: ['@nuxtjs/i18n'],
+        },
       },
     },
   },
