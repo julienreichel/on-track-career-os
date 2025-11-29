@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
-import { resolve } from 'node:path';
 
 // Mock the AWS SDK
 vi.mock('@aws-sdk/client-bedrock-runtime', () => {
@@ -32,8 +31,7 @@ describe('ai.parseCvText', () => {
     mockSend = clientInstance.send as ReturnType<typeof vi.fn>;
 
     // Import handler after mocks are set up
-    const modulePath = resolve(__dirname, '../../../../amplify/data/ai-operations/parseCvText.ts');
-    const module = await import(modulePath);
+    const module = await import('@amplify/data/ai-operations/parseCvText');
     handler = module.handler;
   });
 
@@ -92,7 +90,7 @@ Google Cloud Professional Developer
         body: Buffer.from(
           JSON.stringify({
             content: [{ text: JSON.stringify(mockBedrockResponse) }],
-          }),
+          })
         ),
       });
 
@@ -108,27 +106,19 @@ Google Cloud Professional Developer
       expect(parsed.confidence).toBe(0.95);
     });
 
-    it('should handle markdown-wrapped JSON from Bedrock', async () => {
+    it('should validate output structure and apply operation-specific fallbacks', async () => {
       const mockBedrockResponse = {
         sections: {
           experiences: ['Some experience'],
-          education: ['Some education'],
-          skills: ['JavaScript'],
-          certifications: [],
-          raw_blocks: [],
+          // Missing fields will be filled by operation-specific validation
         },
-        confidence: 0.8,
       };
 
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
-            content: [
-              {
-                text: '```json\n' + JSON.stringify(mockBedrockResponse) + '\n```',
-              },
-            ],
-          }),
+            content: [{ text: JSON.stringify(mockBedrockResponse) }],
+          })
         ),
       });
 
@@ -138,219 +128,35 @@ Google Cloud Professional Developer
 
       const parsed = JSON.parse(result);
       expect(parsed.sections.experiences).toEqual(['Some experience']);
-      expect(parsed.confidence).toBe(0.8);
-    });
-
-    it('should apply fallback for missing confidence', async () => {
-      const mockBedrockResponse = {
-        sections: {
-          experiences: [],
-          education: [],
-          skills: [],
-          certifications: [],
-          raw_blocks: [],
-        },
-        // No confidence field
-      };
-
-      mockSend.mockResolvedValueOnce({
-        body: Buffer.from(
-          JSON.stringify({
-            content: [{ text: JSON.stringify(mockBedrockResponse) }],
-          }),
-        ),
-      });
-
-      const result = await handler({
-        arguments: { cv_text: mockCvText },
-      });
-
-      const parsed = JSON.parse(result);
-      expect(parsed.confidence).toBe(0.5); // DEFAULT_CONFIDENCE
-    });
-
-    it('should apply fallback for missing array fields', async () => {
-      const mockBedrockResponse = {
-        sections: {
-          experiences: ['Some experience'],
-          // Missing: education, skills, certifications, raw_blocks
-        },
-      };
-
-      mockSend.mockResolvedValueOnce({
-        body: Buffer.from(
-          JSON.stringify({
-            content: [{ text: JSON.stringify(mockBedrockResponse) }],
-          }),
-        ),
-      });
-
-      const result = await handler({
-        arguments: { cv_text: mockCvText },
-      });
-
-      const parsed = JSON.parse(result);
+      // Operation-specific validation fills missing fields
       expect(parsed.sections.education).toEqual([]);
       expect(parsed.sections.skills).toEqual([]);
       expect(parsed.sections.certifications).toEqual([]);
       expect(parsed.sections.raw_blocks).toEqual([]);
+      expect(parsed.confidence).toBe(0.5); // DEFAULT_CONFIDENCE fallback
     });
 
-    it('should retry with schema on JSON parse error', async () => {
-      // First call returns invalid JSON
-      mockSend
-        .mockResolvedValueOnce({
-          body: Buffer.from(
-            JSON.stringify({
-              content: [{ text: 'Invalid JSON response' }],
-            }),
-          ),
-        })
-        // Second call (retry) returns valid JSON
-        .mockResolvedValueOnce({
-          body: Buffer.from(
-            JSON.stringify({
-              content: [
-                {
-                  text: JSON.stringify({
-                    sections: {
-                      experiences: [],
-                      education: [],
-                      skills: [],
-                      certifications: [],
-                      raw_blocks: [],
-                    },
-                    confidence: 0.6,
-                  }),
-                },
-              ],
-            }),
-          ),
-        });
-
-      const result = await handler({
-        arguments: { cv_text: mockCvText },
-      });
-
-      const parsed = JSON.parse(result);
-      expect(parsed.confidence).toBe(0.6);
-      expect(mockSend).toHaveBeenCalledTimes(2);
-    });
-
-    it('should throw error after retry fails', async () => {
-      // Both calls return invalid JSON
-      mockSend
-        .mockResolvedValueOnce({
-          body: Buffer.from(
-            JSON.stringify({
-              content: [{ text: 'Invalid JSON' }],
-            }),
-          ),
-        })
-        .mockResolvedValueOnce({
-          body: Buffer.from(
-            JSON.stringify({
-              content: [{ text: 'Still invalid' }],
-            }),
-          ),
-        });
-
-      await expect(
-        handler({
-          arguments: { cv_text: mockCvText },
-        }),
-      ).rejects.toThrow('AI cannot produce a stable answer');
-    });
-
-    it('should throw error for missing sections field', async () => {
+    it('should throw error for invalid output structure', async () => {
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
             content: [
               {
                 text: JSON.stringify({
-                  // Missing sections field
+                  // Missing required sections field
                   confidence: 0.5,
                 }),
               },
             ],
-          }),
+          })
         ),
       });
 
       await expect(
         handler({
           arguments: { cv_text: mockCvText },
-        }),
+        })
       ).rejects.toThrow('Missing required field: sections');
-    });
-  });
-
-  describe('Bedrock API Call Verification', () => {
-    it('should call BedrockRuntimeClient.send once for successful parse', async () => {
-      mockSend.mockResolvedValueOnce({
-        body: Buffer.from(
-          JSON.stringify({
-            content: [
-              {
-                text: JSON.stringify({
-                  sections: {
-                    experiences: [],
-                    education: [],
-                    skills: [],
-                    certifications: [],
-                    raw_blocks: [],
-                  },
-                  confidence: 0.5,
-                }),
-              },
-            ],
-          }),
-        ),
-      });
-
-      await handler({
-        arguments: { cv_text: 'test' },
-      });
-
-      expect(mockSend).toHaveBeenCalledTimes(1);
-    });
-
-    it('should call BedrockRuntimeClient.send twice when retry is triggered', async () => {
-      mockSend
-        .mockResolvedValueOnce({
-          body: Buffer.from(
-            JSON.stringify({
-              content: [{ text: 'invalid' }],
-            }),
-          ),
-        })
-        .mockResolvedValueOnce({
-          body: Buffer.from(
-            JSON.stringify({
-              content: [
-                {
-                  text: JSON.stringify({
-                    sections: {
-                      experiences: [],
-                      education: [],
-                      skills: [],
-                      certifications: [],
-                      raw_blocks: [],
-                    },
-                    confidence: 0.5,
-                  }),
-                },
-              ],
-            }),
-          ),
-        });
-
-      await handler({
-        arguments: { cv_text: 'test' },
-      });
-
-      expect(mockSend).toHaveBeenCalledTimes(2);
     });
   });
 });

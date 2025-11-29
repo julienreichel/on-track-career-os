@@ -29,9 +29,7 @@ describe('bedrock utilities', () => {
     }));
 
     // Dynamically import to get fresh module instance
-    const bedrockModule = await import(
-      '../../../../../amplify/data/ai-operations/utils/bedrock'
-    );
+    const bedrockModule = await import('@amplify/data/ai-operations/utils/bedrock');
     invokeBedrock = bedrockModule.invokeBedrock;
     retryWithSchema = bedrockModule.retryWithSchema;
   });
@@ -202,11 +200,11 @@ describe('bedrock utilities', () => {
       mockSend.mockResolvedValue(mockResponse);
 
       await invokeBedrock('system1', 'user1');
-      
+
       // Clear the mock call count but keep same client
       vi.clearAllMocks();
       mockSend.mockResolvedValue(mockResponse);
-      
+
       await invokeBedrock('system2', 'user2');
 
       // Both calls should use same client (mockSend called twice total, but client instantiated once in beforeEach)
@@ -313,9 +311,7 @@ describe('bedrock utilities', () => {
       };
       mockSend.mockResolvedValue(mockResponse);
 
-      await expect(retryWithSchema('system', 'user', 'schema')).rejects.toThrow(
-        /Unexpected token/
-      );
+      await expect(retryWithSchema('system', 'user', 'schema')).rejects.toThrow(/Unexpected token/);
     });
 
     it('should handle complex nested JSON types', async () => {

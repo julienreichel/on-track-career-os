@@ -5,11 +5,12 @@
     "paths": {
       "@/*": ["src/*"],
       "~/*": ["src/*"],
+      "@amplify/*": ["amplify/*"],
       "#app": ["node_modules/nuxt/dist/app"],
       "#app/*": ["node_modules/nuxt/dist/app/*"]
     },
     "types": ["vitest/globals", "@nuxt/test-utils", "node"]
   },
-  "include": ["**/*.ts", "**/*.vue", "../src/**/*.ts", "../src/**/*.vue"],
+  "include": ["**/*.ts", "**/*.vue", "../src/**/*.ts", "../src/**/*.vue", "../amplify/**/*.ts"],
   "exclude": ["node_modules"]
 }

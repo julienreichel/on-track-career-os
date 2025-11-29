@@ -53,6 +53,12 @@ export default defineConfig({
             ],
           },
         },
+        // Configure path aliases for amplify tests
+        resolve: {
+          alias: {
+            '@amplify': resolve(__dirname, './amplify'),
+          },
+        },
       },
       // Nuxt tests - run in Nuxt runtime environment
       await defineVitestProject({

@@ -11,7 +11,7 @@ import {
   truncateForLog,
   createLogEntry,
   createErrorLogEntry,
-} from '../../../../../amplify/data/ai-operations/utils/common';
+} from '@amplify/data/ai-operations/utils/common';
 
 describe('common utilities', () => {
   describe('constants', () => {
@@ -158,12 +158,9 @@ describe('common utilities', () => {
     });
 
     it('should include fallbacksUsed when provided', () => {
-      const entry = createLogEntry(
-        'parseCvText',
-        { cv_text: 'test' },
-        { sections: [] },
-        ['default_confidence']
-      );
+      const entry = createLogEntry('parseCvText', { cv_text: 'test' }, { sections: [] }, [
+        'default_confidence',
+      ]);
       expect(entry).toEqual({
         timestamp: '2025-11-29T12:00:00.000Z',
         input: { cv_text: 'test' },
