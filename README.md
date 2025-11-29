@@ -1,152 +1,214 @@
 # AI Career OS
 
-AI-powered career development platform built with Nuxt 4 + AWS Amplify Gen2.
+> AI-powered career development platform to help you understand yourself, analyze opportunities, and communicate your value.
 
-## Setup
+[![Test](https://github.com/julienreichel/on-track-career-os/actions/workflows/test.yml/badge.svg)](https://github.com/julienreichel/on-track-career-os/actions/workflows/test.yml)
+[![Coverage](https://img.shields.io/badge/coverage-96%25-brightgreen)](./coverage)
 
-Install dependencies:
+## 🎯 Overview
+
+**Your AI Career OS** guides you through a structured job search workflow:
+
+1. **Know Yourself** → Build your professional profile, document experiences with STAR methodology, generate your Personal Canvas
+2. **Understand the Opportunity** → Analyze job descriptions, research companies, create role and company canvases
+3. **Communicate Your Value** → Generate tailored CVs, cover letters, elevator pitches, and KPIs that match your strengths to company needs
+4. **Prepare & Apply** → Practice with AI-generated interview questions and simulations
+
+## 🏗️ Architecture
+
+- **Frontend**: Nuxt 4 + TypeScript (strict) + Nuxt UI + Tailwind CSS
+- **Backend**: AWS Amplify Gen2 (GraphQL) + Lambda functions
+- **Auth**: AWS Cognito with owner-based authorization
+- **AI**: Structured AI operations (17 operations) with strict JSON I/O validation
+- **State Management**: Composables over global stores
+
+See [docs/High_Level_Architecture.md](docs/High_Level_Architecture.md) for details.
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 20.x or higher
+- npm/pnpm/yarn
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/julienreichel/on-track-career-os.git
+cd on-track-career-os
+
+# Install dependencies
 npm install
-```
 
-## Development
-
-Start the development server on `http://localhost:3000`:
-
-```bash
+# Start development server
 npm run dev
 ```
 
-## Testing
+Visit `http://localhost:3000` to see the app.
 
-This project follows [Nuxt's testing best practices](https://nuxt.com/docs/getting-started/testing).
+### With Amplify Backend
+
+```bash
+# Start Amplify sandbox (requires AWS credentials)
+npx ampx sandbox --once
+
+# In another terminal, start the dev server
+npm run dev
+```
+
+## 🧪 Testing
+
+This project follows [Nuxt testing best practices](https://nuxt.com/docs/getting-started/testing) with **96% code coverage**.
 
 ```bash
 # Run all tests
 npm test
 
-# Run unit tests only
+# Run unit tests (business logic, services, repositories)
 npm run test:unit
 
-# Run integration tests only
+# Run integration tests (components, pages, layouts)
 npm run test:integration
 
-# Watch mode
+# Watch mode for TDD
 npm run test:watch
 
-# UI mode
+# Interactive UI mode
 npm run test:ui
 
 # Coverage report
 npm run test:coverage
 ```
 
+**Test Structure:**
+- `test/unit/` - Pure business logic tests (domain, application, data layers)
+- `test/integration/` - Component and page tests requiring Nuxt context
+
 See [test/README.md](test/README.md) for detailed testing documentation.
 
-## Code Quality
+## 📋 Code Quality
 
 ```bash
-# Format code
+# Format code with Prettier
 npm run format
 
 # Check formatting
 npm run format:check
 
-# Lint code
+# Lint with ESLint
 npm run lint
 
-# Fix lint issues
+# Auto-fix lint issues
 npm run lint:fix
+
+# Type checking
+npx vue-tsc --noEmit
 ```
 
-## Production
+**Pre-commit checklist:**
+- ✅ All tests passing
+- ✅ 80%+ code coverage
+- ✅ No linting errors
+- ✅ Code formatted
 
-Build the application for production:
+## 🏗️ Project Structure
+
+```
+on-track-career-os/
+├── src/                      # Application code (srcDir: 'src/')
+│   ├── components/           # Auto-imported Vue components
+│   ├── composables/          # Auto-imported composables
+│   ├── pages/                # File-based routing
+│   ├── layouts/              # Layout components
+│   ├── domain/               # Business logic (services, repositories)
+│   ├── application/          # Application layer (use cases)
+│   ├── data/                 # Data layer (GraphQL, schemas)
+│   └── types/                # TypeScript type definitions
+├── amplify/                  # AWS Amplify backend
+│   ├── auth/                 # Cognito authentication
+│   ├── data/                 # GraphQL schema & models
+│   └── backend.ts            # Backend configuration
+├── test/                     # Test files
+│   ├── unit/                 # Unit tests (business logic)
+│   └── integration/          # Integration tests (components)
+├── docs/                     # Documentation
+└── i18n/                     # Internationalization
+```
+
+## 🛠️ Key Technologies
+
+| Category | Technology |
+|----------|-----------|
+| **Framework** | Nuxt 4.2.1 |
+| **Language** | TypeScript (strict mode) |
+| **UI** | Nuxt UI 4.2.1 + Tailwind CSS |
+| **Backend** | AWS Amplify Gen2 |
+| **Database** | DynamoDB (via Amplify Data) |
+| **Auth** | AWS Cognito |
+| **Testing** | Vitest 3.2.4 + @nuxt/test-utils |
+| **Linting** | ESLint + Prettier |
+| **i18n** | @nuxtjs/i18n 10.2.1 |
+
+## 📚 Documentation
+
+- [Product Description](docs/Product_Description.md) - Vision and features
+- [High-Level Architecture](docs/High_Level_Architecture.md) - System design
+- [Conceptual Data Model](docs/Conceptual_Data_Model.md) - Domain entities
+- [AI Interaction Contract](docs/AI_Interaction_Contract.md) - AI operations spec
+- [Component/Page Mapping](docs/Component_Page_Mapping.md) - UI structure
+- [Tech Foundation Specs](docs/Tech_Fundation_Specs.md) - Technical decisions
+- [EPIC Roadmap](docs/EPIC_Roadmap.md) - Development phases
+- [Testing Strategy](test/README.md) - Testing approach
+
+## 🎨 Development Guidelines
+
+### Mandatory Conventions
+
+1. **i18n First** - No hard-coded strings. All user-facing text must use `t('key.path')`
+2. **Nuxt UI Components** - Use `<UButton>`, `<UCard>`, etc. instead of raw Tailwind classes
+3. **Test-Driven Development** - Write tests before implementation, maintain 80%+ coverage
+4. **Conventional Commits** - Follow [Conventional Commits](https://www.conventionalcommits.org/) specification
+5. **Owner-Based Auth** - All GraphQL models use `authorization((allow) => [allow.owner()])`
+
+### Code Organization
+
+- **Domain Layer** (`src/domain/`) - Business logic, repositories
+- **Application Layer** (`src/application/`) - Use cases, composables
+- **Data Layer** (`src/data/`) - GraphQL operations, schema types
+- **Presentation Layer** (`src/pages/`, `src/components/`) - UI components
+
+## 🚢 Production Build
 
 ```bash
+# Build for production
 npm run build
-```
 
-Preview production build:
-
-```bash
+# Preview production build locally
 npm run preview
 ```
 
-## Documentation
+## 🤝 Contributing
 
-- [Product Description](docs/Product_Description.md)
-- [High Level Architecture](docs/High_Level_Architecture.md)
-- [AI Interaction Contract](docs/AI_Interaction_Contract.md)
-- [Testing Strategy](test/README.md)
+1. Create a feature branch: `git checkout -b feature/amazing-feature`
+2. Write tests first (TDD approach)
+3. Implement the feature
+4. Ensure tests pass: `npm test`
+5. Check coverage: `npm run test:coverage` (must be 80%+)
+6. Format & lint: `npm run format && npm run lint`
+7. Commit with conventional commit: `git commit -m "feat(scope): add amazing feature"`
+8. Push and create a Pull Request
 
-Check out the [Nuxt deployment documentation](https://nuxt.com/docs/getting-started/deployment) for deployment information.
+## 📄 License
 
-```bash
-# npm
-npm install
+This project is private and proprietary.
 
-# pnpm
-pnpm install
+## 👤 Author
 
-# yarn
-yarn install
+**Julien Reichel**
 
-# bun
-bun install
-```
+---
 
-## Development Server
+**Status**: 🚧 Initial Development Phase - Setting up foundation and testing infrastructure
 
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Current Coverage: **96.22%** | Tests: **63 passing** | Build: ✅ Passing
