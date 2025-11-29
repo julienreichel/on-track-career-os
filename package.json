@@ -13,8 +13,8 @@
     "lint": "eslint -c ./eslint.config.mjs \"./{src,test,amplify}*/**/*.{ts,js,cjs,mjs,vue}\"",
     "lint:fix": "eslint -c ./eslint.config.mjs \"./{src,test,amplify}*/**/*.{ts,js,cjs,mjs,vue}\" --fix",
     "test": "vitest run",
-    "test:unit": "vitest run --config test/unit/vitest.config.ts",
-    "test:integration": "vitest run --config test/integration/vitest.config.ts",
+    "test:unit": "vitest run --project unit",
+    "test:nuxt": "vitest run --project nuxt",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage"

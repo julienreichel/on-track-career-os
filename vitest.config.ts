@@ -1,23 +1,64 @@
-import { defineVitestConfig } from '@nuxt/test-utils/config';
+import { defineConfig } from 'vitest/config';
+import { defineVitestProject } from '@nuxt/test-utils/config';
+import { resolve } from 'node:path';
 
 /**
- * Root Vitest configuration for Nuxt project
- * See: https://nuxt.com/docs/getting-started/testing
+ * Vitest workspace configuration for Nuxt project
+ * Using projects approach as recommended in Nuxt docs:
+ * https://nuxt.com/docs/4.x/getting-started/testing
  */
-export default defineVitestConfig({
+export default defineConfig({
   test: {
-    environment: 'nuxt',
-    environmentOptions: {
-      nuxt: {
-        domEnvironment: 'happy-dom',
-        rootDir: '.',
+    projects: [
+      // Unit tests - run in Node environment for speed
+      {
+        test: {
+          name: 'unit',
+          include: ['test/unit/**/*.spec.ts'],
+          environment: 'node',
+          coverage: {
+            provider: 'v8',
+            include: ['src/**/*.{ts,vue}'],
+            exclude: [
+              'src/**/*.spec.ts',
+              'src/**/*.test.ts',
+              'src/tests/**',
+              'test/**',
+              'amplify/**',
+            ],
+          },
+        },
+        // Configure path aliases for unit tests
+        resolve: {
+          alias: {
+            '@': resolve(__dirname, './src'),
+            '~': resolve(__dirname, './src'),
+          },
+        },
       },
-    },
+      // Nuxt tests - run in Nuxt runtime environment
+      await defineVitestProject({
+        test: {
+          name: 'nuxt',
+          include: ['test/nuxt/**/*.spec.ts'],
+          environment: 'nuxt',
+          environmentOptions: {
+            nuxt: {
+              domEnvironment: 'happy-dom',
+              overrides: {
+                modules: ['@nuxtjs/i18n'],
+              },
+            },
+          },
+        },
+      }),
+    ],
+    // Global coverage settings
     coverage: {
       provider: 'v8',
       reportsDirectory: './coverage',
       all: true,
-      include: ['**/*.ts', '**/*.vue'],
+      include: ['src/**/*.{ts,vue}'],
       exclude: [
         '**/*.spec.ts',
         '**/*.test.ts',

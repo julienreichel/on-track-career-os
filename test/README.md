@@ -1,30 +1,30 @@
 # Testing Strategy
 
-This project follows [Nuxt's testing best practices](https://nuxt.com/docs/getting-started/testing) with separate unit and integration tests.
+This project follows [Nuxt's testing best practices](https://nuxt.com/docs/getting-started/testing) using **Vitest projects** (workspace approach).
 
 ## Test Structure
 
 ```
 test/
-├── unit/                    # Unit tests (business logic, services, composables)
-│   ├── domain/             # Domain layer tests
-│   ├── application/        # Application layer tests
-│   └── vitest.config.ts    # Unit test configuration
-└── integration/            # Integration tests (components, pages, flows)
-    └── vitest.config.ts    # Integration test configuration
+├── unit/                    # Unit tests - Node environment (fast!)
+│   ├── domain/             # Domain layer (repositories, services)
+│   ├── application/        # Application layer (composables)
+│   └── data/               # Data layer (GraphQL utilities)
+└── nuxt/                   # Nuxt tests - Nuxt runtime environment
+    └── layouts/            # Layout components with i18n, routing
 ```
 
 ## Running Tests
 
 ```bash
-# Run all tests
+# Run all tests (unit + nuxt projects)
 npm test
 
-# Run unit tests only
+# Run unit tests only (Node environment - fast)
 npm run test:unit
 
-# Run integration tests only
-npm run test:integration
+# Run Nuxt tests only (Nuxt runtime environment)
+npm run test:nuxt
 
 # Watch mode (all tests)
 npm run test:watch
@@ -38,13 +38,15 @@ npm run test:coverage
 
 ## Test Environment
 
-- **Environment**: Nuxt environment with happy-dom
-- **Framework**: Vitest with @nuxt/test-utils
-- **Coverage**: v8 provider
+- **Configuration**: Single `vitest.config.ts` with Vitest projects
+- **Unit tests**: Node environment (no Nuxt overhead, very fast)
+- **Nuxt tests**: Nuxt environment with happy-dom, i18n, auto-imports
+- **Framework**: Vitest 3.2.4 with @nuxt/test-utils
+- **Coverage**: v8 provider with 80% threshold
 
 ## Writing Tests
 
-### Unit Tests
+### Unit Tests (Node Environment)
 
 Unit tests focus on isolated business logic without full Nuxt context:
 
@@ -52,6 +54,7 @@ Unit tests focus on isolated business logic without full Nuxt context:
 - Repository patterns (with dependency injection)
 - Composables (with mocked dependencies)
 - Utility functions
+- GraphQL query builders
 
 **Example:**
 
@@ -67,14 +70,15 @@ describe('UserProfileService', () => {
 });
 ```
 
-### Integration Tests
+### Nuxt Tests (Nuxt Runtime Environment)
 
-Integration tests verify component interactions and page flows with full Nuxt context:
+Nuxt tests verify components/features requiring Nuxt runtime:
 
-- Component behavior
-- Page routing and navigation
-- State management across components
-- API integration
+- Layout components with i18n
+- Components using Nuxt auto-imports
+- Routing and navigation
+- Plugin integration
+- Full Nuxt context features
 
 **Example:**
 
