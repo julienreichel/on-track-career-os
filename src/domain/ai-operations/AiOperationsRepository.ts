@@ -1,3 +1,4 @@
+import { gqlOptions } from '@/data/graphql/options';
 import type { ParsedCV } from './ParsedCV';
 import type { ExperiencesResult } from './Experience';
 
@@ -67,7 +68,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
   async parseCvText(cvText: string): Promise<ParsedCV> {
     const { data, errors } = await this.client.parseCvText(
       { cv_text: cvText },
-      { authMode: 'userPool' }
+      gqlOptions()
     );
 
     if (errors && errors.length > 0) {
@@ -87,7 +88,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
   async extractExperienceBlocks(experienceTextBlocks: string[]): Promise<ExperiencesResult> {
     const { data, errors } = await this.client.extractExperienceBlocks(
       { experience_text_blocks: experienceTextBlocks },
-      { authMode: 'userPool' }
+      gqlOptions()
     );
 
     if (errors && errors.length > 0) {
