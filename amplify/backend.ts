@@ -6,6 +6,7 @@ import {
   MODEL_ID,
   parseCvTextFunction,
   extractExperienceBlocksFunction,
+  generateStarStoryFunction,
 } from './data/resource';
 
 /**
@@ -16,6 +17,7 @@ const backend = defineBackend({
   data,
   parseCvTextFunction,
   extractExperienceBlocksFunction,
+  generateStarStoryFunction,
 });
 
 // Grant Bedrock permissions to AI operation Lambda functions
@@ -28,6 +30,14 @@ backend.parseCvTextFunction.resources.lambda.addToRolePolicy(
 );
 
 backend.extractExperienceBlocksFunction.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['bedrock:InvokeModel'],
+    resources: [`arn:aws:bedrock:*::foundation-model/${MODEL_ID}`],
+  })
+);
+
+backend.generateStarStoryFunction.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     effect: Effect.ALLOW,
     actions: ['bedrock:InvokeModel'],

@@ -1,8 +1,8 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { Amplify } from 'aws-amplify';
 import { signUp, signIn, signOut } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/data';
-import amplifyOutputs from '../../../amplify_outputs.json';
+import * as amplifyOutputs from '../../../amplify_outputs.json';
 import type { Schema } from '../../../amplify/data/resource';
 
 /**
@@ -26,7 +26,8 @@ import type { Schema } from '../../../amplify/data/resource';
  */
 
 Amplify.configure(amplifyOutputs);
-const client = generateClient<Schema>();
+// Use userPool auth mode for owner-based authorization
+const client = generateClient<Schema>({ authMode: 'userPool' });
 
 describe('AI Operations Integration (E2E Sandbox)', () => {
   const testEmail = `ai-test-${Date.now()}@example.com`;
@@ -48,18 +49,24 @@ describe('AI Operations Integration (E2E Sandbox)', () => {
     // Note: testUserId available but not needed for AI operation tests
     console.log('Test user created:', signUpResult.userId);
 
-    // Sign in once for all tests
+    // Wait for post-confirmation Lambda to create UserProfile
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  });
+
+  beforeEach(async () => {
+    // Sign in before each test to ensure fresh authenticated session
     await signIn({
       username: testEmail,
       password: testPassword,
     });
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
+    // Sign out after each test
     try {
       await signOut();
     } catch {
-      // Ignore cleanup errors
+      // Ignore sign-out errors
     }
   });
 
@@ -85,50 +92,41 @@ Key Requirements:
 - DevOps best practices
 `;
 
-    try {
-      // Invoke AI operation via GraphQL query
-      const { data, errors } = await client.queries.generateStarStory({
-        sourceText,
-      });
+    // Invoke AI operation via GraphQL query
+    const { data, errors } = await client.queries.generateStarStory({
+      sourceText,
+    });
 
-      // Check for GraphQL errors
-      if (errors) {
-        console.log('GraphQL errors:', errors);
-        // May fail if email verification required
-        return;
-      }
-
-      // Validate response structure
-      expect(data).toBeDefined();
-
-      if (data) {
-        // Parse JSON response (AI operations return JSON strings)
-        const starStory = JSON.parse(data as string);
-
-        // Validate STAR structure
-        expect(starStory).toHaveProperty('situation');
-        expect(starStory).toHaveProperty('task');
-        expect(starStory).toHaveProperty('action');
-        expect(starStory).toHaveProperty('result');
-
-        // Validate content arrays
-        expect(Array.isArray(starStory.situation)).toBe(true);
-        expect(Array.isArray(starStory.task)).toBe(true);
-        expect(Array.isArray(starStory.action)).toBe(true);
-        expect(Array.isArray(starStory.result)).toBe(true);
-
-        // Validate at least some content generated
-        expect(
-          starStory.situation.length +
-            starStory.task.length +
-            starStory.action.length +
-            starStory.result.length
-        ).toBeGreaterThan(0);
-      }
-    } catch {
-      // May fail if not authenticated (email verification pending)
-      console.log('Test requires authentication');
+    // Check for GraphQL errors
+    if (errors) {
+      throw new Error(`GraphQL errors: ${JSON.stringify(errors)}`);
     }
+
+    // Validate response structure
+    expect(data).toBeDefined();
+
+    // Parse JSON response (AI operations return JSON strings)
+    const starStory = JSON.parse(data as string);
+
+    // Validate STAR structure
+    expect(starStory).toHaveProperty('situation');
+    expect(starStory).toHaveProperty('task');
+    expect(starStory).toHaveProperty('action');
+    expect(starStory).toHaveProperty('result');
+
+    // Validate content arrays
+    expect(Array.isArray(starStory.situation)).toBe(true);
+    expect(Array.isArray(starStory.task)).toBe(true);
+    expect(Array.isArray(starStory.action)).toBe(true);
+    expect(Array.isArray(starStory.result)).toBe(true);
+
+    // Validate at least some content generated
+    expect(
+      starStory.situation.length +
+        starStory.task.length +
+        starStory.action.length +
+        starStory.result.length
+    ).toBeGreaterThan(0);
   }, 60000); // 60s timeout for AI operation
 
   it('should handle missing required fields gracefully', async () => {
