@@ -19,10 +19,11 @@ describe('useExperience', () => {
   });
 
   it('should initialize with null item and loading false', () => {
-    const { item, loading } = useExperience('experience-123');
+    const { item, loading, error } = useExperience('experience-123');
 
     expect(item.value).toBeNull();
     expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
   });
 
   it('should load Experience successfully', async () => {
@@ -86,17 +87,15 @@ describe('useExperience', () => {
     expect(mockService.getFullExperience).toHaveBeenCalledWith('non-existent-id');
   });
 
-  it('should handle service errors gracefully', async () => {
+  it('should handle service errors and set error state', async () => {
     mockService.getFullExperience.mockRejectedValue(new Error('Service error'));
 
-    const { item, loading, load } = useExperience('experience-123');
+    const { item, loading, error, load } = useExperience('experience-123');
 
-    // Error propagates from service, loading remains true until finally block
-    await expect(load()).rejects.toThrow('Service error');
+    await load();
 
-    // Loading is set to false in finally block even on error
     expect(loading.value).toBe(false);
-    // Item remains null since service threw error before setting value
+    expect(error.value).toBe('Service error');
     expect(item.value).toBeNull();
   });
 

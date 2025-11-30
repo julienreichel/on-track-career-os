@@ -19,10 +19,11 @@ describe('useUserProfile', () => {
   });
 
   it('should initialize with null item and loading false', () => {
-    const { item, loading } = useUserProfile('user-123');
+    const { item, loading, error } = useUserProfile('user-123');
 
     expect(item.value).toBeNull();
     expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
   });
 
   it('should load user profile successfully', async () => {
@@ -53,6 +54,18 @@ describe('useUserProfile', () => {
     expect(mockService.getFullUserProfile).toHaveBeenCalledWith('user-123');
   });
 
+  it('should handle errors and set error state', async () => {
+    mockService.getFullUserProfile.mockRejectedValue(new Error('Service failed'));
+
+    const { item, loading, error, load } = useUserProfile('user-123');
+
+    await load();
+
+    expect(loading.value).toBe(false);
+    expect(error.value).toBe('Service failed');
+    expect(item.value).toBeNull();
+  });
+
   it('should handle loading state correctly', async () => {
     mockService.getFullUserProfile.mockImplementation(
       () => new Promise((resolve) => setTimeout(() => resolve(null), 100))
@@ -80,13 +93,16 @@ describe('useUserProfile', () => {
     expect(mockService.getFullUserProfile).toHaveBeenCalledWith('non-existent-id');
   });
 
-  it('should propagate errors from service', async () => {
+  it('should handle errors and set error state', async () => {
     mockService.getFullUserProfile.mockRejectedValue(new Error('Network error'));
 
-    const { load } = useUserProfile('user-123');
+    const { loading, error, item, load } = useUserProfile('user-123');
 
-    // The composable doesn't catch errors, so they should propagate
-    await expect(load()).rejects.toThrow('Network error');
+    await load();
+
+    expect(loading.value).toBe(false);
+    expect(error.value).toBe('Network error');
+    expect(item.value).toBeNull();
   });
 
   it('should allow multiple load calls', async () => {

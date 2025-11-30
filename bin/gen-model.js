@@ -165,18 +165,24 @@ import type { ${modelName} } from '@/domain/${folder}/${modelName}';
 export function use${modelName}(id: string) {
   const item = ref<${modelName} | null>(null);
   const loading = ref(false)
+  const error = ref<string | null>(null)
   const service = new ${modelName}Service()
 
   const load = async () => {
     loading.value = true
+    error.value = null
+    
     try {
       item.value = await service.getFull${modelName}(id)
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      console.error('[use${modelName}] Error loading ${modelName.toLowerCase()}:', err)
     } finally {
       loading.value = false
     }
   }
 
-  return { item, loading, load }
+  return { item, loading, error, load }
 }
 `;
 }
@@ -269,10 +275,11 @@ describe('use${modelName}', () => {
   });
 
   it('should initialize with null item and loading false', () => {
-    const { item, loading } = use${modelName}('${modelName.toLowerCase()}-123');
+    const { item, loading, error } = use${modelName}('${modelName.toLowerCase()}-123');
 
     expect(item.value).toBeNull();
     expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
   });
 
   it('should load ${modelName} successfully', async () => {
@@ -327,6 +334,18 @@ describe('use${modelName}', () => {
 
     expect(item.value).toBeNull();
     expect(mockService.getFull${modelName}).toHaveBeenCalledWith('non-existent-id');
+  });
+
+  it('should handle errors and set error state', async () => {
+    mockService.getFull${modelName}.mockRejectedValue(new Error('Service failed'));
+
+    const { item, loading, error, load } = use${modelName}('${modelName.toLowerCase()}-123');
+
+    await load();
+
+    expect(loading.value).toBe(false);
+    expect(error.value).toBe('Service failed');
+    expect(item.value).toBeNull();
   });
 
   // TODO: Add more tests for error handling and edge cases
