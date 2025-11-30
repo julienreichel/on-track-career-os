@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   MAX_LOG_LENGTH,
   LOG_PREFIX_BASE,
@@ -257,6 +257,177 @@ describe('common utilities', () => {
       const error = new Error(longMessage);
       const entry = createErrorLogEntry('operation', error, { input: 'test' });
       expect(entry.error).toBe(longMessage);
+    });
+  });
+
+  describe('withAiOperationHandler', () => {
+    let consoleLogSpy: ReturnType<typeof vi.spyOn>;
+    let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2025-11-30T10:00:00.000Z'));
+      consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      consoleLogSpy.mockRestore();
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('should log input, execute function, log output, and return JSON string', async () => {
+      const { withAiOperationHandler } = await import(
+        '@amplify/data/ai-operations/utils/common'
+      );
+
+      const mockExecute = vi.fn().mockResolvedValue({ result: 'success' });
+      const mockPrepareInput = vi.fn().mockReturnValue({ input: 'test_input' });
+
+      const result = await withAiOperationHandler(
+        'testOperation',
+        { arguments: { rawInput: 'test' } },
+        mockExecute,
+        mockPrepareInput
+      );
+
+      // Should call prepareInput with arguments
+      expect(mockPrepareInput).toHaveBeenCalledWith({ rawInput: 'test' });
+
+      // Should call execute function with arguments
+      expect(mockExecute).toHaveBeenCalledWith({ rawInput: 'test' });
+
+      // Should log initial input
+      expect(consoleLogSpy).toHaveBeenNthCalledWith(1, 'AI Operation: testOperation', {
+        timestamp: '2025-11-30T10:00:00.000Z',
+        input: { input: 'test_input' },
+      });
+
+      // Should log success with output
+      expect(consoleLogSpy).toHaveBeenNthCalledWith(2, 'AI Operation: testOperation', {
+        timestamp: '2025-11-30T10:00:00.000Z',
+        input: { input: 'test_input' },
+        output: { result: 'success' },
+        fallbacksUsed: [],
+      });
+
+      // Should return JSON stringified result
+      expect(result).toBe('{"result":"success"}');
+    });
+
+    it('should handle errors and rethrow', async () => {
+      const { withAiOperationHandler } = await import(
+        '@amplify/data/ai-operations/utils/common'
+      );
+
+      const mockError = new Error('Execution failed');
+      const mockExecute = vi.fn().mockRejectedValue(mockError);
+      const mockPrepareInput = vi.fn().mockReturnValue({ input: 'test' });
+
+      await expect(
+        withAiOperationHandler(
+          'testOperation',
+          { arguments: { rawInput: 'test' } },
+          mockExecute,
+          mockPrepareInput
+        )
+      ).rejects.toThrow('Execution failed');
+
+      // Should log error
+      expect(consoleErrorSpy).toHaveBeenCalledWith('AI Operation Error: testOperation', {
+        timestamp: '2025-11-30T10:00:00.000Z',
+        error: 'Execution failed',
+        input: { input: 'test' },
+      });
+    });
+
+    it('should handle complex output objects', async () => {
+      const { withAiOperationHandler } = await import(
+        '@amplify/data/ai-operations/utils/common'
+      );
+
+      const complexOutput = {
+        nested: { data: [1, 2, 3] },
+        array: ['a', 'b'],
+        boolean: true,
+      };
+
+      const mockExecute = vi.fn().mockResolvedValue(complexOutput);
+      const mockPrepareInput = vi.fn().mockReturnValue({ input: 'test' });
+
+      const result = await withAiOperationHandler(
+        'testOp',
+        { arguments: { data: 'test' } },
+        mockExecute,
+        mockPrepareInput
+      );
+
+      expect(result).toBe(JSON.stringify(complexOutput));
+    });
+  });
+
+  describe('withAiOperationHandlerObject', () => {
+    let consoleLogSpy: ReturnType<typeof vi.spyOn>;
+    let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2025-11-30T10:00:00.000Z'));
+      consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      consoleLogSpy.mockRestore();
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('should return output object directly (not JSON string)', async () => {
+      const { withAiOperationHandlerObject } = await import(
+        '@amplify/data/ai-operations/utils/common'
+      );
+
+      const mockOutput = { experiences: [{ title: 'Engineer' }] };
+      const mockExecute = vi.fn().mockResolvedValue(mockOutput);
+      const mockPrepareInput = vi.fn().mockReturnValue({ input: 'test' });
+
+      const result = await withAiOperationHandlerObject(
+        'extractExperiences',
+        { arguments: { data: 'test' } },
+        mockExecute,
+        mockPrepareInput
+      );
+
+      // Should return object, not string
+      expect(result).toEqual(mockOutput);
+      expect(typeof result).toBe('object');
+    });
+
+    it('should log and handle errors same as string variant', async () => {
+      const { withAiOperationHandlerObject } = await import(
+        '@amplify/data/ai-operations/utils/common'
+      );
+
+      const mockError = new Error('Processing error');
+      const mockExecute = vi.fn().mockRejectedValue(mockError);
+      const mockPrepareInput = vi.fn().mockReturnValue({ input: 'test' });
+
+      await expect(
+        withAiOperationHandlerObject(
+          'extractOp',
+          { arguments: { data: 'test' } },
+          mockExecute,
+          mockPrepareInput
+        )
+      ).rejects.toThrow('Processing error');
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith('AI Operation Error: extractOp', {
+        timestamp: '2025-11-30T10:00:00.000Z',
+        error: 'Processing error',
+        input: { input: 'test' },
+      });
     });
   });
 });

@@ -76,7 +76,7 @@ export function createErrorLogEntry(operationName: string, error: Error, input: 
 /**
  * Generic Lambda handler wrapper for AI operations
  * Handles common logging, error handling, and execution flow
- * 
+ *
  * @param operationName - Name of the AI operation (e.g., 'parseCvText')
  * @param event - Lambda event with arguments
  * @param executeFn - Function that executes the AI operation logic

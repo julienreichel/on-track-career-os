@@ -7,6 +7,7 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => ({
   InvokeModelCommand: vi.fn(),
 }));
 
+/* eslint-disable max-lines-per-function */
 describe('bedrock utilities', () => {
   let mockSend: Mock;
   let invokeBedrock: (
@@ -351,6 +352,312 @@ describe('bedrock utilities', () => {
       mockSend.mockRejectedValue(new Error('Bedrock timeout'));
 
       await expect(retryWithSchema('system', 'user', 'schema')).rejects.toThrow('Bedrock timeout');
+    });
+  });
+
+  describe('invokeAiWithRetry', () => {
+    let invokeAiWithRetry: <T>(options: {
+      systemPrompt: string;
+      userPrompt: string;
+      outputSchema: string;
+      validate: (parsed: Partial<T>) => T;
+      operationName?: string;
+    }) => Promise<T>;
+    let consoleLogSpy: ReturnType<typeof vi.spyOn>;
+    let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(async () => {
+      const bedrockModule = await import('@amplify/data/ai-operations/utils/bedrock');
+      invokeAiWithRetry = bedrockModule.invokeAiWithRetry;
+      consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      consoleLogSpy.mockRestore();
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('should successfully invoke AI and validate output', async () => {
+      interface TestOutput {
+        result: string;
+      }
+
+      const mockResponse = {
+        body: new TextEncoder().encode(
+          JSON.stringify({
+            content: [{ text: '{"result": "success"}' }],
+          })
+        ),
+      };
+      mockSend.mockResolvedValue(mockResponse);
+
+      const validate = (parsed: Partial<TestOutput>): TestOutput => ({
+        result: parsed.result || 'default',
+      });
+
+      const result = await invokeAiWithRetry<TestOutput>({
+        systemPrompt: 'system',
+        userPrompt: 'user',
+        outputSchema: '{"result": "string"}',
+        validate,
+      });
+
+      expect(result).toEqual({ result: 'success' });
+      expect(mockSend).toHaveBeenCalledTimes(1);
+    });
+
+    it('should extract JSON from markdown wrappers', async () => {
+      interface TestOutput {
+        data: string;
+      }
+
+      const mockResponse = {
+        body: new TextEncoder().encode(
+          JSON.stringify({
+            content: [{ text: '```json\n{"data": "value"}\n```' }],
+          })
+        ),
+      };
+      mockSend.mockResolvedValue(mockResponse);
+
+      const validate = (parsed: Partial<TestOutput>): TestOutput => ({
+        data: parsed.data || '',
+      });
+
+      const result = await invokeAiWithRetry<TestOutput>({
+        systemPrompt: 'system',
+        userPrompt: 'user',
+        outputSchema: '{"data": "string"}',
+        validate,
+      });
+
+      expect(result).toEqual({ data: 'value' });
+    });
+
+    it('should retry with schema on parse error and log appropriately', async () => {
+      interface TestOutput {
+        result: string;
+      }
+
+      // First call returns invalid JSON
+      mockSend
+        .mockResolvedValueOnce({
+          body: new TextEncoder().encode(
+            JSON.stringify({
+              content: [{ text: 'not valid json' }],
+            })
+          ),
+        })
+        // Second call (retry) returns valid JSON
+        .mockResolvedValueOnce({
+          body: new TextEncoder().encode(
+            JSON.stringify({
+              content: [{ text: '{"result": "success"}' }],
+            })
+          ),
+        });
+
+      const validate = (parsed: Partial<TestOutput>): TestOutput => ({
+        result: parsed.result || 'default',
+      });
+
+      const result = await invokeAiWithRetry<TestOutput>({
+        systemPrompt: 'system',
+        userPrompt: 'user',
+        outputSchema: '{"result": "string"}',
+        validate,
+        operationName: 'testOp',
+      });
+
+      expect(result).toEqual({ result: 'success' });
+      expect(mockSend).toHaveBeenCalledTimes(2);
+
+      // Should log error with retry flag
+      expect(consoleErrorSpy).toHaveBeenCalledWith('AI Operation Error: testOp', {
+        timestamp: expect.any(String),
+        error: expect.stringContaining('Unexpected token'),
+        retrying: true,
+      });
+
+      // Should log retry success
+      expect(consoleLogSpy).toHaveBeenCalledWith('AI Operation: testOp (retry successful)', {
+        timestamp: expect.any(String),
+        fallbacksUsed: ['retry_with_schema'],
+      });
+    });
+
+    it('should not log when operationName is not provided', async () => {
+      interface TestOutput {
+        data: string;
+      }
+
+      // Invalid JSON on first call
+      mockSend
+        .mockResolvedValueOnce({
+          body: new TextEncoder().encode(
+            JSON.stringify({
+              content: [{ text: 'invalid' }],
+            })
+          ),
+        })
+        // Valid JSON on retry
+        .mockResolvedValueOnce({
+          body: new TextEncoder().encode(
+            JSON.stringify({
+              content: [{ text: '{"data": "ok"}' }],
+            })
+          ),
+        });
+
+      const validate = (parsed: Partial<TestOutput>): TestOutput => ({
+        data: parsed.data || '',
+      });
+
+      await invokeAiWithRetry<TestOutput>({
+        systemPrompt: 'system',
+        userPrompt: 'user',
+        outputSchema: '{"data": "string"}',
+        validate,
+        // No operationName
+      });
+
+      // Should not log anything
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      expect(consoleLogSpy).not.toHaveBeenCalled();
+    });
+
+    it('should apply validation and fallbacks', async () => {
+      interface TestOutput {
+        required: string;
+        optional: string;
+      }
+
+      const mockResponse = {
+        body: new TextEncoder().encode(
+          JSON.stringify({
+            content: [{ text: '{"required": "value"}' }],
+          })
+        ),
+      };
+      mockSend.mockResolvedValue(mockResponse);
+
+      const validate = (parsed: Partial<TestOutput>): TestOutput => ({
+        required: parsed.required || 'default_required',
+        optional: parsed.optional || 'default_optional',
+      });
+
+      const result = await invokeAiWithRetry<TestOutput>({
+        systemPrompt: 'system',
+        userPrompt: 'user',
+        outputSchema: '{"required": "string", "optional": "string"}',
+        validate,
+      });
+
+      expect(result).toEqual({
+        required: 'value',
+        optional: 'default_optional',
+      });
+    });
+
+    it('should throw if retry also fails to parse', async () => {
+      interface TestOutput {
+        data: string;
+      }
+
+      // Both calls return invalid JSON
+      mockSend.mockResolvedValue({
+        body: new TextEncoder().encode(
+          JSON.stringify({
+            content: [{ text: 'still invalid' }],
+          })
+        ),
+      });
+
+      const validate = (parsed: Partial<TestOutput>): TestOutput => ({
+        data: parsed.data || '',
+      });
+
+      await expect(
+        invokeAiWithRetry<TestOutput>({
+          systemPrompt: 'system',
+          userPrompt: 'user',
+          outputSchema: '{"data": "string"}',
+          validate,
+          operationName: 'testOp',
+        })
+      ).rejects.toThrow(/AI cannot produce a stable answer/);
+
+      expect(mockSend).toHaveBeenCalledTimes(2);
+    });
+
+    it('should propagate validation errors', async () => {
+      interface TestOutput {
+        required: string;
+      }
+
+      const mockResponse = {
+        body: new TextEncoder().encode(
+          JSON.stringify({
+            content: [{ text: '{}' }],
+          })
+        ),
+      };
+      mockSend.mockResolvedValue(mockResponse);
+
+      const validate = (parsed: Partial<TestOutput>): TestOutput => {
+        if (!parsed.required) {
+          throw new Error('Missing required field');
+        }
+        return { required: parsed.required };
+      };
+
+      await expect(
+        invokeAiWithRetry<TestOutput>({
+          systemPrompt: 'system',
+          userPrompt: 'user',
+          outputSchema: '{"required": "string"}',
+          validate,
+        })
+      ).rejects.toThrow('Missing required field');
+    });
+
+    it('should handle complex nested types', async () => {
+      interface ComplexOutput {
+        nested: {
+          array: number[];
+          object: { key: string };
+        };
+      }
+
+      const complexData = {
+        nested: {
+          array: [1, 2, 3],
+          object: { key: 'value' },
+        },
+      };
+
+      const mockResponse = {
+        body: new TextEncoder().encode(
+          JSON.stringify({
+            content: [{ text: JSON.stringify(complexData) }],
+          })
+        ),
+      };
+      mockSend.mockResolvedValue(mockResponse);
+
+      const validate = (parsed: Partial<ComplexOutput>): ComplexOutput => ({
+        nested: parsed.nested || { array: [], object: { key: '' } },
+      });
+
+      const result = await invokeAiWithRetry<ComplexOutput>({
+        systemPrompt: 'system',
+        userPrompt: 'user',
+        outputSchema: JSON.stringify(complexData),
+        validate,
+      });
+
+      expect(result).toEqual(complexData);
     });
   });
 });

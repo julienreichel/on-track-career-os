@@ -100,28 +100,6 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
       expect(typeof parsed.result).toBe('string');
     });
 
-    it('should handle AI response wrapped in markdown code blocks', async () => {
-      const mockResponse = generateMockStarStory(mockExperienceText);
-
-      mockSend.mockResolvedValueOnce({
-        body: Buffer.from(
-          JSON.stringify({
-            content: [{ text: '```json\n' + JSON.stringify(mockResponse) + '\n```' }],
-          })
-        ),
-      });
-
-      const result = await handler({
-        arguments: { sourceText: mockExperienceText },
-      });
-
-      const parsed = JSON.parse(result);
-      expect(parsed.situation).toBeTruthy();
-      expect(parsed.task).toBeTruthy();
-      expect(parsed.action).toBeTruthy();
-      expect(parsed.result).toBeTruthy();
-    });
-
     it('should apply fallbacks for missing fields', async () => {
       const incompleteResponse = {
         situation: 'Working on a project',
@@ -146,37 +124,6 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
       expect(parsed.task).toBe('No task provided'); // Fallback for empty string
       expect(parsed.action).toBe('No action provided'); // Fallback for missing field
       expect(parsed.result).toBe('No result provided'); // Fallback for missing field
-    });
-
-    it('should retry with schema on parse error', async () => {
-      // First call returns invalid JSON
-      mockSend
-        .mockResolvedValueOnce({
-          body: Buffer.from(
-            JSON.stringify({
-              content: [{ text: 'This is not valid JSON' }],
-            })
-          ),
-        })
-        // Second call (retry) returns valid JSON
-        .mockResolvedValueOnce({
-          body: Buffer.from(
-            JSON.stringify({
-              content: [{ text: JSON.stringify(generateMockStarStory(mockExperienceText)) }],
-            })
-          ),
-        });
-
-      const result = await handler({
-        arguments: { sourceText: mockExperienceText },
-      });
-
-      const parsed = JSON.parse(result);
-      expect(parsed.situation).toBeTruthy();
-      expect(parsed.task).toBeTruthy();
-      expect(parsed.action).toBeTruthy();
-      expect(parsed.result).toBeTruthy();
-      expect(mockSend).toHaveBeenCalledTimes(2);
     });
 
     it('should handle short experience text', async () => {
