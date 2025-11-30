@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
-import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import type { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
 
 // Mock the repository
