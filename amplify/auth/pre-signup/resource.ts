@@ -3,8 +3,10 @@ import { defineFunction } from '@aws-amplify/backend';
 export const preSignup = defineFunction({
   name: 'pre-signup',
   entry: './handler.ts',
-  // AMPLIFY_ENVIRONMENT is automatically set by Amplify Gen 2:
-  // - 'sandbox' when running npx ampx sandbox
-  // - Branch name when deployed via Amplify Hosting
-  // No need to manually configure it here
+  environment: {
+    // AUTO_CONFIRM_USERS: Control whether to auto-confirm users
+    // Set to 'true' for sandbox/dev, 'false' for production
+    // Amplify Hosting can override this per branch
+    AUTO_CONFIRM_USERS: 'false', // Default to secure (production) behavior
+  },
 });
