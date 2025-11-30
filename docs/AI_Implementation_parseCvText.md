@@ -29,7 +29,7 @@ Added custom query:
 
 ```typescript
 parseCvText: a.query()
-  .arguments({ cv_text: a.string().required() })
+  .arguments({ cvText: a.string().required() })
   .returns(a.string())
   .authorization((allow) => [allow.authenticated()])
   .handler(a.handler.function(parseCvTextFunction));
@@ -72,11 +72,11 @@ All tests passing ✅
 | --------------------------- | ------ | -------------------------------------------------------- |
 | System prompt (constant)    | ✅     | `SYSTEM_PROMPT` constant                                 |
 | User prompt (data-injected) | ✅     | Template string with `${cv_text}`                        |
-| Input schema validation     | ✅     | GraphQL `.arguments({ cv_text: a.string().required() })` |
+| Input schema validation     | ✅     | GraphQL `.arguments({ cvText: a.string().required() })` |
 | Output schema validation    | ✅     | `validateOutput()` function                              |
 | Fallback strategy           | ✅     | `retryWithSchema()` for JSON errors                      |
 | No free-form text           | ✅     | Always returns structured JSON string                    |
-| JSON output (snake_case)    | ✅     | `experiences`, `raw_blocks`, etc.                        |
+| JSON output (camelCase)     | ✅     | `experiences`, `rawBlocks`, etc.                         |
 | Content blocks as arrays    | ✅     | All sections are `string[]`                              |
 | Logging & traceability      | ✅     | `console.log()` with timestamp, I/O, fallbacks           |
 
@@ -90,7 +90,7 @@ const client = generateClient<Schema>();
 
 // Call AI operation
 const { data, errors } = await client.queries.parseCvText({
-  cv_text: pdfExtractedText,
+  cvText: pdfExtractedText,
 });
 
 if (!errors) {
@@ -129,7 +129,7 @@ EXPERIENCE
 ...
 `;
 
-const result = await client.queries.parseCvText({ cv_text: cvText });
+const result = await client.queries.parseCvText({ cvText });
 console.log(JSON.parse(result.data));
 ```
 
@@ -142,7 +142,7 @@ interface ParseCvTextOutput {
     education: string[]; // Raw education text blocks
     skills: string[]; // Extracted skills
     certifications: string[]; // Extracted certifications
-    raw_blocks: string[]; // Any unclassified sections
+    rawBlocks: string[]; // Any unclassified sections
   };
   confidence: number; // 0-1 confidence score
 }
@@ -160,7 +160,7 @@ interface ParseCvTextOutput {
     "education": ["Bachelor of Science in Computer Science\nUniversity of Technology (2014-2018)"],
     "skills": ["JavaScript", "TypeScript", "React", "Node.js", "AWS", "Docker"],
     "certifications": ["AWS Certified Solutions Architect", "Google Cloud Professional Developer"],
-    "raw_blocks": []
+    "rawBlocks": []
   },
   "confidence": 0.95
 }

@@ -19,8 +19,10 @@ Each operation must conform to:
 ## 2. Naming Conventions
 
 - Operations: `ai.operationName` (camelCase)
-- JSON output: `snake_case`
+- JSON output: `camelCase` (JavaScript/TypeScript standard)
 - Content blocks: arrays only (no raw paragraphs)
+
+**Note**: Lambda validation functions support both `snake_case` (from AI responses) and `camelCase` as input, but always normalize output to `camelCase` for consistency.
 
 **Examples:**
 
@@ -101,7 +103,7 @@ Extract structured sections from this CV text:
 
 ```json
 {
-  "cv_text": "string"
+  "cvText": "string"
 }
 ```
 
@@ -114,7 +116,7 @@ Extract structured sections from this CV text:
     "education": ["string"],
     "skills": ["string"],
     "certifications": ["string"],
-    "raw_blocks": ["string"]
+    "rawBlocks": ["string"]
   },
   "confidence": "number"
 }
@@ -148,7 +150,7 @@ Convert the following CV experience sections into experience blocks:
 
 ```json
 {
-  "experience_text_blocks": ["string"]
+  "experienceTextBlocks": ["string"]
 }
 ```
 
@@ -160,8 +162,8 @@ Convert the following CV experience sections into experience blocks:
     {
       "title": "string",
       "company": "string",
-      "start_date": "string",
-      "end_date": "string",
+      "startDate": "string",
+      "endDate": "string",
       "responsibilities": ["string"],
       "tasks": ["string"]
     }
