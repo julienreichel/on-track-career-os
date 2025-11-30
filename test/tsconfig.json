@@ -2,6 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "baseUrl": "..",
+    "resolveJsonModule": true,
     "paths": {
       "@/*": ["src/*"],
       "~/*": ["src/*"],
@@ -11,6 +12,6 @@
     },
     "types": ["vitest/globals", "@nuxt/test-utils", "node"]
   },
-  "include": ["**/*.ts", "**/*.vue", "../src/**/*.ts", "../src/**/*.vue", "../amplify/**/*.ts"],
+  "include": ["**/*.ts", "**/*.vue", "../src/**/*.ts", "../src/**/*.vue", "../amplify/**/*.ts", "../amplify_outputs.json"],
   "exclude": ["node_modules"]
 }

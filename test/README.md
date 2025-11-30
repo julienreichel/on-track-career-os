@@ -10,8 +10,15 @@ test/
 │   ├── domain/             # Domain layer (repositories, services)
 │   ├── application/        # Application layer (composables)
 │   └── data/               # Data layer (GraphQL utilities)
-└── nuxt/                   # Nuxt tests - Nuxt runtime environment
-    └── layouts/            # Layout components with i18n, routing
+├── amplify/                # Amplify tests - Lambda functions (Node env)
+│   ├── auth/               # Auth Lambda handlers
+│   └── data/               # Data Lambda handlers (AI operations)
+├── nuxt/                   # Nuxt tests - Nuxt runtime environment
+│   └── layouts/            # Layout components with i18n, routing
+└── e2e-sandbox/            # E2E tests against live Amplify sandbox
+    ├── auth/               # Auth flows (signup, post-confirmation)
+    ├── graphql/            # GraphQL operations (mutations, queries)
+    └── ai-operations/      # AI Lambda integration tests
 ```
 
 ## Running Tests
@@ -23,8 +30,14 @@ npm test
 # Run unit tests only (Node environment - fast)
 npm run test:unit
 
+# Run Amplify tests only (Lambda handlers - fast)
+npm run test:amplify
+
 # Run Nuxt tests only (Nuxt runtime environment)
 npm run test:nuxt
+
+# Run E2E sandbox tests (requires live Amplify sandbox)
+npm run test:sandbox
 
 # Watch mode (all tests)
 npm run test:watch
@@ -40,7 +53,9 @@ npm run test:coverage
 
 - **Configuration**: Single `vitest.config.ts` with Vitest projects
 - **Unit tests**: Node environment (no Nuxt overhead, very fast)
+- **Amplify tests**: Node environment for Lambda handlers
 - **Nuxt tests**: Nuxt environment with happy-dom, i18n, auto-imports
+- **E2E Sandbox tests**: Node environment with live AWS services
 - **Framework**: Vitest 3.2.4 with @nuxt/test-utils
 - **Coverage**: v8 provider with 80% threshold
 
@@ -95,6 +110,16 @@ describe('Login Page', () => {
   });
 });
 ```
+
+### E2E Sandbox Tests (Optional)
+
+E2E sandbox tests validate complete backend integration against a live Amplify sandbox environment. See `test/e2e-sandbox/README.md` for details.
+
+**Prerequisites**: `npx ampx sandbox --once` must be running
+
+**Run**: `npm run test:sandbox`
+
+**Note**: These tests are slower (~30s-2min) and optional in CI.
 
 ## Coverage Goals
 

@@ -76,6 +76,22 @@ export default defineConfig({
           },
         },
       }),
+      // E2E Sandbox tests - run against live Amplify sandbox
+      {
+        test: {
+          name: 'e2e-sandbox',
+          include: ['test/e2e-sandbox/**/*.spec.ts'],
+          environment: 'node',
+          testTimeout: 60000, // 60s for AWS operations
+        },
+        // Configure path aliases for sandbox tests
+        resolve: {
+          alias: {
+            '@': resolve(__dirname, './src'),
+            '~': resolve(__dirname, './src'),
+          },
+        },
+      },
     ],
     // Global coverage settings
     coverage: {

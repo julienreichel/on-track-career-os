@@ -1,0 +1,79 @@
+name: E2E Sandbox Tests (Manual)
+
+# Run sandbox tests manually via workflow dispatch
+# This is optional due to longer execution time and AWS resource usage
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_pattern:
+        description: 'Test pattern (e.g., auth/post-confirmation.spec.ts)'
+        required: false
+        default: ''
+
+jobs:
+  sandbox-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy Amplify Sandbox
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION || 'eu-central-1' }}
+        run: |
+          echo "Deploying Amplify sandbox..."
+          npx ampx sandbox --once &
+          SANDBOX_PID=$!
+          
+          # Wait for sandbox to be ready (max 10 minutes)
+          echo "Waiting for sandbox deployment..."
+          for i in {1..60}; do
+            if [ -f "amplify_outputs.json" ]; then
+              echo "Sandbox deployed successfully"
+              break
+            fi
+            sleep 10
+          done
+          
+          if [ ! -f "amplify_outputs.json" ]; then
+            echo "Sandbox deployment timed out"
+            exit 1
+          fi
+
+      - name: Run E2E Sandbox Tests
+        run: |
+          if [ -n "${{ github.event.inputs.test_pattern }}" ]; then
+            npm run test:sandbox -- ${{ github.event.inputs.test_pattern }}
+          else
+            npm run test:sandbox
+          fi
+
+      - name: Cleanup Sandbox
+        if: always()
+        run: |
+          echo "Cleaning up sandbox..."
+          npx ampx sandbox delete --yes || true
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sandbox-test-results
+          path: |
+            test-results/
+            coverage/
+          retention-days: 7
