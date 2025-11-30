@@ -17,12 +17,18 @@ import type { PreSignUpTriggerHandler } from 'aws-lambda';
  * - Normal email verification flow (auto-confirm DISABLED)
  * - Users must verify email via confirmation code
  *
+ * ENVIRONMENT DETECTION:
+ * - env.AMPLIFY_ENVIRONMENT is automatically set by Amplify Gen 2
+ * - 'sandbox' → when running `npx ampx sandbox`
+ * - 'main' or branch name → when deployed via Amplify Hosting
+ * - Falls back to 'production' if not set (safe default)
+ *
  * CONFIGURATION:
  * Attached to Cognito User Pool → Pre sign-up trigger
  */
 
 export const handler: PreSignUpTriggerHandler = async (event) => {
-  // Get environment from Amplify
+  // Get environment from Amplify (automatically set)
   const environment = env.AMPLIFY_ENVIRONMENT || 'production';
   const isSandbox = environment === 'sandbox' || environment === 'dev';
 
