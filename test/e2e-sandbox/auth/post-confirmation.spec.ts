@@ -45,7 +45,7 @@ describe('Post-Confirmation Flow (E2E Sandbox)', () => {
     });
 
     testUserId = signUpResult.userId;
-    
+
     // Sign in once for all tests
     await signIn({
       username: testEmail,
@@ -125,7 +125,7 @@ describe('Post-Confirmation Flow (E2E Sandbox)', () => {
 
     // Should only see own profile due to owner-based authorization
     expect(profiles.length).toBeGreaterThanOrEqual(1);
-    
+
     // All returned profiles should belong to current user
     profiles.forEach((profile) => {
       expect(profile.id).toBe(testUserId);

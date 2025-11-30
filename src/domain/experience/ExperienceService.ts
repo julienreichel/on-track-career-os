@@ -1,4 +1,4 @@
-import { ExperienceRepository } from './ExperienceRepository'
+import { ExperienceRepository } from './ExperienceRepository';
 import type { Experience } from './Experience';
 // import { loadLazy } from '@/data/graphql/lazy'
 

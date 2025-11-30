@@ -39,7 +39,7 @@ export const handler: PreSignUpTriggerHandler = async (event) => {
   // Only auto-confirm if explicitly enabled (for sandbox/dev)
   if (autoConfirmEnabled) {
     console.log('Auto-confirming user (AUTO_CONFIRM_USERS=true)');
-    
+
     // Auto-confirm user (no email verification code required)
     event.response.autoConfirmUser = true;
 

@@ -20,11 +20,13 @@ This creates a temporary AWS environment with all resources deployed.
 **Auto-Confirmation Setup:**
 
 The project includes a **Pre Sign-up Lambda trigger** (`amplify/auth/pre-signup/handler.ts`) that automatically:
+
 - Confirms users (no verification code required)
-- Verifies email addresses  
+- Verifies email addresses
 - Enables immediate testing without manual verification
 
 **Environment Protection**:
+
 ```typescript
 const environment = env.AMPLIFY_ENVIRONMENT || 'production';
 const isSandbox = environment === 'sandbox' || environment === 'dev';

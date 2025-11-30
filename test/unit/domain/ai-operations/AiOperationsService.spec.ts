@@ -157,10 +157,7 @@ describe('AiOperationsService', () => {
           education: [],
           skills: [],
           certifications: [],
-          rawBlocks: [
-            'EXPERIENCE section: Senior Developer at TechCorp',
-            'EDUCATION section: MIT',
-          ],
+          rawBlocks: ['EXPERIENCE section: Senior Developer at TechCorp', 'EDUCATION section: MIT'],
         },
         confidence: 0.95,
       };
