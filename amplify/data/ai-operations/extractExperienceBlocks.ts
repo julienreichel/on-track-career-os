@@ -106,11 +106,18 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
       const title = typeof expObj.title === 'string' ? expObj.title : `Experience ${index + 1}`;
       const company = typeof expObj.company === 'string' ? expObj.company : 'Unknown Company';
       // Support both camelCase and snake_case from AI response
-      const startDate = typeof expObj.startDate === 'string' ? expObj.startDate : 
-                        typeof expObj.start_date === 'string' ? expObj.start_date : '';
+      const startDate =
+        typeof expObj.startDate === 'string'
+          ? expObj.startDate
+          : typeof expObj.start_date === 'string'
+            ? expObj.start_date
+            : '';
       const endDate =
-        expObj.endDate === null || typeof expObj.endDate === 'string' ? expObj.endDate :
-        expObj.end_date === null || typeof expObj.end_date === 'string' ? expObj.end_date : null;
+        expObj.endDate === null || typeof expObj.endDate === 'string'
+          ? expObj.endDate
+          : expObj.end_date === null || typeof expObj.end_date === 'string'
+            ? expObj.end_date
+            : null;
 
       // Array fields with fallbacks
       const responsibilities = Array.isArray(expObj.responsibilities)

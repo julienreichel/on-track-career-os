@@ -68,17 +68,17 @@ All tests passing ✅
 
 ## AI Interaction Contract Compliance
 
-| Requirement                 | Status | Implementation                                           |
-| --------------------------- | ------ | -------------------------------------------------------- |
-| System prompt (constant)    | ✅     | `SYSTEM_PROMPT` constant                                 |
-| User prompt (data-injected) | ✅     | Template string with `${cv_text}`                        |
+| Requirement                 | Status | Implementation                                          |
+| --------------------------- | ------ | ------------------------------------------------------- |
+| System prompt (constant)    | ✅     | `SYSTEM_PROMPT` constant                                |
+| User prompt (data-injected) | ✅     | Template string with `${cv_text}`                       |
 | Input schema validation     | ✅     | GraphQL `.arguments({ cvText: a.string().required() })` |
-| Output schema validation    | ✅     | `validateOutput()` function                              |
-| Fallback strategy           | ✅     | `retryWithSchema()` for JSON errors                      |
-| No free-form text           | ✅     | Always returns structured JSON string                    |
-| JSON output (camelCase)     | ✅     | `experiences`, `rawBlocks`, etc.                         |
-| Content blocks as arrays    | ✅     | All sections are `string[]`                              |
-| Logging & traceability      | ✅     | `console.log()` with timestamp, I/O, fallbacks           |
+| Output schema validation    | ✅     | `validateOutput()` function                             |
+| Fallback strategy           | ✅     | `retryWithSchema()` for JSON errors                     |
+| No free-form text           | ✅     | Always returns structured JSON string                   |
+| JSON output (camelCase)     | ✅     | `experiences`, `rawBlocks`, etc.                        |
+| Content blocks as arrays    | ✅     | All sections are `string[]`                             |
+| Logging & traceability      | ✅     | `console.log()` with timestamp, I/O, fallbacks          |
 
 ## Frontend Usage
 

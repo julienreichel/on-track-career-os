@@ -76,8 +76,8 @@ function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOu
       rawBlocks: Array.isArray(parsedOutput.sections.rawBlocks)
         ? parsedOutput.sections.rawBlocks
         : Array.isArray((parsedOutput.sections as Record<string, unknown>).raw_blocks)
-        ? ((parsedOutput.sections as Record<string, unknown>).raw_blocks as string[])
-        : [],
+          ? ((parsedOutput.sections as Record<string, unknown>).raw_blocks as string[])
+          : [],
     },
     confidence:
       typeof parsedOutput.confidence === 'number' ? parsedOutput.confidence : DEFAULT_CONFIDENCE,
