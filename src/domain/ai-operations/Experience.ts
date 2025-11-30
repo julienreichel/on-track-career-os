@@ -1,20 +1,16 @@
 /**
- * Experience entity - represents the structured output from experience block extraction
- * Maps to the JSON output schema from extractExperienceBlocks Lambda function
+ * Experience entity - re-exports types from Lambda function
+ * @see amplify/data/ai-operations/extractExperienceBlocks.ts
  */
 
-export interface ExtractedExperience {
-  title: string;
-  company: string;
-  start_date: string;
-  end_date?: string;
-  responsibilities: string[];
-  tasks: string[];
-}
+import type {
+  ExperienceBlock,
+  ExtractExperienceBlocksOutput,
+} from '@amplify/data/ai-operations/extractExperienceBlocks';
 
-export interface ExperiencesResult {
-  experiences: ExtractedExperience[];
-}
+// Re-export Lambda types with frontend-friendly names
+export type ExtractedExperience = ExperienceBlock;
+export type ExperiencesResult = ExtractExperienceBlocksOutput;
 
 /**
  * Type guard to validate ExperiencesResult structure

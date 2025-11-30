@@ -81,7 +81,7 @@ describe('useAiOperations composables', () => {
     it('should reset state', () => {
       // Arrange
       const { parsedCv, loading, error, reset } = useParseCvText();
-      parsedCv.value = { experiences: [], education: [], skills: [], certifications: [], raw_blocks: [], confidence: 0.9 };
+      parsedCv.value = { sections: { experiences: [], education: [], skills: [], certifications: [], raw_blocks: [] }, confidence: 0.9 };
       loading.value = true;
       error.value = 'Some error';
 
@@ -182,11 +182,13 @@ describe('useAiOperations composables', () => {
     it('should successfully parse CV', async () => {
       // Arrange
       const mockParsedCv: ParsedCV = {
-        experiences: [],
-        education: [],
-        skills: [],
-        certifications: [],
-        raw_blocks: [],
+        sections: {
+          experiences: [],
+          education: [],
+          skills: [],
+          certifications: [],
+          raw_blocks: [],
+        },
         confidence: 0.95,
       };
       mockService.parseCvText.mockResolvedValue(mockParsedCv);
@@ -229,11 +231,13 @@ describe('useAiOperations composables', () => {
     it('should successfully parse and extract in one operation', async () => {
       // Arrange
       const mockParsedCv: ParsedCV = {
-        experiences: [],
-        education: [],
-        skills: [],
-        certifications: [],
-        raw_blocks: [],
+        sections: {
+          experiences: [],
+          education: [],
+          skills: [],
+          certifications: [],
+          raw_blocks: [],
+        },
         confidence: 0.95,
       };
       const mockExperiences: ExperiencesResult = {
@@ -286,7 +290,7 @@ describe('useAiOperations composables', () => {
     it('should reset state', () => {
       // Arrange
       const { parsedCv, experiences, loading, error, reset } = useAiOperations();
-      parsedCv.value = { experiences: [], education: [], skills: [], certifications: [], raw_blocks: [], confidence: 0.9 };
+      parsedCv.value = { sections: { experiences: [], education: [], skills: [], certifications: [], raw_blocks: [] }, confidence: 0.9 };
       experiences.value = { experiences: [] };
       loading.value = true;
       error.value = 'Some error';

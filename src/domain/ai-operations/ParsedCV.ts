@@ -1,46 +1,12 @@
 /**
- * ParsedCV entity - represents the structured output from CV text parsing
- * Maps to the JSON output schema from parseCvText Lambda function
+ * ParsedCV entity - re-exports types from Lambda function
+ * @see amplify/data/ai-operations/parseCvText.ts
  */
 
-export interface CVSection {
-  text: string;
-}
+import type { ParseCvTextOutput } from '@amplify/data/ai-operations/parseCvText';
 
-export interface CVExperience {
-  title: string;
-  company: string;
-  start_date?: string;
-  end_date?: string;
-  description: string;
-}
-
-export interface CVEducation {
-  degree?: string;
-  institution: string;
-  graduation_date?: string;
-  description: string;
-}
-
-export interface CVSkill {
-  skill: string;
-  category?: string;
-}
-
-export interface CVCertification {
-  name: string;
-  issuer?: string;
-  date?: string;
-}
-
-export interface ParsedCV {
-  experiences: CVExperience[];
-  education: CVEducation[];
-  skills: CVSkill[];
-  certifications: CVCertification[];
-  raw_blocks: CVSection[];
-  confidence: number;
-}
+// Re-export Lambda type with frontend-friendly name
+export type ParsedCV = ParseCvTextOutput;
 
 /**
  * Type guard to validate ParsedCV structure
@@ -50,12 +16,16 @@ export function isParsedCV(data: unknown): data is ParsedCV {
   
   const cv = data as Record<string, unknown>;
   
+  if (!cv.sections || typeof cv.sections !== 'object') return false;
+  
+  const sections = cv.sections as Record<string, unknown>;
+  
   return (
-    Array.isArray(cv.experiences) &&
-    Array.isArray(cv.education) &&
-    Array.isArray(cv.skills) &&
-    Array.isArray(cv.certifications) &&
-    Array.isArray(cv.raw_blocks) &&
+    Array.isArray(sections.experiences) &&
+    Array.isArray(sections.education) &&
+    Array.isArray(sections.skills) &&
+    Array.isArray(sections.certifications) &&
+    Array.isArray(sections.raw_blocks) &&
     typeof cv.confidence === 'number'
   );
 }

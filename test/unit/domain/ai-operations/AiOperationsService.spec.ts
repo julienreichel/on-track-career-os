@@ -29,26 +29,13 @@ describe('AiOperationsService', () => {
     it('should successfully parse valid CV text', async () => {
       // Arrange
       const mockParsedCv: ParsedCV = {
-        experiences: [
-          {
-            title: 'Senior Developer',
-            company: 'TechCorp',
-            start_date: '2020-01',
-            end_date: '2023-12',
-            description: 'Led development team',
-          },
-        ],
-        education: [
-          {
-            degree: 'BSc Computer Science',
-            institution: 'MIT',
-            graduation_date: '2019',
-            description: 'Graduated with honors',
-          },
-        ],
-        skills: [{ skill: 'Python', category: 'Programming' }],
-        certifications: [{ name: 'AWS Certified', issuer: 'Amazon', date: '2022' }],
-        raw_blocks: [{ text: 'Experience section...' }],
+        sections: {
+          experiences: ['Senior Developer at TechCorp (2020-2023)'],
+          education: ['BSc Computer Science from MIT (2019)'],
+          skills: ['Python'],
+          certifications: ['AWS Certified'],
+          raw_blocks: ['Experience section...'],
+        },
         confidence: 0.95,
       };
 
@@ -165,21 +152,16 @@ describe('AiOperationsService', () => {
     it('should successfully parse CV and extract experiences from raw_blocks', async () => {
       // Arrange
       const mockParsedCv: ParsedCV = {
-        experiences: [
-          {
-            title: 'Senior Developer',
-            company: 'TechCorp',
-            start_date: '2020-01',
-            description: 'Led development team',
-          },
-        ],
-        education: [],
-        skills: [],
-        certifications: [],
-        raw_blocks: [
-          { text: 'EXPERIENCE section: Senior Developer at TechCorp' },
-          { text: 'EDUCATION section: MIT' },
-        ],
+        sections: {
+          experiences: ['Senior Developer at TechCorp'],
+          education: [],
+          skills: [],
+          certifications: [],
+          raw_blocks: [
+            'EXPERIENCE section: Senior Developer at TechCorp',
+            'EDUCATION section: MIT',
+          ],
+        },
         confidence: 0.95,
       };
 
@@ -214,18 +196,13 @@ describe('AiOperationsService', () => {
     it('should fallback to experiences descriptions when no experience blocks found', async () => {
       // Arrange
       const mockParsedCv: ParsedCV = {
-        experiences: [
-          {
-            title: 'Senior Developer',
-            company: 'TechCorp',
-            start_date: '2020-01',
-            description: 'Led development team',
-          },
-        ],
-        education: [],
-        skills: [],
-        certifications: [],
-        raw_blocks: [{ text: 'Some other section' }],
+        sections: {
+          experiences: ['Led development team'],
+          education: [],
+          skills: [],
+          certifications: [],
+          raw_blocks: ['Some other section'],
+        },
         confidence: 0.95,
       };
 
@@ -266,11 +243,13 @@ describe('AiOperationsService', () => {
     it('should propagate extraction errors', async () => {
       // Arrange
       const mockParsedCv: ParsedCV = {
-        experiences: [{ title: 'Dev', company: 'Corp', start_date: '2020', description: 'Work' }],
-        education: [],
-        skills: [],
-        certifications: [],
-        raw_blocks: [{ text: 'EXPERIENCE: Dev at Corp' }],
+        sections: {
+          experiences: ['Work'],
+          education: [],
+          skills: [],
+          certifications: [],
+          raw_blocks: ['EXPERIENCE: Dev at Corp'],
+        },
         confidence: 0.9,
       };
 

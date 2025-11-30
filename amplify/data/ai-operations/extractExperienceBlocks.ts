@@ -46,7 +46,7 @@ const OUTPUT_SCHEMA = `{
 }`;
 
 // Experience block interface (matches output schema)
-interface ExperienceBlock {
+export interface ExperienceBlock {
   title: string;
   company: string;
   start_date: string;
@@ -55,11 +55,11 @@ interface ExperienceBlock {
   tasks: string[];
 }
 
-interface OutputSchema {
+export interface ExtractExperienceBlocksOutput {
   experiences: ExperienceBlock[];
 }
 
-interface InputSchema {
+export interface ExtractExperienceBlocksInput {
   experience_text_blocks: string[];
 }
 
@@ -82,7 +82,7 @@ ${OUTPUT_SCHEMA}`;
 /**
  * Validate output and apply fallback rules per AIC
  */
-function validateOutput(output: unknown): OutputSchema {
+function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
   if (!output || typeof output !== 'object') {
     throw new Error('Output must be an object');
   }
@@ -136,7 +136,7 @@ function validateOutput(output: unknown): OutputSchema {
 /**
  * Main Lambda handler
  */
-export const handler = async (event: { arguments: InputSchema }): Promise<OutputSchema> => {
+export const handler = async (event: { arguments: ExtractExperienceBlocksInput }): Promise<ExtractExperienceBlocksOutput> => {
   const { experience_text_blocks } = event.arguments;
 
   // Log input (truncated)
@@ -161,7 +161,7 @@ export const handler = async (event: { arguments: InputSchema }): Promise<Output
     responseText = extractJson(responseText);
 
     // Try to parse
-    let parsedOutput: OutputSchema;
+    let parsedOutput: ExtractExperienceBlocksOutput;
     try {
       parsedOutput = JSON.parse(responseText);
     } catch (parseError) {
@@ -172,7 +172,7 @@ export const handler = async (event: { arguments: InputSchema }): Promise<Output
         input: { experience_text_blocks: truncatedInput },
       });
 
-      parsedOutput = await retryWithSchema<OutputSchema>(SYSTEM_PROMPT, userPrompt, OUTPUT_SCHEMA);
+      parsedOutput = await retryWithSchema<ExtractExperienceBlocksOutput>(SYSTEM_PROMPT, userPrompt, OUTPUT_SCHEMA);
 
       console.log('AI Operation: extractExperienceBlocks (retry successful)', {
         timestamp: new Date().toISOString(),

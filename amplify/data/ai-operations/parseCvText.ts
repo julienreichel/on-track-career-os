@@ -37,7 +37,7 @@ const OUTPUT_SCHEMA = `{
 }`;
 
 // Type definitions matching AI Interaction Contract
-interface ParseCvTextOutput {
+export interface ParseCvTextOutput {
   sections: {
     experiences: string[];
     education: string[];
@@ -48,10 +48,8 @@ interface ParseCvTextOutput {
   confidence: number;
 }
 
-interface ParseCvTextEvent {
-  arguments: {
-    cv_text: string;
-  };
+export interface ParseCvTextInput {
+  cv_text: string;
 }
 
 /**
@@ -94,7 +92,7 @@ ${cvText}`;
 /**
  * Main Lambda handler
  */
-export const handler = async (event: ParseCvTextEvent): Promise<string> => {
+export const handler = async (event: { arguments: ParseCvTextInput }): Promise<string> => {
   const { cv_text } = event.arguments;
   const truncatedInput = truncateForLog(cv_text);
 
