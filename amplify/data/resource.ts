@@ -21,6 +21,14 @@ export const extractExperienceBlocksFunction = defineFunction({
   timeoutSeconds: 60,
 });
 
+export const generateStarStoryFunction = defineFunction({
+  entry: './ai-operations/generateStarStory.ts',
+  environment: {
+    MODEL_ID,
+  },
+  timeoutSeconds: 60,
+});
+
 export const schema = a
   .schema({
     // =====================================================
@@ -328,6 +336,13 @@ export const schema = a
       .returns(a.string())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(extractExperienceBlocksFunction)),
+
+    generateStarStory: a
+      .query()
+      .arguments({ sourceText: a.string().required() })
+      .returns(a.string())
+      .authorization((allow) => [allow.authenticated()])
+      .handler(a.handler.function(generateStarStoryFunction)),
   })
   .authorization((allow) => [allow.resource(postConfirmation)]);
 
