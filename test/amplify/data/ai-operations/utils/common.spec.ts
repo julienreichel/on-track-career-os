@@ -278,9 +278,7 @@ describe('common utilities', () => {
     });
 
     it('should log input, execute function, log output, and return JSON string', async () => {
-      const { withAiOperationHandler } = await import(
-        '@amplify/data/ai-operations/utils/common'
-      );
+      const { withAiOperationHandler } = await import('@amplify/data/ai-operations/utils/common');
 
       const mockExecute = vi.fn().mockResolvedValue({ result: 'success' });
       const mockPrepareInput = vi.fn().mockReturnValue({ input: 'test_input' });
@@ -317,9 +315,7 @@ describe('common utilities', () => {
     });
 
     it('should handle errors and rethrow', async () => {
-      const { withAiOperationHandler } = await import(
-        '@amplify/data/ai-operations/utils/common'
-      );
+      const { withAiOperationHandler } = await import('@amplify/data/ai-operations/utils/common');
 
       const mockError = new Error('Execution failed');
       const mockExecute = vi.fn().mockRejectedValue(mockError);
@@ -343,9 +339,7 @@ describe('common utilities', () => {
     });
 
     it('should handle complex output objects', async () => {
-      const { withAiOperationHandler } = await import(
-        '@amplify/data/ai-operations/utils/common'
-      );
+      const { withAiOperationHandler } = await import('@amplify/data/ai-operations/utils/common');
 
       const complexOutput = {
         nested: { data: [1, 2, 3] },
@@ -385,9 +379,8 @@ describe('common utilities', () => {
     });
 
     it('should return output object directly (not JSON string)', async () => {
-      const { withAiOperationHandlerObject } = await import(
-        '@amplify/data/ai-operations/utils/common'
-      );
+      const { withAiOperationHandlerObject } =
+        await import('@amplify/data/ai-operations/utils/common');
 
       const mockOutput = { experiences: [{ title: 'Engineer' }] };
       const mockExecute = vi.fn().mockResolvedValue(mockOutput);
@@ -406,9 +399,8 @@ describe('common utilities', () => {
     });
 
     it('should log and handle errors same as string variant', async () => {
-      const { withAiOperationHandlerObject } = await import(
-        '@amplify/data/ai-operations/utils/common'
-      );
+      const { withAiOperationHandlerObject } =
+        await import('@amplify/data/ai-operations/utils/common');
 
       const mockError = new Error('Processing error');
       const mockExecute = vi.fn().mockRejectedValue(mockError);

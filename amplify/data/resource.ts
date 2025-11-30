@@ -38,6 +38,7 @@ export const schema = a
     UserProfile: a
       .model({
         fullName: a.string().required(),
+        owner: a.string().required(),
         headline: a.string(),
         location: a.string(),
         seniorityLevel: a.string(),
