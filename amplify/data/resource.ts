@@ -317,14 +317,14 @@ export const schema = a
 
     parseCvText: a
       .query()
-      .arguments({ cv_text: a.string().required() })
+      .arguments({ cvText: a.string().required() })
       .returns(a.string())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(parseCvTextFunction)),
 
     extractExperienceBlocks: a
       .query()
-      .arguments({ experience_text_blocks: a.string().array().required() })
+      .arguments({ experienceTextBlocks: a.string().array().required() })
       .returns(a.string())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(extractExperienceBlocksFunction)),

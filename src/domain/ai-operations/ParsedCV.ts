@@ -13,19 +13,19 @@ export type ParsedCV = ParseCvTextOutput;
  */
 export function isParsedCV(data: unknown): data is ParsedCV {
   if (typeof data !== 'object' || data === null) return false;
-  
+
   const cv = data as Record<string, unknown>;
-  
+
   if (!cv.sections || typeof cv.sections !== 'object') return false;
-  
+
   const sections = cv.sections as Record<string, unknown>;
-  
+
   return (
     Array.isArray(sections.experiences) &&
     Array.isArray(sections.education) &&
     Array.isArray(sections.skills) &&
     Array.isArray(sections.certifications) &&
-    Array.isArray(sections.raw_blocks) &&
+    Array.isArray(sections.rawBlocks) &&
     typeof cv.confidence === 'number'
   );
 }

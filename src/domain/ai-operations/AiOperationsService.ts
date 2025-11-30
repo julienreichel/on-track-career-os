@@ -6,7 +6,7 @@ import { isExperiencesResult } from './Experience';
 
 /**
  * Service for AI-powered CV and experience operations
- * 
+ *
  * Provides business logic layer between application (composables) and data (repository).
  * Handles validation, error handling, and data transformation.
  */
@@ -88,23 +88,18 @@ export class AiOperationsService {
     // Parse CV first
     const parsedCv = await this.parseCvText(cvText);
 
-    // Extract experience text blocks from raw_blocks
-    const experienceBlocks = parsedCv.sections.raw_blocks
-      .filter((block) => {
-        // Simple heuristic: blocks containing experience-related keywords
-        const text = block.toLowerCase();
-        return (
-          text.includes('experience') ||
-          text.includes('employment') ||
-          text.includes('work history')
-        );
-      });
+    // Extract experience text blocks from rawBlocks
+    const experienceBlocks = parsedCv.sections.rawBlocks.filter((block) => {
+      // Simple heuristic: blocks containing experience-related keywords
+      const text = block.toLowerCase();
+      return (
+        text.includes('experience') || text.includes('employment') || text.includes('work history')
+      );
+    });
 
     // If no blocks found, try using experiences from parsed CV
     const blocksToExtract =
-      experienceBlocks.length > 0
-        ? experienceBlocks
-        : parsedCv.sections.experiences;
+      experienceBlocks.length > 0 ? experienceBlocks : parsedCv.sections.experiences;
 
     // Extract structured experiences
     const experiences = await this.extractExperienceBlocks(blocksToExtract);

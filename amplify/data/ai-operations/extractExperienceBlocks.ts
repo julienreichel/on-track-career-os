@@ -26,7 +26,7 @@ RULES:
 - Extract only information explicitly stated in the text
 - Do not invent or infer missing details
 - Dates should be in YYYY-MM-DD format or YYYY-MM if day is not specified
-- If end_date is "Present" or missing, leave it null
+- If endDate is "Present" or missing, leave it null
 - Responsibilities are high-level duties
 - Tasks are specific actions or deliverables
 - Return ONLY valid JSON with no markdown wrappers`;
@@ -37,8 +37,8 @@ const OUTPUT_SCHEMA = `{
     {
       "title": "string",
       "company": "string",
-      "start_date": "YYYY-MM-DD or YYYY-MM",
-      "end_date": "YYYY-MM-DD or YYYY-MM or null",
+      "startDate": "YYYY-MM-DD or YYYY-MM",
+      "endDate": "YYYY-MM-DD or YYYY-MM or null",
       "responsibilities": ["string"],
       "tasks": ["string"]
     }
@@ -49,8 +49,8 @@ const OUTPUT_SCHEMA = `{
 export interface ExperienceBlock {
   title: string;
   company: string;
-  start_date: string;
-  end_date: string | null;
+  startDate: string;
+  endDate: string | null;
   responsibilities: string[];
   tasks: string[];
 }
@@ -60,7 +60,7 @@ export interface ExtractExperienceBlocksOutput {
 }
 
 export interface ExtractExperienceBlocksInput {
-  experience_text_blocks: string[];
+  experienceTextBlocks: string[];
 }
 
 /**
@@ -105,8 +105,11 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
       // Required fields with fallbacks
       const title = typeof expObj.title === 'string' ? expObj.title : `Experience ${index + 1}`;
       const company = typeof expObj.company === 'string' ? expObj.company : 'Unknown Company';
-      const start_date = typeof expObj.start_date === 'string' ? expObj.start_date : '';
-      const end_date =
+      // Support both camelCase and snake_case from AI response
+      const startDate = typeof expObj.startDate === 'string' ? expObj.startDate : 
+                        typeof expObj.start_date === 'string' ? expObj.start_date : '';
+      const endDate =
+        expObj.endDate === null || typeof expObj.endDate === 'string' ? expObj.endDate :
         expObj.end_date === null || typeof expObj.end_date === 'string' ? expObj.end_date : null;
 
       // Array fields with fallbacks
@@ -118,8 +121,8 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
       return {
         title,
         company,
-        start_date,
-        end_date,
+        startDate,
+        endDate,
         responsibilities: responsibilities.filter(
           (r: unknown) => typeof r === 'string'
         ) as string[],
@@ -136,14 +139,16 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
 /**
  * Main Lambda handler
  */
-export const handler = async (event: { arguments: ExtractExperienceBlocksInput }): Promise<ExtractExperienceBlocksOutput> => {
-  const { experience_text_blocks } = event.arguments;
+export const handler = async (event: {
+  arguments: ExtractExperienceBlocksInput;
+}): Promise<ExtractExperienceBlocksOutput> => {
+  const { experienceTextBlocks } = event.arguments;
 
   // Log input (truncated)
   const truncatedInput =
-    experience_text_blocks.length > 1
-      ? `${experience_text_blocks.length} experience blocks`
-      : truncateForLog(experience_text_blocks[0] || '');
+    experienceTextBlocks.length > 1
+      ? `${experienceTextBlocks.length} experience blocks`
+      : truncateForLog(experienceTextBlocks[0] || '');
 
   console.log('AI Operation: extractExperienceBlocks', {
     timestamp: new Date().toISOString(),
@@ -152,7 +157,7 @@ export const handler = async (event: { arguments: ExtractExperienceBlocksInput }
 
   try {
     // Build user prompt from input
-    const userPrompt = buildUserPrompt(experience_text_blocks);
+    const userPrompt = buildUserPrompt(experienceTextBlocks);
 
     // First attempt
     let responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);
@@ -172,7 +177,11 @@ export const handler = async (event: { arguments: ExtractExperienceBlocksInput }
         input: { experience_text_blocks: truncatedInput },
       });
 
-      parsedOutput = await retryWithSchema<ExtractExperienceBlocksOutput>(SYSTEM_PROMPT, userPrompt, OUTPUT_SCHEMA);
+      parsedOutput = await retryWithSchema<ExtractExperienceBlocksOutput>(
+        SYSTEM_PROMPT,
+        userPrompt,
+        OUTPUT_SCHEMA
+      );
 
       console.log('AI Operation: extractExperienceBlocks (retry successful)', {
         timestamp: new Date().toISOString(),

@@ -4,7 +4,7 @@ import type { ExperiencesResult } from './Experience';
 
 /**
  * Repository interface for AI operations
- * 
+ *
  * Provides type-safe access to Amplify GraphQL AI queries.
  * Implementation will use Amplify's auto-generated client.
  */
@@ -30,12 +30,12 @@ export interface IAiOperationsRepository {
  */
 export type AmplifyAiOperations = {
   parseCvText: (
-    input: { cv_text: string },
+    input: { cvText: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: string | null; errors?: unknown[] }>;
-  
+
   extractExperienceBlocks: (
-    input: { experience_text_blocks: string[] },
+    input: { experienceTextBlocks: string[] },
     options?: Record<string, unknown>
   ) => Promise<{ data: string | null; errors?: unknown[] }>;
 };
@@ -66,10 +66,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
   }
 
   async parseCvText(cvText: string): Promise<ParsedCV> {
-    const { data, errors } = await this.client.parseCvText(
-      { cv_text: cvText },
-      gqlOptions()
-    );
+    const { data, errors } = await this.client.parseCvText({ cvText }, gqlOptions());
 
     if (errors && errors.length > 0) {
       throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
@@ -81,13 +78,13 @@ export class AiOperationsRepository implements IAiOperationsRepository {
 
     // Parse JSON response from Lambda
     const parsed = JSON.parse(data) as ParsedCV;
-    
+
     return parsed;
   }
 
   async extractExperienceBlocks(experienceTextBlocks: string[]): Promise<ExperiencesResult> {
     const { data, errors } = await this.client.extractExperienceBlocks(
-      { experience_text_blocks: experienceTextBlocks },
+      { experienceTextBlocks },
       gqlOptions()
     );
 
@@ -101,7 +98,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
 
     // Parse JSON response from Lambda
     const parsed = JSON.parse(data) as ExperiencesResult;
-    
+
     return parsed;
   }
 }

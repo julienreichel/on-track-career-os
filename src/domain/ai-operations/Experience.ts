@@ -17,9 +17,9 @@ export type ExperiencesResult = ExtractExperienceBlocksOutput;
  */
 export function isExperiencesResult(data: unknown): data is ExperiencesResult {
   if (typeof data !== 'object' || data === null) return false;
-  
+
   const result = data as Record<string, unknown>;
-  
+
   return (
     Array.isArray(result.experiences) &&
     result.experiences.every((exp) => {
@@ -27,7 +27,7 @@ export function isExperiencesResult(data: unknown): data is ExperiencesResult {
       return (
         typeof e.title === 'string' &&
         typeof e.company === 'string' &&
-        typeof e.start_date === 'string' &&
+        typeof e.startDate === 'string' &&
         Array.isArray(e.responsibilities) &&
         Array.isArray(e.tasks)
       );

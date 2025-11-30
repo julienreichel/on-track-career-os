@@ -34,13 +34,13 @@ describe('ai.extractExperienceBlocks', () => {
 
       // Extract dates: "(Month Year - Month Year)" or "(Year-present)"
       const datesMatch = block.match(/\((.*?)\)/);
-      let start_date = '2020-01';
-      let end_date: string | null = null;
+      let startDate = '2020-01';
+      let endDate: string | null = null;
 
       if (datesMatch) {
         const dateStr = datesMatch[1];
         if (dateStr.includes('present')) {
-          end_date = null;
+          endDate = null;
         } else if (dateStr.includes('-')) {
           const [startPart, endPart] = dateStr.split('-').map((d) => d.trim());
           // Parse month and year from text like "March 2020"
@@ -60,7 +60,7 @@ describe('ai.extractExperienceBlocks', () => {
               November: '11',
               December: '12',
             };
-            start_date = `${startMatch[2]}-${monthMap[startMatch[1]] || '01'}`;
+            startDate = `${startMatch[2]}-${monthMap[startMatch[1]] || '01'}`;
           }
           if (endPart) {
             const endMatch = endPart.match(/(\w+)\s+(\d{4})/);
@@ -79,9 +79,9 @@ describe('ai.extractExperienceBlocks', () => {
                 November: '11',
                 December: '12',
               };
-              end_date = `${endMatch[2]}-${monthMap[endMatch[1]] || '12'}`;
+              endDate = `${endMatch[2]}-${monthMap[endMatch[1]] || '12'}`;
             } else if (/\d{4}/.test(endPart)) {
-              end_date = `${endPart}-12`;
+              endDate = `${endPart}-12`;
             }
           }
         }
@@ -99,8 +99,8 @@ describe('ai.extractExperienceBlocks', () => {
       return {
         title,
         company,
-        start_date,
-        end_date,
+        startDate,
+        endDate,
         responsibilities,
         tasks,
       };
@@ -140,15 +140,15 @@ describe('ai.extractExperienceBlocks', () => {
 
       const result = await handler({
         arguments: {
-          experience_text_blocks: inputBlocks,
+          experienceTextBlocks: inputBlocks,
         },
       });
 
       expect(result.experiences).toHaveLength(1);
       expect(result.experiences[0].title).toBe('Senior Software Engineer');
       expect(result.experiences[0].company).toBe('TechCorp Inc.');
-      expect(result.experiences[0].start_date).toBe('2020-03');
-      expect(result.experiences[0].end_date).toBe('2023-12');
+      expect(result.experiences[0].startDate).toBe('2020-03');
+      expect(result.experiences[0].endDate).toBe('2023-12');
       expect(result.experiences[0].responsibilities).toContain('Lead development team');
       expect(result.experiences[0].tasks).toContain('Implemented microservices');
     });
@@ -174,18 +174,18 @@ describe('ai.extractExperienceBlocks', () => {
 
       const result = await handler({
         arguments: {
-          experience_text_blocks: inputBlocks,
+          experienceTextBlocks: inputBlocks,
         },
       });
 
       expect(result.experiences).toHaveLength(2);
       expect(result.experiences[0].title).toBe('Senior Developer');
       expect(result.experiences[0].company).toBe('Company A');
-      expect(result.experiences[0].end_date).toBeNull();
+      expect(result.experiences[0].endDate).toBeNull();
       expect(result.experiences[1].title).toBe('Junior Developer');
       expect(result.experiences[1].company).toBe('Company B');
-      expect(result.experiences[1].start_date).toBe('2018-06');
-      expect(result.experiences[1].end_date).toBe('2019-12');
+      expect(result.experiences[1].startDate).toBe('2018-06');
+      expect(result.experiences[1].endDate).toBe('2019-12');
     });
 
     it('should apply operation-specific validation fallbacks', async () => {
@@ -202,8 +202,8 @@ describe('ai.extractExperienceBlocks', () => {
                     experiences: [
                       {
                         // Missing title and company - will use fallbacks
-                        start_date: '2020-01',
-                        end_date: null,
+                        startDate: '2020-01',
+                        endDate: null,
                         // Missing responsibilities and tasks - will default to []
                       },
                     ],
@@ -217,7 +217,7 @@ describe('ai.extractExperienceBlocks', () => {
 
       const result = await handler({
         arguments: {
-          experience_text_blocks: inputBlocks,
+          experienceTextBlocks: inputBlocks,
         },
       });
 
@@ -248,7 +248,7 @@ describe('ai.extractExperienceBlocks', () => {
       await expect(
         handler({
           arguments: {
-            experience_text_blocks: ['Experience text'],
+            experienceTextBlocks: ['Experience text'],
           },
         })
       ).rejects.toThrow('Missing required field: experiences');

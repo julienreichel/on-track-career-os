@@ -17,7 +17,7 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => {
  * Tests the actual implementation with mocked Bedrock responses
  */
 describe('ai.parseCvText', () => {
-  let handler: (event: { arguments: { cv_text: string } }) => Promise<string>;
+  let handler: (event: { arguments: { cvText: string } }) => Promise<string>;
   let mockSend: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
@@ -102,7 +102,7 @@ AWS Certified Solutions Architect
         education,
         skills,
         certifications,
-        raw_blocks: [],
+        rawBlocks: [],
       },
       confidence: 0.95,
     };
@@ -135,7 +135,7 @@ AWS Certified Solutions Architect
       });
 
       const result = await handler({
-        arguments: { cv_text: mockCvText },
+        arguments: { cvText: mockCvText },
       });
 
       const parsed = JSON.parse(result);
@@ -166,7 +166,7 @@ AWS Certified Solutions Architect
       });
 
       const result = await handler({
-        arguments: { cv_text: mockCvText },
+        arguments: { cvText: mockCvText },
       });
 
       const parsed = JSON.parse(result);
@@ -175,7 +175,7 @@ AWS Certified Solutions Architect
       expect(parsed.sections.education).toEqual([]);
       expect(parsed.sections.skills).toEqual([]);
       expect(parsed.sections.certifications).toEqual([]);
-      expect(parsed.sections.raw_blocks).toEqual([]);
+      expect(parsed.sections.rawBlocks).toEqual([]);
       expect(parsed.confidence).toBe(0.5); // DEFAULT_CONFIDENCE fallback
     });
 
@@ -197,7 +197,7 @@ AWS Certified Solutions Architect
 
       await expect(
         handler({
-          arguments: { cv_text: mockCvText },
+          arguments: { cvText: mockCvText },
         })
       ).rejects.toThrow('Missing required field: sections');
     });

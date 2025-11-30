@@ -31,7 +31,7 @@ const OUTPUT_SCHEMA = `{
     "education": ["string"],
     "skills": ["string"],
     "certifications": ["string"],
-    "raw_blocks": ["string"]
+    "rawBlocks": ["string"]
   },
   "confidence": 0.95
 }`;
@@ -43,13 +43,13 @@ export interface ParseCvTextOutput {
     education: string[];
     skills: string[];
     certifications: string[];
-    raw_blocks: string[];
+    rawBlocks: string[];
   };
   confidence: number;
 }
 
 export interface ParseCvTextInput {
-  cv_text: string;
+  cvText: string;
 }
 
 /**
@@ -72,8 +72,11 @@ function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOu
       certifications: Array.isArray(parsedOutput.sections.certifications)
         ? parsedOutput.sections.certifications
         : [],
-      raw_blocks: Array.isArray(parsedOutput.sections.raw_blocks)
-        ? parsedOutput.sections.raw_blocks
+      // Support both camelCase and snake_case from AI response
+      rawBlocks: Array.isArray(parsedOutput.sections.rawBlocks)
+        ? parsedOutput.sections.rawBlocks
+        : Array.isArray((parsedOutput.sections as Record<string, unknown>).raw_blocks)
+        ? ((parsedOutput.sections as Record<string, unknown>).raw_blocks as string[])
         : [],
     },
     confidence:
@@ -93,8 +96,8 @@ ${cvText}`;
  * Main Lambda handler
  */
 export const handler = async (event: { arguments: ParseCvTextInput }): Promise<string> => {
-  const { cv_text } = event.arguments;
-  const truncatedInput = truncateForLog(cv_text);
+  const { cvText } = event.arguments;
+  const truncatedInput = truncateForLog(cvText);
 
   console.log('AI Operation: parseCvText', {
     timestamp: new Date().toISOString(),
@@ -103,7 +106,7 @@ export const handler = async (event: { arguments: ParseCvTextInput }): Promise<s
 
   try {
     // Build user prompt
-    const userPrompt = buildUserPrompt(cv_text);
+    const userPrompt = buildUserPrompt(cvText);
 
     // Initial attempt
     let responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);

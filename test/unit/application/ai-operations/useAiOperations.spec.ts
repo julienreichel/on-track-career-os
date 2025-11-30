@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useParseCvText, useExtractExperienceBlocks, useAiOperations } from '@/application/ai-operations/useAiOperations';
+import {
+  useParseCvText,
+  useExtractExperienceBlocks,
+  useAiOperations,
+} from '@/application/ai-operations/useAiOperations';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
 import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
@@ -23,7 +27,9 @@ describe('useAiOperations composables', () => {
     };
 
     // Mock the service constructor
-    vi.mocked(AiOperationsService).mockImplementation(() => mockService as unknown as AiOperationsService);
+    vi.mocked(AiOperationsService).mockImplementation(
+      () => mockService as unknown as AiOperationsService
+    );
   });
 
   describe('useParseCvText', () => {
@@ -44,18 +50,18 @@ describe('useAiOperations composables', () => {
         education: [],
         skills: [],
         certifications: [],
-        raw_blocks: [],
+        rawBlocks: [],
         confidence: 0.95,
       };
       mockService.parseCvText.mockResolvedValue(mockParsedCv);
 
       // Act
       const { parsedCv, loading, error, parse } = useParseCvText();
-      
+
       expect(loading.value).toBe(false);
       const parsePromise = parse('Sample CV');
       expect(loading.value).toBe(true);
-      
+
       await parsePromise;
 
       // Assert
@@ -81,7 +87,16 @@ describe('useAiOperations composables', () => {
     it('should reset state', () => {
       // Arrange
       const { parsedCv, loading, error, reset } = useParseCvText();
-      parsedCv.value = { sections: { experiences: [], education: [], skills: [], certifications: [], raw_blocks: [] }, confidence: 0.9 };
+      parsedCv.value = {
+        sections: {
+          experiences: [],
+          education: [],
+          skills: [],
+          certifications: [],
+          rawBlocks: [],
+        },
+        confidence: 0.9,
+      };
       loading.value = true;
       error.value = 'Some error';
 
@@ -113,7 +128,7 @@ describe('useAiOperations composables', () => {
           {
             title: 'Developer',
             company: 'TechCorp',
-            start_date: '2020-01',
+            startDate: '2020-01',
             responsibilities: [],
             tasks: [],
           },
@@ -123,11 +138,11 @@ describe('useAiOperations composables', () => {
 
       // Act
       const { experiences, loading, error, extract } = useExtractExperienceBlocks();
-      
+
       expect(loading.value).toBe(false);
       const extractPromise = extract(['Experience 1']);
       expect(loading.value).toBe(true);
-      
+
       await extractPromise;
 
       // Assert
@@ -187,7 +202,7 @@ describe('useAiOperations composables', () => {
           education: [],
           skills: [],
           certifications: [],
-          raw_blocks: [],
+          rawBlocks: [],
         },
         confidence: 0.95,
       };
@@ -210,7 +225,7 @@ describe('useAiOperations composables', () => {
           {
             title: 'Developer',
             company: 'TechCorp',
-            start_date: '2020-01',
+            startDate: '2020-01',
             responsibilities: [],
             tasks: [],
           },
@@ -236,7 +251,7 @@ describe('useAiOperations composables', () => {
           education: [],
           skills: [],
           certifications: [],
-          raw_blocks: [],
+          rawBlocks: [],
         },
         confidence: 0.95,
       };
@@ -245,7 +260,7 @@ describe('useAiOperations composables', () => {
           {
             title: 'Developer',
             company: 'TechCorp',
-            start_date: '2020-01',
+            startDate: '2020-01',
             responsibilities: [],
             tasks: [],
           },
@@ -258,11 +273,11 @@ describe('useAiOperations composables', () => {
 
       // Act
       const { parsedCv, experiences, loading, error, parseAndExtract } = useAiOperations();
-      
+
       expect(loading.value).toBe(false);
       const parsePromise = parseAndExtract('Sample CV');
       expect(loading.value).toBe(true);
-      
+
       await parsePromise;
 
       // Assert
@@ -274,7 +289,9 @@ describe('useAiOperations composables', () => {
 
     it('should handle errors in parseAndExtract', async () => {
       // Arrange
-      mockService.parseCvAndExtractExperiences.mockRejectedValue(new Error('Combined operation failed'));
+      mockService.parseCvAndExtractExperiences.mockRejectedValue(
+        new Error('Combined operation failed')
+      );
 
       // Act
       const { parsedCv, experiences, loading, error, parseAndExtract } = useAiOperations();
@@ -290,7 +307,16 @@ describe('useAiOperations composables', () => {
     it('should reset state', () => {
       // Arrange
       const { parsedCv, experiences, loading, error, reset } = useAiOperations();
-      parsedCv.value = { sections: { experiences: [], education: [], skills: [], certifications: [], raw_blocks: [] }, confidence: 0.9 };
+      parsedCv.value = {
+        sections: {
+          experiences: [],
+          education: [],
+          skills: [],
+          certifications: [],
+          rawBlocks: [],
+        },
+        confidence: 0.9,
+      };
       experiences.value = { experiences: [] };
       loading.value = true;
       error.value = 'Some error';

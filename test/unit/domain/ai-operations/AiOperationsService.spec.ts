@@ -34,7 +34,7 @@ describe('AiOperationsService', () => {
           education: ['BSc Computer Science from MIT (2019)'],
           skills: ['Python'],
           certifications: ['AWS Certified'],
-          raw_blocks: ['Experience section...'],
+          rawBlocks: ['Experience section...'],
         },
         confidence: 0.95,
       };
@@ -90,8 +90,8 @@ describe('AiOperationsService', () => {
           {
             title: 'Senior Developer',
             company: 'TechCorp',
-            start_date: '2020-01',
-            end_date: '2023-12',
+            startDate: '2020-01',
+            endDate: '2023-12',
             responsibilities: ['Lead team', 'Code review'],
             tasks: ['Development', 'Mentoring'],
           },
@@ -149,7 +149,7 @@ describe('AiOperationsService', () => {
   });
 
   describe('parseCvAndExtractExperiences', () => {
-    it('should successfully parse CV and extract experiences from raw_blocks', async () => {
+    it('should successfully parse CV and extract experiences from rawBlocks', async () => {
       // Arrange
       const mockParsedCv: ParsedCV = {
         sections: {
@@ -157,7 +157,7 @@ describe('AiOperationsService', () => {
           education: [],
           skills: [],
           certifications: [],
-          raw_blocks: [
+          rawBlocks: [
             'EXPERIENCE section: Senior Developer at TechCorp',
             'EDUCATION section: MIT',
           ],
@@ -170,8 +170,8 @@ describe('AiOperationsService', () => {
           {
             title: 'Senior Developer',
             company: 'TechCorp',
-            start_date: '2020-01',
-            end_date: '2023-12',
+            startDate: '2020-01',
+            endDate: '2023-12',
             responsibilities: ['Lead team'],
             tasks: ['Development'],
           },
@@ -201,7 +201,7 @@ describe('AiOperationsService', () => {
           education: [],
           skills: [],
           certifications: [],
-          raw_blocks: ['Some other section'],
+          rawBlocks: ['Some other section'],
         },
         confidence: 0.95,
       };
@@ -211,7 +211,7 @@ describe('AiOperationsService', () => {
           {
             title: 'Senior Developer',
             company: 'TechCorp',
-            start_date: '2020-01',
+            startDate: '2020-01',
             responsibilities: ['Lead team'],
             tasks: ['Development'],
           },
@@ -248,7 +248,7 @@ describe('AiOperationsService', () => {
           education: [],
           skills: [],
           certifications: [],
-          raw_blocks: ['EXPERIENCE: Dev at Corp'],
+          rawBlocks: ['EXPERIENCE: Dev at Corp'],
         },
         confidence: 0.9,
       };
