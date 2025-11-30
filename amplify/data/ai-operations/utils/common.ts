@@ -72,3 +72,84 @@ export function createErrorLogEntry(operationName: string, error: Error, input: 
     input,
   };
 }
+
+/**
+ * Generic Lambda handler wrapper for AI operations
+ * Handles common logging, error handling, and execution flow
+ * 
+ * @param operationName - Name of the AI operation (e.g., 'parseCvText')
+ * @param event - Lambda event with arguments
+ * @param executeFn - Function that executes the AI operation logic
+ * @param prepareInput - Function to prepare input for logging (e.g., truncate, transform keys)
+ */
+export async function withAiOperationHandler<TInput, TOutput>(
+  operationName: string,
+  event: { arguments: TInput },
+  executeFn: (args: TInput) => Promise<TOutput>,
+  prepareInput: (args: TInput) => Record<string, unknown>
+): Promise<string> {
+  const logInput = prepareInput(event.arguments);
+
+  console.log(`${LOG_PREFIX_BASE}: ${operationName}`, {
+    timestamp: new Date().toISOString(),
+    input: logInput,
+  });
+
+  try {
+    const output = await executeFn(event.arguments);
+
+    console.log(`${LOG_PREFIX_BASE}: ${operationName}`, {
+      timestamp: new Date().toISOString(),
+      input: logInput,
+      output,
+      fallbacksUsed: [],
+    });
+
+    return JSON.stringify(output);
+  } catch (error) {
+    console.error(`${LOG_ERROR_PREFIX_BASE}: ${operationName}`, {
+      timestamp: new Date().toISOString(),
+      error: (error as Error).message,
+      input: logInput,
+    });
+    throw error;
+  }
+}
+
+/**
+ * Variant of withAiOperationHandler that returns the output object directly
+ * Used for operations that don't return JSON strings (e.g., extractExperienceBlocks)
+ */
+export async function withAiOperationHandlerObject<TInput, TOutput>(
+  operationName: string,
+  event: { arguments: TInput },
+  executeFn: (args: TInput) => Promise<TOutput>,
+  prepareInput: (args: TInput) => Record<string, unknown>
+): Promise<TOutput> {
+  const logInput = prepareInput(event.arguments);
+
+  console.log(`${LOG_PREFIX_BASE}: ${operationName}`, {
+    timestamp: new Date().toISOString(),
+    input: logInput,
+  });
+
+  try {
+    const output = await executeFn(event.arguments);
+
+    console.log(`${LOG_PREFIX_BASE}: ${operationName}`, {
+      timestamp: new Date().toISOString(),
+      input: logInput,
+      output,
+      fallbacksUsed: [],
+    });
+
+    return output;
+  } catch (error) {
+    console.error(`${LOG_ERROR_PREFIX_BASE}: ${operationName}`, {
+      timestamp: new Date().toISOString(),
+      error: (error as Error).message,
+      input: logInput,
+    });
+    throw error;
+  }
+}

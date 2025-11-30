@@ -1,5 +1,5 @@
-import { invokeBedrock, retryWithSchema } from './utils/bedrock';
-import { extractJson, truncateForLog } from './utils/common';
+import { invokeAiWithRetry } from './utils/bedrock';
+import { truncateForLog, withAiOperationHandler } from './utils/common';
 
 /**
  * AWS Lambda handler for ai.generateStarStory
@@ -44,9 +44,7 @@ export interface GenerateStarStoryInput {
 /**
  * Validate and apply fallback rules from AIC
  */
-function validateOutput(
-  parsedOutput: Partial<GenerateStarStoryOutput>
-): GenerateStarStoryOutput {
+function validateOutput(parsedOutput: Partial<GenerateStarStoryOutput>): GenerateStarStoryOutput {
   return {
     situation:
       typeof parsedOutput.situation === 'string' && parsedOutput.situation.trim()
@@ -79,65 +77,21 @@ ${sourceText}`;
  * Main Lambda handler
  */
 export const handler = async (event: { arguments: GenerateStarStoryInput }): Promise<string> => {
-  const { sourceText } = event.arguments;
-  const truncatedInput = truncateForLog(sourceText);
-
-  console.log('AI Operation: generateStarStory', {
-    timestamp: new Date().toISOString(),
-    input: { source_text: truncatedInput },
-  });
-
-  try {
-    // Build user prompt
-    const userPrompt = buildUserPrompt(sourceText);
-
-    // Initial attempt
-    let responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);
-
-    // Extract JSON from potential markdown wrappers
-    responseText = extractJson(responseText);
-
-    // Try to parse
-    let parsedOutput: GenerateStarStoryOutput;
-    try {
-      parsedOutput = JSON.parse(responseText);
-    } catch (parseError) {
-      // Retry with explicit schema
-      console.error('AI Operation Error: generateStarStory', {
-        timestamp: new Date().toISOString(),
-        error: (parseError as Error).message,
-        input: { source_text: truncatedInput },
-      });
-
-      parsedOutput = await retryWithSchema<GenerateStarStoryOutput>(
-        SYSTEM_PROMPT,
+  return withAiOperationHandler(
+    'generateStarStory',
+    event,
+    async (args) => {
+      const userPrompt = buildUserPrompt(args.sourceText);
+      return invokeAiWithRetry<GenerateStarStoryOutput>({
+        systemPrompt: SYSTEM_PROMPT,
         userPrompt,
-        OUTPUT_SCHEMA
-      );
-
-      console.log('AI Operation: generateStarStory (retry successful)', {
-        timestamp: new Date().toISOString(),
-        fallbacksUsed: ['retry_with_schema'],
+        outputSchema: OUTPUT_SCHEMA,
+        validate: validateOutput,
+        operationName: 'generateStarStory',
       });
-    }
-
-    // Validate and apply fallbacks
-    const validatedOutput = validateOutput(parsedOutput);
-
-    console.log('AI Operation: generateStarStory', {
-      timestamp: new Date().toISOString(),
-      input: { source_text: truncatedInput },
-      output: validatedOutput,
-      fallbacksUsed: [],
-    });
-
-    return JSON.stringify(validatedOutput);
-  } catch (error) {
-    console.error('AI Operation Error: generateStarStory', {
-      timestamp: new Date().toISOString(),
-      error: (error as Error).message,
-      input: { source_text: truncatedInput },
-    });
-    throw error;
-  }
+    },
+    (args) => ({
+      source_text: truncateForLog(args.sourceText),
+    })
+  );
 };

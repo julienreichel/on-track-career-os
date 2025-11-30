@@ -1,5 +1,5 @@
-import { invokeBedrock, retryWithSchema } from './utils/bedrock';
-import { extractJson, truncateForLog } from './utils/common';
+import { invokeAiWithRetry } from './utils/bedrock';
+import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 /**
  * AWS Lambda handler for ai.extractExperienceBlocks
@@ -149,72 +149,24 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
 export const handler = async (event: {
   arguments: ExtractExperienceBlocksInput;
 }): Promise<ExtractExperienceBlocksOutput> => {
-  const { experienceTextBlocks } = event.arguments;
-
-  // Log input (truncated)
-  const truncatedInput =
-    experienceTextBlocks.length > 1
-      ? `${experienceTextBlocks.length} experience blocks`
-      : truncateForLog(experienceTextBlocks[0] || '');
-
-  console.log('AI Operation: extractExperienceBlocks', {
-    timestamp: new Date().toISOString(),
-    input: { experience_text_blocks: truncatedInput },
-  });
-
-  try {
-    // Build user prompt from input
-    const userPrompt = buildUserPrompt(experienceTextBlocks);
-
-    // First attempt
-    let responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);
-
-    // Extract JSON from potential markdown wrappers
-    responseText = extractJson(responseText);
-
-    // Try to parse
-    let parsedOutput: ExtractExperienceBlocksOutput;
-    try {
-      parsedOutput = JSON.parse(responseText);
-    } catch (parseError) {
-      // Retry with explicit schema
-      console.error('AI Operation Error: extractExperienceBlocks', {
-        timestamp: new Date().toISOString(),
-        error: (parseError as Error).message,
-        input: { experience_text_blocks: truncatedInput },
-      });
-
-      parsedOutput = await retryWithSchema<ExtractExperienceBlocksOutput>(
-        SYSTEM_PROMPT,
+  return withAiOperationHandlerObject(
+    'extractExperienceBlocks',
+    event,
+    async (args: ExtractExperienceBlocksInput) => {
+      const userPrompt = buildUserPrompt(args.experienceTextBlocks);
+      return invokeAiWithRetry<ExtractExperienceBlocksOutput>({
+        systemPrompt: SYSTEM_PROMPT,
         userPrompt,
-        OUTPUT_SCHEMA
-      );
-
-      console.log('AI Operation: extractExperienceBlocks (retry successful)', {
-        timestamp: new Date().toISOString(),
-        fallbacksUsed: ['retry_with_schema'],
+        outputSchema: OUTPUT_SCHEMA,
+        validate: validateOutput,
+        operationName: 'extractExperienceBlocks',
       });
-    }
-
-    // Validate and apply fallbacks
-    const validatedOutput = validateOutput(parsedOutput);
-
-    console.log('AI Operation: extractExperienceBlocks', {
-      timestamp: new Date().toISOString(),
-      input: { experience_text_blocks: truncatedInput },
-      output: {
-        experienceCount: validatedOutput.experiences.length,
-      },
-      fallbacksUsed: parsedOutput !== validatedOutput ? ['validation_fallbacks'] : [],
-    });
-
-    return validatedOutput;
-  } catch (error) {
-    console.error('AI Operation Error: extractExperienceBlocks', {
-      timestamp: new Date().toISOString(),
-      error: (error as Error).message,
-      input: { experience_text_blocks: truncatedInput },
-    });
-    throw error;
-  }
+    },
+    (args: ExtractExperienceBlocksInput) => ({
+      experience_text_blocks:
+        args.experienceTextBlocks.length > 1
+          ? `${args.experienceTextBlocks.length} experience blocks`
+          : truncateForLog(args.experienceTextBlocks[0] || ''),
+    })
+  );
 };

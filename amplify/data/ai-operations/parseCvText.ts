@@ -1,5 +1,5 @@
-import { invokeBedrock, retryWithSchema } from './utils/bedrock';
-import { extractJson, truncateForLog } from './utils/common';
+import { invokeAiWithRetry } from './utils/bedrock';
+import { truncateForLog, withAiOperationHandler } from './utils/common';
 
 /**
  * AWS Lambda handler for ai.parseCvText
@@ -96,65 +96,21 @@ ${cvText}`;
  * Main Lambda handler
  */
 export const handler = async (event: { arguments: ParseCvTextInput }): Promise<string> => {
-  const { cvText } = event.arguments;
-  const truncatedInput = truncateForLog(cvText);
-
-  console.log('AI Operation: parseCvText', {
-    timestamp: new Date().toISOString(),
-    input: { cv_text: truncatedInput },
-  });
-
-  try {
-    // Build user prompt
-    const userPrompt = buildUserPrompt(cvText);
-
-    // Initial attempt
-    let responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);
-
-    // Extract JSON from potential markdown wrappers
-    responseText = extractJson(responseText);
-
-    // Try to parse
-    let parsedOutput: ParseCvTextOutput;
-    try {
-      parsedOutput = JSON.parse(responseText);
-    } catch (parseError) {
-      // Retry with explicit schema
-      console.error('AI Operation Error: parseCvText', {
-        timestamp: new Date().toISOString(),
-        error: (parseError as Error).message,
-        input: { cv_text: truncatedInput },
-      });
-
-      parsedOutput = await retryWithSchema<ParseCvTextOutput>(
-        SYSTEM_PROMPT,
+  return withAiOperationHandler(
+    'parseCvText',
+    event,
+    async (args) => {
+      const userPrompt = buildUserPrompt(args.cvText);
+      return invokeAiWithRetry<ParseCvTextOutput>({
+        systemPrompt: SYSTEM_PROMPT,
         userPrompt,
-        OUTPUT_SCHEMA
-      );
-
-      console.log('AI Operation: parseCvText (retry successful)', {
-        timestamp: new Date().toISOString(),
-        fallbacksUsed: ['retry_with_schema'],
+        outputSchema: OUTPUT_SCHEMA,
+        validate: validateOutput,
+        operationName: 'parseCvText',
       });
-    }
-
-    // Validate and apply fallbacks
-    const validatedOutput = validateOutput(parsedOutput);
-
-    console.log('AI Operation: parseCvText', {
-      timestamp: new Date().toISOString(),
-      input: { cv_text: truncatedInput },
-      output: validatedOutput,
-      fallbacksUsed: parsedOutput.confidence === undefined ? ['default_confidence'] : [],
-    });
-
-    return JSON.stringify(validatedOutput);
-  } catch (error) {
-    console.error('AI Operation Error: parseCvText', {
-      timestamp: new Date().toISOString(),
-      error: (error as Error).message,
-      input: { cv_text: truncatedInput },
-    });
-    throw error;
-  }
+    },
+    (args) => ({
+      cv_text: truncateForLog(args.cvText),
+    })
+  );
 };

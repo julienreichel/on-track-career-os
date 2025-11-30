@@ -3,7 +3,13 @@ import {
   InvokeModelCommand,
   type InvokeModelCommandInput,
 } from '@aws-sdk/client-bedrock-runtime';
-import { BEDROCK_REGION, MAX_TOKENS, INITIAL_TEMPERATURE, RETRY_TEMPERATURE } from './common';
+import {
+  BEDROCK_REGION,
+  MAX_TOKENS,
+  INITIAL_TEMPERATURE,
+  RETRY_TEMPERATURE,
+  extractJson,
+} from './common';
 
 /**
  * Bedrock client wrapper for AI operations
@@ -96,4 +102,56 @@ No explanations. No markdown. Just pure JSON.`;
   } catch (error) {
     throw new Error(`AI cannot produce a stable answer. Last error: ${(error as Error).message}`);
   }
+}
+
+/**
+ * Options for AI invocation with retry
+ */
+export interface InvokeAiOptions<T> {
+  systemPrompt: string;
+  userPrompt: string;
+  outputSchema: string;
+  validate: (parsed: Partial<T>) => T;
+  operationName?: string;
+}
+
+/**
+ * Generic AI invocation with automatic retry logic
+ * Handles: invoke → extract JSON → parse → retry on failure → validate
+ */
+export async function invokeAiWithRetry<T>(options: InvokeAiOptions<T>): Promise<T> {
+  const { systemPrompt, userPrompt, outputSchema, validate, operationName } = options;
+
+  // Initial attempt
+  let responseText = await invokeBedrock(systemPrompt, userPrompt);
+
+  // Extract JSON from potential markdown wrappers
+  responseText = extractJson(responseText);
+
+  // Try to parse
+  let parsedOutput: T;
+  try {
+    parsedOutput = JSON.parse(responseText);
+  } catch (parseError) {
+    // Retry with explicit schema
+    if (operationName) {
+      console.error(`AI Operation Error: ${operationName}`, {
+        timestamp: new Date().toISOString(),
+        error: (parseError as Error).message,
+        retrying: true,
+      });
+    }
+
+    parsedOutput = await retryWithSchema<T>(systemPrompt, userPrompt, outputSchema);
+
+    if (operationName) {
+      console.log(`AI Operation: ${operationName} (retry successful)`, {
+        timestamp: new Date().toISOString(),
+        fallbacksUsed: ['retry_with_schema'],
+      });
+    }
+  }
+
+  // Validate and apply fallbacks
+  return validate(parsedOutput);
 }
