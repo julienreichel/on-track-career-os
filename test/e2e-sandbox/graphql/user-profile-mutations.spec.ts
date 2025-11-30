@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Amplify } from 'aws-amplify';
 import { signUp, signIn, signOut } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/data';
@@ -30,8 +30,8 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
   const testPassword = 'Test123!@#';
   let testUserId: string | undefined;
 
-  beforeEach(async () => {
-    // Create test user for each test
+  beforeAll(async () => {
+    // Create one test user for all tests in this suite
     const signUpResult = await signUp({
       username: testEmail,
       password: testPassword,
@@ -43,9 +43,15 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
       },
     });
     testUserId = signUpResult.userId;
+
+    // Sign in once for all tests
+    await signIn({
+      username: testEmail,
+      password: testPassword,
+    });
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     try {
       await signOut();
     } catch {
@@ -58,27 +64,17 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
       throw new Error('Test user not created');
     }
 
-    try {
-      await signIn({
-        username: testEmail,
-        password: testPassword,
-      });
+    const { data: profile } = await client.models.UserProfile.get({
+      id: testUserId,
+    });
 
-      const { data: profile } = await client.models.UserProfile.get({
-        id: testUserId,
-      });
-
-      // Validate all required fields are present
-      expect(profile).toBeDefined();
-      expect(profile?.id).toBe(testUserId);
-      expect(profile?.fullName).toBeDefined();
-      expect(profile?.owner).toBeDefined();
-      expect(profile?.createdAt).toBeDefined();
-      expect(profile?.updatedAt).toBeDefined();
-    } catch {
-      // Email verification required
-      console.log('Test requires email verification');
-    }
+    // Validate all required fields are present
+    expect(profile).toBeDefined();
+    expect(profile?.id).toBe(testUserId);
+    expect(profile?.fullName).toBeDefined();
+    expect(profile?.owner).toBeDefined();
+    expect(profile?.createdAt).toBeDefined();
+    expect(profile?.updatedAt).toBeDefined();
   }, 30000);
 
   it('should update UserProfile fields', async () => {
@@ -86,36 +82,27 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
       throw new Error('Test user not created');
     }
 
-    try {
-      await signIn({
-        username: testEmail,
-        password: testPassword,
-      });
+    // Update profile
+    const updatedName = 'Updated Test User';
+    const { data: updatedProfile, errors } = await client.models.UserProfile.update({
+      id: testUserId,
+      fullName: updatedName,
+    });
 
-      // Update profile
-      const updatedName = 'Updated Test User';
-      const { data: updatedProfile, errors } = await client.models.UserProfile.update({
-        id: testUserId,
-        fullName: updatedName,
-      });
-
-      // Check for GraphQL errors
-      if (errors) {
-        throw new Error(`GraphQL errors: ${JSON.stringify(errors)}`);
-      }
-
-      // Validate update
-      expect(updatedProfile).toBeDefined();
-      expect(updatedProfile?.fullName).toBe(updatedName);
-
-      // Re-fetch to confirm
-      const { data: refetchedProfile } = await client.models.UserProfile.get({
-        id: testUserId,
-      });
-      expect(refetchedProfile?.fullName).toBe(updatedName);
-    } catch {
-      console.log('Test requires email verification');
+    // Check for GraphQL errors
+    if (errors) {
+      throw new Error(`GraphQL errors: ${JSON.stringify(errors)}`);
     }
+
+    // Validate update
+    expect(updatedProfile).toBeDefined();
+    expect(updatedProfile?.fullName).toBe(updatedName);
+
+    // Re-fetch to confirm
+    const { data: refetchedProfile } = await client.models.UserProfile.get({
+      id: testUserId,
+    });
+    expect(refetchedProfile?.fullName).toBe(updatedName);
   }, 30000);
 
   it('should enforce owner field in create operation', async () => {
@@ -127,30 +114,21 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
       throw new Error('Test user not created');
     }
 
-    try {
-      await signIn({
-        username: testEmail,
-        password: testPassword,
-      });
+    // Fetch profile created by post-confirmation
+    const { data: profile } = await client.models.UserProfile.get({
+      id: testUserId,
+    });
 
-      // Fetch profile created by post-confirmation
-      const { data: profile } = await client.models.UserProfile.get({
-        id: testUserId,
-      });
-
-      // Validate owner field format
-      expect(profile?.owner).toBeDefined();
-      expect(profile?.owner).toMatch(/^[a-z0-9-]+::[a-z0-9-]+$/i); // Format: userId::userId
-      expect(profile?.owner).toContain(testUserId!);
-    } catch {
-      console.log('Test requires email verification');
-    }
+    // Validate owner field format
+    expect(profile?.owner).toBeDefined();
+    expect(profile?.owner).toMatch(/^[a-z0-9-]+::[a-z0-9-]+$/i); // Format: userId::userId
+    expect(profile?.owner).toContain(testUserId!);
   }, 30000);
 
   it('should prevent unauthorized access to other profiles', async () => {
-    // Create second user
+    // Create second user to test authorization
     const userBEmail = `profile-test-b-${Date.now()}@example.com`;
-    const userBResult = await signUp({
+    await signUp({
       username: userBEmail,
       password: testPassword,
       options: {
@@ -161,23 +139,26 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
       },
     });
 
-    try {
-      // Sign in as first user
-      await signIn({
-        username: testEmail,
-        password: testPassword,
-      });
+    // Sign out current user and sign in as User B
+    await signOut();
+    await signIn({
+      username: userBEmail,
+      password: testPassword,
+    });
 
-      // Try to access second user's profile
-      const { data: userBProfile } = await client.models.UserProfile.get({
-        id: userBResult.userId,
-      });
+    // Try to access first user's profile
+    const { data: userAProfile } = await client.models.UserProfile.get({
+      id: testUserId!,
+    });
 
-      // Should be null or undefined due to authorization rules
-      expect(userBProfile).toBeNull();
-    } catch {
-      // Expected: authorization should prevent access
-      console.log('Authorization correctly prevented access');
-    }
+    // Should be null due to authorization rules
+    expect(userAProfile).toBeNull();
+
+    // Sign back in as original test user for cleanup
+    await signOut();
+    await signIn({
+      username: testEmail,
+      password: testPassword,
+    });
   }, 30000);
 });

@@ -17,6 +17,15 @@ npx ampx sandbox --once
 
 This creates a temporary AWS environment with all resources deployed.
 
+**Auto-Confirmation Setup:**
+
+The project includes a **Pre Sign-up Lambda trigger** (`amplify/auth/pre-signup/handler.ts`) that automatically:
+- Confirms users (no verification code required)
+- Verifies email addresses  
+- Enables immediate testing without manual verification
+
+This is **only enabled in sandbox/dev environments** and should not be used in production.
+
 ## Running Tests
 
 ```bash
@@ -33,6 +42,7 @@ npm run test:sandbox -- --watch
 ## Test Strategy
 
 ### What to Test
+
 - ✅ **Critical user flows** that span multiple AWS services
 - ✅ **Lambda triggers** (post-confirmation, resolvers)
 - ✅ **Authorization rules** (owner-based access, field-level security)
@@ -40,6 +50,7 @@ npm run test:sandbox -- --watch
 - ✅ **AI operations** integration with real Lambda functions
 
 ### What NOT to Test
+
 - ❌ Unit logic (covered by unit tests)
 - ❌ UI components (covered by Nuxt tests)
 - ❌ Utility functions (covered by amplify tests)
@@ -57,6 +68,7 @@ afterEach(async () => {
 ```
 
 **Known Issue**: User cleanup requires either:
+
 1. Using unique emails per test run (e.g., `test-${Date.now()}@example.com`) ✅ Currently implemented
 2. Using Cognito Admin API for cleanup (requires additional permissions)
 3. Resetting sandbox between test runs: `npx ampx sandbox delete && npx ampx sandbox --once`
@@ -66,6 +78,7 @@ afterEach(async () => {
 ## CI Integration
 
 Sandbox tests are **optional in CI** due to:
+
 - Require deployed environment
 - Slower execution (~30s-2min per test)
 - AWS resource consumption

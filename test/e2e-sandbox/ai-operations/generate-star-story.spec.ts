@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Amplify } from 'aws-amplify';
 import { signUp, signIn, signOut } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/data';
@@ -32,8 +32,8 @@ describe('AI Operations Integration (E2E Sandbox)', () => {
   const testEmail = `ai-test-${Date.now()}@example.com`;
   const testPassword = 'Test123!@#';
 
-  beforeEach(async () => {
-    // Create test user
+  beforeAll(async () => {
+    // Create one test user for all tests in this suite
     const signUpResult = await signUp({
       username: testEmail,
       password: testPassword,
@@ -48,19 +48,14 @@ describe('AI Operations Integration (E2E Sandbox)', () => {
     // Note: testUserId available but not needed for AI operation tests
     console.log('Test user created:', signUpResult.userId);
 
-    // Sign in for authenticated requests
-    try {
-      await signIn({
-        username: testEmail,
-        password: testPassword,
-      });
-    } catch {
-      // Email verification may be required
-      console.log('Email verification required - some tests may be skipped');
-    }
+    // Sign in once for all tests
+    await signIn({
+      username: testEmail,
+      password: testPassword,
+    });
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     try {
       await signOut();
     } catch {
@@ -127,7 +122,7 @@ Key Requirements:
           starStory.situation.length +
             starStory.task.length +
             starStory.action.length +
-            starStory.result.length,
+            starStory.result.length
         ).toBeGreaterThan(0);
       }
     } catch {

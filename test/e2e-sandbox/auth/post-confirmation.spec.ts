@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { Amplify } from 'aws-amplify';
 import { signUp, signIn, signOut } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/data';
@@ -30,26 +30,35 @@ describe('Post-Confirmation Flow (E2E Sandbox)', () => {
   const testName = 'Test User';
   let testUserId: string | undefined;
 
-  beforeEach(() => {
-    // Reset user ID before each test
-    testUserId = undefined;
+  beforeAll(async () => {
+    // Create one test user for all tests in this suite
+    const signUpResult = await signUp({
+      username: testEmail,
+      password: testPassword,
+      options: {
+        userAttributes: {
+          email: testEmail,
+          name: testName,
+        },
+        autoSignIn: true,
+      },
+    });
+
+    testUserId = signUpResult.userId;
+    
+    // Sign in once for all tests
+    await signIn({
+      username: testEmail,
+      password: testPassword,
+    });
   });
 
-  afterEach(async () => {
-    // Clean up: Delete test user and profile
+  afterAll(async () => {
+    // Clean up: Sign out after all tests
     try {
-      // Sign out if signed in
       await signOut();
-
-      // Delete user if created
-      if (testUserId) {
-        // Note: deleteUser requires the user to be signed in
-        // In production, you'd use Cognito Admin API for cleanup
-        // For now, we'll just sign out and leave cleanup to sandbox reset
-      }
-    } catch (error) {
-      // Ignore cleanup errors in tests
-      console.log('Cleanup error (non-critical):', error);
+    } catch {
+      // Ignore cleanup errors
     }
   });
 
@@ -103,48 +112,23 @@ describe('Post-Confirmation Flow (E2E Sandbox)', () => {
     } catch {
       // If email verification is required, test still passes
       // as long as signup succeeded (post-confirmation will run on verify)
-      console.log(
-        'Email verification required - post-confirmation will run on verify',
-      );
+      console.log('Email verification required - post-confirmation will run on verify');
       expect(testUserId).toBeDefined();
     }
   }, 30000); // 30s timeout for AWS operations
 
   it('should enforce owner-based authorization on UserProfile', async () => {
     // This test validates that users can only access their own profiles
-    // Create user A, verify they can't access user B's profile
+    // Current user should only see their own profile
 
-    // Step 1: Sign up first user
-    const userA = await signUp({
-      username: `test-a-${Date.now()}@example.com`,
-      password: testPassword,
-      options: {
-        userAttributes: {
-          email: `test-a-${Date.now()}@example.com`,
-          name: 'User A',
-        },
-      },
+    const { data: profiles } = await client.models.UserProfile.list();
+
+    // Should only see own profile due to owner-based authorization
+    expect(profiles.length).toBeGreaterThanOrEqual(1);
+    
+    // All returned profiles should belong to current user
+    profiles.forEach((profile) => {
+      expect(profile.id).toBe(testUserId);
     });
-
-    expect(userA.userId).toBeDefined();
-
-    // Step 2: Try to query all profiles (should only see own profile)
-    try {
-      await signIn({
-        username: `test-a-${Date.now()}@example.com`,
-        password: testPassword,
-      });
-
-      const { data: profiles } = await client.models.UserProfile.list();
-
-      // Should only see own profile due to owner-based authorization
-      expect(profiles.length).toBeLessThanOrEqual(1);
-      if (profiles.length === 1) {
-        expect(profiles[0].id).toBe(userA.userId);
-      }
-    } catch {
-      // Email verification required - authorization still enforced
-      console.log('Authorization test requires email verification');
-    }
   }, 30000);
 });

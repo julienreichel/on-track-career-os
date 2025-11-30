@@ -38,7 +38,7 @@ jobs:
           echo "Deploying Amplify sandbox..."
           npx ampx sandbox --once &
           SANDBOX_PID=$!
-          
+
           # Wait for sandbox to be ready (max 10 minutes)
           echo "Waiting for sandbox deployment..."
           for i in {1..60}; do
@@ -48,7 +48,7 @@ jobs:
             fi
             sleep 10
           done
-          
+
           if [ ! -f "amplify_outputs.json" ]; then
             echo "Sandbox deployment timed out"
             exit 1

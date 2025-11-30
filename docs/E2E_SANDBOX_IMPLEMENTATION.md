@@ -9,6 +9,7 @@ Implemented **Phase 2: Sandbox Integration Tests** to catch production issues li
 ### 1. Test Infrastructure (`test/e2e-sandbox/`)
 
 **Directory Structure:**
+
 ```
 test/e2e-sandbox/
 ├── README.md                           # Documentation
@@ -23,12 +24,14 @@ test/e2e-sandbox/
 ### 2. Test Coverage
 
 **Auth Flow Tests** (`auth/post-confirmation.spec.ts`):
+
 - ✅ User signup triggers post-confirmation Lambda
 - ✅ UserProfile created with owner field
 - ✅ Owner-based authorization enforced
 - **Validates**: The exact fix we made (owner field in schema)
 
 **GraphQL Operation Tests** (`graphql/user-profile-mutations.spec.ts`):
+
 - ✅ Read UserProfile with required fields
 - ✅ Update UserProfile fields
 - ✅ Owner field format validation
@@ -36,6 +39,7 @@ test/e2e-sandbox/
 - **Validates**: GraphQL input types match schema definitions
 
 **AI Operation Tests** (`ai-operations/generate-star-story.spec.ts`):
+
 - ✅ Generate STAR story from experience data
 - ✅ Validate JSON output schema
 - ✅ Handle missing/empty input
@@ -45,20 +49,24 @@ test/e2e-sandbox/
 ### 3. Configuration
 
 **Vitest Config** (`vitest.config.ts`):
+
 - Added `e2e-sandbox` test project
 - 60s timeout for AWS operations
 - Uses `amplify_outputs.json` from running sandbox
 
 **TypeScript Config** (`test/tsconfig.json`):
+
 - Added `resolveJsonModule: true`
 - Include `amplify_outputs.json` for type safety
 
 **NPM Scripts** (`package.json`):
+
 - Added `npm run test:sandbox` command
 
 ### 4. CI Integration
 
 **GitHub Actions** (`.github/workflows/e2e-sandbox.yml`):
+
 - Manual workflow dispatch (optional in CI)
 - Deploys sandbox automatically
 - Runs tests with configurable patterns
@@ -67,11 +75,13 @@ test/e2e-sandbox/
 ### 5. Documentation
 
 **Test README** (`test/README.md`):
+
 - Updated test structure with e2e-sandbox
 - Added sandbox test commands
 - Documented prerequisites
 
 **Sandbox README** (`test/e2e-sandbox/README.md`):
+
 - Comprehensive guide for sandbox testing
 - Test strategy (what to test vs. what not to test)
 - Cleanup strategies and known issues
@@ -102,10 +112,12 @@ npm run test:sandbox -- auth/post-confirmation.spec.ts
 ## Test Results
 
 **Initial Run**: 9 tests created
+
 - ✅ 4 tests passed (AI operation smoke tests)
 - ❌ 5 tests failed (expected - require email verification in real Cognito)
 
 **Known Limitations**:
+
 1. Email verification required for full auth flow (expected in production Cognito)
 2. User cleanup requires Admin API or unique emails (currently using timestamps)
 3. Tests are slower (~30s-2min per test suite)
@@ -113,12 +125,16 @@ npm run test:sandbox -- auth/post-confirmation.spec.ts
 ## Impact
 
 ### Problem Solved
+
 The post-confirmation error (missing owner field) **would have been caught** by:
+
 - `auth/post-confirmation.spec.ts` → Validates UserProfile creation
 - `graphql/user-profile-mutations.spec.ts` → Validates required fields
 
 ### Future Prevention
+
 Any schema-related issues will now be caught by:
+
 1. **Local testing**: Run `npm run test:sandbox` before committing
 2. **Manual CI**: Trigger workflow before major releases
 3. **Nightly builds**: Schedule workflow for daily validation (optional)
@@ -126,12 +142,14 @@ Any schema-related issues will now be caught by:
 ## Next Steps
 
 ### Immediate
+
 1. ✅ Infrastructure complete
 2. ✅ Core tests implemented
 3. ✅ Documentation complete
 4. ⏳ Commit all changes
 
 ### Future Enhancements
+
 1. Add more test scenarios (edge cases, error handling)
 2. Implement test data cleanup with Admin API
 3. Add snapshot testing for GraphQL responses
@@ -141,6 +159,7 @@ Any schema-related issues will now be caught by:
 ## Files Modified
 
 **New Files:**
+
 - `test/e2e-sandbox/README.md`
 - `test/e2e-sandbox/auth/post-confirmation.spec.ts`
 - `test/e2e-sandbox/graphql/user-profile-mutations.spec.ts`
@@ -149,6 +168,7 @@ Any schema-related issues will now be caught by:
 - `docs/E2E_SANDBOX_IMPLEMENTATION.md` (this file)
 
 **Modified Files:**
+
 - `vitest.config.ts` - Added e2e-sandbox project
 - `package.json` - Added test:sandbox script
 - `test/tsconfig.json` - Added JSON module resolution
