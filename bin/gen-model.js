@@ -169,8 +169,11 @@ export function use${modelName}(id: string) {
 
   const load = async () => {
     loading.value = true
-    item.value = await service.getFull${modelName}(id)
-    loading.value = false
+    try {
+      item.value = await service.getFull${modelName}(id)
+    } finally {
+      loading.value = false
+    }
   }
 
   return { item, loading, load }
