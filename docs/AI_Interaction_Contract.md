@@ -96,7 +96,7 @@ Never invent information.
 
 ```
 Extract structured sections from this CV text:
-{{cv_text}}
+{{cvText}}
 ```
 
 ### Input Schema
@@ -143,7 +143,7 @@ Return JSON only.
 
 ```
 Convert the following CV experience sections into experience blocks:
-{{raw_experience_sections}}
+{{experienceTextBlocks}}
 ```
 
 ### Input Schema
@@ -191,14 +191,14 @@ Return JSON only.
 
 ```
 Generate a STAR story based on this input:
-{{experience_text_or_user_answers}}
+{{experienceTextOrUserAnswers}}
 ```
 
 ### Input Schema
 
 ```json
 {
-  "source_text": "string"
+  "sourceText": "string"
 }
 ```
 
@@ -233,14 +233,14 @@ Return JSON only.
 
 ```
 Generate achievements and KPIs based on this STAR story:
-{{star_story_json}}
+{{starStoryJson}}
 ```
 
 ### Input Schema
 
 ```json
 {
-  "star_story": {
+  "starStory": {
     "situation": "string",
     "task": "string",
     "action": "string",
@@ -254,7 +254,7 @@ Generate achievements and KPIs based on this STAR story:
 ```json
 {
   "achievements": ["string"],
-  "kpi_suggestions": ["string"]
+  "kpiSuggestions": ["string"]
 }
 ```
 
@@ -279,13 +279,13 @@ Return JSON only.
 ```
 Generate the Personal Business Model Canvas from:
 Profile:
-{{user_profile_json}}
+{{userProfileJson}}
 
 Experiences:
-{{experience_list}}
+{{experienceList}}
 
 Stories:
-{{stories_json}}
+{{storiesJson}}
 ```
 
 ### Input Schema
@@ -302,15 +302,15 @@ Stories:
 
 ```json
 {
-  "value_proposition": ["string"],
-  "key_activities": ["string"],
-  "strengths_advantage": ["string"],
-  "target_roles": ["string"],
+  "valueProposition": ["string"],
+  "keyActivities": ["string"],
+  "strengthsAdvantage": ["string"],
+  "targetRoles": ["string"],
   "channels": ["string"],
   "resources": ["string"],
-  "career_direction": ["string"],
-  "pain_relievers": ["string"],
-  "gain_creators": ["string"]
+  "careerDirection": ["string"],
+  "painRelievers": ["string"],
+  "gainCreators": ["string"]
 }
 ```
 
@@ -334,13 +334,13 @@ No hallucinations. Return JSON only.
 
 ```
 Parse this job description:
-{{job_text}}
+{{jobText}}
 ```
 
 ### Input
 
 ```json
-{ "job_text": "string" }
+{ "jobText": "string" }
 ```
 
 ### Output
@@ -348,10 +348,10 @@ Parse this job description:
 ```json
 {
   "responsibilities": ["string"],
-  "required_skills": ["string"],
+  "requiredSkills": ["string"],
   "behaviours": ["string"],
-  "success_criteria": ["string"],
-  "explicit_pains": ["string"]
+  "successCriteria": ["string"],
+  "explicitPains": ["string"]
 }
 ```
 
@@ -367,12 +367,12 @@ Refine job analysis into a structured Role Card.
 
 ```json
 {
-  "role_summary": "string",
+  "roleSummary": "string",
   "responsibilities": ["string"],
   "skills": ["string"],
   "behaviours": ["string"],
-  "success_criteria": ["string"],
-  "job_pains": ["string"]
+  "successCriteria": ["string"],
+  "jobPains": ["string"]
 }
 ```
 
@@ -388,10 +388,10 @@ Generate the Company Canvas from job & company inputs.
 
 ```json
 {
-  "market_challenges": ["string"],
-  "internal_pains": ["string"],
-  "customer_pains": ["string"],
-  "strategic_priorities": ["string"]
+  "marketChallenges": ["string"],
+  "internalPains": ["string"],
+  "customerPains": ["string"],
+  "strategicPriorities": ["string"]
 }
 ```
 
@@ -407,10 +407,10 @@ Produce the User × Job × Company Fit Summary.
 
 ```json
 {
-  "impact_areas": ["string"],
-  "contribution_map": ["string"],
+  "impactAreas": ["string"],
+  "contributionMap": ["string"],
   "risks": ["string"],
-  "fit_summary": "string"
+  "fitSummary": "string"
 }
 ```
 
@@ -422,7 +422,7 @@ Produce the User × Job × Company Fit Summary.
 
 ```json
 {
-  "cv_blocks": [
+  "cvBlocks": [
     { "type": "experience", "content": "string" },
     { "type": "skills", "content": ["string"] },
     { "type": "achievements", "content": ["string"] }
@@ -443,9 +443,9 @@ Produce the User × Job × Company Fit Summary.
 
 ```json
 {
-  "elevator_pitch": "string",
-  "career_story": "string",
-  "why_me": "string"
+  "elevatorPitch": "string",
+  "careerStory": "string",
+  "whyMe": "string"
 }
 ```
 
@@ -469,7 +469,7 @@ Produce the User × Job × Company Fit Summary.
   "behavioral": ["string"],
   "technical": ["string"],
   "cultural": ["string"],
-  "pain_based": ["string"]
+  "painBased": ["string"]
 }
 ```
 
