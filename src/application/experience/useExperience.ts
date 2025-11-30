@@ -11,7 +11,7 @@ export function useExperience(id: string) {
   const load = async () => {
     loading.value = true;
     error.value = null;
-    
+
     try {
       item.value = await service.getFullExperience(id);
     } catch (err) {

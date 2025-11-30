@@ -11,7 +11,7 @@ export function useUserProfile(id: string) {
   const load = async () => {
     loading.value = true;
     error.value = null;
-    
+
     try {
       item.value = await service.getFullUserProfile(id);
     } catch (err) {
