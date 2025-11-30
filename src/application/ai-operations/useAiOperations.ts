@@ -6,7 +6,7 @@ import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
 /**
  * Composable for AI operations
  * Provides reactive state management for CV parsing and experience extraction
- * 
+ *
  * Supports three workflows:
  * - parseCv: Parse CV text only
  * - extractExperiences: Extract experience blocks only

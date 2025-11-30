@@ -22,159 +22,159 @@ describe('useAiOperations', () => {
       parseCvAndExtractExperiences: vi.fn(),
     };
 
-  // Mock the service constructor
-  vi.mocked(AiOperationsService).mockImplementation(
-    () => mockService as unknown as AiOperationsService
-  );
-});
+    // Mock the service constructor
+    vi.mocked(AiOperationsService).mockImplementation(
+      () => mockService as unknown as AiOperationsService
+    );
+  });
 
-it('should initialize with default state', () => {
-  // Act
-  const { parsedCv, experiences, loading, error } = useAiOperations();
+  it('should initialize with default state', () => {
+    // Act
+    const { parsedCv, experiences, loading, error } = useAiOperations();
 
-  // Assert
-  expect(parsedCv.value).toBeNull();
-  expect(experiences.value).toBeNull();
-  expect(loading.value).toBe(false);
-  expect(error.value).toBeNull();
-});
+    // Assert
+    expect(parsedCv.value).toBeNull();
+    expect(experiences.value).toBeNull();
+    expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
+  });
 
-it('should successfully parse CV', async () => {
-  // Arrange
-  const mockParsedCv: ParsedCV = {
-        sections: {
-          experiences: [],
-          education: [],
-          skills: [],
-          certifications: [],
-          rawBlocks: [],
+  it('should successfully parse CV', async () => {
+    // Arrange
+    const mockParsedCv: ParsedCV = {
+      sections: {
+        experiences: [],
+        education: [],
+        skills: [],
+        certifications: [],
+        rawBlocks: [],
+      },
+      confidence: 0.95,
+    };
+    mockService.parseCvText.mockResolvedValue(mockParsedCv);
+
+    // Act
+    const { parsedCv, loading, error, parseCv } = useAiOperations();
+    await parseCv('Sample CV');
+
+    // Assert
+    expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
+    expect(parsedCv.value).toEqual(mockParsedCv);
+  });
+
+  it('should successfully extract experiences', async () => {
+    // Arrange
+    const mockExperiences: ExperiencesResult = {
+      experiences: [
+        {
+          title: 'Developer',
+          company: 'TechCorp',
+          startDate: '2020-01',
+          endDate: '2023-12',
+          responsibilities: [],
+          tasks: [],
         },
-        confidence: 0.95,
-      };
-      mockService.parseCvText.mockResolvedValue(mockParsedCv);
+      ],
+    };
+    mockService.extractExperienceBlocks.mockResolvedValue(mockExperiences);
 
-  // Act
-  const { parsedCv, loading, error, parseCv } = useAiOperations();
-  await parseCv('Sample CV');
+    // Act
+    const { experiences, loading, error, extractExperiences } = useAiOperations();
+    await extractExperiences(['Experience 1']);
 
-  // Assert
-  expect(loading.value).toBe(false);
-  expect(error.value).toBeNull();
-  expect(parsedCv.value).toEqual(mockParsedCv);
-});
+    // Assert
+    expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
+    expect(experiences.value).toEqual(mockExperiences);
+  });
 
-it('should successfully extract experiences', async () => {
-  // Arrange
-  const mockExperiences: ExperiencesResult = {
-        experiences: [
-          {
-            title: 'Developer',
-            company: 'TechCorp',
-            startDate: '2020-01',
-            endDate: '2023-12',
-            responsibilities: [],
-            tasks: [],
-          },
-        ],
-      };
-      mockService.extractExperienceBlocks.mockResolvedValue(mockExperiences);
-
-  // Act
-  const { experiences, loading, error, extractExperiences } = useAiOperations();
-  await extractExperiences(['Experience 1']);
-
-  // Assert
-  expect(loading.value).toBe(false);
-  expect(error.value).toBeNull();
-  expect(experiences.value).toEqual(mockExperiences);
-});
-
-it('should successfully parse and extract in one operation', async () => {
-  // Arrange
-  const mockParsedCv: ParsedCV = {
-        sections: {
-          experiences: [],
-          education: [],
-          skills: [],
-          certifications: [],
-          rawBlocks: [],
+  it('should successfully parse and extract in one operation', async () => {
+    // Arrange
+    const mockParsedCv: ParsedCV = {
+      sections: {
+        experiences: [],
+        education: [],
+        skills: [],
+        certifications: [],
+        rawBlocks: [],
+      },
+      confidence: 0.95,
+    };
+    const mockExperiences: ExperiencesResult = {
+      experiences: [
+        {
+          title: 'Developer',
+          company: 'TechCorp',
+          startDate: '2020-01',
+          endDate: '2023-12',
+          responsibilities: [],
+          tasks: [],
         },
-        confidence: 0.95,
-      };
-  const mockExperiences: ExperiencesResult = {
-        experiences: [
-          {
-            title: 'Developer',
-            company: 'TechCorp',
-            startDate: '2020-01',
-            endDate: '2023-12',
-            responsibilities: [],
-            tasks: [],
-          },
-        ],
-      };
-      mockService.parseCvAndExtractExperiences.mockResolvedValue({
-        parsedCv: mockParsedCv,
-        experiences: mockExperiences,
-      });
+      ],
+    };
+    mockService.parseCvAndExtractExperiences.mockResolvedValue({
+      parsedCv: mockParsedCv,
+      experiences: mockExperiences,
+    });
 
-  // Act
-  const { parsedCv, experiences, loading, error, parseAndExtract } = useAiOperations();
+    // Act
+    const { parsedCv, experiences, loading, error, parseAndExtract } = useAiOperations();
 
-  expect(loading.value).toBe(false);
-  const parsePromise = parseAndExtract('Sample CV');
-  expect(loading.value).toBe(true);
+    expect(loading.value).toBe(false);
+    const parsePromise = parseAndExtract('Sample CV');
+    expect(loading.value).toBe(true);
 
-  await parsePromise;
+    await parsePromise;
 
-  // Assert
-  expect(loading.value).toBe(false);
-  expect(error.value).toBeNull();
-  expect(parsedCv.value).toEqual(mockParsedCv);
-  expect(experiences.value).toEqual(mockExperiences);
-});
+    // Assert
+    expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
+    expect(parsedCv.value).toEqual(mockParsedCv);
+    expect(experiences.value).toEqual(mockExperiences);
+  });
 
-it('should handle errors in parseAndExtract', async () => {
-  // Arrange
-      mockService.parseCvAndExtractExperiences.mockRejectedValue(
-        new Error('Combined operation failed')
-      );
+  it('should handle errors in parseAndExtract', async () => {
+    // Arrange
+    mockService.parseCvAndExtractExperiences.mockRejectedValue(
+      new Error('Combined operation failed')
+    );
 
-  // Act
-  const { parsedCv, experiences, loading, error, parseAndExtract } = useAiOperations();
-  await parseAndExtract('Sample CV');
+    // Act
+    const { parsedCv, experiences, loading, error, parseAndExtract } = useAiOperations();
+    await parseAndExtract('Sample CV');
 
-  // Assert
-  expect(loading.value).toBe(false);
-  expect(error.value).toBe('Combined operation failed');
-  expect(parsedCv.value).toBeNull();
-  expect(experiences.value).toBeNull();
-});
+    // Assert
+    expect(loading.value).toBe(false);
+    expect(error.value).toBe('Combined operation failed');
+    expect(parsedCv.value).toBeNull();
+    expect(experiences.value).toBeNull();
+  });
 
-it('should reset state', () => {
-  // Arrange
-  const { parsedCv, experiences, loading, error, reset } = useAiOperations();
-      parsedCv.value = {
-        sections: {
-          experiences: [],
-          education: [],
-          skills: [],
-          certifications: [],
-          rawBlocks: [],
-        },
-        confidence: 0.9,
-      };
-      experiences.value = { experiences: [] };
-      loading.value = true;
-      error.value = 'Some error';
+  it('should reset state', () => {
+    // Arrange
+    const { parsedCv, experiences, loading, error, reset } = useAiOperations();
+    parsedCv.value = {
+      sections: {
+        experiences: [],
+        education: [],
+        skills: [],
+        certifications: [],
+        rawBlocks: [],
+      },
+      confidence: 0.9,
+    };
+    experiences.value = { experiences: [] };
+    loading.value = true;
+    error.value = 'Some error';
 
-  // Act
-      reset();
+    // Act
+    reset();
 
-  // Assert
-  expect(parsedCv.value).toBeNull();
-  expect(experiences.value).toBeNull();
-  expect(loading.value).toBe(false);
-  expect(error.value).toBeNull();
-});
+    // Assert
+    expect(parsedCv.value).toBeNull();
+    expect(experiences.value).toBeNull();
+    expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
+  });
 });
