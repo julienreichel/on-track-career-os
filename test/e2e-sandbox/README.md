@@ -24,7 +24,21 @@ The project includes a **Pre Sign-up Lambda trigger** (`amplify/auth/pre-signup/
 - Verifies email addresses  
 - Enables immediate testing without manual verification
 
-This is **only enabled in sandbox/dev environments** and should not be used in production.
+**Environment Protection**:
+```typescript
+const environment = env.AMPLIFY_ENVIRONMENT || 'production';
+const isSandbox = environment === 'sandbox' || environment === 'dev';
+
+if (isSandbox) {
+  // Auto-confirm only in sandbox/dev
+  event.response.autoConfirmUser = true;
+  event.response.autoVerifyEmail = true;
+} else {
+  // Production: require normal email verification
+}
+```
+
+This is **automatically enabled only in sandbox/dev environments**. Production requires normal email verification.
 
 ## Running Tests
 
