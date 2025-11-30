@@ -7,6 +7,8 @@
  *   src/domain/<model>/<Model>Repository.ts
  *   src/domain/<model>/<Model>Service.ts
  *   src/application/<model>/use<Model>.ts
+ *   test/unit/domain/<model>/<Model>Service.spec.ts
+ *   test/unit/application/<model>/use<Model>.spec.ts
  *
  * Usage:
  *   npx gen-model ${modelName}
@@ -176,6 +178,159 @@ export function use${modelName}(id: string) {
 }
 
 // ----------------------------------------------------------
+// TEMPLATE: Service Test
+// ----------------------------------------------------------
+function templateServiceTest(modelName) {
+  const folder = kebabCase(modelName);
+  return `import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ${modelName}Service } from '@/domain/${folder}/${modelName}Service';
+import { ${modelName}Repository } from '@/domain/${folder}/${modelName}Repository';
+import type { ${modelName} } from '@/domain/${folder}/${modelName}';
+
+// Mock the repository
+vi.mock('@/domain/${folder}/${modelName}Repository');
+
+describe('${modelName}Service', () => {
+  let service: ${modelName}Service;
+  let mockRepository: ReturnType<typeof vi.mocked<${modelName}Repository>>;
+
+  beforeEach(() => {
+    mockRepository = {
+      get: vi.fn(),
+      list: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    } as unknown as ReturnType<typeof vi.mocked<${modelName}Repository>>;
+
+    service = new ${modelName}Service(mockRepository);
+  });
+
+  describe('getFull${modelName}', () => {
+    it('should fetch a complete ${modelName} by id', async () => {
+      const mock${modelName} = {
+        id: '${modelName.toLowerCase()}-123',
+        // TODO: Add model-specific fields
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-15T00:00:00Z',
+        owner: 'user-123::user-123',
+      } as ${modelName};
+
+      mockRepository.get.mockResolvedValue(mock${modelName});
+
+      const result = await service.getFull${modelName}('${modelName.toLowerCase()}-123');
+
+      expect(mockRepository.get).toHaveBeenCalledWith('${modelName.toLowerCase()}-123');
+      expect(result).toEqual(mock${modelName});
+    });
+
+    it('should return null when ${modelName} does not exist', async () => {
+      mockRepository.get.mockResolvedValue(null);
+
+      const result = await service.getFull${modelName}('non-existent-id');
+
+      expect(mockRepository.get).toHaveBeenCalledWith('non-existent-id');
+      expect(result).toBeNull();
+    });
+
+    // TODO: Add more tests for lazy loading and relations
+  });
+});
+`;
+}
+
+// ----------------------------------------------------------
+// TEMPLATE: Composable Test
+// ----------------------------------------------------------
+function templateComposableTest(modelName) {
+  const folder = kebabCase(modelName);
+  return `import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { use${modelName} } from '@/application/${folder}/use${modelName}';
+import { ${modelName}Service } from '@/domain/${folder}/${modelName}Service';
+import type { ${modelName} } from '@/domain/${folder}/${modelName}';
+
+// Mock the ${modelName}Service
+vi.mock('@/domain/${folder}/${modelName}Service');
+
+describe('use${modelName}', () => {
+  let mockService: ReturnType<typeof vi.mocked<${modelName}Service>>;
+
+  beforeEach(() => {
+    mockService = {
+      getFull${modelName}: vi.fn(),
+    } as unknown as ReturnType<typeof vi.mocked<${modelName}Service>>;
+
+    // Mock the constructor to return our mock service
+    vi.mocked(${modelName}Service).mockImplementation(() => mockService);
+  });
+
+  it('should initialize with null item and loading false', () => {
+    const { item, loading } = use${modelName}('${modelName.toLowerCase()}-123');
+
+    expect(item.value).toBeNull();
+    expect(loading.value).toBe(false);
+  });
+
+  it('should load ${modelName} successfully', async () => {
+    const mock${modelName} = {
+      id: '${modelName.toLowerCase()}-123',
+      // TODO: Add model-specific fields
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      owner: 'user-123::user-123',
+    } as ${modelName};
+
+    mockService.getFull${modelName}.mockResolvedValue(mock${modelName});
+
+    const { item, loading, load } = use${modelName}('${modelName.toLowerCase()}-123');
+
+    expect(loading.value).toBe(false);
+
+    const loadPromise = load();
+
+    // Loading should be true during the async operation
+    expect(loading.value).toBe(true);
+
+    await loadPromise;
+
+    expect(loading.value).toBe(false);
+    expect(item.value).toEqual(mock${modelName});
+    expect(mockService.getFull${modelName}).toHaveBeenCalledWith('${modelName.toLowerCase()}-123');
+  });
+
+  it('should handle loading state correctly', async () => {
+    mockService.getFull${modelName}.mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve(null), 100))
+    );
+
+    const { loading, load } = use${modelName}('${modelName.toLowerCase()}-123');
+
+    expect(loading.value).toBe(false);
+
+    const loadPromise = load();
+    expect(loading.value).toBe(true);
+
+    await loadPromise;
+    expect(loading.value).toBe(false);
+  });
+
+  it('should set item to null when ${modelName} not found', async () => {
+    mockService.getFull${modelName}.mockResolvedValue(null);
+
+    const { item, load } = use${modelName}('non-existent-id');
+
+    await load();
+
+    expect(item.value).toBeNull();
+    expect(mockService.getFull${modelName}).toHaveBeenCalledWith('non-existent-id');
+  });
+
+  // TODO: Add more tests for error handling and edge cases
+});
+`;
+}
+
+// ----------------------------------------------------------
 // MAIN
 // ----------------------------------------------------------
 const [, , rawModelName] = process.argv;
@@ -211,6 +366,21 @@ writeFile(
 writeFile(
   path.join(baseDir, `application/${folder}/use${modelName}.ts`),
   templateComposable(modelName)
+);
+
+// Tests
+const testBaseDir = path.join(process.cwd(), 'test/unit');
+
+// Service Test
+writeFile(
+  path.join(testBaseDir, `domain/${folder}/${modelName}Service.spec.ts`),
+  templateServiceTest(modelName)
+);
+
+// Composable Test
+writeFile(
+  path.join(testBaseDir, `application/${folder}/use${modelName}.spec.ts`),
+  templateComposableTest(modelName)
 );
 
 console.log(`\n🎉 Done! ${modelName} scaffolding created successfully.\n`);
