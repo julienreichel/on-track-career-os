@@ -157,9 +157,10 @@ export class ${modelName}Service {
 // TEMPLATE: Composable
 // ----------------------------------------------------------
 function templateComposable(modelName) {
+  const folder = kebabCase(modelName);
   return `import { ref } from 'vue'
-import { ${modelName}Service } from '@/domain/${kebabCase(modelName)}/${modelName}Service'
-import type { ${modelName} } from '@/domain/user-profile/${modelName}';
+import { ${modelName}Service } from '@/domain/${folder}/${modelName}Service'
+import type { ${modelName} } from '@/domain/${folder}/${modelName}';
 
 export function use${modelName}(id: string) {
   const item = ref<${modelName} | null>(null);
