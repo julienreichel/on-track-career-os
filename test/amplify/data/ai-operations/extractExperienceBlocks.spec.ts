@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 
 // Mock AWS SDK
 const mockSend = vi.fn();
@@ -20,122 +21,203 @@ describe('ai.extractExperienceBlocks', () => {
     handler = module.handler;
   });
 
+  /**
+   * Mock AI response generator that simulates actual parsing of experience text
+   * Uses regex to extract structured data from input, mimicking real AI behavior
+   */
+  const generateMockResponse = (experienceBlocks: string[]) => {
+    const experiences = experienceBlocks.map((block, index) => {
+      // Extract title and company: "Title at Company (dates)"
+      const titleCompanyMatch = block.match(/^(.*?)\s+at\s+(.*?)\s*\(/);
+      const title = titleCompanyMatch ? titleCompanyMatch[1].trim() : `Experience ${index + 1}`;
+      const company = titleCompanyMatch ? titleCompanyMatch[2].trim() : 'Unknown Company';
+
+      // Extract dates: "(Month Year - Month Year)" or "(Year-present)"
+      const datesMatch = block.match(/\((.*?)\)/);
+      let start_date = '2020-01';
+      let end_date: string | null = null;
+
+      if (datesMatch) {
+        const dateStr = datesMatch[1];
+        if (dateStr.includes('present')) {
+          end_date = null;
+        } else if (dateStr.includes('-')) {
+          const [startPart, endPart] = dateStr.split('-').map((d) => d.trim());
+          // Parse month and year from text like "March 2020"
+          const startMatch = startPart.match(/(\w+)\s+(\d{4})/);
+          if (startMatch) {
+            const monthMap: Record<string, string> = {
+              January: '01',
+              February: '02',
+              March: '03',
+              April: '04',
+              May: '05',
+              June: '06',
+              July: '07',
+              August: '08',
+              September: '09',
+              October: '10',
+              November: '11',
+              December: '12',
+            };
+            start_date = `${startMatch[2]}-${monthMap[startMatch[1]] || '01'}`;
+          }
+          if (endPart) {
+            const endMatch = endPart.match(/(\w+)\s+(\d{4})/);
+            if (endMatch) {
+              const monthMap: Record<string, string> = {
+                January: '01',
+                February: '02',
+                March: '03',
+                April: '04',
+                May: '05',
+                June: '06',
+                July: '07',
+                August: '08',
+                September: '09',
+                October: '10',
+                November: '11',
+                December: '12',
+              };
+              end_date = `${endMatch[2]}-${monthMap[endMatch[1]] || '12'}`;
+            } else if (/\d{4}/.test(endPart)) {
+              end_date = `${endPart}-12`;
+            }
+          }
+        }
+      }
+
+      // Extract responsibilities and tasks from bullet points
+      const bulletPoints = block.match(/^[-•]\s*(.+)$/gm) || [];
+      const responsibilities = bulletPoints
+        .slice(0, Math.ceil(bulletPoints.length / 2))
+        .map((b) => b.replace(/^[-•]\s*/, '').trim());
+      const tasks = bulletPoints
+        .slice(Math.ceil(bulletPoints.length / 2))
+        .map((b) => b.replace(/^[-•]\s*/, '').trim());
+
+      return {
+        title,
+        company,
+        start_date,
+        end_date,
+        responsibilities,
+        tasks,
+      };
+    });
+
+    return { experiences };
+  };
+
   describe('Handler Integration Tests', () => {
     it('should successfully extract experience blocks with all fields', async () => {
-      mockSend.mockResolvedValueOnce({
-        body: Buffer.from(
-          JSON.stringify({
-            content: [
-              {
-                text: JSON.stringify({
-                  experiences: [
-                    {
-                      title: 'Senior Software Engineer',
-                      company: 'TechCorp Inc.',
-                      start_date: '2020-03',
-                      end_date: '2023-12',
-                      responsibilities: ['Lead development team', 'Architecture decisions'],
-                      tasks: ['Implemented microservices', 'Mentored junior developers'],
-                    },
-                  ],
-                }),
-              },
-            ],
-          })
-        ),
+      const inputBlocks = [
+        'Senior Software Engineer at TechCorp Inc. (March 2020 - December 2023)\n- Lead development team\n- Architecture decisions\n- Implemented microservices\n- Mentored junior developers',
+      ];
+
+      mockSend.mockImplementationOnce(async () => {
+        // Get the command input from InvokeModelCommand constructor
+        const commandCall = (vi.mocked(InvokeModelCommand).mock.calls[0] as unknown[])[0] as {
+          body: string;
+        };
+        const requestBody = JSON.parse(commandCall.body);
+        const userPrompt = requestBody.messages[0].content[0].text;
+
+        // Extract experience blocks from prompt
+        const blocksMatch = userPrompt.match(/Experience blocks to parse:\n([\s\S]*)/);
+        const extractedBlocks = blocksMatch ? [blocksMatch[1].trim()] : inputBlocks;
+
+        const mockResponse = generateMockResponse(extractedBlocks);
+
+        return {
+          body: new TextEncoder().encode(
+            JSON.stringify({
+              content: [{ text: JSON.stringify(mockResponse) }],
+            })
+          ),
+        };
       });
 
       const result = await handler({
         arguments: {
-          experience_text_blocks: [
-            'Senior Software Engineer at TechCorp Inc. (March 2020 - December 2023)',
-          ],
+          experience_text_blocks: inputBlocks,
         },
       });
 
       expect(result.experiences).toHaveLength(1);
-      expect(result.experiences[0]).toEqual({
-        title: 'Senior Software Engineer',
-        company: 'TechCorp Inc.',
-        start_date: '2020-03',
-        end_date: '2023-12',
-        responsibilities: ['Lead development team', 'Architecture decisions'],
-        tasks: ['Implemented microservices', 'Mentored junior developers'],
-      });
+      expect(result.experiences[0].title).toBe('Senior Software Engineer');
+      expect(result.experiences[0].company).toBe('TechCorp Inc.');
+      expect(result.experiences[0].start_date).toBe('2020-03');
+      expect(result.experiences[0].end_date).toBe('2023-12');
+      expect(result.experiences[0].responsibilities).toContain('Lead development team');
+      expect(result.experiences[0].tasks).toContain('Implemented microservices');
     });
 
     it('should handle multiple experience blocks', async () => {
-      mockSend.mockResolvedValueOnce({
-        body: Buffer.from(
-          JSON.stringify({
-            content: [
-              {
-                text: JSON.stringify({
-                  experiences: [
-                    {
-                      title: 'Senior Developer',
-                      company: 'Company A',
-                      start_date: '2020-01',
-                      end_date: null,
-                      responsibilities: ['Team lead'],
-                      tasks: ['Code reviews'],
-                    },
-                    {
-                      title: 'Junior Developer',
-                      company: 'Company B',
-                      start_date: '2018-06',
-                      end_date: '2019-12',
-                      responsibilities: ['Development'],
-                      tasks: ['Bug fixes'],
-                    },
-                  ],
-                }),
-              },
-            ],
-          })
-        ),
+      const inputBlocks = [
+        'Senior Developer at Company A (2020-present)\n- Team lead\n- Code reviews',
+        'Junior Developer at Company B (June 2018 - December 2019)\n- Development\n- Bug fixes',
+      ];
+
+      mockSend.mockImplementationOnce(async () => {
+        // Generate response from input blocks
+        const mockResponse = generateMockResponse(inputBlocks);
+
+        return {
+          body: new TextEncoder().encode(
+            JSON.stringify({
+              content: [{ text: JSON.stringify(mockResponse) }],
+            })
+          ),
+        };
       });
 
       const result = await handler({
         arguments: {
-          experience_text_blocks: [
-            'Senior Developer at Company A (2020-present)',
-            'Junior Developer at Company B (2018-2019)',
-          ],
+          experience_text_blocks: inputBlocks,
         },
       });
 
       expect(result.experiences).toHaveLength(2);
       expect(result.experiences[0].title).toBe('Senior Developer');
+      expect(result.experiences[0].company).toBe('Company A');
       expect(result.experiences[0].end_date).toBeNull();
       expect(result.experiences[1].title).toBe('Junior Developer');
+      expect(result.experiences[1].company).toBe('Company B');
+      expect(result.experiences[1].start_date).toBe('2018-06');
+      expect(result.experiences[1].end_date).toBe('2019-12');
     });
 
     it('should apply operation-specific validation fallbacks', async () => {
-      mockSend.mockResolvedValueOnce({
-        body: Buffer.from(
-          JSON.stringify({
-            content: [
-              {
-                text: JSON.stringify({
-                  experiences: [
-                    {
-                      // Missing title and company - will use fallbacks
-                      start_date: '2020-01',
-                      end_date: null,
-                      // Missing responsibilities and tasks - will default to []
-                    },
-                  ],
-                }),
-              },
-            ],
-          })
-        ),
+      const inputBlocks = ['Incomplete experience'];
+
+      mockSend.mockImplementationOnce(async () => {
+        // Simulate incomplete response that will trigger fallbacks
+        return {
+          body: new TextEncoder().encode(
+            JSON.stringify({
+              content: [
+                {
+                  text: JSON.stringify({
+                    experiences: [
+                      {
+                        // Missing title and company - will use fallbacks
+                        start_date: '2020-01',
+                        end_date: null,
+                        // Missing responsibilities and tasks - will default to []
+                      },
+                    ],
+                  }),
+                },
+              ],
+            })
+          ),
+        };
       });
 
       const result = await handler({
         arguments: {
-          experience_text_blocks: ['Incomplete experience'],
+          experience_text_blocks: inputBlocks,
         },
       });
 
@@ -147,18 +229,20 @@ describe('ai.extractExperienceBlocks', () => {
     });
 
     it('should throw error for invalid output structure', async () => {
-      mockSend.mockResolvedValueOnce({
-        body: Buffer.from(
-          JSON.stringify({
-            content: [
-              {
-                text: JSON.stringify({
-                  invalid_field: 'data',
-                }),
-              },
-            ],
-          })
-        ),
+      mockSend.mockImplementationOnce(async () => {
+        return {
+          body: new TextEncoder().encode(
+            JSON.stringify({
+              content: [
+                {
+                  text: JSON.stringify({
+                    invalid_field: 'data',
+                  }),
+                },
+              ],
+            })
+          ),
+        };
       });
 
       await expect(

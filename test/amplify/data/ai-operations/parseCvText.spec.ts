@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
+import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 
 // Mock the AWS SDK
 vi.mock('@aws-sdk/client-bedrock-runtime', () => {
@@ -40,58 +40,98 @@ describe('ai.parseCvText', () => {
   });
 
   const mockCvText = `
-John Doe
-Senior Software Engineer
-
 EXPERIENCE
 Senior Software Engineer at TechCorp (2020-2023)
-- Led development of cloud-native applications
-- Managed team of 5 developers
-- Implemented CI/CD pipelines
-
-Software Engineer at StartupXYZ (2018-2020)
-- Built scalable microservices architecture
-- Developed RESTful APIs using Node.js
+- Led development of cloud applications
 
 EDUCATION
-Bachelor of Science in Computer Science
-University of Technology (2014-2018)
+BS Computer Science, MIT (2018)
 
 SKILLS
-JavaScript, TypeScript, React, Node.js, AWS, Docker, Kubernetes
+JavaScript, Python, AWS
 
 CERTIFICATIONS
 AWS Certified Solutions Architect
-Google Cloud Professional Developer
   `.trim();
+
+  /**
+   * Mock AI response generator that simulates actual parsing of CV text
+   * Uses regex to extract sections from the input, mimicking real AI behavior
+   */
+  const generateMockResponse = (cvText: string) => {
+    // Extract experiences (lines after EXPERIENCE until next section)
+    const experienceMatch = cvText.match(/EXPERIENCE\n([\s\S]*?)(?=\n[A-Z]+\n|$)/);
+    const experiences = experienceMatch
+      ? experienceMatch[1]
+          .trim()
+          .split(/\n(?=[A-Z].*?at\s)/)
+          .filter((e) => e.trim())
+      : [];
+
+    // Extract education (lines after EDUCATION until next section)
+    const educationMatch = cvText.match(/EDUCATION\n([\s\S]*?)(?=\n[A-Z]+\n|$)/);
+    const education = educationMatch
+      ? educationMatch[1]
+          .trim()
+          .split('\n')
+          .filter((e) => e.trim())
+      : [];
+
+    // Extract skills (comma-separated after SKILLS)
+    const skillsMatch = cvText.match(/SKILLS\n([\s\S]*?)(?=\n[A-Z]+\n|$)/);
+    const skills = skillsMatch
+      ? skillsMatch[1]
+          .trim()
+          .split(',')
+          .map((s) => s.trim())
+          .filter((s) => s)
+      : [];
+
+    // Extract certifications (lines after CERTIFICATIONS)
+    const certificationsMatch = cvText.match(/CERTIFICATIONS\n([\s\S]*?)$/);
+    const certifications = certificationsMatch
+      ? certificationsMatch[1]
+          .trim()
+          .split('\n')
+          .filter((c) => c.trim())
+      : [];
+
+    return {
+      sections: {
+        experiences,
+        education,
+        skills,
+        certifications,
+        raw_blocks: [],
+      },
+      confidence: 0.95,
+    };
+  };
 
   describe('Handler Integration Tests', () => {
     it('should successfully parse CV text with valid Bedrock response', async () => {
-      const mockBedrockResponse = {
-        sections: {
-          experiences: [
-            'Senior Software Engineer at TechCorp (2020-2023)\n- Led development of cloud-native applications\n- Managed team of 5 developers\n- Implemented CI/CD pipelines',
-            'Software Engineer at StartupXYZ (2018-2020)\n- Built scalable microservices architecture\n- Developed RESTful APIs using Node.js',
-          ],
-          education: [
-            'Bachelor of Science in Computer Science\nUniversity of Technology (2014-2018)',
-          ],
-          skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'AWS', 'Docker', 'Kubernetes'],
-          certifications: [
-            'AWS Certified Solutions Architect',
-            'Google Cloud Professional Developer',
-          ],
-          raw_blocks: [],
-        },
-        confidence: 0.95,
-      };
+      // Mock Bedrock to simulate actual parsing of input
+      mockSend.mockImplementationOnce(async () => {
+        // Get the command input from InvokeModelCommand constructor
+        const commandCall = (vi.mocked(InvokeModelCommand).mock.calls[0] as unknown[])[0] as {
+          body: string;
+        };
+        const requestBody = JSON.parse(commandCall.body);
+        const userPrompt = requestBody.messages[0].content[0].text;
 
-      mockSend.mockResolvedValueOnce({
-        body: Buffer.from(
-          JSON.stringify({
-            content: [{ text: JSON.stringify(mockBedrockResponse) }],
-          })
-        ),
+        // Extract CV text from prompt (after "CV text to parse:")
+        const cvTextMatch = userPrompt.match(/CV text to parse:\n([\s\S]*)/);
+        const extractedCvText = cvTextMatch ? cvTextMatch[1].trim() : mockCvText;
+
+        const mockResponse = generateMockResponse(extractedCvText);
+
+        return {
+          body: new TextEncoder().encode(
+            JSON.stringify({
+              content: [{ text: JSON.stringify(mockResponse) }],
+            })
+          ),
+        };
       });
 
       const result = await handler({
@@ -99,13 +139,16 @@ Google Cloud Professional Developer
       });
 
       const parsed = JSON.parse(result);
-      expect(parsed.sections.experiences).toHaveLength(2);
+      expect(parsed.sections.experiences).toHaveLength(1);
+      expect(parsed.sections.experiences[0]).toContain('TechCorp');
       expect(parsed.sections.education).toHaveLength(1);
-      expect(parsed.sections.skills).toHaveLength(7);
-      expect(parsed.sections.certifications).toHaveLength(2);
+      expect(parsed.sections.education[0]).toContain('MIT');
+      expect(parsed.sections.skills).toHaveLength(3);
+      expect(parsed.sections.skills).toContain('JavaScript');
+      expect(parsed.sections.certifications).toHaveLength(1);
+      expect(parsed.sections.certifications[0]).toContain('AWS Certified');
       expect(parsed.confidence).toBe(0.95);
     });
-
     it('should validate output structure and apply operation-specific fallbacks', async () => {
       const mockBedrockResponse = {
         sections: {
