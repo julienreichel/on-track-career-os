@@ -3,7 +3,7 @@ import { postConfirmation } from '../auth/post-confirmation/resource';
 import { deleteUserProfile } from './delete-user-profile/resource';
 
 // Bedrock model ID (Amazon Nova Lite)
-export const MODEL_ID = 'amazon.nova-lite-v1:0';
+export const MODEL_ID = 'eu.amazon.nova-micro-v1:0';
 
 // Define AI operation Lambda functions
 export const parseCvTextFunction = defineFunction({

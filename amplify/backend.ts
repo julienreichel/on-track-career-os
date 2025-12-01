@@ -3,7 +3,6 @@ import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { auth } from './auth/resource';
 import {
   data,
-  MODEL_ID,
   parseCvTextFunction,
   extractExperienceBlocksFunction,
   generateStarStoryFunction,
@@ -23,11 +22,12 @@ const backend = defineBackend({
 });
 
 // Grant Bedrock permissions to AI operation Lambda functions
+// Note: Using wildcard to support all Bedrock models (foundation models, inference profiles, cross-region)
 backend.parseCvTextFunction.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     effect: Effect.ALLOW,
     actions: ['bedrock:InvokeModel'],
-    resources: [`arn:aws:bedrock:*::foundation-model/${MODEL_ID}`],
+    resources: ['arn:aws:bedrock:*::foundation-model/*', 'arn:aws:bedrock:*:*:inference-profile/*'],
   })
 );
 
@@ -35,7 +35,7 @@ backend.extractExperienceBlocksFunction.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     effect: Effect.ALLOW,
     actions: ['bedrock:InvokeModel'],
-    resources: [`arn:aws:bedrock:*::foundation-model/${MODEL_ID}`],
+    resources: ['arn:aws:bedrock:*::foundation-model/*', 'arn:aws:bedrock:*:*:inference-profile/*'],
   })
 );
 
@@ -43,7 +43,7 @@ backend.generateStarStoryFunction.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     effect: Effect.ALLOW,
     actions: ['bedrock:InvokeModel'],
-    resources: [`arn:aws:bedrock:*::foundation-model/${MODEL_ID}`],
+    resources: ['arn:aws:bedrock:*::foundation-model/*', 'arn:aws:bedrock:*:*:inference-profile/*'],
   })
 );
 
