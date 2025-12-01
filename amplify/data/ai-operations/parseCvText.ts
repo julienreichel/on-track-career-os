@@ -19,10 +19,18 @@ import { truncateForLog, withAiOperationHandler } from './utils/common';
 const DEFAULT_CONFIDENCE = 0.5;
 
 // System prompt - constant as per AIC
-const SYSTEM_PROMPT = `You are a CV text parser.
-You MUST return structured JSON only.
-Extract distinct sections and normalize them.
-Never invent information.`;
+const SYSTEM_PROMPT = `You are a CV text parser that extracts structured sections from CV text.
+Extract experiences, education, skills, certifications, and other text blocks.
+Never invent information not present in the text.
+Return ONLY valid JSON with no markdown wrappers.
+
+RULES:
+- Extract only information explicitly stated in the CV
+- Do not infer or invent missing details
+- Categorize text into appropriate sections
+- If a section has no content, return empty array
+- Return ONLY valid JSON matching the specified schema`;
+
 
 // Output schema for retry
 const OUTPUT_SCHEMA = `{
@@ -56,27 +64,26 @@ export interface ParseCvTextInput {
  * Validate and apply fallback rules from AIC
  */
 function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOutput {
-  if (!parsedOutput.sections) {
-    throw new Error('Missing required field: sections');
-  }
+  // If sections is missing, create empty fallback structure
+  const sections = parsedOutput.sections || {
+    experiences: [],
+    education: [],
+    skills: [],
+    certifications: [],
+    rawBlocks: [],
+  };
 
   return {
     sections: {
-      experiences: Array.isArray(parsedOutput.sections.experiences)
-        ? parsedOutput.sections.experiences
-        : [],
-      education: Array.isArray(parsedOutput.sections.education)
-        ? parsedOutput.sections.education
-        : [],
-      skills: Array.isArray(parsedOutput.sections.skills) ? parsedOutput.sections.skills : [],
-      certifications: Array.isArray(parsedOutput.sections.certifications)
-        ? parsedOutput.sections.certifications
-        : [],
+      experiences: Array.isArray(sections.experiences) ? sections.experiences : [],
+      education: Array.isArray(sections.education) ? sections.education : [],
+      skills: Array.isArray(sections.skills) ? sections.skills : [],
+      certifications: Array.isArray(sections.certifications) ? sections.certifications : [],
       // Support both camelCase and snake_case from AI response
-      rawBlocks: Array.isArray(parsedOutput.sections.rawBlocks)
-        ? parsedOutput.sections.rawBlocks
-        : Array.isArray((parsedOutput.sections as Record<string, unknown>).raw_blocks)
-          ? ((parsedOutput.sections as Record<string, unknown>).raw_blocks as string[])
+      rawBlocks: Array.isArray(sections.rawBlocks)
+        ? sections.rawBlocks
+        : Array.isArray((sections as Record<string, unknown>).raw_blocks)
+          ? ((sections as Record<string, unknown>).raw_blocks as string[])
           : [],
     },
     confidence:
@@ -89,7 +96,11 @@ function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOu
  */
 function buildUserPrompt(cvText: string): string {
   return `Extract structured sections from this CV text:
-${cvText}`;
+
+${cvText}
+
+Return a JSON object with this exact structure:
+${OUTPUT_SCHEMA}`;
 }
 
 /**
