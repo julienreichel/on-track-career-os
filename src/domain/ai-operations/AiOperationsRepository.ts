@@ -1,6 +1,7 @@
 import { gqlOptions } from '@/data/graphql/options';
 import type { ParsedCV } from './ParsedCV';
 import type { ExperiencesResult } from './Experience';
+import type { STARStory } from './STARStory';
 
 /**
  * Repository interface for AI operations
@@ -22,6 +23,13 @@ export interface IAiOperationsRepository {
    * @returns Structured experience objects with dates, responsibilities, tasks
    */
   extractExperienceBlocks(experienceTextBlocks: string[]): Promise<ExperiencesResult>;
+
+  /**
+   * Generate STAR story from experience text
+   * @param sourceText - Experience text to convert to STAR format
+   * @returns STAR story with situation, task, action, result
+   */
+  generateStarStory(sourceText: string): Promise<STARStory>;
 }
 
 /**
@@ -36,6 +44,11 @@ export type AmplifyAiOperations = {
 
   extractExperienceBlocks: (
     input: { experienceTextBlocks: string[] },
+    options?: Record<string, unknown>
+  ) => Promise<{ data: string | null; errors?: unknown[] }>;
+
+  generateStarStory: (
+    input: { sourceText: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: string | null; errors?: unknown[] }>;
 };
@@ -98,6 +111,23 @@ export class AiOperationsRepository implements IAiOperationsRepository {
 
     // Parse JSON response from Lambda
     const parsed = JSON.parse(data) as ExperiencesResult;
+
+    return parsed;
+  }
+
+  async generateStarStory(sourceText: string): Promise<STARStory> {
+    const { data, errors } = await this.client.generateStarStory({ sourceText }, gqlOptions());
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    // Parse JSON response from Lambda
+    const parsed = JSON.parse(data) as STARStory;
 
     return parsed;
   }

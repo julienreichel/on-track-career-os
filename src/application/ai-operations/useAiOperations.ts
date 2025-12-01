@@ -2,19 +2,22 @@ import { ref } from 'vue';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
 import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
+import type { STARStory } from '@/domain/ai-operations/STARStory';
 
 /**
  * Composable for AI operations
- * Provides reactive state management for CV parsing and experience extraction
+ * Provides reactive state management for CV parsing, experience extraction, and STAR story generation
  *
- * Supports three workflows:
+ * Supports four workflows:
  * - parseCv: Parse CV text only
  * - extractExperiences: Extract experience blocks only
+ * - generateStarStory: Generate STAR story from experience text
  * - parseAndExtract: Complete workflow (parse + extract)
  */
 export function useAiOperations() {
   const parsedCv = ref<ParsedCV | null>(null);
   const experiences = ref<ExperiencesResult | null>(null);
+  const starStory = ref<STARStory | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
   const service = new AiOperationsService();
@@ -54,6 +57,23 @@ export function useAiOperations() {
   };
 
   /**
+   * Generate STAR story from experience text
+   */
+  const generateStarStory = async (sourceText: string) => {
+    loading.value = true;
+    error.value = null;
+    starStory.value = null;
+
+    try {
+      starStory.value = await service.generateStarStory(sourceText);
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error occurred';
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
    * Parse CV and extract experiences in one workflow
    */
   const parseAndExtract = async (cvText: string) => {
@@ -76,6 +96,7 @@ export function useAiOperations() {
   const reset = () => {
     parsedCv.value = null;
     experiences.value = null;
+    starStory.value = null;
     error.value = null;
     loading.value = false;
   };
@@ -83,10 +104,12 @@ export function useAiOperations() {
   return {
     parsedCv,
     experiences,
+    starStory,
     loading,
     error,
     parseCv,
     extractExperiences,
+    generateStarStory,
     parseAndExtract,
     reset,
   };

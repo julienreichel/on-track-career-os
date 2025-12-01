@@ -3,6 +3,7 @@ import { useAiOperations } from '@/application/ai-operations/useAiOperations';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
 import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
+import type { STARStory } from '@/domain/ai-operations/STARStory';
 
 // Mock the service
 vi.mock('@/domain/ai-operations/AiOperationsService');
@@ -11,6 +12,7 @@ describe('useAiOperations', () => {
   let mockService: {
     parseCvText: ReturnType<typeof vi.fn>;
     extractExperienceBlocks: ReturnType<typeof vi.fn>;
+    generateStarStory: ReturnType<typeof vi.fn>;
     parseCvAndExtractExperiences: ReturnType<typeof vi.fn>;
   };
 
@@ -19,6 +21,7 @@ describe('useAiOperations', () => {
     mockService = {
       parseCvText: vi.fn(),
       extractExperienceBlocks: vi.fn(),
+      generateStarStory: vi.fn(),
       parseCvAndExtractExperiences: vi.fn(),
     };
 
@@ -30,11 +33,12 @@ describe('useAiOperations', () => {
 
   it('should initialize with default state', () => {
     // Act
-    const { parsedCv, experiences, loading, error } = useAiOperations();
+    const { parsedCv, experiences, starStory, loading, error } = useAiOperations();
 
     // Assert
     expect(parsedCv.value).toBeNull();
     expect(experiences.value).toBeNull();
+    expect(starStory.value).toBeNull();
     expect(loading.value).toBe(false);
     expect(error.value).toBeNull();
   });
@@ -87,6 +91,40 @@ describe('useAiOperations', () => {
     expect(loading.value).toBe(false);
     expect(error.value).toBeNull();
     expect(experiences.value).toEqual(mockExperiences);
+  });
+
+  it('should successfully generate STAR story', async () => {
+    // Arrange
+    const mockStarStory: STARStory = {
+      situation: 'Led a distributed team during company restructuring',
+      task: 'Maintain team productivity and morale',
+      action: 'Implemented daily standups and 1-on-1s',
+      result: 'Team maintained 95% sprint completion rate',
+    };
+    mockService.generateStarStory.mockResolvedValue(mockStarStory);
+
+    // Act
+    const { starStory, loading, error, generateStarStory } = useAiOperations();
+    await generateStarStory('Led team during restructuring...');
+
+    // Assert
+    expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
+    expect(starStory.value).toEqual(mockStarStory);
+  });
+
+  it('should handle errors in generateStarStory', async () => {
+    // Arrange
+    mockService.generateStarStory.mockRejectedValue(new Error('STAR generation failed'));
+
+    // Act
+    const { starStory, loading, error, generateStarStory } = useAiOperations();
+    await generateStarStory('Some experience text');
+
+    // Assert
+    expect(loading.value).toBe(false);
+    expect(error.value).toBe('STAR generation failed');
+    expect(starStory.value).toBeNull();
   });
 
   it('should successfully parse and extract in one operation', async () => {
@@ -153,7 +191,7 @@ describe('useAiOperations', () => {
 
   it('should reset state', () => {
     // Arrange
-    const { parsedCv, experiences, loading, error, reset } = useAiOperations();
+    const { parsedCv, experiences, starStory, loading, error, reset } = useAiOperations();
     parsedCv.value = {
       sections: {
         experiences: [],
@@ -165,6 +203,12 @@ describe('useAiOperations', () => {
       confidence: 0.9,
     };
     experiences.value = { experiences: [] };
+    starStory.value = {
+      situation: 'Test',
+      task: 'Test',
+      action: 'Test',
+      result: 'Test',
+    };
     loading.value = true;
     error.value = 'Some error';
 
@@ -174,6 +218,7 @@ describe('useAiOperations', () => {
     // Assert
     expect(parsedCv.value).toBeNull();
     expect(experiences.value).toBeNull();
+    expect(starStory.value).toBeNull();
     expect(loading.value).toBe(false);
     expect(error.value).toBeNull();
   });

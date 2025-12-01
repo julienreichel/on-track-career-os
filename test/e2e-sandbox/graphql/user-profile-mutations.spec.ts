@@ -3,8 +3,8 @@ import { Amplify } from 'aws-amplify';
 import { signUp, signIn, signOut } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/data';
 import * as amplifyOutputs from '../../../amplify_outputs.json';
-import type { Schema } from '../../../amplify/data/resource';
-import { UserProfileRepository } from '../../../src/domain/user-profile/UserProfileRepository';
+import type { Schema } from '@amplify/data/resource';
+import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
 
 /**
  * E2E Sandbox Test: UserProfile GraphQL Operations

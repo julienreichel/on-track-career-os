@@ -3,7 +3,8 @@ import { Amplify } from 'aws-amplify';
 import { signUp, signIn, signOut } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/data';
 import * as amplifyOutputs from '../../../amplify_outputs.json';
-import type { Schema } from '../../../amplify/data/resource';
+import type { Schema } from '@amplify/data/resource';
+import { AiOperationsRepository } from '@/domain/ai-operations/AiOperationsRepository';
 
 /**
  * E2E Sandbox Test: AI Operations Integration
@@ -28,6 +29,7 @@ import type { Schema } from '../../../amplify/data/resource';
 Amplify.configure(amplifyOutputs);
 // Use userPool auth mode for owner-based authorization
 const client = generateClient<Schema>({ authMode: 'userPool' });
+let repository: AiOperationsRepository;
 
 describe('AI Operations Integration (E2E Sandbox)', () => {
   const testEmail = `ai-test-${Date.now()}@example.com`;
@@ -52,6 +54,9 @@ describe('AI Operations Integration (E2E Sandbox)', () => {
 
     // Wait for post-confirmation Lambda to create UserProfile
     await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Initialize repository with client
+    repository = new AiOperationsRepository(client.queries);
   }, 30000);
 
   beforeEach(async () => {
@@ -110,21 +115,8 @@ Key Requirements:
 - DevOps best practices
 `;
 
-    // Invoke AI operation via GraphQL query
-    const { data, errors } = await client.queries.generateStarStory({
-      sourceText,
-    });
-
-    // Check for GraphQL errors
-    if (errors) {
-      throw new Error(`GraphQL errors: ${JSON.stringify(errors)}`);
-    }
-
-    // Validate response structure
-    expect(data).toBeDefined();
-
-    // Parse JSON response (AI operations return JSON strings)
-    const starStory = JSON.parse(data as string);
+    // Invoke AI operation via repository
+    const starStory = await repository.generateStarStory(sourceText);
 
     // Validate STAR structure (per AI Interaction Contract - fields are strings, not arrays)
     expect(starStory).toHaveProperty('situation');
@@ -146,36 +138,39 @@ Key Requirements:
   }, 60000); // 60s timeout for AI operation
 
   it('should handle missing required fields gracefully', async () => {
-    // Test with empty input
-    try {
-      const { errors } = await client.queries.generateStarStory({
-        sourceText: '',
-      });
+    // Test with empty input - per AI Interaction Contract fallback rules,
+    // should return valid structure with placeholder/empty values instead of throwing
+    const starStory = await repository.generateStarStory('');
 
-      // Should have validation errors or return fallback
-      // AI operation should not crash
-      expect(errors || true).toBeDefined();
-    } catch (error) {
-      // Expected: validation may fail
-      expect(error).toBeDefined();
-    }
+    // Validate structure is returned (even if content is minimal/placeholder)
+    expect(starStory).toHaveProperty('situation');
+    expect(starStory).toHaveProperty('task');
+    expect(starStory).toHaveProperty('action');
+    expect(starStory).toHaveProperty('result');
+
+    // All fields should be strings (per schema)
+    expect(typeof starStory.situation).toBe('string');
+    expect(typeof starStory.task).toBe('string');
+    expect(typeof starStory.action).toBe('string');
+    expect(typeof starStory.result).toBe('string');
+
+    // With empty input, AI should provide fallback/placeholder values
+    // (not crash or throw errors - this is the graceful handling)
   }, 30000);
 
   it('should validate AI operation is properly configured', async () => {
     // Simple smoke test: verify the operation exists and is callable
     // This catches deployment issues (Lambda not deployed, wrong permissions, etc.)
 
-    const minimalInput = {
-      sourceText: 'Test experience: Led a project successfully',
-    };
+    const sourceText = 'Test experience: Led a project successfully';
 
     try {
       // This should not throw even if user is not authenticated
       // (though it may return authorization error)
-      const result = await client.queries.generateStarStory(minimalInput);
+      const starStory = await repository.generateStarStory(sourceText);
 
       // If we get here, the operation is deployed and accessible
-      expect(result).toBeDefined();
+      expect(starStory).toBeDefined();
     } catch (error) {
       // If error is about authorization, that's fine - operation exists
       const errorMessage = (error as Error).message;

@@ -3,6 +3,8 @@ import type { ParsedCV } from './ParsedCV';
 import { isParsedCV } from './ParsedCV';
 import type { ExperiencesResult } from './Experience';
 import { isExperiencesResult } from './Experience';
+import type { STARStory } from './STARStory';
+import { isSTARStory } from './STARStory';
 
 /**
  * Service for AI-powered CV and experience operations
@@ -71,6 +73,35 @@ export class AiOperationsService {
       // Re-throw with more context
       throw new Error(
         `Failed to extract experience blocks: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Generate STAR story from experience text with validation
+   * @param sourceText - Experience text to convert to STAR format
+   * @returns STAR story with situation, task, action, result
+   * @throws Error if generation fails or validation fails
+   */
+  async generateStarStory(sourceText: string): Promise<STARStory> {
+    // Validate input
+    if (!sourceText || sourceText.trim().length === 0) {
+      throw new Error('Source text cannot be empty');
+    }
+
+    try {
+      const result = await this.repo.generateStarStory(sourceText);
+
+      // Validate output structure
+      if (!isSTARStory(result)) {
+        throw new Error('Invalid STAR story result structure');
+      }
+
+      return result;
+    } catch (error) {
+      // Re-throw with more context
+      throw new Error(
+        `Failed to generate STAR story: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }

@@ -3,6 +3,7 @@ import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService'
 import type { AiOperationsRepository } from '@/domain/ai-operations/AiOperationsRepository';
 import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
 import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
+import type { STARStory } from '@/domain/ai-operations/STARStory';
 
 // Mock the repository
 vi.mock('@/domain/ai-operations/AiOperationsRepository');
@@ -12,6 +13,7 @@ describe('AiOperationsService', () => {
   let mockRepo: {
     parseCvText: ReturnType<typeof vi.fn>;
     extractExperienceBlocks: ReturnType<typeof vi.fn>;
+    generateStarStory: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -19,6 +21,7 @@ describe('AiOperationsService', () => {
     mockRepo = {
       parseCvText: vi.fn(),
       extractExperienceBlocks: vi.fn(),
+      generateStarStory: vi.fn(),
     };
 
     // Create service with mocked repo
@@ -148,6 +151,61 @@ describe('AiOperationsService', () => {
     });
   });
 
+  describe('generateStarStory', () => {
+    it('should successfully generate STAR story from source text', async () => {
+      // Arrange
+      const mockStarStory: STARStory = {
+        situation: 'Led a distributed team during company restructuring',
+        task: 'Maintain team productivity and morale while adapting to new organizational structure',
+        action: 'Implemented daily standups, 1-on-1s, and created team charter',
+        result: 'Team maintained 95% sprint completion rate and received positive feedback',
+      };
+
+      mockRepo.generateStarStory.mockResolvedValue(mockStarStory);
+
+      // Act
+      const result = await service.generateStarStory('Led team during restructuring...');
+
+      // Assert
+      expect(result).toEqual(mockStarStory);
+      expect(mockRepo.generateStarStory).toHaveBeenCalledWith('Led team during restructuring...');
+    });
+
+    it('should throw error for empty source text', async () => {
+      // Act & Assert
+      await expect(service.generateStarStory('')).rejects.toThrow('Source text cannot be empty');
+      expect(mockRepo.generateStarStory).not.toHaveBeenCalled();
+    });
+
+    it('should throw error for whitespace-only source text', async () => {
+      // Act & Assert
+      await expect(service.generateStarStory('   ')).rejects.toThrow(
+        'Source text cannot be empty'
+      );
+      expect(mockRepo.generateStarStory).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when repository fails', async () => {
+      // Arrange
+      mockRepo.generateStarStory.mockRejectedValue(new Error('AI operation failed'));
+
+      // Act & Assert
+      await expect(service.generateStarStory('Some experience text')).rejects.toThrow(
+        'Failed to generate STAR story: AI operation failed'
+      );
+    });
+
+    it('should throw error when result structure is invalid', async () => {
+      // Arrange
+      mockRepo.generateStarStory.mockResolvedValue({ invalid: 'structure' });
+
+      // Act & Assert
+      await expect(service.generateStarStory('Some experience text')).rejects.toThrow(
+        'Invalid STAR story result structure'
+      );
+    });
+  });
+
   describe('parseCvAndExtractExperiences', () => {
     it('should successfully parse CV and extract experiences from rawBlocks', async () => {
       // Arrange
@@ -209,6 +267,7 @@ describe('AiOperationsService', () => {
             title: 'Senior Developer',
             company: 'TechCorp',
             startDate: '2020-01',
+            endDate: '2023-12',
             responsibilities: ['Lead team'],
             tasks: ['Development'],
           },
