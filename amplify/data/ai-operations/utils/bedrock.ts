@@ -33,6 +33,7 @@ function getBedrockClient(): BedrockRuntimeClient {
 
 /**
  * Invoke Bedrock model with given prompt
+ * Supports both Amazon Nova and Anthropic Claude models
  */
 export async function invokeBedrock(
   systemPrompt: string,
@@ -40,22 +41,44 @@ export async function invokeBedrock(
   maxTokens: number = MAX_TOKENS,
   temperature: number = INITIAL_TEMPERATURE
 ): Promise<string> {
+  // Determine if we're using Nova or Claude based on model ID
+  const isNovaModel = BEDROCK_MODEL_ID.includes('nova');
+
   const input: InvokeModelCommandInput = {
     modelId: BEDROCK_MODEL_ID,
     contentType: 'application/json',
     accept: 'application/json',
-    body: JSON.stringify({
-      anthropic_version: 'bedrock-2023-05-31',
-      system: systemPrompt,
-      messages: [
-        {
-          role: 'user',
-          content: [{ type: 'text', text: userPrompt }],
-        },
-      ],
-      max_tokens: maxTokens,
-      temperature,
-    }),
+    body: JSON.stringify(
+      isNovaModel
+        ? {
+            // Amazon Nova format
+            schemaVersion: 'messages-v1',
+            system: [{ text: systemPrompt }],
+            messages: [
+              {
+                role: 'user',
+                content: [{ text: userPrompt }],
+              },
+            ],
+            inferenceConfig: {
+              max_new_tokens: maxTokens,
+              temperature,
+            },
+          }
+        : {
+            // Anthropic Claude format
+            anthropic_version: 'bedrock-2023-05-31',
+            system: systemPrompt,
+            messages: [
+              {
+                role: 'user',
+                content: [{ type: 'text', text: userPrompt }],
+              },
+            ],
+            max_tokens: maxTokens,
+            temperature,
+          }
+    ),
   };
 
   const client = getBedrockClient();
@@ -68,11 +91,20 @@ export async function invokeBedrock(
 
   const responseBody = JSON.parse(new TextDecoder().decode(response.body));
 
-  if (!responseBody.content || !responseBody.content[0]?.text) {
-    throw new Error('Invalid response structure from Bedrock');
+  // Handle different response formats
+  if (isNovaModel) {
+    // Nova format: { output: { message: { content: [{ text: "..." }] } } }
+    if (!responseBody.output?.message?.content?.[0]?.text) {
+      throw new Error('Invalid response structure from Bedrock Nova');
+    }
+    return responseBody.output.message.content[0].text;
+  } else {
+    // Claude format: { content: [{ text: "..." }] }
+    if (!responseBody.content || !responseBody.content[0]?.text) {
+      throw new Error('Invalid response structure from Bedrock Claude');
+    }
+    return responseBody.content[0].text;
   }
-
-  return responseBody.content[0].text;
 }
 
 /**

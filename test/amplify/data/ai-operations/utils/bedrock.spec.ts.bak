@@ -250,11 +250,7 @@ describe('bedrock utilities', () => {
       const mockResponse = {
         body: new TextEncoder().encode(
           JSON.stringify({
-            output: {
-              message: {
-                content: [{ text: 'response' }],
-              },
-            },
+            content: [{ text: 'response' }],
           })
         ),
       };
@@ -448,11 +444,7 @@ describe('bedrock utilities', () => {
       const mockResponse = {
         body: new TextEncoder().encode(
           JSON.stringify({
-            output: {
-              message: {
-                content: [{ text: '{"result": "success"}' }],
-              },
-            },
+            content: [{ text: '{"result": "success"}' }],
           })
         ),
       };
@@ -481,11 +473,7 @@ describe('bedrock utilities', () => {
       const mockResponse = {
         body: new TextEncoder().encode(
           JSON.stringify({
-            output: {
-              message: {
-                content: [{ text: '```json\n{"data": "value"}\n```' }],
-              },
-            },
+            content: [{ text: '```json\n{"data": "value"}\n```' }],
           })
         ),
       };
@@ -515,7 +503,7 @@ describe('bedrock utilities', () => {
         .mockResolvedValueOnce({
           body: new TextEncoder().encode(
             JSON.stringify({
-              output: { message: { content: [{ text: 'not valid json' }] } },
+              content: [{ text: 'not valid json' }],
             })
           ),
         })
@@ -523,11 +511,7 @@ describe('bedrock utilities', () => {
         .mockResolvedValueOnce({
           body: new TextEncoder().encode(
             JSON.stringify({
-              output: {
-                message: {
-                  content: [{ text: '{"result": "success"}' }],
-                },
-              },
+              content: [{ text: '{"result": "success"}' }],
             })
           ),
         });
@@ -571,7 +555,7 @@ describe('bedrock utilities', () => {
         .mockResolvedValueOnce({
           body: new TextEncoder().encode(
             JSON.stringify({
-              output: { message: { content: [{ text: 'invalid' }] } },
+              content: [{ text: 'invalid' }],
             })
           ),
         })
@@ -579,11 +563,7 @@ describe('bedrock utilities', () => {
         .mockResolvedValueOnce({
           body: new TextEncoder().encode(
             JSON.stringify({
-              output: {
-                message: {
-                  content: [{ text: '{"data": "ok"}' }],
-                },
-              },
+              content: [{ text: '{"data": "ok"}' }],
             })
           ),
         });
@@ -614,11 +594,7 @@ describe('bedrock utilities', () => {
       const mockResponse = {
         body: new TextEncoder().encode(
           JSON.stringify({
-            output: {
-              message: {
-                content: [{ text: '{"required": "value"}' }],
-              },
-            },
+            content: [{ text: '{"required": "value"}' }],
           })
         ),
       };
@@ -651,7 +627,7 @@ describe('bedrock utilities', () => {
       mockSend.mockResolvedValue({
         body: new TextEncoder().encode(
           JSON.stringify({
-            output: { message: { content: [{ text: 'still invalid' }] } },
+            content: [{ text: 'still invalid' }],
           })
         ),
       });
@@ -681,11 +657,7 @@ describe('bedrock utilities', () => {
       const mockResponse = {
         body: new TextEncoder().encode(
           JSON.stringify({
-            output: {
-              message: {
-                content: [{ text: '{}' }],
-              },
-            },
+            content: [{ text: '{}' }],
           })
         ),
       };
@@ -726,7 +698,7 @@ describe('bedrock utilities', () => {
       const mockResponse = {
         body: new TextEncoder().encode(
           JSON.stringify({
-            output: { message: { content: [{ text: JSON.stringify(complexData) }] } },
+            content: [{ text: JSON.stringify(complexData) }],
           })
         ),
       };
