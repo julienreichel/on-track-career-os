@@ -2,11 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   UserProfileRepository,
   type AmplifyUserProfileModel,
+  type AmplifyMutations,
 } from '@/domain/user-profile/UserProfileRepository';
-import type {
-  UserProfileCreateInput,
-  UserProfileUpdateInput,
-} from '@/domain/user-profile/UserProfile';
+import type { UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
 
 // Mock gqlOptions
 vi.mock('@/data/graphql/options', () => ({
@@ -21,23 +19,29 @@ describe('UserProfileRepository', () => {
   let mockModel: {
     get: ReturnType<typeof vi.fn>;
     list: ReturnType<typeof vi.fn>;
-    create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
-    delete: ReturnType<typeof vi.fn>;
+  };
+  let mockMutations: {
+    deleteUserProfileWithAuth: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
-    // Create a fresh mock model for each test
+    // Create fresh mocks for each test
     mockModel = {
       get: vi.fn(),
       list: vi.fn(),
-      create: vi.fn(),
       update: vi.fn(),
-      delete: vi.fn(),
     };
 
-    // Inject the mock model via constructor (dependency injection)
-    repository = new UserProfileRepository(mockModel as AmplifyUserProfileModel);
+    mockMutations = {
+      deleteUserProfileWithAuth: vi.fn(),
+    };
+
+    // Inject the mocks via constructor (dependency injection)
+    repository = new UserProfileRepository(
+      mockModel as AmplifyUserProfileModel,
+      mockMutations as AmplifyMutations
+    );
   });
 
   describe('get', () => {
@@ -107,44 +111,6 @@ describe('UserProfileRepository', () => {
     });
   });
 
-  describe('create', () => {
-    it('should create a new user profile', async () => {
-      const input: UserProfileCreateInput = {
-        fullName: 'John Doe',
-        headline: 'Software Engineer',
-        location: 'San Francisco, CA',
-      };
-
-      const mockCreatedProfile = {
-        id: 'new-user-123',
-        ...input,
-        createdAt: new Date().toISOString(),
-      };
-
-      mockModel.create.mockResolvedValue({
-        data: mockCreatedProfile,
-      });
-
-      const result = await repository.create(input);
-
-      expect(mockModel.create).toHaveBeenCalledWith(
-        input,
-        expect.objectContaining({ authMode: 'userPool' })
-      );
-      expect(result).toEqual(mockCreatedProfile);
-    });
-
-    it('should handle creation errors', async () => {
-      const input: UserProfileCreateInput = {
-        fullName: 'John Doe',
-      };
-
-      mockModel.create.mockRejectedValue(new Error('Creation failed'));
-
-      await expect(repository.create(input)).rejects.toThrow('Creation failed');
-    });
-  });
-
   describe('update', () => {
     it('should update an existing user profile', async () => {
       const input: UserProfileUpdateInput = {
@@ -193,20 +159,22 @@ describe('UserProfileRepository', () => {
 
   describe('delete', () => {
     it('should delete a user profile by id', async () => {
-      mockModel.delete.mockResolvedValue({
-        data: null,
+      mockMutations.deleteUserProfileWithAuth.mockResolvedValue({
+        data: true,
       });
 
-      await repository.delete('user-123');
+      const result = await repository.delete('user-123');
 
-      expect(mockModel.delete).toHaveBeenCalledWith(
-        { id: 'user-123' },
-        expect.objectContaining({ authMode: 'userPool' })
-      );
+      expect(mockMutations.deleteUserProfileWithAuth).toHaveBeenCalledWith({
+        userId: 'user-123',
+      });
+      expect(result).toBe(true);
     });
 
     it('should handle deletion errors', async () => {
-      mockModel.delete.mockRejectedValue(new Error('Deletion failed'));
+      mockMutations.deleteUserProfileWithAuth.mockRejectedValue(
+        new Error('Deletion failed')
+      );
 
       await expect(repository.delete('user-123')).rejects.toThrow('Deletion failed');
     });

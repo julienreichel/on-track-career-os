@@ -76,9 +76,7 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
           username: testEmail,
           password: testPassword,
         });
-        // Step 1: Delete UserProfile from database
-        await client.models.UserProfile.delete({ id: testUserId });
-        // Step 2: Delete Cognito user via custom mutation
+        // Delete both UserProfile and Cognito user in one call
         await client.mutations.deleteUserProfileWithAuth({ userId: testUserId });
         console.log('Test user cleaned up:', testUserId);
       }

@@ -1,5 +1,5 @@
 import { gqlOptions } from '@/data/graphql/options';
-import type { UserProfileCreateInput, UserProfileUpdateInput, UserProfile } from './UserProfile';
+import type { UserProfileUpdateInput, UserProfile } from './UserProfile';
 
 export type AmplifyUserProfileModel = {
   get: (
@@ -7,39 +7,44 @@ export type AmplifyUserProfileModel = {
     options?: Record<string, unknown>
   ) => Promise<{ data: UserProfile | null }>;
   list: (options?: Record<string, unknown>) => Promise<{ data: UserProfile[] }>;
-  create: (
-    input: UserProfileCreateInput,
-    options?: Record<string, unknown>
-  ) => Promise<{ data: UserProfile | null }>;
   update: (
     input: UserProfileUpdateInput,
     options?: Record<string, unknown>
   ) => Promise<{ data: UserProfile | null }>;
-  delete: (
-    input: { id: string },
-    options?: Record<string, unknown>
-  ) => Promise<{ data: UserProfile | null }>;
+};
+
+export type AmplifyMutations = {
+  deleteUserProfileWithAuth: (input: { userId: string }) => Promise<{ data: boolean | null }>;
 };
 
 export class UserProfileRepository {
   private readonly _model: AmplifyUserProfileModel;
+  private readonly _mutations: AmplifyMutations;
 
   /**
    * Constructor with optional dependency injection for testing
    * @param model - Optional Amplify model instance (for testing)
+   * @param mutations - Optional Amplify mutations instance (for testing)
    */
-  constructor(model?: AmplifyUserProfileModel) {
-    if (model) {
-      // Use injected model (for tests)
+  constructor(model?: AmplifyUserProfileModel, mutations?: AmplifyMutations) {
+    if (model && mutations) {
+      // Use injected dependencies (for tests)
       this._model = model;
+      this._mutations = mutations;
     } else {
       // Use Nuxt's auto-imported useNuxtApp (for production)
-      this._model = useNuxtApp().$Amplify.GraphQL.client.models.UserProfile;
+      const amplify = useNuxtApp().$Amplify.GraphQL.client;
+      this._model = amplify.models.UserProfile;
+      this._mutations = amplify.mutations;
     }
   }
 
   private get model() {
     return this._model;
+  }
+
+  private get mutations() {
+    return this._mutations;
   }
 
   async get(id: string) {
@@ -52,17 +57,17 @@ export class UserProfileRepository {
     return data;
   }
 
-  async create(input: UserProfileCreateInput) {
-    const { data } = await this.model.create(input, gqlOptions());
-    return data;
-  }
-
   async update(input: UserProfileUpdateInput) {
     const { data } = await this.model.update(input, gqlOptions());
     return data;
   }
 
+  /**
+   * Delete user profile and associated Cognito user
+   * Uses Lambda mutation to delete both DynamoDB record and Cognito user in one call
+   */
   async delete(id: string) {
-    await this.model.delete({ id }, gqlOptions());
+    const { data } = await this.mutations.deleteUserProfileWithAuth({ userId: id });
+    return data;
   }
 }

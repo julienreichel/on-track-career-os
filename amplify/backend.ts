@@ -56,8 +56,22 @@ backend.deleteUserProfile.resources.lambda.addToRolePolicy(
   })
 );
 
-// Pass User Pool ID to delete-user-profile Lambda
+// Grant DynamoDB permissions to delete-user-profile Lambda
+backend.deleteUserProfile.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['dynamodb:DeleteItem'],
+    resources: [backend.data.resources.tables['UserProfile'].tableArn],
+  })
+);
+
+// Pass User Pool ID and Table Name to delete-user-profile Lambda
 backend.deleteUserProfile.addEnvironment(
   'USER_POOL_ID',
   backend.auth.resources.userPool.userPoolId
+);
+
+backend.deleteUserProfile.addEnvironment(
+  'USERPROFILE_TABLE_NAME',
+  backend.data.resources.tables['UserProfile'].tableName
 );
