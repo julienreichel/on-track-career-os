@@ -148,7 +148,7 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
   it('should prevent unauthorized access to other profiles', async () => {
     // Create second user to test authorization
     const userBEmail = `profile-test-b-${Date.now()}@example.com`;
-    await signUp({
+    const userBResult = await signUp({
       username: userBEmail,
       password: testPassword,
       options: {
@@ -158,6 +158,7 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
         },
       },
     });
+    const userBId = userBResult.userId;
 
     // Wait for post-confirmation
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -175,7 +176,10 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
     // Should be null due to authorization rules
     expect(userAProfile).toBeNull();
 
-    // Note: afterEach will try to sign in as original user and will fail
+    // Clean up User B before signing out
+    await repository.delete(userBId);
+    console.log('User B cleaned up:', userBId);
+
     // Sign out User B so afterEach doesn't fail
     await signOut();
   }, 30000);
