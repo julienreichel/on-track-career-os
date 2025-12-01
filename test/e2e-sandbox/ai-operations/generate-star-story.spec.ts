@@ -126,25 +126,23 @@ Key Requirements:
     // Parse JSON response (AI operations return JSON strings)
     const starStory = JSON.parse(data as string);
 
-    // Validate STAR structure
+    // Validate STAR structure (per AI Interaction Contract - fields are strings, not arrays)
     expect(starStory).toHaveProperty('situation');
     expect(starStory).toHaveProperty('task');
     expect(starStory).toHaveProperty('action');
     expect(starStory).toHaveProperty('result');
 
-    // Validate content arrays
-    expect(Array.isArray(starStory.situation)).toBe(true);
-    expect(Array.isArray(starStory.task)).toBe(true);
-    expect(Array.isArray(starStory.action)).toBe(true);
-    expect(Array.isArray(starStory.result)).toBe(true);
+    // Validate content is strings
+    expect(typeof starStory.situation).toBe('string');
+    expect(typeof starStory.task).toBe('string');
+    expect(typeof starStory.action).toBe('string');
+    expect(typeof starStory.result).toBe('string');
 
-    // Validate at least some content generated
-    expect(
-      starStory.situation.length +
-        starStory.task.length +
-        starStory.action.length +
-        starStory.result.length
-    ).toBeGreaterThan(0);
+    // Validate at least some content generated (each field should have some text)
+    expect(starStory.situation.length).toBeGreaterThan(0);
+    expect(starStory.task.length).toBeGreaterThan(0);
+    expect(starStory.action.length).toBeGreaterThan(0);
+    expect(starStory.result.length).toBeGreaterThan(0);
   }, 60000); // 60s timeout for AI operation
 
   it('should handle missing required fields gracefully', async () => {
