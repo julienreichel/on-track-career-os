@@ -4,6 +4,7 @@ import { signUp, signIn, signOut } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/data';
 import * as amplifyOutputs from '../../../amplify_outputs.json';
 import type { Schema } from '../../../amplify/data/resource';
+import { UserProfileRepository } from '../../../src/domain/user-profile/UserProfileRepository';
 
 /**
  * E2E Sandbox Test: Post-Confirmation Flow
@@ -24,6 +25,7 @@ import type { Schema } from '../../../amplify/data/resource';
 Amplify.configure(amplifyOutputs);
 // Use userPool auth mode for owner-based authorization
 const client = generateClient<Schema>({ authMode: 'userPool' });
+let repository: UserProfileRepository;
 
 describe('Post-Confirmation Flow (E2E Sandbox)', () => {
   const testEmail = `test-${Date.now()}@example.com`;
@@ -51,6 +53,9 @@ describe('Post-Confirmation Flow (E2E Sandbox)', () => {
     // Wait for post-confirmation Lambda to create UserProfile
     // Small delay to ensure async Lambda completes
     await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Initialize repository with client
+    repository = new UserProfileRepository(client.models.UserProfile, client.mutations);
   }, 30000);
 
   beforeEach(async () => {
@@ -78,8 +83,8 @@ describe('Post-Confirmation Flow (E2E Sandbox)', () => {
           username: testEmail,
           password: testPassword,
         });
-        // Delete both UserProfile and Cognito user in one call
-        await client.mutations.deleteUserProfileWithAuth({ userId: testUserId });
+        // Delete both UserProfile and Cognito user in one call via repository
+        await repository.delete(testUserId);
         console.log('Test user cleaned up:', testUserId);
       }
     } catch (error) {
@@ -91,10 +96,8 @@ describe('Post-Confirmation Flow (E2E Sandbox)', () => {
     // User already signed up in beforeAll, signed in via beforeEach
     expect(testUserId).toBeDefined();
 
-    // Query UserProfile - should exist with owner field (created by post-confirmation Lambda)
-    const { data: profile } = await client.models.UserProfile.get({
-      id: testUserId!,
-    });
+    // Query UserProfile via repository - should exist with owner field (created by post-confirmation Lambda)
+    const profile = await repository.get(testUserId!);
 
     // Assertions
     expect(profile).toBeDefined();
@@ -108,7 +111,7 @@ describe('Post-Confirmation Flow (E2E Sandbox)', () => {
     // This test validates that users can only access their own profiles
     // Current user should only see their own profile
 
-    const { data: profiles } = await client.models.UserProfile.list();
+    const profiles = await repository.list();
 
     // Should see at least own profile due to owner-based authorization
     expect(profiles.length).toBeGreaterThanOrEqual(1);

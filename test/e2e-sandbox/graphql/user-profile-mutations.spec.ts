@@ -4,6 +4,7 @@ import { signUp, signIn, signOut } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/data';
 import * as amplifyOutputs from '../../../amplify_outputs.json';
 import type { Schema } from '../../../amplify/data/resource';
+import { UserProfileRepository } from '../../../src/domain/user-profile/UserProfileRepository';
 
 /**
  * E2E Sandbox Test: UserProfile GraphQL Operations
@@ -26,6 +27,7 @@ import type { Schema } from '../../../amplify/data/resource';
 Amplify.configure(amplifyOutputs);
 // Use userPool auth mode for owner-based authorization
 const client = generateClient<Schema>({ authMode: 'userPool' });
+let repository: UserProfileRepository;
 
 describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
   const testEmail = `profile-test-${Date.now()}@example.com`;
@@ -49,6 +51,9 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
 
     // Wait for post-confirmation Lambda to create UserProfile
     await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Initialize repository with client
+    repository = new UserProfileRepository(client.models.UserProfile, client.mutations);
   }, 30000);
 
   beforeEach(async () => {
@@ -76,8 +81,8 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
           username: testEmail,
           password: testPassword,
         });
-        // Delete both UserProfile and Cognito user in one call
-        await client.mutations.deleteUserProfileWithAuth({ userId: testUserId });
+        // Delete both UserProfile and Cognito user in one call via repository
+        await repository.delete(testUserId);
         console.log('Test user cleaned up:', testUserId);
       }
     } catch (error) {
@@ -90,9 +95,7 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
       throw new Error('Test user not created');
     }
 
-    const { data: profile } = await client.models.UserProfile.get({
-      id: testUserId,
-    });
+    const profile = await repository.get(testUserId);
 
     // Validate all required fields are present
     expect(profile).toBeDefined();
@@ -110,24 +113,17 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
 
     // Update profile
     const updatedName = 'Updated Test User';
-    const { data: updatedProfile, errors } = await client.models.UserProfile.update({
+    const updatedProfile = await repository.update({
       id: testUserId,
       fullName: updatedName,
     });
-
-    // Check for GraphQL errors
-    if (errors) {
-      throw new Error(`GraphQL errors: ${JSON.stringify(errors)}`);
-    }
 
     // Validate update
     expect(updatedProfile).toBeDefined();
     expect(updatedProfile?.fullName).toBe(updatedName);
 
     // Re-fetch to confirm
-    const { data: refetchedProfile } = await client.models.UserProfile.get({
-      id: testUserId,
-    });
+    const refetchedProfile = await repository.get(testUserId);
     expect(refetchedProfile?.fullName).toBe(updatedName);
   }, 30000);
 
@@ -141,9 +137,7 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
     }
 
     // Fetch profile created by post-confirmation
-    const { data: profile } = await client.models.UserProfile.get({
-      id: testUserId,
-    });
+    const profile = await repository.get(testUserId);
 
     // Validate owner field format
     expect(profile?.owner).toBeDefined();
@@ -175,10 +169,8 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
       password: testPassword,
     });
 
-    // Try to access first user's profile
-    const { data: userAProfile } = await client.models.UserProfile.get({
-      id: testUserId!,
-    });
+    // Try to access first user's profile via repository
+    const userAProfile = await repository.get(testUserId!);
 
     // Should be null due to authorization rules
     expect(userAProfile).toBeNull();

@@ -172,9 +172,7 @@ describe('UserProfileRepository', () => {
     });
 
     it('should handle deletion errors', async () => {
-      mockMutations.deleteUserProfileWithAuth.mockRejectedValue(
-        new Error('Deletion failed')
-      );
+      mockMutations.deleteUserProfileWithAuth.mockRejectedValue(new Error('Deletion failed'));
 
       await expect(repository.delete('user-123')).rejects.toThrow('Deletion failed');
     });
