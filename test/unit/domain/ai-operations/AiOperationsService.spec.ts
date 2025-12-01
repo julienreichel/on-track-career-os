@@ -179,9 +179,7 @@ describe('AiOperationsService', () => {
 
     it('should throw error for whitespace-only source text', async () => {
       // Act & Assert
-      await expect(service.generateStarStory('   ')).rejects.toThrow(
-        'Source text cannot be empty'
-      );
+      await expect(service.generateStarStory('   ')).rejects.toThrow('Source text cannot be empty');
       expect(mockRepo.generateStarStory).not.toHaveBeenCalled();
     });
 
