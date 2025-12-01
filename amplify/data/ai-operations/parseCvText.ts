@@ -17,6 +17,7 @@ import { truncateForLog, withAiOperationHandler } from './utils/common';
 
 // Configuration
 const DEFAULT_CONFIDENCE = 0.5;
+const LOW_CONFIDENCE_THRESHOLD = 0.3; // Applied when no content extracted
 
 // System prompt - constant as per AIC
 const SYSTEM_PROMPT = `You are a CV text parser that extracts structured sections from CV text.
@@ -30,7 +31,6 @@ RULES:
 - Categorize text into appropriate sections
 - If a section has no content, return empty array
 - Return ONLY valid JSON matching the specified schema`;
-
 
 // Output schema for retry
 const OUTPUT_SCHEMA = `{
@@ -73,21 +73,43 @@ function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOu
     rawBlocks: [],
   };
 
+  const validatedSections = {
+    experiences: Array.isArray(sections.experiences) ? sections.experiences : [],
+    education: Array.isArray(sections.education) ? sections.education : [],
+    skills: Array.isArray(sections.skills) ? sections.skills : [],
+    certifications: Array.isArray(sections.certifications) ? sections.certifications : [],
+    // Support both camelCase and snake_case from AI response
+    rawBlocks: Array.isArray(sections.rawBlocks)
+      ? sections.rawBlocks
+      : Array.isArray((sections as Record<string, unknown>).raw_blocks)
+        ? ((sections as Record<string, unknown>).raw_blocks as string[])
+        : [],
+  };
+
+  // Calculate confidence based on content
+  // If all sections are empty, confidence should be low
+  const totalItems =
+    validatedSections.experiences.length +
+    validatedSections.education.length +
+    validatedSections.skills.length +
+    validatedSections.certifications.length +
+    validatedSections.rawBlocks.length;
+
+  let confidence: number;
+  if (typeof parsedOutput.confidence === 'number') {
+    confidence = parsedOutput.confidence;
+  } else {
+    confidence = DEFAULT_CONFIDENCE;
+  }
+
+  // Override confidence to low if no content was extracted
+  if (totalItems === 0) {
+    confidence = Math.min(confidence, LOW_CONFIDENCE_THRESHOLD);
+  }
+
   return {
-    sections: {
-      experiences: Array.isArray(sections.experiences) ? sections.experiences : [],
-      education: Array.isArray(sections.education) ? sections.education : [],
-      skills: Array.isArray(sections.skills) ? sections.skills : [],
-      certifications: Array.isArray(sections.certifications) ? sections.certifications : [],
-      // Support both camelCase and snake_case from AI response
-      rawBlocks: Array.isArray(sections.rawBlocks)
-        ? sections.rawBlocks
-        : Array.isArray((sections as Record<string, unknown>).raw_blocks)
-          ? ((sections as Record<string, unknown>).raw_blocks as string[])
-          : [],
-    },
-    confidence:
-      typeof parsedOutput.confidence === 'number' ? parsedOutput.confidence : DEFAULT_CONFIDENCE,
+    sections: validatedSections,
+    confidence,
   };
 }
 
@@ -121,7 +143,7 @@ export const handler = async (event: { arguments: ParseCvTextInput }): Promise<s
       });
     },
     (args) => ({
-      cv_text: truncateForLog(args.cvText),
+      cvText: truncateForLog(args.cvText),
     })
   );
 };
