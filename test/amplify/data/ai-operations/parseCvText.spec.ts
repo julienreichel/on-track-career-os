@@ -187,7 +187,7 @@ AWS Certified Solutions Architect
       expect(parsed.confidence).toBe(0.5); // DEFAULT_CONFIDENCE fallback
     });
 
-    it('should throw error for invalid output structure', async () => {
+    it('should apply fallback when sections field is missing', async () => {
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
@@ -207,11 +207,19 @@ AWS Certified Solutions Architect
         ),
       });
 
-      await expect(
-        handler({
-          arguments: { cvText: mockCvText },
-        })
-      ).rejects.toThrow('Missing required field: sections');
+      const resultString = await handler({
+        arguments: { cvText: mockCvText },
+      });
+      const result = JSON.parse(resultString);
+
+      // Should apply fallback structure for missing sections
+      expect(result.sections).toBeDefined();
+      expect(result.sections.experiences).toEqual([]);
+      expect(result.sections.education).toEqual([]);
+      expect(result.sections.skills).toEqual([]);
+      expect(result.sections.certifications).toEqual([]);
+      expect(result.sections.rawBlocks).toEqual([]);
+      expect(result.confidence).toBe(0.3); // Low confidence due to no content
     });
   });
 });

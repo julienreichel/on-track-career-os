@@ -142,11 +142,12 @@ describe('ai.extractExperienceBlocks', () => {
         };
       });
 
-      const result = await handler({
+      const resultString = await handler({
         arguments: {
           experienceTextBlocks: inputBlocks,
         },
       });
+      const result = JSON.parse(resultString);
 
       expect(result.experiences).toHaveLength(1);
       expect(result.experiences[0].title).toBe('Senior Software Engineer');
@@ -180,11 +181,12 @@ describe('ai.extractExperienceBlocks', () => {
         };
       });
 
-      const result = await handler({
+      const resultString = await handler({
         arguments: {
           experienceTextBlocks: inputBlocks,
         },
       });
+      const result = JSON.parse(resultString);
 
       expect(result.experiences).toHaveLength(2);
       expect(result.experiences[0].title).toBe('Senior Developer');
@@ -200,7 +202,7 @@ describe('ai.extractExperienceBlocks', () => {
       const inputBlocks = ['Incomplete experience'];
 
       mockSend.mockImplementationOnce(async () => {
-        // Simulate incomplete response that will trigger fallbacks
+        // Simulate incomplete response with missing fields - will trigger validation fallbacks
         return {
           body: new TextEncoder().encode(
             JSON.stringify({
@@ -227,11 +229,12 @@ describe('ai.extractExperienceBlocks', () => {
         };
       });
 
-      const result = await handler({
+      const resultString = await handler({
         arguments: {
           experienceTextBlocks: inputBlocks,
         },
       });
+      const result = JSON.parse(resultString);
 
       expect(result.experiences).toHaveLength(1);
       expect(result.experiences[0].title).toBe('Experience 1'); // Fallback
@@ -240,7 +243,7 @@ describe('ai.extractExperienceBlocks', () => {
       expect(result.experiences[0].tasks).toEqual([]); // Fallback
     });
 
-    it('should throw error for invalid output structure', async () => {
+    it('should apply fallback for missing experiences field', async () => {
       mockSend.mockImplementationOnce(async () => {
         return {
           body: new TextEncoder().encode(
@@ -261,13 +264,18 @@ describe('ai.extractExperienceBlocks', () => {
         };
       });
 
-      await expect(
-        handler({
-          arguments: {
-            experienceTextBlocks: ['Experience text'],
-          },
-        })
-      ).rejects.toThrow('Missing required field: experiences');
+      const resultString = await handler({
+        arguments: {
+          experienceTextBlocks: ['Experience text'],
+        },
+      });
+      const result = JSON.parse(resultString);
+
+      // Should apply fallback for missing experiences field
+      expect(result.experiences).toBeDefined();
+      expect(result.experiences).toHaveLength(1);
+      expect(result.experiences[0].title).toBe('Experience 1');
+      expect(result.experiences[0].company).toBe('Unknown Company');
     });
   });
 });

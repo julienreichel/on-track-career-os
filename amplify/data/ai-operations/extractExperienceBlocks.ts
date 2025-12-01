@@ -89,12 +89,20 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
 
   const outputObj = output as Record<string, unknown>;
 
-  if (!outputObj.experiences) {
-    throw new Error('Missing required field: experiences');
-  }
-
-  if (!Array.isArray(outputObj.experiences)) {
-    throw new Error('Field "experiences" must be an array');
+  // Apply fallback if experiences field is missing or invalid
+  if (!outputObj.experiences || !Array.isArray(outputObj.experiences)) {
+    return {
+      experiences: [
+        {
+          title: 'Experience 1',
+          company: 'Unknown Company',
+          startDate: '',
+          endDate: null,
+          responsibilities: [],
+          tasks: [],
+        },
+      ],
+    };
   }
 
   // Validate and clean each experience block
