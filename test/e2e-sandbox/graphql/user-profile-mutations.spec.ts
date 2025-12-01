@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { Amplify } from 'aws-amplify';
 import { signUp, signIn, signOut } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/data';
@@ -28,13 +28,12 @@ Amplify.configure(amplifyOutputs);
 const client = generateClient<Schema>({ authMode: 'userPool' });
 
 describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
-  let testEmail: string;
+  const testEmail = `profile-test-${Date.now()}@example.com`;
   const testPassword = 'Test123!@#';
   let testUserId: string | undefined;
 
-  beforeEach(async () => {
-    // Create fresh test user for each test with unique email
-    testEmail = `profile-test-${Date.now()}@example.com`;
+  beforeAll(async () => {
+    // Create one test user for all tests in this suite
     const signUpResult = await signUp({
       username: testEmail,
       password: testPassword,
@@ -50,17 +49,33 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
 
     // Wait for post-confirmation Lambda to create UserProfile
     await new Promise((resolve) => setTimeout(resolve, 2000));
+  }, 30000);
 
-    // Sign in for the test
+  beforeEach(async () => {
+    // Sign in before each test to ensure fresh authenticated session
     await signIn({
       username: testEmail,
       password: testPassword,
     });
-  }, 30000);
+  });
 
   afterEach(async () => {
+    // Sign out after each test
+    try {
+      await signOut();
+    } catch {
+      // Ignore sign-out errors
+    }
+  });
+
+  afterAll(async () => {
     try {
       if (testUserId) {
+        // Sign in to perform cleanup
+        await signIn({
+          username: testEmail,
+          password: testPassword,
+        });
         // Step 1: Delete UserProfile from database
         await client.models.UserProfile.delete({ id: testUserId });
         // Step 2: Delete Cognito user via custom mutation

@@ -346,7 +346,10 @@ export const schema = a
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateStarStoryFunction)),
 
-    // Custom mutation to delete Cognito user (for E2E test cleanup)
+    // =====================================================
+    // UTILITY FUNCTIONS (Custom Queries)
+    // =====================================================
+
     deleteUserProfileWithAuth: a
       .mutation()
       .arguments({ userId: a.string().required() })

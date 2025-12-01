@@ -38,6 +38,7 @@
     "@aws-amplify/backend": "^1.18.0",
     "@aws-amplify/backend-cli": "^1.8.0",
     "@aws-sdk/client-bedrock-runtime": "^3.941.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.940.0",
     "@nuxt/test-utils": "^3.20.1",
     "@types/aws-lambda": "^8.10.159",
     "@vitest/coverage-v8": "^3.2.4",
