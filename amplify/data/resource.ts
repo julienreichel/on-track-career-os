@@ -1,5 +1,6 @@
 import { type ClientSchema, a, defineData, defineFunction } from '@aws-amplify/backend';
 import { postConfirmation } from '../auth/post-confirmation/resource';
+import { deleteUserProfile } from './delete-user-profile/resource';
 
 // Bedrock model ID (Amazon Nova Lite)
 export const MODEL_ID = 'amazon.nova-lite-v1:0';
@@ -344,6 +345,14 @@ export const schema = a
       .returns(a.string())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateStarStoryFunction)),
+
+    // Custom mutation to delete Cognito user (for E2E test cleanup)
+    deleteUserProfileWithAuth: a
+      .mutation()
+      .arguments({ userId: a.string().required() })
+      .returns(a.boolean())
+      .authorization((allow) => [allow.authenticated()])
+      .handler(a.handler.function(deleteUserProfile)),
   })
   .authorization((allow) => [allow.resource(postConfirmation)]);
 

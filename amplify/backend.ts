@@ -8,6 +8,7 @@ import {
   extractExperienceBlocksFunction,
   generateStarStoryFunction,
 } from './data/resource';
+import { deleteUserProfile } from './data/delete-user-profile/resource';
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
@@ -18,6 +19,7 @@ const backend = defineBackend({
   parseCvTextFunction,
   extractExperienceBlocksFunction,
   generateStarStoryFunction,
+  deleteUserProfile,
 });
 
 // Grant Bedrock permissions to AI operation Lambda functions
@@ -43,4 +45,19 @@ backend.generateStarStoryFunction.resources.lambda.addToRolePolicy(
     actions: ['bedrock:InvokeModel'],
     resources: [`arn:aws:bedrock:*::foundation-model/${MODEL_ID}`],
   })
+);
+
+// Grant Cognito permissions to delete-user-profile Lambda
+backend.deleteUserProfile.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['cognito-idp:AdminDeleteUser'],
+    resources: [backend.auth.resources.userPool.userPoolArn],
+  })
+);
+
+// Pass User Pool ID to delete-user-profile Lambda
+backend.deleteUserProfile.addEnvironment(
+  'USER_POOL_ID',
+  backend.auth.resources.userPool.userPoolId
 );

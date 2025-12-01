@@ -1,6 +1,6 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Amplify } from 'aws-amplify';
-import { signUp, signIn, signOut } from 'aws-amplify/auth';
+import { signUp, signIn } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/data';
 import * as amplifyOutputs from '../../../amplify_outputs.json';
 import type { Schema } from '../../../amplify/data/resource';
@@ -30,11 +30,13 @@ Amplify.configure(amplifyOutputs);
 const client = generateClient<Schema>({ authMode: 'userPool' });
 
 describe('AI Operations Integration (E2E Sandbox)', () => {
-  const testEmail = `ai-test-${Date.now()}@example.com`;
+  let testEmail: string;
   const testPassword = 'Test123!@#';
+  let testUserId: string | undefined;
 
-  beforeAll(async () => {
-    // Create one test user for all tests in this suite
+  beforeEach(async () => {
+    // Create fresh test user for each test
+    testEmail = `ai-test-${Date.now()}@example.com`;
     const signUpResult = await signUp({
       username: testEmail,
       password: testPassword,
@@ -46,29 +48,32 @@ describe('AI Operations Integration (E2E Sandbox)', () => {
       },
     });
 
-    // Note: testUserId available but not needed for AI operation tests
-    console.log('Test user created:', signUpResult.userId);
+    testUserId = signUpResult.userId;
+    console.log('Test user created:', testUserId);
 
     // Wait for post-confirmation Lambda to create UserProfile
     await new Promise((resolve) => setTimeout(resolve, 2000));
-  });
 
-  beforeEach(async () => {
-    // Sign in before each test to ensure fresh authenticated session
+    // Sign in for the test
     await signIn({
       username: testEmail,
       password: testPassword,
     });
-  });
+  }, 30000);
 
   afterEach(async () => {
-    // Sign out after each test
     try {
-      await signOut();
-    } catch {
-      // Ignore sign-out errors
+      if (testUserId) {
+        // Step 1: Delete UserProfile from database
+        await client.models.UserProfile.delete({ id: testUserId });
+        // Step 2: Delete Cognito user via custom mutation
+        await client.mutations.deleteUserProfileWithAuth({ userId: testUserId });
+        console.log('Test user cleaned up:', testUserId);
+      }
+    } catch (error) {
+      console.error('Cleanup error:', error);
     }
-  });
+  }, 30000);
 
   it('should generate STAR story from experience data', async () => {
     // Test input matching generateStarStory operation schema
