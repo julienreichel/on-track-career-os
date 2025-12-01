@@ -19,7 +19,7 @@
     "test:sandbox": "vitest run --project e2e-sandbox",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage --project unit --project amplify --project nuxt"
   },
   "bin": {
     "gen-model": "bin/gen-model.js"
