@@ -79,7 +79,11 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
         return {
           body: new TextEncoder().encode(
             JSON.stringify({
-              content: [{ text: JSON.stringify(mockResponse) }],
+              output: {
+                message: {
+                  content: [{ text: JSON.stringify(mockResponse) }],
+                },
+              },
             })
           ),
         };
@@ -110,7 +114,11 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
-            content: [{ text: JSON.stringify(incompleteResponse) }],
+            output: {
+              message: {
+                content: [{ text: JSON.stringify(incompleteResponse) }],
+              },
+            },
           })
         ),
       });
@@ -132,16 +140,20 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
-            content: [
-              {
-                text: JSON.stringify({
-                  situation: 'Working on improving user engagement',
-                  task: 'Implement a new feature',
-                  action: 'Developed and deployed the feature',
-                  result: 'Increased user engagement',
-                }),
+            output: {
+              message: {
+                content: [
+                  {
+                    text: JSON.stringify({
+                      situation: 'Working on improving user engagement',
+                      task: 'Implement a new feature',
+                      action: 'Developed and deployed the feature',
+                      result: 'Increased user engagement',
+                    }),
+                  },
+                ],
               },
-            ],
+            },
           })
         ),
       });
@@ -168,7 +180,11 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
-            content: [{ text: JSON.stringify(emptyResponse) }],
+            output: {
+              message: {
+                content: [{ text: JSON.stringify(emptyResponse) }],
+              },
+            },
           })
         ),
       });
@@ -195,7 +211,11 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
-            content: [{ text: JSON.stringify(mixedResponse) }],
+            output: {
+              message: {
+                content: [{ text: JSON.stringify(mixedResponse) }],
+              },
+            },
           })
         ),
       });

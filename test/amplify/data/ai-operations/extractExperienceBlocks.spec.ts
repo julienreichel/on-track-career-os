@@ -132,7 +132,11 @@ describe('ai.extractExperienceBlocks', () => {
         return {
           body: new TextEncoder().encode(
             JSON.stringify({
-              content: [{ text: JSON.stringify(mockResponse) }],
+              output: {
+                message: {
+                  content: [{ text: JSON.stringify(mockResponse) }],
+                },
+              },
             })
           ),
         };
@@ -166,7 +170,11 @@ describe('ai.extractExperienceBlocks', () => {
         return {
           body: new TextEncoder().encode(
             JSON.stringify({
-              content: [{ text: JSON.stringify(mockResponse) }],
+              output: {
+                message: {
+                  content: [{ text: JSON.stringify(mockResponse) }],
+                },
+              },
             })
           ),
         };
@@ -196,20 +204,24 @@ describe('ai.extractExperienceBlocks', () => {
         return {
           body: new TextEncoder().encode(
             JSON.stringify({
-              content: [
-                {
-                  text: JSON.stringify({
-                    experiences: [
-                      {
-                        // Missing title and company - will use fallbacks
-                        startDate: '2020-01',
-                        endDate: null,
-                        // Missing responsibilities and tasks - will default to []
-                      },
-                    ],
-                  }),
+              output: {
+                message: {
+                  content: [
+                    {
+                      text: JSON.stringify({
+                        experiences: [
+                          {
+                            // Missing title and company - will use fallbacks
+                            startDate: '2020-01',
+                            endDate: null,
+                            // Missing responsibilities and tasks - will default to []
+                          },
+                        ],
+                      }),
+                    },
+                  ],
                 },
-              ],
+              },
             })
           ),
         };
@@ -233,13 +245,17 @@ describe('ai.extractExperienceBlocks', () => {
         return {
           body: new TextEncoder().encode(
             JSON.stringify({
-              content: [
-                {
-                  text: JSON.stringify({
-                    invalid_field: 'data',
-                  }),
+              output: {
+                message: {
+                  content: [
+                    {
+                      text: JSON.stringify({
+                        invalid_field: 'data',
+                      }),
+                    },
+                  ],
                 },
-              ],
+              },
             })
           ),
         };

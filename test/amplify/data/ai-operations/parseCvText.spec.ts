@@ -128,7 +128,11 @@ AWS Certified Solutions Architect
         return {
           body: new TextEncoder().encode(
             JSON.stringify({
-              content: [{ text: JSON.stringify(mockResponse) }],
+              output: {
+                message: {
+                  content: [{ text: JSON.stringify(mockResponse) }],
+                },
+              },
             })
           ),
         };
@@ -160,7 +164,11 @@ AWS Certified Solutions Architect
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
-            content: [{ text: JSON.stringify(mockBedrockResponse) }],
+            output: {
+              message: {
+                content: [{ text: JSON.stringify(mockBedrockResponse) }],
+              },
+            },
           })
         ),
       });
@@ -183,14 +191,18 @@ AWS Certified Solutions Architect
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
-            content: [
-              {
-                text: JSON.stringify({
-                  // Missing required sections field
-                  confidence: 0.5,
-                }),
+            output: {
+              message: {
+                content: [
+                  {
+                    text: JSON.stringify({
+                      // Missing required sections field
+                      confidence: 0.5,
+                    }),
+                  },
+                ],
               },
-            ],
+            },
           })
         ),
       });
