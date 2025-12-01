@@ -141,48 +141,48 @@ describe('common utilities', () => {
     });
 
     it('should create log entry with operation name and input', () => {
-      const entry = createLogEntry('parseCvText', { cv_text: 'test' });
+      const entry = createLogEntry('parseCvText', { cvText: 'test' });
       expect(entry).toEqual({
         timestamp: '2025-11-29T12:00:00.000Z',
-        input: { cv_text: 'test' },
+        input: { cvText: 'test' },
       });
     });
 
     it('should include output when provided', () => {
-      const entry = createLogEntry('parseCvText', { cv_text: 'test' }, { sections: [] });
+      const entry = createLogEntry('parseCvText', { cvText: 'test' }, { sections: [] });
       expect(entry).toEqual({
         timestamp: '2025-11-29T12:00:00.000Z',
-        input: { cv_text: 'test' },
+        input: { cvText: 'test' },
         output: { sections: [] },
       });
     });
 
     it('should include fallbacksUsed when provided', () => {
-      const entry = createLogEntry('parseCvText', { cv_text: 'test' }, { sections: [] }, [
+      const entry = createLogEntry('parseCvText', { cvText: 'test' }, { sections: [] }, [
         'default_confidence',
       ]);
       expect(entry).toEqual({
         timestamp: '2025-11-29T12:00:00.000Z',
-        input: { cv_text: 'test' },
+        input: { cvText: 'test' },
         output: { sections: [] },
         fallbacksUsed: ['default_confidence'],
       });
     });
 
     it('should not include empty fallbacksUsed array', () => {
-      const entry = createLogEntry('parseCvText', { cv_text: 'test' }, { sections: [] }, []);
+      const entry = createLogEntry('parseCvText', { cvText: 'test' }, { sections: [] }, []);
       expect(entry).toEqual({
         timestamp: '2025-11-29T12:00:00.000Z',
-        input: { cv_text: 'test' },
+        input: { cvText: 'test' },
         output: { sections: [] },
       });
     });
 
     it('should handle undefined output', () => {
-      const entry = createLogEntry('parseCvText', { cv_text: 'test' }, undefined);
+      const entry = createLogEntry('parseCvText', { cvText: 'test' }, undefined);
       expect(entry).toEqual({
         timestamp: '2025-11-29T12:00:00.000Z',
-        input: { cv_text: 'test' },
+        input: { cvText: 'test' },
       });
     });
 
@@ -195,10 +195,10 @@ describe('common utilities', () => {
     });
 
     it('should create entry with null output', () => {
-      const entry = createLogEntry('parseCvText', { cv_text: 'test' }, null);
+      const entry = createLogEntry('parseCvText', { cvText: 'test' }, null);
       expect(entry).toEqual({
         timestamp: '2025-11-29T12:00:00.000Z',
-        input: { cv_text: 'test' },
+        input: { cvText: 'test' },
         output: null,
       });
     });
@@ -225,17 +225,17 @@ describe('common utilities', () => {
 
     it('should create error log entry with error message', () => {
       const error = new Error('Test error');
-      const entry = createErrorLogEntry('parseCvText', error, { cv_text: 'test' });
+      const entry = createErrorLogEntry('parseCvText', error, { cvText: 'test' });
       expect(entry).toEqual({
         timestamp: '2025-11-29T12:00:00.000Z',
         error: 'Test error',
-        input: { cv_text: 'test' },
+        input: { cvText: 'test' },
       });
     });
 
     it('should handle error with empty message', () => {
       const error = new Error('');
-      const entry = createErrorLogEntry('parseCvText', error, { cv_text: 'test' });
+      const entry = createErrorLogEntry('parseCvText', error, { cvText: 'test' });
       expect(entry.error).toBe('');
     });
 

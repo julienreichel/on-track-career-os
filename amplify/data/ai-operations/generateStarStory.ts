@@ -91,7 +91,7 @@ export const handler = async (event: { arguments: GenerateStarStoryInput }): Pro
       });
     },
     (args) => ({
-      source_text: truncateForLog(args.sourceText),
+      sourceText: truncateForLog(args.sourceText),
     })
   );
 };

@@ -71,7 +71,7 @@ All tests passing ✅
 | Requirement                 | Status | Implementation                                          |
 | --------------------------- | ------ | ------------------------------------------------------- |
 | System prompt (constant)    | ✅     | `SYSTEM_PROMPT` constant                                |
-| User prompt (data-injected) | ✅     | Template string with `${cv_text}`                       |
+| User prompt (data-injected) | ✅     | Template string with `${cvText}`                        |
 | Input schema validation     | ✅     | GraphQL `.arguments({ cvText: a.string().required() })` |
 | Output schema validation    | ✅     | `validateOutput()` function                             |
 | Fallback strategy           | ✅     | `retryWithSchema()` for JSON errors                     |

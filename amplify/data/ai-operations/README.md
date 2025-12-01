@@ -165,7 +165,7 @@ const client = generateClient<Schema>();
 
 // Call AI operation
 const { data, errors } = await client.queries.parseCvText({
-  cv_text: cvTextContent,
+  cvText: cvTextContent,
 });
 
 if (!errors) {

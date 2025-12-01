@@ -163,7 +163,7 @@ export const handler = async (event: {
       });
     },
     (args: ExtractExperienceBlocksInput) => ({
-      experience_text_blocks:
+      experienceTextBlocks:
         args.experienceTextBlocks.length > 1
           ? `${args.experienceTextBlocks.length} experience blocks`
           : truncateForLog(args.experienceTextBlocks[0] || ''),
