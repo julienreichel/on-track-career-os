@@ -39,7 +39,6 @@ async function handleAsyncOperation<T>(
  * - generateStarStory: Generate STAR story from experience text
  * - generateAchievementsAndKpis: Generate achievements and KPIs from STAR story
  * - generatePersonalCanvas: Generate Personal Business Model Canvas
- * - parseAndExtract: Complete workflow (parse + extract)
  */
 export function useAiOperations() {
   const parsedCv = ref<ParsedCV | null>(null);
@@ -81,23 +80,6 @@ export function useAiOperations() {
       personalCanvas
     );
 
-  const parseAndExtract = async (cvText: string) => {
-    loading.value = true;
-    error.value = null;
-    parsedCv.value = null;
-    experiences.value = null;
-
-    try {
-      const result = await service.parseCvAndExtractExperiences(cvText);
-      parsedCv.value = result.parsedCv;
-      experiences.value = result.experiences;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred';
-    } finally {
-      loading.value = false;
-    }
-  };
-
   const reset = () => {
     parsedCv.value = null;
     experiences.value = null;
@@ -121,7 +103,6 @@ export function useAiOperations() {
     generateStarStory,
     generateAchievementsAndKpis,
     generatePersonalCanvas,
-    parseAndExtract,
     reset,
   };
 }

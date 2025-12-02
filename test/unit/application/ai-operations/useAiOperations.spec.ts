@@ -176,68 +176,6 @@ describe('useAiOperations', () => {
     expect(achievementsAndKpis.value).toBeNull();
   });
 
-  it('should successfully parse and extract in one operation', async () => {
-    // Arrange
-    const mockParsedCv: ParsedCV = {
-      sections: {
-        experiences: [],
-        education: [],
-        skills: [],
-        certifications: [],
-        rawBlocks: [],
-      },
-      confidence: 0.95,
-    };
-    const mockExperiences: ExperiencesResult = {
-      experiences: [
-        {
-          title: 'Developer',
-          company: 'TechCorp',
-          startDate: '2020-01',
-          endDate: '2023-12',
-          responsibilities: [],
-          tasks: [],
-        },
-      ],
-    };
-    mockService.parseCvAndExtractExperiences.mockResolvedValue({
-      parsedCv: mockParsedCv,
-      experiences: mockExperiences,
-    });
-
-    // Act
-    const { parsedCv, experiences, loading, error, parseAndExtract } = useAiOperations();
-
-    expect(loading.value).toBe(false);
-    const parsePromise = parseAndExtract('Sample CV');
-    expect(loading.value).toBe(true);
-
-    await parsePromise;
-
-    // Assert
-    expect(loading.value).toBe(false);
-    expect(error.value).toBeNull();
-    expect(parsedCv.value).toEqual(mockParsedCv);
-    expect(experiences.value).toEqual(mockExperiences);
-  });
-
-  it('should handle errors in parseAndExtract', async () => {
-    // Arrange
-    mockService.parseCvAndExtractExperiences.mockRejectedValue(
-      new Error('Combined operation failed')
-    );
-
-    // Act
-    const { parsedCv, experiences, loading, error, parseAndExtract } = useAiOperations();
-    await parseAndExtract('Sample CV');
-
-    // Assert
-    expect(loading.value).toBe(false);
-    expect(error.value).toBe('Combined operation failed');
-    expect(parsedCv.value).toBeNull();
-    expect(experiences.value).toBeNull();
-  });
-
   it('should reset state', () => {
     // Arrange
     const { parsedCv, experiences, starStory, achievementsAndKpis, loading, error, reset } =
