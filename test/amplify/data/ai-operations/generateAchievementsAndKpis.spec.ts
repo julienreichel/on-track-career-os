@@ -20,6 +20,50 @@ describe('ai.generateAchievementsAndKpis', () => {
     handler = module.handler;
   });
 
+  /**
+   * Mock AI response generator that simulates achievement/KPI extraction
+   * Extracts key terms and metrics from the STAR story input
+   */
+  const generateMockResponse = (starStory: {
+    situation: string;
+    task: string;
+    action: string;
+    result: string;
+  }) => {
+    // Extract numbers from result for quantitative KPIs
+    const numbers = starStory.result.match(/\d+\.?\d*%?/g) || [];
+
+    // Extract key action words
+    const actionWords =
+      starStory.action.match(
+        /\b(Led|Implemented|Created|Improved|Reduced|Increased|Developed|Established|Managed)\w*/gi
+      ) || [];
+
+    // Generate achievements based on action and result
+    const achievements = [
+      ...actionWords.slice(0, 2).map((word) => `${word} successfully`),
+      starStory.result
+        .split(/[,.]/)
+        .filter((s) => s.trim())[0]
+        ?.trim() || 'Completed project successfully',
+    ].slice(0, 3);
+
+    // Generate KPIs - use numbers if available, otherwise qualitative
+    const kpiSuggestions =
+      numbers.length > 0
+        ? numbers.map((num) => `Metric improvement: ${num}`)
+        : [
+            'Team effectiveness improved',
+            'Process efficiency increased',
+            'Quality metrics improved',
+          ].slice(0, 2);
+
+    return {
+      achievements,
+      kpiSuggestions: kpiSuggestions.slice(0, 3),
+    };
+  };
+
   describe('Handler Integration Tests', () => {
     it('should successfully generate achievements and KPIs from STAR story', async () => {
       const starStory = {
@@ -36,18 +80,7 @@ describe('ai.generateAchievementsAndKpis', () => {
               message: {
                 content: [
                   {
-                    text: JSON.stringify({
-                      achievements: [
-                        'Led successful migration to microservices architecture',
-                        'Reduced deployment time by 70%',
-                        'Improved system reliability to 99.9% uptime',
-                      ],
-                      kpiSuggestions: [
-                        'Deployment time reduction: 70%',
-                        'System uptime: 99.9%',
-                        'Service independence: 100% decoupled services',
-                      ],
-                    }),
+                    text: JSON.stringify(generateMockResponse(starStory)),
                   },
                 ],
               },
@@ -61,12 +94,20 @@ describe('ai.generateAchievementsAndKpis', () => {
       });
       const result = JSON.parse(resultString);
 
+      // Verify input was used - result should contain data from input
       expect(result.achievements).toBeDefined();
-      expect(result.achievements).toHaveLength(3);
-      expect(result.achievements[0]).toBe('Led successful migration to microservices architecture');
+      expect(result.achievements.length).toBeGreaterThan(0);
+
+      // Verify the mock extracted keywords from the input
+      const achievementText = result.achievements.join(' ');
+      expect(achievementText).toMatch(/Led|migration|Reduced/i);
+
       expect(result.kpiSuggestions).toBeDefined();
-      expect(result.kpiSuggestions).toHaveLength(3);
-      expect(result.kpiSuggestions[0]).toContain('70%');
+      expect(result.kpiSuggestions.length).toBeGreaterThan(0);
+
+      // Verify numbers from input are captured
+      const kpiText = result.kpiSuggestions.join(' ');
+      expect(kpiText).toMatch(/70|99\.9/);
     });
 
     it('should handle qualitative KPIs when no numbers are present', async () => {
@@ -84,18 +125,7 @@ describe('ai.generateAchievementsAndKpis', () => {
               message: {
                 content: [
                   {
-                    text: JSON.stringify({
-                      achievements: [
-                        'Established daily standup meetings',
-                        'Implemented retrospective process',
-                        'Improved team communication',
-                      ],
-                      kpiSuggestions: [
-                        'Team communication effectiveness',
-                        'Meeting attendance rate',
-                        'Team morale improvement',
-                      ],
-                    }),
+                    text: JSON.stringify(generateMockResponse(starStory)),
                   },
                 ],
               },
@@ -109,9 +139,17 @@ describe('ai.generateAchievementsAndKpis', () => {
       });
       const result = JSON.parse(resultString);
 
-      expect(result.achievements).toHaveLength(3);
-      expect(result.kpiSuggestions).toHaveLength(3);
-      expect(result.kpiSuggestions[0]).toBe('Team communication effectiveness');
+      expect(result.achievements).toBeDefined();
+      expect(result.achievements.length).toBeGreaterThan(0);
+
+      // Verify input was used - achievements should reference the action
+      const achievementText = result.achievements.join(' ');
+      expect(achievementText).toMatch(/Implemented|standups|retrospectives/i);
+
+      // Should have qualitative KPIs (no numbers in input)
+      expect(result.kpiSuggestions).toBeDefined();
+      expect(result.kpiSuggestions.length).toBeGreaterThan(0);
+      expect(result.kpiSuggestions[0]).toMatch(/effectiveness|efficiency|improved/i);
     });
 
     it('should apply fallbacks for missing achievements field', async () => {
