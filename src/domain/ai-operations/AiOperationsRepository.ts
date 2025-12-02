@@ -83,7 +83,7 @@ export type AmplifyAiOperations = {
   generatePersonalCanvas: (
     input: PersonalCanvasInput,
     options?: Record<string, unknown>
-  ) => Promise<{ data: PersonalCanvas | null; errors?: unknown[] }>;
+  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 };
 
 /**
@@ -196,7 +196,8 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    // Data is already parsed as JSON by GraphQL (returns a.json())
+    // Data is JSON type from a.json() - cast to PersonalCanvas
+    // The Lambda returns a properly typed PersonalCanvas object
     return data as PersonalCanvas;
   }
 }
