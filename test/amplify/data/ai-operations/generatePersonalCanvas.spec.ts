@@ -36,9 +36,8 @@ describe('ai.generatePersonalCanvas', () => {
 
     // Extract value props from stories
     const valueProps =
-      input.stories
-        .map((story) => story.result || 'Delivered successful outcomes')
-        .slice(0, 3) || [];
+      input.stories.map((story) => story.result || 'Delivered successful outcomes').slice(0, 3) ||
+      [];
 
     // Generate target roles from experience titles
     const targetRoles =

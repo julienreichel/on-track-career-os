@@ -197,7 +197,9 @@ function validatePersonalCanvas(parsed: Partial<PersonalCanvasOutput>): Personal
 /**
  * Core logic for generatePersonalCanvas operation
  */
-async function generatePersonalCanvasCore(input: PersonalCanvasInput): Promise<PersonalCanvasOutput> {
+async function generatePersonalCanvasCore(
+  input: PersonalCanvasInput
+): Promise<PersonalCanvasOutput> {
   // Generate user prompt with injected data
   const profileSummary = `
 Name: ${input.profile.fullName || 'N/A'}
@@ -206,8 +208,8 @@ Summary: ${input.profile.summary || 'N/A'}
   `.trim();
 
   const experiencesSummary = input.experiences
-    .map(
-      (exp, idx) => `
+    .map((exp, idx) =>
+      `
 Experience ${idx + 1}:
 - Title: ${exp.title || 'N/A'}
 - Company: ${exp.company || 'N/A'}
@@ -219,8 +221,8 @@ Experience ${idx + 1}:
     .join('\n\n');
 
   const storiesSummary = input.stories
-    .map(
-      (story, idx) => `
+    .map((story, idx) =>
+      `
 Story ${idx + 1}:
 - Situation: ${story.situation || 'N/A'}
 - Task: ${story.task || 'N/A'}
