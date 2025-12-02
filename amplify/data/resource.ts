@@ -379,33 +379,9 @@ export const schema = a
     generatePersonalCanvas: a
       .query()
       .arguments({
-        profile: a.customType({
-          fullName: a.string(),
-          headline: a.string(),
-          summary: a.string(),
-        }),
-        experiences: a
-          .customType({
-            title: a.string(),
-            company: a.string(),
-            startDate: a.string(),
-            endDate: a.string(),
-            responsibilities: a.string().array(),
-            tasks: a.string().array(),
-          })
-          .array()
-          .required(),
-        stories: a
-          .customType({
-            situation: a.string(),
-            task: a.string(),
-            action: a.string(),
-            result: a.string(),
-            achievements: a.string().array(),
-            kpiSuggestions: a.string().array(),
-          })
-          .array()
-          .required(),
+        profile: a.json().required(),
+        experiences: a.json().required(),
+        stories: a.json().required(),
       })
       .returns(a.json())
       .authorization((allow) => [allow.authenticated()])
