@@ -4,16 +4,18 @@ import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
 import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
 import type { STARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
+import type { PersonalCanvas, PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas';
 
 /**
  * Composable for AI operations
- * Provides reactive state management for CV parsing, experience extraction, STAR story generation, and achievements/KPIs
+ * Provides reactive state management for CV parsing, experience extraction, STAR story generation, achievements/KPIs, and Personal Canvas
  *
- * Supports five workflows:
+ * Supports six workflows:
  * - parseCv: Parse CV text only
  * - extractExperiences: Extract experience blocks only
  * - generateStarStory: Generate STAR story from experience text
  * - generateAchievementsAndKpis: Generate achievements and KPIs from STAR story
+ * - generatePersonalCanvas: Generate Personal Business Model Canvas
  * - parseAndExtract: Complete workflow (parse + extract)
  */
 export function useAiOperations() {
@@ -21,6 +23,7 @@ export function useAiOperations() {
   const experiences = ref<ExperiencesResult | null>(null);
   const starStory = ref<STARStory | null>(null);
   const achievementsAndKpis = ref<AchievementsAndKpis | null>(null);
+  const personalCanvas = ref<PersonalCanvas | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
   const service = new AiOperationsService();
@@ -113,11 +116,29 @@ export function useAiOperations() {
     }
   };
 
+  /**
+   * Generate Personal Business Model Canvas
+   */
+  const generatePersonalCanvas = async (input: PersonalCanvasInput) => {
+    loading.value = true;
+    error.value = null;
+    personalCanvas.value = null;
+
+    try {
+      personalCanvas.value = await service.generatePersonalCanvas(input);
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error occurred';
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const reset = () => {
     parsedCv.value = null;
     experiences.value = null;
     starStory.value = null;
     achievementsAndKpis.value = null;
+    personalCanvas.value = null;
     error.value = null;
     loading.value = false;
   };
@@ -127,12 +148,14 @@ export function useAiOperations() {
     experiences,
     starStory,
     achievementsAndKpis,
+    personalCanvas,
     loading,
     error,
     parseCv,
     extractExperiences,
     generateStarStory,
     generateAchievementsAndKpis,
+    generatePersonalCanvas,
     parseAndExtract,
     reset,
   };

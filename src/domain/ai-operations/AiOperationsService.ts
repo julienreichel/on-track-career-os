@@ -7,6 +7,8 @@ import type { STARStory } from './STARStory';
 import { isSTARStory } from './STARStory';
 import type { AchievementsAndKpis } from './AchievementsAndKpis';
 import { isAchievementsAndKpis } from './AchievementsAndKpis';
+import type { PersonalCanvas, PersonalCanvasInput } from './PersonalCanvas';
+import { isPersonalCanvas } from './PersonalCanvas';
 
 /**
  * Service for AI-powered CV and experience operations
@@ -143,6 +145,47 @@ export class AiOperationsService {
       // Re-throw with more context
       throw new Error(
         `Failed to generate achievements and KPIs: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Generate Personal Business Model Canvas with validation
+   * @param input - User profile, experiences, and stories
+   * @returns Complete Personal Canvas with all 9 sections
+   * @throws Error if generation fails or validation fails
+   */
+  async generatePersonalCanvas(input: PersonalCanvasInput): Promise<PersonalCanvas> {
+    // Validate input structure
+    if (!input || typeof input !== 'object') {
+      throw new Error('Invalid input structure');
+    }
+
+    if (!input.profile || typeof input.profile !== 'object') {
+      throw new Error('Profile is required');
+    }
+
+    if (!Array.isArray(input.experiences)) {
+      throw new Error('Experiences must be an array');
+    }
+
+    if (!Array.isArray(input.stories)) {
+      throw new Error('Stories must be an array');
+    }
+
+    try {
+      const result = await this.repo.generatePersonalCanvas(input);
+
+      // Validate output structure
+      if (!isPersonalCanvas(result)) {
+        throw new Error('Invalid Personal Canvas result structure');
+      }
+
+      return result;
+    } catch (error) {
+      // Re-throw with more context
+      throw new Error(
+        `Failed to generate Personal Canvas: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }

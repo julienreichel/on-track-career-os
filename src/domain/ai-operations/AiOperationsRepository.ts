@@ -3,6 +3,7 @@ import type { ParsedCV } from './ParsedCV';
 import type { ExperiencesResult } from './Experience';
 import type { STARStory } from './STARStory';
 import type { AchievementsAndKpis } from './AchievementsAndKpis';
+import type { PersonalCanvas, PersonalCanvasInput } from './PersonalCanvas';
 
 /**
  * Repository interface for AI operations
@@ -38,6 +39,13 @@ export interface IAiOperationsRepository {
    * @returns Achievements and KPI suggestions
    */
   generateAchievementsAndKpis(starStory: STARStory): Promise<AchievementsAndKpis>;
+
+  /**
+   * Generate Personal Business Model Canvas from user data
+   * @param input - User profile, experiences, and stories
+   * @returns Complete Personal Canvas with all 9 sections
+   */
+  generatePersonalCanvas(input: PersonalCanvasInput): Promise<PersonalCanvas>;
 }
 
 /**
@@ -71,6 +79,11 @@ export type AmplifyAiOperations = {
     },
     options?: Record<string, unknown>
   ) => Promise<{ data: string | null; errors?: unknown[] }>;
+
+  generatePersonalCanvas: (
+    input: PersonalCanvasInput,
+    options?: Record<string, unknown>
+  ) => Promise<{ data: PersonalCanvas | null; errors?: unknown[] }>;
 };
 
 /**
@@ -170,5 +183,20 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     const parsed = JSON.parse(data) as AchievementsAndKpis;
 
     return parsed;
+  }
+
+  async generatePersonalCanvas(input: PersonalCanvasInput): Promise<PersonalCanvas> {
+    const { data, errors } = await this.client.generatePersonalCanvas(input, gqlOptions());
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    // Data is already parsed as JSON by GraphQL (returns a.json())
+    return data as PersonalCanvas;
   }
 }
