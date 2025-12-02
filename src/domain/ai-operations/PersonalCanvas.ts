@@ -39,4 +39,3 @@ export function isPersonalCanvas(obj: unknown): obj is PersonalCanvas {
       Array.isArray(typed[field]) && typed[field].every((item: unknown) => typeof item === 'string')
   );
 }
-

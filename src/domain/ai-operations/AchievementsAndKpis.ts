@@ -25,4 +25,3 @@ export function isAchievementsAndKpis(obj: unknown): obj is AchievementsAndKpis 
     typed.kpiSuggestions.every((k) => typeof k === 'string')
   );
 }
-
