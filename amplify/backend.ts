@@ -6,6 +6,7 @@ import {
   parseCvTextFunction,
   extractExperienceBlocksFunction,
   generateStarStoryFunction,
+  generateAchievementsAndKpisFunction,
 } from './data/resource';
 import { deleteUserProfile } from './data/delete-user-profile/resource';
 
@@ -18,6 +19,7 @@ const backend = defineBackend({
   parseCvTextFunction,
   extractExperienceBlocksFunction,
   generateStarStoryFunction,
+  generateAchievementsAndKpisFunction,
   deleteUserProfile,
 });
 
@@ -40,6 +42,14 @@ backend.extractExperienceBlocksFunction.resources.lambda.addToRolePolicy(
 );
 
 backend.generateStarStoryFunction.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['bedrock:InvokeModel'],
+    resources: ['arn:aws:bedrock:*::foundation-model/*', 'arn:aws:bedrock:*:*:inference-profile/*'],
+  })
+);
+
+backend.generateAchievementsAndKpisFunction.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     effect: Effect.ALLOW,
     actions: ['bedrock:InvokeModel'],
