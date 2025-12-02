@@ -5,6 +5,8 @@ import type { ExperiencesResult } from './Experience';
 import { isExperiencesResult } from './Experience';
 import type { STARStory } from './STARStory';
 import { isSTARStory } from './STARStory';
+import type { AchievementsAndKpis } from './AchievementsAndKpis';
+import { isAchievementsAndKpis } from './AchievementsAndKpis';
 
 /**
  * Service for AI-powered CV and experience operations
@@ -102,6 +104,45 @@ export class AiOperationsService {
       // Re-throw with more context
       throw new Error(
         `Failed to generate STAR story: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Generate achievements and KPIs from STAR story with validation
+   * @param starStory - STAR story to extract achievements and KPIs from
+   * @returns Achievements and KPI suggestions
+   * @throws Error if generation fails or validation fails
+   */
+  async generateAchievementsAndKpis(starStory: STARStory): Promise<AchievementsAndKpis> {
+    // Validate input
+    if (!isSTARStory(starStory)) {
+      throw new Error('Invalid STAR story structure');
+    }
+
+    // Check that all STAR story fields have content
+    if (
+      !starStory.situation?.trim() ||
+      !starStory.task?.trim() ||
+      !starStory.action?.trim() ||
+      !starStory.result?.trim()
+    ) {
+      throw new Error('All STAR story fields (situation, task, action, result) must be non-empty');
+    }
+
+    try {
+      const result = await this.repo.generateAchievementsAndKpis(starStory);
+
+      // Validate output structure
+      if (!isAchievementsAndKpis(result)) {
+        throw new Error('Invalid achievements and KPIs result structure');
+      }
+
+      return result;
+    } catch (error) {
+      // Re-throw with more context
+      throw new Error(
+        `Failed to generate achievements and KPIs: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }

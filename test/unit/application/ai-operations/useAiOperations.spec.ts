@@ -4,6 +4,7 @@ import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService'
 import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
 import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
 import type { STARStory } from '@/domain/ai-operations/STARStory';
+import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 
 // Mock the service
 vi.mock('@/domain/ai-operations/AiOperationsService');
@@ -13,6 +14,7 @@ describe('useAiOperations', () => {
     parseCvText: ReturnType<typeof vi.fn>;
     extractExperienceBlocks: ReturnType<typeof vi.fn>;
     generateStarStory: ReturnType<typeof vi.fn>;
+    generateAchievementsAndKpis: ReturnType<typeof vi.fn>;
     parseCvAndExtractExperiences: ReturnType<typeof vi.fn>;
   };
 
@@ -22,6 +24,7 @@ describe('useAiOperations', () => {
       parseCvText: vi.fn(),
       extractExperienceBlocks: vi.fn(),
       generateStarStory: vi.fn(),
+      generateAchievementsAndKpis: vi.fn(),
       parseCvAndExtractExperiences: vi.fn(),
     };
 
@@ -33,12 +36,14 @@ describe('useAiOperations', () => {
 
   it('should initialize with default state', () => {
     // Act
-    const { parsedCv, experiences, starStory, loading, error } = useAiOperations();
+    const { parsedCv, experiences, starStory, achievementsAndKpis, loading, error } =
+      useAiOperations();
 
     // Assert
     expect(parsedCv.value).toBeNull();
     expect(experiences.value).toBeNull();
     expect(starStory.value).toBeNull();
+    expect(achievementsAndKpis.value).toBeNull();
     expect(loading.value).toBe(false);
     expect(error.value).toBeNull();
   });
@@ -127,6 +132,50 @@ describe('useAiOperations', () => {
     expect(starStory.value).toBeNull();
   });
 
+  it('should successfully generate achievements and KPIs', async () => {
+    // Arrange
+    const mockStarStory: STARStory = {
+      situation: 'Led distributed team',
+      task: 'Maintain productivity',
+      action: 'Implemented standups',
+      result: '95% completion rate',
+    };
+    const mockResult: AchievementsAndKpis = {
+      achievements: ['Led distributed team successfully', 'Maintained high productivity'],
+      kpiSuggestions: ['95% sprint completion rate', 'Team satisfaction improved'],
+    };
+    mockService.generateAchievementsAndKpis.mockResolvedValue(mockResult);
+
+    // Act
+    const { achievementsAndKpis, loading, error, generateAchievementsAndKpis } = useAiOperations();
+    await generateAchievementsAndKpis(mockStarStory);
+
+    // Assert
+    expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
+    expect(achievementsAndKpis.value).toEqual(mockResult);
+  });
+
+  it('should handle errors in generateAchievementsAndKpis', async () => {
+    // Arrange
+    const mockStarStory: STARStory = {
+      situation: 'Led team',
+      task: 'Maintain productivity',
+      action: 'Implemented standups',
+      result: 'High completion',
+    };
+    mockService.generateAchievementsAndKpis.mockRejectedValue(new Error('KPI generation failed'));
+
+    // Act
+    const { achievementsAndKpis, loading, error, generateAchievementsAndKpis } = useAiOperations();
+    await generateAchievementsAndKpis(mockStarStory);
+
+    // Assert
+    expect(loading.value).toBe(false);
+    expect(error.value).toBe('KPI generation failed');
+    expect(achievementsAndKpis.value).toBeNull();
+  });
+
   it('should successfully parse and extract in one operation', async () => {
     // Arrange
     const mockParsedCv: ParsedCV = {
@@ -191,7 +240,8 @@ describe('useAiOperations', () => {
 
   it('should reset state', () => {
     // Arrange
-    const { parsedCv, experiences, starStory, loading, error, reset } = useAiOperations();
+    const { parsedCv, experiences, starStory, achievementsAndKpis, loading, error, reset } =
+      useAiOperations();
     parsedCv.value = {
       sections: {
         experiences: [],
@@ -209,6 +259,10 @@ describe('useAiOperations', () => {
       action: 'Test',
       result: 'Test',
     };
+    achievementsAndKpis.value = {
+      achievements: ['Test'],
+      kpiSuggestions: ['Test KPI'],
+    };
     loading.value = true;
     error.value = 'Some error';
 
@@ -219,6 +273,7 @@ describe('useAiOperations', () => {
     expect(parsedCv.value).toBeNull();
     expect(experiences.value).toBeNull();
     expect(starStory.value).toBeNull();
+    expect(achievementsAndKpis.value).toBeNull();
     expect(loading.value).toBe(false);
     expect(error.value).toBeNull();
   });

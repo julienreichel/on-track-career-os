@@ -2,6 +2,7 @@ import { gqlOptions } from '@/data/graphql/options';
 import type { ParsedCV } from './ParsedCV';
 import type { ExperiencesResult } from './Experience';
 import type { STARStory } from './STARStory';
+import type { AchievementsAndKpis } from './AchievementsAndKpis';
 
 /**
  * Repository interface for AI operations
@@ -30,6 +31,13 @@ export interface IAiOperationsRepository {
    * @returns STAR story with situation, task, action, result
    */
   generateStarStory(sourceText: string): Promise<STARStory>;
+
+  /**
+   * Generate achievements and KPIs from STAR story
+   * @param starStory - STAR story to extract achievements and KPIs from
+   * @returns Achievements and KPI suggestions
+   */
+  generateAchievementsAndKpis(starStory: STARStory): Promise<AchievementsAndKpis>;
 }
 
 /**
@@ -49,6 +57,18 @@ export type AmplifyAiOperations = {
 
   generateStarStory: (
     input: { sourceText: string },
+    options?: Record<string, unknown>
+  ) => Promise<{ data: string | null; errors?: unknown[] }>;
+
+  generateAchievementsAndKpis: (
+    input: {
+      starStory: {
+        situation: string;
+        task: string;
+        action: string;
+        result: string;
+      };
+    },
     options?: Record<string, unknown>
   ) => Promise<{ data: string | null; errors?: unknown[] }>;
 };
@@ -128,6 +148,26 @@ export class AiOperationsRepository implements IAiOperationsRepository {
 
     // Parse JSON response from Lambda
     const parsed = JSON.parse(data) as STARStory;
+
+    return parsed;
+  }
+
+  async generateAchievementsAndKpis(starStory: STARStory): Promise<AchievementsAndKpis> {
+    const { data, errors } = await this.client.generateAchievementsAndKpis(
+      { starStory },
+      gqlOptions()
+    );
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    // Parse JSON response from Lambda
+    const parsed = JSON.parse(data) as AchievementsAndKpis;
 
     return parsed;
   }

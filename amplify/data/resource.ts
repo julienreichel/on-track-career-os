@@ -30,6 +30,14 @@ export const generateStarStoryFunction = defineFunction({
   timeoutSeconds: 60,
 });
 
+export const generateAchievementsAndKpisFunction = defineFunction({
+  entry: './ai-operations/generateAchievementsAndKpis.ts',
+  environment: {
+    MODEL_ID,
+  },
+  timeoutSeconds: 60,
+});
+
 export const schema = a
   .schema({
     // =====================================================
@@ -345,6 +353,20 @@ export const schema = a
       .returns(a.string())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateStarStoryFunction)),
+
+    generateAchievementsAndKpis: a
+      .query()
+      .arguments({
+        starStory: a.customType({
+          situation: a.string().required(),
+          task: a.string().required(),
+          action: a.string().required(),
+          result: a.string().required(),
+        }),
+      })
+      .returns(a.string())
+      .authorization((allow) => [allow.authenticated()])
+      .handler(a.handler.function(generateAchievementsAndKpisFunction)),
 
     // =====================================================
     // UTILITY FUNCTIONS (Custom Queries)

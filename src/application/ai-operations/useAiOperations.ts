@@ -3,21 +3,24 @@ import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService'
 import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
 import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
 import type { STARStory } from '@/domain/ai-operations/STARStory';
+import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 
 /**
  * Composable for AI operations
- * Provides reactive state management for CV parsing, experience extraction, and STAR story generation
+ * Provides reactive state management for CV parsing, experience extraction, STAR story generation, and achievements/KPIs
  *
- * Supports four workflows:
+ * Supports five workflows:
  * - parseCv: Parse CV text only
  * - extractExperiences: Extract experience blocks only
  * - generateStarStory: Generate STAR story from experience text
+ * - generateAchievementsAndKpis: Generate achievements and KPIs from STAR story
  * - parseAndExtract: Complete workflow (parse + extract)
  */
 export function useAiOperations() {
   const parsedCv = ref<ParsedCV | null>(null);
   const experiences = ref<ExperiencesResult | null>(null);
   const starStory = ref<STARStory | null>(null);
+  const achievementsAndKpis = ref<AchievementsAndKpis | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
   const service = new AiOperationsService();
@@ -74,6 +77,23 @@ export function useAiOperations() {
   };
 
   /**
+   * Generate achievements and KPIs from STAR story
+   */
+  const generateAchievementsAndKpis = async (story: STARStory) => {
+    loading.value = true;
+    error.value = null;
+    achievementsAndKpis.value = null;
+
+    try {
+      achievementsAndKpis.value = await service.generateAchievementsAndKpis(story);
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error occurred';
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
    * Parse CV and extract experiences in one workflow
    */
   const parseAndExtract = async (cvText: string) => {
@@ -97,6 +117,7 @@ export function useAiOperations() {
     parsedCv.value = null;
     experiences.value = null;
     starStory.value = null;
+    achievementsAndKpis.value = null;
     error.value = null;
     loading.value = false;
   };
@@ -105,11 +126,13 @@ export function useAiOperations() {
     parsedCv,
     experiences,
     starStory,
+    achievementsAndKpis,
     loading,
     error,
     parseCv,
     extractExperiences,
     generateStarStory,
+    generateAchievementsAndKpis,
     parseAndExtract,
     reset,
   };

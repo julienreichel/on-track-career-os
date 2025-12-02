@@ -4,6 +4,7 @@ import type { AiOperationsRepository } from '@/domain/ai-operations/AiOperations
 import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
 import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
 import type { STARStory } from '@/domain/ai-operations/STARStory';
+import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 
 // Mock the repository
 vi.mock('@/domain/ai-operations/AiOperationsRepository');
@@ -14,6 +15,7 @@ describe('AiOperationsService', () => {
     parseCvText: ReturnType<typeof vi.fn>;
     extractExperienceBlocks: ReturnType<typeof vi.fn>;
     generateStarStory: ReturnType<typeof vi.fn>;
+    generateAchievementsAndKpis: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -22,6 +24,7 @@ describe('AiOperationsService', () => {
       parseCvText: vi.fn(),
       extractExperienceBlocks: vi.fn(),
       generateStarStory: vi.fn(),
+      generateAchievementsAndKpis: vi.fn(),
     };
 
     // Create service with mocked repo
@@ -200,6 +203,101 @@ describe('AiOperationsService', () => {
       // Act & Assert
       await expect(service.generateStarStory('Some experience text')).rejects.toThrow(
         'Invalid STAR story result structure'
+      );
+    });
+  });
+
+  describe('generateAchievementsAndKpis', () => {
+    it('should successfully generate achievements and KPIs from STAR story', async () => {
+      // Arrange
+      const mockStarStory: STARStory = {
+        situation: 'Led distributed team during restructuring',
+        task: 'Maintain productivity and morale',
+        action: 'Implemented daily standups and team charter',
+        result: 'Achieved 95% sprint completion rate and improved team satisfaction',
+      };
+
+      const mockResult: AchievementsAndKpis = {
+        achievements: [
+          'Led distributed team through organizational restructuring',
+          'Maintained high team productivity during change',
+        ],
+        kpiSuggestions: ['95% sprint completion rate', 'Team satisfaction score increased'],
+      };
+
+      mockRepo.generateAchievementsAndKpis.mockResolvedValue(mockResult);
+
+      // Act
+      const result = await service.generateAchievementsAndKpis(mockStarStory);
+
+      // Assert
+      expect(result).toEqual(mockResult);
+      expect(mockRepo.generateAchievementsAndKpis).toHaveBeenCalledWith(mockStarStory);
+    });
+
+    it('should throw error for empty situation', async () => {
+      // Arrange
+      const invalidStory: STARStory = {
+        situation: '',
+        task: 'Some task',
+        action: 'Some action',
+        result: 'Some result',
+      };
+
+      // Act & Assert
+      await expect(service.generateAchievementsAndKpis(invalidStory)).rejects.toThrow(
+        'All STAR story fields (situation, task, action, result) must be non-empty'
+      );
+      expect(mockRepo.generateAchievementsAndKpis).not.toHaveBeenCalled();
+    });
+
+    it('should throw error for empty task', async () => {
+      // Arrange
+      const invalidStory: STARStory = {
+        situation: 'Some situation',
+        task: '',
+        action: 'Some action',
+        result: 'Some result',
+      };
+
+      // Act & Assert
+      await expect(service.generateAchievementsAndKpis(invalidStory)).rejects.toThrow(
+        'All STAR story fields (situation, task, action, result) must be non-empty'
+      );
+      expect(mockRepo.generateAchievementsAndKpis).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when repository fails', async () => {
+      // Arrange
+      const mockStarStory: STARStory = {
+        situation: 'Led team',
+        task: 'Maintain productivity',
+        action: 'Implemented standups',
+        result: 'High completion rate',
+      };
+
+      mockRepo.generateAchievementsAndKpis.mockRejectedValue(new Error('AI operation failed'));
+
+      // Act & Assert
+      await expect(service.generateAchievementsAndKpis(mockStarStory)).rejects.toThrow(
+        'Failed to generate achievements and KPIs: AI operation failed'
+      );
+    });
+
+    it('should throw error when result structure is invalid', async () => {
+      // Arrange
+      const mockStarStory: STARStory = {
+        situation: 'Led team',
+        task: 'Maintain productivity',
+        action: 'Implemented standups',
+        result: 'High completion rate',
+      };
+
+      mockRepo.generateAchievementsAndKpis.mockResolvedValue({ invalid: 'structure' });
+
+      // Act & Assert
+      await expect(service.generateAchievementsAndKpis(mockStarStory)).rejects.toThrow(
+        'Invalid achievements and KPIs result structure'
       );
     });
   });
