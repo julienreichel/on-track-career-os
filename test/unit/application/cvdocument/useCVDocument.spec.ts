@@ -136,9 +136,7 @@ describe('useCVDocument', () => {
       owner: 'user-123::user-123',
     } as CVDocument;
 
-    mockService.getFullCVDocument
-      .mockResolvedValueOnce(mockCV1)
-      .mockResolvedValueOnce(mockCV2);
+    mockService.getFullCVDocument.mockResolvedValueOnce(mockCV1).mockResolvedValueOnce(mockCV2);
 
     const { item, load } = useCVDocument('cvdocument-123');
 

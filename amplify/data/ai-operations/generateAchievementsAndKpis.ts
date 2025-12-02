@@ -37,7 +37,7 @@ const OUTPUT_SCHEMA = `{
 }`;
 
 // Input types
-interface GenerateAchievementsAndKpisInput {
+export interface GenerateAchievementsAndKpisInput {
   starStory: {
     situation: string;
     task: string;
@@ -47,7 +47,7 @@ interface GenerateAchievementsAndKpisInput {
 }
 
 // Output types
-interface GenerateAchievementsAndKpisOutput {
+export interface GenerateAchievementsAndKpisOutput {
   achievements: string[];
   kpiSuggestions: string[];
 }

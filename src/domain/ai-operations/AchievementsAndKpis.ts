@@ -1,32 +1,12 @@
 /**
- * Domain model for AI-generated achievements and KPIs
- *
- * Represents the output of ai.generateAchievementsAndKpis operation
- * which extracts achievements and KPI suggestions from STAR stories.
- *
- * @see docs/AI_Interaction_Contract.md - Operation 4
+ * AchievementsAndKpis entity - re-exports types from Lambda function
+ * @see amplify/data/ai-operations/generateAchievementsAndKpis.ts
  */
 
-/**
- * AchievementsAndKpis domain model
- *
- * Contains achievements and KPI suggestions generated from a STAR story.
- * Achievements are concrete accomplishments, while KPIs are measurable
- * indicators of success.
- */
-export interface AchievementsAndKpis {
-  /**
-   * List of achievements extracted from the STAR story
-   * Each achievement should be a clear, concise accomplishment
-   */
-  achievements: string[];
+import type { GenerateAchievementsAndKpisOutput } from '@amplify/data/ai-operations/generateAchievementsAndKpis';
 
-  /**
-   * List of KPI (Key Performance Indicator) suggestions
-   * Can be quantitative (with numbers) or qualitative
-   */
-  kpiSuggestions: string[];
-}
+// Re-export Lambda type with frontend-friendly name
+export type AchievementsAndKpis = GenerateAchievementsAndKpisOutput;
 
 /**
  * Validates that an object is a valid AchievementsAndKpis
@@ -45,3 +25,4 @@ export function isAchievementsAndKpis(obj: unknown): obj is AchievementsAndKpis 
     typed.kpiSuggestions.every((k) => typeof k === 'string')
   );
 }
+

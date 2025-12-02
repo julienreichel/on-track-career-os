@@ -295,9 +295,7 @@ describe('CVDocumentRepository', () => {
         contentJSON: {
           header: { name: 'Jane Doe', title: 'Senior Engineer' },
           sections: {
-            experience: [
-              { company: 'Tech Corp', title: 'Lead Engineer', years: 5 },
-            ],
+            experience: [{ company: 'Tech Corp', title: 'Lead Engineer', years: 5 }],
           },
         },
       };
