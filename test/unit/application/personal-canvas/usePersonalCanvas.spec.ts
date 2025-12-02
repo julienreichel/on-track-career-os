@@ -29,9 +29,20 @@ describe('usePersonalCanvas', () => {
   it('should load PersonalCanvas successfully', async () => {
     const mockPersonalCanvas = {
       id: 'personalcanvas-123',
-      // TODO: Add model-specific fields
+      userId: 'user-123',
+      valueProposition: 'Experienced software engineer',
+      keyActivities: ['Development', 'Mentoring'],
+      strengthsAdvantage: 'Technical leadership',
+      targetRoles: ['Senior Engineer', 'Tech Lead'],
+      channels: ['LinkedIn', 'GitHub'],
+      resources: ['AWS Certification', 'Portfolio'],
+      careerDirection: 'Technical leadership',
+      painRelievers: ['Process improvement'],
+      gainCreators: ['Team productivity'],
+      lastGeneratedAt: '2025-01-15T00:00:00Z',
+      needsUpdate: false,
       createdAt: '2025-01-01T00:00:00Z',
-      updatedAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-15T00:00:00Z',
       owner: 'user-123::user-123',
     } as PersonalCanvas;
 
@@ -92,5 +103,169 @@ describe('usePersonalCanvas', () => {
     expect(item.value).toBeNull();
   });
 
-  // TODO: Add more tests for error handling and edge cases
+  it('should handle network errors', async () => {
+    mockService.getFullPersonalCanvas.mockRejectedValue(new Error('Network error'));
+
+    const { loading, error, item, load } = usePersonalCanvas('personalcanvas-123');
+
+    await load();
+
+    expect(loading.value).toBe(false);
+    expect(error.value).toBe('Network error');
+    expect(item.value).toBeNull();
+  });
+
+  it('should allow multiple load calls', async () => {
+    const mockCanvas1 = {
+      id: 'personalcanvas-123',
+      userId: 'user-123',
+      valueProposition: 'Version 1',
+      needsUpdate: false,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      owner: 'user-123::user-123',
+    } as PersonalCanvas;
+
+    const mockCanvas2 = {
+      id: 'personalcanvas-123',
+      userId: 'user-123',
+      valueProposition: 'Version 2',
+      needsUpdate: false,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-02T00:00:00Z',
+      owner: 'user-123::user-123',
+    } as PersonalCanvas;
+
+    mockService.getFullPersonalCanvas
+      .mockResolvedValueOnce(mockCanvas1)
+      .mockResolvedValueOnce(mockCanvas2);
+
+    const { item, load } = usePersonalCanvas('personalcanvas-123');
+
+    await load();
+    expect(item.value).toEqual(mockCanvas1);
+
+    await load();
+    expect(item.value).toEqual(mockCanvas2);
+    expect(mockService.getFullPersonalCanvas).toHaveBeenCalledTimes(2);
+  });
+
+  it('should create a new service instance for each composable call', () => {
+    const composable1 = usePersonalCanvas('canvas-1');
+    const composable2 = usePersonalCanvas('canvas-2');
+
+    expect(composable1).not.toBe(composable2);
+    expect(composable1.item).not.toBe(composable2.item);
+    expect(composable1.loading).not.toBe(composable2.loading);
+  });
+
+  it('should maintain reactivity on item', async () => {
+    const mockPersonalCanvas = {
+      id: 'personalcanvas-123',
+      userId: 'user-123',
+      valueProposition: 'Test canvas',
+      needsUpdate: false,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      owner: 'user-123::user-123',
+    } as PersonalCanvas;
+
+    mockService.getFullPersonalCanvas.mockResolvedValue(mockPersonalCanvas);
+
+    const { item, load } = usePersonalCanvas('personalcanvas-123');
+
+    await load();
+
+    expect(item.value).toEqual(mockPersonalCanvas);
+  });
+
+  it('should pass correct canvas id to service', async () => {
+    const canvasId = 'specific-canvas-id-456';
+    mockService.getFullPersonalCanvas.mockResolvedValue(null);
+
+    const { load } = usePersonalCanvas(canvasId);
+    await load();
+
+    expect(mockService.getFullPersonalCanvas).toHaveBeenCalledWith(canvasId);
+  });
+
+  it('should handle PersonalCanvas with needsUpdate flag', async () => {
+    const mockCanvas = {
+      id: 'personalcanvas-123',
+      userId: 'user-123',
+      valueProposition: 'Outdated',
+      needsUpdate: true,
+      lastGeneratedAt: '2025-01-01T00:00:00Z',
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-15T00:00:00Z',
+      owner: 'user-123::user-123',
+    } as PersonalCanvas;
+
+    mockService.getFullPersonalCanvas.mockResolvedValue(mockCanvas);
+
+    const { item, load } = usePersonalCanvas('personalcanvas-123');
+
+    await load();
+
+    expect(item.value?.needsUpdate).toBe(true);
+  });
+
+  it('should handle PersonalCanvas with all sections populated', async () => {
+    const completeCanvas = {
+      id: 'personalcanvas-123',
+      userId: 'user-123',
+      valueProposition: 'Full value proposition',
+      keyActivities: ['Activity 1', 'Activity 2'],
+      strengthsAdvantage: 'Competitive advantage',
+      targetRoles: ['Role 1', 'Role 2'],
+      channels: ['Channel 1', 'Channel 2'],
+      resources: ['Resource 1', 'Resource 2'],
+      careerDirection: 'Clear direction',
+      painRelievers: ['Pain 1', 'Pain 2'],
+      gainCreators: ['Gain 1', 'Gain 2'],
+      lastGeneratedAt: '2025-01-15T00:00:00Z',
+      needsUpdate: false,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-15T00:00:00Z',
+      owner: 'user-123::user-123',
+    } as PersonalCanvas;
+
+    mockService.getFullPersonalCanvas.mockResolvedValue(completeCanvas);
+
+    const { item, load } = usePersonalCanvas('personalcanvas-123');
+
+    await load();
+
+    expect(item.value).toEqual(completeCanvas);
+    expect(item.value?.keyActivities).toHaveLength(2);
+    expect(item.value?.targetRoles).toHaveLength(2);
+    expect(item.value?.painRelievers).toHaveLength(2);
+  });
+
+  it('should handle PersonalCanvas with empty arrays', async () => {
+    const canvasWithEmptyArrays = {
+      id: 'personalcanvas-123',
+      userId: 'user-123',
+      keyActivities: [],
+      targetRoles: [],
+      channels: [],
+      resources: [],
+      painRelievers: [],
+      gainCreators: [],
+      needsUpdate: true,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      owner: 'user-123::user-123',
+    } as PersonalCanvas;
+
+    mockService.getFullPersonalCanvas.mockResolvedValue(canvasWithEmptyArrays);
+
+    const { item, load } = usePersonalCanvas('personalcanvas-123');
+
+    await load();
+
+    expect(item.value?.keyActivities).toEqual([]);
+    expect(item.value?.targetRoles).toEqual([]);
+    expect(item.value?.needsUpdate).toBe(true);
+  });
 });
