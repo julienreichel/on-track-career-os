@@ -1,10 +1,33 @@
 import { ref } from 'vue';
+import type { Ref } from 'vue';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
 import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
 import type { STARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 import type { PersonalCanvas, PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas';
+
+/**
+ * Helper function to handle async operations with loading and error states
+ */
+async function handleAsyncOperation<T>(
+  operation: () => Promise<T>,
+  loading: Ref<boolean>,
+  error: Ref<string | null>,
+  target: Ref<T | null>
+): Promise<void> {
+  loading.value = true;
+  error.value = null;
+  target.value = null;
+
+  try {
+    target.value = await operation();
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Unknown error occurred';
+  } finally {
+    loading.value = false;
+  }
+}
 
 /**
  * Composable for AI operations
@@ -28,77 +51,36 @@ export function useAiOperations() {
   const error = ref<string | null>(null);
   const service = new AiOperationsService();
 
-  /**
-   * Parse CV text only
-   */
-  const parseCv = async (cvText: string) => {
-    loading.value = true;
-    error.value = null;
-    parsedCv.value = null;
+  const parseCv = (cvText: string) =>
+    handleAsyncOperation(() => service.parseCvText(cvText), loading, error, parsedCv);
 
-    try {
-      parsedCv.value = await service.parseCvText(cvText);
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred';
-    } finally {
-      loading.value = false;
-    }
-  };
+  const extractExperiences = (experienceTextBlocks: string[]) =>
+    handleAsyncOperation(
+      () => service.extractExperienceBlocks(experienceTextBlocks),
+      loading,
+      error,
+      experiences
+    );
 
-  /**
-   * Extract experience blocks only
-   */
-  const extractExperiences = async (experienceTextBlocks: string[]) => {
-    loading.value = true;
-    error.value = null;
-    experiences.value = null;
+  const generateStarStory = (sourceText: string) =>
+    handleAsyncOperation(() => service.generateStarStory(sourceText), loading, error, starStory);
 
-    try {
-      experiences.value = await service.extractExperienceBlocks(experienceTextBlocks);
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred';
-    } finally {
-      loading.value = false;
-    }
-  };
+  const generateAchievementsAndKpis = (story: STARStory) =>
+    handleAsyncOperation(
+      () => service.generateAchievementsAndKpis(story),
+      loading,
+      error,
+      achievementsAndKpis
+    );
 
-  /**
-   * Generate STAR story from experience text
-   */
-  const generateStarStory = async (sourceText: string) => {
-    loading.value = true;
-    error.value = null;
-    starStory.value = null;
+  const generatePersonalCanvas = (input: PersonalCanvasInput) =>
+    handleAsyncOperation(
+      () => service.generatePersonalCanvas(input),
+      loading,
+      error,
+      personalCanvas
+    );
 
-    try {
-      starStory.value = await service.generateStarStory(sourceText);
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred';
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  /**
-   * Generate achievements and KPIs from STAR story
-   */
-  const generateAchievementsAndKpis = async (story: STARStory) => {
-    loading.value = true;
-    error.value = null;
-    achievementsAndKpis.value = null;
-
-    try {
-      achievementsAndKpis.value = await service.generateAchievementsAndKpis(story);
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred';
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  /**
-   * Parse CV and extract experiences in one workflow
-   */
   const parseAndExtract = async (cvText: string) => {
     loading.value = true;
     error.value = null;
@@ -109,23 +91,6 @@ export function useAiOperations() {
       const result = await service.parseCvAndExtractExperiences(cvText);
       parsedCv.value = result.parsedCv;
       experiences.value = result.experiences;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred';
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  /**
-   * Generate Personal Business Model Canvas
-   */
-  const generatePersonalCanvas = async (input: PersonalCanvasInput) => {
-    loading.value = true;
-    error.value = null;
-    personalCanvas.value = null;
-
-    try {
-      personalCanvas.value = await service.generatePersonalCanvas(input);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Unknown error occurred';
     } finally {
