@@ -45,10 +45,13 @@ npx playwright show-report
 
 ### Backend-Dependent Tests (Skipped)
 
-- **`cv-upload-flow.spec.ts.skip`**: Complete CV upload workflow tests
-  - Ready for backend integration
-  - Currently skipped (`.skip` extension)
-  - To activate: Rename to `.spec.ts` after deploying Amplify backend
+- **`cv-upload-flow.spec.ts.skip`**: Complete CV upload workflow tests (17 tests)
+  - Tests CV upload, experiences management, form validation, responsive design
+  - Currently skipped - pages have rendering issues
+  - **Status**: Backend deployed, authentication working, but pages need fixes
+  - **Next Steps**: Debug page rendering errors before activating tests
+  - Tests use `networkidle` wait strategy and authenticated state
+  - To activate: Fix page issues, then rename to `.spec.ts`
 
 ## Test Organization
 

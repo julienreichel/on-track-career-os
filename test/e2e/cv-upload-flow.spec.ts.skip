@@ -14,8 +14,7 @@ import { test, expect } from '@playwright/test';
 test.describe('CV Upload Flow', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to CV upload page
-    // Note: In production, you would handle authentication here
-    await page.goto('/profile/cv-upload');
+    await page.goto('/profile/cv-upload', { waitUntil: 'networkidle' });
   });
 
   test('should display CV upload page with dropzone', async ({ page }) => {
@@ -54,7 +53,7 @@ test.describe('CV Upload Flow', () => {
 
 test.describe('Experiences List', () => {
   test('should display experiences list page', async ({ page }) => {
-    await page.goto('/profile/experiences');
+    await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
 
     // Verify page header
     await expect(page.getByRole('heading', { name: /experiences/i })).toBeVisible();
@@ -65,7 +64,7 @@ test.describe('Experiences List', () => {
   });
 
   test('should navigate to CV upload from experiences list', async ({ page }) => {
-    await page.goto('/profile/experiences');
+    await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
 
     // Click upload CV button
     await page.getByRole('link', { name: /upload your cv/i }).click();
@@ -76,7 +75,7 @@ test.describe('Experiences List', () => {
   });
 
   test('should navigate to add new experience', async ({ page }) => {
-    await page.goto('/profile/experiences');
+    await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
 
     // Click add experience button
     const addButton = page.getByRole('button', { name: /add experience/i });
@@ -89,7 +88,7 @@ test.describe('Experiences List', () => {
 
 test.describe('Experience Form', () => {
   test('should display new experience form', async ({ page }) => {
-    await page.goto('/profile/experiences/new');
+    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
 
     // Verify form header
     await expect(page.getByRole('heading', { name: /add experience/i })).toBeVisible();
@@ -102,7 +101,7 @@ test.describe('Experience Form', () => {
   });
 
   test('should validate required fields', async ({ page }) => {
-    await page.goto('/profile/experiences/new');
+    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
 
     // Submit button should be disabled without required fields
     const submitButton = page.getByRole('button', { name: /save experience/i });
@@ -112,7 +111,7 @@ test.describe('Experience Form', () => {
   });
 
   test('should enable submit when required fields filled', async ({ page }) => {
-    await page.goto('/profile/experiences/new');
+    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
 
     // Fill required fields
     await page.getByLabel(/job title/i).fill('Software Engineer');
@@ -124,7 +123,7 @@ test.describe('Experience Form', () => {
   });
 
   test('should handle form submission', async ({ page }) => {
-    await page.goto('/profile/experiences/new');
+    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
 
     // Fill out complete form
     await page.getByLabel(/job title/i).fill('Senior Software Engineer');
@@ -146,7 +145,7 @@ test.describe('Experience Form', () => {
   });
 
   test('should navigate back on cancel', async ({ page }) => {
-    await page.goto('/profile/experiences/new');
+    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
 
     // Click cancel button
     const cancelButton = page.getByRole('button', { name: /cancel/i });
@@ -157,7 +156,7 @@ test.describe('Experience Form', () => {
   });
 
   test('should handle text area to array conversion', async ({ page }) => {
-    await page.goto('/profile/experiences/new');
+    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
 
     // Fill responsibilities with multiple lines
     const responsibilitiesField = page.getByLabel(/responsibilities/i);
@@ -170,7 +169,7 @@ test.describe('Experience Form', () => {
   });
 
   test('should display form hints', async ({ page }) => {
-    await page.goto('/profile/experiences/new');
+    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
 
     // Verify helpful hints are displayed
     await expect(page.getByText(/leave empty if this is your current position/i)).toBeVisible();
@@ -181,7 +180,7 @@ test.describe('Experience Form', () => {
 
 test.describe('Experience Management', () => {
   test('should display empty state when no experiences', async ({ page }) => {
-    await page.goto('/profile/experiences');
+    await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
 
     // In a fresh state, should show empty message
     // Note: Actual check depends on database state
@@ -196,7 +195,7 @@ test.describe('Experience Management', () => {
 
   test('should navigate between pages', async ({ page }) => {
     // Test navigation flow: list → new → cancel → list
-    await page.goto('/profile/experiences');
+    await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
     await expect(page).toHaveURL('/profile/experiences');
 
     // Navigate to new
@@ -227,7 +226,7 @@ test.describe('Responsive Design', () => {
     // Set mobile viewport
     await page.setViewportSize({ width: MOBILE_WIDTH, height: MOBILE_HEIGHT });
 
-    await page.goto('/profile/experiences');
+    await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
 
     // Verify page is accessible on mobile
     await expect(page.getByRole('heading', { name: /experiences/i })).toBeVisible();
@@ -237,7 +236,7 @@ test.describe('Responsive Design', () => {
     // Set tablet viewport
     await page.setViewportSize({ width: TABLET_WIDTH, height: TABLET_HEIGHT });
 
-    await page.goto('/profile/cv-upload');
+    await page.goto('/profile/cv-upload', { waitUntil: 'networkidle' });
 
     // Verify upload page is accessible on tablet
     await expect(page.getByRole('heading', { name: /upload your cv/i })).toBeVisible();

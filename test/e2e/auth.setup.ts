@@ -25,18 +25,20 @@ setup('authenticate', async ({ page }) => {
 
   // Fill in credentials
   await emailInput.fill(TEST_USER.email);
-  
+
   const passwordInput = page.locator('input[name="password"], input[type="password"]').first();
   await passwordInput.fill(TEST_USER.password);
 
   // Click sign in button - wait for it to be ready
-  const signInButton = page.locator('button[type="submit"], button:has-text("Sign in"), button:has-text("Sign In")').first();
+  const signInButton = page
+    .locator('button[type="submit"], button:has-text("Sign in"), button:has-text("Sign In")')
+    .first();
   await signInButton.waitFor({ state: 'visible', timeout: 5000 });
-  
+
   // Wait a moment for any validation to complete
   const SHORT_DELAY_MS = 500;
   await page.waitForTimeout(SHORT_DELAY_MS);
-  
+
   await signInButton.click();
 
   // Wait for successful authentication
