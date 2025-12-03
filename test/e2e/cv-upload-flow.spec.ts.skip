@@ -23,7 +23,7 @@ test.describe('CV Upload Flow', () => {
     await expect(page.getByRole('heading', { name: /upload your cv/i })).toBeVisible();
 
     // Verify dropzone is present
-    await expect(page.getByText(/drop your cv here/i)).toBeVisible();
+    await expect(page.getByText(/drop your cv here or click to browse/i)).toBeVisible();
     await expect(page.getByText(/supports pdf and txt files/i)).toBeVisible();
   });
 

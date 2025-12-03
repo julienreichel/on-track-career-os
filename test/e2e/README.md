@@ -27,13 +27,21 @@ npx playwright show-report
 
 ## Test Structure
 
+### Setup Files
+
+- **`auth.setup.ts`**: Authentication setup for all tests
+  - Logs in test user before running tests
+  - Saves authenticated state for reuse
+  - Runs automatically before test suite
+  - Uses test credentials (test@example.com)
+
 ### Active Tests
 
 - **`smoke.spec.ts`**: Basic application smoke tests
   - Verifies home page loads
   - Validates HTML structure
   - Checks profile routes are accessible
-  - ✅ Passes without backend integration
+  - ✅ Passes with authentication
 
 ### Backend-Dependent Tests (Skipped)
 
@@ -47,10 +55,39 @@ npx playwright show-report
 ```
 test/e2e/
 ├── README.md                           # This file
+├── auth.setup.ts                       # Authentication setup
 ├── smoke.spec.ts                       # Basic smoke tests (active)
 ├── cv-upload-flow.spec.ts.skip        # Full workflow tests (skipped)
 └── fixtures/
     └── test-cv.txt                     # Sample CV for upload tests
+```
+
+## Authentication
+
+All E2E tests run with authentication. The `auth.setup.ts` file handles login automatically:
+
+- **Test User**: test@example.com
+- **Auto-login**: Runs before all tests
+- **State Reuse**: Authenticated state is saved and reused across tests
+- **No Manual Login**: Tests don't need to handle authentication
+
+### How It Works
+
+1. Setup project runs `auth.setup.ts` first
+2. Logs in with test credentials
+3. Saves authentication state to `test-results/.auth/user.json`
+4. All tests use the saved authenticated state
+5. No repeated logins needed
+
+### Updating Test Credentials
+
+If test credentials change, update `test/e2e/auth.setup.ts`:
+
+```typescript
+const TEST_USER = {
+  email: 'your-test-user@example.com',
+  password: 'your-test-password',
+};
 ```
 
 ## CI/CD Configuration
@@ -120,6 +157,7 @@ test('should be mobile responsive', async ({ page }) => {
 To activate full E2E tests:
 
 1. **Deploy Amplify Backend**
+
    ```bash
    npx amplify sandbox
    ```
@@ -129,6 +167,7 @@ To activate full E2E tests:
    - Add auth context to tests
 
 3. **Activate Tests**
+
    ```bash
    mv test/e2e/cv-upload-flow.spec.ts.skip test/e2e/cv-upload-flow.spec.ts
    ```
@@ -149,6 +188,7 @@ npx playwright show-report
 ### Inspect Screenshots/Videos
 
 Failed tests automatically capture:
+
 - Screenshot at point of failure
 - Video of entire test run
 - Trace file for debugging

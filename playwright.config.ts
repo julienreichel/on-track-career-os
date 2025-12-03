@@ -47,9 +47,21 @@ export default defineConfig({
 
   // Configure projects for major browsers
   projects: [
+    // Setup project for authentication
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+
+    // Test project that depends on setup
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use signed-in state from setup
+        storageState: 'test-results/.auth/user.json',
+      },
+      dependencies: ['setup'],
     },
   ],
 
