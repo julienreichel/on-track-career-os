@@ -52,22 +52,22 @@ const stubs = {
     name: 'UTable',
     template: `
       <div class="u-table">
-        <div v-if="rows.length === 0"><slot name="empty-state" /></div>
+        <div v-if="!data || data.length === 0"><slot name="empty-state" /></div>
         <table v-else>
           <thead>
-            <tr><th v-for="col in columns" :key="col.key">{{ col.label }}</th></tr>
+            <tr><th v-for="col in columns" :key="col.accessorKey">{{ col.header }}</th></tr>
           </thead>
           <tbody>
-            <tr v-for="row in rows" :key="row.id">
-              <td v-for="col in columns" :key="col.key">
-                <slot :name="col.key + '-data'" :row="row">{{ row[col.key] }}</slot>
+            <tr v-for="row in data" :key="row.id">
+              <td v-for="col in columns" :key="col.accessorKey">
+                <slot :name="col.accessorKey + '-data'" :row="{ original: row }">{{ row[col.accessorKey] }}</slot>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     `,
-    props: ['columns', 'rows', 'loading'],
+    props: ['columns', 'data', 'loading'],
   },
   UBadge: {
     name: 'UBadge',
@@ -197,14 +197,14 @@ describe('ExperienceList', () => {
     const wrapper = createWrapper({ experiences: mockExperiences });
     const badges = wrapper.findAllComponents({ name: 'UBadge' });
     const draftBadge = badges.find((badge) => badge.props('label') === 'Draft');
-    expect(draftBadge?.props('color')).toBe('gray');
+    expect(draftBadge?.props('color')).toBe('neutral');
   });
 
   it('displays complete status with green badge', () => {
     const wrapper = createWrapper({ experiences: mockExperiences });
     const badges = wrapper.findAllComponents({ name: 'UBadge' });
     const completeBadge = badges.find((badge) => badge.props('label') === 'Complete');
-    expect(completeBadge?.props('color')).toBe('green');
+    expect(completeBadge?.props('color')).toBe('success');
   });
 
   it('displays edit and delete buttons for each experience', () => {

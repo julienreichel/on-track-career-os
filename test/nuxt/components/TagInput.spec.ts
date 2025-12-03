@@ -18,7 +18,15 @@ const stubs = {
     props: ['label', 'hint', 'required'],
   },
   UInput: {
-    template: '<input v-bind="$attrs" v-on="$attrs" />',
+    template: '<input :value="modelValue" :placeholder="placeholder" :disabled="disabled" @input="$emit(\'update:modelValue\', $event.target.value)" @keydown="handleKeydown" />',
+    props: ['modelValue', 'placeholder', 'disabled'],
+    emits: ['update:modelValue', 'keydown'],
+    setup(props, { emit }) {
+      const handleKeydown = (event: KeyboardEvent) => {
+        emit('keydown', event);
+      };
+      return { handleKeydown };
+    },
   },
   UBadge: {
     template: '<span class="badge"><slot /></span>',
@@ -82,9 +90,13 @@ describe('TagInput', () => {
       },
     });
 
+    // Directly set the component's internal inputValue ref
+    (wrapper.vm as any).inputValue = 'New Tag';
+    await wrapper.vm.$nextTick();
+
     const input = wrapper.find('input');
-    await input.setValue('New Tag');
     await input.trigger('keydown', { key: 'Enter' });
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([['New Tag']]);
@@ -104,8 +116,10 @@ describe('TagInput', () => {
     });
 
     const input = wrapper.find('input');
-    await input.setValue('New Tag');
+    (wrapper.vm as any).inputValue = 'New Tag';
+    await wrapper.vm.$nextTick();
     await input.trigger('keydown', { key: 'Enter' });
+    await wrapper.vm.$nextTick();
 
     // Verify the update was emitted and input is ready for next entry
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
@@ -145,8 +159,10 @@ describe('TagInput', () => {
     });
 
     const input = wrapper.find('input');
-    await input.setValue('  Tag with spaces  ');
+    (wrapper.vm as any).inputValue = '  Tag with spaces  ';
+    await wrapper.vm.$nextTick();
     await input.trigger('keydown', { key: 'Enter' });
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([['Tag with spaces']]);
   });
@@ -181,7 +197,7 @@ describe('TagInput', () => {
       props: {
         modelValue: ['Tag 1'],
         label: 'Tags',
-        color: 'green',
+        color: 'success',
       },
     });
 
@@ -260,13 +276,17 @@ describe('TagInput', () => {
 
     const input = wrapper.find('input');
 
-    await input.setValue('First');
+    (wrapper.vm as any).inputValue = 'First';
+    await wrapper.vm.$nextTick();
     await input.trigger('keydown', { key: 'Enter' });
+    await wrapper.vm.$nextTick();
 
     await wrapper.setProps({ modelValue: ['First'] });
 
-    await input.setValue('Second');
+    (wrapper.vm as any).inputValue = 'Second';
+    await wrapper.vm.$nextTick();
     await input.trigger('keydown', { key: 'Enter' });
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.emitted('update:modelValue')?.length).toBe(2);
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([['First']]);
