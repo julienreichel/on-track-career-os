@@ -15,7 +15,6 @@ describe('useAiOperations', () => {
     extractExperienceBlocks: ReturnType<typeof vi.fn>;
     generateStarStory: ReturnType<typeof vi.fn>;
     generateAchievementsAndKpis: ReturnType<typeof vi.fn>;
-    parseCvAndExtractExperiences: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -25,7 +24,6 @@ describe('useAiOperations', () => {
       extractExperienceBlocks: vi.fn(),
       generateStarStory: vi.fn(),
       generateAchievementsAndKpis: vi.fn(),
-      parseCvAndExtractExperiences: vi.fn(),
     };
 
     // Mock the service constructor

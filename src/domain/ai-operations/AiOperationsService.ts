@@ -189,39 +189,4 @@ export class AiOperationsService {
       );
     }
   }
-
-  /**
-   * Parse CV and then extract experiences in one workflow
-   * Convenience method for common use case
-   * @param cvText - Raw CV text content
-   * @returns Both parsed CV and extracted experiences
-   */
-  async parseCvAndExtractExperiences(cvText: string): Promise<{
-    parsedCv: ParsedCV;
-    experiences: ExperiencesResult;
-  }> {
-    // Parse CV first
-    const parsedCv = await this.parseCvText(cvText);
-
-    // Extract experience text blocks from rawBlocks
-    const experienceBlocks = parsedCv.sections.rawBlocks.filter((block) => {
-      // Simple heuristic: blocks containing experience-related keywords
-      const text = block.toLowerCase();
-      return (
-        text.includes('experience') || text.includes('employment') || text.includes('work history')
-      );
-    });
-
-    // If no blocks found, try using experiences from parsed CV
-    const blocksToExtract =
-      experienceBlocks.length > 0 ? experienceBlocks : parsedCv.sections.experiences;
-
-    // Extract structured experiences
-    const experiences = await this.extractExperienceBlocks(blocksToExtract);
-
-    return {
-      parsedCv,
-      experiences,
-    };
-  }
 }
