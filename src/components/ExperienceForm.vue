@@ -167,7 +167,7 @@ function handleCancel() {
       <div class="flex justify-end gap-3">
         <UButton
           type="button"
-          color="gray"
+          color="neutral"
           variant="ghost"
           :label="t('experiences.form.cancel')"
           @click="handleCancel"

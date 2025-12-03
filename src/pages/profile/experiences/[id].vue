@@ -97,7 +97,7 @@ function handleCancel() {
         <template #actions>
           <UButton
             icon="i-heroicons-arrow-left"
-            color="gray"
+            color="neutral"
             variant="ghost"
             :label="t('experiences.list.title')"
             to="/profile/experiences"
@@ -111,7 +111,7 @@ function handleCancel() {
           <UAlert
             v-if="errorMessage"
             icon="i-heroicons-exclamation-triangle"
-            color="red"
+            color="error"
             variant="soft"
             :title="t('cvUpload.errors.unknown')"
             :description="errorMessage"

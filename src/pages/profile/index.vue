@@ -6,7 +6,7 @@
       <UAlert
         v-if="error"
         icon="i-heroicons-exclamation-triangle"
-        color="red"
+        color="error"
         variant="soft"
         :title="t('profile.messages.loadError')"
         :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'red', variant: 'link' }"
@@ -16,7 +16,7 @@
       <UAlert
         v-if="saveSuccess"
         icon="i-heroicons-check-circle"
-        color="green"
+        color="primary"
         variant="soft"
         :title="t('profile.messages.saveSuccess')"
         :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'green', variant: 'link' }"
@@ -163,12 +163,7 @@
 
         <!-- Form Actions -->
         <div class="flex justify-end gap-3">
-          <UButton
-            type="button"
-            color="gray"
-            variant="ghost"
-            @click="handleCancel"
-          >
+          <UButton type="button" color="neutral" variant="ghost" @click="handleCancel">
             {{ t('profile.actions.cancel') }}
           </UButton>
           <UButton

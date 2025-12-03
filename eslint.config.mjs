@@ -36,7 +36,7 @@ export default withNuxt(
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
 
       // Vue specific rules
-      'vue/max-attributes-per-line': ['error', { singleline: 3, multiline: 1 }],
+      'vue/max-attributes-per-line': ['error', { singleline: 5, multiline: 1 }],
       'vue/component-name-in-template-casing': ['error', 'kebab-case'],
       'vue/require-default-prop': 'error',
       'vue/require-prop-types': 'error',

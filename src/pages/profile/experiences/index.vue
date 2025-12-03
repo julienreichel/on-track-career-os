@@ -91,7 +91,7 @@ function cancelDelete() {
           <UAlert
             v-if="errorMessage"
             icon="i-heroicons-exclamation-triangle"
-            color="red"
+            color="error"
             variant="soft"
             :title="t('cvUpload.errors.unknown')"
             :description="errorMessage"
@@ -122,12 +122,16 @@ function cancelDelete() {
         <template #footer>
           <div class="flex justify-end gap-3">
             <UButton
-              color="gray"
+              color="neutral"
               variant="ghost"
               :label="t('experiences.delete.cancel')"
               @click="cancelDelete"
             />
-            <UButton color="red" :label="t('experiences.delete.confirm')" @click="confirmDelete" />
+            <UButton
+              color="error"
+              :label="t('experiences.delete.confirm')"
+              @click="confirmDelete"
+            />
           </div>
         </template>
       </UCard>

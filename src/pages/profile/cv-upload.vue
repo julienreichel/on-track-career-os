@@ -125,7 +125,7 @@ function viewExperiences() {
           <UAlert
             v-if="errorMessage"
             icon="i-heroicons-exclamation-triangle"
-            color="red"
+            color="error"
             variant="soft"
             :title="t('cvUpload.errors.unknown')"
             :description="errorMessage"
@@ -169,11 +169,7 @@ function viewExperiences() {
                     {{ t('cvUpload.sections.experiences') }} ({{ extractedExperiences.length }})
                   </h4>
                   <div class="space-y-3">
-                    <UCard
-                      v-for="(exp, index) in extractedExperiences"
-                      :key="index"
-                      :ui="{ body: { padding: 'p-4' } }"
-                    >
+                    <UCard v-for="(exp, index) in extractedExperiences" :key="index">
                       <div class="space-y-2">
                         <h5 class="font-semibold">{{ exp.title }}</h5>
                         <p class="text-sm text-gray-600">{{ exp.company }}</p>
@@ -200,7 +196,7 @@ function viewExperiences() {
               <template #footer>
                 <div class="flex justify-end gap-3">
                   <UButton
-                    color="gray"
+                    color="neutral"
                     variant="ghost"
                     :label="t('cvUpload.cancel')"
                     @click="handleCancel"
