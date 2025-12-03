@@ -5,6 +5,10 @@ import { useRouter } from 'vue-router';
 import { useAiOperations } from '@/application/ai-operations/useAiOperations';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { ExtractedExperience } from '@/domain/ai-operations/Experience';
+import { PDFParse } from 'pdf-parse';
+
+// Note: pdf-parse may require worker configuration in production
+// See: https://github.com/mehmet-kozan/pdf-parse#worker-configuration--troubleshooting
 
 const { t } = useI18n();
 const router = useRouter();
@@ -23,7 +27,7 @@ const importCount = ref(0);
 const uploadedFile = ref<File | null>(null);
 
 // Handle file upload
-async function handleUpload(file: File | null) {
+async function handleUpload(file: File | null | undefined) {
   if (!file) return;
 
   uploadedFile.value = file;
@@ -31,13 +35,29 @@ async function handleUpload(file: File | null) {
   errorMessage.value = null;
 
   try {
-    // Read file content
-    const reader = new FileReader();
-    const text = await new Promise<string>((resolve, reject) => {
-      reader.onload = (e) => resolve(e.target?.result as string);
-      reader.onerror = (e) => reject(e);
-      reader.readAsText(file);
-    });
+    let text: string;
+
+    // Check file type and parse accordingly
+    if (file.type === 'application/pdf') {
+      // Parse PDF file using pdf-parse
+      const arrayBuffer = await file.arrayBuffer();
+      const parser = new PDFParse({ data: arrayBuffer });
+      const result = await parser.getText();
+      await parser.destroy();
+      text = result.text;
+    } else {
+      // Read text file (txt, doc, docx - for now just txt)
+      const reader = new FileReader();
+      text = await new Promise<string>((resolve, reject) => {
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = (e) => reject(e);
+        reader.readAsText(file);
+      });
+    }
+
+    if (!text || text.trim().length === 0) {
+      throw new Error(t('cvUpload.errors.noTextExtracted'));
+    }
 
     extractedText.value = text;
     // Step 1: Parse CV text to extract sections
