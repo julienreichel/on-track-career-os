@@ -105,7 +105,7 @@
               :label="t('profile.fields.personalValues')"
               :placeholder="t('profile.fields.personalValuesPlaceholder')"
               :hint="t('profile.fields.personalValuesHint')"
-              color="blue"
+              color="info"
             />
 
             <TagInput
@@ -113,7 +113,7 @@
               :label="t('profile.fields.strengths')"
               :placeholder="t('profile.fields.strengthsPlaceholder')"
               :hint="t('profile.fields.strengthsHint')"
-              color="blue"
+              color="info"
             />
 
             <TagInput
@@ -121,7 +121,7 @@
               :label="t('profile.fields.interests')"
               :placeholder="t('profile.fields.interestsPlaceholder')"
               :hint="t('profile.fields.interestsHint')"
-              color="blue"
+              color="info"
             />
           </div>
         </UCard>
@@ -140,7 +140,7 @@
               :label="t('profile.fields.skills')"
               :placeholder="t('profile.fields.skillsPlaceholder')"
               :hint="t('profile.fields.skillsHint')"
-              color="green"
+              color="success"
             />
 
             <TagInput
@@ -148,7 +148,7 @@
               :label="t('profile.fields.certifications')"
               :placeholder="t('profile.fields.certificationsPlaceholder')"
               :hint="t('profile.fields.certificationsHint')"
-              color="green"
+              color="success"
             />
 
             <TagInput
@@ -156,7 +156,7 @@
               :label="t('profile.fields.languages')"
               :placeholder="t('profile.fields.languagesPlaceholder')"
               :hint="t('profile.fields.languagesHint')"
-              color="green"
+              color="success"
             />
           </div>
         </UCard>

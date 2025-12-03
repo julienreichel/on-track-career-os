@@ -11,7 +11,7 @@
         {{ item }}
         <UButton
           icon="i-heroicons-x-mark-20-solid"
-          size="2xs"
+          size="xs"
           :color="color"
           variant="link"
           :padded="false"
@@ -30,7 +30,7 @@ interface Props {
   label: string;
   placeholder?: string;
   hint?: string;
-  color?: 'primary' | 'blue' | 'green' | 'red' | 'yellow' | 'gray';
+  color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral';
   required?: boolean;
 }
 
