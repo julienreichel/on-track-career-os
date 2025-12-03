@@ -18,7 +18,7 @@ import { truncateForLog, withAiOperationHandler } from './utils/common';
 
 // System prompt - constant as per AIC
 const SYSTEM_PROMPT = `You transform experience text into structured experience blocks.
-Extract: title, company, dates, responsibilities, tasks.
+Extract: title, company, dates, responsibilities, tasks & achievements.
 Never infer seniority or technologies not present.
 Return JSON only.
 
@@ -27,8 +27,9 @@ RULES:
 - Do not invent or infer missing details
 - Dates should be in YYYY-MM-DD format or YYYY-MM if day is not specified
 - If endDate is "Present" or missing, leave it null
-- Responsibilities are high-level duties
-- Tasks are specific actions or deliverables
+- Responsibilities are high-level duties and roles
+- Tasks include specific actions, deliverables, achievements, and measurable results
+- Tasks should capture accomplishments, metrics, and outcomes (e.g., "Increased sales by 30%", "Led team of 5 developers")
 - Return ONLY valid JSON with no markdown wrappers`;
 
 // Output schema for retry
@@ -74,6 +75,10 @@ function buildUserPrompt(blocks: string[]): string {
   return `Convert the following CV experience sections into experience blocks:
 
 ${blocksText}
+
+IMPORTANT:
+- Responsibilities: High-level duties and roles
+- Tasks: Specific actions, deliverables, achievements, and measurable results (e.g., "Increased sales by 30%", "Managed team of 5", "Delivered project ahead of schedule")
 
 Return a JSON object with this exact structure:
 ${OUTPUT_SCHEMA}`;
