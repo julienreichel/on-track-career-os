@@ -18,7 +18,8 @@ const stubs = {
     props: ['label', 'hint', 'required'],
   },
   UInput: {
-    template: '<input :value="modelValue" :placeholder="placeholder" :disabled="disabled" @input="$emit(\'update:modelValue\', $event.target.value)" @keydown="handleKeydown" />',
+    template:
+      '<input :value="modelValue" :placeholder="placeholder" :disabled="disabled" @input="$emit(\'update:modelValue\', $event.target.value)" @keydown="handleKeydown" />',
     props: ['modelValue', 'placeholder', 'disabled'],
     emits: ['update:modelValue', 'keydown'],
     setup(props, { emit }) {
