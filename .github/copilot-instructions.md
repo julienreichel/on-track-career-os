@@ -96,9 +96,6 @@ npm run preview         # Preview production build
 - **Git Commits**: MUST follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
   - Format: `<type>(<scope>): <description>`
   - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
-  - Example: `feat(auth): add login page with Amplify UI`
-  - Example: `fix(i18n): correct French translation keys`
-  - Example: `refactor(layout): replace CSS classes with Nuxt UI components`
 
 ## Critical Conventions
 
@@ -145,113 +142,23 @@ const { t } = useI18n();
 
 **Nuxt UI v4 Component Library** (150+ components available):
 
-**Layout & Structure:**
-
-- `UApp` - Wraps your app for global configurations
-- `UContainer` - Center and constrain content width
-- `UPage` - Grid layout with left/right columns
-- `UPageHeader`, `UPageBody`, `UPageAside`, `UPageCard` - Page structure
-- `UPageColumns`, `UPageGrid`, `UPageList` - Content layouts
-- `UHeader`, `UMain`, `UFooter` - Main layout components
-- `UDashboardGroup`, `UDashboardNavbar`, `UDashboardSidebar`, `UDashboardPanel` - Dashboard layouts
-
-**Forms & Inputs:**
-
-- `UForm` - Form with validation and submission
-- `UFormField` - Wrapper for form elements with validation (NOT UFormGroup)
-- `UInput` - Text input
-- `UInputDate`, `UInputTime`, `UInputNumber` - Specialized inputs
-- `UInputMenu` - Autocomplete input
-- `UInputTags` - Tag-based input
-- `UTextarea` - Multi-line text input
-- `USelect`, `USelectMenu` - Select dropdowns
-- `UCheckbox`, `UCheckboxGroup` - Checkboxes
-- `URadioGroup` - Radio buttons
-- `USwitch` - Toggle switch
-- `USlider` - Range slider
-- `UFileUpload` - File upload
-- `UColorPicker` - Color selection
-- `UPinInput` - PIN entry
-- `UCalendar` - Date selection
-
-**Buttons & Navigation:**
-
-- `UButton` - Button element
-- `ULink` - Enhanced NuxtLink
-- `UNavigationMenu` - Horizontal/vertical links
-- `UBreadcrumb` - Hierarchy navigation
-- `UPagination` - Page navigation
-- `UTabs` - Tab panels
-- `UAccordion` - Collapsible panels
-- `UCollapsible` - Toggle visibility
-
-**Display & Feedback:**
-
-- `UCard` - Content card
-- `UBadge` - Status/category indicator
-- `UChip` - Numeric indicator
-- `UAlert` - User attention callout
-- `UToast` - Notification messages (via `useToast()`)
-- `UModal`, `UDrawer`, `USlideover` - Overlays
-- `UPopover`, `UTooltip` - Floating content
-- `UProgress`, `USkeleton` - Loading states
-- `UEmpty`, `UError` - Empty/error states
-
-**Data Display:**
-
-- `UTable` - Data tables
-- `UAvatar`, `UAvatarGroup` - User avatars
-- `UUser` - User info with avatar
-- `UIcon` - Icons from Iconify
-- `UKbd` - Keyboard keys
-- `UTimeline` - Event sequence
-- `UTree` - Hierarchical data
-- `UStepper` - Multi-step progress
-
-**Menus & Overlays:**
-
-- `UDropdownMenu` - Click-triggered menu
-- `UContextMenu` - Right-click menu
-- `UCommandPalette` - Full-text search
-- `UChatPalette` - Chat interface overlay
-
-**Content & Blogging:**
-
-- `UBlogPost`, `UBlogPosts` - Blog layouts
-- `UChangelogVersion`, `UChangelogVersions` - Changelog display
-- `UContentNavigation`, `UContentToc`, `UContentSearch` - Documentation components
-
-**Chat & AI:**
-
-- `UChatMessage`, `UChatMessages` - Chat display (Vercel AI SDK compatible)
-- `UChatPrompt`, `UChatPromptSubmit` - Chat input
-
-**Specialized:**
-
-- `UAuthForm` - Login/register forms
-- `UPricingPlan`, `UPricingPlans`, `UPricingTable` - Pricing displays
-- `UCarousel` - Image/content carousel
-- `UMarquee` - Infinite scrolling
-- `UBanner` - Top banner
-- `UColorModeButton`, `UColorModeSwitch`, `UColorModeSelect` - Theme switching
-- `ULocaleSelect` - Language selection
-- `USeparator` - Content divider
-- `UFieldGroup` - Group button-like elements
-
-**Composables:**
-
-- `useToast()` - Display toast notifications
-- `useOverlay()` - Control overlays programmatically
-- `useFormField()` - Custom input integration
-- `defineShortcuts()` - Keyboard shortcuts
+- **Layout & Structure**: UApp, UContainer, UPage, UPageHeader, UPageBody, UPageAside, UPageCard, UPageColumns, UPageGrid, UPageList, UHeader, UMain, UFooter, UDashboardGroup, UDashboardNavbar, UDashboardSidebar, UDashboardPanel, UDashboardToolbar, UDashboardResizeHandle, UDashboardSidebarCollapse, UDashboardSidebarToggle
+- **Forms & Inputs**: UForm, UFormField (NOT UFormGroup), UInput, UInputDate, UInputTime, UInputNumber, UInputMenu, UInputTags, UTextarea, USelect, USelectMenu, UCheckbox, UCheckboxGroup, URadioGroup, USwitch, USlider, UFileUpload, UColorPicker, UPinInput, UCalendar
+- **Buttons & Navigation**: UButton, ULink, UNavigationMenu, UBreadcrumb, UPagination, UTabs, UAccordion, UCollapsible
+- **Display & Feedback**: UCard, UBadge, UChip, UAlert, UToast, UModal, UDrawer, USlideover, UPopover, UTooltip, UProgress, USkeleton, UEmpty, UError
+- **Data Display**: UTable, UAvatar, UAvatarGroup, UUser, UIcon, UKbd, UTimeline, UTree, UStepper
+- **Menus & Overlays**: UDropdownMenu, UContextMenu, UCommandPalette, UChatPalette
+- **Content & Blogging**: UBlogPost, UBlogPosts, UChangelogVersion, UChangelogVersions, UContentNavigation, UContentToc, UContentSearch, UContentSearchButton, UContentSurround
+- **Chat & AI**: UChatMessage, UChatMessages, UChatPrompt, UChatPromptSubmit
+- **Specialized**: UAuthForm, UPricingPlan, UPricingPlans, UPricingTable, UCarousel, UMarquee, UBanner, UColorModeButton, UColorModeSwitch, UColorModeSelect, UColorModeAvatar, UColorModeImage, ULocaleSelect, USeparator, UFieldGroup
+- **Composables**: useToast(), useOverlay(), useFormField(), defineShortcuts()
 
 **Critical Notes:**
 
 - Use `UFormField` (NOT `UFormGroup`) for form field wrapping
 - `UFormField` accepts `:label` and `:hint` as props, not template slots
-- All components follow consistent naming: `U` prefix + PascalCase
-- Components are auto-imported, no manual imports needed
-- Full documentation per component at `https://ui.nuxt.com/docs/components/[component-name]`
+- All components auto-imported, no manual imports needed
+- Full docs: `https://ui.nuxt.com/docs/components/[component-name]` or see `docs/Nuxt UI.md`
 
 ## Critical Conventions
 
