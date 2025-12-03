@@ -134,17 +134,124 @@ const { t } = useI18n();
 
 - **NEVER write raw Tailwind CSS classes** unless absolutely necessary
 - Use Nuxt UI semantic components for ALL UI elements
-- Available components: `UButton`, `UCard`, `UContainer`, `UHeader`, `UMain`, `UPage`, `UPageHeader`, `UPageBody`, `UPageCard`, etc.
-- Example: Use `<UButton>` NOT `<button class="px-4 py-2 bg-blue-500">`
-- Example: Use `<UCard>` NOT `<div class="rounded-lg shadow-md p-4">`
 - Only use Tailwind classes for: spacing adjustments, custom layouts not covered by Nuxt UI
-- Refer to [Nuxt UI documentation](https://ui.nuxt.com) for available components
+- Refer to `docs/Nuxt UI.md` for complete component list and [Nuxt UI documentation](https://ui.nuxt.com)
 
 **Component Priority:**
 
-1. First choice: Nuxt UI component (e.g., `<UButton>`, `<UCard>`)
+1. First choice: Nuxt UI component (e.g., `<UButton>`, `<UCard>`, `<UFormField>`)
 2. Second choice: Semantic HTML with minimal utility classes
 3. Last resort: Custom CSS (only if Nuxt UI doesn't provide the component)
+
+**Nuxt UI v4 Component Library** (150+ components available):
+
+**Layout & Structure:**
+
+- `UApp` - Wraps your app for global configurations
+- `UContainer` - Center and constrain content width
+- `UPage` - Grid layout with left/right columns
+- `UPageHeader`, `UPageBody`, `UPageAside`, `UPageCard` - Page structure
+- `UPageColumns`, `UPageGrid`, `UPageList` - Content layouts
+- `UHeader`, `UMain`, `UFooter` - Main layout components
+- `UDashboardGroup`, `UDashboardNavbar`, `UDashboardSidebar`, `UDashboardPanel` - Dashboard layouts
+
+**Forms & Inputs:**
+
+- `UForm` - Form with validation and submission
+- `UFormField` - Wrapper for form elements with validation (NOT UFormGroup)
+- `UInput` - Text input
+- `UInputDate`, `UInputTime`, `UInputNumber` - Specialized inputs
+- `UInputMenu` - Autocomplete input
+- `UInputTags` - Tag-based input
+- `UTextarea` - Multi-line text input
+- `USelect`, `USelectMenu` - Select dropdowns
+- `UCheckbox`, `UCheckboxGroup` - Checkboxes
+- `URadioGroup` - Radio buttons
+- `USwitch` - Toggle switch
+- `USlider` - Range slider
+- `UFileUpload` - File upload
+- `UColorPicker` - Color selection
+- `UPinInput` - PIN entry
+- `UCalendar` - Date selection
+
+**Buttons & Navigation:**
+
+- `UButton` - Button element
+- `ULink` - Enhanced NuxtLink
+- `UNavigationMenu` - Horizontal/vertical links
+- `UBreadcrumb` - Hierarchy navigation
+- `UPagination` - Page navigation
+- `UTabs` - Tab panels
+- `UAccordion` - Collapsible panels
+- `UCollapsible` - Toggle visibility
+
+**Display & Feedback:**
+
+- `UCard` - Content card
+- `UBadge` - Status/category indicator
+- `UChip` - Numeric indicator
+- `UAlert` - User attention callout
+- `UToast` - Notification messages (via `useToast()`)
+- `UModal`, `UDrawer`, `USlideover` - Overlays
+- `UPopover`, `UTooltip` - Floating content
+- `UProgress`, `USkeleton` - Loading states
+- `UEmpty`, `UError` - Empty/error states
+
+**Data Display:**
+
+- `UTable` - Data tables
+- `UAvatar`, `UAvatarGroup` - User avatars
+- `UUser` - User info with avatar
+- `UIcon` - Icons from Iconify
+- `UKbd` - Keyboard keys
+- `UTimeline` - Event sequence
+- `UTree` - Hierarchical data
+- `UStepper` - Multi-step progress
+
+**Menus & Overlays:**
+
+- `UDropdownMenu` - Click-triggered menu
+- `UContextMenu` - Right-click menu
+- `UCommandPalette` - Full-text search
+- `UChatPalette` - Chat interface overlay
+
+**Content & Blogging:**
+
+- `UBlogPost`, `UBlogPosts` - Blog layouts
+- `UChangelogVersion`, `UChangelogVersions` - Changelog display
+- `UContentNavigation`, `UContentToc`, `UContentSearch` - Documentation components
+
+**Chat & AI:**
+
+- `UChatMessage`, `UChatMessages` - Chat display (Vercel AI SDK compatible)
+- `UChatPrompt`, `UChatPromptSubmit` - Chat input
+
+**Specialized:**
+
+- `UAuthForm` - Login/register forms
+- `UPricingPlan`, `UPricingPlans`, `UPricingTable` - Pricing displays
+- `UCarousel` - Image/content carousel
+- `UMarquee` - Infinite scrolling
+- `UBanner` - Top banner
+- `UColorModeButton`, `UColorModeSwitch`, `UColorModeSelect` - Theme switching
+- `ULocaleSelect` - Language selection
+- `USeparator` - Content divider
+- `UFieldGroup` - Group button-like elements
+
+**Composables:**
+
+- `useToast()` - Display toast notifications
+- `useOverlay()` - Control overlays programmatically
+- `useFormField()` - Custom input integration
+- `defineShortcuts()` - Keyboard shortcuts
+
+**Critical Notes:**
+
+- Use `UFormField` (NOT `UFormGroup`) for form field wrapping
+- `UFormField` accepts `:label` and `:hint` as props, not template slots
+- All components follow consistent naming: `U` prefix + PascalCase
+- Components are auto-imported, no manual imports needed
+- Full documentation per component at `https://ui.nuxt.com/docs/components/[component-name]`
 
 ## Critical Conventions
 
@@ -199,6 +306,7 @@ const { t } = useI18n();
 - **Tech Specs**: `docs/Tech_Fundation_Specs.md`
 - **EPIC Roadmap**: `docs/EPIC_Roadmap.md`
 - **Product Vision**: `docs/Product_Description.md`
+- **Nuxt UI Components**: `docs/Nuxt UI.md` - Complete component reference
 - **Knowledge Base**: `KNOWLEDGE_BASE.md` (high-level summary)
 
 ## Current State & MVP Focus
