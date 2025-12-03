@@ -7,8 +7,10 @@ import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { ExtractedExperience } from '@/domain/ai-operations/Experience';
 import { PDFParse } from 'pdf-parse';
 
-// Note: pdf-parse may require worker configuration in production
-// See: https://github.com/mehmet-kozan/pdf-parse#worker-configuration--troubleshooting
+// Configure PDF.js worker (must be set before any PDF operations)
+PDFParse.setWorker(
+  'https://cdn.jsdelivr.net/npm/pdf-parse@latest/dist/pdf-parse/web/pdf.worker.mjs'
+);
 
 const { t } = useI18n();
 const router = useRouter();
@@ -136,6 +138,11 @@ function handleCancel() {
   aiOps.reset();
 }
 
+// Remove an experience from the list
+function removeExperience(index: number) {
+  extractedExperiences.value.splice(index, 1);
+}
+
 // Navigate to experiences list
 function viewExperiences() {
   router.push('/profile/experiences');
@@ -148,132 +155,129 @@ function viewExperiences() {
       <UPageHeader :title="t('cvUpload.title')" :description="t('cvUpload.description')" />
 
       <UPageBody>
-        <div class="space-y-6">
-          <!-- Error Alert -->
-          <UAlert
-            v-if="errorMessage"
-            icon="i-heroicons-exclamation-triangle"
-            color="error"
-            variant="soft"
-            :title="t('cvUpload.errors.unknown')"
-            :description="errorMessage"
-            :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'red', variant: 'link' }"
-            @close="errorMessage = null"
+        <!-- Error Alert -->
+        <UAlert
+          v-if="errorMessage"
+          icon="i-heroicons-exclamation-triangle"
+          color="error"
+          variant="soft"
+          :title="t('cvUpload.errors.unknown')"
+          :description="errorMessage"
+          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+          @close="errorMessage = null"
+        />
+
+        <!-- Upload Step -->
+        <UCard v-if="currentStep === 'upload'">
+          <UFileUpload
+            v-model="uploadedFile"
+            accept=".pdf,.doc,.docx,.txt"
+            :label="t('cvUpload.dropzone.label')"
+            :description="t('cvUpload.dropzone.description')"
+            icon="i-heroicons-document-text"
+            @update:model-value="handleUpload"
           />
+        </UCard>
 
-          <!-- Upload Step -->
-          <div v-if="currentStep === 'upload'">
-            <UFileUpload
-              v-model="uploadedFile"
-              accept=".pdf,.doc,.docx,.txt"
-              :label="t('cvUpload.dropzone.label')"
-              :description="t('cvUpload.dropzone.description')"
-              icon="i-heroicons-document-text"
-              class="min-h-48"
-              @update:model-value="handleUpload"
+        <!-- Parsing Step -->
+        <UCard v-if="currentStep === 'parsing'">
+          <UEmpty :title="t('cvUpload.parsing')" :description="t('cvUpload.parsingDescription')">
+            <template #icon>
+              <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
+            </template>
+          </UEmpty>
+        </UCard>
+
+        <!-- Preview Step -->
+        <UCard v-if="currentStep === 'preview'">
+          <template #header>
+            <UPageHeader
+              :title="t('cvUpload.parsedTitle')"
+              :description="t('cvUpload.parsedDescription')"
             />
-          </div>
+          </template>
 
-          <!-- Parsing Step -->
-          <UCard v-if="currentStep === 'parsing'">
-            <div class="flex flex-col items-center gap-4 py-8">
-              <UIcon name="i-heroicons-arrow-path" class="h-12 w-12 animate-spin text-primary" />
-              <div class="text-center">
-                <h3 class="text-lg font-semibold">{{ t('cvUpload.parsing') }}</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  {{ t('cvUpload.parsingDescription') }}
-                </p>
-              </div>
-            </div>
-          </UCard>
+          <div v-if="extractedExperiences.length > 0">
+            <h3>{{ t('cvUpload.sections.experiences') }} ({{ extractedExperiences.length }})</h3>
 
-          <!-- Preview Step -->
-          <div v-if="currentStep === 'preview'" class="space-y-4">
-            <UCard>
+            <UCard v-for="(exp, index) in extractedExperiences" :key="index">
               <template #header>
-                <div class="space-y-2">
-                  <h3 class="text-lg font-semibold">{{ t('cvUpload.parsedTitle') }}</h3>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('cvUpload.parsedDescription') }}
-                  </p>
+                <div>
+                  <UPageHeader :title="exp.title" :description="exp.company">
+                    <template #actions>
+                      <UButton
+                        icon="i-heroicons-x-mark"
+                        color="error"
+                        variant="ghost"
+                        size="sm"
+                        :aria-label="t('cvUpload.removeExperience')"
+                        @click="removeExperience(index)"
+                      />
+                    </template>
+                  </UPageHeader>
                 </div>
               </template>
 
-              <div class="space-y-4">
-                <div v-if="extractedExperiences.length > 0">
-                  <h4 class="mb-3 font-medium">
-                    {{ t('cvUpload.sections.experiences') }} ({{ extractedExperiences.length }})
-                  </h4>
-                  <div class="space-y-3">
-                    <UCard v-for="(exp, index) in extractedExperiences" :key="index">
-                      <div class="space-y-2">
-                        <h5 class="font-semibold">{{ exp.title }}</h5>
-                        <p class="text-sm text-gray-600">{{ exp.company }}</p>
-                        <p class="text-xs text-gray-500">
-                          {{ exp.startDate }} - {{ exp.endDate || t('experiences.present') }}
-                        </p>
-                        <div v-if="exp.responsibilities.length > 0" class="text-sm">
-                          <p class="font-medium">{{ t('experiences.form.responsibilities') }}:</p>
-                          <ul class="ml-4 list-disc">
-                            <li v-for="(resp, idx) in exp.responsibilities.slice(0, 3)" :key="idx">
-                              {{ resp }}
-                            </li>
-                            <li v-if="exp.responsibilities.length > 3" class="text-gray-500">
-                              +{{ exp.responsibilities.length - 3 }} more...
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </UCard>
-                  </div>
-                </div>
-              </div>
+              <UBadge color="neutral" variant="subtle" size="sm">
+                {{ exp.startDate }} - {{ exp.endDate || t('experiences.present') }}
+              </UBadge>
 
-              <template #footer>
-                <div class="flex justify-end gap-3">
-                  <UButton
-                    color="neutral"
-                    variant="ghost"
-                    :label="t('cvUpload.cancel')"
-                    @click="handleCancel"
-                  />
-                  <UButton
-                    :label="t('cvUpload.confirmImport')"
-                    icon="i-heroicons-arrow-down-tray"
-                    @click="handleImport"
-                  />
-                </div>
+              <template v-if="exp.responsibilities.length > 0">
+                <p>{{ t('experiences.form.responsibilities') }}:</p>
+                <ul>
+                  <li v-for="(resp, idx) in exp.responsibilities.slice(0, 3)" :key="idx">
+                    {{ resp }}
+                  </li>
+                  <li v-if="exp.responsibilities.length > 3">
+                    <UBadge color="neutral" variant="subtle">
+                      +{{ exp.responsibilities.length - 3 }} {{ t('cvUpload.more') }}
+                    </UBadge>
+                  </li>
+                </ul>
               </template>
             </UCard>
           </div>
 
-          <!-- Importing Step -->
-          <UCard v-if="currentStep === 'importing'">
-            <div class="flex flex-col items-center gap-4 py-8">
-              <UIcon name="i-heroicons-arrow-path" class="h-12 w-12 animate-spin text-primary" />
-              <div class="text-center">
-                <h3 class="text-lg font-semibold">{{ t('cvUpload.importing') }}</h3>
-              </div>
-            </div>
-          </UCard>
+          <template #footer>
+            <UButton
+              color="neutral"
+              variant="ghost"
+              :label="t('cvUpload.cancel')"
+              @click="handleCancel"
+            />
+            <UButton
+              :label="t('cvUpload.confirmImport')"
+              icon="i-heroicons-arrow-down-tray"
+              @click="handleImport"
+            />
+          </template>
+        </UCard>
 
-          <!-- Complete Step -->
-          <UCard v-if="currentStep === 'complete'">
-            <div class="flex flex-col items-center gap-4 py-8">
-              <UIcon name="i-heroicons-check-circle" class="h-12 w-12 text-green-500" />
-              <div class="text-center">
-                <h3 class="text-lg font-semibold">
-                  {{ t('cvUpload.success', { count: importCount }) }}
-                </h3>
-              </div>
+        <!-- Importing Step -->
+        <UCard v-if="currentStep === 'importing'">
+          <UEmpty :title="t('cvUpload.importing')">
+            <template #icon>
+              <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
+            </template>
+          </UEmpty>
+        </UCard>
+
+        <!-- Complete Step -->
+        <UCard v-if="currentStep === 'complete'">
+          <UEmpty
+            icon="i-heroicons-check-circle"
+            :title="t('cvUpload.success', { count: importCount })"
+            color="success"
+          >
+            <template #actions>
               <UButton
                 :label="t('cvUpload.viewExperiences')"
                 icon="i-heroicons-arrow-right"
                 @click="viewExperiences"
               />
-            </div>
-          </UCard>
-        </div>
+            </template>
+          </UEmpty>
+        </UCard>
       </UPageBody>
     </UPage>
   </UContainer>
