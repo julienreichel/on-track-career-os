@@ -181,11 +181,12 @@ function viewExperiences() {
 
         <!-- Parsing Step -->
         <UCard v-if="currentStep === 'parsing'">
-          <UEmpty :title="t('cvUpload.parsing')" :description="t('cvUpload.parsingDescription')">
-            <template #icon>
-              <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
-            </template>
-          </UEmpty>
+          <UEmpty
+            icon="i-heroicons-arrow-path"
+            :title="t('cvUpload.parsing')"
+            :description="t('cvUpload.parsingDescription')"
+          />
+          <UProgress animation="carousel" />
         </UCard>
 
         <!-- Preview Step -->
@@ -197,30 +198,14 @@ function viewExperiences() {
             />
           </template>
 
-          <div v-if="extractedExperiences.length > 0">
-            <h3>{{ t('cvUpload.sections.experiences') }} ({{ extractedExperiences.length }})</h3>
-
-            <UCard v-for="(exp, index) in extractedExperiences" :key="index">
+          <UPageGrid v-if="extractedExperiences.length > 0">
+            <UCard v-for="(exp, index) in extractedExperiences" :key="index" class="lg:col-span-3">
               <template #header>
-                <div>
-                  <UPageHeader :title="exp.title" :description="exp.company">
-                    <template #actions>
-                      <UButton
-                        icon="i-heroicons-x-mark"
-                        color="error"
-                        variant="ghost"
-                        size="sm"
-                        :aria-label="t('cvUpload.removeExperience')"
-                        @click="removeExperience(index)"
-                      />
-                    </template>
-                  </UPageHeader>
-                </div>
+                <UPageHeader :title="exp.title" :description="exp.company" />
+                <UBadge color="neutral" variant="subtle" size="sm">
+                  {{ exp.startDate }} - {{ exp.endDate || t('experiences.present') }}
+                </UBadge>
               </template>
-
-              <UBadge color="neutral" variant="subtle" size="sm">
-                {{ exp.startDate }} - {{ exp.endDate || t('experiences.present') }}
-              </UBadge>
 
               <template v-if="exp.responsibilities.length > 0">
                 <p>{{ t('experiences.form.responsibilities') }}:</p>
@@ -235,8 +220,19 @@ function viewExperiences() {
                   </li>
                 </ul>
               </template>
+
+              <template #footer>
+                <UButton
+                  icon="i-heroicons-trash"
+                  color="error"
+                  variant="outline"
+                  size="sm"
+                  :label="t('cvUpload.removeExperience')"
+                  @click="removeExperience(index)"
+                />
+              </template>
             </UCard>
-          </div>
+          </UPageGrid>
 
           <template #footer>
             <UButton
@@ -255,11 +251,8 @@ function viewExperiences() {
 
         <!-- Importing Step -->
         <UCard v-if="currentStep === 'importing'">
-          <UEmpty :title="t('cvUpload.importing')">
-            <template #icon>
-              <UIcon name="i-heroicons-arrow-path" class="animate-spin" />
-            </template>
-          </UEmpty>
+          <UEmpty icon="i-heroicons-arrow-path" :title="t('cvUpload.importing')" />
+          <UProgress animation="carousel" />
         </UCard>
 
         <!-- Complete Step -->
