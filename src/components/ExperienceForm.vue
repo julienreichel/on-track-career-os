@@ -101,7 +101,11 @@ function handleCancel() {
     <form class="space-y-6" @submit.prevent="handleSubmit">
       <!-- Title -->
       <UFormField :label="t('experiences.form.title')" required>
-        <UInput v-model="form.title" :placeholder="t('experiences.form.titlePlaceholder')" class="w-full lg:w-1/2" />
+        <UInput
+          v-model="form.title"
+          :placeholder="t('experiences.form.titlePlaceholder')"
+          class="w-full lg:w-1/2"
+        />
       </UFormField>
 
       <!-- Company Name -->
