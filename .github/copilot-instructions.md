@@ -153,13 +153,6 @@ const { t } = useI18n();
 - **Specialized**: UAuthForm, UPricingPlan, UPricingPlans, UPricingTable, UCarousel, UMarquee, UBanner, UColorModeButton, UColorModeSwitch, UColorModeSelect, UColorModeAvatar, UColorModeImage, ULocaleSelect, USeparator, UFieldGroup
 - **Composables**: useToast(), useOverlay(), useFormField(), defineShortcuts()
 
-**Critical Notes:**
-
-- Use `UFormField` (NOT `UFormGroup`) for form field wrapping
-- `UFormField` accepts `:label` and `:hint` as props, not template slots
-- All components auto-imported, no manual imports needed
-- Full docs: `https://ui.nuxt.com/docs/components/[component-name]` or see `docs/Nuxt UI.md`
-
 ## Critical Conventions
 
 ### Project Structure
