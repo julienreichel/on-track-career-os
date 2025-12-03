@@ -100,58 +100,60 @@ function handleCancel() {
 
     <form class="space-y-6" @submit.prevent="handleSubmit">
       <!-- Title -->
-      <UFormGroup :label="t('experiences.form.title')" required>
-        <UInput v-model="form.title" :placeholder="t('experiences.form.titlePlaceholder')" />
-      </UFormGroup>
+      <UFormField :label="t('experiences.form.title')" required>
+        <UInput v-model="form.title" :placeholder="t('experiences.form.titlePlaceholder')" class="w-full lg:w-1/2" />
+      </UFormField>
 
       <!-- Company Name -->
-      <UFormGroup :label="t('experiences.form.company')">
+      <UFormField :label="t('experiences.form.company')">
         <UInput
           v-model="form.companyName"
           :placeholder="t('experiences.form.companyPlaceholder')"
+          class="w-full lg:w-1/2"
         />
-      </UFormGroup>
+      </UFormField>
 
       <!-- Dates -->
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <UFormGroup :label="t('experiences.form.startDate')" required>
+        <UFormField :label="t('experiences.form.startDate')" required>
           <UInput v-model="form.startDate" type="date" />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup :label="t('experiences.form.endDate')">
+        <UFormField
+          :label="t('experiences.form.endDate')"
+          :hint="t('experiences.form.endDateHint')"
+        >
           <UInput v-model="form.endDate" type="date" />
-          <template #hint>
-            <span class="text-xs">{{ t('experiences.form.endDateHint') }}</span>
-          </template>
-        </UFormGroup>
+        </UFormField>
       </div>
 
       <!-- Responsibilities -->
-      <UFormGroup :label="t('experiences.form.responsibilities')">
+      <UFormField
+        :label="t('experiences.form.responsibilities')"
+        :hint="t('experiences.form.responsibilitiesHint')"
+      >
         <UTextarea
           v-model="responsibilitiesText"
           :placeholder="t('experiences.form.responsibilitiesPlaceholder')"
           :rows="5"
+          resize="none"
+          class="w-full"
         />
-        <template #hint>
-          <span class="text-xs">{{ t('experiences.form.responsibilitiesHint') }}</span>
-        </template>
-      </UFormGroup>
+      </UFormField>
 
       <!-- Tasks -->
-      <UFormGroup :label="t('experiences.form.tasks')">
+      <UFormField :label="t('experiences.form.tasks')" :hint="t('experiences.form.tasksHint')">
         <UTextarea
           v-model="tasksText"
           :placeholder="t('experiences.form.tasksPlaceholder')"
           :rows="5"
+          resize="none"
+          class="w-full"
         />
-        <template #hint>
-          <span class="text-xs">{{ t('experiences.form.tasksHint') }}</span>
-        </template>
-      </UFormGroup>
+      </UFormField>
 
       <!-- Status -->
-      <UFormGroup :label="t('experiences.form.status')">
+      <UFormField :label="t('experiences.form.status')">
         <USelect
           v-model="form.status"
           :options="[
@@ -161,7 +163,7 @@ function handleCancel() {
           option-attribute="label"
           value-attribute="value"
         />
-      </UFormGroup>
+      </UFormField>
 
       <!-- Actions -->
       <div class="flex justify-end gap-3">

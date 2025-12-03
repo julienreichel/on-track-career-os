@@ -93,46 +93,41 @@ function handleCancel() {
         :title="
           isNewExperience ? t('experiences.form.createTitle') : t('experiences.form.editTitle')
         "
-      >
-        <template #actions>
-          <UButton
-            icon="i-heroicons-arrow-left"
-            color="neutral"
-            variant="ghost"
-            :label="t('experiences.list.title')"
-            to="/profile/experiences"
-          />
-        </template>
-      </UPageHeader>
+        :links="[
+          {
+            label: t('experiences.list.title'),
+            icon: 'i-heroicons-arrow-left',
+            to: '/profile/experiences',
+          },
+        ]"
+      />
 
       <UPageBody>
-        <div class="space-y-6">
-          <!-- Error Alert -->
-          <UAlert
-            v-if="errorMessage"
-            icon="i-heroicons-exclamation-triangle"
-            color="error"
-            variant="soft"
-            :title="t('cvUpload.errors.unknown')"
-            :description="errorMessage"
-            :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'red', variant: 'link' }"
-            @close="errorMessage = null"
-          />
+        <!-- Error Alert -->
+        <UAlert
+          v-if="errorMessage"
+          icon="i-heroicons-exclamation-triangle"
+          color="error"
+          variant="soft"
+          :title="t('cvUpload.errors.unknown')"
+          :description="errorMessage"
+          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'red', variant: 'link' }"
+          @close="errorMessage = null"
+        />
 
-          <!-- Loading State -->
-          <div v-if="loading" class="flex justify-center py-12">
-            <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin text-primary" />
-          </div>
-
-          <!-- Experience Form -->
-          <experience-form
-            v-else
-            :experience="experience"
-            :loading="saving"
-            @save="handleSave"
-            @cancel="handleCancel"
-          />
+        <!-- Loading State -->
+        <div v-if="loading" class="flex justify-center py-12">
+          <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin text-primary" />
         </div>
+
+        <!-- Experience Form -->
+        <experience-form
+          v-else
+          :experience="experience"
+          :loading="saving"
+          @save="handleSave"
+          @cancel="handleCancel"
+        />
       </UPageBody>
     </UPage>
   </UContainer>
