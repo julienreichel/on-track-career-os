@@ -1,4 +1,4 @@
-import { CVDocumentRepository } from './CVDocumentRepository'
+import { CVDocumentRepository } from './CVDocumentRepository';
 import type { CVDocument } from './CVDocument';
 // import { loadLazy } from '@/data/graphql/lazy'
 

@@ -1,4 +1,4 @@
-import { PersonalCanvasRepository } from './PersonalCanvasRepository'
+import { PersonalCanvasRepository } from './PersonalCanvasRepository';
 import type { PersonalCanvas } from './PersonalCanvas';
 // import { loadLazy } from '@/data/graphql/lazy'
 

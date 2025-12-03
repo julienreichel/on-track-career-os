@@ -96,11 +96,7 @@ async function handleFileSelect(files: File[]) {
         {{ t('cvUpload.description') }}
       </p>
 
-      <UDropzone
-accept=".pdf,.txt"
-:max-files="1"
-:loading="loading"
-@change="handleFileSelect">
+      <UDropzone accept=".pdf,.txt" :max-files="1" :loading="loading" @change="handleFileSelect">
         <template #default>
           <div class="flex flex-col items-center gap-2 text-center">
             <UIcon name="i-heroicons-document-text" class="h-8 w-8 text-gray-400" />

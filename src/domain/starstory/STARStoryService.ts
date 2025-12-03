@@ -1,4 +1,4 @@
-import { STARStoryRepository } from './STARStoryRepository'
+import { STARStoryRepository } from './STARStoryRepository';
 import type { STARStory } from './STARStory';
 // import { loadLazy } from '@/data/graphql/lazy'
 

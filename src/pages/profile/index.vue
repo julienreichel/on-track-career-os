@@ -33,34 +33,34 @@
           </template>
 
           <div class="space-y-4">
-            <UFormGroup :label="t('profile.fields.fullName')" required>
+            <UFormField :label="t('profile.fields.fullName')" required>
               <UInput
                 v-model="form.fullName"
                 :placeholder="t('profile.fields.fullNamePlaceholder')"
                 required
               />
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup :label="t('profile.fields.headline')">
+            <UFormField :label="t('profile.fields.headline')">
               <UInput
                 v-model="form.headline"
                 :placeholder="t('profile.fields.headlinePlaceholder')"
               />
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup :label="t('profile.fields.location')">
+            <UFormField :label="t('profile.fields.location')">
               <UInput
                 v-model="form.location"
                 :placeholder="t('profile.fields.locationPlaceholder')"
               />
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup :label="t('profile.fields.seniorityLevel')">
+            <UFormField :label="t('profile.fields.seniorityLevel')">
               <UInput
                 v-model="form.seniorityLevel"
                 :placeholder="t('profile.fields.seniorityLevelPlaceholder')"
               />
-            </UFormGroup>
+            </UFormField>
           </div>
         </UCard>
 
@@ -73,10 +73,7 @@
           </template>
 
           <div class="space-y-4">
-            <UFormGroup :label="t('profile.fields.goals')">
-              <template #hint>
-                <span class="text-sm text-gray-500">{{ t('profile.fields.goalsHint') }}</span>
-              </template>
+            <UFormField :label="t('profile.fields.goals')" :hint="t('profile.fields.goalsHint')">
               <UInput
                 v-model="goalInput"
                 :placeholder="t('profile.fields.goalsPlaceholder')"
@@ -100,12 +97,12 @@
                   />
                 </UBadge>
               </div>
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup :label="t('profile.fields.aspirations')">
-              <template #hint>
-                <span class="text-sm text-gray-500">{{ t('profile.fields.aspirationsHint') }}</span>
-              </template>
+            <UFormField
+              :label="t('profile.fields.aspirations')"
+              :hint="t('profile.fields.aspirationsHint')"
+            >
               <UInput
                 v-model="aspirationInput"
                 :placeholder="t('profile.fields.aspirationsPlaceholder')"
@@ -129,7 +126,7 @@
                   />
                 </UBadge>
               </div>
-            </UFormGroup>
+            </UFormField>
           </div>
         </UCard>
 
@@ -142,12 +139,10 @@
           </template>
 
           <div class="space-y-4">
-            <UFormGroup :label="t('profile.fields.personalValues')">
-              <template #hint>
-                <span class="text-sm text-gray-500">{{
-                  t('profile.fields.personalValuesHint')
-                }}</span>
-              </template>
+            <UFormField
+              :label="t('profile.fields.personalValues')"
+              :hint="t('profile.fields.personalValuesHint')"
+            >
               <UInput
                 v-model="personalValueInput"
                 :placeholder="t('profile.fields.personalValuesPlaceholder')"
@@ -171,12 +166,12 @@
                   />
                 </UBadge>
               </div>
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup :label="t('profile.fields.strengths')">
-              <template #hint>
-                <span class="text-sm text-gray-500">{{ t('profile.fields.strengthsHint') }}</span>
-              </template>
+            <UFormField
+              :label="t('profile.fields.strengths')"
+              :hint="t('profile.fields.strengthsHint')"
+            >
               <UInput
                 v-model="strengthInput"
                 :placeholder="t('profile.fields.strengthsPlaceholder')"
@@ -200,12 +195,12 @@
                   />
                 </UBadge>
               </div>
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup :label="t('profile.fields.interests')">
-              <template #hint>
-                <span class="text-sm text-gray-500">{{ t('profile.fields.interestsHint') }}</span>
-              </template>
+            <UFormField
+              :label="t('profile.fields.interests')"
+              :hint="t('profile.fields.interestsHint')"
+            >
               <UInput
                 v-model="interestInput"
                 :placeholder="t('profile.fields.interestsPlaceholder')"
@@ -229,7 +224,7 @@
                   />
                 </UBadge>
               </div>
-            </UFormGroup>
+            </UFormField>
           </div>
         </UCard>
 
@@ -242,10 +237,7 @@
           </template>
 
           <div class="space-y-4">
-            <UFormGroup :label="t('profile.fields.skills')">
-              <template #hint>
-                <span class="text-sm text-gray-500">{{ t('profile.fields.skillsHint') }}</span>
-              </template>
+            <UFormField :label="t('profile.fields.skills')" :hint="t('profile.fields.skillsHint')">
               <UInput
                 v-model="skillInput"
                 :placeholder="t('profile.fields.skillsPlaceholder')"
@@ -269,14 +261,12 @@
                   />
                 </UBadge>
               </div>
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup :label="t('profile.fields.certifications')">
-              <template #hint>
-                <span class="text-sm text-gray-500">{{
-                  t('profile.fields.certificationsHint')
-                }}</span>
-              </template>
+            <UFormField
+              :label="t('profile.fields.certifications')"
+              :hint="t('profile.fields.certificationsHint')"
+            >
               <UInput
                 v-model="certificationInput"
                 :placeholder="t('profile.fields.certificationsPlaceholder')"
@@ -300,12 +290,12 @@
                   />
                 </UBadge>
               </div>
-            </UFormGroup>
+            </UFormField>
 
-            <UFormGroup :label="t('profile.fields.languages')">
-              <template #hint>
-                <span class="text-sm text-gray-500">{{ t('profile.fields.languagesHint') }}</span>
-              </template>
+            <UFormField
+              :label="t('profile.fields.languages')"
+              :hint="t('profile.fields.languagesHint')"
+            >
               <UInput
                 v-model="languageInput"
                 :placeholder="t('profile.fields.languagesPlaceholder')"
@@ -329,17 +319,13 @@
                   />
                 </UBadge>
               </div>
-            </UFormGroup>
+            </UFormField>
           </div>
         </UCard>
 
         <!-- Form Actions -->
         <div class="flex justify-end gap-3">
-          <UButton
-type="button"
-color="gray"
-variant="ghost"
-@click="handleCancel">
+          <UButton type="button" color="gray" variant="ghost" @click="handleCancel">
             {{ t('profile.actions.cancel') }}
           </UButton>
           <UButton
