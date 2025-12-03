@@ -89,12 +89,52 @@
             </h3>
           </template>
 
-          <div class="space-y-4">
+          <!-- Display Mode -->
+          <div v-if="!isEditing" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.fullName') }}
+                <span class="text-red-500">*</span>
+              </label>
+              <p class="text-base text-gray-900 dark:text-gray-100">
+                {{ form.fullName || '-' }}
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.headline') }}
+              </label>
+              <p class="text-base text-gray-900 dark:text-gray-100">
+                {{ form.headline || '-' }}
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.location') }}
+              </label>
+              <p class="text-base text-gray-900 dark:text-gray-100">
+                {{ form.location || '-' }}
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.seniorityLevel') }}
+              </label>
+              <p class="text-base text-gray-900 dark:text-gray-100">
+                {{ form.seniorityLevel || '-' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Edit Mode -->
+          <div v-else class="space-y-4">
             <UFormField :label="t('profile.fields.fullName')" required>
               <UInput
                 v-model="form.fullName"
                 :placeholder="t('profile.fields.fullNamePlaceholder')"
-                :disabled="!isEditing"
                 required
               />
             </UFormField>
@@ -103,23 +143,17 @@
               <UInput
                 v-model="form.headline"
                 :placeholder="t('profile.fields.headlinePlaceholder')"
-                :disabled="!isEditing"
               />
             </UFormField>
 
             <UFormField :label="t('profile.fields.location')">
-              <UInput
-                v-model="form.location"
-                :placeholder="t('profile.fields.locationPlaceholder')"
-                :disabled="!isEditing"
-              />
+              <UInput v-model="form.location" :placeholder="t('profile.fields.locationPlaceholder')" />
             </UFormField>
 
             <UFormField :label="t('profile.fields.seniorityLevel')">
               <UInput
                 v-model="form.seniorityLevel"
                 :placeholder="t('profile.fields.seniorityLevelPlaceholder')"
-                :disabled="!isEditing"
               />
             </UFormField>
           </div>
@@ -133,13 +167,40 @@
             </h3>
           </template>
 
-          <div class="space-y-4">
+          <!-- Display Mode -->
+          <div v-if="!isEditing" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.goals') }}
+              </label>
+              <div v-if="form.goals.length > 0" class="flex flex-wrap gap-2">
+                <UBadge v-for="(goal, index) in form.goals" :key="index" color="primary" variant="subtle">
+                  {{ goal }}
+                </UBadge>
+              </div>
+              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.aspirations') }}
+              </label>
+              <div v-if="form.aspirations.length > 0" class="flex flex-wrap gap-2">
+                <UBadge v-for="(aspiration, index) in form.aspirations" :key="index" color="primary" variant="subtle">
+                  {{ aspiration }}
+                </UBadge>
+              </div>
+              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
+            </div>
+          </div>
+
+          <!-- Edit Mode -->
+          <div v-else class="space-y-4">
             <TagInput
               v-model="form.goals"
               :label="t('profile.fields.goals')"
               :placeholder="t('profile.fields.goalsPlaceholder')"
               :hint="t('profile.fields.goalsHint')"
-              :disabled="!isEditing"
               color="primary"
             />
 
@@ -148,7 +209,6 @@
               :label="t('profile.fields.aspirations')"
               :placeholder="t('profile.fields.aspirationsPlaceholder')"
               :hint="t('profile.fields.aspirationsHint')"
-              :disabled="!isEditing"
               color="primary"
             />
           </div>
@@ -162,13 +222,52 @@
             </h3>
           </template>
 
-          <div class="space-y-4">
+          <!-- Display Mode -->
+          <div v-if="!isEditing" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.personalValues') }}
+              </label>
+              <div v-if="form.personalValues.length > 0" class="flex flex-wrap gap-2">
+                <UBadge v-for="(value, index) in form.personalValues" :key="index" color="info" variant="subtle">
+                  {{ value }}
+                </UBadge>
+              </div>
+              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.strengths') }}
+              </label>
+              <div v-if="form.strengths.length > 0" class="flex flex-wrap gap-2">
+                <UBadge v-for="(strength, index) in form.strengths" :key="index" color="info" variant="subtle">
+                  {{ strength }}
+                </UBadge>
+              </div>
+              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.interests') }}
+              </label>
+              <div v-if="form.interests.length > 0" class="flex flex-wrap gap-2">
+                <UBadge v-for="(interest, index) in form.interests" :key="index" color="info" variant="subtle">
+                  {{ interest }}
+                </UBadge>
+              </div>
+              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
+            </div>
+          </div>
+
+          <!-- Edit Mode -->
+          <div v-else class="space-y-4">
             <TagInput
               v-model="form.personalValues"
               :label="t('profile.fields.personalValues')"
               :placeholder="t('profile.fields.personalValuesPlaceholder')"
               :hint="t('profile.fields.personalValuesHint')"
-              :disabled="!isEditing"
               color="info"
             />
 
@@ -177,7 +276,6 @@
               :label="t('profile.fields.strengths')"
               :placeholder="t('profile.fields.strengthsPlaceholder')"
               :hint="t('profile.fields.strengthsHint')"
-              :disabled="!isEditing"
               color="info"
             />
 
@@ -186,7 +284,6 @@
               :label="t('profile.fields.interests')"
               :placeholder="t('profile.fields.interestsPlaceholder')"
               :hint="t('profile.fields.interestsHint')"
-              :disabled="!isEditing"
               color="info"
             />
           </div>
@@ -200,13 +297,52 @@
             </h3>
           </template>
 
-          <div class="space-y-4">
+          <!-- Display Mode -->
+          <div v-if="!isEditing" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.skills') }}
+              </label>
+              <div v-if="form.skills.length > 0" class="flex flex-wrap gap-2">
+                <UBadge v-for="(skill, index) in form.skills" :key="index" color="success" variant="subtle">
+                  {{ skill }}
+                </UBadge>
+              </div>
+              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.certifications') }}
+              </label>
+              <div v-if="form.certifications.length > 0" class="flex flex-wrap gap-2">
+                <UBadge v-for="(cert, index) in form.certifications" :key="index" color="success" variant="subtle">
+                  {{ cert }}
+                </UBadge>
+              </div>
+              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.languages') }}
+              </label>
+              <div v-if="form.languages.length > 0" class="flex flex-wrap gap-2">
+                <UBadge v-for="(lang, index) in form.languages" :key="index" color="success" variant="subtle">
+                  {{ lang }}
+                </UBadge>
+              </div>
+              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
+            </div>
+          </div>
+
+          <!-- Edit Mode -->
+          <div v-else class="space-y-4">
             <TagInput
               v-model="form.skills"
               :label="t('profile.fields.skills')"
               :placeholder="t('profile.fields.skillsPlaceholder')"
               :hint="t('profile.fields.skillsHint')"
-              :disabled="!isEditing"
               color="success"
             />
 
@@ -215,7 +351,6 @@
               :label="t('profile.fields.certifications')"
               :placeholder="t('profile.fields.certificationsPlaceholder')"
               :hint="t('profile.fields.certificationsHint')"
-              :disabled="!isEditing"
               color="success"
             />
 
@@ -224,7 +359,6 @@
               :label="t('profile.fields.languages')"
               :placeholder="t('profile.fields.languagesPlaceholder')"
               :hint="t('profile.fields.languagesHint')"
-              :disabled="!isEditing"
               color="success"
             />
           </div>
