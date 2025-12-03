@@ -189,7 +189,7 @@ describe('ExperienceList', () => {
     const wrapper = createWrapper({ experiences: mockExperiences });
     // Note: formatDate function with h() may not render text in test environment
     // Verify component renders with experiences that have null endDate
-    const experienceWithNoEndDate = mockExperiences.find(exp => !exp.endDate);
+    const experienceWithNoEndDate = mockExperiences.find((exp) => !exp.endDate);
     expect(experienceWithNoEndDate).toBeDefined();
     expect(wrapper.exists()).toBe(true);
   });
