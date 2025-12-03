@@ -221,7 +221,13 @@ function viewExperiences() {
               <template v-if="exp.responsibilities.length > 0">
                 <p class="font-semibold mb-2">{{ t('experiences.form.responsibilities') }}:</p>
                 <ul class="list-disc list-inside space-y-1 mb-4">
-                  <li v-for="(resp, idx) in exp.responsibilities.slice(0, exp.responsibilities.length > 3 ? 2 : exp.responsibilities.length)" :key="idx">
+                  <li
+                    v-for="(resp, idx) in exp.responsibilities.slice(
+                      0,
+                      exp.responsibilities.length > 3 ? 2 : exp.responsibilities.length
+                    )"
+                    :key="idx"
+                  >
                     {{ resp }}
                   </li>
                   <li v-if="exp.responsibilities.length > 3">
@@ -235,7 +241,13 @@ function viewExperiences() {
               <template v-if="exp.tasks.length > 0">
                 <p class="font-semibold mb-2">{{ t('experiences.form.tasks') }}:</p>
                 <ul class="list-disc list-inside space-y-1">
-                  <li v-for="(task, idx) in exp.tasks.slice(0, exp.tasks.length > 3 ? 2 : exp.tasks.length)" :key="idx">
+                  <li
+                    v-for="(task, idx) in exp.tasks.slice(
+                      0,
+                      exp.tasks.length > 3 ? 2 : exp.tasks.length
+                    )"
+                    :key="idx"
+                  >
                     {{ task }}
                   </li>
                   <li v-if="exp.tasks.length > 3">
