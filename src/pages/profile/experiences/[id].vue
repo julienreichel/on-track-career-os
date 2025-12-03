@@ -1,0 +1,139 @@
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter, useRoute } from 'vue-router';
+import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import type { Experience, ExperienceCreateInput } from '@/domain/experience/Experience';
+import ExperienceForm from '@/components/ExperienceForm.vue';
+
+const { t } = useI18n();
+const router = useRouter();
+const route = useRoute();
+const experienceRepo = new ExperienceRepository();
+
+const experience = ref<Experience | null>(null);
+const loading = ref(false);
+const saving = ref(false);
+const errorMessage = ref<string | null>(null);
+
+const experienceId = computed(() => {
+  const id = route.params.id;
+  return typeof id === 'string' ? id : null;
+});
+
+const isNewExperience = computed(() => experienceId.value === 'new' || !experienceId.value);
+
+// Load experience if editing
+onMounted(async () => {
+  if (!isNewExperience.value && experienceId.value) {
+    await loadExperience(experienceId.value);
+  }
+});
+
+async function loadExperience(id: string) {
+  loading.value = true;
+  errorMessage.value = null;
+
+  try {
+    const result = await experienceRepo.get(id);
+    if (!result) {
+      throw new Error('Experience not found');
+    }
+    experience.value = result;
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : 'Failed to load experience';
+    console.error('[experience] Error loading experience:', error);
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function handleSave(data: ExperienceCreateInput) {
+  saving.value = true;
+  errorMessage.value = null;
+
+  try {
+    // Get current user ID
+    const user = useNuxtApp().$Amplify.Auth.getCurrentUser();
+    const userId = (await user).userId;
+
+    if (isNewExperience.value) {
+      // Create new experience
+      await experienceRepo.create({
+        ...data,
+        userId,
+      });
+    } else if (experienceId.value) {
+      // Update existing experience
+      await experienceRepo.update({
+        id: experienceId.value,
+        ...data,
+      });
+    }
+
+    // Navigate back to list
+    router.push('/profile/experiences');
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : 'Failed to save experience';
+    console.error('[experience] Error saving experience:', error);
+  } finally {
+    saving.value = false;
+  }
+}
+
+function handleCancel() {
+  router.push('/profile/experiences');
+}
+</script>
+
+<template>
+  <UContainer>
+    <UPage>
+      <UPageHeader
+        :title="
+          isNewExperience ? t('experiences.form.createTitle') : t('experiences.form.editTitle')
+        "
+      >
+        <template #actions>
+          <UButton
+            icon="i-heroicons-arrow-left"
+            color="gray"
+            variant="ghost"
+            :label="t('experiences.list.title')"
+            to="/profile/experiences"
+          />
+        </template>
+      </UPageHeader>
+
+      <UPageBody>
+        <div class="space-y-6">
+          <!-- Error Alert -->
+          <UAlert
+            v-if="errorMessage"
+            icon="i-heroicons-exclamation-triangle"
+            color="red"
+            variant="soft"
+            :title="t('cvUpload.errors.unknown')"
+            :description="errorMessage"
+            :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'red', variant: 'link' }"
+            @close="errorMessage = null"
+          />
+
+          <!-- Loading State -->
+          <div v-if="loading" class="flex justify-center py-12">
+            <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin text-primary" />
+          </div>
+
+          <!-- Experience Form -->
+          <experience-form
+            v-else
+            :experience="experience"
+            :loading="saving"
+            @save="handleSave"
+            @cancel="handleCancel"
+          />
+        </div>
+      </UPageBody>
+    </UPage>
+  </UContainer>
+</template>

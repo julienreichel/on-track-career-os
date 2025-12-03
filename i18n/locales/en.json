@@ -31,5 +31,85 @@
       "title": "Interview Prep",
       "description": "Prepare for interviews with AI assistance"
     }
+  },
+  "cvUpload": {
+    "title": "Upload Your CV",
+    "description": "Upload your CV to extract your professional experience automatically.",
+    "dropzoneText": "Drop your CV here or click to browse",
+    "dropzoneHint": "Supports PDF and TXT files (max 5MB)",
+    "fileUploaded": "File uploaded: {fileName}",
+    "parsing": "Parsing your CV...",
+    "parsingDescription": "AI is extracting your experiences and information.",
+    "parsedTitle": "Extracted Information",
+    "parsedDescription": "Review the extracted information before importing.",
+    "sections": {
+      "experiences": "Experiences",
+      "education": "Education",
+      "skills": "Skills",
+      "certifications": "Certifications"
+    },
+    "confirmImport": "Import Experiences",
+    "cancel": "Cancel",
+    "importing": "Creating experiences...",
+    "success": "Successfully imported {count} experience(s)",
+    "viewExperiences": "View Experiences",
+    "errors": {
+      "invalidFileType": "Invalid file type. Please upload a PDF or TXT file.",
+      "fileTooLarge": "File is too large. Maximum size is 5MB.",
+      "noTextExtracted": "No text could be extracted from the file.",
+      "fileReadError": "Error reading file. Please try again.",
+      "unknown": "An unknown error occurred",
+      "parsingFailed": "Failed to parse CV. Please try again or enter experiences manually.",
+      "extractionFailed": "Failed to extract experiences. Please try again.",
+      "importFailed": "Failed to import experiences. Please try again."
+    }
+  },
+  "experiences": {
+    "present": "Present",
+    "status": {
+      "draft": "Draft",
+      "complete": "Complete"
+    },
+    "list": {
+      "title": "Your Experiences",
+      "addNew": "Add Experience",
+      "edit": "Edit",
+      "delete": "Delete",
+      "empty": "No experiences yet. Upload a CV or add one manually."
+    },
+    "table": {
+      "title": "Title",
+      "company": "Company",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "form": {
+      "createTitle": "Add Experience",
+      "editTitle": "Edit Experience",
+      "title": "Job Title",
+      "titlePlaceholder": "e.g., Senior Software Engineer",
+      "company": "Company Name",
+      "companyPlaceholder": "e.g., Acme Corporation",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "endDateHint": "Leave empty if this is your current position",
+      "responsibilities": "Responsibilities",
+      "responsibilitiesPlaceholder": "Enter each responsibility on a new line",
+      "responsibilitiesHint": "One responsibility per line",
+      "tasks": "Tasks & Achievements",
+      "tasksPlaceholder": "Enter each task or achievement on a new line",
+      "tasksHint": "One task per line",
+      "status": "Status",
+      "save": "Save Experience",
+      "cancel": "Cancel"
+    },
+    "delete": {
+      "title": "Delete Experience",
+      "message": "Are you sure you want to delete this experience? This action cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
   }
 }
