@@ -15,6 +15,10 @@
       "title": "Profile",
       "description": "Build your professional profile and personal canvas"
     },
+    "cvUpload": {
+      "title": "Upload CV",
+      "description": "Upload your CV to extract experiences automatically"
+    },
     "experiences": {
       "title": "Experiences",
       "description": "Document your work experiences and achievements"
@@ -110,6 +114,60 @@
       "message": "Are you sure you want to delete this experience? This action cannot be undone.",
       "confirm": "Delete",
       "cancel": "Cancel"
+    }
+  },
+  "profile": {
+    "title": "Your Profile",
+    "description": "Manage your professional identity and career direction",
+    "sections": {
+      "coreIdentity": "Core Identity",
+      "careerDirection": "Career Direction",
+      "identityValues": "Identity & Values",
+      "professionalAttributes": "Professional Attributes"
+    },
+    "fields": {
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "John Doe",
+      "headline": "Professional Headline",
+      "headlinePlaceholder": "Senior Software Engineer",
+      "location": "Location",
+      "locationPlaceholder": "San Francisco, CA",
+      "seniorityLevel": "Seniority Level",
+      "seniorityLevelPlaceholder": "Senior",
+      "goals": "Career Goals",
+      "goalsPlaceholder": "e.g., Become engineering manager",
+      "goalsHint": "Press Enter to add each goal",
+      "aspirations": "Career Aspirations",
+      "aspirationsPlaceholder": "e.g., Lead cross-functional teams",
+      "aspirationsHint": "Press Enter to add each aspiration",
+      "personalValues": "Personal Values",
+      "personalValuesPlaceholder": "e.g., Integrity",
+      "personalValuesHint": "Press Enter to add each value",
+      "strengths": "Strengths",
+      "strengthsPlaceholder": "e.g., System design",
+      "strengthsHint": "Press Enter to add each strength",
+      "interests": "Interests",
+      "interestsPlaceholder": "e.g., AI ethics",
+      "interestsHint": "Press Enter to add each interest",
+      "skills": "Skills",
+      "skillsPlaceholder": "e.g., Vue.js",
+      "skillsHint": "Press Enter to add each skill",
+      "certifications": "Certifications",
+      "certificationsPlaceholder": "e.g., AWS Architect",
+      "certificationsHint": "Press Enter to add each certification",
+      "languages": "Languages",
+      "languagesPlaceholder": "e.g., English",
+      "languagesHint": "Press Enter to add each language"
+    },
+    "actions": {
+      "save": "Save Profile",
+      "cancel": "Cancel",
+      "saving": "Saving..."
+    },
+    "messages": {
+      "saveSuccess": "Profile saved successfully",
+      "saveError": "Failed to save profile. Please try again.",
+      "loadError": "Failed to load profile. Please try again."
     }
   }
 }

@@ -9,11 +9,19 @@
             :title="t('features.profile.title')"
             :description="t('features.profile.description')"
             icon="i-heroicons-user-circle"
+            :to="{ name: 'profile' }"
+          />
+          <UPageCard
+            :title="t('features.cvUpload.title')"
+            :description="t('features.cvUpload.description')"
+            icon="i-heroicons-arrow-up-tray"
+            :to="{ name: 'profile-cv-upload' }"
           />
           <UPageCard
             :title="t('features.experiences.title')"
             :description="t('features.experiences.description')"
             icon="i-heroicons-briefcase"
+            :to="{ name: 'profile-experiences' }"
           />
           <UPageCard
             :title="t('features.jobs.title')"
