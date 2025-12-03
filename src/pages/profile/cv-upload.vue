@@ -201,7 +201,18 @@ function viewExperiences() {
           <UPageGrid v-if="extractedExperiences.length > 0">
             <UCard v-for="(exp, index) in extractedExperiences" :key="index" class="lg:col-span-3">
               <template #header>
-                <UPageHeader :title="exp.title" :description="exp.company" />
+                <UPageHeader
+                  :title="exp.title"
+                  :description="exp.company"
+                  :links="[
+                    {
+                      label: t('cvUpload.removeExperience'),
+                      icon: 'i-heroicons-trash',
+                      color: 'error',
+                      onClick: () => removeExperience(index),
+                    },
+                  ]"
+                />
                 <UBadge color="neutral" variant="subtle" size="sm">
                   {{ exp.startDate }} - {{ exp.endDate || t('experiences.present') }}
                 </UBadge>
@@ -219,17 +230,6 @@ function viewExperiences() {
                     </UBadge>
                   </li>
                 </ul>
-              </template>
-
-              <template #footer>
-                <UButton
-                  icon="i-heroicons-trash"
-                  color="error"
-                  variant="outline"
-                  size="sm"
-                  :label="t('cvUpload.removeExperience')"
-                  @click="removeExperience(index)"
-                />
               </template>
             </UCard>
           </UPageGrid>
