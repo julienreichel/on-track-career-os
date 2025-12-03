@@ -1,5 +1,5 @@
 import { UserProfileRepository } from './UserProfileRepository';
-import type { UserProfile } from './UserProfile';
+import type { UserProfile, UserProfileUpdateInput } from './UserProfile';
 // import { loadLazy } from '@/data/graphql/lazy'
 
 export class UserProfileService {
@@ -13,5 +13,9 @@ export class UserProfileService {
     // const relations = await loadLazy(item.experiences);
 
     return item;
+  }
+
+  async updateUserProfile(input: UserProfileUpdateInput): Promise<UserProfile | null> {
+    return await this.repo.update(input);
   }
 }

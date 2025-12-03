@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
-import type { UserProfile } from '@/domain/user-profile/UserProfile';
+import type { UserProfile, UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
 
 export function useUserProfile(id: string) {
   const item = ref<UserProfile | null>(null);
@@ -22,5 +22,21 @@ export function useUserProfile(id: string) {
     }
   };
 
-  return { item, loading, error, load };
+  const save = async (input: UserProfileUpdateInput) => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      item.value = await service.updateUserProfile(input);
+      return true;
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error occurred';
+      console.error('[useUserProfile] Error saving profile:', err);
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  return { item, loading, error, load, save };
 }

@@ -1,10 +1,16 @@
 <template>
   <UFormField :label="label" :hint="hint" :required="required">
-    <UInput v-model="inputValue" :placeholder="placeholder" @keydown="handleKeydown" />
+    <UInput
+      v-model="inputValue"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      @keydown="handleKeydown"
+    />
     <div v-if="modelValue.length > 0" class="mt-2 flex flex-wrap gap-2">
       <UBadge v-for="(item, index) in modelValue" :key="index" :color="color" variant="subtle">
         {{ item }}
         <UButton
+          v-if="!disabled"
           icon="i-heroicons-x-mark-20-solid"
           size="xs"
           :color="color"
@@ -27,6 +33,7 @@ interface Props {
   hint?: string;
   color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral';
   required?: boolean;
+  disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -34,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
   hint: '',
   color: 'primary',
   required: false,
+  disabled: false,
 });
 
 const emit = defineEmits<{
