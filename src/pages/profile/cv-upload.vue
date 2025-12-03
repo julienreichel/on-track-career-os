@@ -219,14 +219,28 @@ function viewExperiences() {
               </template>
 
               <template v-if="exp.responsibilities.length > 0">
-                <p>{{ t('experiences.form.responsibilities') }}:</p>
-                <ul>
-                  <li v-for="(resp, idx) in exp.responsibilities.slice(0, 3)" :key="idx">
+                <p class="font-semibold mb-2">{{ t('experiences.form.responsibilities') }}:</p>
+                <ul class="list-disc list-inside space-y-1 mb-4">
+                  <li v-for="(resp, idx) in exp.responsibilities.slice(0, exp.responsibilities.length > 3 ? 2 : exp.responsibilities.length)" :key="idx">
                     {{ resp }}
                   </li>
                   <li v-if="exp.responsibilities.length > 3">
                     <UBadge color="neutral" variant="subtle">
-                      +{{ exp.responsibilities.length - 3 }} {{ t('cvUpload.more') }}
+                      +{{ exp.responsibilities.length - 2 }} {{ t('cvUpload.more') }}
+                    </UBadge>
+                  </li>
+                </ul>
+              </template>
+
+              <template v-if="exp.tasks.length > 0">
+                <p class="font-semibold mb-2">{{ t('experiences.form.tasks') }}:</p>
+                <ul class="list-disc list-inside space-y-1">
+                  <li v-for="(task, idx) in exp.tasks.slice(0, exp.tasks.length > 3 ? 2 : exp.tasks.length)" :key="idx">
+                    {{ task }}
+                  </li>
+                  <li v-if="exp.tasks.length > 3">
+                    <UBadge color="neutral" variant="subtle">
+                      +{{ exp.tasks.length - 2 }} {{ t('cvUpload.more') }}
                     </UBadge>
                   </li>
                 </ul>
