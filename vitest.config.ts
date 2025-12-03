@@ -97,6 +97,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reportsDirectory: './coverage',
+      reporter: ['text', 'json', 'json-summary', 'html'],
       all: true,
       include: ['src/**/*.{ts,vue}', 'amplify/**/*.ts'],
       exclude: [
