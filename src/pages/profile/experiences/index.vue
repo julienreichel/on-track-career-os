@@ -75,66 +75,53 @@ function cancelDelete() {
       <UPageHeader
         :title="t('features.experiences.title')"
         :description="t('features.experiences.description')"
-      >
-        <template #actions>
-          <UButton
-            :label="t('cvUpload.title')"
-            icon="i-heroicons-arrow-up-tray"
-            to="/profile/cv-upload"
-          />
-        </template>
-      </UPageHeader>
+        :links="[
+          {
+            label: t('cvUpload.title'),
+            icon: 'i-heroicons-arrow-up-tray',
+            to: '/profile/cv-upload',
+          },
+        ]"
+      />
 
       <UPageBody>
-        <div class="space-y-6">
-          <!-- Error Alert -->
-          <UAlert
-            v-if="errorMessage"
-            icon="i-heroicons-exclamation-triangle"
-            color="error"
-            variant="soft"
-            :title="t('cvUpload.errors.unknown')"
-            :description="errorMessage"
-            :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'red', variant: 'link' }"
-            @close="errorMessage = null"
-          />
+        <!-- Error Alert -->
+        <UAlert
+          v-if="errorMessage"
+          icon="i-heroicons-exclamation-triangle"
+          color="error"
+          variant="soft"
+          :title="t('cvUpload.errors.unknown')"
+          :description="errorMessage"
+          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'red', variant: 'link' }"
+          @close="errorMessage = null"
+        />
 
-          <!-- Experience List -->
-          <experience-list
-            :experiences="experiences"
-            :loading="loading"
-            @edit="handleEdit"
-            @delete="handleDelete"
-          />
-        </div>
+        <!-- Experience List -->
+        <experience-list
+          :experiences="experiences"
+          :loading="loading"
+          @edit="handleEdit"
+          @delete="handleDelete"
+        />
       </UPageBody>
     </UPage>
 
     <!-- Delete Confirmation Modal -->
-    <UModal v-model="showDeleteModal">
-      <UCard>
-        <template #header>
-          <h3 class="text-lg font-semibold">{{ t('experiences.delete.title') }}</h3>
-        </template>
-
+    <UModal v-model:open="showDeleteModal" :title="t('experiences.delete.title')">
+      <template #body>
         <p>{{ t('experiences.delete.message') }}</p>
+      </template>
 
-        <template #footer>
-          <div class="flex justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              :label="t('experiences.delete.cancel')"
-              @click="cancelDelete"
-            />
-            <UButton
-              color="error"
-              :label="t('experiences.delete.confirm')"
-              @click="confirmDelete"
-            />
-          </div>
-        </template>
-      </UCard>
+      <template #footer>
+        <UButton
+          color="neutral"
+          variant="ghost"
+          :label="t('experiences.delete.cancel')"
+          @click="cancelDelete"
+        />
+        <UButton color="error" :label="t('experiences.delete.confirm')" @click="confirmDelete" />
+      </template>
     </UModal>
   </UContainer>
 </template>
