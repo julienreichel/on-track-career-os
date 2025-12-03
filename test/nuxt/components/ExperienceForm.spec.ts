@@ -92,7 +92,7 @@ const mockExperience: Experience = {
   updatedAt: '2023-01-01T00:00:00.000Z',
   owner: 'user-1',
   rawText: '',
-};
+} as unknown as Experience;
 
 describe('ExperienceForm', () => {
   const createWrapper = (props = {}) => {
