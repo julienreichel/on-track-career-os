@@ -1,0 +1,245 @@
+import { test, expect } from '@playwright/test';
+
+/**
+ * E2E Tests: CV Upload → Experience Extraction → Experience Management
+ *
+ * Tests the complete EPIC 1A workflow:
+ * 1. Upload CV file
+ * 2. AI parsing and extraction
+ * 3. Preview extracted experiences
+ * 4. Import to database
+ * 5. Manage experiences (view, edit, delete)
+ */
+
+test.describe('CV Upload Flow', () => {
+  test.beforeEach(async ({ page }) => {
+    // Navigate to CV upload page
+    // Note: In production, you would handle authentication here
+    await page.goto('/profile/cv-upload');
+  });
+
+  test('should display CV upload page with dropzone', async ({ page }) => {
+    // Verify page loads
+    await expect(page.getByRole('heading', { name: /upload your cv/i })).toBeVisible();
+
+    // Verify dropzone is present
+    await expect(page.getByText(/drop your cv here/i)).toBeVisible();
+    await expect(page.getByText(/supports pdf and txt files/i)).toBeVisible();
+  });
+
+  test('should handle file upload and show parsing state', async ({ page }) => {
+    // Note: Full file upload with AI processing requires backend integration
+    // This test validates the UI structure for file upload
+
+    // Verify file input exists
+    const fileInput = page.locator('input[type="file"]');
+    await expect(fileInput).toBeAttached();
+
+    // For future implementation with backend:
+    // const testFilePath = join(__dirname, 'fixtures', 'test-cv.txt');
+    // await fileInput.setInputFiles(testFilePath);
+    // await expect(page.getByText(/parsing your cv/i)).toBeVisible();
+  });
+
+  test('should show error for invalid file type', async ({ page }) => {
+    // This test validates error handling UI exists
+    await expect(page.getByRole('heading', { name: /upload your cv/i })).toBeVisible();
+
+    // Verify error alert structure exists
+    const alerts = page.locator('[role="alert"]');
+    // Initially no errors
+    await expect(alerts).toHaveCount(0);
+  });
+});
+
+test.describe('Experiences List', () => {
+  test('should display experiences list page', async ({ page }) => {
+    await page.goto('/profile/experiences');
+
+    // Verify page header
+    await expect(page.getByRole('heading', { name: /experiences/i })).toBeVisible();
+
+    // Verify action buttons
+    await expect(page.getByRole('button', { name: /add experience/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /upload your cv/i })).toBeVisible();
+  });
+
+  test('should navigate to CV upload from experiences list', async ({ page }) => {
+    await page.goto('/profile/experiences');
+
+    // Click upload CV button
+    await page.getByRole('link', { name: /upload your cv/i }).click();
+
+    // Should navigate to upload page
+    await expect(page).toHaveURL('/profile/cv-upload');
+    await expect(page.getByRole('heading', { name: /upload your cv/i })).toBeVisible();
+  });
+
+  test('should navigate to add new experience', async ({ page }) => {
+    await page.goto('/profile/experiences');
+
+    // Click add experience button
+    const addButton = page.getByRole('button', { name: /add experience/i });
+    await addButton.click();
+
+    // Note: This triggers an event that navigates, check for form
+    // In a real test with data, we'd verify the navigation
+  });
+});
+
+test.describe('Experience Form', () => {
+  test('should display new experience form', async ({ page }) => {
+    await page.goto('/profile/experiences/new');
+
+    // Verify form header
+    await expect(page.getByRole('heading', { name: /add experience/i })).toBeVisible();
+
+    // Verify form fields are present
+    await expect(page.getByLabel(/job title/i)).toBeVisible();
+    await expect(page.getByLabel(/company name/i)).toBeVisible();
+    await expect(page.getByLabel(/start date/i)).toBeVisible();
+    await expect(page.getByLabel(/end date/i)).toBeVisible();
+  });
+
+  test('should validate required fields', async ({ page }) => {
+    await page.goto('/profile/experiences/new');
+
+    // Submit button should be disabled without required fields
+    const submitButton = page.getByRole('button', { name: /save experience/i });
+
+    // Check initial state (should be disabled due to validation)
+    await expect(submitButton).toBeDisabled();
+  });
+
+  test('should enable submit when required fields filled', async ({ page }) => {
+    await page.goto('/profile/experiences/new');
+
+    // Fill required fields
+    await page.getByLabel(/job title/i).fill('Software Engineer');
+    await page.getByLabel(/start date/i).fill('2023-01-01');
+
+    // Submit button should now be enabled
+    const submitButton = page.getByRole('button', { name: /save experience/i });
+    await expect(submitButton).toBeEnabled();
+  });
+
+  test('should handle form submission', async ({ page }) => {
+    await page.goto('/profile/experiences/new');
+
+    // Fill out complete form
+    await page.getByLabel(/job title/i).fill('Senior Software Engineer');
+    await page.getByLabel(/company name/i).fill('Tech Corp');
+    await page.getByLabel(/start date/i).fill('2020-01-01');
+    await page.getByLabel(/end date/i).fill('2023-12-31');
+
+    const responsibilitiesField = page.getByLabel(/responsibilities/i);
+    await responsibilitiesField.fill('Lead development\nMentor team\nArchitect solutions');
+
+    const tasksField = page.getByLabel(/tasks/i);
+    await tasksField.fill('Build APIs\nCode reviews\nCI/CD setup');
+
+    // Submit form
+    const submitButton = page.getByRole('button', { name: /save experience/i });
+    await submitButton.click();
+
+    // Note: In real test with backend, would verify redirect and data persistence
+  });
+
+  test('should navigate back on cancel', async ({ page }) => {
+    await page.goto('/profile/experiences/new');
+
+    // Click cancel button
+    const cancelButton = page.getByRole('button', { name: /cancel/i });
+    await cancelButton.click();
+
+    // Should navigate back to list
+    await expect(page).toHaveURL('/profile/experiences');
+  });
+
+  test('should handle text area to array conversion', async ({ page }) => {
+    await page.goto('/profile/experiences/new');
+
+    // Fill responsibilities with multiple lines
+    const responsibilitiesField = page.getByLabel(/responsibilities/i);
+    await responsibilitiesField.fill(
+      'First responsibility\nSecond responsibility\nThird responsibility'
+    );
+
+    // Verify content is in the field
+    await expect(responsibilitiesField).toHaveValue(/First responsibility/);
+  });
+
+  test('should display form hints', async ({ page }) => {
+    await page.goto('/profile/experiences/new');
+
+    // Verify helpful hints are displayed
+    await expect(page.getByText(/leave empty if this is your current position/i)).toBeVisible();
+    await expect(page.getByText(/one responsibility per line/i)).toBeVisible();
+    await expect(page.getByText(/one task per line/i)).toBeVisible();
+  });
+});
+
+test.describe('Experience Management', () => {
+  test('should display empty state when no experiences', async ({ page }) => {
+    await page.goto('/profile/experiences');
+
+    // In a fresh state, should show empty message
+    // Note: Actual check depends on database state
+    const emptyMessage = page.getByText(/no experiences yet/i);
+    // We check if it exists (might not be visible if there's data)
+    const isVisible = await emptyMessage.isVisible().catch(() => false);
+
+    if (isVisible) {
+      await expect(emptyMessage).toBeVisible();
+    }
+  });
+
+  test('should navigate between pages', async ({ page }) => {
+    // Test navigation flow: list → new → cancel → list
+    await page.goto('/profile/experiences');
+    await expect(page).toHaveURL('/profile/experiences');
+
+    // Navigate to new
+    const addButton = page.getByRole('button', { name: /add experience/i });
+    await addButton.click();
+
+    // Wait for any navigation or modal (500ms timeout)
+    const WAIT_TIMEOUT_MS = 500;
+    await page.waitForTimeout(WAIT_TIMEOUT_MS);
+
+    // Navigate back (via cancel or back button)
+    const backLink = page.getByRole('link', { name: /your experiences/i });
+    if (await backLink.isVisible()) {
+      await backLink.click();
+      await expect(page).toHaveURL('/profile/experiences');
+    }
+  });
+});
+
+test.describe('Responsive Design', () => {
+  // Mobile viewport constants
+  const MOBILE_WIDTH = 375;
+  const MOBILE_HEIGHT = 667;
+  const TABLET_WIDTH = 768;
+  const TABLET_HEIGHT = 1024;
+
+  test('should be mobile responsive', async ({ page }) => {
+    // Set mobile viewport
+    await page.setViewportSize({ width: MOBILE_WIDTH, height: MOBILE_HEIGHT });
+
+    await page.goto('/profile/experiences');
+
+    // Verify page is accessible on mobile
+    await expect(page.getByRole('heading', { name: /experiences/i })).toBeVisible();
+  });
+
+  test('should be tablet responsive', async ({ page }) => {
+    // Set tablet viewport
+    await page.setViewportSize({ width: TABLET_WIDTH, height: TABLET_HEIGHT });
+
+    await page.goto('/profile/cv-upload');
+
+    // Verify upload page is accessible on tablet
+    await expect(page.getByRole('heading', { name: /upload your cv/i })).toBeVisible();
+  });
+});

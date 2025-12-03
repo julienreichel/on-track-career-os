@@ -1,0 +1,59 @@
+PROFESSIONAL EXPERIENCE
+
+Senior Software Engineer
+Tech Corporation | San Francisco, CA
+January 2020 - December 2023
+
+Responsibilities:
+- Led development of cloud-based applications serving 1M+ users
+- Mentored junior developers and conducted technical interviews
+- Architected microservices solutions using AWS and Kubernetes
+- Collaborated with product team on feature roadmap
+- Established code review processes and best practices
+
+Key Achievements:
+- Built scalable REST APIs handling 10k requests/second
+- Implemented CI/CD pipelines reducing deployment time by 60%
+- Reduced system latency by 40% through performance optimization
+- Led migration to microservices architecture
+
+Technologies: TypeScript, Node.js, AWS, Kubernetes, PostgreSQL, Redis
+
+---
+
+Software Engineer
+StartupCo | Remote
+June 2018 - December 2019
+
+Responsibilities:
+- Full-stack development of web applications
+- Database design and optimization
+- Integration of third-party APIs
+- Agile development and sprint planning
+
+Key Achievements:
+- Developed core product features used by 50k+ users
+- Optimized database queries improving performance by 35%
+- Built authentication system with OAuth2 integration
+- Implemented real-time notifications using WebSockets
+
+Technologies: JavaScript, React, Python, Django, MySQL
+
+---
+
+Junior Software Developer
+WebDev Agency | New York, NY
+January 2017 - May 2018
+
+Responsibilities:
+- Frontend development for client websites
+- Bug fixes and maintenance
+- Responsive design implementation
+- Client communication and support
+
+Key Achievements:
+- Delivered 15+ client projects on time and within budget
+- Improved website loading speeds by 50%
+- Implemented accessibility features meeting WCAG standards
+
+Technologies: HTML, CSS, JavaScript, jQuery, WordPress

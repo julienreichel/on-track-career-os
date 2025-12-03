@@ -19,7 +19,11 @@
     "test:sandbox": "vitest run --project e2e-sandbox",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage --project unit --project amplify --project nuxt"
+    "test:coverage": "vitest run --coverage --project unit --project amplify --project nuxt",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report"
   },
   "bin": {
     "gen-model": "bin/gen-model.js"
@@ -42,6 +46,7 @@
     "@aws-sdk/client-dynamodb": "^3.940.0",
     "@aws-sdk/lib-dynamodb": "^3.940.0",
     "@nuxt/test-utils": "^3.20.1",
+    "@playwright/test": "^1.57.0",
     "@types/aws-lambda": "^8.10.159",
     "@vitest/coverage-v8": "^3.2.4",
     "@vue/test-utils": "^2.4.6",
