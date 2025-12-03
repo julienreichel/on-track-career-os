@@ -163,7 +163,12 @@
 
         <!-- Form Actions -->
         <div class="flex justify-end gap-3">
-          <UButton type="button" color="gray" variant="ghost" @click="handleCancel">
+          <UButton
+            type="button"
+            color="gray"
+            variant="ghost"
+            @click="handleCancel"
+          >
             {{ t('profile.actions.cancel') }}
           </UButton>
           <UButton

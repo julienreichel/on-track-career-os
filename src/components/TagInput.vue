@@ -2,7 +2,12 @@
   <UFormField :label="label" :hint="hint" :required="required">
     <UInput v-model="inputValue" :placeholder="placeholder" @keydown="handleKeydown" />
     <div v-if="modelValue.length > 0" class="mt-2 flex flex-wrap gap-2">
-      <UBadge v-for="(item, index) in modelValue" :key="index" :color="color" variant="subtle">
+      <UBadge
+        v-for="(item, index) in modelValue"
+        :key="index"
+        :color="color"
+        variant="subtle"
+      >
         {{ item }}
         <UButton
           icon="i-heroicons-x-mark-20-solid"
