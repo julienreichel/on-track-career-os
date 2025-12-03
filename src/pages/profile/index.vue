@@ -80,9 +80,16 @@
         </UPageGrid>
       </UCard>
 
+      <!-- Edit Button (prominent when not editing) -->
+      <div v-if="!isEditing" class="mb-6 flex justify-end">
+        <UButton icon="i-heroicons-pencil" color="primary" size="lg" @click="startEditing">
+          {{ t('profile.actions.edit') }}
+        </UButton>
+      </div>
+
       <form @submit.prevent="handleSubmit">
         <!-- SECTION A: Core Identity -->
-        <UCard class="mb-6">
+        <UCard v-if="isEditing || hasCoreIdentity" class="mb-6">
           <template #header>
             <h3 class="text-lg font-semibold">
               {{ t('profile.sections.coreIdentity') }}
@@ -91,40 +98,40 @@
 
           <!-- Display Mode -->
           <div v-if="!isEditing" class="space-y-4">
-            <div>
+            <div v-if="form.fullName">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('profile.fields.fullName') }}
                 <span class="text-red-500">*</span>
               </label>
               <p class="text-base text-gray-900 dark:text-gray-100">
-                {{ form.fullName || '-' }}
+                {{ form.fullName }}
               </p>
             </div>
 
-            <div>
+            <div v-if="form.headline">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('profile.fields.headline') }}
               </label>
               <p class="text-base text-gray-900 dark:text-gray-100">
-                {{ form.headline || '-' }}
+                {{ form.headline }}
               </p>
             </div>
 
-            <div>
+            <div v-if="form.location">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('profile.fields.location') }}
               </label>
               <p class="text-base text-gray-900 dark:text-gray-100">
-                {{ form.location || '-' }}
+                {{ form.location }}
               </p>
             </div>
 
-            <div>
+            <div v-if="form.seniorityLevel">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('profile.fields.seniorityLevel') }}
               </label>
               <p class="text-base text-gray-900 dark:text-gray-100">
-                {{ form.seniorityLevel || '-' }}
+                {{ form.seniorityLevel }}
               </p>
             </div>
           </div>
@@ -160,7 +167,7 @@
         </UCard>
 
         <!-- SECTION B: Career Direction -->
-        <UCard class="mb-6">
+        <UCard v-if="isEditing || hasCareerDirection" class="mb-6">
           <template #header>
             <h3 class="text-lg font-semibold">
               {{ t('profile.sections.careerDirection') }}
@@ -169,28 +176,26 @@
 
           <!-- Display Mode -->
           <div v-if="!isEditing" class="space-y-4">
-            <div>
+            <div v-if="form.goals.length > 0">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('profile.fields.goals') }}
               </label>
-              <div v-if="form.goals.length > 0" class="flex flex-wrap gap-2">
+              <div class="flex flex-wrap gap-2">
                 <UBadge v-for="(goal, index) in form.goals" :key="index" color="primary" variant="subtle">
                   {{ goal }}
                 </UBadge>
               </div>
-              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
             </div>
 
-            <div>
+            <div v-if="form.aspirations.length > 0">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('profile.fields.aspirations') }}
               </label>
-              <div v-if="form.aspirations.length > 0" class="flex flex-wrap gap-2">
+              <div class="flex flex-wrap gap-2">
                 <UBadge v-for="(aspiration, index) in form.aspirations" :key="index" color="primary" variant="subtle">
                   {{ aspiration }}
                 </UBadge>
               </div>
-              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
             </div>
           </div>
 
@@ -215,7 +220,7 @@
         </UCard>
 
         <!-- SECTION C: Identity & Values -->
-        <UCard class="mb-6">
+        <UCard v-if="isEditing || hasIdentityValues" class="mb-6">
           <template #header>
             <h3 class="text-lg font-semibold">
               {{ t('profile.sections.identityValues') }}
@@ -224,40 +229,37 @@
 
           <!-- Display Mode -->
           <div v-if="!isEditing" class="space-y-4">
-            <div>
+            <div v-if="form.personalValues.length > 0">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('profile.fields.personalValues') }}
               </label>
-              <div v-if="form.personalValues.length > 0" class="flex flex-wrap gap-2">
+              <div class="flex flex-wrap gap-2">
                 <UBadge v-for="(value, index) in form.personalValues" :key="index" color="info" variant="subtle">
                   {{ value }}
                 </UBadge>
               </div>
-              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
             </div>
 
-            <div>
+            <div v-if="form.strengths.length > 0">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('profile.fields.strengths') }}
               </label>
-              <div v-if="form.strengths.length > 0" class="flex flex-wrap gap-2">
+              <div class="flex flex-wrap gap-2">
                 <UBadge v-for="(strength, index) in form.strengths" :key="index" color="info" variant="subtle">
                   {{ strength }}
                 </UBadge>
               </div>
-              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
             </div>
 
-            <div>
+            <div v-if="form.interests.length > 0">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('profile.fields.interests') }}
               </label>
-              <div v-if="form.interests.length > 0" class="flex flex-wrap gap-2">
+              <div class="flex flex-wrap gap-2">
                 <UBadge v-for="(interest, index) in form.interests" :key="index" color="info" variant="subtle">
                   {{ interest }}
                 </UBadge>
               </div>
-              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
             </div>
           </div>
 
@@ -290,7 +292,7 @@
         </UCard>
 
         <!-- SECTION D: Professional Attributes -->
-        <UCard class="mb-6">
+        <UCard v-if="isEditing || hasProfessionalAttributes" class="mb-6">
           <template #header>
             <h3 class="text-lg font-semibold">
               {{ t('profile.sections.professionalAttributes') }}
@@ -299,40 +301,37 @@
 
           <!-- Display Mode -->
           <div v-if="!isEditing" class="space-y-4">
-            <div>
+            <div v-if="form.skills.length > 0">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('profile.fields.skills') }}
               </label>
-              <div v-if="form.skills.length > 0" class="flex flex-wrap gap-2">
+              <div class="flex flex-wrap gap-2">
                 <UBadge v-for="(skill, index) in form.skills" :key="index" color="success" variant="subtle">
                   {{ skill }}
                 </UBadge>
               </div>
-              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
             </div>
 
-            <div>
+            <div v-if="form.certifications.length > 0">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('profile.fields.certifications') }}
               </label>
-              <div v-if="form.certifications.length > 0" class="flex flex-wrap gap-2">
+              <div class="flex flex-wrap gap-2">
                 <UBadge v-for="(cert, index) in form.certifications" :key="index" color="success" variant="subtle">
                   {{ cert }}
                 </UBadge>
               </div>
-              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
             </div>
 
-            <div>
+            <div v-if="form.languages.length > 0">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {{ t('profile.fields.languages') }}
               </label>
-              <div v-if="form.languages.length > 0" class="flex flex-wrap gap-2">
+              <div class="flex flex-wrap gap-2">
                 <UBadge v-for="(lang, index) in form.languages" :key="index" color="success" variant="subtle">
                   {{ lang }}
                 </UBadge>
               </div>
-              <p v-else class="text-sm text-gray-500 dark:text-gray-400">-</p>
             </div>
           </div>
 
@@ -384,7 +383,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useUserProfile } from '@/application/user-profile/useUserProfile';
@@ -463,6 +462,29 @@ const originalForm = ref<ProfileForm | null>(null);
 const isEditing = ref(false);
 const error = ref<string | null>(null);
 const saveSuccess = ref(false);
+
+// Computed properties to check if sections have content
+const hasCoreIdentity = computed(() => {
+  return !!(form.value.fullName || form.value.headline || form.value.location || form.value.seniorityLevel);
+});
+
+const hasCareerDirection = computed(() => {
+  return form.value.goals.length > 0 || form.value.aspirations.length > 0;
+});
+
+const hasIdentityValues = computed(() => {
+  return (
+    form.value.personalValues.length > 0 ||
+    form.value.strengths.length > 0 ||
+    form.value.interests.length > 0
+  );
+});
+
+const hasProfessionalAttributes = computed(() => {
+  return (
+    form.value.skills.length > 0 || form.value.certifications.length > 0 || form.value.languages.length > 0
+  );
+});
 
 // Load profile data into form
 const loadProfileToForm = () => {
