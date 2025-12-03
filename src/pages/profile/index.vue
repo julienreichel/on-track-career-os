@@ -73,60 +73,21 @@
           </template>
 
           <div class="space-y-4">
-            <UFormField :label="t('profile.fields.goals')" :hint="t('profile.fields.goalsHint')">
-              <UInput
-                v-model="goalInput"
-                :placeholder="t('profile.fields.goalsPlaceholder')"
-                @keydown.enter.prevent="addGoal"
-              />
-              <div v-if="form.goals.length > 0" class="mt-2 flex flex-wrap gap-2">
-                <UBadge
-                  v-for="(goal, index) in form.goals"
-                  :key="index"
-                  color="primary"
-                  variant="subtle"
-                >
-                  {{ goal }}
-                  <UButton
-                    icon="i-heroicons-x-mark-20-solid"
-                    size="2xs"
-                    color="primary"
-                    variant="link"
-                    :padded="false"
-                    @click="removeGoal(index)"
-                  />
-                </UBadge>
-              </div>
-            </UFormField>
+            <TagInput
+              v-model="form.goals"
+              :label="t('profile.fields.goals')"
+              :placeholder="t('profile.fields.goalsPlaceholder')"
+              :hint="t('profile.fields.goalsHint')"
+              color="primary"
+            />
 
-            <UFormField
+            <TagInput
+              v-model="form.aspirations"
               :label="t('profile.fields.aspirations')"
+              :placeholder="t('profile.fields.aspirationsPlaceholder')"
               :hint="t('profile.fields.aspirationsHint')"
-            >
-              <UInput
-                v-model="aspirationInput"
-                :placeholder="t('profile.fields.aspirationsPlaceholder')"
-                @keydown.enter.prevent="addAspiration"
-              />
-              <div v-if="form.aspirations.length > 0" class="mt-2 flex flex-wrap gap-2">
-                <UBadge
-                  v-for="(aspiration, index) in form.aspirations"
-                  :key="index"
-                  color="primary"
-                  variant="subtle"
-                >
-                  {{ aspiration }}
-                  <UButton
-                    icon="i-heroicons-x-mark-20-solid"
-                    size="2xs"
-                    color="primary"
-                    variant="link"
-                    :padded="false"
-                    @click="removeAspiration(index)"
-                  />
-                </UBadge>
-              </div>
-            </UFormField>
+              color="primary"
+            />
           </div>
         </UCard>
 
@@ -139,92 +100,29 @@
           </template>
 
           <div class="space-y-4">
-            <UFormField
+            <TagInput
+              v-model="form.personalValues"
               :label="t('profile.fields.personalValues')"
+              :placeholder="t('profile.fields.personalValuesPlaceholder')"
               :hint="t('profile.fields.personalValuesHint')"
-            >
-              <UInput
-                v-model="personalValueInput"
-                :placeholder="t('profile.fields.personalValuesPlaceholder')"
-                @keydown.enter.prevent="addPersonalValue"
-              />
-              <div v-if="form.personalValues.length > 0" class="mt-2 flex flex-wrap gap-2">
-                <UBadge
-                  v-for="(value, index) in form.personalValues"
-                  :key="index"
-                  color="blue"
-                  variant="subtle"
-                >
-                  {{ value }}
-                  <UButton
-                    icon="i-heroicons-x-mark-20-solid"
-                    size="2xs"
-                    color="blue"
-                    variant="link"
-                    :padded="false"
-                    @click="removePersonalValue(index)"
-                  />
-                </UBadge>
-              </div>
-            </UFormField>
+              color="blue"
+            />
 
-            <UFormField
+            <TagInput
+              v-model="form.strengths"
               :label="t('profile.fields.strengths')"
+              :placeholder="t('profile.fields.strengthsPlaceholder')"
               :hint="t('profile.fields.strengthsHint')"
-            >
-              <UInput
-                v-model="strengthInput"
-                :placeholder="t('profile.fields.strengthsPlaceholder')"
-                @keydown.enter.prevent="addStrength"
-              />
-              <div v-if="form.strengths.length > 0" class="mt-2 flex flex-wrap gap-2">
-                <UBadge
-                  v-for="(strength, index) in form.strengths"
-                  :key="index"
-                  color="blue"
-                  variant="subtle"
-                >
-                  {{ strength }}
-                  <UButton
-                    icon="i-heroicons-x-mark-20-solid"
-                    size="2xs"
-                    color="blue"
-                    variant="link"
-                    :padded="false"
-                    @click="removeStrength(index)"
-                  />
-                </UBadge>
-              </div>
-            </UFormField>
+              color="blue"
+            />
 
-            <UFormField
+            <TagInput
+              v-model="form.interests"
               :label="t('profile.fields.interests')"
+              :placeholder="t('profile.fields.interestsPlaceholder')"
               :hint="t('profile.fields.interestsHint')"
-            >
-              <UInput
-                v-model="interestInput"
-                :placeholder="t('profile.fields.interestsPlaceholder')"
-                @keydown.enter.prevent="addInterest"
-              />
-              <div v-if="form.interests.length > 0" class="mt-2 flex flex-wrap gap-2">
-                <UBadge
-                  v-for="(interest, index) in form.interests"
-                  :key="index"
-                  color="blue"
-                  variant="subtle"
-                >
-                  {{ interest }}
-                  <UButton
-                    icon="i-heroicons-x-mark-20-solid"
-                    size="2xs"
-                    color="blue"
-                    variant="link"
-                    :padded="false"
-                    @click="removeInterest(index)"
-                  />
-                </UBadge>
-              </div>
-            </UFormField>
+              color="blue"
+            />
           </div>
         </UCard>
 
@@ -237,89 +135,29 @@
           </template>
 
           <div class="space-y-4">
-            <UFormField :label="t('profile.fields.skills')" :hint="t('profile.fields.skillsHint')">
-              <UInput
-                v-model="skillInput"
-                :placeholder="t('profile.fields.skillsPlaceholder')"
-                @keydown.enter.prevent="addSkill"
-              />
-              <div v-if="form.skills.length > 0" class="mt-2 flex flex-wrap gap-2">
-                <UBadge
-                  v-for="(skill, index) in form.skills"
-                  :key="index"
-                  color="green"
-                  variant="subtle"
-                >
-                  {{ skill }}
-                  <UButton
-                    icon="i-heroicons-x-mark-20-solid"
-                    size="2xs"
-                    color="green"
-                    variant="link"
-                    :padded="false"
-                    @click="removeSkill(index)"
-                  />
-                </UBadge>
-              </div>
-            </UFormField>
+            <TagInput
+              v-model="form.skills"
+              :label="t('profile.fields.skills')"
+              :placeholder="t('profile.fields.skillsPlaceholder')"
+              :hint="t('profile.fields.skillsHint')"
+              color="green"
+            />
 
-            <UFormField
+            <TagInput
+              v-model="form.certifications"
               :label="t('profile.fields.certifications')"
+              :placeholder="t('profile.fields.certificationsPlaceholder')"
               :hint="t('profile.fields.certificationsHint')"
-            >
-              <UInput
-                v-model="certificationInput"
-                :placeholder="t('profile.fields.certificationsPlaceholder')"
-                @keydown.enter.prevent="addCertification"
-              />
-              <div v-if="form.certifications.length > 0" class="mt-2 flex flex-wrap gap-2">
-                <UBadge
-                  v-for="(cert, index) in form.certifications"
-                  :key="index"
-                  color="green"
-                  variant="subtle"
-                >
-                  {{ cert }}
-                  <UButton
-                    icon="i-heroicons-x-mark-20-solid"
-                    size="2xs"
-                    color="green"
-                    variant="link"
-                    :padded="false"
-                    @click="removeCertification(index)"
-                  />
-                </UBadge>
-              </div>
-            </UFormField>
+              color="green"
+            />
 
-            <UFormField
+            <TagInput
+              v-model="form.languages"
               :label="t('profile.fields.languages')"
+              :placeholder="t('profile.fields.languagesPlaceholder')"
               :hint="t('profile.fields.languagesHint')"
-            >
-              <UInput
-                v-model="languageInput"
-                :placeholder="t('profile.fields.languagesPlaceholder')"
-                @keydown.enter.prevent="addLanguage"
-              />
-              <div v-if="form.languages.length > 0" class="mt-2 flex flex-wrap gap-2">
-                <UBadge
-                  v-for="(language, index) in form.languages"
-                  :key="index"
-                  color="green"
-                  variant="subtle"
-                >
-                  {{ language }}
-                  <UButton
-                    icon="i-heroicons-x-mark-20-solid"
-                    size="2xs"
-                    color="green"
-                    variant="link"
-                    :padded="false"
-                    @click="removeLanguage(index)"
-                  />
-                </UBadge>
-              </div>
-            </UFormField>
+              color="green"
+            />
           </div>
         </UCard>
 
@@ -382,109 +220,10 @@ const form = ref<ProfileForm>({
   languages: [],
 });
 
-// Input fields for array values
-const goalInput = ref('');
-const aspirationInput = ref('');
-const personalValueInput = ref('');
-const strengthInput = ref('');
-const interestInput = ref('');
-const skillInput = ref('');
-const certificationInput = ref('');
-const languageInput = ref('');
-
 // UI state
 const loading = ref(false);
 const error = ref<string | null>(null);
 const saveSuccess = ref(false);
-
-// Array management functions
-const addGoal = () => {
-  if (goalInput.value.trim()) {
-    form.value.goals.push(goalInput.value.trim());
-    goalInput.value = '';
-  }
-};
-
-const removeGoal = (index: number) => {
-  form.value.goals.splice(index, 1);
-};
-
-const addAspiration = () => {
-  if (aspirationInput.value.trim()) {
-    form.value.aspirations.push(aspirationInput.value.trim());
-    aspirationInput.value = '';
-  }
-};
-
-const removeAspiration = (index: number) => {
-  form.value.aspirations.splice(index, 1);
-};
-
-const addPersonalValue = () => {
-  if (personalValueInput.value.trim()) {
-    form.value.personalValues.push(personalValueInput.value.trim());
-    personalValueInput.value = '';
-  }
-};
-
-const removePersonalValue = (index: number) => {
-  form.value.personalValues.splice(index, 1);
-};
-
-const addStrength = () => {
-  if (strengthInput.value.trim()) {
-    form.value.strengths.push(strengthInput.value.trim());
-    strengthInput.value = '';
-  }
-};
-
-const removeStrength = (index: number) => {
-  form.value.strengths.splice(index, 1);
-};
-
-const addInterest = () => {
-  if (interestInput.value.trim()) {
-    form.value.interests.push(interestInput.value.trim());
-    interestInput.value = '';
-  }
-};
-
-const removeInterest = (index: number) => {
-  form.value.interests.splice(index, 1);
-};
-
-const addSkill = () => {
-  if (skillInput.value.trim()) {
-    form.value.skills.push(skillInput.value.trim());
-    skillInput.value = '';
-  }
-};
-
-const removeSkill = (index: number) => {
-  form.value.skills.splice(index, 1);
-};
-
-const addCertification = () => {
-  if (certificationInput.value.trim()) {
-    form.value.certifications.push(certificationInput.value.trim());
-    certificationInput.value = '';
-  }
-};
-
-const removeCertification = (index: number) => {
-  form.value.certifications.splice(index, 1);
-};
-
-const addLanguage = () => {
-  if (languageInput.value.trim()) {
-    form.value.languages.push(languageInput.value.trim());
-    languageInput.value = '';
-  }
-};
-
-const removeLanguage = (index: number) => {
-  form.value.languages.splice(index, 1);
-};
 
 // Load profile on mount
 onMounted(async () => {
