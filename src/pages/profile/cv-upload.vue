@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router';
 import { useAiOperations } from '@/application/ai-operations/useAiOperations';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { ExtractedExperience } from '@/domain/ai-operations/Experience';
-import CvUploadDropzone from '@/components/CvUploadDropzone.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -21,14 +20,26 @@ const extractedText = ref<string>('');
 const extractedExperiences = ref<ExtractedExperience[]>([]);
 const errorMessage = ref<string | null>(null);
 const importCount = ref(0);
+const uploadedFile = ref<File | null>(null);
 
 // Handle file upload
-async function handleUpload(text: string) {
-  extractedText.value = text;
+async function handleUpload(file: File | null) {
+  if (!file) return;
+
+  uploadedFile.value = file;
   currentStep.value = 'parsing';
   errorMessage.value = null;
 
   try {
+    // Read file content
+    const reader = new FileReader();
+    const text = await new Promise<string>((resolve, reject) => {
+      reader.onload = (e) => resolve(e.target?.result as string);
+      reader.onerror = (e) => reject(e);
+      reader.readAsText(file);
+    });
+
+    extractedText.value = text;
     // Step 1: Parse CV text to extract sections
     await aiOps.parseCv(text);
 
@@ -56,12 +67,8 @@ async function handleUpload(text: string) {
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : t('cvUpload.errors.unknown');
     currentStep.value = 'upload';
+    uploadedFile.value = null;
   }
-}
-
-// Handle upload error
-function handleUploadError(error: string) {
-  errorMessage.value = error;
 }
 
 // Handle import confirmation
@@ -105,6 +112,7 @@ function handleCancel() {
   extractedText.value = '';
   extractedExperiences.value = [];
   errorMessage.value = null;
+  uploadedFile.value = null;
   aiOps.reset();
 }
 
@@ -135,7 +143,15 @@ function viewExperiences() {
 
           <!-- Upload Step -->
           <div v-if="currentStep === 'upload'">
-            <cv-upload-dropzone @upload="handleUpload" @error="handleUploadError" />
+            <UFileUpload
+              v-model="uploadedFile"
+              accept=".pdf,.doc,.docx,.txt"
+              :label="t('cvUpload.dropzone.label')"
+              :description="t('cvUpload.dropzone.description')"
+              icon="i-heroicons-document-text"
+              class="min-h-48"
+              @update:model-value="handleUpload"
+            />
           </div>
 
           <!-- Parsing Step -->

@@ -39,6 +39,10 @@
   "cvUpload": {
     "title": "Upload Your CV",
     "description": "Upload your CV to extract your professional experience automatically.",
+    "dropzone": {
+      "label": "Drop your CV here or click to browse",
+      "description": "Supports PDF, DOC, DOCX, and TXT files (max 5MB)"
+    },
     "dropzoneText": "Drop your CV here or click to browse",
     "dropzoneHint": "Supports PDF and TXT files (max 5MB)",
     "fileUploaded": "File uploaded: {fileName}",

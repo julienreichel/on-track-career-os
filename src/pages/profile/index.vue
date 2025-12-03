@@ -154,7 +154,10 @@
             </UFormField>
 
             <UFormField :label="t('profile.fields.location')">
-              <UInput v-model="form.location" :placeholder="t('profile.fields.locationPlaceholder')" />
+              <UInput
+                v-model="form.location"
+                :placeholder="t('profile.fields.locationPlaceholder')"
+              />
             </UFormField>
 
             <UFormField :label="t('profile.fields.seniorityLevel')">
@@ -181,7 +184,12 @@
                 {{ t('profile.fields.goals') }}
               </label>
               <div class="flex flex-wrap gap-2">
-                <UBadge v-for="(goal, index) in form.goals" :key="index" color="primary" variant="subtle">
+                <UBadge
+                  v-for="(goal, index) in form.goals"
+                  :key="index"
+                  color="primary"
+                  variant="subtle"
+                >
                   {{ goal }}
                 </UBadge>
               </div>
@@ -192,7 +200,12 @@
                 {{ t('profile.fields.aspirations') }}
               </label>
               <div class="flex flex-wrap gap-2">
-                <UBadge v-for="(aspiration, index) in form.aspirations" :key="index" color="primary" variant="subtle">
+                <UBadge
+                  v-for="(aspiration, index) in form.aspirations"
+                  :key="index"
+                  color="primary"
+                  variant="subtle"
+                >
                   {{ aspiration }}
                 </UBadge>
               </div>
@@ -234,7 +247,12 @@
                 {{ t('profile.fields.personalValues') }}
               </label>
               <div class="flex flex-wrap gap-2">
-                <UBadge v-for="(value, index) in form.personalValues" :key="index" color="info" variant="subtle">
+                <UBadge
+                  v-for="(value, index) in form.personalValues"
+                  :key="index"
+                  color="info"
+                  variant="subtle"
+                >
                   {{ value }}
                 </UBadge>
               </div>
@@ -245,7 +263,12 @@
                 {{ t('profile.fields.strengths') }}
               </label>
               <div class="flex flex-wrap gap-2">
-                <UBadge v-for="(strength, index) in form.strengths" :key="index" color="info" variant="subtle">
+                <UBadge
+                  v-for="(strength, index) in form.strengths"
+                  :key="index"
+                  color="info"
+                  variant="subtle"
+                >
                   {{ strength }}
                 </UBadge>
               </div>
@@ -256,7 +279,12 @@
                 {{ t('profile.fields.interests') }}
               </label>
               <div class="flex flex-wrap gap-2">
-                <UBadge v-for="(interest, index) in form.interests" :key="index" color="info" variant="subtle">
+                <UBadge
+                  v-for="(interest, index) in form.interests"
+                  :key="index"
+                  color="info"
+                  variant="subtle"
+                >
                   {{ interest }}
                 </UBadge>
               </div>
@@ -306,7 +334,12 @@
                 {{ t('profile.fields.skills') }}
               </label>
               <div class="flex flex-wrap gap-2">
-                <UBadge v-for="(skill, index) in form.skills" :key="index" color="success" variant="subtle">
+                <UBadge
+                  v-for="(skill, index) in form.skills"
+                  :key="index"
+                  color="success"
+                  variant="subtle"
+                >
                   {{ skill }}
                 </UBadge>
               </div>
@@ -317,7 +350,12 @@
                 {{ t('profile.fields.certifications') }}
               </label>
               <div class="flex flex-wrap gap-2">
-                <UBadge v-for="(cert, index) in form.certifications" :key="index" color="success" variant="subtle">
+                <UBadge
+                  v-for="(cert, index) in form.certifications"
+                  :key="index"
+                  color="success"
+                  variant="subtle"
+                >
                   {{ cert }}
                 </UBadge>
               </div>
@@ -328,7 +366,12 @@
                 {{ t('profile.fields.languages') }}
               </label>
               <div class="flex flex-wrap gap-2">
-                <UBadge v-for="(lang, index) in form.languages" :key="index" color="success" variant="subtle">
+                <UBadge
+                  v-for="(lang, index) in form.languages"
+                  :key="index"
+                  color="success"
+                  variant="subtle"
+                >
                   {{ lang }}
                 </UBadge>
               </div>
@@ -465,7 +508,12 @@ const saveSuccess = ref(false);
 
 // Computed properties to check if sections have content
 const hasCoreIdentity = computed(() => {
-  return !!(form.value.fullName || form.value.headline || form.value.location || form.value.seniorityLevel);
+  return !!(
+    form.value.fullName ||
+    form.value.headline ||
+    form.value.location ||
+    form.value.seniorityLevel
+  );
 });
 
 const hasCareerDirection = computed(() => {
@@ -482,7 +530,9 @@ const hasIdentityValues = computed(() => {
 
 const hasProfessionalAttributes = computed(() => {
   return (
-    form.value.skills.length > 0 || form.value.certifications.length > 0 || form.value.languages.length > 0
+    form.value.skills.length > 0 ||
+    form.value.certifications.length > 0 ||
+    form.value.languages.length > 0
   );
 });
 
