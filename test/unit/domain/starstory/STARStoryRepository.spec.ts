@@ -55,7 +55,7 @@ describe('STARStoryRepository', () => {
         tags: ['performance', 'optimization', 'leadership'],
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-01T00:00:00Z',
-      };
+      } as unknown as STARStory;
 
       mockModel.get.mockResolvedValue({
         data: mockStory,
@@ -111,7 +111,7 @@ describe('STARStoryRepository', () => {
           createdAt: '2025-01-01T00:00:00Z',
           updatedAt: '2025-01-01T00:00:00Z',
         },
-      ];
+      ] as unknown as STARStory[];
 
       mockModel.list.mockResolvedValue({
         data: mockStories,
@@ -165,14 +165,14 @@ describe('STARStoryRepository', () => {
         result: 'Reduced deployment time from 2 hours to 15 minutes',
         title: 'CI/CD Implementation',
         tags: ['devops', 'automation', 'ci-cd'],
-      };
+      } as unknown as STARStoryCreateInput;
 
       const mockCreatedStory: STARStory = {
         id: 'story-new',
         ...mockInput,
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-01T00:00:00Z',
-      };
+      } as unknown as STARStory;
 
       mockModel.create.mockResolvedValue({
         data: mockCreatedStory,
@@ -199,7 +199,7 @@ describe('STARStoryRepository', () => {
         result: 'Test',
         title: 'Test Story',
         tags: [],
-      };
+      } as unknown as STARStoryCreateInput;
 
       mockModel.create.mockResolvedValue({
         data: null,
@@ -217,7 +217,7 @@ describe('STARStoryRepository', () => {
         id: 'story-123',
         title: 'Updated Title',
         tags: ['updated', 'tags'],
-      };
+      } as unknown as STARStoryUpdateInput;
 
       const mockUpdatedStory: STARStory = {
         id: 'story-123',
@@ -231,7 +231,7 @@ describe('STARStoryRepository', () => {
         tags: ['updated', 'tags'],
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-02T00:00:00Z',
-      };
+      } as unknown as STARStory;
 
       mockModel.update.mockResolvedValue({
         data: mockUpdatedStory,
@@ -252,7 +252,7 @@ describe('STARStoryRepository', () => {
       const mockInput: STARStoryUpdateInput = {
         id: 'story-123',
         result: 'Updated result with new metrics',
-      };
+      } as unknown as STARStoryUpdateInput;
 
       mockModel.update.mockResolvedValue({
         data: {
@@ -273,7 +273,7 @@ describe('STARStoryRepository', () => {
         task: 'New task',
         action: 'New action',
         result: 'New result',
-      };
+      } as unknown as STARStoryUpdateInput;
 
       mockModel.update.mockResolvedValue({
         data: {
