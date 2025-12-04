@@ -71,9 +71,7 @@ describe('AiOperationsRepository', () => {
         errors: mockErrors,
       });
 
-      await expect(repository.parseCvText('invalid text')).rejects.toThrow(
-        'AI operation failed'
-      );
+      await expect(repository.parseCvText('invalid text')).rejects.toThrow('AI operation failed');
     });
 
     it('should throw error when no data is returned', async () => {
@@ -82,9 +80,7 @@ describe('AiOperationsRepository', () => {
         errors: undefined,
       });
 
-      await expect(repository.parseCvText('test')).rejects.toThrow(
-        'AI operation returned no data'
-      );
+      await expect(repository.parseCvText('test')).rejects.toThrow('AI operation returned no data');
     });
   });
 
