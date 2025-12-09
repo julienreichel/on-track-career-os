@@ -74,42 +74,42 @@ function hasProfileData(profile: ParseCvTextOutput['profile']): boolean {
         v-if="profile.goals && profile.goals.length > 0"
         :label="t('profile.cvUpload.profile.goals')"
         :items="profile.goals"
-        @remove="(index) => emit('removeArrayItem', 'goals', index)"
+        @remove="(index: number) => emit('removeArrayItem', 'goals', index)"
       />
 
       <CvBadgeList
         v-if="profile.aspirations && profile.aspirations.length > 0"
         :label="t('profile.cvUpload.profile.aspirations')"
         :items="profile.aspirations"
-        @remove="(index) => emit('removeArrayItem', 'aspirations', index)"
+        @remove="(index: number) => emit('removeArrayItem', 'aspirations', index)"
       />
 
       <CvBadgeList
         v-if="profile.personalValues && profile.personalValues.length > 0"
         :label="t('profile.cvUpload.profile.personalValues')"
         :items="profile.personalValues"
-        @remove="(index) => emit('removeArrayItem', 'personalValues', index)"
+        @remove="(index: number) => emit('removeArrayItem', 'personalValues', index)"
       />
 
       <CvBadgeList
         v-if="profile.strengths && profile.strengths.length > 0"
         :label="t('profile.cvUpload.profile.strengths')"
         :items="profile.strengths"
-        @remove="(index) => emit('removeArrayItem', 'strengths', index)"
+        @remove="(index: number) => emit('removeArrayItem', 'strengths', index)"
       />
 
       <CvBadgeList
         v-if="profile.interests && profile.interests.length > 0"
         :label="t('profile.cvUpload.profile.interests')"
         :items="profile.interests"
-        @remove="(index) => emit('removeArrayItem', 'interests', index)"
+        @remove="(index: number) => emit('removeArrayItem', 'interests', index)"
       />
 
       <CvBadgeList
         v-if="profile.languages && profile.languages.length > 0"
         :label="t('profile.cvUpload.profile.languages')"
         :items="profile.languages"
-        @remove="(index) => emit('removeArrayItem', 'languages', index)"
+        @remove="(index: number) => emit('removeArrayItem', 'languages', index)"
       />
     </div>
   </UCard>

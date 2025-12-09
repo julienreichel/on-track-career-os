@@ -89,10 +89,7 @@ export function useCvParsing() {
     }
   }
 
-  function removeProfileArrayItem(
-    field: keyof ParseCvTextOutput['profile'],
-    index: number
-  ) {
+  function removeProfileArrayItem(field: keyof ParseCvTextOutput['profile'], index: number) {
     if (extractedProfile.value && Array.isArray(extractedProfile.value[field])) {
       (extractedProfile.value[field] as string[]).splice(index, 1);
     }

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import type { ParseCvTextOutput } from '@amplify/data/ai-operations/parseCvText';
+import type { ExtractedExperience } from '@/domain/ai-operations/Experience';
 
 const { t } = useI18n();
 
 interface Props {
-  experiences: ParseCvTextOutput['experiences'];
+  experiences: ExtractedExperience[];
 }
 
 defineProps<Props>();
@@ -14,7 +14,7 @@ const emit = defineEmits<{
   remove: [index: number];
 }>();
 
-function formatDateRange(start?: string, end?: string): string {
+function formatDateRange(start?: string, end?: string | null): string {
   if (!start) return t('profile.cvUpload.experiences.dateUnknown');
   if (!end) return `${start} - ${t('profile.cvUpload.experiences.present')}`;
   return `${start} - ${end}`;
@@ -35,22 +35,18 @@ function formatDateRange(start?: string, end?: string): string {
     </template>
 
     <div class="space-y-4">
-      <UCard
-        v-for="(exp, index) in experiences"
-        :key="index"
-        class="relative"
-      >
+      <UCard v-for="(exp, index) in experiences" :key="index" class="relative">
         <div class="space-y-2">
           <div class="flex items-start justify-between">
             <div>
-              <h4 class="font-semibold">{{ exp.position }}</h4>
+              <h4 class="font-semibold">{{ exp.title }}</h4>
               <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ exp.company }}
               </p>
             </div>
             <UButton
               icon="i-lucide-x"
-              color="red"
+              color="neutral"
               variant="ghost"
               size="xs"
               @click="emit('remove', index)"
@@ -61,15 +57,22 @@ function formatDateRange(start?: string, end?: string): string {
             {{ formatDateRange(exp.startDate, exp.endDate) }}
           </p>
 
-          <p class="text-sm">{{ exp.description }}</p>
-
-          <div v-if="exp.achievements?.length" class="space-y-1">
+          <div v-if="exp.responsibilities?.length" class="space-y-1">
             <p class="text-sm font-medium">
-              {{ t('profile.cvUpload.experiences.achievements') }}:
+              {{ t('profile.cvUpload.experiences.responsibilities') }}:
             </p>
             <ul class="list-disc list-inside text-sm space-y-1">
-              <li v-for="(achievement, i) in exp.achievements" :key="i">
-                {{ achievement }}
+              <li v-for="(resp, i) in exp.responsibilities" :key="i">
+                {{ resp }}
+              </li>
+            </ul>
+          </div>
+
+          <div v-if="exp.tasks?.length" class="space-y-1">
+            <p class="text-sm font-medium">{{ t('profile.cvUpload.experiences.tasks') }}:</p>
+            <ul class="list-disc list-inside text-sm space-y-1">
+              <li v-for="(task, i) in exp.tasks" :key="i">
+                {{ task }}
               </li>
             </ul>
           </div>

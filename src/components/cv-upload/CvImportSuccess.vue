@@ -30,9 +30,7 @@ const emit = defineEmits<{
       <UAlert
         color="primary"
         :title="t('profile.cvUpload.success.message')"
-        :description="
-          t('profile.cvUpload.success.imported', { count: importCount })
-        "
+        :description="t('profile.cvUpload.success.imported', { count: importCount })"
       />
 
       <div class="flex flex-col sm:flex-row gap-3">

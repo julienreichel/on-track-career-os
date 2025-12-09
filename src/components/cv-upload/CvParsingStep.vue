@@ -16,7 +16,7 @@ const { t } = useI18n();
       <USkeleton class="h-32 w-full" />
       <USkeleton class="h-24 w-full" />
       <USkeleton class="h-16 w-full" />
-      
+
       <p class="text-gray-600 dark:text-gray-400 text-center">
         {{ t('profile.cvUpload.parsing.inProgress') }}
       </p>

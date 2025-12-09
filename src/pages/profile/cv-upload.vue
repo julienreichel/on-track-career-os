@@ -17,20 +17,23 @@ const profileMerge = useProfileMerge();
 
 // Handle file selection and parsing
 async function handleFileSelected(file: File) {
-  workflow.startParsing(file);
-  
+  workflow.setUploadedFile(file);
+  workflow.setStep('parsing');
+
   try {
     await parsing.parseFile(file);
-    workflow.moveToPreview();
+    workflow.setStep('preview');
   } catch (error) {
-    workflow.setError(error instanceof Error ? error.message : t('profile.cvUpload.errors.unknown'));
+    workflow.setError(
+      error instanceof Error ? error.message : t('profile.cvUpload.errors.unknown')
+    );
     workflow.reset();
   }
 }
 
 // Handle import confirmation
 async function handleImport() {
-  workflow.startImporting();
+  workflow.setStep('importing');
 
   try {
     // Get current user ID
@@ -39,9 +42,9 @@ async function handleImport() {
 
     // Import experiences
     const count = await importing.importExperiences(
-      userId,
       parsing.extractedExperiences.value,
-      parsing.extractedText.value
+      parsing.extractedText.value,
+      userId
     );
     workflow.setImportCount(count);
 
@@ -54,10 +57,12 @@ async function handleImport() {
       );
     }
 
-    workflow.complete();
+    workflow.setStep('complete');
   } catch (error) {
-    workflow.setError(error instanceof Error ? error.message : t('profile.cvUpload.errors.importFailed'));
-    workflow.moveToPreview();
+    workflow.setError(
+      error instanceof Error ? error.message : t('profile.cvUpload.errors.importFailed')
+    );
+    workflow.setStep('preview');
   }
 }
 
@@ -89,10 +94,10 @@ function viewExperiences() {
         <UAlert
           v-if="workflow.errorMessage.value"
           icon="i-lucide-alert-triangle"
-          color="red"
+          color="error"
           :title="t('profile.cvUpload.errors.title')"
           :description="workflow.errorMessage.value"
-          :close-button="{ icon: 'i-lucide-x', color: 'red', variant: 'link' }"
+          :close-button="{ icon: 'i-lucide-x', color: 'error', variant: 'link' }"
           @close="workflow.clearError()"
         />
 

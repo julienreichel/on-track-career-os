@@ -13,9 +13,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="space-y-2">
-    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-      {{ label }}:
-    </p>
+    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ label }}:</p>
     <div class="flex flex-wrap gap-2">
       <UBadge
         v-for="(item, index) in items"

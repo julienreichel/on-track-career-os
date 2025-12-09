@@ -13,9 +13,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="space-y-2">
-    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-      {{ label }}:
-    </p>
+    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ label }}:</p>
     <UBadge color="primary" variant="subtle" class="group">
       <span>{{ value }}</span>
       <UButton
