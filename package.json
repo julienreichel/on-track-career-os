@@ -20,9 +20,9 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage --project unit --project amplify --project nuxt",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:debug": "playwright test --debug",
+    "test:e2e": "node scripts/playwright-runner.mjs",
+    "test:e2e:ui": "node scripts/playwright-runner.mjs --ui",
+    "test:e2e:debug": "node scripts/playwright-runner.mjs --debug",
     "test:e2e:report": "playwright show-report"
   },
   "bin": {
