@@ -158,14 +158,12 @@ function handleCancel() {
 
       <!-- Status -->
       <UFormField :label="t('experiences.form.status')">
-        <USelect
+        <URadioGroup
           v-model="form.status"
-          :options="[
+          :items="[
             { value: 'draft', label: t('experiences.status.draft') },
             { value: 'complete', label: t('experiences.status.complete') },
           ]"
-          option-attribute="label"
-          value-attribute="value"
         />
       </UFormField>
 
