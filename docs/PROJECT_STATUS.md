@@ -52,7 +52,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 #### ✅ EPIC 1A: User Data Intake & Identity Collection (95% Complete)
 
-**Status:** Nearly complete — only weaknesses field missing
+**Status:** Completed
 
 **Implemented:**
 
@@ -81,16 +81,6 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ 139 tests covering all features (65 component, 62 unit, 12 validator)
 - ✅ Conditional UI based on user state (CV upload only when no experiences)
 - ✅ Navigation UX (breadcrumbs, back buttons, dynamic labels)
-
-**Missing (Only 1 Feature):**
-
-- ❌ Weaknesses field (EPIC 1A mentions "strengths & weaknesses" but only strengths is implemented)
-
-**Next Steps:**
-
-1. Add `weaknesses: a.string().array()` field to UserProfile model
-2. Add weaknesses to AI parsing extraction and profile merge logic
-3. Add weaknesses input to profile page Identity & Values section
 
 ---
 

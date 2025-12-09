@@ -75,7 +75,7 @@ Shows:
 - Identity (name, headline)
 - Goals & aspirations
 - Core values
-- Strengths & weaknesses
+- Strengths
 
 Actions:
 
@@ -498,7 +498,7 @@ Dashboard → Start Profile Setup
 │   ├── Identity & Headline
 │   ├── Goals & Aspirations
 │   ├── Personal Values
-│   └── Strengths & Weaknesses
+│   └── Strengths
 ├── Experiences
 │   ├── Experience List
 │   ├── Experience Editor

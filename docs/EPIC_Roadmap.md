@@ -28,7 +28,7 @@ Collect all raw information about the user without interpreting it yet. All futu
 - Capture aspirations (future direction)
 - Capture professional goals
 - Capture personal values
-- Capture key strengths & weaknesses
+- Capture key strengths
 
 ### User Value
 
