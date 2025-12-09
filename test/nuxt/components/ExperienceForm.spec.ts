@@ -46,11 +46,11 @@ const stubs = {
     name: 'UCard',
     template: '<div class="u-card"><slot name="header" /><slot /></div>',
   },
-  UFormGroup: {
-    name: 'UFormGroup',
+  UFormField: {
+    name: 'UFormField',
     template:
-      '<div class="u-form-group"><label>{{ label }}<slot name="label" /></label><slot /><slot name="hint" /></div>',
-    props: ['label', 'required'],
+      '<div class="u-form-field"><label>{{ label }}<slot name="label" /></label><slot /><slot name="hint" /></div>',
+    props: ['label', 'required', 'hint'],
   },
   UInput: {
     name: 'UInput',
@@ -62,13 +62,13 @@ const stubs = {
     name: 'UTextarea',
     template:
       '<textarea class="u-textarea" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-    props: ['modelValue', 'placeholder', 'rows'],
+    props: ['modelValue', 'placeholder', 'rows', 'resize'],
   },
-  USelect: {
-    name: 'USelect',
+  URadioGroup: {
+    name: 'URadioGroup',
     template:
-      '<select class="u-select" :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><option v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.label }}</option></select>',
-    props: ['modelValue', 'options', 'optionAttribute', 'valueAttribute'],
+      '<div class="u-radio-group"><label v-for="item in items" :key="item.value"><input type="radio" :value="item.value" :checked="item.value === modelValue" @change="$emit(\'update:modelValue\', item.value)" /> {{ item.label }}</label></div>',
+    props: ['modelValue', 'items'],
   },
   UButton: {
     name: 'UButton',
@@ -125,7 +125,7 @@ describe('ExperienceForm', () => {
     const wrapper = createWrapper();
     expect(wrapper.findAll('.u-input').length).toBeGreaterThan(0);
     expect(wrapper.findAll('.u-textarea').length).toBe(2);
-    expect(wrapper.find('.u-select').exists()).toBe(true);
+    expect(wrapper.find('.u-radio-group').exists()).toBe(true);
   });
 
   it('displays field labels', () => {
