@@ -8,6 +8,16 @@ Playwright and Chromium browser are already installed. No additional setup requi
 
 ## Running Tests
 
+**Important**: Ensure the dev server is running before executing tests:
+```bash
+# Terminal 1: Start dev server
+npm run dev
+
+# Terminal 2: Run tests
+npm run test:e2e
+```
+
+Or let Playwright start the server automatically (configured in `playwright.config.ts`):
 ```bash
 # Run all E2E tests
 npm run test:e2e
@@ -16,14 +26,22 @@ npm run test:e2e
 npx playwright test smoke.spec.ts
 
 # Run tests in UI mode (interactive)
-npx playwright test --ui
+npm run test:e2e:ui
 
 # Run tests in debug mode
-npx playwright test --debug
+npm run test:e2e:debug
 
 # Show HTML report from last run
 npx playwright show-report
 ```
+
+### Troubleshooting
+
+If you see `TypeError: Cannot redefine property: Symbol($$jest-matchers-object)`:
+- This indicates a Vitest/Playwright matcher conflict
+- Ensure no test files in `test/e2e/` import from 'vitest'
+- The `scripts/playwright-runner.mjs` wrapper isolates the execution environment
+- Files with vitest imports should use `.skip` extension
 
 ## Test Structure
 
