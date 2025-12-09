@@ -35,7 +35,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 | EPIC   | Name                        | Backend | Domain | AI Ops     | Frontend | Overall |
 | ------ | --------------------------- | ------- | ------ | ---------- | -------- | ------- |
-| **1A** | User Data Intake & Identity | 90%     | 80%    | 60% (3/5)  | 5%       | **50%** |
+| **1A** | User Data Intake & Identity | 95%     | 95%    | 100% (2/2) | 90%      | **95%** |
 | **1B** | Personal Canvas Generation  | 100%    | 100%   | 100% (1/1) | 0%       | **60%** |
 | **2**  | Experience Builder (STAR)   | 90%     | 80%    | 100% (2/2) | 0%       | **50%** |
 | **3**  | Generic CV Generator        | 50%     | 60%    | 0% (0/1)   | 0%       | **20%** |
@@ -50,33 +50,47 @@ The project has established a **strong backend and domain foundation** with comp
 
 ### Detailed EPIC Analysis
 
-#### ✅ EPIC 1A: User Data Intake & Identity Collection (50% Complete)
+#### ✅ EPIC 1A: User Data Intake & Identity Collection (95% Complete)
 
-**Status:** Partially implemented — backend strong, frontend improving
+**Status:** Nearly complete — only weaknesses field missing
 
 **Implemented:**
 
-- ✅ UserProfile GraphQL model (owner-based auth)
-- ✅ `ai.parseCvText` Lambda + tests (3 passing) - **Enhanced with profile extraction**
-- ✅ `ai.extractExperienceBlocks` Lambda + tests
-- ✅ User profile repository/service/composable
-- ✅ Experience repository/service/composable
-- ✅ CV upload UI with preview and profile extraction
-- ✅ Experience list and edit pages
-- ✅ Profile information extraction and merge from CV (fullName, headline, location, seniority, goals, aspirations, values, strengths, interests, languages)
+- ✅ UserProfile GraphQL model (owner-based auth) with all required fields
+- ✅ `ai.parseCvText` Lambda + tests - extracts profile data (fullName, headline, location, seniority, goals, aspirations, values, strengths, interests, languages)
+- ✅ `ai.extractExperienceBlocks` Lambda + tests - extracts structured experience data
+- ✅ User profile repository/service/composable - full CRUD operations
+- ✅ Experience repository/service/composable - full CRUD operations
+- ✅ CV upload workflow (158 lines, refactored from 647)
+  - File upload (PDF/TXT)
+  - AI parsing with preview
+  - Profile and experience extraction
+  - Manual editing of extracted data
+  - Import to database
+- ✅ Experience management pages
+  - List view with edit/delete actions
+  - Edit/create form with all fields
+  - Dynamic breadcrumbs with company names
+- ✅ Profile page (`/profile`) with complete forms
+  - Core identity (fullName, headline, location, seniorityLevel)
+  - Career direction (goals, aspirations)
+  - Identity & values (personalValues, strengths, interests)
+  - Professional attributes (skills, certifications, languages)
+  - View/edit modes with conditional display
+  - Profile merge from CV upload
+- ✅ 139 tests covering all features (65 component, 62 unit, 12 validator)
+- ✅ Conditional UI based on user state (CV upload only when no experiences)
+- ✅ Navigation UX (breadcrumbs, back buttons, dynamic labels)
 
-**Missing:**
+**Missing (Only 1 Feature):**
 
-- ❌ Manual experience editing forms (partially done)
-- ❌ Aspirations/goals/values input forms (can be populated from CV)
-- ❌ Strengths/weaknesses capture UI (strengths extracted from CV)
-- ❌ `/profile` page with complete user info forms
+- ❌ Weaknesses field (EPIC 1A mentions "strengths & weaknesses" but only strengths is implemented)
 
 **Next Steps:**
 
-1. Create `/profile` page with user info forms to view/edit extracted profile data
-2. Enhance manual editing for extracted experiences
-3. Add forms for manual entry of aspirations, goals, values, strengths (complementing CV extraction)
+1. Add `weaknesses: a.string().array()` field to UserProfile model
+2. Add weaknesses to AI parsing extraction and profile merge logic
+3. Add weaknesses input to profile page Identity & Values section
 
 ---
 

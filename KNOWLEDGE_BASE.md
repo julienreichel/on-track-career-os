@@ -225,7 +225,39 @@ _(From AI Interaction Contract) _
 
 ---
 
-## 7. Development Constraints
+## 8. Current Implementation Status
+
+### MVP Progress: ~40% Complete
+
+#### ✅ EPIC 1A: User Data Intake & Identity (95% Complete)
+
+**Fully Implemented:**
+- CV upload workflow with PDF/TXT parsing
+- AI extraction of experiences and profile data
+- Profile page with all fields (goals, aspirations, values, strengths, interests, skills, certifications, languages)
+- Experience management (list, create, edit, delete)
+- Profile merge from CV upload
+- 139 tests (65 component, 62 unit, 12 validator)
+
+**Missing:**
+- Weaknesses field (see `docs/PROMPTS.md` for implementation prompt)
+
+#### ✅ EPIC 1B: Personal Canvas Generation (60% Complete)
+
+**Implemented:**
+- Backend: GraphQL model + Lambda + repository/service/composable
+- 42 tests passing
+
+**Missing:**
+- Frontend: Canvas view/edit page, visualization UI
+
+#### ⚠️ Other EPICs: Backend foundations in place, frontend implementation pending
+
+See `docs/PROJECT_STATUS.md` for detailed progress on all 10 MVP EPICs.
+
+---
+
+## 9. Development Constraints
 
 _(From Tech Foundations) _
 
