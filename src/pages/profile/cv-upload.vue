@@ -80,7 +80,17 @@ function viewExperiences() {
 <template>
   <UContainer>
     <UPage>
-      <UPageHeader :title="t('cvUpload.title')" :description="t('cvUpload.description')" />
+      <UPageHeader :title="t('cvUpload.title')" :description="t('cvUpload.description')">
+        <template #actions>
+          <UButton
+            v-if="workflow.currentStep.value === 'upload'"
+            icon="i-heroicons-arrow-left"
+            variant="ghost"
+            :label="t('navigation.backToProfile')"
+            @click="router.push('/profile')"
+          />
+        </template>
+      </UPageHeader>
 
       <UPageBody>
         <!-- Error Alert -->

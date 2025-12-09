@@ -2,6 +2,18 @@
   "app": {
     "title": "AI Career OS"
   },
+  "navigation": {
+    "home": "Home",
+    "profile": "Profile",
+    "cvUpload": "Upload CV",
+    "experiences": "Experiences",
+    "jobs": "Jobs & Companies",
+    "companies": "Companies",
+    "applications": "Applications",
+    "interview": "Interview Prep",
+    "backToProfile": "Back to Profile",
+    "backToHome": "Back to Home"
+  },
   "auth": {
     "signOut": "Sign Out",
     "errorSigningOut": "Error signing out"

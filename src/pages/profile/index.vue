@@ -2,9 +2,22 @@
   <UPage>
     <UPageHeader :title="t('profile.title')" :description="t('profile.description')">
       <template #actions>
-        <UButton v-if="!isEditing" icon="i-heroicons-pencil" color="primary" @click="startEditing">
-          {{ t('profile.actions.edit') }}
-        </UButton>
+        <div class="flex items-center gap-2">
+          <UButton
+            icon="i-heroicons-arrow-left"
+            variant="ghost"
+            :label="t('navigation.backToHome')"
+            @click="$router.push('/')"
+          />
+          <UButton
+            v-if="!isEditing"
+            icon="i-heroicons-pencil"
+            color="primary"
+            @click="startEditing"
+          >
+            {{ t('profile.actions.edit') }}
+          </UButton>
+        </div>
       </template>
     </UPageHeader>
 
