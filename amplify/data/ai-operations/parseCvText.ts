@@ -88,11 +88,10 @@ export interface ParseCvTextInput {
 }
 
 /**
- * Validate and apply fallback rules from AIC
+ * Validate sections and apply fallback for missing or invalid data
  */
-function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOutput {
-  // If sections is missing, create empty fallback structure
-  const sections = parsedOutput.sections || {
+function validateSections(sections: Partial<ParseCvTextOutput['sections']> | undefined): ParseCvTextOutput['sections'] {
+  const fallbackSections = {
     experiences: [],
     education: [],
     skills: [],
@@ -100,54 +99,69 @@ function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOu
     rawBlocks: [],
   };
 
-  const validatedSections = {
-    experiences: Array.isArray(sections.experiences) ? sections.experiences : [],
-    education: Array.isArray(sections.education) ? sections.education : [],
-    skills: Array.isArray(sections.skills) ? sections.skills : [],
-    certifications: Array.isArray(sections.certifications) ? sections.certifications : [],
+  const parsedSections = sections || fallbackSections;
+
+  return {
+    experiences: Array.isArray(parsedSections.experiences) ? parsedSections.experiences : [],
+    education: Array.isArray(parsedSections.education) ? parsedSections.education : [],
+    skills: Array.isArray(parsedSections.skills) ? parsedSections.skills : [],
+    certifications: Array.isArray(parsedSections.certifications) ? parsedSections.certifications : [],
     // Support both camelCase and snake_case from AI response
-    rawBlocks: Array.isArray(sections.rawBlocks)
-      ? sections.rawBlocks
-      : Array.isArray((sections as Record<string, unknown>).raw_blocks)
-        ? ((sections as Record<string, unknown>).raw_blocks as string[])
+    rawBlocks: Array.isArray(parsedSections.rawBlocks)
+      ? parsedSections.rawBlocks
+      : Array.isArray((parsedSections as Record<string, unknown>).raw_blocks)
+        ? ((parsedSections as Record<string, unknown>).raw_blocks as string[])
         : [],
   };
+}
 
-  // Validate profile data
-  const profile = parsedOutput.profile || {};
-  const validatedProfile = {
-    fullName: typeof profile.fullName === 'string' ? profile.fullName : undefined,
-    headline: typeof profile.headline === 'string' ? profile.headline : undefined,
-    location: typeof profile.location === 'string' ? profile.location : undefined,
-    seniorityLevel: typeof profile.seniorityLevel === 'string' ? profile.seniorityLevel : undefined,
-    goals: Array.isArray(profile.goals) ? profile.goals : [],
-    aspirations: Array.isArray(profile.aspirations) ? profile.aspirations : [],
-    personalValues: Array.isArray(profile.personalValues) ? profile.personalValues : [],
-    strengths: Array.isArray(profile.strengths) ? profile.strengths : [],
-    interests: Array.isArray(profile.interests) ? profile.interests : [],
-    languages: Array.isArray(profile.languages) ? profile.languages : [],
+/**
+ * Validate profile data and apply fallback for missing or invalid fields
+ */
+function validateProfile(profile: Partial<ParseCvTextOutput['profile']> | undefined): ParseCvTextOutput['profile'] {
+  const parsedProfile = profile || {};
+
+  return {
+    fullName: typeof parsedProfile.fullName === 'string' ? parsedProfile.fullName : undefined,
+    headline: typeof parsedProfile.headline === 'string' ? parsedProfile.headline : undefined,
+    location: typeof parsedProfile.location === 'string' ? parsedProfile.location : undefined,
+    seniorityLevel: typeof parsedProfile.seniorityLevel === 'string' ? parsedProfile.seniorityLevel : undefined,
+    goals: Array.isArray(parsedProfile.goals) ? parsedProfile.goals : [],
+    aspirations: Array.isArray(parsedProfile.aspirations) ? parsedProfile.aspirations : [],
+    personalValues: Array.isArray(parsedProfile.personalValues) ? parsedProfile.personalValues : [],
+    strengths: Array.isArray(parsedProfile.strengths) ? parsedProfile.strengths : [],
+    interests: Array.isArray(parsedProfile.interests) ? parsedProfile.interests : [],
+    languages: Array.isArray(parsedProfile.languages) ? parsedProfile.languages : [],
   };
+}
 
-  // Calculate confidence based on content
-  // If all sections are empty, confidence should be low
+/**
+ * Calculate confidence score based on extracted content
+ */
+function calculateConfidence(
+  sections: ParseCvTextOutput['sections'],
+  providedConfidence: number | undefined
+): number {
   const totalItems =
-    validatedSections.experiences.length +
-    validatedSections.education.length +
-    validatedSections.skills.length +
-    validatedSections.certifications.length +
-    validatedSections.rawBlocks.length;
+    sections.experiences.length +
+    sections.education.length +
+    sections.skills.length +
+    sections.certifications.length +
+    sections.rawBlocks.length;
 
-  let confidence: number;
-  if (typeof parsedOutput.confidence === 'number') {
-    confidence = parsedOutput.confidence;
-  } else {
-    confidence = DEFAULT_CONFIDENCE;
-  }
+  const confidence = typeof providedConfidence === 'number' ? providedConfidence : DEFAULT_CONFIDENCE;
 
   // Override confidence to low if no content was extracted
-  if (totalItems === 0) {
-    confidence = Math.min(confidence, LOW_CONFIDENCE_THRESHOLD);
-  }
+  return totalItems === 0 ? Math.min(confidence, LOW_CONFIDENCE_THRESHOLD) : confidence;
+}
+
+/**
+ * Validate and apply fallback rules from AIC
+ */
+function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOutput {
+  const validatedSections = validateSections(parsedOutput.sections);
+  const validatedProfile = validateProfile(parsedOutput.profile);
+  const confidence = calculateConfidence(validatedSections, parsedOutput.confidence);
 
   return {
     sections: validatedSections,
