@@ -25,9 +25,9 @@ function formatDateRange(start?: string, end?: string | null): string {
   <UCard v-if="experiences.length > 0">
     <template #header>
       <div class="flex items-center justify-between">
-        <h3 class="text-lg font-semibold">
+        <UText size="lg" weight="semibold">
           {{ t('cvUpload.sections.experiences') }}
-        </h3>
+        </UText>
         <UBadge color="primary">
           {{ experiences.length }}
         </UBadge>
@@ -39,10 +39,10 @@ function formatDateRange(start?: string, end?: string | null): string {
         <div class="space-y-2">
           <div class="flex items-start justify-between">
             <div>
-              <h4 class="font-semibold">{{ exp.title }}</h4>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
+              <UText weight="semibold">{{ exp.title }}</UText>
+              <UText size="sm" color="neutral">
                 {{ exp.company }}
-              </p>
+              </UText>
             </div>
             <UButton
               icon="i-lucide-x"
@@ -53,22 +53,22 @@ function formatDateRange(start?: string, end?: string | null): string {
             />
           </div>
 
-          <p class="text-sm text-gray-500">
+          <UText size="sm" color="neutral">
             {{ formatDateRange(exp.startDate, exp.endDate) }}
-          </p>
+          </UText>
 
           <div v-if="exp.responsibilities?.length" class="space-y-1">
-            <p class="text-sm font-medium">{{ t('experiences.form.responsibilities') }}:</p>
-            <ul class="list-disc list-inside text-sm space-y-1">
+            <UText size="sm" weight="medium">{{ t('experiences.form.responsibilities') }}:</UText>UText>
+            <ul class="list-disc list-inside space-y-1">
               <li v-for="(resp, i) in exp.responsibilities" :key="i">
-                {{ resp }}
+                <UText size="sm">{{ resp }}</UText>
               </li>
             </ul>
           </div>
 
           <div v-if="exp.tasks?.length" class="space-y-1">
-            <p class="text-sm font-medium">{{ t('experiences.form.tasks') }}:</p>
-            <ul class="list-disc list-inside text-sm space-y-1">
+            <UText size="sm" weight="medium">{{ t('experiences.form.tasks') }}:</UText>
+            <ul class="list-disc list-inside space-y-1">
               <li v-for="(task, i) in exp.tasks" :key="i">
                 {{ task }}
               </li>

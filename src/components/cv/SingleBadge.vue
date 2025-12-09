@@ -13,13 +13,13 @@ const emit = defineEmits<{
 
 <template>
   <div class="space-y-2">
-    <p class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ label }}:</p>
+    <UText size="sm" weight="medium">{{ label }}:</UText>
     <UBadge color="primary" variant="subtle" class="group">
       <span>{{ value }}</span>
       <UButton
         icon="i-lucide-x"
-        size="2xs"
-        color="red"
+        size="xs"
+        color="error"
         variant="ghost"
         class="ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
         @click="emit('remove')"

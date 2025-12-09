@@ -18,11 +18,11 @@ const emit = defineEmits<{
 <template>
   <UCard>
     <template #header>
-      <div class="flex items-center space-x-2">
-        <UIcon name="i-lucide-check-circle" class="text-green-500" />
-        <h2 class="text-xl font-semibold">
+      <div class="flex items-center gap-2">
+        <UIcon name="i-lucide-check-circle" color="success" />
+        <UText size="xl" weight="semibold">
           {{ t('cvUpload.importing') }}
-        </h2>
+        </UText>
       </div>
     </template>
 
