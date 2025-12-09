@@ -20,8 +20,8 @@ const DEFAULT_CONFIDENCE = 0.5;
 const LOW_CONFIDENCE_THRESHOLD = 0.3; // Applied when no content extracted
 
 // System prompt - constant as per AIC
-const SYSTEM_PROMPT = `You are a CV text parser that extracts structured sections from CV text.
-Extract experiences, education, skills, certifications, and other text blocks.
+const SYSTEM_PROMPT = `You are a CV text parser that extracts structured sections and profile information from CV text.
+Extract experiences, education, skills, certifications, and personal profile information.
 Never invent information not present in the text.
 Return ONLY valid JSON with no markdown wrappers.
 
@@ -29,7 +29,10 @@ RULES:
 - Extract only information explicitly stated in the CV
 - Do not infer or invent missing details
 - Categorize text into appropriate sections
-- If a section has no content, return empty array
+- Extract profile information: full name, headline/title, location, seniority level, goals, aspirations, values, strengths, interests, languages
+- Skills should be extracted into the sections.skills array
+- Certifications should be extracted into the sections.certifications array
+- If a section has no content, return empty array or omit the field
 - Return ONLY valid JSON matching the specified schema`;
 
 // Output schema for retry
@@ -40,6 +43,18 @@ const OUTPUT_SCHEMA = `{
     "skills": ["string"],
     "certifications": ["string"],
     "rawBlocks": ["string"]
+  },
+  "profile": {
+    "fullName": "string",
+    "headline": "string",
+    "location": "string",
+    "seniorityLevel": "string",
+    "goals": ["string"],
+    "aspirations": ["string"],
+    "personalValues": ["string"],
+    "strengths": ["string"],
+    "interests": ["string"],
+    "languages": ["string"]
   },
   "confidence": 0.95
 }`;
@@ -52,6 +67,18 @@ export interface ParseCvTextOutput {
     skills: string[];
     certifications: string[];
     rawBlocks: string[];
+  };
+  profile: {
+    fullName?: string;
+    headline?: string;
+    location?: string;
+    seniorityLevel?: string;
+    goals?: string[];
+    aspirations?: string[];
+    personalValues?: string[];
+    strengths?: string[];
+    interests?: string[];
+    languages?: string[];
   };
   confidence: number;
 }
@@ -86,6 +113,21 @@ function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOu
         : [],
   };
 
+  // Validate profile data
+  const profile = parsedOutput.profile || {};
+  const validatedProfile = {
+    fullName: typeof profile.fullName === 'string' ? profile.fullName : undefined,
+    headline: typeof profile.headline === 'string' ? profile.headline : undefined,
+    location: typeof profile.location === 'string' ? profile.location : undefined,
+    seniorityLevel: typeof profile.seniorityLevel === 'string' ? profile.seniorityLevel : undefined,
+    goals: Array.isArray(profile.goals) ? profile.goals : [],
+    aspirations: Array.isArray(profile.aspirations) ? profile.aspirations : [],
+    personalValues: Array.isArray(profile.personalValues) ? profile.personalValues : [],
+    strengths: Array.isArray(profile.strengths) ? profile.strengths : [],
+    interests: Array.isArray(profile.interests) ? profile.interests : [],
+    languages: Array.isArray(profile.languages) ? profile.languages : [],
+  };
+
   // Calculate confidence based on content
   // If all sections are empty, confidence should be low
   const totalItems =
@@ -109,6 +151,7 @@ function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOu
 
   return {
     sections: validatedSections,
+    profile: validatedProfile,
     confidence,
   };
 }

@@ -17,6 +17,7 @@ export function isParsedCV(data: unknown): data is ParsedCV {
   const cv = data as Record<string, unknown>;
 
   if (!cv.sections || typeof cv.sections !== 'object') return false;
+  if (!cv.profile || typeof cv.profile !== 'object') return false;
 
   const sections = cv.sections as Record<string, unknown>;
 
