@@ -12,16 +12,11 @@
             :to="{ name: 'profile' }"
           />
           <UPageCard
+            v-if="showCvUpload"
             :title="t('features.cvUpload.title')"
             :description="t('features.cvUpload.description')"
             icon="i-heroicons-arrow-up-tray"
             :to="{ name: 'profile-cv-upload' }"
-          />
-          <UPageCard
-            :title="t('features.experiences.title')"
-            :description="t('features.experiences.description')"
-            icon="i-heroicons-briefcase"
-            :to="{ name: 'profile-experiences' }"
           />
           <UPageCard
             :title="t('features.jobs.title')"
@@ -45,8 +40,27 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 
 // Home page - requires authentication
 const { t } = useI18n();
+
+const showCvUpload = ref(false);
+const experienceRepo = new ExperienceRepository();
+
+// Check if user has any experiences
+onMounted(async () => {
+  try {
+    const experiences = await experienceRepo.list();
+    // Show CV upload only if user has no experiences
+    showCvUpload.value = !experiences || experiences.length === 0;
+  } catch (error) {
+    console.error('Error checking experiences:', error);
+    // Show CV upload on error (better UX to show than hide)
+    showCvUpload.value = true;
+  }
+});
 </script>
+
