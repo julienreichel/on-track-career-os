@@ -195,13 +195,14 @@ French (Basic)
     
     // Profile should have some extracted data (with real AI, not fake provider)
     // Note: With FAKE_AI_PROVIDER, profile fields might be empty
-    const hasProfileData = 
+    const hasProfileData = Boolean(
       parsedCv.profile.fullName ||
       parsedCv.profile.headline ||
       parsedCv.profile.location ||
       parsedCv.profile.goals.length > 0 ||
       parsedCv.profile.strengths.length > 0 ||
-      parsedCv.profile.languages.length > 0;
+      parsedCv.profile.languages.length > 0
+    );
     
     if (process.env.FAKE_AI_PROVIDER !== 'true') {
       // With real AI, we expect profile data to be extracted
