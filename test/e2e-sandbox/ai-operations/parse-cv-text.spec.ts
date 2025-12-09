@@ -98,8 +98,21 @@ describe('AI Operations - Parse CV Text (E2E Sandbox)', () => {
     // Test input - realistic CV text
     const cvText = `
 John Doe
-Senior Software Engineer
+Senior Software Engineer | San Francisco, CA
 john.doe@example.com | +1-555-0123
+
+PROFESSIONAL SUMMARY
+Experienced software engineer with strong leadership and cloud expertise.
+
+GOALS
+- Lead a distributed engineering team
+- Contribute to open source projects
+- Mentor junior developers
+
+STRENGTHS
+- Technical leadership
+- System architecture
+- Problem solving
 
 EXPERIENCE
 Senior Software Engineer at TechCorp (2020-2023)
@@ -126,6 +139,11 @@ Databases: PostgreSQL, MongoDB, Redis
 CERTIFICATIONS
 AWS Certified Solutions Architect - Professional (2022)
 Kubernetes Certified Administrator (2021)
+
+LANGUAGES
+English (Native)
+Spanish (Fluent)
+French (Basic)
 `;
 
     // Invoke AI operation via repository
@@ -133,6 +151,7 @@ Kubernetes Certified Administrator (2021)
 
     // Validate structure (per AI Interaction Contract)
     expect(parsedCv).toHaveProperty('sections');
+    expect(parsedCv).toHaveProperty('profile');
     expect(parsedCv).toHaveProperty('confidence');
 
     // Validate sections
@@ -149,6 +168,18 @@ Kubernetes Certified Administrator (2021)
     expect(Array.isArray(parsedCv.sections.certifications)).toBe(true);
     expect(Array.isArray(parsedCv.sections.rawBlocks)).toBe(true);
 
+    // Validate profile object
+    expect(parsedCv.profile).toBeDefined();
+    expect(typeof parsedCv.profile).toBe('object');
+    
+    // Profile should have array fields
+    expect(Array.isArray(parsedCv.profile.goals)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.aspirations)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.personalValues)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.strengths)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.interests)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.languages)).toBe(true);
+
     // Validate confidence score
     expect(typeof parsedCv.confidence).toBe('number');
     expect(parsedCv.confidence).toBeGreaterThanOrEqual(0);
@@ -161,6 +192,21 @@ Kubernetes Certified Administrator (2021)
       parsedCv.sections.skills.length +
       parsedCv.sections.certifications.length;
     expect(totalParsedItems).toBeGreaterThan(0);
+    
+    // Profile should have some extracted data (with real AI, not fake provider)
+    // Note: With FAKE_AI_PROVIDER, profile fields might be empty
+    const hasProfileData = 
+      parsedCv.profile.fullName ||
+      parsedCv.profile.headline ||
+      parsedCv.profile.location ||
+      parsedCv.profile.goals.length > 0 ||
+      parsedCv.profile.strengths.length > 0 ||
+      parsedCv.profile.languages.length > 0;
+    
+    if (process.env.FAKE_AI_PROVIDER !== 'true') {
+      // With real AI, we expect profile data to be extracted
+      expect(hasProfileData).toBe(true);
+    }
   }, 60000); // 60s timeout for AI operation
 
   it('should handle empty CV text gracefully', async () => {
@@ -170,14 +216,24 @@ Kubernetes Certified Administrator (2021)
 
     // Validate structure is returned (even if empty)
     expect(parsedCv).toHaveProperty('sections');
+    expect(parsedCv).toHaveProperty('profile');
     expect(parsedCv).toHaveProperty('confidence');
 
-    // All fields should be arrays (even if empty)
+    // All section fields should be arrays (even if empty)
     expect(Array.isArray(parsedCv.sections.experiences)).toBe(true);
     expect(Array.isArray(parsedCv.sections.education)).toBe(true);
     expect(Array.isArray(parsedCv.sections.skills)).toBe(true);
     expect(Array.isArray(parsedCv.sections.certifications)).toBe(true);
     expect(Array.isArray(parsedCv.sections.rawBlocks)).toBe(true);
+
+    // Profile should exist with empty/undefined fields
+    expect(parsedCv.profile).toBeDefined();
+    expect(Array.isArray(parsedCv.profile.goals)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.aspirations)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.personalValues)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.strengths)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.interests)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.languages)).toBe(true);
 
     // Confidence should indicate low quality
     expect(parsedCv.confidence).toBeLessThan(0.5);
@@ -195,6 +251,7 @@ Skills: JavaScript, Python
 
     // Validate structure
     expect(parsedCv).toHaveProperty('sections');
+    expect(parsedCv).toHaveProperty('profile');
     expect(parsedCv).toHaveProperty('confidence');
 
     // Should extract at least some information
@@ -203,6 +260,9 @@ Skills: JavaScript, Python
       parsedCv.sections.skills.length > 0 ||
       parsedCv.sections.rawBlocks.length > 0;
     expect(hasContent).toBe(true);
+    
+    // Profile should exist even if mostly empty
+    expect(parsedCv.profile).toBeDefined();
   }, 60000);
 
   it('should validate AI operation is properly configured', async () => {
