@@ -71,9 +71,7 @@ describe('useProfileMerge', () => {
 
     expect(mockRepo.get).toHaveBeenCalledWith('user-123');
     expect(mockRepo.update).not.toHaveBeenCalled();
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      'User profile not found, skipping profile update'
-    );
+    expect(consoleWarnSpy).toHaveBeenCalledWith('User profile not found, skipping profile update');
 
     consoleWarnSpy.mockRestore();
   });

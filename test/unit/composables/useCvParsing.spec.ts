@@ -273,9 +273,7 @@ describe('useCvParsing', () => {
 
       mockAiOps.experiences.value = null;
 
-      await expect(parsing.parseFile(textFile)).rejects.toThrow(
-        'cvUpload.errors.extractionFailed'
-      );
+      await expect(parsing.parseFile(textFile)).rejects.toThrow('cvUpload.errors.extractionFailed');
     });
   });
 
