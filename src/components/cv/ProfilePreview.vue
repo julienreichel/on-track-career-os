@@ -34,9 +34,9 @@ function hasProfileData(profile: ParseCvTextOutput['profile']): boolean {
 <template>
   <UCard v-if="hasProfileData(profile)">
     <template #header>
-      <UText size="lg" weight="semibold">
+      <h3 class="text-lg font-semibold">
         {{ t('cvUpload.sections.profile') }}
-      </UText>
+      </h3>
     </template>
 
     <div class="space-y-4">
