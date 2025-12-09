@@ -12,7 +12,8 @@
     "applications": "Applications",
     "interview": "Interview Prep",
     "backToProfile": "Back to Profile",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "new": "New"
   },
   "auth": {
     "signOut": "Sign Out",

@@ -61,7 +61,16 @@ const breadcrumbItems = computed(() => {
     currentPath += `/${pathSegments[i]}`;
     const segment = pathSegments[i];
 
-    // Map route segments to translation keys
+    // Check if this is the last segment and we have a custom breadcrumb label from page meta
+    if (i === pathSegments.length - 1 && route.meta.breadcrumbLabel) {
+      items.push({
+        label: String(route.meta.breadcrumbLabel),
+        to: currentPath,
+      });
+      continue;
+    }
+
+    // Map route segments to translation keys or use the segment itself
     let label = segment;
     if (segment === 'profile') {
       label = t('navigation.profile');
@@ -77,6 +86,8 @@ const breadcrumbItems = computed(() => {
       label = t('navigation.applications');
     } else if (segment === 'interview') {
       label = t('navigation.interview');
+    } else if (segment === 'new') {
+      label = t('navigation.new');
     }
 
     items.push({

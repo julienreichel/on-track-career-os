@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
@@ -23,10 +23,26 @@ const experienceId = computed(() => {
 
 const isNewExperience = computed(() => experienceId.value === 'new' || !experienceId.value);
 
+// Update page meta with company name for breadcrumb
+watch(
+  () => experience.value,
+  (exp) => {
+    if (exp?.companyName) {
+      // Update route meta for breadcrumb
+      route.meta.breadcrumbLabel = exp.companyName;
+    } else if (isNewExperience.value) {
+      route.meta.breadcrumbLabel = t('navigation.new');
+    }
+  },
+  { immediate: true }
+);
+
 // Load experience if editing
 onMounted(async () => {
   if (!isNewExperience.value && experienceId.value) {
     await loadExperience(experienceId.value);
+  } else if (isNewExperience.value) {
+    route.meta.breadcrumbLabel = t('navigation.new');
   }
 });
 
