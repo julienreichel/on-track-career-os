@@ -70,6 +70,15 @@ watch(
   { immediate: true }
 );
 
+// Helper to get status value for radio group (converts null to string)
+function getStatusValue(): string {
+  return form.value.status ?? 'draft';
+}
+
+function handleStatusChange(value: string) {
+  form.value.status = value as 'draft' | 'complete';
+}
+
 function handleSubmit() {
   // Convert text areas to arrays
   form.value.responsibilities = responsibilitiesText.value
@@ -159,11 +168,12 @@ function handleCancel() {
       <!-- Status -->
       <UFormField :label="t('experiences.form.status')">
         <URadioGroup
-          v-model="form.status"
+          :model-value="getStatusValue()"
           :items="[
             { value: 'draft', label: t('experiences.status.draft') },
             { value: 'complete', label: t('experiences.status.complete') },
           ]"
+          @update:model-value="handleStatusChange"
         />
       </UFormField>
 
