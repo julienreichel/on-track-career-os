@@ -171,7 +171,7 @@ French (Basic)
     // Validate profile object
     expect(parsedCv.profile).toBeDefined();
     expect(typeof parsedCv.profile).toBe('object');
-    
+
     // Profile should have array fields
     expect(Array.isArray(parsedCv.profile.goals)).toBe(true);
     expect(Array.isArray(parsedCv.profile.aspirations)).toBe(true);
@@ -192,7 +192,7 @@ French (Basic)
       parsedCv.sections.skills.length +
       parsedCv.sections.certifications.length;
     expect(totalParsedItems).toBeGreaterThan(0);
-    
+
     // Profile should have some extracted data (with real AI, not fake provider)
     // Note: With FAKE_AI_PROVIDER, profile fields might be empty
     const hasProfileData = Boolean(
@@ -203,7 +203,7 @@ French (Basic)
       parsedCv.profile.strengths.length > 0 ||
       parsedCv.profile.languages.length > 0
     );
-    
+
     if (process.env.FAKE_AI_PROVIDER !== 'true') {
       // With real AI, we expect profile data to be extracted
       expect(hasProfileData).toBe(true);
@@ -261,7 +261,7 @@ Skills: JavaScript, Python
       parsedCv.sections.skills.length > 0 ||
       parsedCv.sections.rawBlocks.length > 0;
     expect(hasContent).toBe(true);
-    
+
     // Profile should exist even if mostly empty
     expect(parsedCv.profile).toBeDefined();
   }, 60000);

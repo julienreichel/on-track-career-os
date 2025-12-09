@@ -119,7 +119,12 @@ GOALS
       ? languagesMatch[1]
           .trim()
           .split(',')
-          .map((l) => l.trim().replace(/\(.*?\)/, '').trim())
+          .map((l) =>
+            l
+              .trim()
+              .replace(/\(.*?\)/, '')
+              .trim()
+          )
           .filter((l) => l)
       : [];
 
@@ -200,7 +205,7 @@ GOALS
       expect(parsed.sections.skills).toContain('JavaScript');
       expect(parsed.sections.certifications).toHaveLength(1);
       expect(parsed.sections.certifications[0]).toContain('AWS Certified');
-      
+
       // Verify profile information extraction
       expect(parsed.profile).toBeDefined();
       expect(parsed.profile.fullName).toBe('John Doe');
@@ -211,7 +216,7 @@ GOALS
       expect(parsed.profile.languages).toContain('Spanish');
       expect(parsed.profile.goals).toHaveLength(2);
       expect(parsed.profile.goals[0]).toContain('distributed engineering team');
-      
+
       expect(parsed.confidence).toBe(0.95);
     });
     it('should validate output structure and apply operation-specific fallbacks', async () => {
@@ -249,14 +254,14 @@ GOALS
       expect(parsed.sections.skills).toEqual([]);
       expect(parsed.sections.certifications).toEqual([]);
       expect(parsed.sections.rawBlocks).toEqual([]);
-      
+
       // Verify profile validation
       expect(parsed.profile).toBeDefined();
       expect(parsed.profile.fullName).toBe('Test User');
       expect(parsed.profile.goals).toEqual([]);
       expect(parsed.profile.aspirations).toEqual([]);
       expect(parsed.profile.languages).toEqual([]);
-      
+
       expect(parsed.confidence).toBe(0.5); // DEFAULT_CONFIDENCE fallback
     });
 
@@ -292,7 +297,7 @@ GOALS
       expect(result.sections.skills).toEqual([]);
       expect(result.sections.certifications).toEqual([]);
       expect(result.sections.rawBlocks).toEqual([]);
-      
+
       // Should apply fallback for missing profile
       expect(result.profile).toBeDefined();
       expect(result.profile.goals).toEqual([]);
@@ -301,7 +306,7 @@ GOALS
       expect(result.profile.strengths).toEqual([]);
       expect(result.profile.interests).toEqual([]);
       expect(result.profile.languages).toEqual([]);
-      
+
       expect(result.confidence).toBe(0.3); // Low confidence due to no content
     });
   });
