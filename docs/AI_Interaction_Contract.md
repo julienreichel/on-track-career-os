@@ -81,15 +81,25 @@ Below is the **minimum viable version** of each operation, including purpose, pr
 
 ### Purpose
 
-Extract raw text sections from PDF-extracted CV text and normalize for downstream processing.
+Extract raw text sections from PDF-extracted CV text and normalize for downstream processing. Additionally, extract profile information such as name, headline, location, seniority level, goals, aspirations, values, strengths, interests, and languages.
 
 ### System Prompt
 
 ```
-You are a CV text parser.
-You MUST return structured JSON only.
-Extract distinct sections and normalize them.
-Never invent information.
+You are a CV text parser that extracts structured sections and profile information from CV text.
+Extract experiences, education, skills, certifications, and personal profile information.
+Never invent information not present in the text.
+Return ONLY valid JSON with no markdown wrappers.
+
+RULES:
+- Extract only information explicitly stated in the CV
+- Do not infer or invent missing details
+- Categorize text into appropriate sections
+- Extract profile information: full name, headline/title, location, seniority level, goals, aspirations, values, strengths, interests, languages
+- Skills should be extracted into the sections.skills array
+- Certifications should be extracted into the sections.certifications array
+- If a section has no content, return empty array or omit the field
+- Return ONLY valid JSON matching the specified schema
 ```
 
 ### User Prompt
@@ -97,6 +107,30 @@ Never invent information.
 ```
 Extract structured sections from this CV text:
 {{cvText}}
+
+Return a JSON object with this exact structure:
+{
+  "sections": {
+    "experiences": ["string"],
+    "education": ["string"],
+    "skills": ["string"],
+    "certifications": ["string"],
+    "rawBlocks": ["string"]
+  },
+  "profile": {
+    "fullName": "string",
+    "headline": "string",
+    "location": "string",
+    "seniorityLevel": "string",
+    "goals": ["string"],
+    "aspirations": ["string"],
+    "personalValues": ["string"],
+    "strengths": ["string"],
+    "interests": ["string"],
+    "languages": ["string"]
+  },
+  "confidence": 0.95
+}
 ```
 
 ### Input Schema
@@ -118,9 +152,29 @@ Extract structured sections from this CV text:
     "certifications": ["string"],
     "rawBlocks": ["string"]
   },
+  "profile": {
+    "fullName": "string (optional)",
+    "headline": "string (optional)",
+    "location": "string (optional)",
+    "seniorityLevel": "string (optional)",
+    "goals": ["string"],
+    "aspirations": ["string"],
+    "personalValues": ["string"],
+    "strengths": ["string"],
+    "interests": ["string"],
+    "languages": ["string"]
+  },
   "confidence": "number"
 }
 ```
+
+### Fallback Strategy
+
+- If `sections` is missing, create empty structure with all section arrays
+- If `profile` is missing, create empty structure with all profile arrays
+- If individual profile fields are missing, use `undefined` for strings or empty arrays for lists
+- If `confidence` is missing, use `0.5` as default
+- If no content extracted, override confidence to `0.3` (low confidence threshold)
 
 ---
 

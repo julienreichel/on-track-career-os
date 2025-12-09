@@ -183,7 +183,7 @@ _(From AI Interaction Contract) _
 
 ### Identity & Experience
 
-1. `ai.parseCvText`
+1. `ai.parseCvText` - **Enhanced: Extracts both experience sections AND profile information** (fullName, headline, location, seniority, goals, aspirations, values, strengths, interests, languages, skills, certifications)
 2. `ai.extractExperienceBlocks`
 3. `ai.generateStarStory`
 4. `ai.generateAchievementsAndKpis`

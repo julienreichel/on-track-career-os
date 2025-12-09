@@ -40,6 +40,9 @@ describe('ai.parseCvText', () => {
   });
 
   const mockCvText = `
+John Doe
+Senior Software Engineer | San Francisco, CA
+
 EXPERIENCE
 Senior Software Engineer at TechCorp (2020-2023)
 - Led development of cloud applications
@@ -52,6 +55,13 @@ JavaScript, Python, AWS
 
 CERTIFICATIONS
 AWS Certified Solutions Architect
+
+LANGUAGES
+English (Native), Spanish (Fluent)
+
+GOALS
+- Lead a distributed engineering team
+- Contribute to open source
   `.trim();
 
   /**
@@ -59,6 +69,13 @@ AWS Certified Solutions Architect
    * Uses regex to extract sections from the input, mimicking real AI behavior
    */
   const generateMockResponse = (cvText: string) => {
+    // Extract profile information (first few lines)
+    const lines = cvText.split('\n');
+    const fullName = lines[0] || undefined;
+    const headlineLocationMatch = lines[1]?.match(/^(.+?)(?:\s*\|\s*(.+))?$/);
+    const headline = headlineLocationMatch?.[1]?.trim();
+    const location = headlineLocationMatch?.[2]?.trim();
+
     // Extract experiences (lines after EXPERIENCE until next section)
     const experienceMatch = cvText.match(/EXPERIENCE\n([\s\S]*?)(?=\n[A-Z]+\n|$)/);
     const experiences = experienceMatch
@@ -88,12 +105,32 @@ AWS Certified Solutions Architect
       : [];
 
     // Extract certifications (lines after CERTIFICATIONS)
-    const certificationsMatch = cvText.match(/CERTIFICATIONS\n([\s\S]*?)$/);
+    const certificationsMatch = cvText.match(/CERTIFICATIONS\n([\s\S]*?)(?=\n[A-Z]+\n|$)/);
     const certifications = certificationsMatch
       ? certificationsMatch[1]
           .trim()
           .split('\n')
           .filter((c) => c.trim())
+      : [];
+
+    // Extract languages
+    const languagesMatch = cvText.match(/LANGUAGES\n([\s\S]*?)(?=\n[A-Z]+\n|$)/);
+    const languages = languagesMatch
+      ? languagesMatch[1]
+          .trim()
+          .split(',')
+          .map((l) => l.trim().replace(/\(.*?\)/, '').trim())
+          .filter((l) => l)
+      : [];
+
+    // Extract goals
+    const goalsMatch = cvText.match(/GOALS\n([\s\S]*?)(?=\n[A-Z]+\n|$)/);
+    const goals = goalsMatch
+      ? goalsMatch[1]
+          .trim()
+          .split('\n')
+          .map((g) => g.replace(/^-\s*/, '').trim())
+          .filter((g) => g)
       : [];
 
     return {
@@ -103,6 +140,18 @@ AWS Certified Solutions Architect
         skills,
         certifications,
         rawBlocks: [],
+      },
+      profile: {
+        fullName,
+        headline,
+        location,
+        seniorityLevel: headline?.includes('Senior') ? 'Senior' : undefined,
+        goals,
+        aspirations: [],
+        personalValues: [],
+        strengths: [],
+        interests: [],
+        languages,
       },
       confidence: 0.95,
     };
@@ -151,6 +200,18 @@ AWS Certified Solutions Architect
       expect(parsed.sections.skills).toContain('JavaScript');
       expect(parsed.sections.certifications).toHaveLength(1);
       expect(parsed.sections.certifications[0]).toContain('AWS Certified');
+      
+      // Verify profile information extraction
+      expect(parsed.profile).toBeDefined();
+      expect(parsed.profile.fullName).toBe('John Doe');
+      expect(parsed.profile.headline).toBe('Senior Software Engineer');
+      expect(parsed.profile.location).toBe('San Francisco, CA');
+      expect(parsed.profile.seniorityLevel).toBe('Senior');
+      expect(parsed.profile.languages).toContain('English');
+      expect(parsed.profile.languages).toContain('Spanish');
+      expect(parsed.profile.goals).toHaveLength(2);
+      expect(parsed.profile.goals[0]).toContain('distributed engineering team');
+      
       expect(parsed.confidence).toBe(0.95);
     });
     it('should validate output structure and apply operation-specific fallbacks', async () => {
@@ -158,6 +219,10 @@ AWS Certified Solutions Architect
         sections: {
           experiences: ['Some experience'],
           // Missing fields will be filled by operation-specific validation
+        },
+        profile: {
+          fullName: 'Test User',
+          // Missing profile fields will be filled by validation
         },
       };
 
@@ -184,6 +249,14 @@ AWS Certified Solutions Architect
       expect(parsed.sections.skills).toEqual([]);
       expect(parsed.sections.certifications).toEqual([]);
       expect(parsed.sections.rawBlocks).toEqual([]);
+      
+      // Verify profile validation
+      expect(parsed.profile).toBeDefined();
+      expect(parsed.profile.fullName).toBe('Test User');
+      expect(parsed.profile.goals).toEqual([]);
+      expect(parsed.profile.aspirations).toEqual([]);
+      expect(parsed.profile.languages).toEqual([]);
+      
       expect(parsed.confidence).toBe(0.5); // DEFAULT_CONFIDENCE fallback
     });
 
@@ -219,6 +292,16 @@ AWS Certified Solutions Architect
       expect(result.sections.skills).toEqual([]);
       expect(result.sections.certifications).toEqual([]);
       expect(result.sections.rawBlocks).toEqual([]);
+      
+      // Should apply fallback for missing profile
+      expect(result.profile).toBeDefined();
+      expect(result.profile.goals).toEqual([]);
+      expect(result.profile.aspirations).toEqual([]);
+      expect(result.profile.personalValues).toEqual([]);
+      expect(result.profile.strengths).toEqual([]);
+      expect(result.profile.interests).toEqual([]);
+      expect(result.profile.languages).toEqual([]);
+      
       expect(result.confidence).toBe(0.3); // Low confidence due to no content
     });
   });

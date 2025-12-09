@@ -52,31 +52,31 @@ The project has established a **strong backend and domain foundation** with comp
 
 #### ✅ EPIC 1A: User Data Intake & Identity Collection (50% Complete)
 
-**Status:** Partially implemented — backend strong, frontend missing
+**Status:** Partially implemented — backend strong, frontend improving
 
 **Implemented:**
 
 - ✅ UserProfile GraphQL model (owner-based auth)
-- ✅ `ai.parseCvText` Lambda + tests (7 passing)
+- ✅ `ai.parseCvText` Lambda + tests (3 passing) - **Enhanced with profile extraction**
 - ✅ `ai.extractExperienceBlocks` Lambda + tests
 - ✅ User profile repository/service/composable
 - ✅ Experience repository/service/composable
+- ✅ CV upload UI with preview and profile extraction
+- ✅ Experience list and edit pages
+- ✅ Profile information extraction and merge from CV (fullName, headline, location, seniority, goals, aspirations, values, strengths, interests, languages)
 
 **Missing:**
 
-- ❌ CV upload UI
-- ❌ Manual experience editing forms
-- ❌ Aspirations/goals/values input forms
-- ❌ Strengths/weaknesses capture UI
-- ❌ `ai.extractPersonalProfile` operation (not in contract but likely needed)
+- ❌ Manual experience editing forms (partially done)
+- ❌ Aspirations/goals/values input forms (can be populated from CV)
+- ❌ Strengths/weaknesses capture UI (strengths extracted from CV)
+- ❌ `/profile` page with complete user info forms
 
 **Next Steps:**
 
-1. Create `/profile` page with user info forms
-2. Create `/profile/cv-upload` page with file upload
-3. Create `/profile/experiences` page with experience list + editor
-4. Implement manual editing for extracted experiences
-5. Add forms for aspirations, goals, values, strengths
+1. Create `/profile` page with user info forms to view/edit extracted profile data
+2. Enhance manual editing for extracted experiences
+3. Add forms for manual entry of aspirations, goals, values, strengths (complementing CV extraction)
 
 ---
 
