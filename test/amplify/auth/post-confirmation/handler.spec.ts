@@ -38,10 +38,7 @@ describe('post-confirmation handler', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    // Dynamically import handler after mocks are set up
-    const { resolve } = await import('node:path');
-    const modulePath = resolve(__dirname, '../../../../amplify/auth/post-confirmation/handler.ts');
-    const module = await import(modulePath);
+    const module = await import('@amplify/auth/post-confirmation/handler');
     handler = module.handler;
   });
 

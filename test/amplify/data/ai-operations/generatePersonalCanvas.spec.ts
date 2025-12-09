@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { PersonalCanvasOutput } from '@amplify/data/ai-operations/generatePersonalCanvas';
+import type {
+  PersonalCanvasOutput,
+  PersonalCanvasInput,
+} from '@amplify/data/ai-operations/generatePersonalCanvas';
 
 // Mock AWS SDK
 const mockSend = vi.fn();
@@ -25,11 +28,7 @@ describe('ai.generatePersonalCanvas', () => {
    * Mock AI response generator that creates realistic canvas output
    * Extracts insights from user profile, experiences, and stories
    */
-  const generateMockResponse = (input: {
-    profile: { fullName?: string; headline?: string; summary?: string };
-    experiences: Array<{ title?: string; company?: string }>;
-    stories: Array<{ action?: string; result?: string }>;
-  }): PersonalCanvasOutput => {
+  const generateMockResponse = (input: PersonalCanvasInput): PersonalCanvasOutput => {
     // Extract skills and technologies from experiences
     const skills =
       input.experiences.flatMap((exp) => [exp.title || 'Professional role']).slice(0, 3) || [];
