@@ -11,8 +11,8 @@ interface Props {
 defineProps<Props>();
 
 const emit = defineEmits<{
-  removeField: [field: string];
-  removeArrayItem: [field: string, index: number];
+  removeField: [field: keyof ParseCvTextOutput['profile']];
+  removeArrayItem: [field: keyof ParseCvTextOutput['profile'], index: number];
 }>();
 
 function hasProfileData(profile: ParseCvTextOutput['profile']): boolean {

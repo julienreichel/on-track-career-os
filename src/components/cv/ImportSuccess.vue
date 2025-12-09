@@ -27,14 +27,11 @@ const emit = defineEmits<{
     </template>
 
     <div class="space-y-4">
-      <UAlert
-        color="primary"
-        :title="t('cvUpload.success', { count: importCount })"
-      />
+      <UAlert color="primary" :title="t('cvUpload.success', { count: importCount })" />
 
       <div class="flex flex-col sm:flex-row gap-3">
         <UButton
-          :label="t('profile.view')"
+          :label="t('cvUpload.viewExperiences')"
           icon="i-lucide-user"
           @click="emit('viewProfile')"
         />

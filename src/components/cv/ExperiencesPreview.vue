@@ -58,9 +58,7 @@ function formatDateRange(start?: string, end?: string | null): string {
           </p>
 
           <div v-if="exp.responsibilities?.length" class="space-y-1">
-            <p class="text-sm font-medium">
-              {{ t('experiences.form.responsibilities') }}:
-            </p>
+            <p class="text-sm font-medium">{{ t('experiences.form.responsibilities') }}:</p>
             <ul class="list-disc list-inside text-sm space-y-1">
               <li v-for="(resp, i) in exp.responsibilities" :key="i">
                 {{ resp }}

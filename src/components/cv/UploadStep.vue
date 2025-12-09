@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -9,29 +10,19 @@ const emit = defineEmits<{
 
 const selectedFile = ref<File | null>(null);
 
-function handleFileChange(files: File[]) {
-  if (files.length > 0) {
-    selectedFile.value = files[0];
-    emit('fileSelected', files[0]);
+function handleFileChange(file: File | null | undefined) {
+  if (file) {
+    selectedFile.value = file;
+    emit('fileSelected', file);
   }
 }
 </script>
 
 <template>
   <UCard>
-    <template #header>
-      <h2 class="text-xl font-semibold">
-        {{ t('cvUpload.title') }}
-      </h2>
-    </template>
-
     <div class="space-y-4">
-      <p class="text-gray-600 dark:text-gray-400">
-        {{ t('cvUpload.description') }}
-      </p>
-
       <UFileUpload
-        :model-value="selectedFile ? [selectedFile] : []"
+        :model-value="selectedFile"
         accept=".pdf,.txt"
         @update:model-value="handleFileChange"
       />
@@ -39,7 +30,6 @@ function handleFileChange(files: File[]) {
       <UAlert
         v-if="selectedFile"
         :title="t('cvUpload.fileUploaded', { fileName: selectedFile.name })"
-        :description="selectedFile.name"
         color="primary"
       />
     </div>

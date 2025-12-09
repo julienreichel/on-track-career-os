@@ -24,9 +24,7 @@ async function handleFileSelected(file: File) {
     await parsing.parseFile(file);
     workflow.setStep('preview');
   } catch (error) {
-    workflow.setError(
-      error instanceof Error ? error.message : t('cvUpload.errors.unknown')
-    );
+    workflow.setError(error instanceof Error ? error.message : t('cvUpload.errors.unknown'));
     workflow.reset();
   }
 }
@@ -59,9 +57,7 @@ async function handleImport() {
 
     workflow.setStep('complete');
   } catch (error) {
-    workflow.setError(
-      error instanceof Error ? error.message : t('cvUpload.errors.importFailed')
-    );
+    workflow.setError(error instanceof Error ? error.message : t('cvUpload.errors.importFailed'));
     workflow.setStep('preview');
   }
 }
@@ -84,10 +80,7 @@ function viewExperiences() {
 <template>
   <UContainer>
     <UPage>
-      <UPageHeader
-        :title="t('cvUpload.title')"
-        :description="t('cvUpload.description')"
-      />
+      <UPageHeader :title="t('cvUpload.title')" :description="t('cvUpload.description')" />
 
       <UPageBody>
         <!-- Error Alert -->
@@ -128,11 +121,7 @@ function viewExperiences() {
 
           <!-- Actions -->
           <div class="flex justify-end gap-3">
-            <UButton
-              :label="t('cvUpload.cancel')"
-              variant="outline"
-              @click="handleCancel"
-            />
+            <UButton :label="t('cvUpload.cancel')" variant="outline" @click="handleCancel" />
             <UButton
               :label="t('cvUpload.confirmImport')"
               icon="i-lucide-download"
