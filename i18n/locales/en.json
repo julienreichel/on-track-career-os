@@ -79,6 +79,7 @@
     "importing": "Creating experiences...",
     "success": "Successfully imported {count} experience(s)",
     "viewExperiences": "View Experiences",
+    "viewProfile": "View Profile",
     "errors": {
       "invalidFileType": "Invalid file type. Please upload a PDF or TXT file.",
       "fileTooLarge": "File is too large. Maximum size is 5MB.",
