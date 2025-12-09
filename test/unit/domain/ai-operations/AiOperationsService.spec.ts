@@ -42,6 +42,18 @@ describe('AiOperationsService', () => {
           certifications: ['AWS Certified'],
           rawBlocks: ['Experience section...'],
         },
+        profile: {
+          fullName: 'John Doe',
+          headline: 'Senior Software Engineer',
+          location: 'San Francisco, CA',
+          seniorityLevel: 'Senior',
+          goals: ['Lead team'],
+          aspirations: ['CTO'],
+          personalValues: ['Innovation'],
+          strengths: ['Problem solving'],
+          interests: ['AI'],
+          languages: ['English'],
+        },
         confidence: 0.95,
       };
 
