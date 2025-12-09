@@ -8,7 +8,7 @@
       </template>
 
       <template #right>
-        <UButton @click="handleSignOut" variant="ghost">
+        <UButton variant="ghost" @click="handleSignOut">
           {{ t('auth.signOut') }}
         </UButton>
       </template>

@@ -6,19 +6,14 @@
     "paths": {
       "@/*": ["src/*"],
       "~/*": ["src/*"],
-      "@amplify/*": ["amplify/*"],
       "#app": ["node_modules/nuxt/dist/app"],
       "#app/*": ["node_modules/nuxt/dist/app/*"]
     },
-    "types": ["vitest/globals", "@nuxt/test-utils", "node"]
+    "types": ["@playwright/test", "node"]
   },
   "include": [
-    "**/*.ts",
-    "**/*.vue",
-    "../src/**/*.ts",
-    "../src/**/*.vue",
-    "../amplify/**/*.ts",
-    "../amplify_outputs.json"
+    "*.ts",
+    "*.spec.ts"
   ],
-  "exclude": ["node_modules", "e2e/**/*"]
+  "exclude": ["node_modules", "cv-upload-flow.spec.ts.skip"]
 }

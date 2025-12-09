@@ -5,6 +5,7 @@ import { generateClient } from 'aws-amplify/data';
 import * as amplifyOutputs from '../../../amplify_outputs.json';
 import type { Schema } from '@amplify/data/resource';
 import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
+import type { UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
 
 /**
  * E2E Sandbox Test: UserProfile GraphQL Operations
@@ -113,10 +114,11 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
 
     // Update profile
     const updatedName = 'Updated Test User';
-    const updatedProfile = await repository.update({
+    const userProfile = {
       id: testUserId,
       fullName: updatedName,
-    });
+    } as unknown as UserProfileUpdateInput;
+    const updatedProfile = await repository.update(userProfile);
 
     // Validate update
     expect(updatedProfile).toBeDefined();
