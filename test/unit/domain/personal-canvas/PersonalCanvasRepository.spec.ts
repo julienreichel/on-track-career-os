@@ -129,7 +129,7 @@ describe('PersonalCanvasRepository', () => {
 
   describe('create', () => {
     it('should create a new PersonalCanvas', async () => {
-      const input: PersonalCanvasCreateInput = {
+      const input = {
         userId: 'user-123',
         valueProposition: 'New value proposition',
         keyActivities: ['Activity 1', 'Activity 2'],
@@ -141,7 +141,7 @@ describe('PersonalCanvasRepository', () => {
         painRelievers: ['Pain 1'],
         gainCreators: ['Gain 1'],
         needsUpdate: false,
-      };
+      } as unknown as PersonalCanvasCreateInput;
 
       const mockCreatedCanvas = {
         ...input,
@@ -164,10 +164,10 @@ describe('PersonalCanvasRepository', () => {
     });
 
     it('should handle creating PersonalCanvas with minimal fields', async () => {
-      const input: PersonalCanvasCreateInput = {
+      const input = {
         userId: 'user-123',
         needsUpdate: true,
-      };
+      } as unknown as PersonalCanvasCreateInput;
 
       const mockCreatedCanvas = {
         ...input,
@@ -186,7 +186,7 @@ describe('PersonalCanvasRepository', () => {
     });
 
     it('should handle creating PersonalCanvas with empty arrays', async () => {
-      const input: PersonalCanvasCreateInput = {
+      const input = {
         userId: 'user-123',
         keyActivities: [],
         targetRoles: [],
@@ -195,7 +195,7 @@ describe('PersonalCanvasRepository', () => {
         painRelievers: [],
         gainCreators: [],
         needsUpdate: false,
-      };
+      } as unknown as PersonalCanvasCreateInput;
 
       mockModel.create.mockResolvedValue({
         data: { ...input, id: 'canvas-new' },
@@ -210,11 +210,11 @@ describe('PersonalCanvasRepository', () => {
 
   describe('update', () => {
     it('should update an existing PersonalCanvas', async () => {
-      const input: PersonalCanvasUpdateInput = {
+      const input = {
         id: 'canvas-123',
         valueProposition: 'Updated value proposition',
         needsUpdate: false,
-      };
+      } as unknown as PersonalCanvasUpdateInput;
 
       const mockUpdatedCanvas = {
         ...input,
@@ -236,10 +236,10 @@ describe('PersonalCanvasRepository', () => {
     });
 
     it('should handle partial updates', async () => {
-      const input: PersonalCanvasUpdateInput = {
+      const input = {
         id: 'canvas-123',
         needsUpdate: true,
-      };
+      } as unknown as PersonalCanvasUpdateInput;
 
       mockModel.update.mockResolvedValue({
         data: input,
@@ -255,11 +255,11 @@ describe('PersonalCanvasRepository', () => {
     });
 
     it('should handle updating array fields', async () => {
-      const input: PersonalCanvasUpdateInput = {
+      const input = {
         id: 'canvas-123',
         keyActivities: ['Updated Activity 1', 'Updated Activity 2', 'Updated Activity 3'],
         targetRoles: ['Updated Role 1', 'Updated Role 2'],
-      };
+      } as unknown as PersonalCanvasUpdateInput;
 
       mockModel.update.mockResolvedValue({
         data: input,
@@ -272,11 +272,11 @@ describe('PersonalCanvasRepository', () => {
     });
 
     it('should handle updating lastGeneratedAt timestamp', async () => {
-      const input: PersonalCanvasUpdateInput = {
+      const input = {
         id: 'canvas-123',
         lastGeneratedAt: '2025-01-15T12:00:00Z',
         needsUpdate: false,
-      };
+      } as unknown as PersonalCanvasUpdateInput;
 
       mockModel.update.mockResolvedValue({
         data: input,

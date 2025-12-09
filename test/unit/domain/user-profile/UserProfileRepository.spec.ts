@@ -113,11 +113,11 @@ describe('UserProfileRepository', () => {
 
   describe('update', () => {
     it('should update an existing user profile', async () => {
-      const input: UserProfileUpdateInput = {
+      const input = {
         id: 'user-123',
         fullName: 'John Doe Updated',
         headline: 'Senior Software Engineer',
-      };
+      } as unknown as UserProfileUpdateInput;
 
       const mockUpdatedProfile = {
         ...input,
@@ -138,10 +138,10 @@ describe('UserProfileRepository', () => {
     });
 
     it('should handle partial updates', async () => {
-      const input: UserProfileUpdateInput = {
+      const input = {
         id: 'user-123',
         headline: 'New Headline',
-      };
+      } as unknown as UserProfileUpdateInput;
 
       mockModel.update.mockResolvedValue({
         data: input,

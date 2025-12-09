@@ -141,7 +141,7 @@ describe('CVDocumentRepository', () => {
 
   describe('create', () => {
     it('should create a new CVDocument', async () => {
-      const input: CVDocumentCreateInput = {
+      const input = {
         name: 'New CV',
         userId: 'user-123',
         templateId: 'template-modern',
@@ -150,7 +150,7 @@ describe('CVDocumentRepository', () => {
           header: { name: 'John Doe', title: 'Engineer' },
           sections: { experience: [], education: [] },
         },
-      };
+      } as unknown as CVDocumentCreateInput;
 
       const mockCreatedCV = {
         ...input,
@@ -183,7 +183,7 @@ describe('CVDocumentRepository', () => {
           tailored: true,
           jobSpecific: ['AWS expertise', 'Leadership'],
         },
-      };
+      } as unknown as CVDocumentCreateInput;
 
       const mockCreatedCV = {
         ...input,
@@ -206,7 +206,7 @@ describe('CVDocumentRepository', () => {
       const input: CVDocumentCreateInput = {
         name: 'Basic CV',
         userId: 'user-123',
-      };
+      } as unknown as CVDocumentCreateInput;
 
       const mockCreatedCV = {
         ...input,
@@ -230,7 +230,7 @@ describe('CVDocumentRepository', () => {
         userId: 'user-123',
         templateId: 'template-blank',
         contentJSON: null,
-      };
+      } as unknown as CVDocumentCreateInput;
 
       mockModel.create.mockResolvedValue({
         data: { ...input, id: 'cv-empty' },
@@ -244,12 +244,12 @@ describe('CVDocumentRepository', () => {
 
   describe('update', () => {
     it('should update an existing CVDocument', async () => {
-      const input: CVDocumentUpdateInput = {
+      const input = {
         id: 'cv-123',
         name: 'Updated CV Name',
         isTailored: true,
         jobId: 'job-789',
-      };
+      } as unknown as CVDocumentUpdateInput;
 
       const mockUpdatedCV = {
         ...input,
@@ -271,10 +271,10 @@ describe('CVDocumentRepository', () => {
     });
 
     it('should handle partial updates', async () => {
-      const input: CVDocumentUpdateInput = {
+      const input = {
         id: 'cv-123',
         name: 'New Name Only',
-      };
+      } as unknown as CVDocumentUpdateInput;
 
       mockModel.update.mockResolvedValue({
         data: input,
@@ -290,7 +290,7 @@ describe('CVDocumentRepository', () => {
     });
 
     it('should handle updating contentJSON', async () => {
-      const input: CVDocumentUpdateInput = {
+      const input = {
         id: 'cv-123',
         contentJSON: {
           header: { name: 'Jane Doe', title: 'Senior Engineer' },
@@ -298,7 +298,7 @@ describe('CVDocumentRepository', () => {
             experience: [{ company: 'Tech Corp', title: 'Lead Engineer', years: 5 }],
           },
         },
-      };
+      } as unknown as CVDocumentUpdateInput;
 
       mockModel.update.mockResolvedValue({
         data: input,
@@ -311,10 +311,10 @@ describe('CVDocumentRepository', () => {
     });
 
     it('should handle updating template', async () => {
-      const input: CVDocumentUpdateInput = {
+      const input = {
         id: 'cv-123',
         templateId: 'template-updated',
-      };
+      } as unknown as CVDocumentUpdateInput;
 
       mockModel.update.mockResolvedValue({
         data: input,
@@ -326,11 +326,11 @@ describe('CVDocumentRepository', () => {
     });
 
     it('should handle converting CV to tailored', async () => {
-      const input: CVDocumentUpdateInput = {
+      const input = {
         id: 'cv-123',
         isTailored: true,
         jobId: 'job-new',
-      };
+      } as unknown as CVDocumentUpdateInput;
 
       mockModel.update.mockResolvedValue({
         data: input,

@@ -48,7 +48,7 @@ describe('useAiOperations', () => {
 
   it('should successfully parse CV', async () => {
     // Arrange
-    const mockParsedCv: ParsedCV = {
+    const mockParsedCv = {
       sections: {
         experiences: [],
         education: [],
@@ -57,7 +57,7 @@ describe('useAiOperations', () => {
         rawBlocks: [],
       },
       confidence: 0.95,
-    };
+    } as ParsedCV;
     mockService.parseCvText.mockResolvedValue(mockParsedCv);
 
     // Act
@@ -187,7 +187,7 @@ describe('useAiOperations', () => {
         rawBlocks: [],
       },
       confidence: 0.9,
-    };
+    } as unknown as ParsedCV;
     experiences.value = { experiences: [] };
     starStory.value = {
       situation: 'Test',
