@@ -90,7 +90,9 @@ export interface ParseCvTextInput {
 /**
  * Validate sections and apply fallback for missing or invalid data
  */
-function validateSections(sections: Partial<ParseCvTextOutput['sections']> | undefined): ParseCvTextOutput['sections'] {
+function validateSections(
+  sections: Partial<ParseCvTextOutput['sections']> | undefined
+): ParseCvTextOutput['sections'] {
   const fallbackSections = {
     experiences: [],
     education: [],
@@ -105,7 +107,9 @@ function validateSections(sections: Partial<ParseCvTextOutput['sections']> | und
     experiences: Array.isArray(parsedSections.experiences) ? parsedSections.experiences : [],
     education: Array.isArray(parsedSections.education) ? parsedSections.education : [],
     skills: Array.isArray(parsedSections.skills) ? parsedSections.skills : [],
-    certifications: Array.isArray(parsedSections.certifications) ? parsedSections.certifications : [],
+    certifications: Array.isArray(parsedSections.certifications)
+      ? parsedSections.certifications
+      : [],
     // Support both camelCase and snake_case from AI response
     rawBlocks: Array.isArray(parsedSections.rawBlocks)
       ? parsedSections.rawBlocks
@@ -118,14 +122,17 @@ function validateSections(sections: Partial<ParseCvTextOutput['sections']> | und
 /**
  * Validate profile data and apply fallback for missing or invalid fields
  */
-function validateProfile(profile: Partial<ParseCvTextOutput['profile']> | undefined): ParseCvTextOutput['profile'] {
+function validateProfile(
+  profile: Partial<ParseCvTextOutput['profile']> | undefined
+): ParseCvTextOutput['profile'] {
   const parsedProfile = profile || {};
 
   return {
     fullName: typeof parsedProfile.fullName === 'string' ? parsedProfile.fullName : undefined,
     headline: typeof parsedProfile.headline === 'string' ? parsedProfile.headline : undefined,
     location: typeof parsedProfile.location === 'string' ? parsedProfile.location : undefined,
-    seniorityLevel: typeof parsedProfile.seniorityLevel === 'string' ? parsedProfile.seniorityLevel : undefined,
+    seniorityLevel:
+      typeof parsedProfile.seniorityLevel === 'string' ? parsedProfile.seniorityLevel : undefined,
     goals: Array.isArray(parsedProfile.goals) ? parsedProfile.goals : [],
     aspirations: Array.isArray(parsedProfile.aspirations) ? parsedProfile.aspirations : [],
     personalValues: Array.isArray(parsedProfile.personalValues) ? parsedProfile.personalValues : [],
@@ -149,7 +156,8 @@ function calculateConfidence(
     sections.certifications.length +
     sections.rawBlocks.length;
 
-  const confidence = typeof providedConfidence === 'number' ? providedConfidence : DEFAULT_CONFIDENCE;
+  const confidence =
+    typeof providedConfidence === 'number' ? providedConfidence : DEFAULT_CONFIDENCE;
 
   // Override confidence to low if no content was extracted
   return totalItems === 0 ? Math.min(confidence, LOW_CONFIDENCE_THRESHOLD) : confidence;

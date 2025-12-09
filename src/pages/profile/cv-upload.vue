@@ -25,7 +25,7 @@ async function handleFileSelected(file: File) {
     workflow.setStep('preview');
   } catch (error) {
     workflow.setError(
-      error instanceof Error ? error.message : t('profile.cvUpload.errors.unknown')
+      error instanceof Error ? error.message : t('cvUpload.errors.unknown')
     );
     workflow.reset();
   }
@@ -60,7 +60,7 @@ async function handleImport() {
     workflow.setStep('complete');
   } catch (error) {
     workflow.setError(
-      error instanceof Error ? error.message : t('profile.cvUpload.errors.importFailed')
+      error instanceof Error ? error.message : t('cvUpload.errors.importFailed')
     );
     workflow.setStep('preview');
   }
@@ -85,8 +85,8 @@ function viewExperiences() {
   <UContainer>
     <UPage>
       <UPageHeader
-        :title="t('profile.cvUpload.title')"
-        :description="t('profile.cvUpload.description')"
+        :title="t('cvUpload.title')"
+        :description="t('cvUpload.description')"
       />
 
       <UPageBody>
@@ -95,7 +95,7 @@ function viewExperiences() {
           v-if="workflow.errorMessage.value"
           icon="i-lucide-alert-triangle"
           color="error"
-          :title="t('profile.cvUpload.errors.title')"
+          :title="t('cvUpload.errors.unknown')"
           :description="workflow.errorMessage.value"
           :close-button="{ icon: 'i-lucide-x', color: 'error', variant: 'link' }"
           @close="workflow.clearError()"
@@ -129,12 +129,12 @@ function viewExperiences() {
           <!-- Actions -->
           <div class="flex justify-end gap-3">
             <UButton
-              :label="t('profile.cvUpload.cancel')"
+              :label="t('cvUpload.cancel')"
               variant="outline"
               @click="handleCancel"
             />
             <UButton
-              :label="t('profile.cvUpload.confirmImport')"
+              :label="t('cvUpload.confirmImport')"
               icon="i-lucide-download"
               @click="handleImport"
             />

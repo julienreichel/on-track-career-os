@@ -21,7 +21,7 @@ const emit = defineEmits<{
       <div class="flex items-center space-x-2">
         <UIcon name="i-lucide-check-circle" class="text-green-500" />
         <h2 class="text-xl font-semibold">
-          {{ t('profile.cvUpload.success.title') }}
+          {{ t('cvUpload.importing') }}
         </h2>
       </div>
     </template>
@@ -29,18 +29,17 @@ const emit = defineEmits<{
     <div class="space-y-4">
       <UAlert
         color="primary"
-        :title="t('profile.cvUpload.success.message')"
-        :description="t('profile.cvUpload.success.imported', { count: importCount })"
+        :title="t('cvUpload.success', { count: importCount })"
       />
 
       <div class="flex flex-col sm:flex-row gap-3">
         <UButton
-          :label="t('profile.cvUpload.success.viewProfile')"
+          :label="t('profile.view')"
           icon="i-lucide-user"
           @click="emit('viewProfile')"
         />
         <UButton
-          :label="t('profile.cvUpload.success.viewExperiences')"
+          :label="t('cvUpload.viewExperiences')"
           icon="i-lucide-briefcase"
           variant="outline"
           @click="emit('viewExperiences')"

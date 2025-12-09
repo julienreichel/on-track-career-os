@@ -21,13 +21,13 @@ function handleFileChange(files: File[]) {
   <UCard>
     <template #header>
       <h2 class="text-xl font-semibold">
-        {{ t('profile.cvUpload.title') }}
+        {{ t('cvUpload.title') }}
       </h2>
     </template>
 
     <div class="space-y-4">
       <p class="text-gray-600 dark:text-gray-400">
-        {{ t('profile.cvUpload.description') }}
+        {{ t('cvUpload.description') }}
       </p>
 
       <UFileUpload
@@ -38,7 +38,7 @@ function handleFileChange(files: File[]) {
 
       <UAlert
         v-if="selectedFile"
-        :title="t('profile.cvUpload.fileSelected')"
+        :title="t('cvUpload.fileUploaded', { fileName: selectedFile.name })"
         :description="selectedFile.name"
         color="primary"
       />

@@ -35,7 +35,7 @@ function hasProfileData(profile: ParseCvTextOutput['profile']): boolean {
   <UCard v-if="hasProfileData(profile)">
     <template #header>
       <h3 class="text-lg font-semibold">
-        {{ t('profile.cvUpload.profile.title') }}
+        {{ t('cvUpload.sections.profile') }}
       </h3>
     </template>
 
@@ -43,28 +43,28 @@ function hasProfileData(profile: ParseCvTextOutput['profile']): boolean {
       <!-- Single value fields -->
       <CvSingleBadge
         v-if="profile.fullName"
-        :label="t('profile.cvUpload.profile.fullName')"
+        :label="t('cvUpload.profile.fullName')"
         :value="profile.fullName"
         @remove="emit('removeField', 'fullName')"
       />
 
       <CvSingleBadge
         v-if="profile.headline"
-        :label="t('profile.cvUpload.profile.headline')"
+        :label="t('cvUpload.profile.headline')"
         :value="profile.headline"
         @remove="emit('removeField', 'headline')"
       />
 
       <CvSingleBadge
         v-if="profile.location"
-        :label="t('profile.cvUpload.profile.location')"
+        :label="t('cvUpload.profile.location')"
         :value="profile.location"
         @remove="emit('removeField', 'location')"
       />
 
       <CvSingleBadge
         v-if="profile.seniorityLevel"
-        :label="t('profile.cvUpload.profile.seniorityLevel')"
+        :label="t('cvUpload.profile.seniorityLevel')"
         :value="profile.seniorityLevel"
         @remove="emit('removeField', 'seniorityLevel')"
       />
@@ -72,42 +72,42 @@ function hasProfileData(profile: ParseCvTextOutput['profile']): boolean {
       <!-- Array fields -->
       <CvBadgeList
         v-if="profile.goals && profile.goals.length > 0"
-        :label="t('profile.cvUpload.profile.goals')"
+        :label="t('cvUpload.profile.goals')"
         :items="profile.goals"
         @remove="(index: number) => emit('removeArrayItem', 'goals', index)"
       />
 
       <CvBadgeList
         v-if="profile.aspirations && profile.aspirations.length > 0"
-        :label="t('profile.cvUpload.profile.aspirations')"
+        :label="t('cvUpload.profile.aspirations')"
         :items="profile.aspirations"
         @remove="(index: number) => emit('removeArrayItem', 'aspirations', index)"
       />
 
       <CvBadgeList
         v-if="profile.personalValues && profile.personalValues.length > 0"
-        :label="t('profile.cvUpload.profile.personalValues')"
+        :label="t('cvUpload.profile.personalValues')"
         :items="profile.personalValues"
         @remove="(index: number) => emit('removeArrayItem', 'personalValues', index)"
       />
 
       <CvBadgeList
         v-if="profile.strengths && profile.strengths.length > 0"
-        :label="t('profile.cvUpload.profile.strengths')"
+        :label="t('cvUpload.profile.strengths')"
         :items="profile.strengths"
         @remove="(index: number) => emit('removeArrayItem', 'strengths', index)"
       />
 
       <CvBadgeList
         v-if="profile.interests && profile.interests.length > 0"
-        :label="t('profile.cvUpload.profile.interests')"
+        :label="t('cvUpload.profile.interests')"
         :items="profile.interests"
         @remove="(index: number) => emit('removeArrayItem', 'interests', index)"
       />
 
       <CvBadgeList
         v-if="profile.languages && profile.languages.length > 0"
-        :label="t('profile.cvUpload.profile.languages')"
+        :label="t('cvUpload.profile.languages')"
         :items="profile.languages"
         @remove="(index: number) => emit('removeArrayItem', 'languages', index)"
       />

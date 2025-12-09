@@ -15,8 +15,8 @@ const emit = defineEmits<{
 }>();
 
 function formatDateRange(start?: string, end?: string | null): string {
-  if (!start) return t('profile.cvUpload.experiences.dateUnknown');
-  if (!end) return `${start} - ${t('profile.cvUpload.experiences.present')}`;
+  if (!start) return t('cvUpload.sections.experiences');
+  if (!end) return `${start} - ${t('experiences.present')}`;
   return `${start} - ${end}`;
 }
 </script>
@@ -26,7 +26,7 @@ function formatDateRange(start?: string, end?: string | null): string {
     <template #header>
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-semibold">
-          {{ t('profile.cvUpload.experiences.title') }}
+          {{ t('cvUpload.sections.experiences') }}
         </h3>
         <UBadge color="primary">
           {{ experiences.length }}
@@ -59,7 +59,7 @@ function formatDateRange(start?: string, end?: string | null): string {
 
           <div v-if="exp.responsibilities?.length" class="space-y-1">
             <p class="text-sm font-medium">
-              {{ t('profile.cvUpload.experiences.responsibilities') }}:
+              {{ t('experiences.form.responsibilities') }}:
             </p>
             <ul class="list-disc list-inside text-sm space-y-1">
               <li v-for="(resp, i) in exp.responsibilities" :key="i">
@@ -69,7 +69,7 @@ function formatDateRange(start?: string, end?: string | null): string {
           </div>
 
           <div v-if="exp.tasks?.length" class="space-y-1">
-            <p class="text-sm font-medium">{{ t('profile.cvUpload.experiences.tasks') }}:</p>
+            <p class="text-sm font-medium">{{ t('experiences.form.tasks') }}:</p>
             <ul class="list-disc list-inside text-sm space-y-1">
               <li v-for="(task, i) in exp.tasks" :key="i">
                 {{ task }}
