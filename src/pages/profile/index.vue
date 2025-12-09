@@ -47,59 +47,6 @@
         @close="saveSuccess = false"
       />
 
-      <!-- Navigation Links Section -->
-      <UCard class="mb-6">
-        <template #header>
-          <h3 class="text-lg font-semibold">
-            {{ t('profile.sections.relatedPages') }}
-          </h3>
-        </template>
-
-        <UPageGrid>
-          <UPageCard
-            :title="t('profile.links.uploadCv')"
-            :description="t('profile.links.uploadCvDescription')"
-            icon="i-heroicons-document-arrow-up"
-            to="/profile/cv-upload"
-          />
-
-          <UPageCard
-            :title="t('profile.links.experiences')"
-            :description="t('profile.links.experiencesDescription')"
-            icon="i-heroicons-briefcase"
-            to="/profile/experiences"
-          />
-
-          <UPageCard
-            :title="t('profile.links.starStories')"
-            :description="t('profile.links.starStoriesDescription')"
-            icon="i-heroicons-star"
-            to="/profile/stories"
-          />
-
-          <UPageCard
-            :title="t('profile.links.personalCanvas')"
-            :description="t('profile.links.personalCanvasDescription')"
-            icon="i-heroicons-squares-2x2"
-            to="/profile/canvas"
-          />
-
-          <UPageCard
-            :title="t('profile.links.communication')"
-            :description="t('profile.links.communicationDescription')"
-            icon="i-heroicons-chat-bubble-left-right"
-            disabled
-          />
-        </UPageGrid>
-      </UCard>
-
-      <!-- Edit Button (prominent when not editing) -->
-      <div v-if="!isEditing" class="mb-6 flex justify-end">
-        <UButton icon="i-heroicons-pencil" color="primary" size="lg" @click="startEditing">
-          {{ t('profile.actions.edit') }}
-        </UButton>
-      </div>
-
       <form @submit.prevent="handleSubmit">
         <!-- SECTION A: Core Identity -->
         <UCard v-if="isEditing || hasCoreIdentity" class="mb-6">
@@ -434,15 +381,63 @@
           </UButton>
         </div>
       </form>
+
+      <!-- Management Links Section -->
+      <UCard class="mt-6">
+        <template #header>
+          <h3 class="text-lg font-semibold">
+            {{ t('profile.sections.relatedPages') }}
+          </h3>
+        </template>
+
+        <UPageGrid>
+          <UPageCard
+            v-if="showCvUpload"
+            :title="t('profile.links.uploadCv')"
+            :description="t('profile.links.uploadCvDescription')"
+            icon="i-heroicons-document-arrow-up"
+            to="/profile/cv-upload"
+          />
+
+          <UPageCard
+            :title="t('profile.links.experiences')"
+            :description="t('profile.links.experiencesDescription')"
+            icon="i-heroicons-briefcase"
+            to="/profile/experiences"
+          />
+
+          <UPageCard
+            :title="t('profile.links.starStories')"
+            :description="t('profile.links.starStoriesDescription')"
+            icon="i-heroicons-star"
+            to="/profile/stories"
+          />
+
+          <UPageCard
+            :title="t('profile.links.personalCanvas')"
+            :description="t('profile.links.personalCanvasDescription')"
+            icon="i-heroicons-squares-2x2"
+            to="/profile/canvas"
+          />
+
+          <UPageCard
+            :title="t('profile.links.communication')"
+            :description="t('profile.links.communicationDescription')"
+            icon="i-heroicons-chat-bubble-left-right"
+            disabled
+          />
+        </UPageGrid>
+      </UCard>
     </UPageBody>
   </UPage>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useUserProfile } from '@/application/user-profile/useUserProfile';
+import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { UserProfile, UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
 
 // Profile page - manage user profile with view/edit mode
@@ -455,6 +450,23 @@ const { userId } = useAuthUser();
 const profile = ref<UserProfile | null>(null);
 const loading = ref(false);
 const loadError = ref<string | null>(null);
+
+// Experience check for CV upload
+const showCvUpload = ref(false);
+const experienceRepo = new ExperienceRepository();
+
+// Check if user has any experiences
+onMounted(async () => {
+  try {
+    const experiences = await experienceRepo.list();
+    // Show CV upload only if user has no experiences
+    showCvUpload.value = !experiences || experiences.length === 0;
+  } catch (error) {
+    console.error('Error checking experiences:', error);
+    // Show CV upload on error (better UX to show than hide)
+    showCvUpload.value = true;
+  }
+});
 
 // Profile save operation
 let saveProfile: ((input: UserProfileUpdateInput) => Promise<boolean>) | null = null;
