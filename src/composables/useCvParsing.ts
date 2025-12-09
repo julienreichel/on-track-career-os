@@ -56,7 +56,10 @@ export function useCvParsing() {
       throw new Error(aiOps.error.value);
     }
 
-    if (!aiOps.parsedCv.value?.sections?.experiences) {
+    if (
+      !aiOps.parsedCv.value?.sections?.experiences ||
+      aiOps.parsedCv.value.sections.experiences.length === 0
+    ) {
       throw new Error(t('cvUpload.errors.parsingFailed'));
     }
 
