@@ -190,6 +190,45 @@ npm run build
 npm run preview
 ```
 
+## 🔄 CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration and deployment. The pipeline runs on every push to `main` and on pull requests.
+
+### Pipeline Stages
+
+1. **Test** - Runs linting, type checking, and all test suites (unit, amplify, nuxt) with coverage validation (80% threshold)
+2. **Deploy Backend** (main branch only) - Deploys Amplify sandbox to AWS
+3. **E2E Sandbox Tests** - Tests backend integration with real AWS services
+4. **E2E Tests** - Runs Playwright tests against the deployed application
+5. **Cleanup** - Tears down the Amplify sandbox after tests complete
+
+### Required GitHub Secrets
+
+To enable the full CI/CD pipeline, configure these secrets in your repository settings:
+
+| Secret                  | Description                         | Required For        |
+| ----------------------- | ----------------------------------- | ------------------- |
+| `AWS_ACCESS_KEY_ID`     | AWS access key for Amplify          | Backend deployment  |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret key for Amplify          | Backend deployment  |
+| `AWS_REGION`            | AWS region (default: eu-central-1)  | Backend deployment  |
+| `CODECOV_TOKEN`         | Codecov token for coverage reports  | Coverage tracking   |
+
+### Local E2E Testing
+
+```bash
+# Terminal 1: Start dev server
+npm run dev
+
+# Terminal 2: Run E2E tests
+npm run test:e2e
+
+# Or run specific tests
+npm run test:e2e -- test/e2e/smoke.spec.ts
+
+# Interactive mode
+npm run test:e2e:ui
+```
+
 ## 🤝 Contributing
 
 1. Create a feature branch: `git checkout -b feature/amazing-feature`
