@@ -155,7 +155,7 @@ const isValid = () => {
 
         <UFormField
           :label="t('stories.builder.achievementsList')"
-          :description="t('stories.builder.achievementsHint')"
+          :hint="t('stories.builder.achievementsHint')"
         >
           <UInputTags
             v-model="achievements"
@@ -164,10 +164,7 @@ const isValid = () => {
           />
         </UFormField>
 
-        <UFormField
-          :label="t('stories.builder.kpisList')"
-          :description="t('stories.builder.kpisHint')"
-        >
+        <UFormField :label="t('stories.builder.kpisList')" :hint="t('stories.builder.kpisHint')">
           <UInputTags
             v-model="kpiSuggestions"
             :placeholder="t('stories.builder.kpisPlaceholder')"
