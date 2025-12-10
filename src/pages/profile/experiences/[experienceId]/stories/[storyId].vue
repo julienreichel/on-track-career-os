@@ -36,6 +36,7 @@ const experienceService = new ExperienceService();
 
 const {
   selectedStory,
+  draftStory,
   loading,
   generating,
   saving,
@@ -352,7 +353,7 @@ onMounted(async () => {
             (isNew && (selectedMode === 'manual' || (!showModeSelection && !selectedMode))) ||
             (!isNew && selectedStory)
           "
-          :story="isNew ? undefined : selectedStory"
+          :story="isNew ? draftStory : selectedStory"
           :experience-id="experienceId"
           :mode="isNew ? 'create' : 'edit'"
           :generated-achievements="generatedAchievements"
