@@ -279,7 +279,7 @@ onMounted(async () => {
                 class="cursor-pointer hover:border-primary-500 transition-colors"
                 @click="selectedMode = 'freetext'"
               >
-                <div class="flex flex-col items-center text-center gap-3 p-4">
+                <div class="text-center p-4 space-y-3">
                   <u-icon name="i-heroicons-document-text" class="w-8 h-8 text-primary-500" />
                   <h4 class="font-medium">{{ t('stories.builder.modeFreetext') }}</h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -293,7 +293,7 @@ onMounted(async () => {
                 class="cursor-pointer hover:border-primary-500 transition-colors"
                 @click="selectedMode = 'manual'"
               >
-                <div class="flex flex-col items-center text-center gap-3 p-4">
+                <div class="text-center p-4 space-y-3">
                   <u-icon name="i-heroicons-pencil-square" class="w-8 h-8 text-primary-500" />
                   <h4 class="font-medium">{{ t('stories.builder.modeManual') }}</h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -326,7 +326,7 @@ onMounted(async () => {
               />
             </u-form-field>
 
-            <div class="flex justify-end gap-3">
+            <div class="flex justify-end space-x-3">
               <UButton
                 :label="t('common.cancel')"
                 variant="ghost"

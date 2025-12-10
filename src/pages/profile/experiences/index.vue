@@ -227,9 +227,7 @@ function handleViewStories(id: string) {
 
         <!-- Loading State -->
         <UCard v-if="loading">
-          <div class="flex flex-col items-center justify-center py-12 gap-4">
-            <USkeleton class="h-8 w-full" />
-          </div>
+          <USkeleton class="h-8 w-full" />
         </UCard>
 
         <!-- Empty State -->

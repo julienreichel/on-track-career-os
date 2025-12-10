@@ -252,12 +252,10 @@ onMounted(async () => {
         </UCard>
 
         <UCard v-else-if="loading || isGenerating">
-          <div class="flex flex-col items-center justify-center py-12 gap-4">
-            <USkeleton class="h-8 w-full" />
-            <p v-if="isGenerating" class="text-sm text-gray-600 dark:text-gray-400">
-              {{ t('stories.list.generating') }}
-            </p>
-          </div>
+          <USkeleton class="h-8 w-full" />
+          <p v-if="isGenerating" class="text-center mt-4">
+            {{ t('stories.list.generating') }}
+          </p>
         </UCard>
 
         <UCard v-else-if="stories.length === 0">
@@ -276,20 +274,18 @@ onMounted(async () => {
             icon="i-heroicons-document-text"
           >
             <template #actions>
-              <div class="flex gap-2">
-                <UButton
-                  :label="t('stories.list.autoGenerate')"
-                  icon="i-heroicons-sparkles"
-                  color="primary"
-                  variant="soft"
-                  @click="handleAutoGenerate"
-                />
-                <UButton
-                  :label="t('stories.list.addNew')"
-                  icon="i-heroicons-plus"
-                  @click="handleNewStory"
-                />
-              </div>
+              <UButton
+                :label="t('stories.list.autoGenerate')"
+                icon="i-heroicons-sparkles"
+                color="primary"
+                variant="soft"
+                @click="handleAutoGenerate"
+              />
+              <UButton
+                :label="t('stories.list.addNew')"
+                icon="i-heroicons-plus"
+                @click="handleNewStory"
+              />
             </template>
           </UEmpty>
         </UCard>
