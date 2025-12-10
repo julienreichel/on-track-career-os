@@ -190,7 +190,7 @@ const handleCancel = () => {
         </div>
 
         <!-- Mode Selection (only for new stories) -->
-        <UCard v-else-if="showModeSelection">
+        <UCard v-else-if="showModeSelection && !selectedMode">
           <div class="space-y-6">
             <div>
               <h3 class="text-lg font-semibold mb-2">
