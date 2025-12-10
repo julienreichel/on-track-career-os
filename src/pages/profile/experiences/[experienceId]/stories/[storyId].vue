@@ -9,11 +9,7 @@ import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAnd
 import type { Experience } from '@/domain/experience/Experience';
 
 defineOptions({
-  name: 'NewStoryPage',
-});
-
-definePageMeta({
-  breadcrumbLabel: 'New',
+  name: 'StoryFormPage',
 });
 
 const route = useRoute();
@@ -21,25 +17,37 @@ const router = useRouter();
 const { t } = useI18n();
 
 const experienceId = computed(() => route.params.experienceId as string);
+const storyId = computed(() => route.params.storyId as string);
 const companyName = ref<string>('');
 
+// Determine if we're creating or editing
+const isNew = computed(() => storyId.value === 'new');
+const breadcrumbLabel = computed(() => (isNew.value ? 'New' : 'Edit'));
+
+definePageMeta({
+  breadcrumbLabel: computed(() => breadcrumbLabel.value),
+});
+
+const experienceService = new ExperienceService();
+
 const {
+  selectedStory,
+  loading,
   generating,
   saving,
   error,
+  loadStory,
   runStarInterview,
   generateAchievements,
   saveStory,
   updateDraft,
+  updateStory,
 } = useStoryEngine(experienceId);
 
 const generatedAchievements = ref<AchievementsAndKpis | null>(null);
 const showModeSelection = ref(true);
 const selectedMode = ref<'experience' | 'freetext' | 'manual' | null>(null);
 const freeTextInput = ref('');
-
-// Services
-const experienceService = new ExperienceService();
 
 /**
  * Format experience data as text for AI generation
@@ -85,7 +93,7 @@ const handleGenerateFromExperience = async () => {
     const formattedText = formatExperienceAsText(experience);
     await handleGenerateFromText(formattedText);
   } catch (err) {
-    console.error('[NewStory] Generate from experience error:', err);
+    console.error('[StoryForm] Generate from experience error:', err);
   }
 };
 
@@ -99,7 +107,7 @@ const handleGenerateFromText = async (freeText: string) => {
       selectedMode.value = null;
     }
   } catch (err) {
-    console.error('[NewStory] Generation error:', err);
+    console.error('[StoryForm] Generation error:', err);
   }
 };
 
@@ -117,7 +125,7 @@ const handleGenerateAchievements = async () => {
       generatedAchievements.value = result;
     }
   } catch (err) {
-    console.error('[NewStory] Achievements generation error:', err);
+    console.error('[StoryForm] Achievements generation error:', err);
   }
 };
 
@@ -133,16 +141,23 @@ interface StoryData {
 // Handle save
 const handleSave = async (storyData: StoryData) => {
   try {
-    // Update draft with form data
-    updateDraft(storyData);
+    if (isNew.value) {
+      // Update draft with form data
+      updateDraft(storyData);
 
-    // Save the draft
-    const saved = await saveStory(experienceId.value);
-    if (saved) {
-      router.push(`/profile/experiences/${experienceId.value}/stories`);
+      // Save the draft
+      const saved = await saveStory(experienceId.value);
+      if (saved) {
+        router.push(`/profile/experiences/${experienceId.value}/stories`);
+      }
+    } else {
+      const updated = await updateStory(storyId.value, storyData);
+      if (updated) {
+        router.push(`/profile/experiences/${experienceId.value}/stories`);
+      }
     }
   } catch (err) {
-    console.error('[NewStory] Save error:', err);
+    console.error('[StoryForm] Save error:', err);
   }
 };
 
@@ -151,7 +166,7 @@ const handleCancel = () => {
   router.push(`/profile/experiences/${experienceId.value}/stories`);
 };
 
-// Load experience title on mount
+// Load experience and story (if editing) on mount
 onMounted(async () => {
   // Load experience company name for display
   try {
@@ -160,7 +175,12 @@ onMounted(async () => {
       companyName.value = experience.companyName || experience.title;
     }
   } catch (err) {
-    console.error('[NewStory] Error loading experience:', err);
+    console.error('[StoryForm] Error loading experience:', err);
+  }
+
+  // If editing, load the story
+  if (!isNew.value && storyId.value) {
+    await loadStory(storyId.value);
   }
 });
 </script>
@@ -169,8 +189,10 @@ onMounted(async () => {
   <UContainer>
     <UPage>
       <UPageHeader
-        :title="t('stories.builder.newTitle')"
-        :description="t('stories.builder.newDescription')"
+        :title="isNew ? t('stories.builder.newTitle') : t('stories.builder.editTitle')"
+        :description="
+          isNew ? t('stories.builder.newDescription') : t('stories.builder.editDescription')
+        "
         :links="[
           {
             label: t('stories.builder.backToStories'),
@@ -189,7 +211,16 @@ onMounted(async () => {
           :description="error"
         />
 
-        <div v-if="generating" class="flex items-center justify-center py-12">
+        <div v-if="loading" class="flex items-center justify-center py-12">
+          <div class="text-center">
+            <USkeleton class="h-8 w-64 mb-2" />
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ t('stories.builder.loading') }}
+            </p>
+          </div>
+        </div>
+
+        <div v-else-if="generating" class="flex items-center justify-center py-12">
           <div class="text-center">
             <USkeleton class="h-8 w-64 mb-2" />
             <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -208,7 +239,7 @@ onMounted(async () => {
         </div>
 
         <!-- Mode Selection (only for new stories) -->
-        <UCard v-else-if="showModeSelection && !selectedMode">
+        <UCard v-else-if="isNew && showModeSelection && !selectedMode">
           <div class="space-y-6">
             <div>
               <h3 class="text-lg font-semibold mb-2">
@@ -267,8 +298,8 @@ onMounted(async () => {
           </div>
         </UCard>
 
-        <!-- Free Text Input Form -->
-        <UCard v-else-if="selectedMode === 'freetext'">
+        <!-- Free Text Input Form (new stories only) -->
+        <UCard v-else-if="isNew && selectedMode === 'freetext'">
           <div class="space-y-6">
             <div>
               <h3 class="text-lg font-semibold mb-2">
@@ -309,13 +340,26 @@ onMounted(async () => {
           </div>
         </UCard>
 
+        <!-- Story Builder (for manual mode or editing) -->
         <story-builder
-          v-else-if="selectedMode === 'manual' || (!showModeSelection && !selectedMode)"
+          v-else-if="
+            (isNew && (selectedMode === 'manual' || (!showModeSelection && !selectedMode))) ||
+            (!isNew && selectedStory)
+          "
+          :story="isNew ? undefined : selectedStory"
           :experience-id="experienceId"
-          mode="create"
+          :mode="isNew ? 'create' : 'edit'"
           @save="handleSave"
           @cancel="handleCancel"
           @generate-achievements="handleGenerateAchievements"
+        />
+
+        <UAlert
+          v-else-if="!isNew && !selectedStory"
+          color="yellow"
+          icon="i-heroicons-exclamation-triangle"
+          :title="t('stories.builder.notFound')"
+          :description="t('stories.builder.notFoundDescription')"
         />
       </UPageBody>
     </UPage>

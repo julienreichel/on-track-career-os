@@ -95,7 +95,7 @@ const handleNewStory = () => {
 };
 
 const handleEdit = (storyId: string) => {
-  router.push(`/profile/experiences/${experienceId.value}/stories/${storyId}/edit`);
+  router.push(`/profile/experiences/${experienceId.value}/stories/${storyId}`);
 };
 
 const handleDelete = async (storyId: string) => {
