@@ -7,6 +7,7 @@ export interface StoryBuilderProps {
   story?: STARStory | null;
   experienceId: string;
   mode: 'create' | 'edit';
+  showGenerateButton?: boolean;
 }
 
 export interface StoryBuilderEmits {
@@ -25,7 +26,10 @@ export interface StoryBuilderEmits {
   generateAchievements: [];
 }
 
-const props = defineProps<StoryBuilderProps>();
+const props = withDefaults(defineProps<StoryBuilderProps>(), {
+  story: null,
+  showGenerateButton: true,
+});
 const emit = defineEmits<StoryBuilderEmits>();
 
 const { t } = useI18n();
@@ -96,7 +100,7 @@ const isValid = () => {
 <template>
   <UCard>
     <!-- Optional: Generate from free text -->
-    <div v-if="mode === 'create'" class="mb-6">
+    <div v-if="mode === 'create' && showGenerateButton" class="mb-6">
       <UButton
         v-if="!showFreeTextInput"
         :label="t('stories.builder.generateFromText')"

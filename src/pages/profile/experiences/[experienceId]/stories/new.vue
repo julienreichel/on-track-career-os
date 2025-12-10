@@ -266,6 +266,7 @@ const handleCancel = () => {
                 v-model="freeTextInput"
                 :placeholder="t('stories.builder.freetextPlaceholder')"
                 :rows="10"
+                class="w-full"
               />
             </u-form-field>
 
@@ -294,6 +295,7 @@ const handleCancel = () => {
           v-else-if="selectedMode === 'manual' || (!showModeSelection && !selectedMode)"
           :experience-id="experienceId"
           mode="create"
+          :show-generate-button="selectedMode !== 'manual'"
           @save="handleSave"
           @cancel="handleCancel"
           @generate-from-text="handleGenerateFromText"
