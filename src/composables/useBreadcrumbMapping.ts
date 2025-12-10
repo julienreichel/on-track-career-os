@@ -14,15 +14,15 @@ const mappingCache = ref<BreadcrumbMapping>({});
 let experienceService: ExperienceService | null = null;
 
 export function useBreadcrumbMapping() {
-  // Lazy initialize service to avoid issues in test environment
-  if (!experienceService) {
-    experienceService = new ExperienceService();
-  }
-
   /**
    * Get display name for an experience ID
    */
   const getExperienceName = async (experienceId: string): Promise<string> => {
+    // Lazy initialize service to avoid issues in test environment
+    if (!experienceService) {
+      experienceService = new ExperienceService();
+    }
+
     // Check cache first
     if (mappingCache.value[experienceId]) {
       return mappingCache.value[experienceId];
