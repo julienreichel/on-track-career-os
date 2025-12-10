@@ -3,8 +3,10 @@ import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStoryEngine } from '@/application/starstory/useStoryEngine';
+import { ExperienceService } from '@/domain/experience/ExperienceService';
 import StoryBuilder from '@/components/StoryBuilder.vue';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
+import type { Experience } from '@/domain/experience/Experience';
 
 defineOptions({
   name: 'NewStoryPage',
@@ -27,6 +29,57 @@ const {
 } = useStoryEngine(experienceId);
 
 const generatedAchievements = ref<AchievementsAndKpis | null>(null);
+const showModeSelection = ref(true);
+const selectedMode = ref<'experience' | 'freetext' | 'manual' | null>(null);
+
+// Services
+const experienceService = new ExperienceService();
+
+/**
+ * Format experience data as text for AI generation
+ */
+const formatExperienceAsText = (experience: Experience): string => {
+  const lines = [];
+
+  lines.push(`Job Title: ${experience.title}`);
+
+  if (experience.companyName) {
+    lines.push(`Company: ${experience.companyName}`);
+  }
+
+  const startDate = experience.startDate ? new Date(experience.startDate).toLocaleDateString() : '';
+  const endDate = experience.endDate ? new Date(experience.endDate).toLocaleDateString() : 'Present';
+  lines.push(`Duration: ${startDate} - ${endDate}`);
+  lines.push('');
+
+  if (experience.responsibilities && experience.responsibilities.length > 0) {
+    lines.push('Responsibilities:');
+    experience.responsibilities.forEach((resp) => lines.push(`- ${resp}`));
+    lines.push('');
+  }
+
+  if (experience.tasks && experience.tasks.length > 0) {
+    lines.push('Tasks & Achievements:');
+    experience.tasks.forEach((task) => lines.push(`- ${task}`));
+  }
+
+  return lines.join('\n');
+};
+
+// Handle generation from experience data
+const handleGenerateFromExperience = async () => {
+  try {
+    const experience = await experienceService.getFullExperience(experienceId.value);
+    if (!experience) {
+      throw new Error('Experience not found');
+    }
+
+    const formattedText = formatExperienceAsText(experience);
+    await handleGenerateFromText(formattedText);
+  } catch (err) {
+    console.error('[NewStory] Generate from experience error:', err);
+  }
+};
 
 // Handle AI generation from free text
 const handleGenerateFromText = async (freeText: string) => {
@@ -34,6 +87,7 @@ const handleGenerateFromText = async (freeText: string) => {
     const result = await runStarInterview(freeText);
     if (result) {
       // Draft is automatically updated by runStarInterview
+      showModeSelection.value = false;
     }
   } catch (err) {
     console.error('[NewStory] Generation error:', err);
@@ -124,6 +178,76 @@ const handleCancel = () => {
             </p>
           </div>
         </div>
+
+        <!-- Mode Selection (only for new stories) -->
+        <UCard v-else-if="showModeSelection">
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-lg font-semibold mb-2">
+                {{ t('stories.builder.chooseMode') }}
+              </h3>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-3">
+              <!-- Generate from Experience -->
+              <UCard
+                class="cursor-pointer hover:border-primary-500 transition-colors"
+                @click="
+                  () => {
+                    selectedMode = 'experience';
+                    handleGenerateFromExperience();
+                  }
+                "
+              >
+                <div class="flex flex-col items-center text-center gap-3 p-4">
+                  <UIcon name="i-heroicons-sparkles" class="w-8 h-8 text-primary-500" />
+                  <h4 class="font-medium">{{ t('stories.builder.modeExperience') }}</h4>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ t('stories.builder.modeExperienceDescription') }}
+                  </p>
+                </div>
+              </UCard>
+
+              <!-- Generate from Free Text -->
+              <UCard
+                class="cursor-pointer hover:border-primary-500 transition-colors"
+                @click="
+                  () => {
+                    selectedMode = 'freetext';
+                    showModeSelection = false;
+                  }
+                "
+              >
+                <div class="flex flex-col items-center text-center gap-3 p-4">
+                  <UIcon name="i-heroicons-document-text" class="w-8 h-8 text-primary-500" />
+                  <h4 class="font-medium">{{ t('stories.builder.modeFreetext') }}</h4>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ t('stories.builder.modeFreetextDescription') }}
+                  </p>
+                </div>
+              </UCard>
+
+              <!-- Manual Entry -->
+              <UCard
+                class="cursor-pointer hover:border-primary-500 transition-colors"
+                @click="
+                  () => {
+                    selectedMode = 'manual';
+                    showModeSelection = false;
+                  }
+                "
+              >
+                <div class="flex flex-col items-center text-center gap-3 p-4">
+                  <UIcon name="i-heroicons-pencil-square" class="w-8 h-8 text-primary-500" />
+                  <h4 class="font-medium">{{ t('stories.builder.modeManual') }}</h4>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ t('stories.builder.modeManualDescription') }}
+                  </p>
+                </div>
+              </UCard>
+            </div>
+          </div>
+        </UCard>
 
         <story-builder
           v-else

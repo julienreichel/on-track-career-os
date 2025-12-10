@@ -118,6 +118,7 @@ Key Requirements:
     // Invoke AI operation via repository (now returns array of stories)
     const starStories = await repository.generateStarStory(sourceText);
 
+    console.log(starStories);
     // Validate we got an array
     expect(Array.isArray(starStories)).toBe(true);
     expect(starStories.length).toBeGreaterThan(0);

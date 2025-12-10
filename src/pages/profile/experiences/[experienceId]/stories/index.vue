@@ -4,7 +4,9 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStoryEngine } from '@/application/starstory/useStoryEngine';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
+import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { STARStory } from '@/domain/starstory/STARStory';
+import type { Experience } from '@/domain/experience/Experience';
 
 const route = useRoute();
 const router = useRouter();
@@ -15,7 +17,12 @@ const experienceTitle = ref<string>('');
 
 // Story engine
 const { stories, loading, error, loadStories } = useStoryEngine(experienceId);
-const storyService = new ExperienceService();
+const experienceService = new ExperienceService();
+const storyService = new STARStoryService();
+
+// Auto-generation state
+const isGenerating = ref(false);
+const generationError = ref<string | null>(null);
 
 // Table columns configuration
 const columns = computed(() => [
@@ -73,12 +80,84 @@ const handleDelete = async (storyId: string) => {
   }
 };
 
+/**
+ * Format experience data as text for AI generation
+ * Uses the format specified in AI_Interaction_Contract.md
+ */
+const formatExperienceAsText = (experience: Experience): string => {
+  const lines = [];
+
+  // Job Title
+  lines.push(`Job Title: ${experience.title}`);
+
+  // Company (if available)
+  if (experience.companyName) {
+    lines.push(`Company: ${experience.companyName}`);
+  }
+
+  // Duration
+  const startDate = experience.startDate ? new Date(experience.startDate).toLocaleDateString() : '';
+  const endDate = experience.endDate ? new Date(experience.endDate).toLocaleDateString() : 'Present';
+  lines.push(`Duration: ${startDate} - ${endDate}`);
+  lines.push('');
+
+  // Responsibilities
+  if (experience.responsibilities && experience.responsibilities.length > 0) {
+    lines.push('Responsibilities:');
+    experience.responsibilities.forEach((resp) => lines.push(`- ${resp}`));
+    lines.push('');
+  }
+
+  // Tasks & Achievements
+  if (experience.tasks && experience.tasks.length > 0) {
+    lines.push('Tasks & Achievements:');
+    experience.tasks.forEach((task) => lines.push(`- ${task}`));
+  }
+
+  return lines.join('\n');
+};
+
+/**
+ * Auto-generate STAR stories from experience data
+ */
+const handleAutoGenerate = async () => {
+  isGenerating.value = true;
+  generationError.value = null;
+
+  try {
+    // 1. Fetch full experience details
+    const experience = await experienceService.getFullExperience(experienceId.value);
+    if (!experience) {
+      throw new Error('Experience not found');
+    }
+
+    // 2. Format experience as text
+    const formattedText = formatExperienceAsText(experience);
+
+    // 3. Generate STAR stories using AI
+    const generatedStories = await storyService.generateStar(formattedText);
+
+    // 4. Save all generated stories
+    for (const story of generatedStories) {
+      await storyService.createAndLinkStory(story, experienceId.value);
+    }
+
+    // 5. Reload stories list
+    await loadStories();
+  } catch (err) {
+    console.error('[Stories] Auto-generation error:', err);
+    generationError.value = err instanceof Error ? err.message : 'Unknown error occurred';
+  } finally {
+    isGenerating.value = false;
+  }
+};
+
 // Load data
 onMounted(async () => {
   if (experienceId.value) {
     // Load experience details
     try {
-      const experience = await storyService.getFullExperience(experienceId.value);
+      const experience = await experienceService.getFullExperience(experienceId.value);
       if (experience) {
         experienceTitle.value = experience.title;
       }
@@ -121,24 +200,45 @@ onMounted(async () => {
           <p>{{ error }}</p>
         </UCard>
 
-        <UCard v-else-if="loading">
-          <div class="flex items-center justify-center py-12">
+        <UCard v-else-if="loading || isGenerating">
+          <div class="flex flex-col items-center justify-center py-12 gap-4">
             <USkeleton class="h-8 w-full" />
+            <p v-if="isGenerating" class="text-sm text-gray-600 dark:text-gray-400">
+              {{ t('stories.list.generating') }}
+            </p>
           </div>
         </UCard>
 
         <UCard v-else-if="stories.length === 0">
+          <!-- Show generation error if any -->
+          <UAlert
+            v-if="generationError"
+            color="red"
+            icon="i-heroicons-exclamation-triangle"
+            :title="generationError"
+            class="mb-4"
+          />
+
           <UEmpty
             :title="t('stories.list.empty')"
             :description="t('stories.list.emptyDescription')"
             icon="i-heroicons-document-text"
           >
             <template #actions>
-              <UButton
-                :label="t('stories.list.addNew')"
-                icon="i-heroicons-plus"
-                @click="handleNewStory"
-              />
+              <div class="flex gap-2">
+                <UButton
+                  :label="t('stories.list.autoGenerate')"
+                  icon="i-heroicons-sparkles"
+                  color="primary"
+                  variant="soft"
+                  @click="handleAutoGenerate"
+                />
+                <UButton
+                  :label="t('stories.list.addNew')"
+                  icon="i-heroicons-plus"
+                  @click="handleNewStory"
+                />
+              </div>
             </template>
           </UEmpty>
         </UCard>
