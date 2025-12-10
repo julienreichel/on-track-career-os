@@ -126,7 +126,9 @@ const formatExperienceAsText = (experience: Experience): string => {
 
   // Duration
   const startDate = experience.startDate ? new Date(experience.startDate).toLocaleDateString() : '';
-  const endDate = experience.endDate ? new Date(experience.endDate).toLocaleDateString() : 'Present';
+  const endDate = experience.endDate
+    ? new Date(experience.endDate).toLocaleDateString()
+    : 'Present';
   lines.push(`Duration: ${startDate} - ${endDate}`);
   lines.push('');
 
@@ -212,17 +214,13 @@ onMounted(async () => {
             to: '/profile/experiences',
             icon: 'i-heroicons-arrow-left',
           },
+          {
+            label: t('stories.list.addNew'),
+            icon: 'i-heroicons-plus',
+            onClick: handleNewStory,
+          },
         ]"
-      >
-        <template #actions>
-          <UButton
-            :label="t('stories.list.addNew')"
-            icon="i-heroicons-plus"
-            color="primary"
-            @click="handleNewStory"
-          />
-        </template>
-      </UPageHeader>
+      />
 
       <UPageBody>
         <UCard v-if="error" color="red">
@@ -255,14 +253,14 @@ onMounted(async () => {
           >
             <template #actions>
               <div class="flex gap-2">
-                <UButton
+                <u-button
                   :label="t('stories.list.autoGenerate')"
                   icon="i-heroicons-sparkles"
                   color="primary"
                   variant="soft"
                   @click="handleAutoGenerate"
                 />
-                <UButton
+                <u-button
                   :label="t('stories.list.addNew')"
                   icon="i-heroicons-plus"
                   @click="handleNewStory"

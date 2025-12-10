@@ -48,7 +48,9 @@ const formatExperienceAsText = (experience: Experience): string => {
   }
 
   const startDate = experience.startDate ? new Date(experience.startDate).toLocaleDateString() : '';
-  const endDate = experience.endDate ? new Date(experience.endDate).toLocaleDateString() : 'Present';
+  const endDate = experience.endDate
+    ? new Date(experience.endDate).toLocaleDateString()
+    : 'Present';
   lines.push(`Duration: ${startDate} - ${endDate}`);
   lines.push('');
 
