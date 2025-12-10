@@ -197,21 +197,42 @@ The project uses GitHub Actions for continuous integration and deployment. The p
 ### Pipeline Stages
 
 1. **Test** - Runs linting, type checking, and all test suites (unit, amplify, nuxt) with coverage validation (80% threshold)
-2. **Deploy Backend** (main branch only) - Deploys Amplify sandbox to AWS
+2. **Deploy Backend** (main branch only) - Deploys or updates the Amplify sandbox on AWS (persistent across runs)
 3. **E2E Sandbox Tests** - Tests backend integration with real AWS services
 4. **E2E Tests** - Runs Playwright tests against the deployed application
-5. **Cleanup** - Tears down the Amplify sandbox after tests complete
+
+**Note**: The Amplify sandbox backend is **persistent** and reused across CI runs for efficiency. It is updated rather than recreated on each deployment.
 
 ### Required GitHub Secrets
 
 To enable the full CI/CD pipeline, configure these secrets in your repository settings:
 
-| Secret                  | Description                         | Required For        |
-| ----------------------- | ----------------------------------- | ------------------- |
-| `AWS_ACCESS_KEY_ID`     | AWS access key for Amplify          | Backend deployment  |
-| `AWS_SECRET_ACCESS_KEY` | AWS secret key for Amplify          | Backend deployment  |
-| `AWS_REGION`            | AWS region (default: eu-central-1)  | Backend deployment  |
-| `CODECOV_TOKEN`         | Codecov token for coverage reports  | Coverage tracking   |
+| Secret                  | Description                        | Required For       |
+| ----------------------- | ---------------------------------- | ------------------ |
+| `AWS_ACCESS_KEY_ID`     | AWS access key for Amplify         | Backend deployment |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret key for Amplify         | Backend deployment |
+| `AWS_REGION`            | AWS region (default: eu-central-1) | Backend deployment |
+| `CODECOV_TOKEN`         | Codecov token for coverage reports | Coverage tracking  |
+
+### Manual Backend Cleanup
+
+The CI backend is persistent to save deployment time. To manually clean it up:
+
+```bash
+# Using npm script (requires AWS credentials in environment)
+npm run cleanup:sandbox
+
+# Or run the script directly
+bash scripts/cleanup-sandbox.sh
+```
+
+Make sure to set your AWS credentials before running:
+```bash
+export AWS_ACCESS_KEY_ID="your-key"
+export AWS_SECRET_ACCESS_KEY="your-secret"
+export AWS_REGION="eu-central-1"
+npm run cleanup:sandbox
+```
 
 ### Local E2E Testing
 
