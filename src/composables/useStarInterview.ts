@@ -26,9 +26,12 @@ export interface ChatMessage {
 /**
  * Create interview steps configuration
  */
-function createInterviewSteps(
-  answers: { situation: string; task: string; action: string; result: string }
-): InterviewStep[] {
+function createInterviewSteps(answers: {
+  situation: string;
+  task: string;
+  action: string;
+  result: string;
+}): InterviewStep[] {
   return [
     {
       key: 'situation',
@@ -78,10 +81,7 @@ function combineAnswersToText(
 /**
  * Initialize chat history with welcome messages
  */
-function initializeChatHistory(
-  currentQuestion: string,
-  sourceText?: string
-): ChatMessage[] {
+function initializeChatHistory(currentQuestion: string, sourceText?: string): ChatMessage[] {
   const messages: ChatMessage[] = [
     {
       role: 'assistant',
@@ -109,11 +109,7 @@ function initializeChatHistory(
 /**
  * Add message to chat history
  */
-function addChatMessage(
-  history: ChatMessage[],
-  role: 'assistant' | 'user',
-  content: string
-): void {
+function addChatMessage(history: ChatMessage[], role: 'assistant' | 'user', content: string): void {
   history.push({
     role,
     content,

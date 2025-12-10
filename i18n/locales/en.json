@@ -311,6 +311,98 @@
       "notFoundDescription": "The story you're looking for doesn't exist or has been deleted."
     }
   },
+  "interview": {
+    "welcome": "Let's build your STAR story! I'll guide you through four steps to capture your achievement.",
+    "contextProvided": "I see you have some experience context. Let's use that to build your story.",
+    "assistant": "AI Assistant",
+    "you": "You",
+    "thinking": "Thinking...",
+    "yourAnswer": "Your Answer",
+    "answerPlaceholder": "Type your response here...",
+    "submit": "Submit",
+    "noMessages": "No conversation yet",
+    "storyGenerated": "Great! I've generated your STAR story from your answers. You can now review and edit it.",
+    "situation": {
+      "question": "First, tell me about the situation. What was the context or challenge you faced?"
+    },
+    "task": {
+      "question": "What was your specific task or responsibility in this situation?"
+    },
+    "action": {
+      "question": "What actions did you take to address this situation?"
+    },
+    "result": {
+      "question": "Finally, what were the results or outcomes of your actions?"
+    },
+    "errors": {
+      "emptyAnswer": "Please provide an answer before continuing",
+      "incompleteInterview": "Please complete all steps before generating the story",
+      "generationFailed": "Failed to generate story. Please try again."
+    }
+  },
+  "star": {
+    "situation": {
+      "label": "Situation",
+      "description": "Describe the context or challenge you faced",
+      "placeholder": "What was the situation or problem?"
+    },
+    "task": {
+      "label": "Task",
+      "description": "What was your specific responsibility or goal?",
+      "placeholder": "What were you asked or expected to do?"
+    },
+    "action": {
+      "label": "Action",
+      "description": "What specific actions did you take?",
+      "placeholder": "What steps did you take to address the situation?"
+    },
+    "result": {
+      "label": "Result",
+      "description": "What was the outcome or impact?",
+      "placeholder": "What was the result of your actions? Include metrics if possible."
+    }
+  },
+  "enhancer": {
+    "title": "Achievements & KPIs",
+    "regenerate": "Regenerate",
+    "achievements": "Achievements",
+    "noAchievements": "No achievements yet. Click regenerate to generate suggestions.",
+    "addAchievementPlaceholder": "Add new achievement...",
+    "kpis": "Key Performance Indicators",
+    "noKpis": "No KPIs yet. Click regenerate to generate suggestions.",
+    "addKpiPlaceholder": "Add new KPI...",
+    "errors": {
+      "incompleteStory": "Please complete all STAR fields before generating achievements",
+      "generationFailed": "Failed to generate achievements. Please try again."
+    }
+  },
+  "storyCard": {
+    "noContent": "No content",
+    "clickToView": "Click to view details"
+  },
+  "storyList": {
+    "emptyTitle": "No Stories Yet",
+    "emptyDescription": "Create your first STAR story to document your achievements",
+    "createFirst": "Create Your First Story"
+  },
+  "storyEditor": {
+    "title": "Edit Story",
+    "backToList": "Back to Stories",
+    "save": "Save Story",
+    "delete": "Delete Story",
+    "discard": "Discard Changes",
+    "generateEnhancements": "Generate Achievements & KPIs",
+    "errors": {
+      "loadFailed": "Failed to load story",
+      "saveFailed": "Failed to save story",
+      "deleteFailed": "Failed to delete story",
+      "linkFailed": "Failed to link story to experience",
+      "invalidForm": "Please fill in all required fields",
+      "missingExperienceId": "Experience ID is required",
+      "noStoryToDelete": "No story to delete",
+      "noStoryToLink": "No story to link"
+    }
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
