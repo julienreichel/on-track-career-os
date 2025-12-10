@@ -109,6 +109,7 @@ const isValid = () => {
             v-model="freeText"
             :placeholder="t('stories.builder.freeTextPlaceholder')"
             :rows="4"
+            class="w-full"
           />
         </UFormField>
         <div class="flex gap-2">
@@ -138,6 +139,7 @@ const isValid = () => {
           v-model="situation"
           :placeholder="t('stories.builder.situationPlaceholder')"
           :rows="4"
+          class="w-full"
         />
       </UFormField>
 
@@ -150,6 +152,7 @@ const isValid = () => {
           v-model="task"
           :placeholder="t('stories.builder.taskPlaceholder')"
           :rows="4"
+          class="w-full"
         />
       </UFormField>
 
@@ -162,6 +165,7 @@ const isValid = () => {
           v-model="action"
           :placeholder="t('stories.builder.actionPlaceholder')"
           :rows="4"
+          class="w-full"
         />
       </UFormField>
 
@@ -174,6 +178,7 @@ const isValid = () => {
           v-model="result"
           :placeholder="t('stories.builder.resultPlaceholder')"
           :rows="4"
+          class="w-full"
         />
       </UFormField>
 
@@ -200,6 +205,7 @@ const isValid = () => {
           <UInputTags
             v-model="achievements"
             :placeholder="t('stories.builder.achievementsPlaceholder')"
+            class="w-full"
           />
         </UFormField>
 
@@ -210,6 +216,7 @@ const isValid = () => {
           <UInputTags
             v-model="kpiSuggestions"
             :placeholder="t('stories.builder.kpisPlaceholder')"
+            class="w-full"
           />
         </UFormField>
       </div>
