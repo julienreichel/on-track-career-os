@@ -12,7 +12,9 @@ Each operation must conform to:
 - **Output schema** (validated after AI returns)
 - **Fallback strategy** for malformed output
 
-**No operation may return free-form text. All outputs _must_ be structured JSON.**
+**All operations must return structured, validated data to the application.** Most operations use JSON directly, but some use text formats that are parsed into JSON by the Lambda function for greater AI flexibility.
+
+**No operation may return free-form text to the application. All outputs to the app _must_ be structured JSON.**
 
 ---
 
@@ -231,21 +233,44 @@ Convert the following CV experience sections into experience blocks:
 
 ### Purpose
 
-Convert user content into a structured STAR story.
+Extract one or more STAR stories from user experience content. The AI can complete missing information if needed to create coherent stories.
 
 ### System Prompt
 
 ```
-You create STAR stories (Situation, Task, Action, Result).
-Follow the user's words closely. Do not invent missing details.
-Return JSON only.
+You are a STAR story extraction assistant. Your role is to identify distinct achievements within user experiences and structure them using the STAR framework (Situation, Task, Action, Result).
+
+GUIDELINES:
+- Extract ONE or MORE distinct STAR stories from the input text
+- Each story should represent a clear, standalone achievement
+- If information is missing, you MAY complete it based on context, but stay grounded in the user's actual experience
+- Be concise but specific. Use the user's words when available
+
+Format your response as plain text using this structure for EACH story:
+
+## situation:
+[Description of the context or challenge]
+
+## task:
+[What needed to be done]
+
+## action:
+[Steps taken or approach used]
+
+## result:
+[Outcome or impact achieved]
+
+If you identify multiple achievements, create separate story blocks with the same format.
 ```
 
 ### User Prompt
 
 ```
-Generate a STAR story based on this input:
-{{experienceTextOrUserAnswers}}
+Extract STAR stories from this experience:
+
+{{sourceText}}
+
+Remember to use the format with ## headers for each section, and create separate stories if there are multiple distinct achievements.
 ```
 
 ### Input Schema
@@ -258,14 +283,25 @@ Generate a STAR story based on this input:
 
 ### Output Schema
 
+**Note**: The Lambda parses the text-based AI response and returns JSON.
+
 ```json
-{
-  "situation": "string",
-  "task": "string",
-  "action": "string",
-  "result": "string"
-}
+[
+  {
+    "situation": "string",
+    "task": "string",
+    "action": "string",
+    "result": "string"
+  }
+]
 ```
+
+**Implementation Details**:
+- AI returns **text** with markdown-style headers (`## situation:`, `## task:`, etc.)
+- Lambda function parses the text and extracts structured JSON
+- Returns an **array** of STAR stories (one or more)
+- Parser handles missing sections with fallback values
+- Allows AI flexibility while maintaining structured output
 
 ---
 
