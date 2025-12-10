@@ -15,6 +15,9 @@ const i18n = createI18n({
       auth: {
         signOut: 'Sign Out',
       },
+      navigation: {
+        home: 'Home',
+      },
     },
   },
 });
@@ -46,6 +49,10 @@ const stubs = {
   UButton: {
     template: '<button data-testid="button" @click="$emit(\'click\')"><slot /></button>',
     emits: ['click'],
+  },
+  NuxtLink: {
+    template: '<a data-testid="nuxt-link" :to="to"><slot /></a>',
+    props: ['to'],
   },
 };
 

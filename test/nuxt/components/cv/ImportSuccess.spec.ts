@@ -10,9 +10,10 @@ const i18n = createI18n({
   messages: {
     en: {
       cvUpload: {
-        importing: 'Successfully Imported',
+        importing: 'Creating experiences...',
         success: 'Successfully imported {count} experience(s)',
         viewExperiences: 'View Experiences',
+        viewProfile: 'View Profile',
       },
     },
   },
@@ -57,7 +58,7 @@ describe('ImportSuccess', () => {
 
   it('renders the success header', () => {
     const wrapper = createWrapper();
-    expect(wrapper.text()).toContain('Successfully Imported');
+    expect(wrapper.text()).toContain('Creating experiences...');
   });
 
   it('displays success message with count', () => {
@@ -79,7 +80,7 @@ describe('ImportSuccess', () => {
     const wrapper = createWrapper();
     const buttons = wrapper.findAll('.u-button');
     expect(buttons.length).toBe(2);
-    expect(buttons[0].text()).toContain('View Experiences');
+    expect(buttons[0].text()).toContain('View Profile');
   });
 
   it('renders view experiences button', () => {
