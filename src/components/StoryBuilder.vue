@@ -2,11 +2,16 @@
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { STARStory } from '@/domain/starstory/STARStory';
+import TagInput from '@/components/TagInput.vue';
 
 export interface StoryBuilderProps {
   story?: STARStory | null;
   experienceId: string;
   mode: 'create' | 'edit';
+  generatedAchievements?: {
+    achievements: string[];
+    kpiSuggestions: string[];
+  } | null;
 }
 
 export interface StoryBuilderEmits {
@@ -26,6 +31,7 @@ export interface StoryBuilderEmits {
 
 const props = withDefaults(defineProps<StoryBuilderProps>(), {
   story: null,
+  generatedAchievements: null,
 });
 const emit = defineEmits<StoryBuilderEmits>();
 
@@ -53,6 +59,17 @@ watch(
     }
   },
   { immediate: true }
+);
+
+// Watch for generated achievements
+watch(
+  () => props.generatedAchievements,
+  (newAchievements) => {
+    if (newAchievements) {
+      achievements.value = newAchievements.achievements || [];
+      kpiSuggestions.value = newAchievements.kpiSuggestions || [];
+    }
+  }
 );
 
 // Handlers
@@ -153,24 +170,19 @@ const isValid = () => {
           />
         </div>
 
-        <UFormField
+        <TagInput
+          v-model="achievements"
           :label="t('stories.builder.achievementsList')"
           :hint="t('stories.builder.achievementsHint')"
-        >
-          <UInputTags
-            v-model="achievements"
-            :placeholder="t('stories.builder.achievementsPlaceholder')"
-            class="w-full"
-          />
-        </UFormField>
+          :placeholder="t('stories.builder.achievementsPlaceholder')"
+        />
 
-        <UFormField :label="t('stories.builder.kpisList')" :hint="t('stories.builder.kpisHint')">
-          <UInputTags
-            v-model="kpiSuggestions"
-            :placeholder="t('stories.builder.kpisPlaceholder')"
-            class="w-full"
-          />
-        </UFormField>
+        <TagInput
+          v-model="kpiSuggestions"
+          :label="t('stories.builder.kpisList')"
+          :hint="t('stories.builder.kpisHint')"
+          :placeholder="t('stories.builder.kpisPlaceholder')"
+        />
       </div>
     </div>
 

@@ -28,7 +28,27 @@ RULES:
 - If no numbers are available, provide qualitative KPIs (e.g., "Improved team efficiency")
 - Achievements should be clear, concise accomplishments
 - KPI suggestions should be measurable indicators of success
-- Return ONLY valid JSON with no markdown wrappers`;
+- Return ONLY valid JSON with no markdown wrappers
+
+KPI STRUCTURE REQUIREMENTS:
+KPIs should follow this pattern: [Category Verb] + [What was measured]
+
+Use these category verbs based on the type of impact:
+- Increase/grow/improve - for MORE of a positive thing (e.g., "Increased revenue by 25%")
+- Reduce/cut/lower - for LESS of a negative thing (e.g., "Reduced deployment time by 40%")
+- Avoid/prevent - to STOP something bad happening (e.g., "Prevented 200+ critical bugs")
+- Maintain/sustain - to KEEP performance steady (e.g., "Maintained 99.9% uptime")
+- Deliver/build/create - for OUTPUT/production (e.g., "Delivered 5 major features")
+- Optimize/streamline - for EFFICIENCY & refinement (e.g., "Optimized API response time by 50%")
+- Enable/support/empower - for CAPABILITY building (e.g., "Enabled team to deploy 3x faster")
+- Save/free up - for TIME/money/resources (e.g., "Saved $100K annually")
+
+Examples:
+- "Increased user engagement by 40%"
+- "Reduced customer churn from 15% to 8%"
+- "Delivered 12 high-priority features on schedule"
+- "Optimized database queries, improving response time by 60%"
+- "Enabled cross-functional collaboration across 5 teams"`;
 
 // Output schema for retry
 const OUTPUT_SCHEMA = `{

@@ -353,6 +353,7 @@ onMounted(async () => {
           :story="isNew ? undefined : selectedStory"
           :experience-id="experienceId"
           :mode="isNew ? 'create' : 'edit'"
+          :generated-achievements="generatedAchievements"
           @save="handleSave"
           @cancel="handleCancel"
           @generate-achievements="handleGenerateAchievements"
