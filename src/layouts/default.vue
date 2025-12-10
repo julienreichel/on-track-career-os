@@ -68,16 +68,7 @@ const generateBreadcrumbs = async () => {
     const segment = pathSegments[i];
     const previousSegment = i > 0 ? pathSegments[i - 1] : undefined;
 
-    // Check if this is the last segment and we have a custom breadcrumb label from page meta
-    if (i === pathSegments.length - 1 && route.meta.breadcrumbLabel) {
-      items.push({
-        label: String(route.meta.breadcrumbLabel),
-        to: currentPath,
-      });
-      continue;
-    }
-
-    // Try to resolve ID segments to names
+    // Try to resolve ID segments to names first
     if (isUUID(segment)) {
       const resolvedName = await resolveSegment(segment, previousSegment);
       if (resolvedName) {
@@ -87,6 +78,15 @@ const generateBreadcrumbs = async () => {
         });
         continue;
       }
+    }
+
+    // Check if this is the last segment and we have a custom breadcrumb label from page meta
+    if (i === pathSegments.length - 1 && route.meta.breadcrumbLabel) {
+      items.push({
+        label: String(route.meta.breadcrumbLabel),
+        to: currentPath,
+      });
+      continue;
     }
 
     // Map route segments to translation keys or use the segment itself
@@ -105,8 +105,6 @@ const generateBreadcrumbs = async () => {
       label = t('navigation.applications');
     } else if (segment === 'interview') {
       label = t('navigation.interview');
-    } else if (segment === 'new') {
-      label = t('navigation.new');
     } else if (segment === 'stories') {
       label = t('stories.list.title');
     }

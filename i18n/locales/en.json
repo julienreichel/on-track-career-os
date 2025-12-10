@@ -226,7 +226,7 @@
   },
   "stories": {
     "list": {
-      "title": "STAR Stories",
+      "title": "Stories",
       "addNew": "New Story",
       "edit": "Edit",
       "delete": "Delete",

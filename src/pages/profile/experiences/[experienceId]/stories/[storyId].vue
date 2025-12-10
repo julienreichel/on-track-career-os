@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStoryEngine } from '@/application/starstory/useStoryEngine';
@@ -22,11 +22,15 @@ const companyName = ref<string>('');
 
 // Determine if we're creating or editing
 const isNew = computed(() => storyId.value === 'new');
-const breadcrumbLabel = computed(() => (isNew.value ? 'New' : 'Edit'));
 
-definePageMeta({
-  breadcrumbLabel: computed(() => breadcrumbLabel.value),
-});
+// Update breadcrumb label dynamically
+watch(
+  isNew,
+  (newValue) => {
+    route.meta.breadcrumbLabel = newValue ? 'New' : 'Edit';
+  },
+  { immediate: true }
+);
 
 const experienceService = new ExperienceService();
 
