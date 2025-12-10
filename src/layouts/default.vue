@@ -25,9 +25,15 @@
 
 <script setup lang="ts">
 // Default layout with header and sign out
+import { computed, ref, watch } from 'vue';
+import { useBreadcrumbMapping } from '@/composables/useBreadcrumbMapping';
 
 const { t } = useI18n();
 const route = useRoute();
+const { resolveSegment, isUUID } = useBreadcrumbMapping();
+
+// Reactive breadcrumb items that update when IDs are resolved
+const breadcrumbItems = ref<Array<{ label: string; to: string; icon?: string }>>([]);
 
 const handleSignOut = async () => {
   try {
@@ -44,7 +50,7 @@ const handleSignOut = async () => {
 };
 
 // Generate breadcrumb items based on current route
-const breadcrumbItems = computed(() => {
+const generateBreadcrumbs = async () => {
   const items = [];
   const pathSegments = route.path.split('/').filter(Boolean);
 
@@ -60,6 +66,7 @@ const breadcrumbItems = computed(() => {
   for (let i = 0; i < pathSegments.length; i++) {
     currentPath += `/${pathSegments[i]}`;
     const segment = pathSegments[i];
+    const previousSegment = i > 0 ? pathSegments[i - 1] : undefined;
 
     // Check if this is the last segment and we have a custom breadcrumb label from page meta
     if (i === pathSegments.length - 1 && route.meta.breadcrumbLabel) {
@@ -68,6 +75,18 @@ const breadcrumbItems = computed(() => {
         to: currentPath,
       });
       continue;
+    }
+
+    // Try to resolve ID segments to names
+    if (isUUID(segment)) {
+      const resolvedName = await resolveSegment(segment, previousSegment);
+      if (resolvedName) {
+        items.push({
+          label: resolvedName,
+          to: currentPath,
+        });
+        continue;
+      }
     }
 
     // Map route segments to translation keys or use the segment itself
@@ -88,6 +107,8 @@ const breadcrumbItems = computed(() => {
       label = t('navigation.interview');
     } else if (segment === 'new') {
       label = t('navigation.new');
+    } else if (segment === 'stories') {
+      label = t('stories.list.title');
     }
 
     items.push({
@@ -96,8 +117,17 @@ const breadcrumbItems = computed(() => {
     });
   }
 
-  return items;
-});
+  breadcrumbItems.value = items;
+};
+
+// Watch route changes and regenerate breadcrumbs
+watch(
+  () => [route.path, route.meta.breadcrumbLabel],
+  async () => {
+    await generateBreadcrumbs();
+  },
+  { immediate: true }
+);
 
 // Only show breadcrumb on non-home pages
 const showBreadcrumb = computed(() => route.path !== '/');
