@@ -236,7 +236,7 @@ function handleViewStories(id: string) {
         <UCard v-else-if="experiences.length === 0">
           <UEmpty :title="t('experiences.list.empty')" icon="i-heroicons-briefcase">
             <template #actions>
-              <u-button
+              <UButton
                 :label="t('experiences.list.addNew')"
                 icon="i-heroicons-plus"
                 @click="handleNewExperience"
@@ -257,13 +257,13 @@ function handleViewStories(id: string) {
       </template>
 
       <template #footer>
-        <u-button
+        <UButton
           color="neutral"
           variant="ghost"
           :label="t('experiences.delete.cancel')"
           @click="cancelDelete"
         />
-        <u-button color="error" :label="t('experiences.delete.confirm')" @click="confirmDelete" />
+        <UButton color="error" :label="t('experiences.delete.confirm')" @click="confirmDelete" />
       </template>
     </UModal>
   </UContainer>

@@ -137,7 +137,7 @@ function handleCancel() {
         </div>
 
         <!-- Experience Form -->
-        <experience-form
+        <ExperienceForm
           v-else
           :experience="experience"
           :loading="saving"

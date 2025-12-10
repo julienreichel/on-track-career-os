@@ -324,7 +324,7 @@ onMounted(async () => {
             </u-form-field>
 
             <div class="flex justify-end gap-3">
-              <u-button
+              <UButton
                 :label="t('common.cancel')"
                 variant="ghost"
                 @click="
@@ -334,7 +334,7 @@ onMounted(async () => {
                   }
                 "
               />
-              <u-button
+              <UButton
                 :label="t('stories.builder.generate')"
                 icon="i-heroicons-sparkles"
                 :disabled="!freeTextInput.trim()"
@@ -345,7 +345,7 @@ onMounted(async () => {
         </UCard>
 
         <!-- Story Builder (for manual mode or editing) -->
-        <story-builder
+        <StoryBuilder
           v-else-if="
             (isNew && (selectedMode === 'manual' || (!showModeSelection && !selectedMode))) ||
             (!isNew && selectedStory)

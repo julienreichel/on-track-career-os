@@ -37,7 +37,14 @@ export default withNuxt(
 
       // Vue specific rules
       'vue/max-attributes-per-line': ['error', { singleline: 5, multiline: 1 }],
-      'vue/component-name-in-template-casing': ['error', 'kebab-case'],
+      'vue/component-name-in-template-casing': [
+        'error',
+        'PascalCase',
+        {
+          registeredComponentsOnly: false,
+          ignores: ['/^U[A-Z]/', '/^u-/', 'authenticator'],
+        },
+      ],
       'vue/require-default-prop': 'error',
       'vue/require-prop-types': 'error',
 

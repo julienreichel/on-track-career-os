@@ -277,14 +277,14 @@ onMounted(async () => {
           >
             <template #actions>
               <div class="flex gap-2">
-                <u-button
+                <UButton
                   :label="t('stories.list.autoGenerate')"
                   icon="i-heroicons-sparkles"
                   color="primary"
                   variant="soft"
                   @click="handleAutoGenerate"
                 />
-                <u-button
+                <UButton
                   :label="t('stories.list.addNew')"
                   icon="i-heroicons-plus"
                   @click="handleNewStory"
