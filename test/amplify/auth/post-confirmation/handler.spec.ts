@@ -66,7 +66,7 @@ describe('post-confirmation handler', () => {
   });
 
   describe('successful user profile creation', () => {
-    it('should create UserProfile with email when fullname is missing', async () => {
+    it('should create UserProfile with email when name is missing', async () => {
       mockCreate.mockResolvedValueOnce({ data: { id: 'test-user-id' } });
 
       const event = createEvent({
@@ -84,13 +84,13 @@ describe('post-confirmation handler', () => {
       expect(result).toEqual(event);
     });
 
-    it('should create UserProfile with fullname when provided', async () => {
+    it('should create UserProfile with name when provided', async () => {
       mockCreate.mockResolvedValueOnce({ data: { id: 'test-user-id' } });
 
       const event = createEvent({
         sub: 'user-456',
         email: 'jane@example.com',
-        fullname: 'Jane Doe',
+        name: 'Jane Doe',
       });
 
       const result = await handler(event);
@@ -103,13 +103,13 @@ describe('post-confirmation handler', () => {
       expect(result).toEqual(event);
     });
 
-    it('should trim whitespace from fullname', async () => {
+    it('should trim whitespace from name', async () => {
       mockCreate.mockResolvedValueOnce({ data: { id: 'test-user-id' } });
 
       const event = createEvent({
         sub: 'user-789',
         email: 'test@example.com',
-        fullname: '  Spaced Name  ',
+        name: '  Spaced Name  ',
       });
 
       const result = await handler(event);
@@ -122,13 +122,13 @@ describe('post-confirmation handler', () => {
       expect(result).toEqual(event);
     });
 
-    it('should fallback to email when fullname is empty after trimming', async () => {
+    it('should fallback to email when name is empty after trimming', async () => {
       mockCreate.mockResolvedValueOnce({ data: { id: 'test-user-id' } });
 
       const event = createEvent({
         sub: 'user-999',
         email: 'fallback@example.com',
-        fullname: '   ',
+        name: '   ',
       });
 
       const result = await handler(event);
