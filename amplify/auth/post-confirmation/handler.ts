@@ -22,7 +22,7 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
   try {
     await client.models.UserProfile.create({
       id,
-      fullName: userAttributes.name?.trim() || email,
+      fullName: userAttributes.fullname?.trim() || email,
       owner: `${id}::${id}`,
     });
   } catch (err) {
