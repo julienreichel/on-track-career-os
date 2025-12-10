@@ -91,7 +91,13 @@ function handleSubmit() {
     .map((line) => line.trim())
     .filter((line) => line.length > 0);
 
-  emit('save', form.value);
+  // Convert empty date strings to null for GraphQL
+  const dataToSave = {
+    ...form.value,
+    endDate: form.value.endDate?.trim() || null,
+  };
+
+  emit('save', dataToSave);
 }
 
 function handleCancel() {
