@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStoryEngine } from '@/application/starstory/useStoryEngine';
@@ -10,6 +10,10 @@ import type { Experience } from '@/domain/experience/Experience';
 
 defineOptions({
   name: 'NewStoryPage',
+});
+
+definePageMeta({
+  breadcrumbLabel: 'New',
 });
 
 const route = useRoute();
@@ -147,22 +151,9 @@ const handleCancel = () => {
   router.push(`/profile/experiences/${experienceId.value}/stories`);
 };
 
-// Update breadcrumb labels
-watch(
-  () => experienceTitle.value,
-  (title) => {
-    if (title) {
-      route.meta.breadcrumbLabel = title;
-    }
-  },
-  { immediate: true }
-);
-
-// Set route meta for 'new' page
+// Load experience title on mount
 onMounted(async () => {
-  route.meta.breadcrumbLabel = t('navigation.new');
-  
-  // Load experience title for parent breadcrumb
+  // Load experience title for display
   try {
     const experience = await experienceService.getFullExperience(experienceId.value);
     if (experience) {

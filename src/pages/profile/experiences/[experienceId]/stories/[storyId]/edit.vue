@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStoryEngine } from '@/application/starstory/useStoryEngine';
@@ -9,6 +9,10 @@ import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAnd
 
 defineOptions({
   name: 'EditStoryPage',
+});
+
+definePageMeta({
+  breadcrumbLabel: 'Edit',
 });
 
 const route = useRoute();
@@ -72,23 +76,9 @@ const handleCancel = () => {
   router.push(`/profile/experiences/${experienceId.value}/stories`);
 };
 
-// Update breadcrumb labels
-watch(
-  () => experienceTitle.value,
-  (title) => {
-    if (title) {
-      route.meta.breadcrumbLabel = title;
-    }
-  },
-  { immediate: true }
-);
-
 // Load story and experience on mount
 onMounted(async () => {
-  // Set edit breadcrumb
-  route.meta.breadcrumbLabel = t('common.edit');
-  
-  // Load experience title for parent breadcrumb
+  // Load experience title for display
   try {
     const experience = await experienceService.getFullExperience(experienceId.value);
     if (experience) {
