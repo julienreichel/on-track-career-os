@@ -152,6 +152,20 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
         };
       }
 
+      // Automatically generate achievements and KPIs for the generated story
+      try {
+        const achievements = await service.generateAchievements(aiStory);
+        generatedAchievements.value = achievements;
+
+        if (draftStory.value) {
+          draftStory.value.achievements = achievements.achievements || [];
+          draftStory.value.kpiSuggestions = achievements.kpiSuggestions || [];
+        }
+      } catch (achievementsErr) {
+        console.error('[useStoryEngine] Failed to auto-generate achievements:', achievementsErr);
+        // Don't throw - story generation succeeded, achievements are optional
+      }
+
       return aiStory;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to generate STAR';

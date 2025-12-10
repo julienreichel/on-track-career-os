@@ -172,9 +172,29 @@ const handleAutoGenerate = async () => {
     // 3. Generate STAR stories using AI
     const generatedStories = await storyService.generateStar(formattedText);
 
-    // 4. Save all generated stories
+    // 4. Save all generated stories with achievements and KPIs
     for (const story of generatedStories) {
-      await storyService.createAndLinkStory(story, experienceId.value);
+      // Generate achievements and KPIs for each story
+      let achievements: string[] = [];
+      let kpiSuggestions: string[] = [];
+
+      try {
+        const achievementsData = await storyService.generateAchievements(story);
+        achievements = achievementsData.achievements || [];
+        kpiSuggestions = achievementsData.kpiSuggestions || [];
+      } catch (achievementsErr) {
+        console.error('[Stories] Failed to generate achievements for story:', achievementsErr);
+        // Continue without achievements - story can still be saved
+      }
+
+      // Create complete story with achievements and KPIs
+      const completeStory = {
+        ...story,
+        achievements,
+        kpiSuggestions,
+      };
+
+      await storyService.createAndLinkStory(completeStory, experienceId.value);
     }
 
     // 5. Reload stories list
