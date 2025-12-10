@@ -260,13 +260,13 @@ onMounted(async () => {
             }))
           "
         >
-          <template #preview-data="{ row }">
+          <template #preview-cell="{ row }">
             <p class="text-sm text-gray-600 dark:text-gray-400">
               {{ row.preview }}
             </p>
           </template>
 
-          <template #hasAchievements-data="{ row }">
+          <template #hasAchievements-cell="{ row }">
             <UBadge
               v-if="row.hasAchievements"
               :label="t('stories.status.withAchievements')"
@@ -276,7 +276,7 @@ onMounted(async () => {
             <UBadge v-else :label="t('stories.status.draft')" color="neutral" size="xs" />
           </template>
 
-          <template #actions-data="{ row }">
+          <template #actions-cell="{ row }">
             <div class="flex gap-2">
               <UButton
                 icon="i-heroicons-pencil-square"
