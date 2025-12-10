@@ -29,7 +29,17 @@ describe('useStoryEngine', () => {
 
   describe('initialization', () => {
     it('should initialize with empty state', () => {
-      const { stories, selectedStory, draftStory, loading, generating, saving, error, hasStories, hasDraft } = useStoryEngine();
+      const {
+        stories,
+        selectedStory,
+        draftStory,
+        loading,
+        generating,
+        saving,
+        error,
+        hasStories,
+        hasDraft,
+      } = useStoryEngine();
 
       expect(stories.value).toEqual([]);
       expect(selectedStory.value).toBeNull();
@@ -46,8 +56,22 @@ describe('useStoryEngine', () => {
   describe('loadStories', () => {
     it('should load stories for an experience', async () => {
       const mockStories: STARStory[] = [
-        { id: 'story-1', situation: 'S1', task: 'T1', action: 'A1', result: 'R1', experienceId: 'exp-123' },
-        { id: 'story-2', situation: 'S2', task: 'T2', action: 'A2', result: 'R2', experienceId: 'exp-123' },
+        {
+          id: 'story-1',
+          situation: 'S1',
+          task: 'T1',
+          action: 'A1',
+          result: 'R1',
+          experienceId: 'exp-123',
+        },
+        {
+          id: 'story-2',
+          situation: 'S2',
+          task: 'T2',
+          action: 'A2',
+          result: 'R2',
+          experienceId: 'exp-123',
+        },
       ] as STARStory[];
 
       mockService.getStoriesByExperience.mockResolvedValue(mockStories);
@@ -352,7 +376,9 @@ describe('useStoryEngine', () => {
 
       const { stories, updateStory } = useStoryEngine();
 
-      stories.value = [{ id: 'story-123', situation: 'Old', task: 'T', action: 'A', result: 'R' } as STARStory];
+      stories.value = [
+        { id: 'story-123', situation: 'Old', task: 'T', action: 'A', result: 'R' } as STARStory,
+      ];
 
       const result = await updateStory('story-123', { situation: 'Updated situation' });
 
@@ -384,10 +410,7 @@ describe('useStoryEngine', () => {
 
       const { stories, deleteStory } = useStoryEngine();
 
-      stories.value = [
-        { id: 'story-1' } as STARStory,
-        { id: 'story-2' } as STARStory,
-      ];
+      stories.value = [{ id: 'story-1' } as STARStory, { id: 'story-2' } as STARStory];
 
       const result = await deleteStory('story-1');
 
@@ -434,7 +457,14 @@ describe('useStoryEngine', () => {
     it('should clear draft and achievements', () => {
       const { draftStory, generatedAchievements, clearDraft } = useStoryEngine();
 
-      draftStory.value = { situation: 'S', task: 'T', action: 'A', result: 'R', achievements: [], kpiSuggestions: [] };
+      draftStory.value = {
+        situation: 'S',
+        task: 'T',
+        action: 'A',
+        result: 'R',
+        achievements: [],
+        kpiSuggestions: [],
+      };
       generatedAchievements.value = { achievements: ['A'], kpiSuggestions: ['K'] };
 
       clearDraft();
@@ -450,7 +480,14 @@ describe('useStoryEngine', () => {
 
       stories.value = [{ id: '1' } as STARStory];
       selectedStory.value = { id: '2' } as STARStory;
-      draftStory.value = { situation: 'S', task: 'T', action: 'A', result: 'R', achievements: [], kpiSuggestions: [] };
+      draftStory.value = {
+        situation: 'S',
+        task: 'T',
+        action: 'A',
+        result: 'R',
+        achievements: [],
+        kpiSuggestions: [],
+      };
       loading.value = true;
 
       reset();

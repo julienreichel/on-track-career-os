@@ -8,6 +8,7 @@ import type {
   STARStoryUpdateInput,
   STARStory,
 } from '@/domain/starstory/STARStory';
+import type { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 
 // Mock gqlOptions
 vi.mock('@/data/graphql/options', () => ({
@@ -15,6 +16,11 @@ vi.mock('@/data/graphql/options', () => ({
     authMode: 'userPool',
     ...custom,
   }),
+}));
+
+// Mock loadLazy
+vi.mock('@/data/graphql/lazy', () => ({
+  loadLazy: vi.fn(),
 }));
 
 describe('STARStoryRepository', () => {
@@ -25,6 +31,9 @@ describe('STARStoryRepository', () => {
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
+  };
+  let mockExperienceRepo: {
+    get: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -37,8 +46,15 @@ describe('STARStoryRepository', () => {
       delete: vi.fn(),
     };
 
+    mockExperienceRepo = {
+      get: vi.fn(),
+    };
+
     // Inject the mocks via constructor (dependency injection)
-    repository = new STARStoryRepository(mockModel as AmplifySTARStoryModel);
+    repository = new STARStoryRepository(
+      mockModel as AmplifySTARStoryModel,
+      mockExperienceRepo as unknown as ExperienceRepository
+    );
   });
 
   describe('get', () => {
@@ -155,7 +171,7 @@ describe('STARStoryRepository', () => {
   });
 
   describe('getStoriesByExperience', () => {
-    it('should fetch stories for a specific experience', async () => {
+    it('should fetch stories for a specific experience using GraphQL relationship', async () => {
       const mockStories: STARStory[] = [
         {
           id: 'story-1',
@@ -181,34 +197,37 @@ describe('STARStoryRepository', () => {
         },
       ] as unknown as STARStory[];
 
-      mockModel.list.mockResolvedValue({
-        data: mockStories,
-      });
+      const mockExperience = {
+        id: 'exp-123',
+        stories: vi.fn(),
+      };
+
+      mockExperienceRepo.get.mockResolvedValue(mockExperience);
+
+      // Mock loadLazy
+      const { loadLazy } = await import('@/data/graphql/lazy');
+      vi.mocked(loadLazy).mockResolvedValue({ data: mockStories });
 
       const result = await repository.getStoriesByExperience('exp-123');
 
-      expect(mockModel.list).toHaveBeenCalledWith(
-        expect.objectContaining({
-          authMode: 'userPool',
-          filter: {
-            experienceId: { eq: 'exp-123' },
-          },
-        })
-      );
+      expect(mockExperienceRepo.get).toHaveBeenCalledWith('exp-123');
+      expect(loadLazy).toHaveBeenCalledWith(mockExperience.stories);
       expect(result).toEqual(mockStories);
       expect(result).toHaveLength(2);
-      expect(result.every((s) => s.experienceId === 'exp-123')).toBe(true);
     });
 
     it('should return empty array when experience has no stories', async () => {
-      mockModel.list.mockResolvedValue({
-        data: [],
-      });
+      const mockExperience = {
+        id: 'exp-123',
+        stories: null,
+      };
 
-      const result = await repository.getStoriesByExperience('exp-no-stories');
+      mockExperienceRepo.get.mockResolvedValue(mockExperience);
 
+      const result = await repository.getStoriesByExperience('exp-123');
+
+      expect(mockExperienceRepo.get).toHaveBeenCalledWith('exp-123');
       expect(result).toEqual([]);
-      expect(result).toHaveLength(0);
     });
   });
 

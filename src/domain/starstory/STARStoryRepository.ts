@@ -1,4 +1,6 @@
 import { gqlOptions } from '@/data/graphql/options';
+import { loadLazy } from '@/data/graphql/lazy';
+import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { STARStoryCreateInput, STARStoryUpdateInput, STARStory } from './STARStory';
 
 export type AmplifySTARStoryModel = {
@@ -27,12 +29,17 @@ export type AmplifySTARStoryModel = {
  */
 export class STARStoryRepository {
   private readonly _model: AmplifySTARStoryModel;
+  private readonly experienceRepo: ExperienceRepository;
 
   /**
    * Constructor with optional dependency injection for testing
    * @param model - Optional Amplify model instance (for testing)
+   * @param experienceRepository - Optional Experience repository instance (for testing)
    */
-  constructor(model?: AmplifySTARStoryModel) {
+  constructor(
+    model?: AmplifySTARStoryModel,
+    experienceRepository?: ExperienceRepository
+  ) {
     if (model) {
       // Use injected model (for tests)
       this._model = model;
@@ -40,6 +47,7 @@ export class STARStoryRepository {
       // Use Nuxt's auto-imported useNuxtApp (for production)
       this._model = useNuxtApp().$Amplify.GraphQL.client.models.STARStory;
     }
+    this.experienceRepo = experienceRepository || new ExperienceRepository();
   }
 
   private get model() {
@@ -67,18 +75,16 @@ export class STARStoryRepository {
   }
 
   /**
-   * Get all stories for a specific experience
+   * Get all stories for a specific experience using GraphQL relationship
    * @param experienceId - Experience ID to filter by
    * @returns Array of stories for that experience
    */
   async getStoriesByExperience(experienceId: string): Promise<STARStory[]> {
-    const { data } = await this.model.list(
-      gqlOptions({
-        filter: {
-          experienceId: { eq: experienceId },
-        },
-      })
-    );
+    const experience = await this.experienceRepo.get(experienceId);
+    if (!experience?.stories) {
+      return [];
+    }
+    const { data } = await loadLazy(experience.stories);
     return data;
   }
 

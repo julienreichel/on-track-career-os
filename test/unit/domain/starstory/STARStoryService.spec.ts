@@ -78,8 +78,22 @@ describe('STARStoryService', () => {
   describe('getStoriesByExperience', () => {
     it('should fetch all stories for an experience', async () => {
       const mockStories: STARStory[] = [
-        { id: 'story-1', situation: 'S1', task: 'T1', action: 'A1', result: 'R1', experienceId: 'exp-123' },
-        { id: 'story-2', situation: 'S2', task: 'T2', action: 'A2', result: 'R2', experienceId: 'exp-123' },
+        {
+          id: 'story-1',
+          situation: 'S1',
+          task: 'T1',
+          action: 'A1',
+          result: 'R1',
+          experienceId: 'exp-123',
+        },
+        {
+          id: 'story-2',
+          situation: 'S2',
+          task: 'T2',
+          action: 'A2',
+          result: 'R2',
+          experienceId: 'exp-123',
+        },
       ] as STARStory[];
 
       mockRepository.getStoriesByExperience.mockResolvedValue(mockStories);

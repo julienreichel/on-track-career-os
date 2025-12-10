@@ -53,7 +53,11 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
 
   // Helper to resolve experience ID
   const getExperienceId = (expId?: string) => {
-    return expId || draftStory.value?.experienceId || (typeof experienceId === 'string' ? experienceId : experienceId?.value);
+    return (
+      expId ||
+      draftStory.value?.experienceId ||
+      (typeof experienceId === 'string' ? experienceId : experienceId?.value)
+    );
   };
 
   // Load stories for experience
@@ -243,7 +247,10 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
   };
 
   // Update existing story
-  const updateStory = async (storyId: string, updates: Partial<Omit<STARStory, 'id' | 'experienceId' | 'owner' | 'createdAt' | 'updatedAt'>>) => {
+  const updateStory = async (
+    storyId: string,
+    updates: Partial<Omit<STARStory, 'id' | 'experienceId' | 'owner' | 'createdAt' | 'updatedAt'>>
+  ) => {
     saving.value = true;
     error.value = null;
 
