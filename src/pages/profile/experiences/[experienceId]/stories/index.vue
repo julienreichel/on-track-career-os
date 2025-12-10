@@ -256,6 +256,7 @@ onMounted(async () => {
               story,
               preview: getPreview(story),
               hasAchievements: hasAchievements(story),
+              actions: story.id,
             }))
           "
         >
