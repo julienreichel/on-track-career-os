@@ -115,44 +115,54 @@ Key Requirements:
 - DevOps best practices
 `;
 
-    // Invoke AI operation via repository
-    const starStory = await repository.generateStarStory(sourceText);
+    // Invoke AI operation via repository (now returns array of stories)
+    const starStories = await repository.generateStarStory(sourceText);
 
-    // Validate STAR structure (per AI Interaction Contract - fields are strings, not arrays)
-    expect(starStory).toHaveProperty('situation');
-    expect(starStory).toHaveProperty('task');
-    expect(starStory).toHaveProperty('action');
-    expect(starStory).toHaveProperty('result');
+    // Validate we got an array
+    expect(Array.isArray(starStories)).toBe(true);
+    expect(starStories.length).toBeGreaterThan(0);
+
+    // Validate first story's STAR structure (per AI Interaction Contract)
+    const firstStory = starStories[0];
+    expect(firstStory).toHaveProperty('situation');
+    expect(firstStory).toHaveProperty('task');
+    expect(firstStory).toHaveProperty('action');
+    expect(firstStory).toHaveProperty('result');
 
     // Validate content is strings
-    expect(typeof starStory.situation).toBe('string');
-    expect(typeof starStory.task).toBe('string');
-    expect(typeof starStory.action).toBe('string');
-    expect(typeof starStory.result).toBe('string');
+    expect(typeof firstStory.situation).toBe('string');
+    expect(typeof firstStory.task).toBe('string');
+    expect(typeof firstStory.action).toBe('string');
+    expect(typeof firstStory.result).toBe('string');
 
     // Validate at least some content generated (each field should have some text)
-    expect(starStory.situation.length).toBeGreaterThan(0);
-    expect(starStory.task.length).toBeGreaterThan(0);
-    expect(starStory.action.length).toBeGreaterThan(0);
-    expect(starStory.result.length).toBeGreaterThan(0);
+    expect(firstStory.situation.length).toBeGreaterThan(0);
+    expect(firstStory.task.length).toBeGreaterThan(0);
+    expect(firstStory.action.length).toBeGreaterThan(0);
+    expect(firstStory.result.length).toBeGreaterThan(0);
   }, 60000); // 60s timeout for AI operation
 
   it('should handle missing required fields gracefully', async () => {
     // Test with empty input - per AI Interaction Contract fallback rules,
     // should return valid structure with placeholder/empty values instead of throwing
-    const starStory = await repository.generateStarStory('');
+    const starStories = await repository.generateStarStory('');
 
-    // Validate structure is returned (even if content is minimal/placeholder)
-    expect(starStory).toHaveProperty('situation');
-    expect(starStory).toHaveProperty('task');
-    expect(starStory).toHaveProperty('action');
-    expect(starStory).toHaveProperty('result');
+    // Validate we got an array (even with empty input)
+    expect(Array.isArray(starStories)).toBe(true);
+    expect(starStories.length).toBeGreaterThan(0);
+
+    // Validate first story structure is returned (even if content is minimal/placeholder)
+    const firstStory = starStories[0];
+    expect(firstStory).toHaveProperty('situation');
+    expect(firstStory).toHaveProperty('task');
+    expect(firstStory).toHaveProperty('action');
+    expect(firstStory).toHaveProperty('result');
 
     // All fields should be strings (per schema)
-    expect(typeof starStory.situation).toBe('string');
-    expect(typeof starStory.task).toBe('string');
-    expect(typeof starStory.action).toBe('string');
-    expect(typeof starStory.result).toBe('string');
+    expect(typeof firstStory.situation).toBe('string');
+    expect(typeof firstStory.task).toBe('string');
+    expect(typeof firstStory.action).toBe('string');
+    expect(typeof firstStory.result).toBe('string');
 
     // With empty input, AI should provide fallback/placeholder values
     // (not crash or throw errors - this is the graceful handling)
@@ -167,10 +177,11 @@ Key Requirements:
     try {
       // This should not throw even if user is not authenticated
       // (though it may return authorization error)
-      const starStory = await repository.generateStarStory(sourceText);
+      const starStories = await repository.generateStarStory(sourceText);
 
       // If we get here, the operation is deployed and accessible
-      expect(starStory).toBeDefined();
+      expect(starStories).toBeDefined();
+      expect(Array.isArray(starStories)).toBe(true);
     } catch (error) {
       // If error is about authorization, that's fine - operation exists
       const errorMessage = (error as Error).message;
