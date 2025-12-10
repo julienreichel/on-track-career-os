@@ -22,19 +22,24 @@ const SYSTEM_PROMPT = `You extract STAR stories (Situation, Task, Action, Result
 You may generate ONE OR MORE stories if the experience contains multiple achievements.
 You may complete missing information with reasonable inferences based on context.
 
+IMPORTANT: Write all stories in FIRST PERSON perspective using "I" pronouns.
+- Use "I did", "I developed", "I led" - NOT "The individual did" or "The lead developer did"
+- Write as if the user is telling their own story directly
+- Keep the personal narrative voice throughout
+
 Format your response as plain text using this structure for EACH story:
 
 ## situation:
-[Description of the context/challenge]
+[Description of the context/challenge - use "I was", "I faced", etc.]
 
 ## task:
-[What needed to be done]
+[What needed to be done - use "I needed to", "I had to", etc.]
 
 ## action:
-[Specific actions taken]
+[Specific actions taken - use "I implemented", "I created", etc.]
 
 ## result:
-[Outcome/impact achieved]
+[Outcome/impact achieved - use "I achieved", "I delivered", etc.]
 
 If there are multiple distinct achievements or situations, repeat this structure for each one.
 Be concise but specific. Use the user's words when available.`;
