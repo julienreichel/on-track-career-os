@@ -1,25 +1,10 @@
 <template>
   <UPage>
-    <UPageHeader :title="t('profile.title')" :description="t('profile.description')">
-      <template #actions>
-        <div class="flex items-center gap-2">
-          <UButton
-            icon="i-heroicons-arrow-left"
-            variant="ghost"
-            :label="t('navigation.backToHome')"
-            @click="$router.push('/')"
-          />
-          <UButton
-            v-if="!isEditing"
-            icon="i-heroicons-pencil"
-            color="primary"
-            @click="startEditing"
-          >
-            {{ t('profile.actions.edit') }}
-          </UButton>
-        </div>
-      </template>
-    </UPageHeader>
+    <UPageHeader
+      :title="t('profile.title')"
+      :description="t('profile.description')"
+      :links="headerLinks"
+    />
 
     <UPageBody>
       <UAlert
@@ -530,6 +515,28 @@ const originalForm = ref<ProfileForm | null>(null);
 const isEditing = ref(false);
 const error = ref<string | null>(null);
 const saveSuccess = ref(false);
+
+// Header links
+const headerLinks = computed(() => {
+  const links = [
+    {
+      label: t('navigation.backToHome'),
+      icon: 'i-heroicons-arrow-left',
+      to: '/',
+    },
+  ];
+
+  if (!isEditing.value) {
+    links.push({
+      label: t('profile.actions.edit'),
+      icon: 'i-heroicons-pencil',
+      color: 'primary',
+      onClick: startEditing,
+    });
+  }
+
+  return links;
+});
 
 // Computed properties to check if sections have content
 const hasCoreIdentity = computed(() => {
