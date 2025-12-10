@@ -27,18 +27,22 @@ const generationError = ref<string | null>(null);
 // Table columns configuration
 const columns = computed(() => [
   {
+    id: 'index',
     key: 'index',
     label: '#',
   },
   {
+    id: 'preview',
     key: 'preview',
     label: t('stories.table.preview'),
   },
   {
+    id: 'hasAchievements',
     key: 'hasAchievements',
     label: t('stories.table.hasAchievements'),
   },
   {
+    id: 'actions',
     key: 'actions',
     label: t('stories.table.actions'),
   },
