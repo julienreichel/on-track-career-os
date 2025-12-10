@@ -97,14 +97,6 @@ const columns = computed<TableColumn<Experience>[]>(() => [
           onClick: () => handleViewStories(row.original.id),
         }),
         h(UButton, {
-          icon: 'i-heroicons-plus-circle',
-          size: 'xs',
-          color: 'primary',
-          variant: 'ghost',
-          'aria-label': t('experiences.list.newStory'),
-          onClick: () => handleNewStory(row.original.id),
-        }),
-        h(UButton, {
           icon: 'i-heroicons-pencil',
           size: 'xs',
           color: 'neutral',
@@ -246,10 +238,7 @@ function handleNewStory(id: string) {
 
         <!-- Empty State -->
         <UCard v-else-if="experiences.length === 0">
-          <UEmpty
-            :title="t('experiences.list.empty')"
-            icon="i-heroicons-briefcase"
-          >
+          <UEmpty :title="t('experiences.list.empty')" icon="i-heroicons-briefcase">
             <template #actions>
               <u-button
                 :label="t('experiences.list.addNew')"
