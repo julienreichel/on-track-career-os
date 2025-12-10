@@ -54,7 +54,8 @@ const i18n = createI18n({
           title: 'All STAR Stories',
           description: 'Browse all your achievement stories across all experiences',
           empty: 'No stories yet',
-          emptyDescription: 'Create STAR stories from your experiences to document your achievements.',
+          emptyDescription:
+            'Create STAR stories from your experiences to document your achievements.',
           goToExperiences: 'Go to Experiences',
           experience: 'Experience',
           status: 'Status',

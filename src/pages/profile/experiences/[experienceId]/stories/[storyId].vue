@@ -107,8 +107,10 @@ const handleGenerateFromText = async (freeText: string) => {
     const result = await runStarInterview(freeText);
     if (result) {
       // Draft is automatically updated by runStarInterview
+      // Hide mode selection and show the builder
       showModeSelection.value = false;
-      selectedMode.value = null;
+      // Keep selectedMode or set to manual to show the builder
+      selectedMode.value = 'manual';
     }
   } catch (err) {
     console.error('[StoryForm] Generation error:', err);

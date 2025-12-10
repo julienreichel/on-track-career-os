@@ -60,7 +60,7 @@ const enrichedStories = computed(() => {
 });
 
 // Table columns configuration
-const columns = computed<TableColumn<typeof enrichedStories.value[0]>[]>(() => [
+const columns = computed<TableColumn<(typeof enrichedStories.value)[0]>[]>(() => [
   {
     accessorKey: 'experienceName',
     header: t('stories.global.experience'),
