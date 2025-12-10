@@ -154,6 +154,64 @@ describe('STARStoryRepository', () => {
     });
   });
 
+  describe('getStoriesByExperience', () => {
+    it('should fetch stories for a specific experience', async () => {
+      const mockStories: STARStory[] = [
+        {
+          id: 'story-1',
+          userId: 'user-123',
+          experienceId: 'exp-123',
+          situation: 'Situation 1',
+          task: 'Task 1',
+          action: 'Action 1',
+          result: 'Result 1',
+          createdAt: '2025-01-01T00:00:00Z',
+          updatedAt: '2025-01-01T00:00:00Z',
+        },
+        {
+          id: 'story-2',
+          userId: 'user-123',
+          experienceId: 'exp-123',
+          situation: 'Situation 2',
+          task: 'Task 2',
+          action: 'Action 2',
+          result: 'Result 2',
+          createdAt: '2025-01-01T00:00:00Z',
+          updatedAt: '2025-01-01T00:00:00Z',
+        },
+      ] as unknown as STARStory[];
+
+      mockModel.list.mockResolvedValue({
+        data: mockStories,
+      });
+
+      const result = await repository.getStoriesByExperience('exp-123');
+
+      expect(mockModel.list).toHaveBeenCalledWith(
+        expect.objectContaining({
+          authMode: 'userPool',
+          filter: {
+            experienceId: { eq: 'exp-123' },
+          },
+        })
+      );
+      expect(result).toEqual(mockStories);
+      expect(result).toHaveLength(2);
+      expect(result.every((s) => s.experienceId === 'exp-123')).toBe(true);
+    });
+
+    it('should return empty array when experience has no stories', async () => {
+      mockModel.list.mockResolvedValue({
+        data: [],
+      });
+
+      const result = await repository.getStoriesByExperience('exp-no-stories');
+
+      expect(result).toEqual([]);
+      expect(result).toHaveLength(0);
+    });
+  });
+
   describe('create', () => {
     it('should create a new STAR story', async () => {
       const mockInput: STARStoryCreateInput = {

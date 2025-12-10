@@ -21,6 +21,10 @@ export type AmplifySTARStoryModel = {
   ) => Promise<{ data: STARStory | null }>;
 };
 
+/**
+ * Repository for STAR Story data access
+ * Handles CRUD operations and filtering for STAR stories
+ */
 export class STARStoryRepository {
   private readonly _model: AmplifySTARStoryModel;
 
@@ -42,27 +46,67 @@ export class STARStoryRepository {
     return this._model;
   }
 
-  async get(id: string) {
+  /**
+   * Get a single STAR story by ID
+   * @param id - Story ID
+   * @returns Story or null if not found
+   */
+  async get(id: string): Promise<STARStory | null> {
     const res = await this.model.get({ id }, gqlOptions());
     return res.data;
   }
 
-  async list(filter: Record<string, unknown> = {}) {
+  /**
+   * List all stories (optionally filtered)
+   * @param filter - Optional filter object
+   * @returns Array of stories
+   */
+  async list(filter: Record<string, unknown> = {}): Promise<STARStory[]> {
     const { data } = await this.model.list(gqlOptions(filter));
     return data;
   }
 
-  async create(input: STARStoryCreateInput) {
+  /**
+   * Get all stories for a specific experience
+   * @param experienceId - Experience ID to filter by
+   * @returns Array of stories for that experience
+   */
+  async getStoriesByExperience(experienceId: string): Promise<STARStory[]> {
+    const { data } = await this.model.list(
+      gqlOptions({
+        filter: {
+          experienceId: { eq: experienceId },
+        },
+      })
+    );
+    return data;
+  }
+
+  /**
+   * Create a new STAR story
+   * @param input - Story data
+   * @returns Created story or null
+   */
+  async create(input: STARStoryCreateInput): Promise<STARStory | null> {
     const { data } = await this.model.create(input, gqlOptions());
     return data;
   }
 
-  async update(input: STARStoryUpdateInput) {
+  /**
+   * Update an existing STAR story
+   * @param input - Story update data (must include id)
+   * @returns Updated story or null
+   */
+  async update(input: STARStoryUpdateInput): Promise<STARStory | null> {
     const { data } = await this.model.update(input, gqlOptions());
     return data;
   }
 
-  async delete(id: string) {
+  /**
+   * Delete a STAR story
+   * @param id - Story ID to delete
+   */
+  async delete(id: string): Promise<void> {
     await this.model.delete({ id }, gqlOptions());
   }
 }
