@@ -81,6 +81,21 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
     }
   };
 
+  // Load all stories for current user (across all experiences)
+  const loadAllStoriesForUser = async () => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      stories.value = await service.getAllStories();
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to load stories';
+      console.error('[useStoryEngine] Error loading all stories:', err);
+    } finally {
+      loading.value = false;
+    }
+  };
+
   // Load single story
   const loadStory = async (storyId: string) => {
     loading.value = true;
@@ -352,6 +367,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
 
     // Actions
     loadStories,
+    loadAllStoriesForUser,
     loadStory,
     createStoryDraft,
     runStarInterview,

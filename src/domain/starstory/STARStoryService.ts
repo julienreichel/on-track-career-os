@@ -39,6 +39,14 @@ export class STARStoryService {
   }
 
   /**
+   * Get all stories for the current user (across all experiences)
+   * @returns Array of all stories
+   */
+  async getAllStories(): Promise<STARStory[]> {
+    return await this.repo.list();
+  }
+
+  /**
    * Generate STAR stories from source text using AI
    * @param sourceText - Experience text to convert
    * @returns Array of AI-generated STAR story structures
