@@ -192,7 +192,7 @@ describe('useStoryEngine', () => {
         result: 'Reduced deployment time by 70%',
       };
 
-      mockService.generateStar.mockResolvedValue(mockAiStory);
+      mockService.generateStar.mockResolvedValue([mockAiStory]);
 
       const { draftStory, runStarInterview, isGenerating } = useStoryEngine();
 
@@ -216,7 +216,7 @@ describe('useStoryEngine', () => {
         result: 'R',
       };
 
-      mockService.generateStar.mockResolvedValue(mockAiStory);
+      mockService.generateStar.mockResolvedValue([mockAiStory]);
 
       const { draftStory, runStarInterview } = useStoryEngine();
 

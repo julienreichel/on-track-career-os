@@ -176,13 +176,13 @@ describe('AiOperationsService', () => {
         result: 'Team maintained 95% sprint completion rate and received positive feedback',
       };
 
-      mockRepo.generateStarStory.mockResolvedValue(mockStarStory);
+      mockRepo.generateStarStory.mockResolvedValue([mockStarStory]);
 
       // Act
       const result = await service.generateStarStory('Led team during restructuring...');
 
       // Assert
-      expect(result).toEqual(mockStarStory);
+      expect(result).toEqual([mockStarStory]);
       expect(mockRepo.generateStarStory).toHaveBeenCalledWith('Led team during restructuring...');
     });
 
@@ -210,11 +210,11 @@ describe('AiOperationsService', () => {
 
     it('should throw error when result structure is invalid', async () => {
       // Arrange
-      mockRepo.generateStarStory.mockResolvedValue({ invalid: 'structure' });
+      mockRepo.generateStarStory.mockResolvedValue([{ invalid: 'structure' }]);
 
       // Act & Assert
       await expect(service.generateStarStory('Some experience text')).rejects.toThrow(
-        'Invalid STAR story result structure'
+        'Invalid STAR story structure in array'
       );
     });
   });

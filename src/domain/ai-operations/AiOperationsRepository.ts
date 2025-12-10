@@ -29,9 +29,9 @@ export interface IAiOperationsRepository {
   /**
    * Generate STAR story from experience text
    * @param sourceText - Experience text to convert to STAR format
-   * @returns STAR story with situation, task, action, result
+   * @returns Array of STAR stories (one or more extracted from the text)
    */
-  generateStarStory(sourceText: string): Promise<STARStory>;
+  generateStarStory(sourceText: string): Promise<STARStory[]>;
 
   /**
    * Generate achievements and KPIs from STAR story
@@ -148,7 +148,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     return parsed;
   }
 
-  async generateStarStory(sourceText: string): Promise<STARStory> {
+  async generateStarStory(sourceText: string): Promise<STARStory[]> {
     const { data, errors } = await this.client.generateStarStory({ sourceText }, gqlOptions());
 
     if (errors && errors.length > 0) {
@@ -159,8 +159,8 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    // Parse JSON response from Lambda
-    const parsed = JSON.parse(data) as STARStory;
+    // Parse JSON response from Lambda (now returns array)
+    const parsed = JSON.parse(data) as STARStory[];
 
     return parsed;
   }

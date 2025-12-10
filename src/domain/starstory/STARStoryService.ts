@@ -39,11 +39,11 @@ export class STARStoryService {
   }
 
   /**
-   * Generate a STAR story from source text using AI
+   * Generate STAR stories from source text using AI
    * @param sourceText - Experience text to convert
-   * @returns AI-generated STAR story structure
+   * @returns Array of AI-generated STAR story structures
    */
-  async generateStar(sourceText: string): Promise<AiSTARStory> {
+  async generateStar(sourceText: string): Promise<STARStory[]> {
     if (!sourceText || sourceText.trim().length === 0) {
       throw new Error('Source text cannot be empty');
     }

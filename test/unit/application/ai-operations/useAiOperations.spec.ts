@@ -34,13 +34,13 @@ describe('useAiOperations', () => {
 
   it('should initialize with default state', () => {
     // Act
-    const { parsedCv, experiences, starStory, achievementsAndKpis, loading, error } =
+    const { parsedCv, experiences, starStories, achievementsAndKpis, loading, error } =
       useAiOperations();
 
     // Assert
     expect(parsedCv.value).toBeNull();
     expect(experiences.value).toBeNull();
-    expect(starStory.value).toBeNull();
+    expect(starStories.value).toBeNull();
     expect(achievementsAndKpis.value).toBeNull();
     expect(loading.value).toBe(false);
     expect(error.value).toBeNull();
@@ -104,16 +104,16 @@ describe('useAiOperations', () => {
       action: 'Implemented daily standups and 1-on-1s',
       result: 'Team maintained 95% sprint completion rate',
     };
-    mockService.generateStarStory.mockResolvedValue(mockStarStory);
+    mockService.generateStarStory.mockResolvedValue([mockStarStory]);
 
     // Act
-    const { starStory, loading, error, generateStarStory } = useAiOperations();
+    const { starStories, loading, error, generateStarStory } = useAiOperations();
     await generateStarStory('Led team during restructuring...');
 
     // Assert
     expect(loading.value).toBe(false);
     expect(error.value).toBeNull();
-    expect(starStory.value).toEqual(mockStarStory);
+    expect(starStories.value).toEqual([mockStarStory]);
   });
 
   it('should handle errors in generateStarStory', async () => {
@@ -121,13 +121,13 @@ describe('useAiOperations', () => {
     mockService.generateStarStory.mockRejectedValue(new Error('STAR generation failed'));
 
     // Act
-    const { starStory, loading, error, generateStarStory } = useAiOperations();
+    const { starStories, loading, error, generateStarStory } = useAiOperations();
     await generateStarStory('Some experience text');
 
     // Assert
     expect(loading.value).toBe(false);
     expect(error.value).toBe('STAR generation failed');
-    expect(starStory.value).toBeNull();
+    expect(starStories.value).toBeNull();
   });
 
   it('should successfully generate achievements and KPIs', async () => {
@@ -176,7 +176,7 @@ describe('useAiOperations', () => {
 
   it('should reset state', () => {
     // Arrange
-    const { parsedCv, experiences, starStory, achievementsAndKpis, loading, error, reset } =
+    const { parsedCv, experiences, starStories, achievementsAndKpis, loading, error, reset } =
       useAiOperations();
     parsedCv.value = {
       sections: {
@@ -189,12 +189,14 @@ describe('useAiOperations', () => {
       confidence: 0.9,
     } as unknown as ParsedCV;
     experiences.value = { experiences: [] };
-    starStory.value = {
-      situation: 'Test',
-      task: 'Test',
-      action: 'Test',
-      result: 'Test',
-    };
+    starStories.value = [
+      {
+        situation: 'Test',
+        task: 'Test',
+        action: 'Test',
+        result: 'Test',
+      },
+    ];
     achievementsAndKpis.value = {
       achievements: ['Test'],
       kpiSuggestions: ['Test KPI'],
@@ -208,7 +210,7 @@ describe('useAiOperations', () => {
     // Assert
     expect(parsedCv.value).toBeNull();
     expect(experiences.value).toBeNull();
-    expect(starStory.value).toBeNull();
+    expect(starStories.value).toBeNull();
     expect(achievementsAndKpis.value).toBeNull();
     expect(loading.value).toBe(false);
     expect(error.value).toBeNull();

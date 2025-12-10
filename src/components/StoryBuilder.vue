@@ -10,14 +10,16 @@ export interface StoryBuilderProps {
 }
 
 export interface StoryBuilderEmits {
-  save: [story: {
-    situation: string;
-    task: string;
-    action: string;
-    result: string;
-    achievements: string[];
-    kpiSuggestions: string[];
-  }];
+  save: [
+    story: {
+      situation: string;
+      task: string;
+      action: string;
+      result: string;
+      achievements: string[];
+      kpiSuggestions: string[];
+    },
+  ];
   cancel: [];
   generateFromText: [freeText: string];
   generateAchievements: [];
@@ -102,7 +104,7 @@ const isValid = () => {
         variant="outline"
         @click="showFreeTextInput = true"
       />
-      
+
       <div v-else class="space-y-3">
         <UFormField :label="t('stories.builder.freeTextLabel')">
           <UTextarea
@@ -119,11 +121,7 @@ const isValid = () => {
             :disabled="!freeText.trim()"
             @click="handleGenerateFromText"
           />
-          <UButton
-            :label="t('common.cancel')"
-            variant="ghost"
-            @click="showFreeTextInput = false"
-          />
+          <UButton :label="t('common.cancel')" variant="ghost" @click="showFreeTextInput = false" />
         </div>
       </div>
     </div>
@@ -225,11 +223,7 @@ const isValid = () => {
     <!-- Actions -->
     <template #footer>
       <div class="flex justify-end gap-3">
-        <UButton
-          :label="t('common.cancel')"
-          variant="ghost"
-          @click="handleCancel"
-        />
+        <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
         <UButton
           :label="t('common.save')"
           color="primary"

@@ -132,7 +132,10 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
     error.value = null;
 
     try {
-      const aiStory = await service.generateStar(sourceText);
+      const aiStories = await service.generateStar(sourceText);
+
+      // Take the first story from the array (AI may generate multiple)
+      const aiStory = aiStories[0];
 
       if (draftStory.value) {
         Object.assign(draftStory.value, {

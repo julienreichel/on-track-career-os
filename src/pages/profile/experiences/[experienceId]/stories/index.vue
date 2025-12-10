@@ -146,12 +146,14 @@ onMounted(async () => {
         <UTable
           v-else
           :columns="columns"
-          :rows="stories.map((story, idx) => ({
-            index: idx + 1,
-            story,
-            preview: getPreview(story),
-            hasAchievements: hasAchievements(story),
-          }))"
+          :rows="
+            stories.map((story, idx) => ({
+              index: idx + 1,
+              story,
+              preview: getPreview(story),
+              hasAchievements: hasAchievements(story),
+            }))
+          "
         >
           <template #preview-data="{ row }">
             <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -166,12 +168,7 @@ onMounted(async () => {
               color="primary"
               size="xs"
             />
-            <UBadge
-              v-else
-              :label="t('stories.status.draft')"
-              color="neutral"
-              size="xs"
-            />
+            <UBadge v-else :label="t('stories.status.draft')" color="neutral" size="xs" />
           </template>
 
           <template #actions-data="{ row }">

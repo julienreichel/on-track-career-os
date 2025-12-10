@@ -82,12 +82,12 @@ export class AiOperationsService {
   }
 
   /**
-   * Generate STAR story from experience text with validation
+   * Generate STAR stories from experience text with validation
    * @param sourceText - Experience text to convert to STAR format
-   * @returns STAR story with situation, task, action, result
+   * @returns Array of STAR stories (one or more extracted from text)
    * @throws Error if generation fails or validation fails
    */
-  async generateStarStory(sourceText: string): Promise<STARStory> {
+  async generateStarStory(sourceText: string): Promise<STARStory[]> {
     // Validate input
     if (!sourceText || sourceText.trim().length === 0) {
       throw new Error('Source text cannot be empty');
@@ -96,9 +96,16 @@ export class AiOperationsService {
     try {
       const result = await this.repo.generateStarStory(sourceText);
 
-      // Validate output structure
-      if (!isSTARStory(result)) {
-        throw new Error('Invalid STAR story result structure');
+      // Validate output structure (array of STAR stories)
+      if (!Array.isArray(result) || result.length === 0) {
+        throw new Error('Invalid STAR story result: expected non-empty array');
+      }
+
+      // Validate each story
+      for (const story of result) {
+        if (!isSTARStory(story)) {
+          throw new Error('Invalid STAR story structure in array');
+        }
       }
 
       return result;

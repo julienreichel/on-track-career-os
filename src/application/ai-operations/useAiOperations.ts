@@ -43,7 +43,7 @@ async function handleAsyncOperation<T>(
 export function useAiOperations() {
   const parsedCv = ref<ParsedCV | null>(null);
   const experiences = ref<ExperiencesResult | null>(null);
-  const starStory = ref<STARStory | null>(null);
+  const starStories = ref<STARStory[] | null>(null); // Changed to array
   const achievementsAndKpis = ref<AchievementsAndKpis | null>(null);
   const personalCanvas = ref<PersonalCanvas | null>(null);
   const loading = ref(false);
@@ -62,7 +62,7 @@ export function useAiOperations() {
     );
 
   const generateStarStory = (sourceText: string) =>
-    handleAsyncOperation(() => service.generateStarStory(sourceText), loading, error, starStory);
+    handleAsyncOperation(() => service.generateStarStory(sourceText), loading, error, starStories);
 
   const generateAchievementsAndKpis = (story: STARStory) =>
     handleAsyncOperation(
@@ -83,7 +83,7 @@ export function useAiOperations() {
   const reset = () => {
     parsedCv.value = null;
     experiences.value = null;
-    starStory.value = null;
+    starStories.value = null;
     achievementsAndKpis.value = null;
     personalCanvas.value = null;
     error.value = null;
@@ -93,7 +93,7 @@ export function useAiOperations() {
   return {
     parsedCv,
     experiences,
-    starStory,
+    starStories,
     achievementsAndKpis,
     personalCanvas,
     loading,

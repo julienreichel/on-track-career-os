@@ -66,7 +66,7 @@ const handleSave = async (storyData: StoryData) => {
   try {
     // Update draft with form data
     updateDraft(storyData);
-    
+
     // Save the draft
     const saved = await saveStory(experienceId.value);
     if (saved) {

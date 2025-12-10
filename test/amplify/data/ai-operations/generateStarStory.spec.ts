@@ -47,41 +47,50 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
   `.trim();
 
   /**
-   * Mock AI response generator that creates STAR story from experience text
+   * Mock AI response generator that creates STAR stories from experience text
+   * Now returns text with markdown headers instead of JSON
    */
-  const generateMockStarStory = (sourceText: string) => {
+  const generateMockStarStoryText = (sourceText: string) => {
     // In a real scenario, the AI would analyze the text
-    // For testing, we provide a structured response
+    // For testing, we provide a structured text response
     if (sourceText.includes('TechCorp')) {
-      return {
-        situation:
-          'The team was struggling with deployment bottlenecks and scaling issues in a monolithic application at TechCorp.',
-        task: 'Design and implement a solution to improve deployment efficiency and system scalability.',
-        action:
-          'Led the migration to microservices architecture using Docker and Kubernetes, implementing a service-oriented design.',
-        result: 'Reduced deployment time by 70% and improved system reliability to 99.9% uptime.',
-      };
+      return `## situation:
+The team was struggling with deployment bottlenecks and scaling issues in a monolithic application at TechCorp.
+
+## task:
+Design and implement a solution to improve deployment efficiency and system scalability.
+
+## action:
+Led the migration to microservices architecture using Docker and Kubernetes, implementing a service-oriented design.
+
+## result:
+Reduced deployment time by 70% and improved system reliability to 99.9% uptime.`;
     }
-    return {
-      situation: 'Context extracted from the provided experience',
-      task: 'Objective identified from the experience',
-      action: 'Steps taken as described in the experience',
-      result: 'Outcome achieved from the experience',
-    };
+    return `## situation:
+Context extracted from the provided experience
+
+## task:
+Objective identified from the experience
+
+## action:
+Steps taken as described in the experience
+
+## result:
+Outcome achieved from the experience`;
   };
 
   describe('Handler Integration Tests', () => {
     it('should successfully generate STAR story from experience text', async () => {
-      // Mock Bedrock to generate STAR story
+      // Mock Bedrock to generate STAR story text
       mockSend.mockImplementationOnce(async () => {
-        const mockResponse = generateMockStarStory(mockExperienceText);
+        const mockResponse = generateMockStarStoryText(mockExperienceText);
 
         return {
           body: new TextEncoder().encode(
             JSON.stringify({
               output: {
                 message: {
-                  content: [{ text: JSON.stringify(mockResponse) }],
+                  content: [{ text: mockResponse }],
                 },
               },
             })
@@ -94,29 +103,36 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
       });
 
       const parsed = JSON.parse(result);
-      expect(parsed.situation).toContain('TechCorp');
-      expect(parsed.task).toContain('deployment efficiency');
-      expect(parsed.action).toContain('microservices');
-      expect(parsed.result).toContain('70%');
-      expect(typeof parsed.situation).toBe('string');
-      expect(typeof parsed.task).toBe('string');
-      expect(typeof parsed.action).toBe('string');
-      expect(typeof parsed.result).toBe('string');
+      expect(Array.isArray(parsed)).toBe(true);
+      expect(parsed.length).toBeGreaterThan(0);
+      
+      const story = parsed[0];
+      expect(story.situation).toContain('TechCorp');
+      expect(story.task).toContain('deployment efficiency');
+      expect(story.action).toContain('microservices');
+      expect(story.result).toContain('70%');
+      expect(typeof story.situation).toBe('string');
+      expect(typeof story.task).toBe('string');
+      expect(typeof story.action).toBe('string');
+      expect(typeof story.result).toBe('string');
     });
 
     it('should apply fallbacks for missing fields', async () => {
-      const incompleteResponse = {
-        situation: 'Working on a project',
-        task: '', // Empty string
-        // Missing action and result
-      };
+      const incompleteText = `## situation:
+Working on a project
+
+## task:
+
+## action:
+
+## result:`;
 
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
             output: {
               message: {
-                content: [{ text: JSON.stringify(incompleteResponse) }],
+                content: [{ text: incompleteText }],
               },
             },
           })
@@ -128,30 +144,35 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
       });
 
       const parsed = JSON.parse(result);
-      expect(parsed.situation).toBe('Working on a project');
-      expect(parsed.task).toBe('No task provided'); // Fallback for empty string
-      expect(parsed.action).toBe('No action provided'); // Fallback for missing field
-      expect(parsed.result).toBe('No result provided'); // Fallback for missing field
+      expect(Array.isArray(parsed)).toBe(true);
+      const story = parsed[0];
+      expect(story.situation).toBe('Working on a project');
+      expect(story.task).toBe('No task provided'); // Fallback for empty string
+      expect(story.action).toBe('No action provided'); // Fallback for missing field
+      expect(story.result).toBe('No result provided'); // Fallback for missing field
     });
 
     it('should handle short experience text', async () => {
       const shortText = 'Implemented a new feature that increased user engagement.';
+
+      const shortTextResponse = `## situation:
+Working on improving user engagement
+
+## task:
+Implement a new feature
+
+## action:
+Developed and deployed the feature
+
+## result:
+Increased user engagement`;
 
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
             output: {
               message: {
-                content: [
-                  {
-                    text: JSON.stringify({
-                      situation: 'Working on improving user engagement',
-                      task: 'Implement a new feature',
-                      action: 'Developed and deployed the feature',
-                      result: 'Increased user engagement',
-                    }),
-                  },
-                ],
+                content: [{ text: shortTextResponse }],
               },
             },
           })
@@ -163,26 +184,29 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
       });
 
       const parsed = JSON.parse(result);
-      expect(parsed.situation).toBeTruthy();
-      expect(parsed.task).toBeTruthy();
-      expect(parsed.action).toBeTruthy();
-      expect(parsed.result).toBeTruthy();
+      expect(Array.isArray(parsed)).toBe(true);
+      const story = parsed[0];
+      expect(story.situation).toBeTruthy();
+      expect(story.task).toBeTruthy();
+      expect(story.action).toBeTruthy();
+      expect(story.result).toBeTruthy();
     });
 
     it('should handle all fields as empty strings with fallbacks', async () => {
-      const emptyResponse = {
-        situation: '',
-        task: '',
-        action: '',
-        result: '',
-      };
+      const emptyText = `## situation:
+
+## task:
+
+## action:
+
+## result:`;
 
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
             output: {
               message: {
-                content: [{ text: JSON.stringify(emptyResponse) }],
+                content: [{ text: emptyText }],
               },
             },
           })
@@ -194,26 +218,33 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
       });
 
       const parsed = JSON.parse(result);
-      expect(parsed.situation).toBe('No situation provided');
-      expect(parsed.task).toBe('No task provided');
-      expect(parsed.action).toBe('No action provided');
-      expect(parsed.result).toBe('No result provided');
+      expect(Array.isArray(parsed)).toBe(true);
+      const story = parsed[0];
+      // When all fields are empty, the parser can't extract a valid story
+      // so it returns the "unable to extract" fallback
+      expect(story.situation).toBe('Unable to extract situation from text');
+      expect(story.task).toBe('Unable to extract task from text');
+      expect(story.action).toBe('Unable to extract action from text');
+      expect(story.result).toBe('Unable to extract result from text');
     });
 
     it('should preserve non-empty fields while applying fallbacks to empty ones', async () => {
-      const mixedResponse = {
-        situation: 'Valid situation',
-        task: '', // Empty - should get fallback
-        action: 'Valid action',
-        result: undefined, // Missing - should get fallback
-      };
+      const mixedText = `## situation:
+Valid situation
+
+## task:
+
+## action:
+Valid action
+
+## result:`;
 
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
             output: {
               message: {
-                content: [{ text: JSON.stringify(mixedResponse) }],
+                content: [{ text: mixedText }],
               },
             },
           })
@@ -225,10 +256,64 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
       });
 
       const parsed = JSON.parse(result);
-      expect(parsed.situation).toBe('Valid situation');
-      expect(parsed.task).toBe('No task provided');
-      expect(parsed.action).toBe('Valid action');
-      expect(parsed.result).toBe('No result provided');
+      expect(Array.isArray(parsed)).toBe(true);
+      const story = parsed[0];
+      expect(story.situation).toBe('Valid situation');
+      expect(story.task).toBe('No task provided');
+      expect(story.action).toBe('Valid action');
+      expect(story.result).toBe('No result provided');
+    });
+
+    it('should handle multiple STAR stories in one response', async () => {
+      const multipleStoriesText = `## situation:
+First project context
+
+## task:
+First project task
+
+## action:
+First project actions
+
+## result:
+First project results
+
+## situation:
+Second project context
+
+## task:
+Second project task
+
+## action:
+Second project actions
+
+## result:
+Second project results`;
+
+      mockSend.mockResolvedValueOnce({
+        body: Buffer.from(
+          JSON.stringify({
+            output: {
+              message: {
+                content: [{ text: multipleStoriesText }],
+              },
+            },
+          })
+        ),
+      });
+
+      const result = await handler({
+        arguments: { sourceText: 'Multiple experiences text' },
+      });
+
+      const parsed = JSON.parse(result);
+      expect(Array.isArray(parsed)).toBe(true);
+      expect(parsed.length).toBe(2);
+      
+      expect(parsed[0].situation).toBe('First project context');
+      expect(parsed[0].task).toBe('First project task');
+      
+      expect(parsed[1].situation).toBe('Second project context');
+      expect(parsed[1].task).toBe('Second project task');
     });
   });
 });
