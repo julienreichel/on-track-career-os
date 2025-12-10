@@ -190,10 +190,6 @@ function cancelDelete() {
 function handleViewStories(id: string) {
   router.push(`/profile/experiences/${id}/stories`);
 }
-
-function handleNewStory(id: string) {
-  router.push(`/profile/experiences/${id}/stories/new`);
-}
 </script>
 
 <template>

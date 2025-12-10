@@ -21,7 +21,7 @@ const { t } = useI18n();
 
 const experienceId = computed(() => route.params.experienceId as string);
 const storyId = computed(() => route.params.storyId as string);
-const experienceTitle = ref<string>('');
+const companyName = ref<string>('');
 
 const experienceService = new ExperienceService();
 
@@ -78,11 +78,11 @@ const handleCancel = () => {
 
 // Load story and experience on mount
 onMounted(async () => {
-  // Load experience title for display
+  // Load experience company name for display
   try {
     const experience = await experienceService.getFullExperience(experienceId.value);
     if (experience) {
-      experienceTitle.value = experience.title;
+      companyName.value = experience.companyName || experience.title;
     }
   } catch (err) {
     console.error('[EditStory] Error loading experience:', err);

@@ -26,9 +26,10 @@ export function useBreadcrumbMapping() {
     // Fetch from API
     try {
       const experience = await experienceService.getFullExperience(experienceId);
-      if (experience?.title) {
-        mappingCache.value[experienceId] = experience.title;
-        return experience.title;
+      const name = experience?.companyName || experience?.title;
+      if (name) {
+        mappingCache.value[experienceId] = name;
+        return name;
       }
     } catch (err) {
       console.error('[useBreadcrumbMapping] Error fetching experience:', err);

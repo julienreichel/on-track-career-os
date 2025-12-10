@@ -21,7 +21,7 @@ const router = useRouter();
 const { t } = useI18n();
 
 const experienceId = computed(() => route.params.experienceId as string);
-const experienceTitle = ref<string>('');
+const companyName = ref<string>('');
 
 // Story engine
 const { stories, loading, error, loadStories } = useStoryEngine(experienceId);
@@ -194,7 +194,7 @@ onMounted(async () => {
     try {
       const experience = await experienceService.getFullExperience(experienceId.value);
       if (experience) {
-        experienceTitle.value = experience.title;
+        companyName.value = experience.companyName || experience.title;
       }
     } catch (err) {
       console.error('[Stories] Error loading experience:', err);
@@ -211,7 +211,7 @@ onMounted(async () => {
     <UPage>
       <UPageHeader
         :title="t('stories.list.title')"
-        :description="experienceTitle"
+        :description="companyName"
         :links="[
           {
             label: t('experiences.list.title'),

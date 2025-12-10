@@ -21,7 +21,7 @@ const router = useRouter();
 const { t } = useI18n();
 
 const experienceId = computed(() => route.params.experienceId as string);
-const experienceTitle = ref<string>('');
+const companyName = ref<string>('');
 
 const {
   generating,
@@ -153,11 +153,11 @@ const handleCancel = () => {
 
 // Load experience title on mount
 onMounted(async () => {
-  // Load experience title for display
+  // Load experience company name for display
   try {
     const experience = await experienceService.getFullExperience(experienceId.value);
     if (experience) {
-      experienceTitle.value = experience.title;
+      companyName.value = experience.companyName || experience.title;
     }
   } catch (err) {
     console.error('[NewStory] Error loading experience:', err);
