@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, h, resolveComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import type { TableColumn } from '@nuxt/ui';
 import { useStoryEngine } from '@/application/starstory/useStoryEngine';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { STARStory } from '@/domain/starstory/STARStory';
 import type { Experience } from '@/domain/experience/Experience';
+
+const UButton = resolveComponent('UButton');
+const UBadge = resolveComponent('UBadge');
 
 const route = useRoute();
 const router = useRouter();
@@ -24,30 +28,6 @@ const storyService = new STARStoryService();
 const isGenerating = ref(false);
 const generationError = ref<string | null>(null);
 
-// Table columns configuration
-const columns = computed(() => [
-  {
-    id: 'index',
-    key: 'index',
-    label: '#',
-  },
-  {
-    id: 'preview',
-    key: 'preview',
-    label: t('stories.table.preview'),
-  },
-  {
-    id: 'hasAchievements',
-    key: 'hasAchievements',
-    label: t('stories.table.hasAchievements'),
-  },
-  {
-    id: 'actions',
-    key: 'actions',
-    label: t('stories.table.actions'),
-  },
-]);
-
 // Generate preview text (first N chars of situation)
 const PREVIEW_MAX_LENGTH = 100;
 const getPreview = (story: STARStory) => {
@@ -59,6 +39,51 @@ const getPreview = (story: STARStory) => {
 const hasAchievements = (story: STARStory) => {
   return story.achievements && story.achievements.length > 0;
 };
+
+// Table columns configuration using TanStack Table API
+const columns = computed<TableColumn<STARStory>[]>(() => [
+  {
+    accessorKey: 'situation',
+    header: t('stories.table.preview'),
+    cell: ({ row }) => getPreview(row.original),
+  },
+  {
+    id: 'achievements',
+    header: t('stories.table.hasAchievements'),
+    cell: ({ row }) => {
+      const hasAch = hasAchievements(row.original);
+      return h(UBadge, {
+        color: hasAch ? 'primary' : 'neutral',
+        label: hasAch ? t('stories.status.withAchievements') : t('stories.status.draft'),
+        size: 'xs',
+      });
+    },
+  },
+  {
+    id: 'actions',
+    header: t('stories.table.actions'),
+    cell: ({ row }) => {
+      return h('div', { class: 'flex gap-2' }, [
+        h(UButton, {
+          icon: 'i-heroicons-pencil-square',
+          variant: 'ghost',
+          color: 'primary',
+          size: 'xs',
+          'aria-label': t('stories.list.edit'),
+          onClick: () => handleEdit(row.original.id),
+        }),
+        h(UButton, {
+          icon: 'i-heroicons-trash',
+          variant: 'ghost',
+          color: 'red',
+          size: 'xs',
+          'aria-label': t('stories.list.delete'),
+          onClick: () => handleDelete(row.original.id),
+        }),
+      ]);
+    },
+  },
+]);
 
 // Navigation handlers
 const handleNewStory = () => {
@@ -247,56 +272,7 @@ onMounted(async () => {
           </UEmpty>
         </UCard>
 
-        <UTable
-          v-else
-          :columns="columns"
-          :data="
-            stories.map((story, idx) => ({
-              index: idx + 1,
-              story,
-              preview: getPreview(story),
-              hasAchievements: hasAchievements(story),
-              actions: story.id,
-            }))
-          "
-        >
-          <template #preview-cell="{ row }">
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ row.preview }}
-            </p>
-          </template>
-
-          <template #hasAchievements-cell="{ row }">
-            <UBadge
-              v-if="row.hasAchievements"
-              :label="t('stories.status.withAchievements')"
-              color="primary"
-              size="xs"
-            />
-            <UBadge v-else :label="t('stories.status.draft')" color="neutral" size="xs" />
-          </template>
-
-          <template #actions-cell="{ row }">
-            <div class="flex gap-2">
-              <UButton
-                icon="i-heroicons-pencil-square"
-                variant="ghost"
-                color="primary"
-                size="xs"
-                :aria-label="t('stories.list.edit')"
-                @click="handleEdit(row.story.id)"
-              />
-              <UButton
-                icon="i-heroicons-trash"
-                variant="ghost"
-                color="red"
-                size="xs"
-                :aria-label="t('stories.list.delete')"
-                @click="handleDelete(row.story.id)"
-              />
-            </div>
-          </template>
-        </UTable>
+        <UTable v-else :columns="columns" :data="stories" :loading="loading" />
       </UPageBody>
     </UPage>
   </UContainer>
