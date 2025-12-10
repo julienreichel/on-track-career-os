@@ -250,7 +250,7 @@ onMounted(async () => {
         <UTable
           v-else
           :columns="columns"
-          :rows="
+          :data="
             stories.map((story, idx) => ({
               index: idx + 1,
               story,
