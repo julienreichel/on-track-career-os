@@ -86,22 +86,17 @@ const handleCancel = () => {
 <template>
   <UContainer>
     <UPage>
-      <UPageHeader>
-        <template #headline>
-          <UButton
-            :label="t('stories.builder.backToStories')"
-            variant="link"
-            icon="i-heroicons-arrow-left"
-            @click="handleCancel"
-          />
-        </template>
-        <template #title>
-          {{ t('stories.builder.newTitle') }}
-        </template>
-        <template #description>
-          {{ t('stories.builder.newDescription') }}
-        </template>
-      </UPageHeader>
+      <UPageHeader
+        :title="t('stories.builder.newTitle')"
+        :description="t('stories.builder.newDescription')"
+        :links="[
+          {
+            label: t('stories.builder.backToStories'),
+            to: `/profile/experiences/${experienceId}/stories`,
+            icon: 'i-heroicons-arrow-left',
+          },
+        ]"
+      />
 
       <UPageBody>
         <UAlert

@@ -73,10 +73,6 @@ const handleDelete = async (storyId: string) => {
   }
 };
 
-const handleBack = () => {
-  router.push('/profile/experiences');
-};
-
 // Load data
 onMounted(async () => {
   if (experienceId.value) {
@@ -99,21 +95,17 @@ onMounted(async () => {
 <template>
   <UContainer>
     <UPage>
-      <UPageHeader>
-        <template #headline>
-          <UButton
-            :label="t('navigation.backToProfile')"
-            variant="link"
-            icon="i-heroicons-arrow-left"
-            @click="handleBack"
-          />
-        </template>
-        <template #title>
-          {{ t('stories.list.title') }}
-        </template>
-        <template #description>
-          {{ experienceTitle }}
-        </template>
+      <UPageHeader
+        :title="t('stories.list.title')"
+        :description="experienceTitle"
+        :links="[
+          {
+            label: t('experiences.list.title'),
+            to: '/profile/experiences',
+            icon: 'i-heroicons-arrow-left',
+          },
+        ]"
+      >
         <template #actions>
           <UButton
             :label="t('stories.list.addNew')"
