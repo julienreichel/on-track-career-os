@@ -149,8 +149,9 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
     try {
       const aiStories = await service.generateStar(sourceText);
 
-      // Take the first story from the array (AI may generate multiple)
-      const aiStory = aiStories[0];
+      // Pick a random story from the array (AI may generate multiple)
+      const randomIndex = Math.floor(Math.random() * aiStories.length);
+      const aiStory = aiStories[randomIndex];
 
       if (draftStory.value) {
         Object.assign(draftStory.value, {
