@@ -175,7 +175,7 @@ describe('ExperienceList', () => {
   it('displays correct number of table columns', () => {
     const wrapper = createWrapper({ experiences: mockExperiences });
     const headers = wrapper.findAll('th');
-    expect(headers.length).toBe(6); // title, company, startDate, endDate, status, actions
+    expect(headers.length).toBe(7); // title, company, startDate, endDate, status, stories, actions
   });
 
   it('formats dates correctly', () => {
