@@ -227,6 +227,7 @@ bash scripts/cleanup-sandbox.sh
 ```
 
 Make sure to set your AWS credentials before running:
+
 ```bash
 export AWS_ACCESS_KEY_ID="your-key"
 export AWS_SECRET_ACCESS_KEY="your-secret"
