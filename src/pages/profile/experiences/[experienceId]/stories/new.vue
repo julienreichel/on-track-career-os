@@ -31,6 +31,7 @@ const {
 const generatedAchievements = ref<AchievementsAndKpis | null>(null);
 const showModeSelection = ref(true);
 const selectedMode = ref<'experience' | 'freetext' | 'manual' | null>(null);
+const freeTextInput = ref('');
 
 // Services
 const experienceService = new ExperienceService();
@@ -90,10 +91,17 @@ const handleGenerateFromText = async (freeText: string) => {
     if (result) {
       // Draft is automatically updated by runStarInterview
       showModeSelection.value = false;
+      selectedMode.value = null;
     }
   } catch (err) {
     console.error('[NewStory] Generation error:', err);
   }
+};
+
+// Handle submitting free text for generation
+const handleSubmitFreeText = async () => {
+  if (!freeTextInput.value.trim()) return;
+  await handleGenerateFromText(freeTextInput.value);
 };
 
 // Handle achievements generation
@@ -202,7 +210,7 @@ const handleCancel = () => {
                 "
               >
                 <div class="flex flex-col items-center text-center gap-3 p-4">
-                  <UIcon name="i-heroicons-sparkles" class="w-8 h-8 text-primary-500" />
+                  <u-icon name="i-heroicons-sparkles" class="w-8 h-8 text-primary-500" />
                   <h4 class="font-medium">{{ t('stories.builder.modeExperience') }}</h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
                     {{ t('stories.builder.modeExperienceDescription') }}
@@ -213,15 +221,10 @@ const handleCancel = () => {
               <!-- Generate from Free Text -->
               <UCard
                 class="cursor-pointer hover:border-primary-500 transition-colors"
-                @click="
-                  () => {
-                    selectedMode = 'freetext';
-                    showModeSelection = false;
-                  }
-                "
+                @click="selectedMode = 'freetext'"
               >
                 <div class="flex flex-col items-center text-center gap-3 p-4">
-                  <UIcon name="i-heroicons-document-text" class="w-8 h-8 text-primary-500" />
+                  <u-icon name="i-heroicons-document-text" class="w-8 h-8 text-primary-500" />
                   <h4 class="font-medium">{{ t('stories.builder.modeFreetext') }}</h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
                     {{ t('stories.builder.modeFreetextDescription') }}
@@ -232,15 +235,10 @@ const handleCancel = () => {
               <!-- Manual Entry -->
               <UCard
                 class="cursor-pointer hover:border-primary-500 transition-colors"
-                @click="
-                  () => {
-                    selectedMode = 'manual';
-                    showModeSelection = false;
-                  }
-                "
+                @click="selectedMode = 'manual'"
               >
                 <div class="flex flex-col items-center text-center gap-3 p-4">
-                  <UIcon name="i-heroicons-pencil-square" class="w-8 h-8 text-primary-500" />
+                  <u-icon name="i-heroicons-pencil-square" class="w-8 h-8 text-primary-500" />
                   <h4 class="font-medium">{{ t('stories.builder.modeManual') }}</h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
                     {{ t('stories.builder.modeManualDescription') }}
@@ -251,8 +249,49 @@ const handleCancel = () => {
           </div>
         </UCard>
 
+        <!-- Free Text Input Form -->
+        <UCard v-else-if="selectedMode === 'freetext'">
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-lg font-semibold mb-2">
+                {{ t('stories.builder.modeFreetext') }}
+              </h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ t('stories.builder.freetextInstructions') }}
+              </p>
+            </div>
+
+            <u-form-field :label="t('stories.builder.freetextLabel')" required>
+              <u-textarea
+                v-model="freeTextInput"
+                :placeholder="t('stories.builder.freetextPlaceholder')"
+                :rows="10"
+              />
+            </u-form-field>
+
+            <div class="flex justify-end gap-3">
+              <u-button
+                :label="t('common.cancel')"
+                variant="ghost"
+                @click="
+                  () => {
+                    selectedMode = null;
+                    freeTextInput = '';
+                  }
+                "
+              />
+              <u-button
+                :label="t('stories.builder.generate')"
+                icon="i-heroicons-sparkles"
+                :disabled="!freeTextInput.trim()"
+                @click="handleSubmitFreeText"
+              />
+            </div>
+          </div>
+        </UCard>
+
         <story-builder
-          v-else
+          v-else-if="selectedMode === 'manual' || (!showModeSelection && !selectedMode)"
           :experience-id="experienceId"
           mode="create"
           @save="handleSave"
