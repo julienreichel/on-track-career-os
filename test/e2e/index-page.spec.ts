@@ -9,13 +9,9 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Home Page - Authenticated User', () => {
   test.beforeEach(async ({ page }) => {
-    // This test requires authentication
-    // If you need to add auth, uncomment and implement auth.setup.ts
     await page.goto('/');
     await page.waitForLoadState('networkidle');
-  });
-
-  test('should display page header with title and description', async ({ page }) => {
+  });  test('should display page header with title and description', async ({ page }) => {
     // Check for home page title
     const heading = page.locator('h1, [role="heading"]').first();
     await expect(heading).toBeVisible();

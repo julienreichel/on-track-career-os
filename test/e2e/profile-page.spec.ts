@@ -9,7 +9,6 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Profile Page - View Mode', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to profile page
     await page.goto('/profile');
     await page.waitForLoadState('networkidle');
   });
