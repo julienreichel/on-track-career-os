@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStoryEngine } from '@/application/starstory/useStoryEngine';
+import { ExperienceService } from '@/domain/experience/ExperienceService';
 import StoryBuilder from '@/components/StoryBuilder.vue';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 
@@ -16,6 +17,9 @@ const { t } = useI18n();
 
 const experienceId = computed(() => route.params.experienceId as string);
 const storyId = computed(() => route.params.storyId as string);
+const experienceTitle = ref<string>('');
+
+const experienceService = new ExperienceService();
 
 const {
   selectedStory,
@@ -68,8 +72,33 @@ const handleCancel = () => {
   router.push(`/profile/experiences/${experienceId.value}/stories`);
 };
 
-// Load story on mount
+// Update breadcrumb labels
+watch(
+  () => experienceTitle.value,
+  (title) => {
+    if (title) {
+      route.meta.breadcrumbLabel = title;
+    }
+  },
+  { immediate: true }
+);
+
+// Load story and experience on mount
 onMounted(async () => {
+  // Set edit breadcrumb
+  route.meta.breadcrumbLabel = t('common.edit');
+  
+  // Load experience title for parent breadcrumb
+  try {
+    const experience = await experienceService.getFullExperience(experienceId.value);
+    if (experience) {
+      experienceTitle.value = experience.title;
+    }
+  } catch (err) {
+    console.error('[EditStory] Error loading experience:', err);
+  }
+  
+  // Load story
   if (storyId.value) {
     await loadStory(storyId.value);
   }

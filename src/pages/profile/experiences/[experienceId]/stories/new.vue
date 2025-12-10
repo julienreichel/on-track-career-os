@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStoryEngine } from '@/application/starstory/useStoryEngine';
@@ -17,6 +17,7 @@ const router = useRouter();
 const { t } = useI18n();
 
 const experienceId = computed(() => route.params.experienceId as string);
+const experienceTitle = ref<string>('');
 
 const {
   generating,
@@ -145,6 +146,32 @@ const handleSave = async (storyData: StoryData) => {
 const handleCancel = () => {
   router.push(`/profile/experiences/${experienceId.value}/stories`);
 };
+
+// Update breadcrumb labels
+watch(
+  () => experienceTitle.value,
+  (title) => {
+    if (title) {
+      route.meta.breadcrumbLabel = title;
+    }
+  },
+  { immediate: true }
+);
+
+// Set route meta for 'new' page
+onMounted(async () => {
+  route.meta.breadcrumbLabel = t('navigation.new');
+  
+  // Load experience title for parent breadcrumb
+  try {
+    const experience = await experienceService.getFullExperience(experienceId.value);
+    if (experience) {
+      experienceTitle.value = experience.title;
+    }
+  } catch (err) {
+    console.error('[NewStory] Error loading experience:', err);
+  }
+});
 </script>
 
 <template>

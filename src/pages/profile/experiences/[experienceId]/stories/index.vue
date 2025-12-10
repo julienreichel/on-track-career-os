@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, h, resolveComponent } from 'vue';
+import { ref, onMounted, computed, watch, h, resolveComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import type { TableColumn } from '@nuxt/ui';
@@ -27,6 +27,17 @@ const storyService = new STARStoryService();
 // Auto-generation state
 const isGenerating = ref(false);
 const generationError = ref<string | null>(null);
+
+// Update breadcrumb label with experience title
+watch(
+  () => experienceTitle.value,
+  (title) => {
+    if (title) {
+      route.meta.breadcrumbLabel = title;
+    }
+  },
+  { immediate: true }
+);
 
 // Generate preview text (first N chars of situation)
 const PREVIEW_MAX_LENGTH = 100;
