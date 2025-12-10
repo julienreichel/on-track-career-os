@@ -7,7 +7,6 @@ export interface StoryBuilderProps {
   story?: STARStory | null;
   experienceId: string;
   mode: 'create' | 'edit';
-  showGenerateButton?: boolean;
 }
 
 export interface StoryBuilderEmits {
@@ -22,22 +21,17 @@ export interface StoryBuilderEmits {
     },
   ];
   cancel: [];
-  generateFromText: [freeText: string];
   generateAchievements: [];
 }
 
 const props = withDefaults(defineProps<StoryBuilderProps>(), {
   story: null,
-  showGenerateButton: true,
 });
 const emit = defineEmits<StoryBuilderEmits>();
 
 const { t } = useI18n();
 
 // Form state
-const freeText = ref('');
-const showFreeTextInput = ref(false);
-
 const situation = ref('');
 const task = ref('');
 const action = ref('');
@@ -62,12 +56,6 @@ watch(
 );
 
 // Handlers
-const handleGenerateFromText = () => {
-  if (freeText.value.trim()) {
-    emit('generateFromText', freeText.value);
-  }
-};
-
 const handleGenerateAchievements = () => {
   emit('generateAchievements');
 };
@@ -99,42 +87,11 @@ const isValid = () => {
 
 <template>
   <UCard>
-    <!-- Optional: Generate from free text -->
-    <div v-if="mode === 'create' && showGenerateButton" class="mb-6">
-      <UButton
-        v-if="!showFreeTextInput"
-        :label="t('stories.builder.generateFromText')"
-        icon="i-heroicons-sparkles"
-        variant="outline"
-        @click="showFreeTextInput = true"
-      />
-
-      <div v-else class="space-y-3">
-        <UFormField :label="t('stories.builder.freeTextLabel')">
-          <UTextarea
-            v-model="freeText"
-            :placeholder="t('stories.builder.freeTextPlaceholder')"
-            :rows="4"
-            class="w-full"
-          />
-        </UFormField>
-        <div class="flex gap-2">
-          <UButton
-            :label="t('stories.builder.generate')"
-            icon="i-heroicons-sparkles"
-            :disabled="!freeText.trim()"
-            @click="handleGenerateFromText"
-          />
-          <UButton :label="t('common.cancel')" variant="ghost" @click="showFreeTextInput = false" />
-        </div>
-      </div>
-    </div>
-
     <!-- STAR Form Fields -->
     <div class="space-y-6">
       <UFormField
         :label="t('stories.builder.situation')"
-        :description="t('stories.builder.situationHint')"
+        :hint="t('stories.builder.situationHint')"
         required
       >
         <UTextarea
@@ -145,11 +102,7 @@ const isValid = () => {
         />
       </UFormField>
 
-      <UFormField
-        :label="t('stories.builder.task')"
-        :description="t('stories.builder.taskHint')"
-        required
-      >
+      <UFormField :label="t('stories.builder.task')" :hint="t('stories.builder.taskHint')" required>
         <UTextarea
           v-model="task"
           :placeholder="t('stories.builder.taskPlaceholder')"
@@ -160,7 +113,7 @@ const isValid = () => {
 
       <UFormField
         :label="t('stories.builder.action')"
-        :description="t('stories.builder.actionHint')"
+        :hint="t('stories.builder.actionHint')"
         required
       >
         <UTextarea
@@ -173,7 +126,7 @@ const isValid = () => {
 
       <UFormField
         :label="t('stories.builder.result')"
-        :description="t('stories.builder.resultHint')"
+        :hint="t('stories.builder.resultHint')"
         required
       >
         <UTextarea

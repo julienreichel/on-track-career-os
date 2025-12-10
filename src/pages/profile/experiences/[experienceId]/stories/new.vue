@@ -295,10 +295,8 @@ const handleCancel = () => {
           v-else-if="selectedMode === 'manual' || (!showModeSelection && !selectedMode)"
           :experience-id="experienceId"
           mode="create"
-          :show-generate-button="selectedMode !== 'manual'"
           @save="handleSave"
           @cancel="handleCancel"
-          @generate-from-text="handleGenerateFromText"
           @generate-achievements="handleGenerateAchievements"
         />
       </UPageBody>
