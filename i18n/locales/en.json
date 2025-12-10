@@ -223,5 +223,73 @@
       "communication": "Communication Profile",
       "communicationDescription": "Your strengths and style (Coming soon)"
     }
+  },
+  "stories": {
+    "list": {
+      "title": "STAR Stories",
+      "addNew": "New Story",
+      "edit": "Edit",
+      "delete": "Delete",
+      "empty": "No stories yet for this experience.",
+      "emptyDescription": "Create your first STAR story to document your achievements."
+    },
+    "table": {
+      "preview": "Preview",
+      "hasAchievements": "Achievements",
+      "actions": "Actions"
+    },
+    "status": {
+      "draft": "Draft",
+      "withAchievements": "With Achievements"
+    },
+    "delete": {
+      "title": "Delete Story",
+      "message": "Are you sure you want to delete this story? This action cannot be undone."
+    },
+    "builder": {
+      "newTitle": "Create New Story",
+      "newDescription": "Build a STAR story to document your achievement",
+      "editTitle": "Edit Story",
+      "editDescription": "Update your STAR story details",
+      "backToStories": "Back to Stories",
+      "generateFromText": "Generate from Free Text",
+      "freeTextLabel": "Free Text Description",
+      "freeTextPlaceholder": "Paste or type your achievement description here, and we'll help structure it into a STAR story...",
+      "generate": "Generate STAR",
+      "situation": "Situation",
+      "situationHint": "Describe the context or challenge you faced",
+      "situationPlaceholder": "What was the situation or challenge?",
+      "task": "Task",
+      "taskHint": "What was your specific responsibility or goal?",
+      "taskPlaceholder": "What were you asked to do?",
+      "action": "Action",
+      "actionHint": "What specific actions did you take?",
+      "actionPlaceholder": "What did you do to address the situation?",
+      "result": "Result",
+      "resultHint": "What was the outcome or impact?",
+      "resultPlaceholder": "What was the result of your actions?",
+      "achievements": "Achievements & KPIs",
+      "generateAchievements": "Generate Achievements",
+      "achievementsList": "Achievements",
+      "achievementsHint": "Press Enter to add each achievement",
+      "achievementsPlaceholder": "Add achievement",
+      "kpisList": "KPI Suggestions",
+      "kpisHint": "Press Enter to add each KPI",
+      "kpisPlaceholder": "Add KPI",
+      "loading": "Loading story...",
+      "generating": "Generating with AI...",
+      "saving": "Saving story...",
+      "notFound": "Story Not Found",
+      "notFoundDescription": "The story you're looking for doesn't exist or has been deleted."
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "error": "Error",
+    "loading": "Loading...",
+    "success": "Success"
   }
 }

@@ -1,140 +1,98 @@
-# ✅ MASTER PROMPT 1 — Implement STARStory Domain Layer
-
-(Repository + Service + Composable)
+# ✅ UPDATED MASTER PROMPT 1 — STARStory Domain Layer (Many Stories per Experience)
 
 ### 1. CONTEXT
 
-Backend is fully ready for STAR stories:
+Backend & AI are ready:
 
-- Data model defined (STARStory entity with achievements & KPIs)
-- AI operations implemented & validated (`ai.generateStarStory`, `ai.generateAchievementsAndKpis`)
-- Experience model already exists and is stable.
-  Frontend domain layer is missing for STAR creation, persistence, and editing.
+- `Experience` and `STARStory` entities defined, with 1→\* relation.
+- AI ops `ai.generateStarStory` and `ai.generateAchievementsAndKpis` defined in the AI Contract.
+
+You need a domain layer that **explicitly supports multiple stories per experience**.
 
 ### 2. COMPONENTS / COMPOSABLES
 
-Create or use:
+Create or update:
 
 - `StarStoryRepository`
 - `StarStoryService`
-- `useStoryEngine()` (declared in Component Mapping)
+- `useStoryEngine()` (as already planned in the Component/Page mapping)
 
 ### 3. PAGES INVOLVED
 
-- `/profile/experiences/:id` (story entry point)
-- `/stories/new` (guided flow)
+- `/profile/experiences/:experienceId/stories` (per-experience story list)
+- `/profile/experiences/:experienceId/stories/new` (create)
+- `/profile/experiences/:experienceId/stories/:storyId/edit` (edit)
 
 ### 4. IMPLEMENTATION INSTRUCTIONS
 
-Implement the following methods:
+**Repository methods (GraphQL-based):**
 
-**Repository**
+- `getStoriesByExperience(experienceId: string): Promise<StarStory[]>`
+- `getStoryById(storyId: string): Promise<StarStory | null>`
+- `createStoryForExperience(experienceId: string, input: StarStoryInput): Promise<StarStory>`
+- `updateStory(storyId: string, input: StarStoryInput): Promise<StarStory>`
+- `deleteStory(storyId: string): Promise<void>`
 
-- `getStoriesByExperience(experienceId)`
-- `getStory(id)`
-- `createStory(storyInput)`
-- `updateStory(storyId, storyInput)`
-- `deleteStory(storyId)`
+**Service methods:**
 
-**Service**
+- `generateStarFromFreeText(experienceId, sourceText)` → uses `ai.generateStarStory`
+- `generateAchievementsForStory(storyId)` → loads story → calls `ai.generateAchievementsAndKpis`
+- `attachAchievementsToStory(storyId, achievements, kpiSuggestions)`
+- `linkStoryToExperience` is implied by `createStoryForExperience`
 
-- `generateStar(sourceText)` → calls `ai.generateStarStory`
-- `generateAchievements(starStory)` → calls `ai.generateAchievementsAndKpis`
-- `linkStoryToExperience(storyId, experienceId)`
+**Composable `useStoryEngine()` should expose:**
 
-**Composable: `useStoryEngine()`**
-Expose reactive state + actions:
+- State:
+  - `storiesByExperience: Record<experienceId, StarStory[]>`
+  - `currentStory: StarStory | null`
+  - `loading`, `error`
 
-- `stories`, `selectedStory`
-- `loadStories(experienceId)`
-- `createStoryDraft(experience)`
-- `runStarInterview()`
-- `saveStory()`
-- `generateAchievements()`
+- Actions:
+  - `loadStories(experienceId)`
+  - `selectStory(storyId)`
+  - `createStoryDraft(experienceId)`
+  - `saveStory(experienceId, storyDraft)`
+  - `deleteStory(storyId)`
+  - `generateStar(experienceId, sourceText | formFields)`
+  - `generateAchievementsForCurrent()`
 
-Follow same architectural conventions as Experience/Canvas domain layers.
+Keep domain functions pure and tested; follow existing Experience/CV patterns.
 
 ### 5. TESTING INSTRUCTIONS
 
-- Repository mock GraphQL responses
-- Service mock AIC calls (validate schema)
-- Composable: state transitions, error states, loading states
+- Repository tests:
+  - Multiple stories per experience are returned.
+  - Deletion removes only targeted story.
+
+- Service tests:
+  - `generateStarFromFreeText` calls AI with expected payload.
+  - Achievements are attached to the correct story.
+
+- Composable tests:
+  - `loadStories` populates `storiesByExperience[experienceId]`.
+  - Selecting a story updates `currentStory`.
+  - Error and loading flags work.
 
 ### 6. ACCEPTANCE CRITERIA
 
-- Domain layer fully operational
-- Tests cover all methods
-- `useStoryEngine()` is the **single API** used by all UI pages
-- Zero UI implementation yet
+- Domain layer supports **N stories per Experience**.
+- No function assumes “there is at most one story”.
+- All tests green and consistent with other domains.
 
 ---
 
-# ✅ MASTER PROMPT 2 — Implement Experience List Page (`/profile/experiences`)
+# ✅ UPDATED MASTER PROMPT 2 — Experience List Page (`/profile/experiences`)
 
 ### 1. CONTEXT
 
-This page already exists in minimal form per project status, but lacks:
-
-- Entry points to STAR builder
-- “Story status” indicators
-- Navigation refinement
-  See Component Mapping.
-
-### 2. COMPONENTS TO USE
-
-- `<UTable>`
-- `<UButton>`
-- Experience List Component
-
-### 3. COMPOSABLES
-
-- `useExperienceStore()`
-- `useStoryEngine()`
-
-### 4. IMPLEMENTATION INSTRUCTIONS
-
-Modify the experience list to include:
-
-- A “Create STAR Story” button per experience
-- A “View/Edit Story” button if story exists
-- A status chip:
-  - `No story` (grey)
-  - `Draft` (yellow)
-  - `Completed` (green — has achievements)
-
-- Support navigation to:
-  - `/profile/experiences/:id/story`
-
-### 5. TESTING INSTRUCTIONS
-
-- Table renders correct actions
-- Story status computed correctly
-- Navigation triggers correct route
-
-### 6. ACCEPTANCE CRITERIA
-
-- User sees immediately which experiences need stories
-- Table is clean, minimal, MVP-friendly
-- No STAR logic here—only navigation
-
----
-
-# ✅ MASTER PROMPT 3 — Implement Experience Editor + Achievements Generator
-
-(`/profile/experiences/:id/edit`)
-
-### 1. CONTEXT
-
-Experience Editor exists but is missing integration with STAR story generation (achievements/KPIs).
-See Experience model.
-AI operation: `ai.generateAchievementsAndKpis`.
+Experience list should show **how many stories each experience has**, and provide entry points to the per-experience story library (not a single story).
+See Component/Page mapping for Experience List & Story Builder.
 
 ### 2. COMPONENTS
 
-- `<UForm>`
-- `<UTextarea>`
-- `<UButton>`
-- Achievements Preview Component (simple list)
+- `<UTable>` (rows = experiences)
+- `<UBadge>` or `<UChip>` for story count
+- `<UButton>` for navigation
 
 ### 3. COMPOSABLES
 
@@ -143,52 +101,60 @@ AI operation: `ai.generateAchievementsAndKpis`.
 
 ### 4. IMPLEMENTATION INSTRUCTIONS
 
-Add button:
+For each experience row:
 
-**“Generate Achievements & KPIs from STAR Story”**
+- Show:
+  - Title, company, dates
+  - “Stories: N” badge
+    - `N = storiesByExperience[experience.id]?.length ?? 0`
 
-- If no story exists → show modal “Create a STAR story first”
-- If story exists:
-  - Fetch it
-  - Call `generateAchievements(story)`
-  - Display achievements + KPIs in a preview panel
-  - Allow “Apply to Experience” (optional field for MVP: add achievements into experience description or keep separate)
+- Actions:
+  - `View stories` → navigate to `/profile/experiences/:experienceId/stories`
+  - `+ New story` → navigate to `/profile/experiences/:experienceId/stories/new`
+
+Load story counts lazily via `useStoryEngine().loadStories(experienceId)` when the page is mounted or when the row is expanded (MVP can just load for all experiences if count is small).
 
 ### 5. TESTING
 
-- Button is disabled if no story
-- AI call generates the expected arrays
-- Preview renders correctly
+- When `storiesByExperience` has entries, counts match.
+- Clicking “View stories” navigates to correct route.
+- Clicking “+ New story” leads to the story builder page.
 
 ### 6. ACCEPTANCE CRITERIA
 
-- Editor supports generating achievements directly
-- No story? → clean UX fallback
+- UI communicates **counts**, not just “has / has not”.
+- No assumption of single story per experience.
+- MVP remains simple and clean.
 
 ---
 
-# ✅ MASTER PROMPT 4 — Implement STAR Story Builder Page
-
-(`/profile/experiences/:id/story`)
+# ✅ UPDATED MASTER PROMPT 4 — Per-Experience Story Library + STAR Builder
 
 ### 1. CONTEXT
 
-This is the **core** of EPIC 2.
-Page description: Guided STAR interview, chat-like UI.
-See page mapping: STAR Story Builder.
+We need:
 
-AI operations used:
+1. **Per-experience story library**: `/profile/experiences/:experienceId/stories`
+2. **New story flow**: `/profile/experiences/:experienceId/stories/new`
+3. **Edit story flow**: `/profile/experiences/:experienceId/stories/:storyId/edit`
 
-- `ai.generateStarStory`
-- `ai.generateAchievementsAndKpis`
-  (Contract definitions: )
+See EPIC 2 and the mapping for STAR Story Builder.
 
 ### 2. COMPONENTS
 
-- `<UChat>` (custom chat UI)
-- `<UTextarea>`
-- `<UButton>`
-- `<UModal>` for achievements preview
+- Story List Page:
+  - `<UTable>` or `<UList>` for stories
+  - Actions: “Edit”, “Delete”, “Generate Achievements”
+
+- Story Builder Page:
+  - Guided STAR form (no real-time chat needed for MVP, just step-by-step fields)
+  - Fields:
+    - Situation, Task, Action, Result
+
+  - Buttons:
+    - “Generate STAR from free text” (optional)
+    - “Generate Achievements & KPIs”
+    - “Save story”
 
 ### 3. COMPOSABLES
 
@@ -197,150 +163,144 @@ AI operations used:
 
 ### 4. IMPLEMENTATION INSTRUCTIONS
 
-**Flow:**
+**A. Story List Page `/profile/experiences/:experienceId/stories`**
 
-1️⃣ **User starts by answering guided prompts:**
+- Fetch and display all stories with:
+  - Short preview (first 1–2 sentences of Situation/Result)
+  - Columns: `#`, `Summary`, `Has achievements?`
 
-- “What was the situation?”
-- “What was your task?”
-- “What action did you take?”
-- “What result did you achieve?”
-  These prompts are not generated by AI — deterministic MVP flow.
+- Buttons:
+  - `+ New story` → `/profile/experiences/:experienceId/stories/new`
+  - `Edit` → `/profile/experiences/:experienceId/stories/:storyId/edit`
+  - `Delete` → calls `deleteStory(storyId)`
 
-2️⃣ **User submits all fields**
+- Show counts and statuses (e.g. `Draft` vs `With achievements`).
 
-3️⃣ **Call `ai.generateStarStory`**
+**B. STAR Story Builder (New/Edit)**
 
-- Show loading indicator
-- Populate story editor fields with response
+For **new**:
 
-4️⃣ **Ask: “Generate achievements/KPIs?”**
+- Start with empty fields or optional “Paste free-text description” area.
+- Optionally: button “Generate STAR from this free text” → `ai.generateStarStory`.
 
-- If yes: call `ai.generateAchievementsAndKpis`
-- Show preview in a modal
-- User can accept → saved into STARStory entity
+For **edit**:
 
-5️⃣ **User saves story**
+- Load story by id, populate fields.
+
+In both cases:
+
+- Allow generating achievements & KPIs for the **current story**:
+  - Button “Generate Achievements & KPIs”
+  - Call `ai.generateAchievementsAndKpis` via `useStoryEngine`.
+
+- Allow saving at any time.
 
 ### 5. TESTING
 
-- Guided flow is deterministic
-- AI operations called with correct payload
-- Story saved correctly and linked to experience
-- Achievements preview logic works
+- List page:
+  - Displays all stories; actions work (navigation, delete).
+
+- Builder pages:
+  - Correctly load story for edit mode.
+  - Save updates existing story; new creates and links to experience.
+  - AI calls are made with correct inputs.
 
 ### 6. ACCEPTANCE CRITERIA
 
-- Full guided STAR story builder
-- Clean UX, minimalistic
-- Story is persisted
-- Achievements generated optionally
+- A user can create **multiple** stories for one experience.
+- All stories are visible and manageable from the per-experience story library page.
+- Builder supports both create and edit with the same component.
 
 ---
 
-# ✅ MASTER PROMPT 5 — Implement `<StarStoryComponent/>`
+# ✅ UPDATED MASTER PROMPT 5 — `<StarStoryComponent/>` (Unchanged Logic, Multi-Use)
 
 ### 1. CONTEXT
 
-Multiple pages need to display/edit STAR stories.
-Component Mapping lists reusable STAR components.
+Component still represents a **single story**, but it will be **used multiple times** across the story list and builder pages.
 
-### 2. COMPONENT FEATURES
+### 2. COMPONENT REQUIREMENTS
 
-- Props: `story`, `readonly`
-- Editable fields: situation/task/action/result
-- Display achievements + KPIs
-- Emits `update:modelValue`
+- Accept `modelValue: StarStory` and `readonly` props.
+- Emit `update:modelValue` for field changes.
+- Display achievements/KPIs if present.
 
-### 3. IMPLEMENTATION
+### 3. IMPLEMENTATION INSTRUCTIONS
 
-- Use `<UCard>` for each STAR section
-- Achievements & KPIs under collapsible panel `<UAccordion>`
-- Minimal design for MVP
+- Use `<UCard>` for layout, splitting S/T/A/R sections.
+- Achievements & KPIs in `<UAccordion>` or `<UCallout>`.
+- Do **not** store or assume anything about other stories; it only knows about one.
 
-### 4. TESTS
+### 4. TESTING & ACCEPTANCE CRITERIA
 
-- All fields render
-- Edit mode works
-- Read-only mode works
-
-### 5. ACCEPTANCE CRITERIA
-
-- Component reusable in multiple pages
-- No business logic inside
+Same as before; just ensure it’s cleanly reusable wherever a single story is displayed or edited.
 
 ---
 
-# ✅ MASTER PROMPT 6 — Achievements & KPI Integration Component
+# ✅ UPDATED MASTER PROMPT 6 — Achievements & KPI Panel (Multi-Story-aware)
 
 ### 1. CONTEXT
 
-Achievements/KPIs appear in multiple places:
+Achievements and KPIs are attached **per story**, but the same component can be used:
 
-- Experience Editor
-- STAR Builder
-- CV Builder (later EPIC 3)
-  They must follow the CDM.
+- In the Star Story Builder
+- In the Experience Editor (once a story is selected)
 
 ### 2. COMPONENT
 
-`<AchievementsPanel/>`
-Shows:
+`<AchievementsPanel/>`:
 
-- Achievements list
-- KPI suggestions list
-- “Edit”, “Apply”, “Discard” actions
+- Props:
+  - `achievements: string[]`
+  - `kpiSuggestions: string[]`
+  - `readonly: boolean`
+
+- Emits:
+  - `update:achievements`
+  - `update:kpiSuggestions`
 
 ### 3. IMPLEMENTATION
 
-- Props: `achievements`, `kpis`, `mode` (“preview” | “edit”)
-- Emits:
-  - `save`
-  - `cancel`
+- Render checkable list or simple `<ULi>` items.
+- Optional “Add item” in edit mode.
+- No assumption about experiences; it lives purely at story level.
 
-### 4. TESTS
+### 4. TESTING / ACCEPTANCE CRITERIA
 
-- Lists render
-- Emits events correctly
-
-### 5. ACCEPTANCE CRITERIA
-
-- Clear, concise component supporting all EPIC 2 flows
+- Correctly reflects and updates arrays.
+- Works identically regardless of which story or page uses it.
 
 ---
 
-# ✅ MASTER PROMPT 7 — End-to-End Flow Tests
-
-(“From Experience → STAR Story → Achievements → Save”)
+# ✅ UPDATED MASTER PROMPT 7 — E2E Flow with Multiple Stories per Experience
 
 ### 1. CONTEXT
 
-EPIC 2 must be validated end-to-end for MVP.
-Project status shows no E2E tests yet.
+We need at least one E2E scenario validating “multiple stories per experience” behavior.
 
-### 2. REQUIRED E2E STEPS
+### 2. SCENARIO (Playwright or similar)
 
-Using Playwright:
+1. Login as test user.
+2. Create or open an existing Experience.
+3. From Experience List:
+   - Go to `/profile/experiences/:experienceId/stories`.
 
-1. User logs in
-2. Goes to `/profile/experiences`
-3. Opens an experience
-4. Clicks “Create STAR Story”
-5. Goes through guided inputs
-6. Generates STAR story
-7. Generates achievements/kpis
-8. Saves story
-9. Story appears in experience list with correct status
+4. Create **Story A** via `/.../stories/new`. Save.
+5. Create **Story B** for the same experience. Save.
+6. Confirm in the story list that:
+   - 2 stories are visible.
 
-### 3. MOCKING
+7. Go to Experience Editor:
+   - Use story selector to choose Story A → generate achievements/KPIs.
+   - Then choose Story B → generate different achievements/KPIs (based on mock response).
 
-- Mock AI responses with known, deterministic STAR JSON
+8. Ensure experience list shows “Stories: 2”.
 
-### 4. ACCEPTANCE CRITERIA
+### 3. ACCEPTANCE CRITERIA
 
-- Full workflow completes without errors
-- Story persists after page reload
-- Achievements visible in UI
+- One experience can have 2+ stories without conflict.
+- Story list, builder, and experience editor all work with multiple stories.
+- No part of the UI or domain layer breaks when multiple stories exist.
 
 ---
 
