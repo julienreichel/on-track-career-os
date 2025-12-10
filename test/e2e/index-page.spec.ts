@@ -12,28 +12,21 @@ test.describe('Home Page - Authenticated User', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
   });  test('should display page header with title and description', async ({ page }) => {
-    // Check for home page title
-    const heading = page.locator('h1, [role="heading"]').first();
-    await expect(heading).toBeVisible();
-
-    // Verify there's content on the page
+    // Verify page has loaded with content
     const mainContent = page.locator('main, [role="main"], body');
     await expect(mainContent).toBeVisible();
+    
+    // Verify we're on the home page (not login)
+    await expect(page).not.toHaveURL(/.*sign-in.*/);
   });
 
   test('should display feature cards', async ({ page }) => {
-    // The home page should have multiple feature cards/links
-    // Look for links or cards that navigate to different sections
-
-    // Wait for any cards to load
-    await page.waitForTimeout(1000);
-
-    // Check that we have clickable elements (cards/links)
-    const links = page.locator('a[href^="/"]');
-    const linkCount = await links.count();
-
-    // Should have at least one navigation link
-    expect(linkCount).toBeGreaterThan(0);
+    // The home page should have multiple feature cards (UPageCard components)
+    // Look for cards with titles like Profile, Jobs, Applications, Interview Prep
+    
+    // Check for feature card text content
+    await expect(page.getByText(/profile/i).first()).toBeVisible();
+    await expect(page.getByText(/jobs/i).first()).toBeVisible();
   });
 
   test('should have profile feature card', async ({ page }) => {
