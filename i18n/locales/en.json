@@ -115,7 +115,9 @@
       "addNew": "Add Experience",
       "edit": "Edit",
       "delete": "Delete",
-      "empty": "No experiences yet. Upload a CV or add one manually."
+      "empty": "No experiences yet. Upload a CV or add one manually.",
+      "viewStories": "View Stories",
+      "newStory": "New Story"
     },
     "table": {
       "title": "Title",
@@ -123,6 +125,7 @@
       "startDate": "Start Date",
       "endDate": "End Date",
       "status": "Status",
+      "stories": "Stories",
       "actions": "Actions"
     },
     "form": {

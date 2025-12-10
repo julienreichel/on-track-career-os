@@ -11,16 +11,20 @@ const UBadge = resolveComponent('UBadge');
 
 interface Props {
   experiences: Experience[];
+  storyCounts?: Record<string, number>;
   loading?: boolean;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   loading: false,
+  storyCounts: () => ({}),
 });
 
 const emit = defineEmits<{
   edit: [id: string];
   delete: [id: string];
+  viewStories: [id: string];
+  newStory: [id: string];
 }>();
 
 const columns: TableColumn<Experience>[] = [
@@ -55,10 +59,38 @@ const columns: TableColumn<Experience>[] = [
     },
   },
   {
+    id: 'stories',
+    header: t('experiences.table.stories'),
+    cell: ({ row }) => {
+      const count = props.storyCounts?.[row.original.id] ?? 0;
+      return h(UBadge, {
+        color: count > 0 ? 'primary' : 'neutral',
+        label: `${count}`,
+        size: 'xs',
+      });
+    },
+  },
+  {
     id: 'actions',
     header: t('experiences.table.actions'),
     cell: ({ row }) => {
       return h('div', { class: 'flex gap-2' }, [
+        h(UButton, {
+          icon: 'i-heroicons-document-text',
+          size: 'xs',
+          color: 'primary',
+          variant: 'ghost',
+          'aria-label': t('experiences.list.viewStories'),
+          onClick: () => emit('viewStories', row.original.id),
+        }),
+        h(UButton, {
+          icon: 'i-heroicons-plus-circle',
+          size: 'xs',
+          color: 'primary',
+          variant: 'ghost',
+          'aria-label': t('experiences.list.newStory'),
+          onClick: () => emit('newStory', row.original.id),
+        }),
         h(UButton, {
           icon: 'i-heroicons-pencil',
           size: 'xs',

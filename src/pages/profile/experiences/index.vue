@@ -3,14 +3,17 @@ import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { Experience } from '@/domain/experience/Experience';
 import ExperienceList from '@/components/ExperienceList.vue';
 
 const { t } = useI18n();
 const router = useRouter();
 const experienceRepo = new ExperienceRepository();
+const storyService = new STARStoryService();
 
 const experiences = ref<Experience[]>([]);
+const storyCounts = ref<Record<string, number>>({});
 const loading = ref(false);
 const errorMessage = ref<string | null>(null);
 const showDeleteModal = ref(false);
@@ -19,6 +22,7 @@ const experienceToDelete = ref<string | null>(null);
 // Load experiences on mount
 onMounted(async () => {
   await loadExperiences();
+  await loadStoryCounts();
 });
 
 async function loadExperiences() {
@@ -33,6 +37,19 @@ async function loadExperiences() {
     console.error('[experiences] Error loading experiences:', error);
   } finally {
     loading.value = false;
+  }
+}
+
+async function loadStoryCounts() {
+  // Load story counts for all experiences
+  for (const experience of experiences.value) {
+    try {
+      const stories = await storyService.getStoriesByExperience(experience.id);
+      storyCounts.value[experience.id] = stories.length;
+    } catch (error) {
+      console.error(`[experiences] Error loading stories for ${experience.id}:`, error);
+      storyCounts.value[experience.id] = 0;
+    }
   }
 }
 
@@ -67,6 +84,14 @@ function cancelDelete() {
   showDeleteModal.value = false;
   experienceToDelete.value = null;
 }
+
+function handleViewStories(id: string) {
+  router.push(`/profile/experiences/${id}/stories`);
+}
+
+function handleNewStory(id: string) {
+  router.push(`/profile/experiences/${id}/stories/new`);
+}
 </script>
 
 <template>
@@ -100,9 +125,12 @@ function cancelDelete() {
         <!-- Experience List -->
         <experience-list
           :experiences="experiences"
+          :story-counts="storyCounts"
           :loading="loading"
           @edit="handleEdit"
           @delete="handleDelete"
+          @view-stories="handleViewStories"
+          @new-story="handleNewStory"
         />
       </UPageBody>
     </UPage>

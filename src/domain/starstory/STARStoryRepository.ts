@@ -36,10 +36,7 @@ export class STARStoryRepository {
    * @param model - Optional Amplify model instance (for testing)
    * @param experienceRepository - Optional Experience repository instance (for testing)
    */
-  constructor(
-    model?: AmplifySTARStoryModel,
-    experienceRepository?: ExperienceRepository
-  ) {
+  constructor(model?: AmplifySTARStoryModel, experienceRepository?: ExperienceRepository) {
     if (model) {
       // Use injected model (for tests)
       this._model = model;
