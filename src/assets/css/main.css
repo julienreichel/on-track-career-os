@@ -1,13 +1,2 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
-
-/* Global form input styles - make all inputs full width by default */
-/* Target both the Nuxt UI component wrapper and native elements */
-.u-form-field input,
-.u-form-field textarea,
-.u-form-field select,
-.u-form-field .u-input,
-.u-form-field .u-textarea,
-.u-form-field .u-select {
-  @apply w-full;
-}

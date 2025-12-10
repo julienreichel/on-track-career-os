@@ -113,6 +113,7 @@ function handleCancel() {
         <UInput
           v-model="form.title"
           :placeholder="t('experiences.form.titlePlaceholder')"
+          class="w-full lg:w-1/2"
         />
       </UFormField>
 
@@ -121,6 +122,7 @@ function handleCancel() {
         <UInput
           v-model="form.companyName"
           :placeholder="t('experiences.form.companyPlaceholder')"
+          class="w-full lg:w-1/2"
         />
       </UFormField>
 
@@ -148,6 +150,7 @@ function handleCancel() {
           :placeholder="t('experiences.form.responsibilitiesPlaceholder')"
           :rows="5"
           resize="none"
+          class="w-full"
         />
       </UFormField>
 
@@ -158,6 +161,7 @@ function handleCancel() {
           :placeholder="t('experiences.form.tasksPlaceholder')"
           :rows="5"
           resize="none"
+          class="w-full"
         />
       </UFormField>
 
