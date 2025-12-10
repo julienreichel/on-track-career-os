@@ -11,9 +11,14 @@ interface BreadcrumbMapping {
 }
 
 const mappingCache = ref<BreadcrumbMapping>({});
-const experienceService = new ExperienceService();
+let experienceService: ExperienceService | null = null;
 
 export function useBreadcrumbMapping() {
+  // Lazy initialize service to avoid issues in test environment
+  if (!experienceService) {
+    experienceService = new ExperienceService();
+  }
+
   /**
    * Get display name for an experience ID
    */
@@ -25,7 +30,7 @@ export function useBreadcrumbMapping() {
 
     // Fetch from API
     try {
-      const experience = await experienceService.getFullExperience(experienceId);
+      const experience = await experienceService!.getFullExperience(experienceId);
       const name = experience?.companyName || experience?.title;
       if (name) {
         mappingCache.value[experienceId] = name;
