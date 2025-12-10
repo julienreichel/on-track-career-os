@@ -33,6 +33,25 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
 
+  // Configure projects for auth setup and tests
+  projects: [
+    // Setup project - runs authentication before tests
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+    // Test projects that depend on setup
+    {
+      name: 'chromium',
+      use: {
+        ...{ baseURL: process.env.BASE_URL || 'http://localhost:3000' },
+        // Use saved auth state
+        storageState: 'test-results/.auth/user.json',
+      },
+      dependencies: ['setup'],
+    },
+  ],
+
   // Run your local dev server before starting the tests
   webServer: {
     command: 'npm run dev',
