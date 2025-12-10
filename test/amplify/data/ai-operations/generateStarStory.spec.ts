@@ -105,7 +105,7 @@ Outcome achieved from the experience`;
       const parsed = JSON.parse(result);
       expect(Array.isArray(parsed)).toBe(true);
       expect(parsed.length).toBeGreaterThan(0);
-      
+
       const story = parsed[0];
       expect(story.situation).toContain('TechCorp');
       expect(story.task).toContain('deployment efficiency');
@@ -308,10 +308,10 @@ Second project results`;
       const parsed = JSON.parse(result);
       expect(Array.isArray(parsed)).toBe(true);
       expect(parsed.length).toBe(2);
-      
+
       expect(parsed[0].situation).toBe('First project context');
       expect(parsed[0].task).toBe('First project task');
-      
+
       expect(parsed[1].situation).toBe('Second project context');
       expect(parsed[1].task).toBe('Second project task');
     });

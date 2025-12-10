@@ -297,6 +297,7 @@ Remember to use the format with ## headers for each section, and create separate
 ```
 
 **Implementation Details**:
+
 - AI returns **text** with markdown-style headers (`## situation:`, `## task:`, etc.)
 - Lambda function parses the text and extracts structured JSON
 - Returns an **array** of STAR stories (one or more)

@@ -55,10 +55,10 @@ export interface GenerateStarStoryInput {
  * Extract text between markers
  */
 function extractSection(text: string, startMarker: string, endMarker?: string): string {
-  const regex = endMarker 
+  const regex = endMarker
     ? new RegExp(`${startMarker}\\s*(.*?)${endMarker}`, 'is')
     : new RegExp(`${startMarker}\\s*(.*?)(?:##|$)`, 'is');
-  
+
   const match = text.match(regex);
   return match?.[1]?.trim() || '';
 }
@@ -68,10 +68,10 @@ function extractSection(text: string, startMarker: string, endMarker?: string): 
  */
 function parseStarStoriesFromText(aiText: string): GenerateStarStoryOutput[] {
   const stories: GenerateStarStoryOutput[] = [];
-  
+
   // Split by ## situation: to find individual stories
-  const storyBlocks = aiText.split(/##\s*situation:/i).filter(block => block.trim());
-  
+  const storyBlocks = aiText.split(/##\s*situation:/i).filter((block) => block.trim());
+
   for (const block of storyBlocks) {
     const story: GenerateStarStoryOutput = {
       situation: extractSection(block, '^', '##\\s*task:') || 'No situation provided',
@@ -79,18 +79,19 @@ function parseStarStoriesFromText(aiText: string): GenerateStarStoryOutput[] {
       action: extractSection(block, '##\\s*action:', '##\\s*result:') || 'No action provided',
       result: extractSection(block, '##\\s*result:') || 'No result provided',
     };
-    
+
     // Only add stories that have at least some content (not all fallbacks)
-    const hasContent = story.situation !== 'No situation provided' || 
-                      story.task !== 'No task provided' || 
-                      story.action !== 'No action provided' || 
-                      story.result !== 'No result provided';
-    
+    const hasContent =
+      story.situation !== 'No situation provided' ||
+      story.task !== 'No task provided' ||
+      story.action !== 'No action provided' ||
+      story.result !== 'No result provided';
+
     if (hasContent) {
       stories.push(story);
     }
   }
-  
+
   // Fallback: if no stories found, return single placeholder story
   if (stories.length === 0) {
     stories.push({
@@ -100,7 +101,7 @@ function parseStarStoriesFromText(aiText: string): GenerateStarStoryOutput[] {
       result: 'Unable to extract result from text',
     });
   }
-  
+
   return stories;
 }
 
@@ -132,13 +133,13 @@ export const handler = async (event: { arguments: GenerateStarStoryInput }): Pro
     event,
     async (args) => {
       const userPrompt = buildUserPrompt(args.sourceText);
-      
+
       // Get text response from AI
       const aiText = await invokeAiForText(SYSTEM_PROMPT, userPrompt);
-      
+
       // Parse text into structured stories
       const stories = parseStarStoriesFromText(aiText);
-      
+
       // Return array directly (withAiOperationHandler will stringify it)
       return stories;
     },
