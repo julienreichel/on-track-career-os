@@ -6,7 +6,8 @@ import type { STARStory } from '@/domain/starstory/STARStory';
 describe('StoryCard.vue', () => {
   const mockStory: STARStory = {
     id: 'story-1',
-    situation: 'This is a long situation text that should be truncated when displayed in the card preview because it exceeds the maximum length of 150 characters that we allow for the preview text in the story card component',
+    situation:
+      'This is a long situation text that should be truncated when displayed in the card preview because it exceeds the maximum length of 150 characters that we allow for the preview text in the story card component',
     task: 'Test task',
     action: 'Test action',
     result: 'Test result',

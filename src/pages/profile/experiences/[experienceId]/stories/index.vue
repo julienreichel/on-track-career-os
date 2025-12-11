@@ -223,12 +223,7 @@ onMounted(async () => {
         </UEmpty>
 
         <!-- Story List Component -->
-        <StoryList
-          v-else
-          :stories="stories"
-          :loading="loading"
-          @story-click="handleStoryClick"
-        />
+        <StoryList v-else :stories="stories" :loading="loading" @story-click="handleStoryClick" />
       </UPageBody>
     </UPage>
   </UContainer>

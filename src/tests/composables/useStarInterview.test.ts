@@ -166,9 +166,7 @@ describe('useStarInterview', () => {
     });
 
     it('should handle generation errors', async () => {
-      vi.mocked(STARStoryService.prototype.generateStar).mockRejectedValue(
-        new Error('AI Error')
-      );
+      vi.mocked(STARStoryService.prototype.generateStar).mockRejectedValue(new Error('AI Error'));
 
       const { initialize, submitAnswer, nextStep, generateStory, error } = useStarInterview();
 
