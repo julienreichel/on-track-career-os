@@ -4,12 +4,11 @@ import { useI18n } from 'vue-i18n';
 
 const props = defineProps<{
   open: boolean;
-  isCreating?: boolean;
 }>();
 
 const emit = defineEmits<{
   'update:open': [value: boolean];
-  leave: [];
+  discard: [];
 }>();
 
 const { t } = useI18n();
@@ -19,28 +18,24 @@ const isOpen = computed({
   set: (value: boolean) => emit('update:open', value),
 });
 
-const handleStay = () => {
+const handleGoBack = () => {
   emit('update:open', false);
 };
 
-const handleLeave = () => {
-  emit('leave');
+const handleDiscard = () => {
+  emit('discard');
 };
 </script>
 
 <template>
   <UModal
     v-model:open="isOpen"
-    :title="isCreating ? t('storyEditor.cancelCreation') : t('storyEditor.unsavedChanges')"
-    :description="
-      isCreating
-        ? t('storyEditor.cancelCreationDescription')
-        : t('storyEditor.unsavedChangesDescription')
-    "
+    :title="t('storyEditor.unsavedChanges')"
+    :description="t('storyEditor.unsavedChangesDescription')"
   >
     <template #footer>
-      <UButton :label="t('common.stay')" variant="ghost" @click="handleStay" />
-      <UButton :label="t('common.leave')" color="red" @click="handleLeave" />
+      <UButton :label="t('common.goBack')" variant="ghost" @click="handleGoBack" />
+      <UButton :label="t('common.discard')" color="red" @click="handleDiscard" />
     </template>
   </UModal>
 </template>

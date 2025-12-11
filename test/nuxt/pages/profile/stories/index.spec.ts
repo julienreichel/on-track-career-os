@@ -16,29 +16,35 @@ vi.mock('#app', () => ({
   definePageMeta: vi.fn(),
 }));
 
-// Mock story engine
-const mockLoadAllStoriesForUser = vi.fn();
+// Mock story list composable
+const mockLoadAll = vi.fn();
+const mockSearch = vi.fn((_query: string) => []);
 const mockStories = vi.fn(() => []);
 const mockLoading = vi.fn(() => false);
 const mockError = vi.fn(() => null);
 
-vi.mock('@/application/starstory/useStoryEngine', () => ({
-  useStoryEngine: vi.fn(() => ({
+vi.mock('@/composables/useStoryList', () => ({
+  useStoryList: vi.fn(() => ({
     stories: { value: mockStories() },
     loading: { value: mockLoading() },
     error: { value: mockError() },
-    loadAllStoriesForUser: mockLoadAllStoriesForUser,
+    loadAll: mockLoadAll,
+    search: mockSearch,
   })),
 }));
 
 // Mock experience composable
 const mockExperienceLoad = vi.fn();
+const mockLoadAllExperiences = vi.fn();
 const mockExperienceItem = vi.fn(() => null);
+const mockAllExperiences = vi.fn(() => []);
 
 vi.mock('@/application/experience/useExperience', () => ({
   useExperience: vi.fn(() => ({
     item: { value: mockExperienceItem() },
+    allExperiences: { value: mockAllExperiences() },
     load: mockExperienceLoad,
+    loadAllExperiences: mockLoadAllExperiences,
     loading: { value: false },
     error: { value: null },
   })),
@@ -78,6 +84,12 @@ const i18n = createI18n({
       common: {
         error: 'Error',
         backToProfile: 'Back to Profile',
+        search: 'Search',
+      },
+      storyList: {
+        emptyTitle: 'No stories yet',
+        emptyDescription: 'Create your first story',
+        createFirst: 'Create First Story',
       },
     },
   },
@@ -136,10 +148,10 @@ describe('Profile Stories Page', () => {
     expect(pageHeader.exists()).toBe(true);
   });
 
-  it('should call loadAllStoriesForUser on mount', async () => {
+  it('should call loadAll on mount', async () => {
     createWrapper();
     await vi.waitFor(() => {
-      expect(mockLoadAllStoriesForUser).toHaveBeenCalled();
+      expect(mockLoadAll).toHaveBeenCalled();
     });
   });
 
@@ -147,7 +159,8 @@ describe('Profile Stories Page', () => {
     mockLoading.mockReturnValue(true);
     const wrapper = createWrapper();
 
-    expect(wrapper.find('.animate-spin').exists()).toBe(true);
+    // Loading state is passed to StoryList component, not displayed directly in page
+    expect(wrapper.vm.loading.value).toBe(true);
   });
 
   it('should display error state', async () => {
@@ -211,7 +224,7 @@ describe('Profile Stories Page', () => {
     expect(wrapper.vm.stories.value[0].id).toBe('story-1');
   });
 
-  it('should display achievements badge when story has achievements', async () => {
+  it('should pass stories to StoryList component', async () => {
     const mockStoriesData: STARStory[] = [
       {
         id: 'story-1',
@@ -236,12 +249,12 @@ describe('Profile Stories Page', () => {
 
     await wrapper.vm.$nextTick();
 
-    // Check that the story is processed correctly
-    const storyData = wrapper.vm.enrichedStories;
-    expect(storyData[0].hasAchievements).toBe(true);
+    // Check that stories are available in the component
+    expect(wrapper.vm.stories.value).toHaveLength(1);
+    expect(wrapper.vm.stories.value[0].achievements).toHaveLength(2);
   });
 
-  it('should display KPIs badge when story has KPI suggestions', async () => {
+  it('should pass KPI suggestions to StoryList component', async () => {
     const mockStoriesData: STARStory[] = [
       {
         id: 'story-1',
@@ -266,11 +279,10 @@ describe('Profile Stories Page', () => {
 
     await wrapper.vm.$nextTick();
 
-    const storyData = wrapper.vm.enrichedStories;
-    expect(storyData[0].hasKpis).toBe(true);
+    expect(wrapper.vm.stories.value[0].kpiSuggestions).toHaveLength(2);
   });
 
-  it('should display draft badge when story has no achievements or KPIs', async () => {
+  it('should handle stories with no achievements or KPIs', async () => {
     const mockStoriesData: STARStory[] = [
       {
         id: 'story-1',
@@ -295,78 +307,48 @@ describe('Profile Stories Page', () => {
 
     await wrapper.vm.$nextTick();
 
-    const storyData = wrapper.vm.enrichedStories;
-    expect(storyData[0].hasAchievements).toBe(false);
-    expect(storyData[0].hasKpis).toBe(false);
+    expect(wrapper.vm.stories.value[0].achievements).toHaveLength(0);
+    expect(wrapper.vm.stories.value[0].kpiSuggestions).toHaveLength(0);
   });
 
-  it('should show experience name from mapping', async () => {
-    const mockStoriesData: STARStory[] = [
+  it('should build experience names map', async () => {
+    const mockExperiencesData: Experience[] = [
       {
-        id: 'story-1',
-        situation: 'Test',
-        task: 'Test',
-        action: 'Test',
-        result: 'Test',
-        achievements: [],
-        kpiSuggestions: [],
-        experienceId: 'exp-1',
-        owner: 'user-1',
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01',
-      },
+        id: 'exp-1',
+        companyName: 'Acme Corp',
+        title: 'Software Engineer',
+      } as Experience,
     ];
 
-    mockStories.mockReturnValue(mockStoriesData);
+    mockAllExperiences.mockReturnValue(mockExperiencesData);
+    mockStories.mockReturnValue([]);
     mockLoading.mockReturnValue(false);
     mockError.mockReturnValue(null);
-
-    mockExperienceItem.mockReturnValue({
-      id: 'exp-1',
-      companyName: 'Acme Corp',
-      title: 'Software Engineer',
-    } as Experience);
 
     const wrapper = createWrapper();
 
     await vi.waitFor(() => {
-      expect(mockExperienceLoad).toHaveBeenCalled();
+      expect(mockLoadAllExperiences).toHaveBeenCalled();
     });
 
     await wrapper.vm.$nextTick();
 
-    const storyData = wrapper.vm.enrichedStories;
-    expect(storyData[0].experienceName).toBe('Acme Corp');
+    // Check that experienceNames computed property is correctly populated
+    expect(wrapper.vm.experienceNames).toHaveProperty('exp-1');
+    expect(wrapper.vm.experienceNames['exp-1']).toBe('Acme Corp');
   });
 
-  it('should truncate long preview text', () => {
-    const longText = 'a'.repeat(150);
-    const mockStoriesData: STARStory[] = [
-      {
-        id: 'story-1',
-        situation: 'Short',
-        task: 'Short',
-        action: 'Short',
-        result: longText,
-        achievements: [],
-        kpiSuggestions: [],
-        experienceId: 'exp-1',
-        owner: 'user-1',
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01',
-      },
-    ];
-
-    mockStories.mockReturnValue(mockStoriesData);
+  it('should call loadAllExperiences on mount', async () => {
+    mockStories.mockReturnValue([]);
     mockLoading.mockReturnValue(false);
     mockError.mockReturnValue(null);
+    mockAllExperiences.mockReturnValue([]);
 
-    const wrapper = createWrapper();
+    createWrapper();
 
-    // Check preview truncation logic
-    const preview = wrapper.vm.getPreview(mockStoriesData[0]);
-    expect(preview).toHaveLength(83); // 80 chars + '...'
-    expect(preview).toContain('...');
+    await vi.waitFor(() => {
+      expect(mockLoadAllExperiences).toHaveBeenCalled();
+    });
   });
 
   it('should have back to profile link in header', () => {

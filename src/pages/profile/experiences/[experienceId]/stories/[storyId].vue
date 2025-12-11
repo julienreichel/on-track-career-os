@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { useStoryEditor } from '@/composables/useStoryEditor';
+import { useStoryEditor, type StoryFormState } from '@/composables/useStoryEditor';
 import { useStarInterview } from '@/composables/useStarInterview';
 import { useStoryEnhancer } from '@/composables/useStoryEnhancer';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
@@ -133,8 +133,12 @@ const handleGenerateAchievements = async () => {
     updateField('kpiSuggestions', kpiSuggestions.value);
   }
 }; // Handle story form updates
-const handleStoryUpdate = (field: keyof STARStory, value: unknown) => {
-  updateField(field, value);
+const handleStoryUpdate = (updatedFormState: StoryFormState) => {
+  // Update all fields from the form
+  Object.keys(updatedFormState).forEach((key) => {
+    const field = key as keyof StoryFormState;
+    updateField(field, updatedFormState[field]);
+  });
 };
 
 // Handle achievements update from component
@@ -333,14 +337,22 @@ onMounted(async () => {
         <!-- Story Form (for manual mode or editing or after interview) -->
         <div v-else-if="(selectedMode === 'manual' || !isNew) && formState" class="space-y-6">
           <UCard>
-            <StoryForm
-              :model-value="formState"
-              @update:situation="(val) => handleStoryUpdate('situation', val)"
-              @update:task="(val) => handleStoryUpdate('task', val)"
-              @update:action="(val) => handleStoryUpdate('action', val)"
-              @update:result="(val) => handleStoryUpdate('result', val)"
-            />
+            <StoryForm :model-value="formState" @update:model-value="handleStoryUpdate" />
           </UCard>
+
+          <!-- Generate Achievements Button (manual mode only) -->
+          <div
+            v-if="selectedMode === 'manual' && !showAchievementsPanel"
+            class="flex justify-center"
+          >
+            <UButton
+              :label="t('stories.builder.generateAchievements')"
+              icon="i-heroicons-sparkles"
+              :disabled="!canSave || enhancerGenerating"
+              :loading="enhancerGenerating"
+              @click="handleGenerateAchievements"
+            />
+          </div>
 
           <!-- Achievements & KPIs Panel -->
           <UCard v-if="showAchievementsPanel || !isNew">
@@ -379,10 +391,6 @@ onMounted(async () => {
     </UPage>
 
     <!-- Unsaved Changes Modal -->
-    <UnsavedChangesModal
-      v-model:open="showCancelConfirm"
-      :is-creating="isNew"
-      @leave="handleConfirmCancel"
-    />
+    <UnsavedChangesModal v-model:open="showCancelConfirm" @discard="handleConfirmCancel" />
   </UContainer>
 </template>

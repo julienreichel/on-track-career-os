@@ -25,11 +25,7 @@ const updateField = (field: keyof StoryFormState, value: string) => {
 <template>
   <div class="space-y-6">
     <!-- Situation -->
-    <UFormField
-      :label="t('star.situation.label')"
-      :hint="t('star.situation.description')"
-      required
-    >
+    <UFormField :label="t('star.situation.label')" :hint="t('star.situation.description')" required>
       <UTextarea
         :model-value="modelValue.situation"
         :placeholder="t('star.situation.placeholder')"
@@ -55,11 +51,7 @@ const updateField = (field: keyof StoryFormState, value: string) => {
     </UFormField>
 
     <!-- Action -->
-    <UFormField
-      :label="t('star.action.label')"
-      :hint="t('star.action.description')"
-      required
-    >
+    <UFormField :label="t('star.action.label')" :hint="t('star.action.description')" required>
       <UTextarea
         :model-value="modelValue.action"
         :placeholder="t('star.action.placeholder')"
@@ -72,11 +64,7 @@ const updateField = (field: keyof StoryFormState, value: string) => {
     </UFormField>
 
     <!-- Result -->
-    <UFormField
-      :label="t('star.result.label')"
-      :hint="t('star.result.description')"
-      required
-    >
+    <UFormField :label="t('star.result.label')" :hint="t('star.result.description')" required>
       <UTextarea
         :model-value="modelValue.result"
         :placeholder="t('star.result.placeholder')"

@@ -397,10 +397,8 @@
     "generateEnhancements": "Generate Achievements & KPIs",
     "achievementsAndKpis": "Achievements & KPIs",
     "generateAchievements": "Generate Achievements",
-    "unsavedChanges": "Unsaved Changes",
-    "unsavedChangesDescription": "You have unsaved changes. Are you sure you want to leave?",
-    "cancelCreation": "Cancel Story Creation?",
-    "cancelCreationDescription": "Are you sure you want to cancel? Your progress will be lost.",
+    "unsavedChanges": "You have unsaved changes",
+    "unsavedChangesDescription": "Are you sure you want to discard your changes?",
     "errors": {
       "loadFailed": "Failed to load story",
       "saveFailed": "Failed to save story",
@@ -425,6 +423,8 @@
     "yes": "Yes",
     "no": "No",
     "stay": "Stay",
-    "leave": "Leave"
+    "leave": "Leave",
+    "discard": "Discard",
+    "goBack": "Go back"
   }
 }
