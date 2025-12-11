@@ -49,10 +49,7 @@ const {
   updateField,
 } = useStoryEditor();
 
-const {
-  generating: interviewGenerating,
-  error: interviewError,
-} = useStarInterview();
+const { generating: interviewGenerating, error: interviewError } = useStarInterview();
 
 const {
   achievements,
@@ -68,6 +65,7 @@ const showModeSelection = ref(true);
 const selectedMode = ref<'interview' | 'manual' | null>(null);
 const showAchievementsPanel = ref(false);
 const freeTextInput = ref('');
+const showCancelConfirm = ref(false);
 
 // Computed states
 const loading = computed(() => editorLoading.value || interviewGenerating.value);
@@ -111,8 +109,6 @@ const handleSubmitFreeText = async () => {
     console.error('[StoryForm] Free text generation error:', err);
   }
 };
-
-
 
 // Handle achievements generation
 const handleGenerateAchievements = async () => {
@@ -168,10 +164,15 @@ const handleSave = async () => {
 // Handle cancel
 const handleCancel = () => {
   if (isDirty.value) {
-    if (!confirm(t('stories.editor.unsavedChanges'))) {
-      return;
-    }
+    showCancelConfirm.value = true;
+    return;
   }
+  router.push(`/profile/experiences/${experienceId.value}/stories`);
+};
+
+// Handle confirm cancel
+const handleConfirmCancel = () => {
+  showCancelConfirm.value = false;
   router.push(`/profile/experiences/${experienceId.value}/stories`);
 };
 
@@ -317,11 +318,31 @@ onMounted(async () => {
             </UFormField>
 
             <div class="flex justify-end gap-3">
-              <UButton
-                :label="t('common.cancel')"
-                variant="ghost"
-                @click="handleCancel"
-              />
+              <UPopover v-model:open="showCancelConfirm" :popper="{ placement: 'top' }">
+                <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
+                <template #panel>
+                  <div class="p-4 space-y-3">
+                    <p class="text-sm font-medium">{{ t('stories.editor.cancelCreation') }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ t('stories.editor.cancelCreationDescription') }}
+                    </p>
+                    <div class="flex justify-end gap-2">
+                      <UButton
+                        :label="t('common.no')"
+                        variant="ghost"
+                        size="sm"
+                        @click="showCancelConfirm = false"
+                      />
+                      <UButton
+                        :label="t('common.yes')"
+                        color="red"
+                        size="sm"
+                        @click="handleConfirmCancel"
+                      />
+                    </div>
+                  </div>
+                </template>
+              </UPopover>
               <UButton
                 :label="t('stories.builder.generateFromText')"
                 icon="i-heroicons-sparkles"
@@ -359,7 +380,31 @@ onMounted(async () => {
 
           <!-- Action Buttons -->
           <div class="flex justify-end gap-3">
-            <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
+            <UPopover v-model:open="showCancelConfirm" :popper="{ placement: 'top' }">
+              <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
+              <template #panel>
+                <div class="p-4 space-y-3">
+                  <p class="text-sm font-medium">{{ t('stories.editor.unsavedChanges') }}</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ t('stories.editor.unsavedChangesDescription') }}
+                  </p>
+                  <div class="flex justify-end gap-2">
+                    <UButton
+                      :label="t('common.cancel')"
+                      variant="ghost"
+                      size="sm"
+                      @click="showCancelConfirm = false"
+                    />
+                    <UButton
+                      :label="t('common.confirm')"
+                      color="red"
+                      size="sm"
+                      @click="handleConfirmCancel"
+                    />
+                  </div>
+                </div>
+              </template>
+            </UPopover>
             <UButton
               :label="t('common.save')"
               icon="i-heroicons-check"
