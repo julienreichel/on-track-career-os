@@ -381,11 +381,11 @@ onMounted(async () => {
     <!-- Cancel Confirmation Modal -->
     <UModal
       v-model:open="showCancelConfirm"
-      :title="isDirty ? t('stories.editor.unsavedChanges') : t('stories.editor.cancelCreation')"
+      :title="isDirty ? t('storyEditor.unsavedChanges') : t('storyEditor.cancelCreation')"
       :description="
         isDirty
-          ? t('stories.editor.unsavedChangesDescription')
-          : t('stories.editor.cancelCreationDescription')
+          ? t('storyEditor.unsavedChangesDescription')
+          : t('storyEditor.cancelCreationDescription')
       "
     >
       <template #footer="{ close }">
