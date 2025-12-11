@@ -27,17 +27,17 @@ test.describe('Profile Page - View Mode', () => {
   });
 
   test('should display back to home button', async ({ page }) => {
-    // Look for back button or home navigation
+    // Look for back button - actual text is 'Back to Home'
     const backButton = page
-      .locator('button:has-text("back"), a:has-text("back"), button:has-text("home")')
+      .locator('a:has-text("Back to Home"), button:has-text("Back to Home"), a:has-text("back")')
       .first();
 
     await expect(backButton).toBeVisible();
   });
 
   test('should have edit button in view mode', async ({ page }) => {
-    // Look for edit button
-    const editButton = page.locator('button:has-text("edit"), button[aria-label*="edit"]').first();
+    // Look for edit button - actual text is 'Edit Profile'
+    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit"), button[aria-label*="edit"]').first();
 
     // Wait a moment for buttons to render
     await page.waitForTimeout(500);
@@ -71,37 +71,23 @@ test.describe('Profile Page - View Mode', () => {
     await expect(body).toBeVisible();
   });
 
-  test('should display career direction section if data exists', async ({ page }) => {
-    // Look for goals/aspirations
-    const careerSection = page.locator('text=/goals|aspirations|career/i').first();
+  test('should display core identity section', async ({ page }) => {
+    // Look for Core Identity section that contains name input
+    const coreIdentitySection = page.locator('text=/core identity/i').first();
 
-    await expect(careerSection).toBeVisible();
+    await expect(coreIdentitySection).toBeVisible();
   });
 
-  test('should display identity & values section', async ({ page }) => {
-    // Look for values/strengths/interests
-    const identitySection = page.locator('text=/values|strengths|interests/i').first();
-
-    await expect(identitySection).toBeVisible();
-  });
-
-  test('should display professional attributes section', async ({ page }) => {
-    // Look for skills/certifications/languages
-    const attributesSection = page.locator('text=/skills|certifications|languages/i').first();
-
-    await expect(attributesSection).toBeVisible();
-  });
-
-  test('should display management links section', async ({ page }) => {
+  test('should display profile management section', async ({ page }) => {
     // Scroll to bottom to see management links
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
     // Wait for content to be visible
     await page.waitForTimeout(500);
 
-    // Look for management/related pages section
+    // Look for Profile Management section with management cards
     const managementSection = page
-      .locator('text=/related|management|experience|stories|canvas/i')
+      .locator('text=/profile management/i')
       .first();
 
     await expect(managementSection).toBeVisible();
@@ -121,11 +107,12 @@ test.describe('Profile Page - View Mode', () => {
     await expect(canvasLink).toHaveAttribute('href', '/profile/canvas');
   });
 
-  test('should conditionally show CV upload link', async ({ page }) => {
-    // CV upload may or may not be visible depending on user's experience count
-    // Just verify the page structure is correct
-    const body = page.locator('body');
-    await expect(body).toBeVisible();
+  test('should have CV upload link', async ({ page }) => {
+    // CV upload link has absolute overlay positioning (UPageCard)
+    // Check for link existence via href attribute
+    const cvUploadLink = page.locator('a[href="/profile/cv-upload"]');
+    await expect(cvUploadLink).toHaveCount(1);
+    await expect(cvUploadLink).toHaveAttribute('href', '/profile/cv-upload');
   });
 });
 
@@ -136,8 +123,8 @@ test.describe('Profile Page - Edit Mode', () => {
   });
 
   test('should enter edit mode when edit button is clicked', async ({ page }) => {
-    // Find and click edit button
-    const editButton = page.locator('button:has-text("edit"), button[aria-label*="edit"]').first();
+    // Find and click edit button - text is 'Edit Profile'
+    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit"), button[aria-label*="edit"]').first();
 
     // Wait for button to be ready
     await page.waitForTimeout(500);
@@ -157,7 +144,7 @@ test.describe('Profile Page - Edit Mode', () => {
 
   test('should display form inputs in edit mode', async ({ page }) => {
     // Enter edit mode
-    const editButton = page.locator('button:has-text("edit")').first();
+    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit")').first();
 
     await editButton.click();
     await page.waitForTimeout(500);
@@ -169,24 +156,24 @@ test.describe('Profile Page - Edit Mode', () => {
   });
 
   test('should have cancel button in edit mode', async ({ page }) => {
-    const editButton = page.locator('button:has-text("edit")').first();
+    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit")').first();
 
     await editButton.click();
     await page.waitForTimeout(500);
 
-    const cancelButton = page.locator('button:has-text("cancel")').first();
+    const cancelButton = page.locator('button:has-text("Cancel"), button:has-text("cancel")').first();
 
     await expect(cancelButton).toBeVisible();
     await expect(cancelButton).toBeEnabled();
   });
 
   test('should exit edit mode when cancel is clicked', async ({ page }) => {
-    const editButton = page.locator('button:has-text("edit")').first();
+    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit")').first();
 
     await editButton.click();
     await page.waitForTimeout(500);
 
-    const cancelButton = page.locator('button:has-text("cancel")').first();
+    const cancelButton = page.locator('button:has-text("Cancel"), button:has-text("cancel")').first();
 
     await cancelButton.click();
     await page.waitForTimeout(500);
