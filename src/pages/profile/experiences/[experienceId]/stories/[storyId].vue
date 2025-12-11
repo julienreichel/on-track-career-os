@@ -383,20 +383,6 @@ onMounted(async () => {
 
           <!-- Achievements & KPIs Panel -->
           <UCard v-if="showAchievementsPanel || !isNew">
-            <div class="mb-4 flex justify-between items-center">
-              <h3 class="text-lg font-semibold">
-                {{ t('stories.editor.achievementsAndKpis') }}
-              </h3>
-              <UButton
-                v-if="!enhancerGenerating"
-                :label="t('stories.editor.generateAchievements')"
-                icon="i-heroicons-sparkles"
-                variant="soft"
-                size="sm"
-                @click="handleGenerateAchievements"
-              />
-            </div>
-
             <AchievementsKpisPanel
               :achievements="achievements"
               :kpis="kpiSuggestions"
