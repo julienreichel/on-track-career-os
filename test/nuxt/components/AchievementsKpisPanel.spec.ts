@@ -83,7 +83,6 @@ describe('AchievementsKpisPanel', () => {
       },
     });
 
-    const tagInputs = wrapper.findAll('.tag-input');
     await wrapper.vm.$emit('update:achievements', ['Achievement 1', 'Achievement 2']);
 
     expect(wrapper.emitted('update:achievements')).toBeTruthy();
@@ -104,7 +103,6 @@ describe('AchievementsKpisPanel', () => {
       },
     });
 
-    const tagInputs = wrapper.findAll('.tag-input');
     await wrapper.vm.$emit('update:kpis', ['KPI 1', 'KPI 2']);
 
     expect(wrapper.emitted('update:kpis')).toBeTruthy();
