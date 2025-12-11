@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 /**
  * E2E Tests for Story Management (EPIC 2)
@@ -10,22 +10,139 @@ import { test, expect } from '@playwright/test';
  * - Manual story creation (interview flow)
  */
 
+/**
+ * Helper: Create a minimal experience (only required fields)
+ */
+async function createMinimalExperience(page: Page, title: string): Promise<string | null> {
+  await page.goto('/profile/experiences/new');
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(1000);
+
+  // Fill required fields only
+  await page.locator('input[placeholder*="Senior Software Engineer"]').fill(title);
+  await page.locator('input[type="date"]').first().fill('2024-01-01');
+
+  // Scroll to bottom to see Save button
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(300);
+
+  // Save the experience
+  await page.locator('button[type="submit"]:has-text("Save Experience")').click();
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(2000);
+
+  // Navigate to experiences list to get the experience
+  await page.goto('/profile/experiences');
+  await page.waitForLoadState('networkidle');
+  const firstExperienceLink = page.locator('button[aria-label*="stories" i]').first();
+  await firstExperienceLink.click();
+  await page.waitForLoadState('networkidle');
+
+  // Extract experience ID from URL
+  const url = page.url();
+  const match = url.match(/\/experiences\/([a-f0-9-]+)/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Helper: Create a full experience with responsibilities and tasks (for AI story generation)
+ */
+async function createFullExperience(page: Page, title: string): Promise<string | null> {
+  await page.goto('/profile/experiences/new');
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(1000);
+
+  // Fill required fields
+  await page.locator('input[placeholder*="Senior Software Engineer"]').fill(title);
+  await page.locator('input[type="date"]').first().fill('2024-01-01');
+
+  // Fill responsibilities (needed for AI story generation)
+  await page
+    .locator('textarea[placeholder*="responsibility"]')
+    .fill(
+      'Led development team of 5 engineers\nArchitected cloud migration strategy\nImplemented CI/CD pipelines'
+    );
+
+  // Fill tasks & achievements (needed for AI story generation)
+  await page
+    .locator('textarea[placeholder*="task"]')
+    .fill(
+      'Migrated legacy system to microservices reducing costs by 40%\nImplemented automated testing increasing coverage to 85%\nReduced deployment time from 2 hours to 15 minutes'
+    );
+
+  // Scroll to bottom to see Save button
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(300);
+
+  // Save the experience
+  await page.locator('button[type="submit"]:has-text("Save Experience")').click();
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(2000);
+
+  // Navigate to experiences list to get the experience
+  await page.goto('/profile/experiences');
+  await page.waitForLoadState('networkidle');
+  const firstExperienceLink = page.locator('button[aria-label*="stories" i]').first();
+  await firstExperienceLink.click();
+  await page.waitForLoadState('networkidle');
+
+  // Extract experience ID from URL
+  const url = page.url();
+  const match = url.match(/\/experiences\/([a-f0-9-]+)/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Helper: Create a manual story for an experience
+ * Returns true if story was created successfully, false otherwise
+ */
+async function createManualStory(
+  page: Page,
+  experienceId: string,
+  content: string
+): Promise<boolean> {
+  try {
+    await page.goto(`/profile/experiences/${experienceId}/stories/new`);
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(1000);
+
+    // Check if we're on a valid page (not 404)
+    const has404 = (await page.locator('text=/404|not found/i').count()) > 0;
+    if (has404) {
+      console.warn('Story creation page not found (404) - feature not yet implemented');
+      return false;
+    }
+
+    // Check if textarea exists
+    const textareaCount = await page.locator('textarea').count();
+    if (textareaCount === 0) {
+      console.warn('No textarea found on story creation page - form may not be ready');
+      return false;
+    }
+
+    // Fill story content (first textarea)
+    const textarea = page.locator('textarea').first();
+    await textarea.fill(content);
+
+    // Scroll to bottom to see Save button
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(300);
+
+    // Save the story
+    await page.locator('button[type="submit"]:has-text("Save")').first().click();
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
+
+    return true;
+  } catch (error) {
+    console.warn('Failed to create story:', error);
+    return false;
+  }
+}
+
 test.describe('Story Management', () => {
-  test.describe.configure({ retries: 2 });
-
-  test.describe('Global Story Listing', () => {
+  test.describe('Global Story Listing (without stories)', () => {
     test.beforeEach(async ({ page }) => {
-      // CRITICAL: Wait for auth state to be fully restored
-      await page.goto('/profile');
-      await page.waitForLoadState('networkidle');
-
-      // Verify we're not redirected to login
-      const currentUrl = page.url();
-      if (currentUrl.includes('/login')) {
-        throw new Error('Auth state not restored - redirected to login');
-      }
-
-      // Now navigate to the stories page
       await page.goto('/profile/stories');
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1000);
@@ -72,192 +189,85 @@ test.describe('Story Management', () => {
       // Empty state should be visible
       await expect(emptyState).toBeVisible();
     });
-
-    test('should display story cards if stories exist', async ({ page }) => {
-      // Wait for any data to load
-      await page.waitForTimeout(1000);
-
-      // Check for story cards
-      const hasCards = (await page.locator('[class*="card"], [role="article"]').count()) > 0;
-      const hasEmpty = (await page.locator('text=/no stories|get started/i').count()) > 0;
-
-      // Should have either cards OR empty state
-      expect(hasCards || hasEmpty).toBe(true);
-    });
-
-    test('should display company names for stories', async ({ page }) => {
-      await page.waitForTimeout(1500);
-
-      // Check if there are any story cards
-      const storyCards = page.locator('[class*="card"]').first();
-      const count = await storyCards.count();
-
-      if (count > 0) {
-        // Story cards should show company/experience context
-        const hasCompany = (await page.locator('text=/company|experience/i').first().count()) > 0;
-
-        // If stories exist, should have some context (optional check)
-        expect(typeof hasCompany).toBe('boolean');
-      }
-    });
-
-    test('should have View and Edit actions on story cards', async ({ page }) => {
-      await page.waitForTimeout(1500);
-
-      // Check for story cards
-      const storyCards = page.locator('[class*="card"]');
-      const count = await storyCards.count();
-
-      if (count > 0) {
-        // Look for action buttons
-        const hasViewButton =
-          (await page.locator('button:has-text("View"), [aria-label*="view" i]').count()) > 0;
-        const hasEditButton =
-          (await page.locator('button:has-text("Edit"), [aria-label*="edit" i]').count()) > 0;
-
-        // Should have some action buttons
-        expect(hasViewButton || hasEditButton).toBe(true);
-      }
-    });
-
-    test('should open modal when clicking View button', async ({ page }) => {
-      await page.waitForTimeout(1500);
-
-      // Look for View button
-      const viewButton = page.locator('button:has-text("View")').first();
-      const count = await viewButton.count();
-
-      if (count > 0) {
-        await viewButton.click();
-        await page.waitForTimeout(500);
-
-        // Should show modal/dialog
-        const hasModal = (await page.locator('[role="dialog"], [class*="modal"]').count()) > 0;
-
-        expect(hasModal).toBe(true);
-      }
-    });
-
-    test('should have delete functionality with confirmation', async ({ page }) => {
-      await page.waitForTimeout(1500);
-
-      // Look for delete button
-      const deleteButton = page
-        .locator('button:has-text("Delete"), button[aria-label*="delete" i]')
-        .first();
-      const count = await deleteButton.count();
-
-      if (count > 0) {
-        await deleteButton.click();
-        await page.waitForTimeout(500);
-
-        // Should show confirmation dialog
-        const hasConfirmation =
-          (await page.locator('text=/are you sure|confirm|cannot be undone/i').count()) > 0;
-
-        expect(hasConfirmation).toBe(true);
-      }
-    });
   });
 
   test.describe('Experience-Specific Story Listing', () => {
-    test('should display stories for specific experience', async ({ page }) => {
-      // CRITICAL: Verify auth state first
-      await page.goto('/profile');
-      await page.waitForLoadState('networkidle');
-      if (page.url().includes('/login')) {
-        throw new Error('Auth state not restored');
-      }
-
-      // First navigate to experiences
+    test.beforeEach(async ({ page }) => {
+      // Check if experience exists, create one if not
       await page.goto('/profile/experiences');
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1500);
 
-      // Check if there are any experiences
-      const experienceLinks = page.locator('a[href*="/experiences/"][href*="/stories"]');
-      const count = await experienceLinks.count();
+      const hasExperiences = (await page.locator('table tbody tr').count()) > 0;
 
-      if (count > 0) {
-        // Click first experience to see its stories
-        await experienceLinks.first().click();
-        await page.waitForLoadState('networkidle');
-
-        // Should be on experience stories page
-        await expect(page).toHaveURL(/.*\/experiences\/[^/]+\/stories/);
-
-        // Page should display stories or empty state
-        const hasContent = (await page.locator('body').count()) > 0;
-        expect(hasContent).toBe(true);
+      // Create experience if none exist
+      if (!hasExperiences) {
+        const timestamp = Date.now();
+        await createMinimalExperience(page, `E2E Test Experience ${timestamp}`);
       }
+
+      // Navigate back to experiences list
+      await page.goto('/profile/experiences');
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(1000);
+    });
+
+    test('should display stories for specific experience', async ({ page }) => {
+      // Find view stories button and click it
+      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      await viewStoriesButton.click();
+      await page.waitForLoadState('networkidle');
+
+      // Should be on experience stories page
+      await expect(page).toHaveURL(/.*\/experiences\/[^/]+\/stories/);
+
+      // Page should display stories or empty state
+      const hasContent = (await page.locator('body').count()) > 0;
+      expect(hasContent).toBe(true);
     });
 
     test('should have "New Story" button on experience stories page', async ({ page }) => {
-      await page.goto('/profile/experiences');
+      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      await viewStoriesButton.click();
       await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1500);
+      await page.waitForTimeout(500);
 
-      const experienceLinks = page.locator('a[href*="/experiences/"][href*="/stories"]');
-      const count = await experienceLinks.count();
+      // Look for new story button
+      const newButton = page
+        .locator('button:has-text("New"), a:has-text("New"), button:has-text("Add")')
+        .first();
 
-      if (count > 0) {
-        await experienceLinks.first().click();
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(500);
-
-        // Look for new story button
-        const newButton = page
-          .locator('button:has-text("New"), a:has-text("New"), button:has-text("Add")')
-          .first();
-
-        await expect(newButton).toBeVisible();
-      }
+      await expect(newButton).toBeVisible();
     });
 
     test('should have auto-generate button on experience stories page', async ({ page }) => {
-      await page.goto('/profile/experiences');
+      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      await viewStoriesButton.click();
       await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1500);
+      await page.waitForTimeout(500);
 
-      const experienceLinks = page.locator('a[href*="/experiences/"][href*="/stories"]');
-      const count = await experienceLinks.count();
+      // Look for auto-generate or AI button
+      const generateButton = page
+        .locator(
+          'button:has-text("Generate"), button:has-text("AI"), button[aria-label*="generate" i]'
+        )
+        .first();
 
-      if (count > 0) {
-        await experienceLinks.first().click();
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(500);
-
-        // Look for auto-generate or AI button
-        const generateButton = page
-          .locator(
-            'button:has-text("Generate"), button:has-text("AI"), button[aria-label*="generate" i]'
-          )
-          .first();
-
-        await expect(generateButton).toBeVisible();
-      }
+      await expect(generateButton).toBeVisible();
     });
 
     test('should not display company names for experience-specific stories', async ({ page }) => {
-      await page.goto('/profile/experiences');
+      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      await viewStoriesButton.click();
       await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1500);
+      await page.waitForTimeout(1000);
 
-      const experienceLinks = page.locator('a[href*="/experiences/"][href*="/stories"]');
-      const count = await experienceLinks.count();
+      // Check if story cards exist
+      const hasCards = (await page.locator('[class*="card"]').count()) > 0;
 
-      if (count > 0) {
-        await experienceLinks.first().click();
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(1000);
-
-        // Check if story cards exist
-        const hasCards = (await page.locator('[class*="card"]').count()) > 0;
-
-        // This is a visual check - company names should not be prominent
-        // since context is clear from the experience page
-        expect(typeof hasCards).toBe('boolean');
-      }
+      // This is a visual check - company names should not be prominent
+      // since context is clear from the experience page
+      expect(typeof hasCards).toBe('boolean');
     });
   });
 
@@ -265,42 +275,9 @@ test.describe('Story Management', () => {
     let experienceId: string | null = null;
 
     test.beforeEach(async ({ page }) => {
-      // CRITICAL: Verify auth state first
-      await page.goto('/profile');
-      await page.waitForLoadState('networkidle');
-      if (page.url().includes('/login')) {
-        throw new Error('Auth state not restored');
-      }
-
       // Create a test experience if we don't have one yet
       if (!experienceId) {
-        await page.goto('/profile/experiences/new');
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(1000);
-
-        // Fill required fields
-        const titleInput = page
-          .locator('input[name="title"], input[placeholder*="title" i]')
-          .first();
-        await titleInput.fill('E2E Test Experience for Stories');
-
-        const companyInput = page
-          .locator('input[name="company"], input[placeholder*="company" i]')
-          .first();
-        await companyInput.fill('E2E Test Company');
-
-        // Save the experience
-        const saveButton = page.locator('button:has-text("Save"), button[type="submit"]').first();
-        await saveButton.click();
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(1000);
-
-        // Extract experience ID from URL
-        const url = page.url();
-        const match = url.match(/\/experiences\/([a-f0-9-]+)/);
-        if (match) {
-          experienceId = match[1];
-        }
+        experienceId = await createMinimalExperience(page, 'E2E Test Experience for Stories');
       }
     });
 
@@ -357,13 +334,10 @@ test.describe('Story Management', () => {
 
       // Try to fill in a textarea
       const textarea = page.locator('textarea').first();
-      const count = await textarea.count();
 
-      if (count > 0) {
-        await textarea.fill('Test story content from E2E test');
-        const value = await textarea.inputValue();
-        expect(value).toBe('Test story content from E2E test');
-      }
+      await textarea.fill('Test story content from E2E test');
+      const value = await textarea.inputValue();
+      expect(value).toBe('Test story content from E2E test');
     });
 
     test('should have save button', async ({ page }) => {
@@ -399,42 +373,12 @@ test.describe('Story Management', () => {
     let experienceId: string | null = null;
 
     test.beforeEach(async ({ page }) => {
-      // CRITICAL: Verify auth state first
-      await page.goto('/profile');
-      await page.waitForLoadState('networkidle');
-      if (page.url().includes('/login')) {
-        throw new Error('Auth state not restored');
-      }
-
       // Create a test experience if we don't have one yet
       if (!experienceId) {
-        await page.goto('/profile/experiences/new');
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(1000);
-
-        // Fill required fields
-        const titleInput = page
-          .locator('input[name="title"], input[placeholder*="title" i]')
-          .first();
-        await titleInput.fill('E2E Test Experience for Free Text Stories');
-
-        const companyInput = page
-          .locator('input[name="company"], input[placeholder*="company" i]')
-          .first();
-        await companyInput.fill('E2E Test Company');
-
-        // Save the experience
-        const saveButton = page.locator('button:has-text("Save"), button[type="submit"]').first();
-        await saveButton.click();
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(1000);
-
-        // Extract experience ID from URL
-        const url = page.url();
-        const match = url.match(/\/experiences\/([a-f0-9-]+)/);
-        if (match) {
-          experienceId = match[1];
-        }
+        experienceId = await createMinimalExperience(
+          page,
+          'E2E Test Experience for Free Text Stories'
+        );
       }
     });
 
@@ -476,171 +420,244 @@ test.describe('Story Management', () => {
       await page.waitForTimeout(500);
 
       const textarea = page.locator('textarea').first();
-      const count = await textarea.count();
 
-      if (count > 0) {
-        const testText = `
-          In my role as a Senior Engineer, I led the migration of our legacy system.
-          The task was to migrate 50+ microservices with zero downtime.
-          I designed a phased migration approach and coordinated with 5 teams.
-          We successfully completed the migration, reducing deployment time by 85%.
-        `;
+      const testText = `
+        In my role as a Senior Engineer, I led the migration of our legacy system.
+        The task was to migrate 50+ microservices with zero downtime.
+        I designed a phased migration approach and coordinated with 5 teams.
+        We successfully completed the migration, reducing deployment time by 85%.
+      `;
 
-        await textarea.fill(testText);
-        const value = await textarea.inputValue();
-        expect(value).toContain('Senior Engineer');
-      }
+      await textarea.fill(testText);
+      const value = await textarea.inputValue();
+      expect(value).toContain('Senior Engineer');
     });
   });
 
   test.describe('Story Creation - From Experience (Auto-generation)', () => {
-    test('should trigger auto-generation from experience page', async ({ page }) => {
-      // CRITICAL: Verify auth state first
-      await page.goto('/profile');
-      await page.waitForLoadState('networkidle');
-      if (page.url().includes('/login')) {
-        throw new Error('Auth state not restored');
-      }
-
+    test.beforeEach(async ({ page }) => {
+      // Check if experience with full data exists
       await page.goto('/profile/experiences');
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1500);
 
-      const experienceLinks = page.locator('a[href*="/experiences/"][href*="/stories"]');
-      const count = await experienceLinks.count();
+      const hasExperiences = (await page.locator('table tbody tr').count()) > 0;
 
-      if (count > 0) {
-        await experienceLinks.first().click();
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(500);
-
-        // Look for auto-generate button
-        const generateButton = page
-          .locator('button:has-text("Generate"), button:has-text("Auto")')
-          .first();
-
-        await expect(generateButton).toBeVisible();
-        await expect(generateButton).toBeEnabled();
+      // Create full experience if none exist (needed for AI generation)
+      if (!hasExperiences) {
+        const timestamp = Date.now();
+        await createFullExperience(page, `E2E Full Experience ${timestamp}`);
       }
+
+      // Navigate back to experiences list
+      await page.goto('/profile/experiences');
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(1000);
+    });
+
+    test('should trigger auto-generation from experience page', async ({ page }) => {
+      // Navigate to first experience stories page
+      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      await viewStoriesButton.click();
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(500);
+
+      // Look for auto-generate button
+      const generateButton = page
+        .locator('button:has-text("Generate"), button:has-text("Auto")')
+        .first();
+
+      await expect(generateButton).toBeVisible();
+      await expect(generateButton).toBeEnabled();
     });
 
     test('should show loading state when generating stories', async ({ page }) => {
-      await page.goto('/profile/experiences');
+      // Navigate to first experience stories page
+      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      await viewStoriesButton.click();
       await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1500);
 
-      const experienceLinks = page.locator('a[href*="/experiences/"][href*="/stories"]');
-      const count = await experienceLinks.count();
+      const generateButton = page
+        .locator('button:has-text("Generate"), button:has-text("Auto")')
+        .first();
 
-      if (count > 0) {
-        await experienceLinks.first().click();
-        await page.waitForLoadState('networkidle');
+      // Click generate button
+      await generateButton.click();
+      await page.waitForTimeout(500);
 
-        const generateButton = page
-          .locator('button:has-text("Generate"), button:has-text("Auto")')
-          .first();
-
-        // Click generate button
-        await generateButton.click();
-        await page.waitForTimeout(500);
-
-        // Should show some loading indicator
-        const loading = page
-          .locator('text=/generating|loading|processing/i, [class*="loading"], [class*="spinner"]')
-          .first();
-        await expect(loading).toBeVisible();
-      }
+      // Should show some loading indicator - combine locators with .or()
+      const loading = page
+        .locator('text=/generating|loading|processing/i')
+        .or(page.locator('[class*="loading"]'))
+        .or(page.locator('[class*="spinner"]'));
+      await expect(loading.first()).toBeVisible();
     });
 
     test('should display generated stories after auto-generation', async ({ page }) => {
-      await page.goto('/profile/experiences');
+      // Navigate to first experience stories page
+      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      await viewStoriesButton.click();
       await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1500);
 
-      const experienceLinks = page.locator('a[href*="/experiences/"][href*="/stories"]');
-      const count = await experienceLinks.count();
+      const generateButton = page
+        .locator('button:has-text("Generate"), button:has-text("Auto")')
+        .first();
 
-      if (count > 0) {
-        await experienceLinks.first().click();
-        await page.waitForLoadState('networkidle');
+      // Click generate
+      await generateButton.click();
 
-        const generateButton = page
-          .locator('button:has-text("Generate"), button:has-text("Auto")')
-          .first();
+      // Wait for generation (this could take a while with real AI)
+      await page.waitForTimeout(5000);
+      await page.waitForLoadState('networkidle');
 
-        // Click generate
-        await generateButton.click();
-
-        // Wait for generation (this could take a while with real AI)
-        await page.waitForTimeout(5000);
-        await page.waitForLoadState('networkidle');
-
-        // Should have cards after generation
-        const cards = page.locator('[class*="card"]');
-        await expect(cards.first()).toBeVisible();
-      }
+      // Should have View buttons after generation (indicating story cards exist)
+      const viewButtons = page.locator('button:has-text("View")');
+      await expect(viewButtons.first()).toBeVisible();
     });
   });
 
   test.describe('Story Enhancement (Achievements & KPIs)', () => {
-    test('should display achievement badges on story cards', async ({ page }) => {
-      // CRITICAL: Verify auth state first
-      await page.goto('/profile');
-      await page.waitForLoadState('networkidle');
-      if (page.url().includes('/login')) {
-        throw new Error('Auth state not restored');
+    let experienceId: string | null = null;
+    let storyCreated = false;
+
+    test.beforeEach(async ({ page }) => {
+      // Create experience and story if needed
+      if (!experienceId) {
+        experienceId = await createMinimalExperience(page, 'E2E Experience for Story Enhancement');
+        if (experienceId) {
+          storyCreated = await createManualStory(
+            page,
+            experienceId,
+            'Situation: Legacy system causing deployment delays. Task: Migrate to microservices. Action: Led team of 5 engineers implementing phased migration. Result: Reduced deployment time by 85%'
+          );
+          // Give backend time to process
+          if (storyCreated) {
+            await page.waitForTimeout(1500);
+          }
+        }
       }
 
+      // Navigate to global stories page
       await page.goto('/profile/stories');
       await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1500);
+      await page.waitForTimeout(1000);
+    });
 
-      const storyCards = page.locator('[class*="card"]');
-      const count = await storyCards.count();
+    test('should display achievement badges on story cards', async ({ page }) => {
+      // Look for badges indicating achievements/KPIs
+      const hasBadges =
+        (await page.locator('[class*="badge"]').count()) > 0 ||
+        (await page.locator('text=/achievement|kpi/i').count()) > 0;
 
-      if (count > 0) {
-        // Look for badges indicating achievements/KPIs
-        const hasBadges =
-          (await page.locator('[class*="badge"]').count()) > 0 ||
-          (await page.locator('text=/achievement|kpi/i').count()) > 0;
-
-        expect(typeof hasBadges).toBe('boolean');
-      }
+      expect(typeof hasBadges).toBe('boolean');
     });
 
     test('should show KPI count badges on story cards', async ({ page }) => {
-      await page.goto('/profile/stories');
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1500);
+      // Look for KPI indicators
+      const hasKpiIndicator = (await page.locator('[class*="badge"]').count()) > 0;
 
-      const storyCards = page.locator('[class*="card"]');
-      const count = await storyCards.count();
-
-      if (count > 0) {
-        // Look for KPI indicators
-        const hasKpiIndicator = (await page.locator('[class*="badge"]').count()) > 0;
-
-        expect(typeof hasKpiIndicator).toBe('boolean');
-      }
+      expect(typeof hasKpiIndicator).toBe('boolean');
     });
 
     test('should display achievements in story detail view', async ({ page }) => {
+      const viewButton = page.locator('button:has-text("View")').first();
+
+      await viewButton.click();
+      await page.waitForTimeout(500);
+
+      // Check modal for achievements section
+      const hasAchievements = (await page.locator('text=/achievement/i').count()) > 0;
+
+      expect(typeof hasAchievements).toBe('boolean');
+    });
+  });
+  test.describe('Global Story Listing (with stories)', () => {
+    let experienceId: string | null = null;
+    let storyCreated = false;
+
+    test.beforeEach(async ({ page }) => {
+      // Create experience and story if needed
+      if (!experienceId) {
+        experienceId = await createMinimalExperience(page, 'E2E Experience for Global Stories');
+        if (experienceId) {
+          storyCreated = await createManualStory(
+            page,
+            experienceId,
+            'Led cloud migration project resulting in 40% cost reduction and improved scalability'
+          );
+          // Give backend time to process
+          if (storyCreated) {
+            await page.waitForTimeout(1500);
+          }
+        }
+      }
+
+      // Navigate to global stories page
       await page.goto('/profile/stories');
       await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1500);
+      await page.waitForTimeout(1000);
+    });
+    test('should display story cards if stories exist', async ({ page }) => {
+      // Stories are indicated by View/Edit buttons being present
+      const hasStories = (await page.locator('button:has-text("View")').count()) > 0;
+      const hasEmpty = (await page.locator('text=/no stories|get started/i').count()) > 0;
 
+      // Should have either cards OR empty state
+      expect(hasStories || hasEmpty).toBe(true);
+    });
+
+    test('should display company names for stories', async ({ page }) => {
+      // Story cards should show company/experience context
+      const hasCompany = (await page.locator('text=/company|experience/i').first().count()) > 0;
+
+      // If stories exist, should have some context (optional check)
+      expect(typeof hasCompany).toBe('boolean');
+    });
+
+    test('should have View and Edit actions on story cards', async ({ page }) => {
+      // Look for action buttons on story cards
+      const hasViewButton =
+        (await page.locator('button:has-text("View"), [aria-label*="view" i]').count()) > 0;
+      const hasEditButton =
+        (await page.locator('button:has-text("Edit"), [aria-label*="edit" i]').count()) > 0;
+
+      // Should have some action buttons
+      expect(hasViewButton || hasEditButton).toBe(true);
+    });
+
+    test('should open modal when clicking View button', async ({ page }) => {
+      // Check if we have stories
+      const hasEmpty = (await page.locator('text=/no stories|get started/i').count()) > 0;
+      test.skip(hasEmpty, 'No stories to view');
+
+      // Look for View button
       const viewButton = page.locator('button:has-text("View")').first();
-      const count = await viewButton.count();
 
-      if (count > 0) {
-        await viewButton.click();
-        await page.waitForTimeout(500);
+      await viewButton.click();
+      await page.waitForTimeout(500);
 
-        // Check modal for achievements section
-        const hasAchievements = (await page.locator('text=/achievement/i').count()) > 0;
+      // Should show modal/dialog
+      const hasModal = (await page.locator('[role="dialog"], [class*="modal"]').count()) > 0;
 
-        expect(typeof hasAchievements).toBe('boolean');
-      }
+      expect(hasModal).toBe(true);
+    });
+
+    test('should have delete functionality with confirmation', async ({ page }) => {
+      // Check if we have stories
+      const hasEmpty = (await page.locator('text=/no stories|get started/i').count()) > 0;
+      test.skip(hasEmpty, 'No stories to delete');
+
+      // Delete button is directly visible with trash icon
+      const deleteButton = page.locator('button span.i-heroicons\\:trash').first();
+
+      await deleteButton.click();
+      await page.waitForTimeout(500);
+
+      // Should show confirmation dialog
+      const hasConfirmation =
+        (await page.locator('text=/are you sure|confirm|cannot be undone/i').count()) > 0;
+
+      expect(hasConfirmation).toBe(true);
     });
   });
 });

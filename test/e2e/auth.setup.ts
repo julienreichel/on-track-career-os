@@ -73,17 +73,11 @@ setup('authenticate', async ({ page }) => {
     createAccountButton.click(),
   ]);
 
-  // CRITICAL: Wait for Amplify auth tokens to be stored
-  // Amplify stores tokens in localStorage/IndexedDB which takes time
-  // Account creation + auto-login may take longer than regular login
-  await page.waitForTimeout(3000);
-
   // Verify authentication by navigating to a protected route
   await page.goto('/profile');
   await page.waitForLoadState('networkidle');
 
   // Ensure we're not redirected back to login
-  await page.waitForTimeout(2000);
   const currentUrl = page.url();
 
   if (currentUrl.includes('/login') || currentUrl.includes('sign')) {

@@ -10,8 +10,6 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('Experience Management', () => {
-  test.describe.configure({ retries: 2 });
-
   test.describe('Experience Listing', () => {
     test.beforeEach(async ({ page }) => {
       await page.goto('/profile/experiences');
