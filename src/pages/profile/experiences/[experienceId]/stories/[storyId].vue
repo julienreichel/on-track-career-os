@@ -380,20 +380,24 @@ onMounted(async () => {
 
     <!-- Cancel Confirmation Modal -->
     <UModal v-model="showCancelConfirm">
-      <UCard>
+      <UCard
+        :ui="{
+          header: { padding: 'px-4 py-4 sm:px-6' },
+          body: { padding: 'px-4 py-5 sm:p-6' },
+          footer: { padding: 'px-4 py-4 sm:px-6' },
+        }"
+      >
         <template #header>
-          <h3 class="text-lg font-semibold">
-            {{ isDirty ? t('stories.editor.unsavedChanges') : t('stories.editor.cancelCreation') }}
-          </h3>
+          {{
+            isDirty ? t('stories.editor.unsavedChanges') : t('stories.editor.cancelCreation')
+          }}
         </template>
 
-        <p class="text-sm text-gray-600 dark:text-gray-400">
-          {{
-            isDirty
-              ? t('stories.editor.unsavedChangesDescription')
-              : t('stories.editor.cancelCreationDescription')
-          }}
-        </p>
+        {{
+          isDirty
+            ? t('stories.editor.unsavedChangesDescription')
+            : t('stories.editor.cancelCreationDescription')
+        }}
 
         <template #footer>
           <div class="flex justify-end gap-3">
