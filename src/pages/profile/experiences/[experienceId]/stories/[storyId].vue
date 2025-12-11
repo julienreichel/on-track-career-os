@@ -38,25 +38,29 @@ const experienceService = new ExperienceService();
 // Use new composables
 const {
   story,
+  formState,
   isDirty,
-  isValid,
+  canSave,
   loading: editorLoading,
   saving,
   error: editorError,
-  loadStory,
-  createStory,
-  updateStory,
+  load,
+  initializeNew,
+  save,
   updateField,
-} = useStoryEditor(experienceId);
+} = useStoryEditor();
 
 const {
-  messages,
-  currentQuestion,
-  isComplete,
-  isGenerating: interviewGenerating,
+  chatHistory,
+  currentStep,
+  allStepsCompleted,
+  generatedStory,
+  generating: interviewGenerating,
   error: interviewError,
-  startInterview,
-  answerQuestion,
+  initialize,
+  submitAnswer,
+  nextStep,
+  generateStory,
 } = useStarInterview();
 
 const {
@@ -81,9 +85,7 @@ const showAchievementsPanel = ref(false);
 
 // Computed states
 const loading = computed(() => editorLoading.value || interviewGenerating.value);
-const error = computed(
-  () => editorError.value || interviewError.value || enhancerError.value
-);
+const error = computed(() => editorError.value || interviewError.value || enhancerError.value);
 
 /**
  * Format experience data as text for AI generation
@@ -128,7 +130,22 @@ const handleStartInterview = async () => {
     const experience = await experienceService.getFullExperience(experienceId.value);
     if (experience) {
       const formattedText = formatExperienceAsText(experience);
-      await startInterview(formattedText);
+      // Create new interview composable with source text
+      const interviewWithContext = useStarInterview(formattedText);
+      // Copy refs to use in template
+      Object.assign(
+        { chatHistory, currentStep, allStepsCompleted, generatedStory },
+        {
+          chatHistory: interviewWithContext.chatHistory,
+          currentStep: interviewWithContext.currentStep,
+          allStepsCompleted: interviewWithContext.allStepsCompleted,
+          generatedStory: interviewWithContext.generatedStory,
+        }
+      );
+      interviewWithContext.initialize();
+    } else {
+      // No experience context, just initialize
+      initialize();
     }
   } catch (err) {
     console.error('[StoryForm] Interview start error:', err);
@@ -141,11 +158,28 @@ const handleSelectManual = () => {
   showModeSelection.value = false;
 };
 
+// Handle interview answer submission
+const handleAnswerSubmit = async (answer: string) => {
+  if (submitAnswer(answer)) {
+    if (!nextStep()) {
+      // Last step completed, generate story
+      const story = await generateStory();
+      if (story) {
+        // Populate form state with generated story
+        updateField('situation', story.situation);
+        updateField('task', story.task);
+        updateField('action', story.action);
+        updateField('result', story.result);
+      }
+    }
+  }
+};
+
 // Handle interview completion
-watch(isComplete, async (complete) => {
-  if (complete && messages.value.length > 0) {
+watch(allStepsCompleted, async (complete) => {
+  if (complete && generatedStory.value) {
     showInterviewChat.value = false;
-    // Story is already populated by the interview composable
+    selectedMode.value = 'manual'; // Switch to manual mode to show form
     // Generate achievements automatically
     await handleGenerateAchievements();
   }
@@ -153,10 +187,18 @@ watch(isComplete, async (complete) => {
 
 // Handle achievements generation
 const handleGenerateAchievements = async () => {
-  if (!story.value) return;
+  if (!formState.value) return;
 
   showAchievementsPanel.value = true;
-  await generateFromStory(story.value);
+  // Create a story object from form state for generation
+  const storyForGeneration = {
+    situation: formState.value.situation,
+    task: formState.value.task,
+    action: formState.value.action,
+    result: formState.value.result,
+  } as STARStory;
+  
+  await generateFromStory(storyForGeneration);
 
   // Update story with generated achievements
   if (achievements.value.length > 0) {
@@ -174,15 +216,11 @@ const handleStoryUpdate = (field: keyof STARStory, value: unknown) => {
 
 // Handle save
 const handleSave = async () => {
-  if (!story.value) return;
-
   try {
-    if (isNew.value) {
-      await createStory(story.value);
-    } else {
-      await updateStory(storyId.value, story.value);
+    const savedStory = await save(experienceId.value);
+    if (savedStory) {
+      router.push(`/profile/experiences/${experienceId.value}/stories`);
     }
-    router.push(`/profile/experiences/${experienceId.value}/stories`);
   } catch (err) {
     console.error('[StoryForm] Save error:', err);
   }
@@ -212,7 +250,7 @@ onMounted(async () => {
 
   // If editing, load the story
   if (!isNew.value && storyId.value) {
-    await loadStory(storyId.value);
+    await load(storyId.value);
     // Load existing achievements into enhancer
     if (story.value?.achievements) {
       story.value.achievements.forEach((ach) => addAchievement(ach));
@@ -220,6 +258,9 @@ onMounted(async () => {
     if (story.value?.kpiSuggestions) {
       story.value.kpiSuggestions.forEach((kpi) => addKpi(kpi));
     }
+  } else if (isNew.value) {
+    // Initialize new story with empty form state
+    initializeNew({ experienceId: experienceId.value });
   }
 });
 </script>
@@ -315,20 +356,20 @@ onMounted(async () => {
         </UCard>
 
         <!-- Interview Chat -->
-        <UCard v-else-if="showInterviewChat && !isComplete" class="mb-6">
+        <UCard v-else-if="showInterviewChat && !allStepsCompleted" class="mb-6">
           <StarInterviewChat
-            :messages="messages"
-            :current-question="currentQuestion"
+            :messages="chatHistory"
+            :current-question="currentStep?.question || ''"
             :is-generating="interviewGenerating"
-            @answer="answerQuestion"
+            @answer="handleAnswerSubmit"
           />
         </UCard>
 
         <!-- Story Form (for manual mode or editing or after interview) -->
-        <div v-else-if="(selectedMode === 'manual' || !isNew) && story" class="space-y-6">
+        <div v-else-if="(selectedMode === 'manual' || !isNew) && formState" class="space-y-6">
           <UCard>
             <StoryForm
-              :model-value="story"
+              :model-value="formState"
               @update:situation="(val) => handleStoryUpdate('situation', val)"
               @update:task="(val) => handleStoryUpdate('task', val)"
               @update:action="(val) => handleStoryUpdate('action', val)"
@@ -371,7 +412,7 @@ onMounted(async () => {
             <UButton
               :label="t('common.save')"
               icon="i-heroicons-check"
-              :disabled="!isValid || saving"
+              :disabled="!canSave || saving"
               :loading="saving"
               @click="handleSave"
             />
@@ -380,7 +421,7 @@ onMounted(async () => {
 
         <!-- Not Found (editing non-existent story) -->
         <UAlert
-          v-else-if="!isNew && !story && !loading"
+          v-else-if="!isNew && !formState && !loading"
           color="yellow"
           icon="i-heroicons-exclamation-triangle"
           :title="t('stories.builder.notFound')"
