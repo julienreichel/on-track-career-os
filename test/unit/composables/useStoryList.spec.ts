@@ -12,6 +12,7 @@ describe('useStoryList', () => {
   let mockService: {
     getAllStories: ReturnType<typeof vi.fn>;
     getStoriesByExperience: ReturnType<typeof vi.fn>;
+    deleteStory: ReturnType<typeof vi.fn>;
   };
 
   const mockStories: STARStory[] = [
@@ -60,6 +61,7 @@ describe('useStoryList', () => {
     mockService = {
       getAllStories: vi.fn(),
       getStoriesByExperience: vi.fn(),
+      deleteStory: vi.fn(),
     };
     vi.mocked(STARStoryService).mockImplementation(() => mockService as never);
   });
@@ -304,6 +306,60 @@ describe('useStoryList', () => {
       await refresh();
 
       expect(mockService.getAllStories).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('deleteStory', () => {
+    it('should delete a story successfully', async () => {
+      mockService.getAllStories.mockResolvedValue(mockStories);
+      mockService.deleteStory.mockResolvedValue(undefined);
+
+      const { loadAll, deleteStory, stories, loading } = useStoryList();
+      await loadAll();
+
+      expect(stories.value).toHaveLength(3);
+
+      const deletePromise = deleteStory('story-2');
+      expect(loading.value).toBe(true);
+
+      await deletePromise;
+
+      expect(stories.value).toHaveLength(2);
+      expect(stories.value.find((s) => s.id === 'story-2')).toBeUndefined();
+      expect(loading.value).toBe(false);
+      expect(mockService.deleteStory).toHaveBeenCalledWith('story-2');
+    });
+
+    it('should handle delete errors', async () => {
+      const mockError = new Error('Delete failed');
+      mockService.getAllStories.mockResolvedValue(mockStories);
+      mockService.deleteStory.mockRejectedValue(mockError);
+
+      const { loadAll, deleteStory, stories, error } = useStoryList();
+      await loadAll();
+
+      await expect(deleteStory('story-1')).rejects.toThrow('Delete failed');
+
+      expect(stories.value).toHaveLength(3);
+      expect(error.value).toBe('Delete failed');
+    });
+
+    it('should not remove story from list on error', async () => {
+      mockService.getAllStories.mockResolvedValue(mockStories);
+      mockService.deleteStory.mockRejectedValue(new Error('Network error'));
+
+      const { loadAll, deleteStory, stories } = useStoryList();
+      await loadAll();
+
+      const originalCount = stories.value.length;
+
+      try {
+        await deleteStory('story-1');
+      } catch {
+        // Expected to throw
+      }
+
+      expect(stories.value).toHaveLength(originalCount);
     });
   });
 

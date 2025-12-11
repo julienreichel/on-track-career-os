@@ -20,9 +20,10 @@ const experienceId = computed(() => route.params.experienceId as string);
 const companyName = ref<string>('');
 
 // Use new story list composable
-const { stories, loading, error, loadByExperience } = useStoryList();
+const { stories, loading, error, loadByExperience, deleteStory } = useStoryList();
 const experienceService = new ExperienceService();
 const storyService = new STARStoryService();
+const deleting = ref(false);
 
 // Auto-generation state
 const isGenerating = ref(false);
@@ -33,8 +34,23 @@ const handleNewStory = () => {
   router.push(`/profile/experiences/${experienceId.value}/stories/new`);
 };
 
-const handleStoryClick = (story: STARStory) => {
-  router.push(`/profile/experiences/${experienceId.value}/stories/${story.id}`);
+// Handle delete
+const handleDelete = async (story: STARStory) => {
+  deleting.value = true;
+  try {
+    await deleteStory(story.id);
+  } catch (err) {
+    console.error('[Stories] Delete error:', err);
+  } finally {
+    deleting.value = false;
+  }
+};
+
+// Handle refresh
+const handleRefresh = async () => {
+  if (experienceId.value) {
+    await loadByExperience(experienceId.value);
+  }
 };
 
 /**
@@ -223,7 +239,14 @@ onMounted(async () => {
         </UEmpty>
 
         <!-- Story List Component -->
-        <StoryList v-else :stories="stories" :loading="loading" @story-click="handleStoryClick" />
+        <StoryList
+          v-else
+          :stories="stories"
+          :loading="loading || deleting"
+          :experience-id="experienceId"
+          @delete="handleDelete"
+          @refresh="handleRefresh"
+        />
       </UPageBody>
     </UPage>
   </UContainer>

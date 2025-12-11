@@ -3,9 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStoryList } from '@/composables/useStoryList';
-import { useExperience } from '@/application/experience/useExperience';
 import type { STARStory } from '@/domain/starstory/STARStory';
-import type { Experience } from '@/domain/experience/Experience';
 
 definePageMeta({
   breadcrumbLabel: 'All Stories',
@@ -15,35 +13,40 @@ const router = useRouter();
 const { t } = useI18n();
 
 // Use new story list composable
-const { stories, loading, error, loadAll, search } = useStoryList();
+const { stories, loading, error, loadAll, search, deleteStory } = useStoryList();
 const searchQuery = ref('');
 const filteredStories = ref<STARStory[]>([]);
-
-// Experience data for mapping IDs to names
-const experienceMap = ref<Map<string, Experience>>(new Map());
-const loadingExperiences = ref(false);
-
-// Build experience name map for StoryList component
-const experienceNames = computed(() => {
-  const names: Record<string, string> = {};
-  experienceMap.value.forEach((exp, id) => {
-    names[id] = exp.companyName || exp.title || t('stories.global.unknownExperience');
-  });
-  return names;
-});
+const deleting = ref(false);
 
 // Handle search
 const handleSearch = () => {
   filteredStories.value = search(searchQuery.value);
 };
 
-// Navigation handlers
-const handleStoryClick = (story: STARStory) => {
-  if (!story.experienceId) {
-    console.error('[Stories] Cannot navigate to story without experienceId');
-    return;
+// Handle delete
+const handleDelete = async (story: STARStory) => {
+  deleting.value = true;
+  try {
+    await deleteStory(story.id);
+    // Refresh the search results
+    if (searchQuery.value) {
+      filteredStories.value = search(searchQuery.value);
+    }
+  } catch (err) {
+    console.error('[Stories] Delete error:', err);
+  } finally {
+    deleting.value = false;
   }
-  router.push(`/profile/experiences/${story.experienceId}/stories/${story.id}`);
+};
+
+// Handle refresh
+const handleRefresh = async () => {
+  await loadAll();
+  if (searchQuery.value) {
+    filteredStories.value = search(searchQuery.value);
+  } else {
+    filteredStories.value = stories.value;
+  }
 };
 
 const handleBackToProfile = () => {
@@ -61,23 +64,6 @@ const headerLinks = computed(() => [
 
 // Load data on mount
 onMounted(async () => {
-  loadingExperiences.value = true;
-  try {
-    // Load all experiences to build the map
-    const { loadAllExperiences, allExperiences } = useExperience();
-    await loadAllExperiences();
-
-    // Build experience map
-    allExperiences.value.forEach((exp) => {
-      experienceMap.value.set(exp.id, exp);
-    });
-  } catch (err) {
-    console.error('[Stories] Error loading experiences:', err);
-  } finally {
-    loadingExperiences.value = false;
-  }
-
-  // Load all stories using new composable
   await loadAll();
   filteredStories.value = stories.value;
 });
@@ -116,9 +102,10 @@ onMounted(async () => {
       <!-- Story List Component -->
       <StoryList
         :stories="searchQuery ? filteredStories : stories"
-        :loading="loading || loadingExperiences"
-        :experience-names="experienceNames"
-        @story-click="handleStoryClick"
+        :loading="loading || deleting"
+        show-company-names
+        @delete="handleDelete"
+        @refresh="handleRefresh"
       />
     </UPageBody>
   </UPage>

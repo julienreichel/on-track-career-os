@@ -311,43 +311,44 @@ describe('Profile Stories Page', () => {
     expect(wrapper.vm.stories.value[0].kpiSuggestions).toHaveLength(0);
   });
 
-  it('should build experience names map', async () => {
-    const mockExperiencesData: Experience[] = [
+  it('should pass showCompanyNames prop to StoryList', async () => {
+    const mockStoriesData: STARStory[] = [
       {
-        id: 'exp-1',
-        companyName: 'Acme Corp',
-        title: 'Software Engineer',
-      } as Experience,
+        id: 'story-1',
+        situation: 'Test',
+        task: 'Test',
+        action: 'Test',
+        result: 'Test',
+        achievements: [],
+        kpiSuggestions: [],
+        experienceId: 'exp-1',
+        owner: 'user-1',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      },
     ];
 
-    mockAllExperiences.mockReturnValue(mockExperiencesData);
-    mockStories.mockReturnValue([]);
+    mockStories.mockReturnValue(mockStoriesData);
     mockLoading.mockReturnValue(false);
     mockError.mockReturnValue(null);
 
     const wrapper = createWrapper();
-
-    await vi.waitFor(() => {
-      expect(mockLoadAllExperiences).toHaveBeenCalled();
-    });
-
     await wrapper.vm.$nextTick();
 
-    // Check that experienceNames computed property is correctly populated
-    expect(wrapper.vm.experienceNames).toHaveProperty('exp-1');
-    expect(wrapper.vm.experienceNames['exp-1']).toBe('Acme Corp');
+    const storyList = wrapper.findComponent({ name: 'StoryList' });
+    expect(storyList.exists()).toBe(true);
+    expect(storyList.props('showCompanyNames')).toBe(true);
   });
 
-  it('should call loadAllExperiences on mount', async () => {
+  it('should call loadAll on mount', async () => {
     mockStories.mockReturnValue([]);
     mockLoading.mockReturnValue(false);
     mockError.mockReturnValue(null);
-    mockAllExperiences.mockReturnValue([]);
 
     createWrapper();
 
     await vi.waitFor(() => {
-      expect(mockLoadAllExperiences).toHaveBeenCalled();
+      expect(mockLoadAll).toHaveBeenCalled();
     });
   });
 

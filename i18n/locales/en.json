@@ -381,12 +381,28 @@
   },
   "storyCard": {
     "noContent": "No content",
-    "clickToView": "Click to view details"
+    "clickToView": "Click to view details",
+    "deleteConfirm": {
+      "title": "Delete Story",
+      "message": "Are you sure you want to delete this story? This action cannot be undone."
+    }
   },
   "storyList": {
     "emptyTitle": "No Stories Yet",
     "emptyDescription": "Create your first STAR story to document your achievements",
-    "createFirst": "Create Your First Story"
+    "createFirst": "Create Your First Story",
+    "errors": {
+      "deleteFailed": "Failed to delete story"
+    }
+  },
+  "storyView": {
+    "title": "Story Details",
+    "situation": "Situation",
+    "task": "Task",
+    "action": "Action",
+    "result": "Result",
+    "achievements": "Achievements",
+    "kpis": "Key Performance Indicators"
   },
   "storyEditor": {
     "title": "Edit Story",
@@ -415,6 +431,8 @@
     "cancel": "Cancel",
     "edit": "Edit",
     "delete": "Delete",
+    "view": "View",
+    "close": "Close",
     "error": "Error",
     "loading": "Loading...",
     "backToProfile": "Back to Profile",

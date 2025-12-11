@@ -321,15 +321,8 @@ describe('useStoryEnhancer', () => {
     it('should reset all state to initial values', async () => {
       mockService.generateAchievements.mockResolvedValue(mockEnhancements);
 
-      const {
-        generate,
-        reset,
-        achievements,
-        kpiSuggestions,
-        error,
-        generating,
-        hasEnhancements,
-      } = useStoryEnhancer();
+      const { generate, reset, achievements, kpiSuggestions, error, generating, hasEnhancements } =
+        useStoryEnhancer();
 
       await generate(mockStory);
       expect(hasEnhancements.value).toBe(true);

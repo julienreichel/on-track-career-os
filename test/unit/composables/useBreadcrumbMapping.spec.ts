@@ -18,7 +18,7 @@ describe('useBreadcrumbMapping', () => {
     // Clear cache BEFORE each test
     const { clearCache } = useBreadcrumbMapping();
     clearCache();
-    
+
     mockExperienceService = {
       getFullExperience: vi.fn(),
     };

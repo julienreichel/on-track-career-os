@@ -27,13 +27,11 @@ export interface GroupedStories {
  * - Group stories by experience
  * - Search and filter capabilities
  */
-export function useStoryList() {
+export function useStoryList(service = new STARStoryService()) {
   // State
   const stories = ref<STARStory[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
-
-  const service = new STARStoryService();
 
   // Computed
   const hasStories = computed(() => stories.value.length > 0);
@@ -128,6 +126,23 @@ export function useStoryList() {
   };
 
   /**
+   * Delete a story
+   */
+  const deleteStory = async (storyId: string) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      await service.deleteStory(storyId);
+      stories.value = stories.value.filter((story) => story.id !== storyId);
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'storyList.errors.deleteFailed';
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
    * Refresh stories (reload current set)
    */
   const refresh = async () => {
@@ -160,6 +175,7 @@ export function useStoryList() {
     search,
     filterByExperience,
     getById,
+    deleteStory,
     refresh,
     reset,
   };

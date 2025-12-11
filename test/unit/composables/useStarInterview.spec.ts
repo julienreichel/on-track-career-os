@@ -139,7 +139,9 @@ describe('useStarInterview', () => {
       expect(currentStepIndex.value).toBe(1);
       expect(currentStep.value.key).toBe('task');
       expect(isFirstStep.value).toBe(false);
-      expect(chatHistory.value[chatHistory.value.length - 1].content).toBe('interview.task.question');
+      expect(chatHistory.value[chatHistory.value.length - 1].content).toBe(
+        'interview.task.question'
+      );
     });
 
     it('should not move to next step without answer', () => {
@@ -245,8 +247,15 @@ describe('useStarInterview', () => {
     it('should generate story from complete answers', async () => {
       mockService.generateStar.mockResolvedValue(mockGeneratedStories);
 
-      const { initialize, submitAnswer, nextStep, generateStory, generatedStory, generating, chatHistory } =
-        useStarInterview();
+      const {
+        initialize,
+        submitAnswer,
+        nextStep,
+        generateStory,
+        generatedStory,
+        generating,
+        chatHistory,
+      } = useStarInterview();
 
       initialize();
       submitAnswer('Situation answer');
@@ -310,7 +319,8 @@ describe('useStarInterview', () => {
       mockService.generateStar.mockRejectedValue(mockError);
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      const { initialize, submitAnswer, nextStep, generateStory, error, generating } = useStarInterview();
+      const { initialize, submitAnswer, nextStep, generateStory, error, generating } =
+        useStarInterview();
 
       initialize();
       submitAnswer('Situation');
@@ -339,7 +349,8 @@ describe('useStarInterview', () => {
       ];
       mockService.generateStar.mockResolvedValue(multipleStories);
 
-      const { initialize, submitAnswer, nextStep, generateStory, generatedStory } = useStarInterview();
+      const { initialize, submitAnswer, nextStep, generateStory, generatedStory } =
+        useStarInterview();
 
       initialize();
       submitAnswer('Situation');
