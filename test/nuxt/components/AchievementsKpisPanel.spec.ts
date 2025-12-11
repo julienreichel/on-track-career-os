@@ -41,7 +41,6 @@ const stubs = {
 describe('AchievementsKpisPanel', () => {
   it('renders title and regenerate button', () => {
     const wrapper = mount(AchievementsKpisPanel, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -58,7 +57,6 @@ describe('AchievementsKpisPanel', () => {
 
   it('displays achievements and kpis', () => {
     const wrapper = mount(AchievementsKpisPanel, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -75,7 +73,6 @@ describe('AchievementsKpisPanel', () => {
 
   it('emits update:achievements when achievements change', async () => {
     const wrapper = mount(AchievementsKpisPanel, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -97,7 +94,6 @@ describe('AchievementsKpisPanel', () => {
 
   it('emits update:kpis when kpis change', async () => {
     const wrapper = mount(AchievementsKpisPanel, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -117,7 +113,6 @@ describe('AchievementsKpisPanel', () => {
 
   it('emits regenerate when button clicked', async () => {
     const wrapper = mount(AchievementsKpisPanel, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -135,7 +130,6 @@ describe('AchievementsKpisPanel', () => {
 
   it('shows loading state on regenerate button', () => {
     const wrapper = mount(AchievementsKpisPanel, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -153,7 +147,6 @@ describe('AchievementsKpisPanel', () => {
 
   it('hides regenerate button in readonly mode', () => {
     const wrapper = mount(AchievementsKpisPanel, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -170,7 +163,6 @@ describe('AchievementsKpisPanel', () => {
 
   it('disables TagInputs in readonly mode', () => {
     const wrapper = mount(AchievementsKpisPanel, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -188,7 +180,6 @@ describe('AchievementsKpisPanel', () => {
 
   it('passes correct color props to TagInputs', () => {
     const wrapper = mount(AchievementsKpisPanel, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -205,7 +196,6 @@ describe('AchievementsKpisPanel', () => {
 
   it('handles empty achievements and kpis', () => {
     const wrapper = mount(AchievementsKpisPanel, {
-      
       global: {
         plugins: [i18n],
         stubs,

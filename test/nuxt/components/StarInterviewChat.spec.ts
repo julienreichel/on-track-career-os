@@ -53,7 +53,6 @@ const stubs = {
 describe('StarInterviewChat', () => {
   it('renders empty state when no messages and no current question', () => {
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -73,7 +72,6 @@ describe('StarInterviewChat', () => {
     ];
 
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -89,7 +87,6 @@ describe('StarInterviewChat', () => {
 
   it('shows answer input when currentQuestion is provided', () => {
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -106,7 +103,6 @@ describe('StarInterviewChat', () => {
 
   it('disables submit button when answer is empty', () => {
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -123,7 +119,6 @@ describe('StarInterviewChat', () => {
 
   it('enables submit button when answer has content', async () => {
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -144,7 +139,6 @@ describe('StarInterviewChat', () => {
 
   it('emits submit with answer when button clicked', async () => {
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -168,7 +162,6 @@ describe('StarInterviewChat', () => {
 
   it('clears input after submitting', async () => {
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -192,7 +185,6 @@ describe('StarInterviewChat', () => {
 
   it('shows loading state', () => {
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -210,7 +202,6 @@ describe('StarInterviewChat', () => {
 
   it('disables input during loading', () => {
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -230,7 +221,6 @@ describe('StarInterviewChat', () => {
     const messages: ChatMessage[] = [{ role: 'assistant', content: 'Hello!' }];
 
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -248,7 +238,6 @@ describe('StarInterviewChat', () => {
     const messages: ChatMessage[] = [{ role: 'user', content: 'Hello!' }];
 
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -264,7 +253,6 @@ describe('StarInterviewChat', () => {
 
   it('does not submit when answer is only whitespace', async () => {
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -292,7 +280,6 @@ describe('StarInterviewChat', () => {
     ];
 
     const wrapper = mount(StarInterviewChat, {
-      
       global: {
         plugins: [i18n],
         stubs,

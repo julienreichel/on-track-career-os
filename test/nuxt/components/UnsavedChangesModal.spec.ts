@@ -39,7 +39,8 @@ const stubs = {
     },
   },
   UButton: {
-    template: '<button :class="[color, variant]" @click="$attrs.onClick">{{ label }}<slot /></button>',
+    template:
+      '<button :class="[color, variant]" @click="$attrs.onClick">{{ label }}<slot /></button>',
     props: ['label', 'color', 'variant'],
   },
 };
@@ -47,7 +48,6 @@ const stubs = {
 describe('UnsavedChangesModal', () => {
   it('renders when open is true', () => {
     const wrapper = mount(UnsavedChangesModal, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -62,7 +62,6 @@ describe('UnsavedChangesModal', () => {
 
   it('does not render when open is false', () => {
     const wrapper = mount(UnsavedChangesModal, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -77,7 +76,6 @@ describe('UnsavedChangesModal', () => {
 
   it('displays correct title and description', () => {
     const wrapper = mount(UnsavedChangesModal, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -95,7 +93,6 @@ describe('UnsavedChangesModal', () => {
 
   it('renders two footer buttons', () => {
     const wrapper = mount(UnsavedChangesModal, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -111,7 +108,6 @@ describe('UnsavedChangesModal', () => {
 
   it('renders Go back button with ghost variant', () => {
     const wrapper = mount(UnsavedChangesModal, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -128,7 +124,6 @@ describe('UnsavedChangesModal', () => {
 
   it('renders Go back button with ghost variant', () => {
     const wrapper = mount(UnsavedChangesModal, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -146,7 +141,6 @@ describe('UnsavedChangesModal', () => {
 
   it('emits update:open with false when Go back is clicked', async () => {
     const wrapper = mount(UnsavedChangesModal, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -165,7 +159,6 @@ describe('UnsavedChangesModal', () => {
 
   it('emits discard when Discard button is clicked', async () => {
     const wrapper = mount(UnsavedChangesModal, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -183,7 +176,6 @@ describe('UnsavedChangesModal', () => {
 
   it('updates isOpen computed when open prop changes', async () => {
     const wrapper = mount(UnsavedChangesModal, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -201,7 +193,6 @@ describe('UnsavedChangesModal', () => {
 
   it('emits update:open when isOpen computed setter is called', async () => {
     const wrapper = mount(UnsavedChangesModal, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -221,7 +212,6 @@ describe('UnsavedChangesModal', () => {
 
   it('does not emit discard when Go back is clicked', async () => {
     const wrapper = mount(UnsavedChangesModal, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -239,7 +229,6 @@ describe('UnsavedChangesModal', () => {
 
   it('handles rapid button clicks', async () => {
     const wrapper = mount(UnsavedChangesModal, {
-      
       global: {
         plugins: [i18n],
         stubs,

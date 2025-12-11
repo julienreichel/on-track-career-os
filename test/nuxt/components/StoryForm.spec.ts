@@ -10,7 +10,11 @@ const i18n = createI18n({
   messages: {
     en: {
       star: {
-        situation: { label: 'Situation', description: 'Situation hint', placeholder: 'Enter situation' },
+        situation: {
+          label: 'Situation',
+          description: 'Situation hint',
+          placeholder: 'Enter situation',
+        },
         task: { label: 'Task', description: 'Task hint', placeholder: 'Enter task' },
         action: { label: 'Action', description: 'Action hint', placeholder: 'Enter action' },
         result: { label: 'Result', description: 'Result hint', placeholder: 'Enter result' },
@@ -21,7 +25,8 @@ const i18n = createI18n({
 
 const stubs = {
   UFormField: {
-    template: '<div class="form-field"><label>{{ label }}</label><div class="hint">{{ hint }}</div><slot /></div>',
+    template:
+      '<div class="form-field"><label>{{ label }}</label><div class="hint">{{ hint }}</div><slot /></div>',
     props: ['label', 'hint', 'required'],
   },
   UTextarea: {
@@ -85,7 +90,6 @@ describe('StoryForm', () => {
     };
 
     const wrapper = mount(StoryForm, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -104,7 +108,6 @@ describe('StoryForm', () => {
 
   it('emits update:modelValue when situation changes', async () => {
     const wrapper = mount(StoryForm, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -124,7 +127,6 @@ describe('StoryForm', () => {
 
   it('emits update:modelValue when task changes', async () => {
     const wrapper = mount(StoryForm, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -144,7 +146,6 @@ describe('StoryForm', () => {
 
   it('emits update:modelValue when action changes', async () => {
     const wrapper = mount(StoryForm, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -164,7 +165,6 @@ describe('StoryForm', () => {
 
   it('emits update:modelValue when result changes', async () => {
     const wrapper = mount(StoryForm, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -193,7 +193,6 @@ describe('StoryForm', () => {
     };
 
     const wrapper = mount(StoryForm, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -217,7 +216,6 @@ describe('StoryForm', () => {
 
   it('disables all fields when disabled prop is true', () => {
     const wrapper = mount(StoryForm, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -236,7 +234,6 @@ describe('StoryForm', () => {
 
   it('makes all fields readonly when readonly prop is true', () => {
     const wrapper = mount(StoryForm, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -255,7 +252,6 @@ describe('StoryForm', () => {
 
   it('displays hints for each field', () => {
     const wrapper = mount(StoryForm, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -273,7 +269,6 @@ describe('StoryForm', () => {
 
   it('marks all fields as required', () => {
     const wrapper = mount(StoryForm, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -294,7 +289,6 @@ describe('StoryForm', () => {
 
   it('handles empty string values', async () => {
     const wrapper = mount(StoryForm, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -313,7 +307,6 @@ describe('StoryForm', () => {
 
   it('uses correct row heights for textareas', () => {
     const wrapper = mount(StoryForm, {
-      
       global: {
         plugins: [i18n],
         stubs,

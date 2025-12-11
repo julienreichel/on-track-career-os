@@ -46,7 +46,8 @@ const stubs = {
     template: '<div class="card"><slot /><div class="footer"><slot name="footer" /></div></div>',
   },
   UFormField: {
-    template: '<div class="form-field"><label>{{ label }}</label><div class="hint">{{ hint }}</div><slot /></div>',
+    template:
+      '<div class="form-field"><label>{{ label }}</label><div class="hint">{{ hint }}</div><slot /></div>',
     props: ['label', 'hint', 'required'],
   },
   UTextarea: {
@@ -76,7 +77,6 @@ const stubs = {
 describe('StoryBuilder', () => {
   it('renders in create mode with empty fields', () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -110,7 +110,6 @@ describe('StoryBuilder', () => {
     };
 
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -132,7 +131,6 @@ describe('StoryBuilder', () => {
 
   it('renders all STAR field labels', () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -151,7 +149,6 @@ describe('StoryBuilder', () => {
 
   it('renders achievements section', () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -168,7 +165,6 @@ describe('StoryBuilder', () => {
 
   it('renders TagInputs for achievements and KPIs', () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -185,7 +181,6 @@ describe('StoryBuilder', () => {
 
   it('disables generate achievements button when form is invalid', () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -203,7 +198,6 @@ describe('StoryBuilder', () => {
 
   it('enables generate achievements button when all STAR fields are filled', async () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -228,7 +222,6 @@ describe('StoryBuilder', () => {
 
   it('emits generateAchievements when button clicked', async () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -255,7 +248,6 @@ describe('StoryBuilder', () => {
 
   it('disables save button when form is invalid', () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -273,7 +265,6 @@ describe('StoryBuilder', () => {
 
   it('enables save button when form is valid', async () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -297,7 +288,6 @@ describe('StoryBuilder', () => {
 
   it('emits save with story data when save button clicked', async () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -334,7 +324,6 @@ describe('StoryBuilder', () => {
 
   it('emits cancel when cancel button clicked', async () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -354,7 +343,6 @@ describe('StoryBuilder', () => {
 
   it('updates achievements when generatedAchievements prop changes', async () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -380,7 +368,6 @@ describe('StoryBuilder', () => {
 
   it('validates that all STAR fields must be non-empty', async () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -402,7 +389,6 @@ describe('StoryBuilder', () => {
 
   it('renders footer with cancel and save buttons', () => {
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
@@ -435,7 +421,6 @@ describe('StoryBuilder', () => {
     };
 
     const wrapper = mount(StoryBuilder, {
-      
       global: {
         plugins: [i18n],
         stubs,
