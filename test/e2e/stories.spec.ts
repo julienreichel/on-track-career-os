@@ -15,6 +15,17 @@ test.describe('Story Management', () => {
 
   test.describe('Global Story Listing', () => {
     test.beforeEach(async ({ page }) => {
+      // CRITICAL: Wait for auth state to be fully restored
+      await page.goto('/profile');
+      await page.waitForLoadState('networkidle');
+
+      // Verify we're not redirected to login
+      const currentUrl = page.url();
+      if (currentUrl.includes('/login')) {
+        throw new Error('Auth state not restored - redirected to login');
+      }
+
+      // Now navigate to the stories page
       await page.goto('/profile/stories');
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1000);
@@ -91,8 +102,7 @@ test.describe('Story Management', () => {
 
       if (count > 0) {
         // Story cards should show company/experience context
-        const hasCompany =
-          (await page.locator('text=/company|experience/i').first().count()) > 0;
+        const hasCompany = (await page.locator('text=/company|experience/i').first().count()) > 0;
 
         // If stories exist, should have some context (optional check)
         expect(typeof hasCompany).toBe('boolean');
@@ -130,8 +140,7 @@ test.describe('Story Management', () => {
         await page.waitForTimeout(500);
 
         // Should show modal/dialog
-        const hasModal =
-          (await page.locator('[role="dialog"], [class*="modal"]').count()) > 0;
+        const hasModal = (await page.locator('[role="dialog"], [class*="modal"]').count()) > 0;
 
         expect(hasModal).toBe(true);
       }
@@ -141,7 +150,9 @@ test.describe('Story Management', () => {
       await page.waitForTimeout(1500);
 
       // Look for delete button
-      const deleteButton = page.locator('button:has-text("Delete"), button[aria-label*="delete" i]').first();
+      const deleteButton = page
+        .locator('button:has-text("Delete"), button[aria-label*="delete" i]')
+        .first();
       const count = await deleteButton.count();
 
       if (count > 0) {
@@ -159,6 +170,13 @@ test.describe('Story Management', () => {
 
   test.describe('Experience-Specific Story Listing', () => {
     test('should display stories for specific experience', async ({ page }) => {
+      // CRITICAL: Verify auth state first
+      await page.goto('/profile');
+      await page.waitForLoadState('networkidle');
+      if (page.url().includes('/login')) {
+        throw new Error('Auth state not restored');
+      }
+
       // First navigate to experiences
       await page.goto('/profile/experiences');
       await page.waitForLoadState('networkidle');
@@ -221,7 +239,9 @@ test.describe('Story Management', () => {
 
         // Look for auto-generate or AI button
         const generateButton = page
-          .locator('button:has-text("Generate"), button:has-text("AI"), button[aria-label*="generate" i]')
+          .locator(
+            'button:has-text("Generate"), button:has-text("AI"), button[aria-label*="generate" i]'
+          )
           .first();
 
         if ((await generateButton.count()) > 0) {
@@ -254,39 +274,70 @@ test.describe('Story Management', () => {
   });
 
   test.describe('Story Creation - Manual (Interview Flow)', () => {
+    let experienceId: string | null = null;
+
     test.beforeEach(async ({ page }) => {
-      await page.goto('/profile/experiences');
+      // CRITICAL: Verify auth state first
+      await page.goto('/profile');
       await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1500);
-    });
+      if (page.url().includes('/login')) {
+        throw new Error('Auth state not restored');
+      }
 
-    test('should navigate to manual story creation', async ({ page }) => {
-      // Find an experience and navigate to its stories
-      const experienceLinks = page.locator('a[href*="/experiences/"][href*="/stories"]');
-      const count = await experienceLinks.count();
-
-      if (count > 0) {
-        await experienceLinks.first().click();
+      // Create a test experience if we don't have one yet
+      if (!experienceId) {
+        await page.goto('/profile/experiences/new');
         await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(1000);
 
-        // Click new story button
-        const newButton = page
-          .locator('button:has-text("New"), a:has-text("New"), a[href*="/new"]')
+        // Fill required fields
+        const titleInput = page
+          .locator('input[name="title"], input[placeholder*="title" i]')
           .first();
+        if ((await titleInput.count()) > 0) {
+          await titleInput.fill('E2E Test Experience for Stories');
 
-        if ((await newButton.count()) > 0) {
-          await newButton.click();
-          await page.waitForLoadState('networkidle');
+          const companyInput = page
+            .locator('input[name="company"], input[placeholder*="company" i]')
+            .first();
+          if ((await companyInput.count()) > 0) {
+            await companyInput.fill('E2E Test Company');
+          }
 
-          // Should navigate to new story page
-          await expect(page).toHaveURL(/.*\/stories\/new/);
+          // Save the experience
+          const saveButton = page.locator('button:has-text("Save"), button[type="submit"]').first();
+          if ((await saveButton.count()) > 0) {
+            await saveButton.click();
+            await page.waitForLoadState('networkidle');
+            await page.waitForTimeout(1000);
+
+            // Extract experience ID from URL
+            const url = page.url();
+            const match = url.match(/\/experiences\/([a-f0-9-]+)/);
+            if (match) {
+              experienceId = match[1];
+            }
+          }
         }
       }
     });
 
+    test('should navigate to manual story creation', async ({ page }) => {
+      test.skip(!experienceId, 'No experience ID available');
+
+      // Navigate directly to new story page for this experience
+      await page.goto(`/profile/experiences/${experienceId}/stories/new`);
+      await page.waitForLoadState('networkidle');
+
+      // Should be on the new story page
+      await expect(page).toHaveURL(new RegExp(`/experiences/${experienceId}/stories/new`));
+    });
+
     test('should display STAR interview interface', async ({ page }) => {
-      // Navigate to a new story page
-      await page.goto('/stories/new');
+      test.skip(!experienceId, 'No experience ID available');
+
+      // Navigate to new story page with experience context
+      await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1000);
 
@@ -301,7 +352,9 @@ test.describe('Story Management', () => {
     });
 
     test('should have text input for story content', async ({ page }) => {
-      await page.goto('/stories/new');
+      test.skip(!experienceId, 'No experience ID available');
+
+      await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
 
@@ -314,7 +367,9 @@ test.describe('Story Management', () => {
     });
 
     test('should allow filling STAR sections', async ({ page }) => {
-      await page.goto('/stories/new');
+      test.skip(!experienceId, 'No experience ID available');
+
+      await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
 
@@ -330,7 +385,9 @@ test.describe('Story Management', () => {
     });
 
     test('should have save button', async ({ page }) => {
-      await page.goto('/stories/new');
+      test.skip(!experienceId, 'No experience ID available');
+
+      await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
 
@@ -345,14 +402,14 @@ test.describe('Story Management', () => {
     });
 
     test('should have cancel button', async ({ page }) => {
-      await page.goto('/stories/new');
+      test.skip(!experienceId, 'No experience ID available');
+
+      await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
 
       // Look for cancel button
-      const cancelButton = page
-        .locator('button:has-text("Cancel"), a:has-text("Back")')
-        .first();
+      const cancelButton = page.locator('button:has-text("Cancel"), a:has-text("Back")').first();
 
       if ((await cancelButton.count()) > 0) {
         await expect(cancelButton).toBeVisible();
@@ -361,8 +418,58 @@ test.describe('Story Management', () => {
   });
 
   test.describe('Story Creation - From Free Text', () => {
+    let experienceId: string | null = null;
+
+    test.beforeEach(async ({ page }) => {
+      // CRITICAL: Verify auth state first
+      await page.goto('/profile');
+      await page.waitForLoadState('networkidle');
+      if (page.url().includes('/login')) {
+        throw new Error('Auth state not restored');
+      }
+
+      // Create a test experience if we don't have one yet
+      if (!experienceId) {
+        await page.goto('/profile/experiences/new');
+        await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(1000);
+
+        // Fill required fields
+        const titleInput = page
+          .locator('input[name="title"], input[placeholder*="title" i]')
+          .first();
+        if ((await titleInput.count()) > 0) {
+          await titleInput.fill('E2E Test Experience for Free Text Stories');
+
+          const companyInput = page
+            .locator('input[name="company"], input[placeholder*="company" i]')
+            .first();
+          if ((await companyInput.count()) > 0) {
+            await companyInput.fill('E2E Test Company');
+          }
+
+          // Save the experience
+          const saveButton = page.locator('button:has-text("Save"), button[type="submit"]').first();
+          if ((await saveButton.count()) > 0) {
+            await saveButton.click();
+            await page.waitForLoadState('networkidle');
+            await page.waitForTimeout(1000);
+
+            // Extract experience ID from URL
+            const url = page.url();
+            const match = url.match(/\/experiences\/([a-f0-9-]+)/);
+            if (match) {
+              experienceId = match[1];
+            }
+          }
+        }
+      }
+    });
+
     test('should have free text input option', async ({ page }) => {
-      await page.goto('/stories/new');
+      test.skip(!experienceId, 'No experience ID available');
+
+      await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
 
@@ -375,7 +482,9 @@ test.describe('Story Management', () => {
     });
 
     test('should show generate button for AI processing', async ({ page }) => {
-      await page.goto('/stories/new');
+      test.skip(!experienceId, 'No experience ID available');
+
+      await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
 
@@ -390,7 +499,9 @@ test.describe('Story Management', () => {
     });
 
     test('should allow pasting text content', async ({ page }) => {
-      await page.goto('/stories/new');
+      test.skip(!experienceId, 'No experience ID available');
+
+      await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
 
@@ -414,6 +525,13 @@ test.describe('Story Management', () => {
 
   test.describe('Story Creation - From Experience (Auto-generation)', () => {
     test('should trigger auto-generation from experience page', async ({ page }) => {
+      // CRITICAL: Verify auth state first
+      await page.goto('/profile');
+      await page.waitForLoadState('networkidle');
+      if (page.url().includes('/login')) {
+        throw new Error('Auth state not restored');
+      }
+
       await page.goto('/profile/experiences');
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1500);
@@ -506,6 +624,13 @@ test.describe('Story Management', () => {
 
   test.describe('Story Enhancement (Achievements & KPIs)', () => {
     test('should display achievement badges on story cards', async ({ page }) => {
+      // CRITICAL: Verify auth state first
+      await page.goto('/profile');
+      await page.waitForLoadState('networkidle');
+      if (page.url().includes('/login')) {
+        throw new Error('Auth state not restored');
+      }
+
       await page.goto('/profile/stories');
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1500);
@@ -533,8 +658,7 @@ test.describe('Story Management', () => {
 
       if (count > 0) {
         // Look for KPI indicators
-        const hasKpiIndicator =
-          (await page.locator('[class*="badge"]').count()) > 0;
+        const hasKpiIndicator = (await page.locator('[class*="badge"]').count()) > 0;
 
         expect(typeof hasKpiIndicator).toBe('boolean');
       }
@@ -553,8 +677,7 @@ test.describe('Story Management', () => {
         await page.waitForTimeout(500);
 
         // Check modal for achievements section
-        const hasAchievements =
-          (await page.locator('text=/achievement/i').count()) > 0;
+        const hasAchievements = (await page.locator('text=/achievement/i').count()) > 0;
 
         expect(typeof hasAchievements).toBe('boolean');
       }

@@ -25,21 +25,25 @@ test.describe('Home Page - Authenticated User', () => {
   test.describe.configure({ retries: 2 });
 
   test('should have profile feature card', async ({ page }) => {
-    // Look for profile-related link
-    const profileLink = page.locator('a[href*="profile"]').first();
-
-    // Profile link should exist and be visible
-    if ((await profileLink.count()) > 0) {
-      await expect(profileLink).toBeVisible();
-    }
+    // Look for profile link (UPageCard creates absolute positioned overlay)
+    const profileLink = page.locator('a[href="/profile"]');
+    await expect(profileLink).toHaveCount(1);
+    await expect(profileLink).toHaveAttribute('href', '/profile');
   });
 
   test('should navigate to profile page when profile card is clicked', async ({ page }) => {
-    // Find and click profile link
-    const profileLink = page.locator('a[href="/profile"]').first();
+    // UPageCard creates an overlay link, find the card by its title
+    const profileCard = page
+      .locator('div:has-text("Profile")')
+      .filter({ hasText: 'View and manage' })
+      .first();
 
-    if ((await profileLink.count()) > 0) {
-      await profileLink.click();
+    if ((await profileCard.count()) > 0) {
+      await profileCard.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(200);
+
+      // Click on the visible card (overlay link will handle navigation)
+      await profileCard.click();
 
       // Wait for navigation
       await page.waitForURL(/.*profile.*/, { timeout: 5000 });

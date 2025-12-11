@@ -14,16 +14,22 @@ test.describe('Experience Management', () => {
 
   test.describe('Experience Listing', () => {
     test.beforeEach(async ({ page }) => {
+      // CRITICAL: Verify auth state first
+      await page.goto('/profile');
+      await page.waitForLoadState('networkidle');
+      if (page.url().includes('/login')) {
+        throw new Error('Auth state not restored');
+      }
+
       await page.goto('/profile/experiences');
       await page.waitForLoadState('networkidle');
       // Wait for any initial data loading
       await page.waitForTimeout(2000);
     });
 
-    test.skip('should display experiences page', async ({ page }) => {
-      // FIXME: Auth state not persisting - redirects to /login
-      // This appears to be an intermittent issue with Playwright auth state file
-      
+    test('should display experiences page', async ({ page }) => {
+      // Auth state should now persist correctly
+
       // Verify we're on the experiences page
       await expect(page).toHaveURL(/.*\/profile\/experiences/);
 
@@ -34,7 +40,10 @@ test.describe('Experience Management', () => {
 
     test('should display page header with title', async ({ page }) => {
       // Look for experiences title/header
-      const heading = page.locator('h1, h2').filter({ hasText: /experience/i }).first();
+      const heading = page
+        .locator('h1, h2')
+        .filter({ hasText: /experience/i })
+        .first();
 
       if ((await heading.count()) > 0) {
         await expect(heading).toBeVisible();
@@ -68,7 +77,7 @@ test.describe('Experience Management', () => {
 
     test.skip('should display experience cards or table if experiences exist', async ({ page }) => {
       // FIXME: Selector not matching actual UI - needs investigation of UTable render structure
-      
+
       // Wait for any data to load
       await page.waitForTimeout(1500);
 
@@ -118,6 +127,13 @@ test.describe('Experience Management', () => {
 
   test.describe('Experience Creation', () => {
     test.beforeEach(async ({ page }) => {
+      // CRITICAL: Verify auth state first
+      await page.goto('/profile');
+      await page.waitForLoadState('networkidle');
+      if (page.url().includes('/login')) {
+        throw new Error('Auth state not restored');
+      }
+
       await page.goto('/profile/experiences');
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1000);
@@ -153,7 +169,7 @@ test.describe('Experience Management', () => {
 
     test.skip('should have required form fields', async ({ page }) => {
       // FIXME: Input selectors not matching - Nuxt UI may use different input types or wrapper elements
-      
+
       await page.goto('/profile/experiences/new');
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1000);
@@ -198,19 +214,16 @@ test.describe('Experience Management', () => {
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1000);
 
-      // Try to submit empty form - look for Save button
+      // Check that Save button is disabled for empty form
       const saveButton = page.locator('button:has-text("Save")').first();
 
       if ((await saveButton.count()) > 0) {
-        await saveButton.click();
-        await page.waitForTimeout(1000);
+        // Button should be disabled when required fields are empty
+        await expect(saveButton).toBeDisabled();
 
-        // Should either show validation errors OR stay on the same page (form validation preventing submission)
+        // Verify we're still on the new experience page
         const currentUrl = page.url();
-        const stillOnNewPage = currentUrl.includes('/new');
-
-        // If still on new page, form validation is working (preventing invalid submission)
-        expect(stillOnNewPage).toBe(true);
+        expect(currentUrl).toContain('/new');
       }
     });
 

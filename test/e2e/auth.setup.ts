@@ -29,9 +29,11 @@ setup('authenticate', async ({ page }) => {
   const passwordInput = page.locator('input[name="password"], input[type="password"]').first();
   await passwordInput.fill(TEST_USER.password);
 
-  // Click sign in button - wait for it to be ready
+  // Click sign in button - Amplify uses [data-amplify-button] attribute
   const signInButton = page
-    .locator('button[type="submit"], button:has-text("Sign in"), button:has-text("Sign In")')
+    .locator(
+      'button[data-amplify-button]:has-text("Sign in"), button[data-amplify-button]:has-text("Sign In")'
+    )
     .first();
   await signInButton.waitFor({ state: 'visible', timeout: 5000 });
 
@@ -39,20 +41,39 @@ setup('authenticate', async ({ page }) => {
   const SHORT_DELAY_MS = 500;
   await page.waitForTimeout(SHORT_DELAY_MS);
 
-  await signInButton.click();
+  // Click and wait for navigation
+  await Promise.all([
+    page.waitForNavigation({ timeout: 15000 }).catch(() => {}),
+    signInButton.click(),
+  ]);
 
   // Wait for successful authentication
   // After login, we should be redirected away from the login page
-  // Wait for navigation to complete or for authenticated content to appear
-  await page.waitForURL(/^(?!.*sign-in).*$/, { timeout: 15000 });
+  // OR navigation happens OR sign in button disappears
+  await Promise.race([
+    page.waitForURL(/^(?!.*login).*$/, { timeout: 15000 }).catch(() => {}),
+    page.waitForNavigation({ timeout: 15000 }).catch(() => {}),
+    signInButton.waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {}),
+  ]);
 
-  // Verify we're authenticated by checking for authenticated content
-  // (adjust this based on your app's structure after login)
-  const AUTH_SETTLE_DELAY_MS = 2000;
-  await page.waitForTimeout(AUTH_SETTLE_DELAY_MS); // Give time for auth state to settle
+  // CRITICAL: Wait for Amplify auth tokens to be stored
+  // Amplify stores tokens in localStorage/IndexedDB which takes time
+  await page.waitForTimeout(3000);
+
+  // Verify authentication by navigating to a protected route
+  await page.goto('/profile');
+  await page.waitForLoadState('networkidle');
+
+  // Ensure we're not redirected back to login
+  await page.waitForTimeout(2000);
+  const currentUrl = page.url();
+
+  if (currentUrl.includes('/login')) {
+    // Check for any error messages on the page
+    const errorText = await page.locator('[class*="error"], [role="alert"]').allTextContents();
+    throw new Error(`Authentication failed - still on login page. Errors: ${errorText.join(', ')}`);
+  }
 
   // Save signed-in state to reuse in all tests
   await page.context().storageState({ path: authFile });
-
-  console.log('✓ Authentication successful - state saved');
 });
