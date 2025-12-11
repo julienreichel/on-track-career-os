@@ -37,7 +37,6 @@ const experienceService = new ExperienceService();
 
 // Use new composables
 const {
-  story,
   formState,
   isDirty,
   canSave,
@@ -66,15 +65,10 @@ const {
 const {
   achievements,
   kpiSuggestions,
-  isGenerating: enhancerGenerating,
+  generating: enhancerGenerating,
   error: enhancerError,
-  generateFromStory,
-  addAchievement,
-  removeAchievement,
-  updateAchievement,
-  addKpi,
-  removeKpi,
-  updateKpi,
+  generate: generateEnhancements,
+  load: loadEnhancements,
 } = useStoryEnhancer();
 
 // UI state
@@ -198,7 +192,7 @@ const handleGenerateAchievements = async () => {
     result: formState.value.result,
   } as STARStory;
   
-  await generateFromStory(storyForGeneration);
+  await generateEnhancements(storyForGeneration);
 
   // Update story with generated achievements
   if (achievements.value.length > 0) {
@@ -207,11 +201,21 @@ const handleGenerateAchievements = async () => {
   if (kpiSuggestions.value.length > 0) {
     updateField('kpiSuggestions', kpiSuggestions.value);
   }
-};
-
-// Handle story form updates
+};// Handle story form updates
 const handleStoryUpdate = (field: keyof STARStory, value: unknown) => {
   updateField(field, value);
+};
+
+// Handle achievements update from component
+const handleAchievementsUpdate = (newAchievements: string[]) => {
+  achievements.value = newAchievements;
+  updateField('achievements', newAchievements);
+};
+
+// Handle KPIs update from component
+const handleKpisUpdate = (newKpis: string[]) => {
+  kpiSuggestions.value = newKpis;
+  updateField('kpiSuggestions', newKpis);
 };
 
 // Handle save
@@ -252,11 +256,11 @@ onMounted(async () => {
   if (!isNew.value && storyId.value) {
     await load(storyId.value);
     // Load existing achievements into enhancer
-    if (story.value?.achievements) {
-      story.value.achievements.forEach((ach) => addAchievement(ach));
-    }
-    if (story.value?.kpiSuggestions) {
-      story.value.kpiSuggestions.forEach((kpi) => addKpi(kpi));
+    if (formState.value) {
+      loadEnhancements({
+        achievements: formState.value.achievements || [],
+        kpiSuggestions: formState.value.kpiSuggestions || [],
+      });
     }
   } else if (isNew.value) {
     // Initialize new story with empty form state
@@ -395,14 +399,11 @@ onMounted(async () => {
 
             <AchievementsKpisPanel
               :achievements="achievements"
-              :kpi-suggestions="kpiSuggestions"
-              :is-generating="enhancerGenerating"
-              @add-achievement="addAchievement"
-              @remove-achievement="removeAchievement"
-              @update-achievement="updateAchievement"
-              @add-kpi="addKpi"
-              @remove-kpi="removeKpi"
-              @update-kpi="updateKpi"
+              :kpis="kpiSuggestions"
+              :generating="enhancerGenerating"
+              @update:achievements="handleAchievementsUpdate"
+              @update:kpis="handleKpisUpdate"
+              @regenerate="handleGenerateAchievements"
             />
           </UCard>
 
