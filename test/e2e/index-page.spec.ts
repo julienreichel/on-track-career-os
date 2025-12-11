@@ -38,19 +38,17 @@ test.describe('Home Page - Authenticated User', () => {
       .filter({ hasText: 'View and manage' })
       .first();
 
-    if ((await profileCard.count()) > 0) {
-      await profileCard.scrollIntoViewIfNeeded();
-      await page.waitForTimeout(200);
+    await profileCard.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(200);
 
-      // Click on the visible card (overlay link will handle navigation)
-      await profileCard.click();
+    // Click on the visible card (overlay link will handle navigation)
+    await profileCard.click();
 
-      // Wait for navigation
-      await page.waitForURL(/.*profile.*/, { timeout: 5000 });
+    // Wait for navigation
+    await page.waitForURL(/.*profile.*/, { timeout: 5000 });
 
-      // Verify we're on profile page
-      expect(page.url()).toContain('profile');
-    }
+    // Verify we're on profile page
+    expect(page.url()).toContain('profile');
   });
 
   test('should have CV upload feature when no experiences exist', async ({ page }) => {
@@ -58,37 +56,29 @@ test.describe('Home Page - Authenticated User', () => {
     // Check if CV upload link exists
     const cvUploadLink = page.locator('a[href*="cv-upload"]').first();
 
-    // If CV upload is shown, it should be clickable
-    if ((await cvUploadLink.count()) > 0) {
-      await expect(cvUploadLink).toBeVisible();
-    }
+    // CV upload should be visible
+    await expect(cvUploadLink).toBeVisible();
   });
 
   test('should display jobs feature card', async ({ page }) => {
     // Check for jobs-related content
     const jobsText = page.locator('text=/job/i').first();
 
-    if ((await jobsText.count()) > 0) {
-      await expect(jobsText).toBeVisible();
-    }
+    await expect(jobsText).toBeVisible();
   });
 
   test('should display applications feature card', async ({ page }) => {
     // Check for applications-related content
     const applicationsText = page.locator('text=/application/i').first();
 
-    if ((await applicationsText.count()) > 0) {
-      await expect(applicationsText).toBeVisible();
-    }
+    await expect(applicationsText).toBeVisible();
   });
 
   test('should display interview prep feature card', async ({ page }) => {
     // Check for interview-related content
     const interviewText = page.locator('text=/interview/i').first();
 
-    if ((await interviewText.count()) > 0) {
-      await expect(interviewText).toBeVisible();
-    }
+    await expect(interviewText).toBeVisible();
   });
 
   test('should have responsive layout on mobile', async ({ page }) => {
@@ -114,9 +104,7 @@ test.describe('Home Page - Authenticated User', () => {
     // Check for header/navigation element
     const header = page.locator('header, nav, [role="navigation"]').first();
 
-    if ((await header.count()) > 0) {
-      await expect(header).toBeVisible();
-    }
+    await expect(header).toBeVisible();
   });
 });
 

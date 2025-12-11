@@ -45,9 +45,7 @@ test.describe('Experience Management', () => {
         .filter({ hasText: /experience/i })
         .first();
 
-      if ((await heading.count()) > 0) {
-        await expect(heading).toBeVisible();
-      }
+      await expect(heading).toBeVisible();
     });
 
     test('should have "New Experience" button', async ({ page }) => {
@@ -59,20 +57,16 @@ test.describe('Experience Management', () => {
       // Wait a moment for buttons to render
       await page.waitForTimeout(500);
 
-      if ((await newButton.count()) > 0) {
-        await expect(newButton).toBeVisible();
-        await expect(newButton).toBeEnabled();
-      }
+      await expect(newButton).toBeVisible();
+      await expect(newButton).toBeEnabled();
     });
 
     test('should display empty state if no experiences', async ({ page }) => {
       // Check if empty state is shown
       const emptyState = page.locator('text=/no experiences|get started|create first/i').first();
 
-      // If empty state exists, it should be visible
-      if ((await emptyState.count()) > 0) {
-        await expect(emptyState).toBeVisible();
-      }
+      // Empty state should be visible
+      await expect(emptyState).toBeVisible();
     });
 
     test.skip('should display experience cards or table if experiences exist', async ({ page }) => {
@@ -98,9 +92,7 @@ test.describe('Experience Management', () => {
         )
         .first();
 
-      if ((await backButton.count()) > 0) {
-        await expect(backButton).toBeVisible();
-      }
+      await expect(backButton).toBeVisible();
     });
 
     test('should navigate to story list when clicking view stories button', async ({ page }) => {
@@ -109,19 +101,15 @@ test.describe('Experience Management', () => {
 
       // Check if there are any experience rows in the table
       const tableRows = page.locator('table tbody tr');
-      const count = await tableRows.count();
+      await expect(tableRows.first()).toBeVisible();
 
-      if (count > 0) {
-        // Click the first "View Stories" button (document-text icon)
-        const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
-        if ((await viewStoriesButton.count()) > 0) {
-          await viewStoriesButton.click();
+      // Click the first "View Stories" button (document-text icon)
+      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      await viewStoriesButton.click();
 
-          // Should navigate to stories page for that experience
-          await page.waitForLoadState('networkidle');
-          await expect(page).toHaveURL(/.*\/experiences\/[^/]+\/stories/);
-        }
-      }
+      // Should navigate to stories page for that experience
+      await page.waitForLoadState('networkidle');
+      await expect(page).toHaveURL(/.*\/experiences\/[^/]+\/stories/);
     });
   });
 
@@ -200,13 +188,8 @@ test.describe('Experience Management', () => {
         .locator('button:has-text("Cancel"), a:has-text("Cancel"), a:has-text("Back")')
         .first();
 
-      if ((await saveButton.count()) > 0) {
-        await expect(saveButton).toBeVisible();
-      }
-
-      if ((await cancelButton.count()) > 0) {
-        await expect(cancelButton).toBeVisible();
-      }
+      await expect(saveButton).toBeVisible();
+      await expect(cancelButton).toBeVisible();
     });
 
     test('should show validation errors for empty required fields', async ({ page }) => {
@@ -217,14 +200,12 @@ test.describe('Experience Management', () => {
       // Check that Save button is disabled for empty form
       const saveButton = page.locator('button:has-text("Save")').first();
 
-      if ((await saveButton.count()) > 0) {
-        // Button should be disabled when required fields are empty
-        await expect(saveButton).toBeDisabled();
+      // Button should be disabled when required fields are empty
+      await expect(saveButton).toBeDisabled();
 
-        // Verify we're still on the new experience page
-        const currentUrl = page.url();
-        expect(currentUrl).toContain('/new');
-      }
+      // Verify we're still on the new experience page
+      const currentUrl = page.url();
+      expect(currentUrl).toContain('/new');
     });
 
     test('should successfully create experience with valid data', async ({ page }) => {
@@ -250,21 +231,17 @@ test.describe('Experience Management', () => {
 
       // Fill start date (first date input)
       const dateInputs = page.locator('input[type="date"]');
-      if ((await dateInputs.count()) > 0) {
-        await dateInputs.first().fill('2024-01-01');
-      }
+      await dateInputs.first().fill('2024-01-01');
 
       // Submit form
       const saveButton = page.locator('button:has-text("Save")').first();
 
-      if ((await saveButton.count()) > 0) {
-        await saveButton.click();
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(2000);
+      await saveButton.click();
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(2000);
 
-        // Should redirect back to experiences list
-        await expect(page).toHaveURL(/.*\/profile\/experiences$/);
-      }
+      // Should redirect back to experiences list
+      await expect(page).toHaveURL(/.*\/profile\/experiences$/);
     });
 
     test('should allow canceling experience creation', async ({ page }) => {
@@ -276,13 +253,11 @@ test.describe('Experience Management', () => {
         .locator('button:has-text("Cancel"), a:has-text("Cancel"), a:has-text("Back")')
         .first();
 
-      if ((await cancelButton.count()) > 0) {
-        await cancelButton.click();
-        await page.waitForLoadState('networkidle');
+      await cancelButton.click();
+      await page.waitForLoadState('networkidle');
 
-        // Should navigate back to experiences list
-        await expect(page).toHaveURL(/.*\/experiences$/);
-      }
+      // Should navigate back to experiences list
+      await expect(page).toHaveURL(/.*\/experiences$/);
     });
   });
 });

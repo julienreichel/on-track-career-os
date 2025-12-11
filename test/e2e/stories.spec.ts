@@ -44,9 +44,7 @@ test.describe('Story Management', () => {
       // Look for stories title/header
       const heading = page.locator('h1, h2').filter({ hasText: /stor/i }).first();
 
-      if ((await heading.count()) > 0) {
-        await expect(heading).toBeVisible();
-      }
+      await expect(heading).toBeVisible();
     });
 
     test('should have back to profile navigation', async ({ page }) => {
@@ -55,9 +53,7 @@ test.describe('Story Management', () => {
         .locator('button:has-text("Profile"), a:has-text("Profile"), a:has-text("Back")')
         .first();
 
-      if ((await backButton.count()) > 0) {
-        await expect(backButton).toBeVisible();
-      }
+      await expect(backButton).toBeVisible();
     });
 
     test('should have search functionality', async ({ page }) => {
@@ -66,19 +62,15 @@ test.describe('Story Management', () => {
         .locator('input[type="search"], input[placeholder*="search" i]')
         .first();
 
-      if ((await searchInput.count()) > 0) {
-        await expect(searchInput).toBeVisible();
-      }
+      await expect(searchInput).toBeVisible();
     });
 
     test('should display empty state if no stories', async ({ page }) => {
       // Check if empty state is shown
       const emptyState = page.locator('text=/no stories|get started|create first/i').first();
 
-      // If empty state exists, it should be visible
-      if ((await emptyState.count()) > 0) {
-        await expect(emptyState).toBeVisible();
-      }
+      // Empty state should be visible
+      await expect(emptyState).toBeVisible();
     });
 
     test('should display story cards if stories exist', async ({ page }) => {
@@ -218,9 +210,7 @@ test.describe('Story Management', () => {
           .locator('button:has-text("New"), a:has-text("New"), button:has-text("Add")')
           .first();
 
-        if ((await newButton.count()) > 0) {
-          await expect(newButton).toBeVisible();
-        }
+        await expect(newButton).toBeVisible();
       }
     });
 
@@ -244,9 +234,7 @@ test.describe('Story Management', () => {
           )
           .first();
 
-        if ((await generateButton.count()) > 0) {
-          await expect(generateButton).toBeVisible();
-        }
+        await expect(generateButton).toBeVisible();
       }
     });
 
@@ -294,30 +282,24 @@ test.describe('Story Management', () => {
         const titleInput = page
           .locator('input[name="title"], input[placeholder*="title" i]')
           .first();
-        if ((await titleInput.count()) > 0) {
-          await titleInput.fill('E2E Test Experience for Stories');
+        await titleInput.fill('E2E Test Experience for Stories');
 
-          const companyInput = page
-            .locator('input[name="company"], input[placeholder*="company" i]')
-            .first();
-          if ((await companyInput.count()) > 0) {
-            await companyInput.fill('E2E Test Company');
-          }
+        const companyInput = page
+          .locator('input[name="company"], input[placeholder*="company" i]')
+          .first();
+        await companyInput.fill('E2E Test Company');
 
-          // Save the experience
-          const saveButton = page.locator('button:has-text("Save"), button[type="submit"]').first();
-          if ((await saveButton.count()) > 0) {
-            await saveButton.click();
-            await page.waitForLoadState('networkidle');
-            await page.waitForTimeout(1000);
+        // Save the experience
+        const saveButton = page.locator('button:has-text("Save"), button[type="submit"]').first();
+        await saveButton.click();
+        await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(1000);
 
-            // Extract experience ID from URL
-            const url = page.url();
-            const match = url.match(/\/experiences\/([a-f0-9-]+)/);
-            if (match) {
-              experienceId = match[1];
-            }
-          }
+        // Extract experience ID from URL
+        const url = page.url();
+        const match = url.match(/\/experiences\/([a-f0-9-]+)/);
+        if (match) {
+          experienceId = match[1];
         }
       }
     });
@@ -396,9 +378,7 @@ test.describe('Story Management', () => {
         .locator('button:has-text("Save"), button:has-text("Create"), button[type="submit"]')
         .first();
 
-      if ((await saveButton.count()) > 0) {
-        await expect(saveButton).toBeVisible();
-      }
+      await expect(saveButton).toBeVisible();
     });
 
     test('should have cancel button', async ({ page }) => {
@@ -411,9 +391,7 @@ test.describe('Story Management', () => {
       // Look for cancel button
       const cancelButton = page.locator('button:has-text("Cancel"), a:has-text("Back")').first();
 
-      if ((await cancelButton.count()) > 0) {
-        await expect(cancelButton).toBeVisible();
-      }
+      await expect(cancelButton).toBeVisible();
     });
   });
 
@@ -438,30 +416,24 @@ test.describe('Story Management', () => {
         const titleInput = page
           .locator('input[name="title"], input[placeholder*="title" i]')
           .first();
-        if ((await titleInput.count()) > 0) {
-          await titleInput.fill('E2E Test Experience for Free Text Stories');
+        await titleInput.fill('E2E Test Experience for Free Text Stories');
 
-          const companyInput = page
-            .locator('input[name="company"], input[placeholder*="company" i]')
-            .first();
-          if ((await companyInput.count()) > 0) {
-            await companyInput.fill('E2E Test Company');
-          }
+        const companyInput = page
+          .locator('input[name="company"], input[placeholder*="company" i]')
+          .first();
+        await companyInput.fill('E2E Test Company');
 
-          // Save the experience
-          const saveButton = page.locator('button:has-text("Save"), button[type="submit"]').first();
-          if ((await saveButton.count()) > 0) {
-            await saveButton.click();
-            await page.waitForLoadState('networkidle');
-            await page.waitForTimeout(1000);
+        // Save the experience
+        const saveButton = page.locator('button:has-text("Save"), button[type="submit"]').first();
+        await saveButton.click();
+        await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(1000);
 
-            // Extract experience ID from URL
-            const url = page.url();
-            const match = url.match(/\/experiences\/([a-f0-9-]+)/);
-            if (match) {
-              experienceId = match[1];
-            }
-          }
+        // Extract experience ID from URL
+        const url = page.url();
+        const match = url.match(/\/experiences\/([a-f0-9-]+)/);
+        if (match) {
+          experienceId = match[1];
         }
       }
     });
@@ -493,9 +465,7 @@ test.describe('Story Management', () => {
         .locator('button:has-text("Generate"), button:has-text("AI"), button:has-text("Create")')
         .first();
 
-      if ((await generateButton.count()) > 0) {
-        await expect(generateButton).toBeVisible();
-      }
+      await expect(generateButton).toBeVisible();
     });
 
     test('should allow pasting text content', async ({ page }) => {
@@ -549,10 +519,8 @@ test.describe('Story Management', () => {
           .locator('button:has-text("Generate"), button:has-text("Auto")')
           .first();
 
-        if ((await generateButton.count()) > 0) {
-          await expect(generateButton).toBeVisible();
-          await expect(generateButton).toBeEnabled();
-        }
+        await expect(generateButton).toBeVisible();
+        await expect(generateButton).toBeEnabled();
       }
     });
 
@@ -572,19 +540,13 @@ test.describe('Story Management', () => {
           .locator('button:has-text("Generate"), button:has-text("Auto")')
           .first();
 
-        if ((await generateButton.count()) > 0) {
-          // Click generate button
-          await generateButton.click();
-          await page.waitForTimeout(500);
+        // Click generate button
+        await generateButton.click();
+        await page.waitForTimeout(500);
 
-          // Should show some loading indicator
-          const hasLoading =
-            (await page.locator('text=/generating|loading|processing/i').count()) > 0 ||
-            (await page.locator('[class*="loading"], [class*="spinner"]').count()) > 0;
-
-          // Loading state might be brief, so this is optional
-          expect(typeof hasLoading).toBe('boolean');
-        }
+        // Should show some loading indicator
+        const loading = page.locator('text=/generating|loading|processing/i, [class*="loading"], [class*="spinner"]').first();
+        await expect(loading).toBeVisible();
       }
     });
 
@@ -604,20 +566,16 @@ test.describe('Story Management', () => {
           .locator('button:has-text("Generate"), button:has-text("Auto")')
           .first();
 
-        if ((await generateButton.count()) > 0) {
-          // Click generate
-          await generateButton.click();
+        // Click generate
+        await generateButton.click();
 
-          // Wait for generation (this could take a while with real AI)
-          await page.waitForTimeout(5000);
-          await page.waitForLoadState('networkidle');
+        // Wait for generation (this could take a while with real AI)
+        await page.waitForTimeout(5000);
+        await page.waitForLoadState('networkidle');
 
-          // Should have cards after generation
-          const finalCards = await page.locator('[class*="card"]').count();
-
-          // Either already had stories or generated new ones
-          expect(finalCards >= 0).toBe(true);
-        }
+        // Should have cards after generation
+        const cards = page.locator('[class*="card"]');
+        await expect(cards.first()).toBeVisible();
       }
     });
   });

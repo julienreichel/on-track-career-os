@@ -23,9 +23,7 @@ test.describe('Profile Page - View Mode', () => {
     // Give it a moment to render
     await page.waitForTimeout(500);
 
-    if ((await heading.count()) > 0) {
-      await expect(heading).toBeVisible();
-    }
+    await expect(heading).toBeVisible();
   });
 
   test('should display back to home button', async ({ page }) => {
@@ -34,9 +32,7 @@ test.describe('Profile Page - View Mode', () => {
       .locator('button:has-text("back"), a:has-text("back"), button:has-text("home")')
       .first();
 
-    if ((await backButton.count()) > 0) {
-      await expect(backButton).toBeVisible();
-    }
+    await expect(backButton).toBeVisible();
   });
 
   test('should have edit button in view mode', async ({ page }) => {
@@ -46,17 +42,11 @@ test.describe('Profile Page - View Mode', () => {
     // Wait a moment for buttons to render
     await page.waitForTimeout(500);
 
-    if ((await editButton.count()) > 0) {
-      await expect(editButton).toBeVisible();
-      await expect(editButton).toBeEnabled();
-    }
+    await expect(editButton).toBeVisible();
+    await expect(editButton).toBeEnabled();
   });
 
-  test.skip('should display profile sections', async ({ page }) => {
-    // FIXME: This test consistently redirects to /login instead of showing profile
-    // Auth state from test-results/.auth/user.json is not being applied
-    // All 3 retry attempts fail - not a timing issue
-
+  test('should display profile sections', async ({ page }) => {
     // Profile page should be visible (even if empty)
     const body = page.locator('body');
     await expect(body).toBeVisible();
@@ -85,27 +75,21 @@ test.describe('Profile Page - View Mode', () => {
     // Look for goals/aspirations
     const careerSection = page.locator('text=/goals|aspirations|career/i').first();
 
-    if ((await careerSection.count()) > 0) {
-      await expect(careerSection).toBeVisible();
-    }
+    await expect(careerSection).toBeVisible();
   });
 
   test('should display identity & values section', async ({ page }) => {
     // Look for values/strengths/interests
     const identitySection = page.locator('text=/values|strengths|interests/i').first();
 
-    if ((await identitySection.count()) > 0) {
-      await expect(identitySection).toBeVisible();
-    }
+    await expect(identitySection).toBeVisible();
   });
 
   test('should display professional attributes section', async ({ page }) => {
     // Look for skills/certifications/languages
     const attributesSection = page.locator('text=/skills|certifications|languages/i').first();
 
-    if ((await attributesSection.count()) > 0) {
-      await expect(attributesSection).toBeVisible();
-    }
+    await expect(attributesSection).toBeVisible();
   });
 
   test('should display management links section', async ({ page }) => {
@@ -120,9 +104,7 @@ test.describe('Profile Page - View Mode', () => {
       .locator('text=/related|management|experience|stories|canvas/i')
       .first();
 
-    if ((await managementSection.count()) > 0) {
-      await expect(managementSection).toBeVisible();
-    }
+    await expect(managementSection).toBeVisible();
   });
 
   test('should have link to experiences page', async ({ page }) => {
@@ -160,72 +142,57 @@ test.describe('Profile Page - Edit Mode', () => {
     // Wait for button to be ready
     await page.waitForTimeout(500);
 
-    if ((await editButton.count()) > 0) {
-      await editButton.click();
+    await editButton.click();
 
-      // Wait for edit mode to activate
-      await page.waitForTimeout(500);
+    // Wait for edit mode to activate
+    await page.waitForTimeout(500);
 
-      // Should now see save/cancel buttons
-      const saveButton = page.locator('button:has-text("save")').first();
-      const cancelButton = page.locator('button:has-text("cancel")').first();
+    // Should now see save/cancel buttons
+    const saveButton = page.locator('button:has-text("save")').first();
+    const cancelButton = page.locator('button:has-text("cancel")').first();
 
-      // At least one of these should be visible in edit mode
-      const hasSave = (await saveButton.count()) > 0;
-      const hasCancel = (await cancelButton.count()) > 0;
-
-      expect(hasSave || hasCancel).toBeTruthy();
-    }
+    // At least one of these should be visible in edit mode
+    await expect(saveButton.or(cancelButton)).toBeVisible();
   });
 
   test('should display form inputs in edit mode', async ({ page }) => {
-    // Try to enter edit mode
+    // Enter edit mode
     const editButton = page.locator('button:has-text("edit")').first();
 
-    if ((await editButton.count()) > 0) {
-      await editButton.click();
-      await page.waitForTimeout(500);
+    await editButton.click();
+    await page.waitForTimeout(500);
 
-      // Should see input fields
-      const inputs = page.locator('input, textarea').count();
+    // Should see input fields
+    const inputs = page.locator('input, textarea');
 
-      expect(await inputs).toBeGreaterThan(0);
-    }
+    await expect(inputs.first()).toBeVisible();
   });
 
   test('should have cancel button in edit mode', async ({ page }) => {
     const editButton = page.locator('button:has-text("edit")').first();
 
-    if ((await editButton.count()) > 0) {
-      await editButton.click();
-      await page.waitForTimeout(500);
+    await editButton.click();
+    await page.waitForTimeout(500);
 
-      const cancelButton = page.locator('button:has-text("cancel")').first();
+    const cancelButton = page.locator('button:has-text("cancel")').first();
 
-      if ((await cancelButton.count()) > 0) {
-        await expect(cancelButton).toBeVisible();
-        await expect(cancelButton).toBeEnabled();
-      }
-    }
+    await expect(cancelButton).toBeVisible();
+    await expect(cancelButton).toBeEnabled();
   });
 
   test('should exit edit mode when cancel is clicked', async ({ page }) => {
     const editButton = page.locator('button:has-text("edit")').first();
 
-    if ((await editButton.count()) > 0) {
-      await editButton.click();
-      await page.waitForTimeout(500);
+    await editButton.click();
+    await page.waitForTimeout(500);
 
-      const cancelButton = page.locator('button:has-text("cancel")').first();
+    const cancelButton = page.locator('button:has-text("cancel")').first();
 
-      if ((await cancelButton.count()) > 0) {
-        await cancelButton.click();
-        await page.waitForTimeout(500);
+    await cancelButton.click();
+    await page.waitForTimeout(500);
 
-        // Should be back in view mode - edit button should be visible again
-        await expect(editButton).toBeVisible();
-      }
-    }
+    // Should be back in view mode - edit button should be visible again
+    await expect(editButton).toBeVisible();
   });
 });
 
@@ -281,16 +248,14 @@ test.describe('Profile Page - Navigation', () => {
       .locator('button:has-text("back"), a:has-text("back"), a:has-text("home")')
       .first();
 
-    if ((await backButton.count()) > 0) {
-      await backButton.click();
+    await backButton.click();
 
-      // Wait for navigation
-      await page.waitForTimeout(1000);
+    // Wait for navigation
+    await page.waitForTimeout(1000);
 
-      // Should be back at home
-      const url = page.url();
-      expect(url).toMatch(/\/$|\/index/);
-    }
+    // Should be back at home
+    const url = page.url();
+    expect(url).toMatch(/\/$|\/index/);
   });
 
   test('should navigate to experiences page from profile', async ({ page }) => {
