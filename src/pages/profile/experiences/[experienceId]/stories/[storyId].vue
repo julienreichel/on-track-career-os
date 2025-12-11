@@ -6,7 +6,7 @@ import { useStoryEditor } from '@/composables/useStoryEditor';
 import { useStarInterview } from '@/composables/useStarInterview';
 import { useStoryEnhancer } from '@/composables/useStoryEnhancer';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
-import type { Experience } from '@/domain/experience/Experience';
+import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { STARStory } from '@/domain/starstory/STARStory';
 
 defineOptions({
@@ -50,16 +50,8 @@ const {
 } = useStoryEditor();
 
 const {
-  chatHistory,
-  currentStep,
-  allStepsCompleted,
-  generatedStory,
   generating: interviewGenerating,
   error: interviewError,
-  initialize,
-  submitAnswer,
-  nextStep,
-  generateStory,
 } = useStarInterview();
 
 const {
@@ -74,76 +66,17 @@ const {
 // UI state
 const showModeSelection = ref(true);
 const selectedMode = ref<'interview' | 'manual' | null>(null);
-const showInterviewChat = ref(false);
 const showAchievementsPanel = ref(false);
+const freeTextInput = ref('');
 
 // Computed states
 const loading = computed(() => editorLoading.value || interviewGenerating.value);
 const error = computed(() => editorError.value || interviewError.value || enhancerError.value);
 
-/**
- * Format experience data as text for AI generation
- */
-const formatExperienceAsText = (experience: Experience): string => {
-  const lines = [];
-
-  lines.push(`Job Title: ${experience.title}`);
-
-  if (experience.companyName) {
-    lines.push(`Company: ${experience.companyName}`);
-  }
-
-  const startDate = experience.startDate ? new Date(experience.startDate).toLocaleDateString() : '';
-  const endDate = experience.endDate
-    ? new Date(experience.endDate).toLocaleDateString()
-    : 'Present';
-  lines.push(`Duration: ${startDate} - ${endDate}`);
-  lines.push('');
-
-  if (experience.responsibilities && experience.responsibilities.length > 0) {
-    lines.push('Responsibilities:');
-    experience.responsibilities.forEach((resp) => lines.push(`- ${resp}`));
-    lines.push('');
-  }
-
-  if (experience.tasks && experience.tasks.length > 0) {
-    lines.push('Tasks & Achievements:');
-    experience.tasks.forEach((task) => lines.push(`- ${task}`));
-  }
-
-  return lines.join('\n');
-};
-
-// Handle starting interview mode
-const handleStartInterview = async () => {
+// Handle starting free text mode
+const handleStartInterview = () => {
   selectedMode.value = 'interview';
   showModeSelection.value = false;
-  showInterviewChat.value = true;
-
-  try {
-    const experience = await experienceService.getFullExperience(experienceId.value);
-    if (experience) {
-      const formattedText = formatExperienceAsText(experience);
-      // Create new interview composable with source text
-      const interviewWithContext = useStarInterview(formattedText);
-      // Copy refs to use in template
-      Object.assign(
-        { chatHistory, currentStep, allStepsCompleted, generatedStory },
-        {
-          chatHistory: interviewWithContext.chatHistory,
-          currentStep: interviewWithContext.currentStep,
-          allStepsCompleted: interviewWithContext.allStepsCompleted,
-          generatedStory: interviewWithContext.generatedStory,
-        }
-      );
-      interviewWithContext.initialize();
-    } else {
-      // No experience context, just initialize
-      initialize();
-    }
-  } catch (err) {
-    console.error('[StoryForm] Interview start error:', err);
-  }
 };
 
 // Handle manual mode selection
@@ -152,32 +85,34 @@ const handleSelectManual = () => {
   showModeSelection.value = false;
 };
 
-// Handle interview answer submission
-const handleAnswerSubmit = async (answer: string) => {
-  if (submitAnswer(answer)) {
-    if (!nextStep()) {
-      // Last step completed, generate story
-      const story = await generateStory();
-      if (story) {
-        // Populate form state with generated story
-        updateField('situation', story.situation);
-        updateField('task', story.task);
-        updateField('action', story.action);
-        updateField('result', story.result);
-      }
+// Handle free text submission
+const handleSubmitFreeText = async () => {
+  if (!freeTextInput.value.trim()) return;
+
+  try {
+    const storyService = new STARStoryService();
+    const aiStories = await storyService.generateStar(freeTextInput.value);
+
+    if (aiStories && aiStories.length > 0) {
+      const story = aiStories[0];
+      // Populate form state with generated story
+      updateField('situation', story.situation);
+      updateField('task', story.task);
+      updateField('action', story.action);
+      updateField('result', story.result);
+
+      // Switch to manual mode to show the form
+      selectedMode.value = 'manual';
+
+      // Generate achievements automatically
+      await handleGenerateAchievements();
     }
+  } catch (err) {
+    console.error('[StoryForm] Free text generation error:', err);
   }
 };
 
-// Handle interview completion
-watch(allStepsCompleted, async (complete) => {
-  if (complete && generatedStory.value) {
-    showInterviewChat.value = false;
-    selectedMode.value = 'manual'; // Switch to manual mode to show form
-    // Generate achievements automatically
-    await handleGenerateAchievements();
-  }
-});
+
 
 // Handle achievements generation
 const handleGenerateAchievements = async () => {
@@ -191,7 +126,7 @@ const handleGenerateAchievements = async () => {
     action: formState.value.action,
     result: formState.value.result,
   } as STARStory;
-  
+
   await generateEnhancements(storyForGeneration);
 
   // Update story with generated achievements
@@ -201,7 +136,7 @@ const handleGenerateAchievements = async () => {
   if (kpiSuggestions.value.length > 0) {
     updateField('kpiSuggestions', kpiSuggestions.value);
   }
-};// Handle story form updates
+}; // Handle story form updates
 const handleStoryUpdate = (field: keyof STARStory, value: unknown) => {
   updateField(field, value);
 };
@@ -359,14 +294,43 @@ onMounted(async () => {
           </div>
         </UCard>
 
-        <!-- Interview Chat -->
-        <UCard v-else-if="showInterviewChat && !allStepsCompleted" class="mb-6">
-          <StarInterviewChat
-            :messages="chatHistory"
-            :current-question="currentStep?.question || ''"
-            :is-generating="interviewGenerating"
-            @answer="handleAnswerSubmit"
-          />
+        <!-- Free Text Input -->
+        <UCard v-else-if="isNew && selectedMode === 'interview'" class="mb-6">
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-lg font-semibold mb-2">
+                {{ t('stories.builder.modeFreetext') }}
+              </h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ t('stories.builder.freetextInstructions') }}
+              </p>
+            </div>
+
+            <UFormField :label="t('stories.builder.freetextLabel')" required>
+              <UTextarea
+                v-model="freeTextInput"
+                :placeholder="t('stories.builder.freetextPlaceholder')"
+                :rows="10"
+                :disabled="interviewGenerating"
+                class="w-full"
+              />
+            </UFormField>
+
+            <div class="flex justify-end gap-3">
+              <UButton
+                :label="t('common.cancel')"
+                variant="ghost"
+                @click="handleCancel"
+              />
+              <UButton
+                :label="t('stories.builder.generateFromText')"
+                icon="i-heroicons-sparkles"
+                :disabled="!freeTextInput.trim() || interviewGenerating"
+                :loading="interviewGenerating"
+                @click="handleSubmitFreeText"
+              />
+            </div>
+          </div>
         </UCard>
 
         <!-- Story Form (for manual mode or editing or after interview) -->
