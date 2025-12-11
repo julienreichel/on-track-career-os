@@ -2,11 +2,12 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { useStoryEngine } from '@/application/starstory/useStoryEngine';
+import { useStoryEditor } from '@/composables/useStoryEditor';
+import { useStarInterview } from '@/composables/useStarInterview';
+import { useStoryEnhancer } from '@/composables/useStoryEnhancer';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
-import StoryBuilder from '@/components/StoryBuilder.vue';
-import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 import type { Experience } from '@/domain/experience/Experience';
+import type { STARStory } from '@/domain/starstory/STARStory';
 
 defineOptions({
   name: 'StoryFormPage',
@@ -34,25 +35,55 @@ watch(
 
 const experienceService = new ExperienceService();
 
+// Use new composables
 const {
-  selectedStory,
-  draftStory,
-  loading,
-  generating,
+  story,
+  isDirty,
+  isValid,
+  loading: editorLoading,
   saving,
-  error,
+  error: editorError,
   loadStory,
-  runStarInterview,
-  generateAchievements,
-  saveStory,
-  updateDraft,
+  createStory,
   updateStory,
-} = useStoryEngine(experienceId);
+  updateField,
+} = useStoryEditor(experienceId);
 
-const generatedAchievements = ref<AchievementsAndKpis | null>(null);
+const {
+  messages,
+  currentQuestion,
+  isComplete,
+  isGenerating: interviewGenerating,
+  error: interviewError,
+  startInterview,
+  answerQuestion,
+} = useStarInterview();
+
+const {
+  achievements,
+  kpiSuggestions,
+  isGenerating: enhancerGenerating,
+  error: enhancerError,
+  generateFromStory,
+  addAchievement,
+  removeAchievement,
+  updateAchievement,
+  addKpi,
+  removeKpi,
+  updateKpi,
+} = useStoryEnhancer();
+
+// UI state
 const showModeSelection = ref(true);
-const selectedMode = ref<'experience' | 'freetext' | 'manual' | null>(null);
-const freeTextInput = ref('');
+const selectedMode = ref<'interview' | 'manual' | null>(null);
+const showInterviewChat = ref(false);
+const showAchievementsPanel = ref(false);
+
+// Computed states
+const loading = computed(() => editorLoading.value || interviewGenerating.value);
+const error = computed(
+  () => editorError.value || interviewError.value || enhancerError.value
+);
 
 /**
  * Format experience data as text for AI generation
@@ -87,82 +118,71 @@ const formatExperienceAsText = (experience: Experience): string => {
   return lines.join('\n');
 };
 
-// Handle generation from experience data
-const handleGenerateFromExperience = async () => {
+// Handle starting interview mode
+const handleStartInterview = async () => {
+  selectedMode.value = 'interview';
+  showModeSelection.value = false;
+  showInterviewChat.value = true;
+
   try {
     const experience = await experienceService.getFullExperience(experienceId.value);
-    if (!experience) {
-      throw new Error('Experience not found');
+    if (experience) {
+      const formattedText = formatExperienceAsText(experience);
+      await startInterview(formattedText);
     }
-
-    const formattedText = formatExperienceAsText(experience);
-    await handleGenerateFromText(formattedText);
   } catch (err) {
-    console.error('[StoryForm] Generate from experience error:', err);
+    console.error('[StoryForm] Interview start error:', err);
   }
 };
 
-// Handle AI generation from free text
-const handleGenerateFromText = async (freeText: string) => {
-  try {
-    const result = await runStarInterview(freeText);
-    if (result) {
-      // Draft is automatically updated by runStarInterview
-      // Hide mode selection and show the builder
-      showModeSelection.value = false;
-      // Keep selectedMode or set to manual to show the builder
-      selectedMode.value = 'manual';
-    }
-  } catch (err) {
-    console.error('[StoryForm] Generation error:', err);
-  }
+// Handle manual mode selection
+const handleSelectManual = () => {
+  selectedMode.value = 'manual';
+  showModeSelection.value = false;
 };
 
-// Handle submitting free text for generation
-const handleSubmitFreeText = async () => {
-  if (!freeTextInput.value.trim()) return;
-  await handleGenerateFromText(freeTextInput.value);
-};
+// Handle interview completion
+watch(isComplete, async (complete) => {
+  if (complete && messages.value.length > 0) {
+    showInterviewChat.value = false;
+    // Story is already populated by the interview composable
+    // Generate achievements automatically
+    await handleGenerateAchievements();
+  }
+});
 
 // Handle achievements generation
 const handleGenerateAchievements = async () => {
-  try {
-    const result = await generateAchievements();
-    if (result) {
-      generatedAchievements.value = result;
-    }
-  } catch (err) {
-    console.error('[StoryForm] Achievements generation error:', err);
+  if (!story.value) return;
+
+  showAchievementsPanel.value = true;
+  await generateFromStory(story.value);
+
+  // Update story with generated achievements
+  if (achievements.value.length > 0) {
+    updateField('achievements', achievements.value);
+  }
+  if (kpiSuggestions.value.length > 0) {
+    updateField('kpiSuggestions', kpiSuggestions.value);
   }
 };
 
-interface StoryData {
-  situation: string;
-  task: string;
-  action: string;
-  result: string;
-  achievements: string[];
-  kpiSuggestions: string[];
-}
+// Handle story form updates
+const handleStoryUpdate = (field: keyof STARStory, value: unknown) => {
+  updateField(field, value);
+};
 
 // Handle save
-const handleSave = async (storyData: StoryData) => {
+const handleSave = async () => {
+  if (!story.value) return;
+
   try {
     if (isNew.value) {
-      // Update draft with form data
-      updateDraft(storyData);
-
-      // Save the draft
-      const saved = await saveStory(experienceId.value);
-      if (saved) {
-        router.push(`/profile/experiences/${experienceId.value}/stories`);
-      }
+      await createStory(story.value);
     } else {
-      const updated = await updateStory(storyId.value, storyData);
-      if (updated) {
-        router.push(`/profile/experiences/${experienceId.value}/stories`);
-      }
+      await updateStory(storyId.value, story.value);
     }
+    router.push(`/profile/experiences/${experienceId.value}/stories`);
   } catch (err) {
     console.error('[StoryForm] Save error:', err);
   }
@@ -170,6 +190,11 @@ const handleSave = async (storyData: StoryData) => {
 
 // Handle cancel
 const handleCancel = () => {
+  if (isDirty.value) {
+    if (!confirm(t('stories.editor.unsavedChanges'))) {
+      return;
+    }
+  }
   router.push(`/profile/experiences/${experienceId.value}/stories`);
 };
 
@@ -188,6 +213,13 @@ onMounted(async () => {
   // If editing, load the story
   if (!isNew.value && storyId.value) {
     await loadStory(storyId.value);
+    // Load existing achievements into enhancer
+    if (story.value?.achievements) {
+      story.value.achievements.forEach((ach) => addAchievement(ach));
+    }
+    if (story.value?.kpiSuggestions) {
+      story.value.kpiSuggestions.forEach((kpi) => addKpi(kpi));
+    }
   }
 });
 </script>
@@ -197,9 +229,7 @@ onMounted(async () => {
     <UPage>
       <UPageHeader
         :title="isNew ? t('stories.builder.newTitle') : t('stories.builder.editTitle')"
-        :description="
-          isNew ? t('stories.builder.newDescription') : t('stories.builder.editDescription')
-        "
+        :description="companyName"
         :links="[
           {
             label: t('stories.builder.backToStories'),
@@ -210,35 +240,30 @@ onMounted(async () => {
       />
 
       <UPageBody>
+        <!-- Error Alert -->
         <UAlert
           v-if="error"
           color="red"
-          icon="i-heroicons-exclamation-circle"
+          icon="i-heroicons-exclamation-triangle"
           :title="t('common.error')"
           :description="error"
+          class="mb-6"
         />
 
+        <!-- Loading State -->
         <div v-if="loading" class="flex items-center justify-center py-12">
           <div class="text-center">
-            <USkeleton class="h-8 w-64 mb-2" />
+            <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
             <p class="text-sm text-gray-600 dark:text-gray-400">
               {{ t('stories.builder.loading') }}
             </p>
           </div>
         </div>
 
-        <div v-else-if="generating" class="flex items-center justify-center py-12">
-          <div class="text-center">
-            <USkeleton class="h-8 w-64 mb-2" />
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ t('stories.builder.generating') }}
-            </p>
-          </div>
-        </div>
-
+        <!-- Saving State -->
         <div v-else-if="saving" class="flex items-center justify-center py-12">
           <div class="text-center">
-            <USkeleton class="h-8 w-64 mb-2" />
+            <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
             <p class="text-sm text-gray-600 dark:text-gray-400">
               {{ t('stories.builder.saving') }}
             </p>
@@ -246,44 +271,28 @@ onMounted(async () => {
         </div>
 
         <!-- Mode Selection (only for new stories) -->
-        <UCard v-else-if="isNew && showModeSelection && !selectedMode">
+        <UCard v-else-if="isNew && showModeSelection && !selectedMode" class="mb-6">
           <div class="space-y-6">
             <div>
               <h3 class="text-lg font-semibold mb-2">
                 {{ t('stories.builder.chooseMode') }}
               </h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ t('stories.builder.chooseModeDescription') }}
+              </p>
             </div>
 
-            <div class="grid gap-4 md:grid-cols-3">
-              <!-- Generate from Experience -->
+            <div class="grid gap-4 md:grid-cols-2">
+              <!-- Interview Mode -->
               <UCard
                 class="cursor-pointer hover:border-primary-500 transition-colors"
-                @click="
-                  () => {
-                    selectedMode = 'experience';
-                    handleGenerateFromExperience();
-                  }
-                "
+                @click="handleStartInterview"
               >
                 <div class="flex flex-col items-center text-center gap-3 p-4">
-                  <u-icon name="i-heroicons-sparkles" class="w-8 h-8 text-primary-500" />
-                  <h4 class="font-medium">{{ t('stories.builder.modeExperience') }}</h4>
+                  <UIcon name="i-heroicons-chat-bubble-left-right" class="w-8 h-8 text-primary" />
+                  <h4 class="font-medium">{{ t('stories.builder.modeInterview') }}</h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('stories.builder.modeExperienceDescription') }}
-                  </p>
-                </div>
-              </UCard>
-
-              <!-- Generate from Free Text -->
-              <UCard
-                class="cursor-pointer hover:border-primary-500 transition-colors"
-                @click="selectedMode = 'freetext'"
-              >
-                <div class="text-center p-4 space-y-3">
-                  <u-icon name="i-heroicons-document-text" class="w-8 h-8 text-primary-500" />
-                  <h4 class="font-medium">{{ t('stories.builder.modeFreetext') }}</h4>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('stories.builder.modeFreetextDescription') }}
+                    {{ t('stories.builder.modeInterviewDescription') }}
                   </p>
                 </div>
               </UCard>
@@ -291,10 +300,10 @@ onMounted(async () => {
               <!-- Manual Entry -->
               <UCard
                 class="cursor-pointer hover:border-primary-500 transition-colors"
-                @click="selectedMode = 'manual'"
+                @click="handleSelectManual"
               >
-                <div class="text-center p-4 space-y-3">
-                  <u-icon name="i-heroicons-pencil-square" class="w-8 h-8 text-primary-500" />
+                <div class="flex flex-col items-center text-center gap-3 p-4">
+                  <UIcon name="i-heroicons-pencil-square" class="w-8 h-8 text-primary" />
                   <h4 class="font-medium">{{ t('stories.builder.modeManual') }}</h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
                     {{ t('stories.builder.modeManualDescription') }}
@@ -305,65 +314,73 @@ onMounted(async () => {
           </div>
         </UCard>
 
-        <!-- Free Text Input Form (new stories only) -->
-        <UCard v-else-if="isNew && selectedMode === 'freetext'">
-          <div class="space-y-6">
-            <div>
-              <h3 class="text-lg font-semibold mb-2">
-                {{ t('stories.builder.modeFreetext') }}
-              </h3>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ t('stories.builder.freetextInstructions') }}
-              </p>
-            </div>
-
-            <u-form-field :label="t('stories.builder.freetextLabel')" required>
-              <u-textarea
-                v-model="freeTextInput"
-                :placeholder="t('stories.builder.freetextPlaceholder')"
-                :rows="10"
-                class="w-full"
-              />
-            </u-form-field>
-
-            <div class="flex justify-end space-x-3">
-              <UButton
-                :label="t('common.cancel')"
-                variant="ghost"
-                @click="
-                  () => {
-                    selectedMode = null;
-                    freeTextInput = '';
-                  }
-                "
-              />
-              <UButton
-                :label="t('stories.builder.generate')"
-                icon="i-heroicons-sparkles"
-                :disabled="!freeTextInput.trim()"
-                @click="handleSubmitFreeText"
-              />
-            </div>
-          </div>
+        <!-- Interview Chat -->
+        <UCard v-else-if="showInterviewChat && !isComplete" class="mb-6">
+          <StarInterviewChat
+            :messages="messages"
+            :current-question="currentQuestion"
+            :is-generating="interviewGenerating"
+            @answer="answerQuestion"
+          />
         </UCard>
 
-        <!-- Story Builder (for manual mode or editing) -->
-        <StoryBuilder
-          v-else-if="
-            (isNew && (selectedMode === 'manual' || (!showModeSelection && !selectedMode))) ||
-            (!isNew && selectedStory)
-          "
-          :story="isNew ? draftStory : selectedStory"
-          :experience-id="experienceId"
-          :mode="isNew ? 'create' : 'edit'"
-          :generated-achievements="generatedAchievements"
-          @save="handleSave"
-          @cancel="handleCancel"
-          @generate-achievements="handleGenerateAchievements"
-        />
+        <!-- Story Form (for manual mode or editing or after interview) -->
+        <div v-else-if="(selectedMode === 'manual' || !isNew) && story" class="space-y-6">
+          <UCard>
+            <StoryForm
+              :model-value="story"
+              @update:situation="(val) => handleStoryUpdate('situation', val)"
+              @update:task="(val) => handleStoryUpdate('task', val)"
+              @update:action="(val) => handleStoryUpdate('action', val)"
+              @update:result="(val) => handleStoryUpdate('result', val)"
+            />
+          </UCard>
 
+          <!-- Achievements & KPIs Panel -->
+          <UCard v-if="showAchievementsPanel || !isNew">
+            <div class="mb-4 flex justify-between items-center">
+              <h3 class="text-lg font-semibold">
+                {{ t('stories.editor.achievementsAndKpis') }}
+              </h3>
+              <UButton
+                v-if="!enhancerGenerating"
+                :label="t('stories.editor.generateAchievements')"
+                icon="i-heroicons-sparkles"
+                variant="soft"
+                size="sm"
+                @click="handleGenerateAchievements"
+              />
+            </div>
+
+            <AchievementsKpisPanel
+              :achievements="achievements"
+              :kpi-suggestions="kpiSuggestions"
+              :is-generating="enhancerGenerating"
+              @add-achievement="addAchievement"
+              @remove-achievement="removeAchievement"
+              @update-achievement="updateAchievement"
+              @add-kpi="addKpi"
+              @remove-kpi="removeKpi"
+              @update-kpi="updateKpi"
+            />
+          </UCard>
+
+          <!-- Action Buttons -->
+          <div class="flex justify-end gap-3">
+            <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
+            <UButton
+              :label="t('common.save')"
+              icon="i-heroicons-check"
+              :disabled="!isValid || saving"
+              :loading="saving"
+              @click="handleSave"
+            />
+          </div>
+        </div>
+
+        <!-- Not Found (editing non-existent story) -->
         <UAlert
-          v-else-if="!isNew && !selectedStory"
+          v-else-if="!isNew && !story && !loading"
           color="yellow"
           icon="i-heroicons-exclamation-triangle"
           :title="t('stories.builder.notFound')"
