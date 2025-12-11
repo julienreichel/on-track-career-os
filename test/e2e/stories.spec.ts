@@ -545,7 +545,9 @@ test.describe('Story Management', () => {
         await page.waitForTimeout(500);
 
         // Should show some loading indicator
-        const loading = page.locator('text=/generating|loading|processing/i, [class*="loading"], [class*="spinner"]').first();
+        const loading = page
+          .locator('text=/generating|loading|processing/i, [class*="loading"], [class*="spinner"]')
+          .first();
         await expect(loading).toBeVisible();
       }
     });
