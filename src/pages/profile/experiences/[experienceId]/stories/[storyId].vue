@@ -318,31 +318,7 @@ onMounted(async () => {
             </UFormField>
 
             <div class="flex justify-end gap-3">
-              <UPopover v-model:open="showCancelConfirm" :popper="{ placement: 'top' }">
-                <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
-                <template #panel>
-                  <div class="p-4 space-y-3">
-                    <p class="text-sm font-medium">{{ t('stories.editor.cancelCreation') }}</p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ t('stories.editor.cancelCreationDescription') }}
-                    </p>
-                    <div class="flex justify-end gap-2">
-                      <UButton
-                        :label="t('common.no')"
-                        variant="ghost"
-                        size="sm"
-                        @click="showCancelConfirm = false"
-                      />
-                      <UButton
-                        :label="t('common.yes')"
-                        color="red"
-                        size="sm"
-                        @click="handleConfirmCancel"
-                      />
-                    </div>
-                  </div>
-                </template>
-              </UPopover>
+              <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
               <UButton
                 :label="t('stories.builder.generateFromText')"
                 icon="i-heroicons-sparkles"
@@ -380,31 +356,7 @@ onMounted(async () => {
 
           <!-- Action Buttons -->
           <div class="flex justify-end gap-3">
-            <UPopover v-model:open="showCancelConfirm" :popper="{ placement: 'top' }">
-              <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
-              <template #panel>
-                <div class="p-4 space-y-3">
-                  <p class="text-sm font-medium">{{ t('stories.editor.unsavedChanges') }}</p>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('stories.editor.unsavedChangesDescription') }}
-                  </p>
-                  <div class="flex justify-end gap-2">
-                    <UButton
-                      :label="t('common.cancel')"
-                      variant="ghost"
-                      size="sm"
-                      @click="showCancelConfirm = false"
-                    />
-                    <UButton
-                      :label="t('common.confirm')"
-                      color="red"
-                      size="sm"
-                      @click="handleConfirmCancel"
-                    />
-                  </div>
-                </div>
-              </template>
-            </UPopover>
+            <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
             <UButton
               :label="t('common.save')"
               icon="i-heroicons-check"
@@ -425,5 +377,39 @@ onMounted(async () => {
         />
       </UPageBody>
     </UPage>
+
+    <!-- Cancel Confirmation Modal -->
+    <UModal v-model="showCancelConfirm">
+      <UCard>
+        <template #header>
+          <h3 class="text-lg font-semibold">
+            {{ isDirty ? t('stories.editor.unsavedChanges') : t('stories.editor.cancelCreation') }}
+          </h3>
+        </template>
+
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          {{
+            isDirty
+              ? t('stories.editor.unsavedChangesDescription')
+              : t('stories.editor.cancelCreationDescription')
+          }}
+        </p>
+
+        <template #footer>
+          <div class="flex justify-end gap-3">
+            <UButton
+              :label="isDirty ? t('common.cancel') : t('common.no')"
+              variant="ghost"
+              @click="showCancelConfirm = false"
+            />
+            <UButton
+              :label="isDirty ? t('common.confirm') : t('common.yes')"
+              color="red"
+              @click="handleConfirmCancel"
+            />
+          </div>
+        </template>
+      </UCard>
+    </UModal>
   </UContainer>
 </template>
