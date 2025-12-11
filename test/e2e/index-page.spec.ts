@@ -53,7 +53,9 @@ test.describe('Home Page - Authenticated User', () => {
   test('should navigate to profile page when profile card is clicked', async ({ page }) => {
     // UPageCard creates an overlay link with absolute positioned span inside
     // Click the span that covers the card area
-    const profileCard = page.locator('a[href="/profile"][aria-label="Profile"] span.absolute.inset-0');
+    const profileCard = page.locator(
+      'a[href="/profile"][aria-label="Profile"] span.absolute.inset-0'
+    );
 
     await profileCard.scrollIntoViewIfNeeded();
     await page.waitForTimeout(200);

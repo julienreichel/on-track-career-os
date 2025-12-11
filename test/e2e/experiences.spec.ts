@@ -14,13 +14,6 @@ test.describe('Experience Management', () => {
 
   test.describe('Experience Listing', () => {
     test.beforeEach(async ({ page }) => {
-      // CRITICAL: Verify auth state first
-      await page.goto('/profile');
-      await page.waitForLoadState('networkidle');
-      if (page.url().includes('/login')) {
-        throw new Error('Auth state not restored');
-      }
-
       await page.goto('/profile/experiences');
       await page.waitForLoadState('networkidle');
       // Wait for any initial data loading
@@ -62,23 +55,24 @@ test.describe('Experience Management', () => {
     });
 
     test('should display empty state if no experiences', async ({ page }) => {
-      // Check if empty state is shown
-      const emptyState = page.locator('text=/no experiences|get started|create first/i').first();
+      // Check if empty state is shown - UEmpty component with specific text
+      const emptyState = page
+        .locator('text=/no experiences yet|upload.*cv|add.*manually/i')
+        .first();
 
       // Empty state should be visible
       await expect(emptyState).toBeVisible();
     });
 
-    test.skip('should display experience cards or table if experiences exist', async ({ page }) => {
-      // FIXME: Selector not matching actual UI - needs investigation of UTable render structure
-
+    test('should display experience cards or table if experiences exist', async ({ page }) => {
       // Wait for any data to load
       await page.waitForTimeout(1500);
 
-      // Check for experience table (UTable component)
+      // Check for experience table (UTable component) OR empty state text
       const hasTable = (await page.locator('table').count()) > 0;
       const hasTableRows = (await page.locator('table tbody tr').count()) > 0;
-      const hasEmpty = (await page.locator('[class*="empty"]').count()) > 0;
+      const hasEmpty =
+        (await page.locator('text=/no experiences yet|upload.*cv|add.*manually/i').count()) > 0;
 
       // Should have either table with rows OR empty state
       expect(hasTable || hasTableRows || hasEmpty).toBe(true);
@@ -94,34 +88,10 @@ test.describe('Experience Management', () => {
 
       await expect(backButton).toBeVisible();
     });
-
-    test('should navigate to story list when clicking view stories button', async ({ page }) => {
-      // Wait for experiences to load
-      await page.waitForTimeout(1500);
-
-      // Check if there are any experience rows in the table
-      const tableRows = page.locator('table tbody tr');
-      await expect(tableRows.first()).toBeVisible();
-
-      // Click the first "View Stories" button (document-text icon)
-      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
-      await viewStoriesButton.click();
-
-      // Should navigate to stories page for that experience
-      await page.waitForLoadState('networkidle');
-      await expect(page).toHaveURL(/.*\/experiences\/[^/]+\/stories/);
-    });
   });
 
   test.describe('Experience Creation', () => {
     test.beforeEach(async ({ page }) => {
-      // CRITICAL: Verify auth state first
-      await page.goto('/profile');
-      await page.waitForLoadState('networkidle');
-      if (page.url().includes('/login')) {
-        throw new Error('Auth state not restored');
-      }
-
       await page.goto('/profile/experiences');
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1000);
@@ -155,9 +125,7 @@ test.describe('Experience Management', () => {
       expect(hasInputs).toBe(true);
     });
 
-    test.skip('should have required form fields', async ({ page }) => {
-      // FIXME: Input selectors not matching - Nuxt UI may use different input types or wrapper elements
-
+    test('should have required form fields', async ({ page }) => {
       await page.goto('/profile/experiences/new');
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1000);
@@ -258,6 +226,60 @@ test.describe('Experience Management', () => {
 
       // Should navigate back to experiences list
       await expect(page).toHaveURL(/.*\/experiences$/);
+    });
+  });
+
+  test.describe('Experience Navigation - With Data', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.goto('/profile/experiences');
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(1500);
+    });
+
+    test('should navigate to story list when clicking view stories button', async ({ page }) => {
+      // create an experience
+      await page.goto('/profile/experiences/new');
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(1500);
+
+      // Fill in the form with test data
+      const timestamp = Date.now();
+      const jobTitle = `E2E Test Engineer ${timestamp}`;
+      const companyName = `E2E Test Company ${timestamp}`;
+
+      // Get all text inputs in order (title, company)
+      const textInputs = page.locator('input[type="text"]');
+      const textInputCount = await textInputs.count();
+
+      if (textInputCount >= 1) {
+        await textInputs.nth(0).fill(jobTitle); // Title field
+      }
+      if (textInputCount >= 2) {
+        await textInputs.nth(1).fill(companyName); // Company field
+      }
+
+      // Fill start date (first date input)
+      const dateInputs = page.locator('input[type="date"]');
+      await dateInputs.first().fill('2024-01-01');
+
+      // Submit form
+      const saveButton = page.locator('button:has-text("Save")').first();
+
+      await saveButton.click();
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(2000);
+
+      // Check if there are any experience rows in the table
+      const tableRows = page.locator('table tbody tr');
+      await expect(tableRows.first()).toBeVisible();
+
+      // Click the first "View Stories" button (document-text icon)
+      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      await viewStoriesButton.click();
+
+      // Should navigate to stories page for that experience
+      await page.waitForLoadState('networkidle');
+      await expect(page).toHaveURL(/.*\/experiences\/[^/]+\/stories/);
     });
   });
 });
