@@ -378,28 +378,11 @@ onMounted(async () => {
       </UPageBody>
     </UPage>
 
-    <!-- Cancel Confirmation Modal -->
-    <UModal
+    <!-- Unsaved Changes Modal -->
+    <UnsavedChangesModal
       v-model:open="showCancelConfirm"
-      :title="isDirty ? t('storyEditor.unsavedChanges') : t('storyEditor.cancelCreation')"
-      :description="
-        isDirty
-          ? t('storyEditor.unsavedChangesDescription')
-          : t('storyEditor.cancelCreationDescription')
-      "
-    >
-      <template #footer="{ close }">
-        <UButton
-          :label="isDirty ? t('common.cancel') : t('common.no')"
-          variant="ghost"
-          @click="close"
-        />
-        <UButton
-          :label="isDirty ? t('common.confirm') : t('common.yes')"
-          color="red"
-          @click="handleConfirmCancel"
-        />
-      </template>
-    </UModal>
+      :is-creating="isNew"
+      @leave="handleConfirmCancel"
+    />
   </UContainer>
 </template>

@@ -423,6 +423,8 @@
     "success": "Success",
     "confirm": "Confirm",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "stay": "Stay",
+    "leave": "Leave"
   }
 }
