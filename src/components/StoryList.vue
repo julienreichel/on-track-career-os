@@ -74,7 +74,11 @@ const handleView = (story: STARStory) => {
 };
 
 const handleEdit = (story: STARStory) => {
-  router.push(`/stories/${story.id}/edit`);
+  if (!story.experienceId) {
+    console.error('[StoryList] Cannot edit story without experienceId');
+    return;
+  }
+  router.push(`/profile/experiences/${story.experienceId}/stories/${story.id}`);
 };
 
 const handleDelete = (story: STARStory) => {
