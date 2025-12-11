@@ -379,41 +379,27 @@ onMounted(async () => {
     </UPage>
 
     <!-- Cancel Confirmation Modal -->
-    <UModal v-model="showCancelConfirm">
-      <UCard
-        :ui="{
-          header: { padding: 'px-4 py-4 sm:px-6' },
-          body: { padding: 'px-4 py-5 sm:p-6' },
-          footer: { padding: 'px-4 py-4 sm:px-6' },
-        }"
-      >
-        <template #header>
-          {{
-            isDirty ? t('stories.editor.unsavedChanges') : t('stories.editor.cancelCreation')
-          }}
-        </template>
-
-        {{
-          isDirty
-            ? t('stories.editor.unsavedChangesDescription')
-            : t('stories.editor.cancelCreationDescription')
-        }}
-
-        <template #footer>
-          <div class="flex justify-end gap-3">
-            <UButton
-              :label="isDirty ? t('common.cancel') : t('common.no')"
-              variant="ghost"
-              @click="showCancelConfirm = false"
-            />
-            <UButton
-              :label="isDirty ? t('common.confirm') : t('common.yes')"
-              color="red"
-              @click="handleConfirmCancel"
-            />
-          </div>
-        </template>
-      </UCard>
+    <UModal
+      v-model:open="showCancelConfirm"
+      :title="isDirty ? t('stories.editor.unsavedChanges') : t('stories.editor.cancelCreation')"
+      :description="
+        isDirty
+          ? t('stories.editor.unsavedChangesDescription')
+          : t('stories.editor.cancelCreationDescription')
+      "
+    >
+      <template #footer="{ close }">
+        <UButton
+          :label="isDirty ? t('common.cancel') : t('common.no')"
+          variant="ghost"
+          @click="close"
+        />
+        <UButton
+          :label="isDirty ? t('common.confirm') : t('common.yes')"
+          color="red"
+          @click="handleConfirmCancel"
+        />
+      </template>
     </UModal>
   </UContainer>
 </template>
