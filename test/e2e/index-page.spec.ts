@@ -7,6 +7,25 @@ import { test, expect } from '@playwright/test';
  * and navigation links.
  */
 
+// Empty state tests - run serially FIRST before any experiences are created
+test.describe.serial('Home Page - Empty State', () => {
+  test.describe.configure({ retries: 2 });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('should have CV upload feature when no experiences exist', async ({ page }) => {
+    // CV upload is only shown on home page when user has no experiences
+    // This test MUST run before any experience creation tests
+    // CV upload link has absolute overlay positioning (UPageCard)
+    const cvUploadLink = page.locator('a[href="/profile/cv-upload"]');
+    await expect(cvUploadLink).toHaveCount(1);
+    await expect(cvUploadLink).toHaveAttribute('href', '/profile/cv-upload');
+  });
+});
+
 test.describe('Home Page - Authenticated User', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -49,15 +68,6 @@ test.describe('Home Page - Authenticated User', () => {
 
     // Verify we're on profile page
     expect(page.url()).toContain('profile');
-  });
-
-  test('should have CV upload feature', async ({ page }) => {
-    // CV upload link exists but has absolute overlay positioning (UPageCard)
-    // Check for link existence via href attribute
-    const cvUploadLink = page.locator('a[href="/profile/cv-upload"]');
-    
-    await expect(cvUploadLink).toHaveCount(1);
-    await expect(cvUploadLink).toHaveAttribute('href', '/profile/cv-upload');
   });
 
   test('should display jobs feature card', async ({ page }) => {

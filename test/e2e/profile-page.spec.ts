@@ -7,6 +7,25 @@ import { test, expect } from '@playwright/test';
  * editing, and managing profile information.
  */
 
+// Empty state tests - run serially FIRST before any experiences are created
+test.describe.serial('Profile Page - Empty State', () => {
+  test.describe.configure({ retries: 2 });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/profile');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('should have CV upload link when no experiences exist', async ({ page }) => {
+    // CV upload is only shown when user has no experiences
+    // This test MUST run before any experience creation tests
+    // CV upload link has absolute overlay positioning (UPageCard)
+    const cvUploadLink = page.locator('a[href="/profile/cv-upload"]');
+    await expect(cvUploadLink).toHaveCount(1);
+    await expect(cvUploadLink).toHaveAttribute('href', '/profile/cv-upload');
+  });
+});
+
 test.describe('Profile Page - View Mode', () => {
   // Retry tests in this suite due to occasional auth state timing issues
   test.describe.configure({ retries: 2 });
@@ -37,7 +56,11 @@ test.describe('Profile Page - View Mode', () => {
 
   test('should have edit button in view mode', async ({ page }) => {
     // Look for edit button - actual text is 'Edit Profile'
-    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit"), button[aria-label*="edit"]').first();
+    const editButton = page
+      .locator(
+        'button:has-text("Edit Profile"), button:has-text("Edit"), button[aria-label*="edit"]'
+      )
+      .first();
 
     // Wait a moment for buttons to render
     await page.waitForTimeout(500);
@@ -86,9 +109,7 @@ test.describe('Profile Page - View Mode', () => {
     await page.waitForTimeout(500);
 
     // Look for Profile Management section with management cards
-    const managementSection = page
-      .locator('text=/profile management/i')
-      .first();
+    const managementSection = page.locator('text=/profile management/i').first();
 
     await expect(managementSection).toBeVisible();
   });
@@ -106,14 +127,6 @@ test.describe('Profile Page - View Mode', () => {
     await expect(canvasLink).toHaveCount(1);
     await expect(canvasLink).toHaveAttribute('href', '/profile/canvas');
   });
-
-  test('should have CV upload link', async ({ page }) => {
-    // CV upload link has absolute overlay positioning (UPageCard)
-    // Check for link existence via href attribute
-    const cvUploadLink = page.locator('a[href="/profile/cv-upload"]');
-    await expect(cvUploadLink).toHaveCount(1);
-    await expect(cvUploadLink).toHaveAttribute('href', '/profile/cv-upload');
-  });
 });
 
 test.describe('Profile Page - Edit Mode', () => {
@@ -124,7 +137,11 @@ test.describe('Profile Page - Edit Mode', () => {
 
   test('should enter edit mode when edit button is clicked', async ({ page }) => {
     // Find and click edit button - text is 'Edit Profile'
-    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit"), button[aria-label*="edit"]').first();
+    const editButton = page
+      .locator(
+        'button:has-text("Edit Profile"), button:has-text("Edit"), button[aria-label*="edit"]'
+      )
+      .first();
 
     // Wait for button to be ready
     await page.waitForTimeout(500);
@@ -133,6 +150,11 @@ test.describe('Profile Page - Edit Mode', () => {
 
     // Wait for edit mode to activate
     await page.waitForTimeout(500);
+
+    // Scroll to bottom to see Save/Cancel buttons
+    // TODO: Improve UI with floating buttons that are always visible
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(300);
 
     // Should now see save/cancel buttons
     const saveButton = page.locator('button:has-text("save")').first();
@@ -144,7 +166,9 @@ test.describe('Profile Page - Edit Mode', () => {
 
   test('should display form inputs in edit mode', async ({ page }) => {
     // Enter edit mode
-    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit")').first();
+    const editButton = page
+      .locator('button:has-text("Edit Profile"), button:has-text("Edit")')
+      .first();
 
     await editButton.click();
     await page.waitForTimeout(500);
@@ -156,24 +180,40 @@ test.describe('Profile Page - Edit Mode', () => {
   });
 
   test('should have cancel button in edit mode', async ({ page }) => {
-    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit")').first();
+    const editButton = page
+      .locator('button:has-text("Edit Profile"), button:has-text("Edit")')
+      .first();
 
     await editButton.click();
     await page.waitForTimeout(500);
 
-    const cancelButton = page.locator('button:has-text("Cancel"), button:has-text("cancel")').first();
+    // Scroll to bottom to see Cancel button
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(300);
+
+    const cancelButton = page
+      .locator('button:has-text("Cancel"), button:has-text("cancel")')
+      .first();
 
     await expect(cancelButton).toBeVisible();
     await expect(cancelButton).toBeEnabled();
   });
 
   test('should exit edit mode when cancel is clicked', async ({ page }) => {
-    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit")').first();
+    const editButton = page
+      .locator('button:has-text("Edit Profile"), button:has-text("Edit")')
+      .first();
 
     await editButton.click();
     await page.waitForTimeout(500);
 
-    const cancelButton = page.locator('button:has-text("Cancel"), button:has-text("cancel")').first();
+    // Scroll to bottom to see Cancel button
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(300);
+
+    const cancelButton = page
+      .locator('button:has-text("Cancel"), button:has-text("cancel")')
+      .first();
 
     await cancelButton.click();
     await page.waitForTimeout(500);
