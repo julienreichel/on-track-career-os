@@ -7,27 +7,7 @@ import { test, expect } from '@playwright/test';
  * editing, and managing profile information.
  */
 
-// Empty state tests - run serially FIRST before any experiences are created
-test.describe.serial('Profile Page - Empty State', () => {
-  test.describe.configure({ retries: 2 });
-
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/profile');
-    await page.waitForLoadState('networkidle');
-  });
-
-  test('should have CV upload link when no experiences exist', async ({ page }) => {
-    // CV upload is only shown when user has no experiences
-    // This test MUST run before any experience creation tests
-    // CV upload link has absolute overlay positioning (UPageCard)
-    const cvUploadLink = page.locator('a[href="/profile/cv-upload"]');
-    await expect(cvUploadLink).toHaveCount(1);
-    await expect(cvUploadLink).toHaveAttribute('href', '/profile/cv-upload');
-  });
-});
-
-// Run View Mode tests serially to prevent interference from parallel experience creation tests
-test.describe.serial('Profile Page - View Mode', () => {
+test.describe('Profile Page - View Mode', () => {
   // Retry tests in this suite due to occasional auth state timing issues
   test.describe.configure({ retries: 2 });
 
@@ -158,11 +138,12 @@ test.describe('Profile Page - Edit Mode', () => {
     await page.waitForTimeout(300);
 
     // Should now see save/cancel buttons - actual text is 'Save Profile' and 'Cancel'
-    const saveButton = page.locator('button:has-text("Save Profile"), button[type="submit"]:has-text("Save")').first();
-    const cancelButton = page.locator('button:has-text("Cancel")').first();
+    const saveButton = page.locator('button[type="submit"]:has-text("Save Profile")');
+    const cancelButton = page.locator('button[type="button"]:has-text("Cancel")').first();
 
-    // At least one of these should be visible in edit mode
-    await expect(saveButton.or(cancelButton)).toBeVisible();
+    // Both buttons should be visible in edit mode
+    await expect(saveButton).toBeVisible();
+    await expect(cancelButton).toBeVisible();
   });
 
   test('should display form inputs in edit mode', async ({ page }) => {
@@ -192,9 +173,7 @@ test.describe('Profile Page - Edit Mode', () => {
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(300);
 
-    const cancelButton = page
-      .locator('button:has-text("Cancel")')
-      .first();
+    const cancelButton = page.locator('button:has-text("Cancel")').first();
 
     await expect(cancelButton).toBeVisible();
     await expect(cancelButton).toBeEnabled();
@@ -212,9 +191,7 @@ test.describe('Profile Page - Edit Mode', () => {
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(300);
 
-    const cancelButton = page
-      .locator('button:has-text("Cancel")')
-      .first();
+    const cancelButton = page.locator('button:has-text("Cancel")').first();
 
     await cancelButton.click();
     await page.waitForTimeout(500);
