@@ -51,17 +51,15 @@ test.describe('Home Page - Authenticated User', () => {
   });
 
   test('should navigate to profile page when profile card is clicked', async ({ page }) => {
-    // UPageCard creates an overlay link, find the card by its title
-    const profileCard = page
-      .locator('div:has-text("Profile")')
-      .filter({ hasText: 'Build your professional profile' })
-      .first();
+    // UPageCard creates an overlay link with absolute positioning
+    // Find the actual link element inside the card
+    const profileLink = page.locator('a[href="/profile"][aria-label="Profile"]');
 
-    await profileCard.scrollIntoViewIfNeeded();
+    await profileLink.scrollIntoViewIfNeeded();
     await page.waitForTimeout(200);
 
-    // Click on the visible card (overlay link will handle navigation)
-    await profileCard.click();
+    // Click the overlay link
+    await profileLink.click();
 
     // Wait for navigation
     await page.waitForURL(/.*profile.*/, { timeout: 5000 });

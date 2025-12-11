@@ -26,7 +26,8 @@ test.describe.serial('Profile Page - Empty State', () => {
   });
 });
 
-test.describe('Profile Page - View Mode', () => {
+// Run View Mode tests serially to prevent interference from parallel experience creation tests
+test.describe.serial('Profile Page - View Mode', () => {
   // Retry tests in this suite due to occasional auth state timing issues
   test.describe.configure({ retries: 2 });
 
@@ -156,9 +157,9 @@ test.describe('Profile Page - Edit Mode', () => {
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(300);
 
-    // Should now see save/cancel buttons
-    const saveButton = page.locator('button:has-text("save")').first();
-    const cancelButton = page.locator('button:has-text("cancel")').first();
+    // Should now see save/cancel buttons - actual text is 'Save Profile' and 'Cancel'
+    const saveButton = page.locator('button:has-text("Save Profile"), button[type="submit"]:has-text("Save")').first();
+    const cancelButton = page.locator('button:has-text("Cancel")').first();
 
     // At least one of these should be visible in edit mode
     await expect(saveButton.or(cancelButton)).toBeVisible();
@@ -192,7 +193,7 @@ test.describe('Profile Page - Edit Mode', () => {
     await page.waitForTimeout(300);
 
     const cancelButton = page
-      .locator('button:has-text("Cancel"), button:has-text("cancel")')
+      .locator('button:has-text("Cancel")')
       .first();
 
     await expect(cancelButton).toBeVisible();
@@ -212,7 +213,7 @@ test.describe('Profile Page - Edit Mode', () => {
     await page.waitForTimeout(300);
 
     const cancelButton = page
-      .locator('button:has-text("Cancel"), button:has-text("cancel")')
+      .locator('button:has-text("Cancel")')
       .first();
 
     await cancelButton.click();
