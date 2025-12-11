@@ -27,7 +27,7 @@ const updateField = (field: keyof StoryFormState, value: string) => {
     <!-- Situation -->
     <UFormField
       :label="t('star.situation.label')"
-      :description="t('star.situation.description')"
+      :hint="t('star.situation.description')"
       required
     >
       <UTextarea
@@ -36,18 +36,20 @@ const updateField = (field: keyof StoryFormState, value: string) => {
         :rows="4"
         :disabled="disabled"
         :readonly="readonly"
+        class="w-full"
         @update:model-value="updateField('situation', $event)"
       />
     </UFormField>
 
     <!-- Task -->
-    <UFormField :label="t('star.task.label')" :description="t('star.task.description')" required>
+    <UFormField :label="t('star.task.label')" :hint="t('star.task.description')" required>
       <UTextarea
         :model-value="modelValue.task"
         :placeholder="t('star.task.placeholder')"
         :rows="4"
         :disabled="disabled"
         :readonly="readonly"
+        class="w-full"
         @update:model-value="updateField('task', $event)"
       />
     </UFormField>
@@ -55,7 +57,7 @@ const updateField = (field: keyof StoryFormState, value: string) => {
     <!-- Action -->
     <UFormField
       :label="t('star.action.label')"
-      :description="t('star.action.description')"
+      :hint="t('star.action.description')"
       required
     >
       <UTextarea
@@ -64,6 +66,7 @@ const updateField = (field: keyof StoryFormState, value: string) => {
         :rows="6"
         :disabled="disabled"
         :readonly="readonly"
+        class="w-full"
         @update:model-value="updateField('action', $event)"
       />
     </UFormField>
@@ -71,7 +74,7 @@ const updateField = (field: keyof StoryFormState, value: string) => {
     <!-- Result -->
     <UFormField
       :label="t('star.result.label')"
-      :description="t('star.result.description')"
+      :hint="t('star.result.description')"
       required
     >
       <UTextarea
@@ -80,6 +83,7 @@ const updateField = (field: keyof StoryFormState, value: string) => {
         :rows="4"
         :disabled="disabled"
         :readonly="readonly"
+        class="w-full"
         @update:model-value="updateField('result', $event)"
       />
     </UFormField>
