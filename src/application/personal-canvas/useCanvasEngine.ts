@@ -43,11 +43,9 @@ export function useCanvasEngine() {
 
   /**
    * Save PersonalCanvas (create or update based on existence)
-   * @param canvasData - Canvas data to save
+   * @param canvasData - Canvas data to save (without generated fields)
    */
-  const saveCanvas = async (
-    canvasData: Omit<PersonalCanvas, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<void> => {
+  const saveCanvas = async (canvasData: Omit<PersonalCanvasCreateInput, 'id'>): Promise<void> => {
     loading.value = true;
     error.value = null;
 

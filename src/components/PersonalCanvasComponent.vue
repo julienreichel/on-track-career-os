@@ -236,9 +236,14 @@
         {{ t('canvas.needsUpdate') }}
       </UBadge>
       <div v-else />
-      
+
       <div class="flex gap-3">
-        <UButton v-if="!isEditing" variant="outline" icon="i-heroicons-pencil" @click="startEditing">
+        <UButton
+          v-if="!isEditing"
+          variant="outline"
+          icon="i-heroicons-pencil"
+          @click="startEditing"
+        >
           {{ t('canvas.actions.edit') }}
         </UButton>
 

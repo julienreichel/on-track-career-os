@@ -233,15 +233,21 @@ describe('AiOperationsRepository', () => {
         careerDirection: 'Move into technical leadership',
       };
 
+      // GraphQL returns a.json() which is a JSON string
       mockClient.generatePersonalCanvas.mockResolvedValue({
-        data: mockPersonalCanvas,
+        data: JSON.stringify(mockPersonalCanvas),
         errors: undefined,
       });
 
       const result = await repository.generatePersonalCanvas(mockInput);
 
+      // GraphQL expects JSON strings as input, not objects
       expect(mockClient.generatePersonalCanvas).toHaveBeenCalledWith(
-        mockInput,
+        {
+          profile: JSON.stringify(mockInput.profile),
+          experiences: JSON.stringify(mockInput.experiences),
+          stories: JSON.stringify(mockInput.stories),
+        },
         expect.objectContaining({ authMode: 'userPool' })
       );
       expect(result).toEqual(mockPersonalCanvas);

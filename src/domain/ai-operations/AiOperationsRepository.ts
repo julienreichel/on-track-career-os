@@ -81,7 +81,11 @@ export type AmplifyAiOperations = {
   ) => Promise<{ data: string | null; errors?: unknown[] }>;
 
   generatePersonalCanvas: (
-    input: PersonalCanvasInput,
+    input: {
+      profile: string;
+      experiences: string;
+      stories: string;
+    },
     options?: Record<string, unknown>
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 };
@@ -186,7 +190,17 @@ export class AiOperationsRepository implements IAiOperationsRepository {
   }
 
   async generatePersonalCanvas(input: PersonalCanvasInput): Promise<PersonalCanvas> {
-    const { data, errors } = await this.client.generatePersonalCanvas(input, gqlOptions());
+    // GraphQL schema uses a.json() which expects JSON strings, not objects
+    const stringifiedInput = {
+      profile: JSON.stringify(input.profile),
+      experiences: JSON.stringify(input.experiences),
+      stories: JSON.stringify(input.stories),
+    };
+
+    const { data, errors } = await this.client.generatePersonalCanvas(
+      stringifiedInput,
+      gqlOptions()
+    );
 
     if (errors && errors.length > 0) {
       throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
@@ -196,8 +210,10 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    // Data is JSON type from a.json() - cast to PersonalCanvas
-    // The Lambda returns a properly typed PersonalCanvas object
-    return data as PersonalCanvas;
+    // GraphQL schema returns a.json() which is a JSON string - parse it to get PersonalCanvas object
+    // Cast unknown to string since we know a.json() returns a JSON string
+    const parsed = JSON.parse(data as string) as PersonalCanvas;
+
+    return parsed;
   }
 }

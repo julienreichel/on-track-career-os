@@ -1,10 +1,7 @@
 <template>
   <UContainer>
     <UPage>
-      <UPageHeader
-        :title="t('canvas.page.title')"
-        :description="t('canvas.page.description')"
-      />
+      <UPageHeader :title="t('canvas.page.title')" :description="t('canvas.page.description')" />
 
       <UPageBody>
         <!-- Error Alert -->
@@ -49,6 +46,11 @@ import { useAuthUser } from '@/composables/useAuthUser';
 import type { PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
 import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
+import { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
+import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import { STARStoryService } from '@/domain/starstory/STARStoryService';
+import type { Experience } from '@/domain/experience/Experience';
+import type { STARStory } from '@/domain/starstory/STARStory';
 
 definePageMeta({
   breadcrumbLabel: 'Canvas',
@@ -65,6 +67,8 @@ const {
 } = useCanvasEngine();
 const { userId } = useAuthUser();
 const userProfileRepo = new UserProfileRepository();
+const experienceRepo = new ExperienceRepository();
+const storyService = new STARStoryService();
 
 const error = ref<string | null>(null);
 const successMessage = ref<string | null>(null);
@@ -74,6 +78,8 @@ const profile = ref<{
   headline?: string | null;
   summary?: string | null;
 } | null>(null);
+const experiences = ref<Experience[]>([]);
+const stories = ref<STARStory[]>([]);
 
 // Load profile and canvas when userId is available
 watch(
@@ -90,9 +96,27 @@ watch(
         return;
       }
 
+      // Load experiences
+      const userProfile = await userProfileRepo.get(newUserId);
+      if (userProfile) {
+        experiences.value = await experienceRepo.list(userProfile);
+
+        // Load all stories from all experiences
+        const allStories: STARStory[] = [];
+        for (const exp of experiences.value) {
+          const expStories = await storyService.getStoriesByExperience(exp);
+          allStories.push(...expStories);
+        }
+        stories.value = allStories;
+      }
+
       // Try to load existing canvas for this user
-      // For MVP, we use userId as canvas ID (one canvas per user)
-      await loadCanvas(newUserId);
+      // Query by userId to find user's canvas
+      const canvasList = await new PersonalCanvasRepository().list({ userId: { eq: newUserId } });
+      if (canvasList && canvasList.length > 0 && canvasList[0]) {
+        // User has a canvas, load it
+        await loadCanvas(canvasList[0].id);
+      }
     } catch (err) {
       console.error('[canvas] Error loading:', err);
       // Don't set error for missing canvas - that's expected for new users
@@ -131,8 +155,22 @@ const handleGenerate = async () => {
         headline: profile.value.headline || undefined,
         summary: profile.value.summary || undefined,
       },
-      experiences: [], // TODO: Load from useExperienceStore when implemented
-      stories: [], // TODO: Load from useStoryEngine when implemented
+      experiences: experiences.value.map((exp) => ({
+        title: exp.title || undefined,
+        company: exp.companyName || undefined,
+        startDate: exp.startDate || undefined,
+        endDate: exp.endDate || undefined,
+        responsibilities: exp.responsibilities?.filter((r): r is string => r !== null) || undefined,
+        tasks: exp.tasks?.filter((t): t is string => t !== null) || undefined,
+      })),
+      stories: stories.value.map((story) => ({
+        situation: story.situation || undefined,
+        task: story.task || undefined,
+        action: story.action || undefined,
+        result: story.result || undefined,
+        achievements: story.achievements?.filter((a): a is string => a !== null) || undefined,
+        kpiSuggestions: story.kpiSuggestions?.filter((k): k is string => k !== null) || undefined,
+      })),
     };
 
     // Generate canvas
@@ -141,7 +179,7 @@ const handleGenerate = async () => {
     if (result) {
       successMessage.value = t('canvas.messages.generated');
 
-      // Save the generated canvas
+      // Save the generated canvas (owner field is auto-set by Amplify auth)
       await saveCanvas({
         userId: profile.value.id,
         customerSegments: result.customerSegments,
@@ -155,9 +193,7 @@ const handleGenerate = async () => {
         revenueStreams: result.revenueStreams,
         lastGeneratedAt: new Date().toISOString(),
         needsUpdate: false,
-        owner: `${profile.value.id}::${profile.value.id}`,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any);
+      });
     }
   } catch (err) {
     console.error('[canvas] Error generating:', err);
@@ -182,8 +218,22 @@ const handleRegenerate = async () => {
         headline: profile.value.headline || undefined,
         summary: profile.value.summary || undefined,
       },
-      experiences: [], // TODO: Load from useExperienceStore when implemented
-      stories: [], // TODO: Load from useStoryEngine when implemented
+      experiences: experiences.value.map((exp) => ({
+        title: exp.title || undefined,
+        company: exp.companyName || undefined,
+        startDate: exp.startDate || undefined,
+        endDate: exp.endDate || undefined,
+        responsibilities: exp.responsibilities?.filter((r): r is string => r !== null) || undefined,
+        tasks: exp.tasks?.filter((t): t is string => t !== null) || undefined,
+      })),
+      stories: stories.value.map((story) => ({
+        situation: story.situation || undefined,
+        task: story.task || undefined,
+        action: story.action || undefined,
+        result: story.result || undefined,
+        achievements: story.achievements?.filter((a): a is string => a !== null) || undefined,
+        kpiSuggestions: story.kpiSuggestions?.filter((k): k is string => k !== null) || undefined,
+      })),
     };
 
     // Regenerate canvas
@@ -192,7 +242,7 @@ const handleRegenerate = async () => {
     if (result) {
       successMessage.value = t('canvas.messages.regenerated');
 
-      // Update existing canvas
+      // Update existing canvas (owner field is auto-set by Amplify auth)
       await saveCanvas({
         userId: profile.value.id,
         customerSegments: result.customerSegments,
@@ -206,9 +256,7 @@ const handleRegenerate = async () => {
         revenueStreams: result.revenueStreams,
         lastGeneratedAt: new Date().toISOString(),
         needsUpdate: false,
-        owner: canvas.value?.owner || `${profile.value.id}::${profile.value.id}`,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any);
+      });
     }
   } catch (err) {
     console.error('[canvas] Error regenerating:', err);
@@ -231,7 +279,7 @@ const handleSave = async (updates: Partial<PersonalCanvas>) => {
       return;
     }
 
-    // Merge updates with existing canvas
+    // Merge updates with existing canvas (owner field is auto-set by Amplify auth)
     await saveCanvas({
       userId: canvas.value.userId || profile.value.id,
       customerSegments: updates.customerSegments ?? canvas.value.customerSegments,
@@ -245,9 +293,7 @@ const handleSave = async (updates: Partial<PersonalCanvas>) => {
       revenueStreams: updates.revenueStreams ?? canvas.value.revenueStreams,
       lastGeneratedAt: canvas.value.lastGeneratedAt,
       needsUpdate: false,
-      owner: canvas.value.owner,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
+    });
 
     successMessage.value = t('canvas.messages.saved');
   } catch (err) {
