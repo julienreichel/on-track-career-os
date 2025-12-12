@@ -62,32 +62,44 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
     );
   };
 
-  // Load stories for experience
-  const loadStories = async (expIdOrExperience?: string | Experience) => {
-    if (!expIdOrExperience) {
-      const targetId = getExperienceId();
-      if (!targetId) {
-        error.value = 'Experience ID is required';
-        return;
-      }
-      expIdOrExperience = targetId;
+  // Load stories for experience by ID
+  const loadStoriesByExperienceId = async (expId?: string) => {
+    const targetId = expId || getExperienceId();
+    if (!targetId) {
+      error.value = 'Experience ID is required';
+      return;
     }
 
     loading.value = true;
     error.value = null;
 
     try {
-      // If Experience object provided, use directly; otherwise fetch it
-      const experience =
-        typeof expIdOrExperience === 'string'
-          ? await experienceRepo.get(expIdOrExperience)
-          : expIdOrExperience;
-
+      const experience = await experienceRepo.get(targetId);
       if (!experience) {
         error.value = 'Experience not found';
         stories.value = [];
         return;
       }
+      stories.value = await service.getStoriesByExperience(experience);
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to load stories';
+      console.error('[useStoryEngine] Error:', err);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // Load stories for experience (when Experience object already available)
+  const loadStoriesForExperience = async (experience: Experience) => {
+    if (!experience) {
+      error.value = 'Experience is required';
+      return;
+    }
+
+    loading.value = true;
+    error.value = null;
+
+    try {
       stories.value = await service.getStoriesByExperience(experience);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load stories';
@@ -403,7 +415,8 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
     isGenerating,
 
     // Actions
-    loadStories,
+    loadStoriesByExperienceId,
+    loadStoriesForExperience,
     loadAllStoriesForUser,
     loadStory,
     createStoryDraft,

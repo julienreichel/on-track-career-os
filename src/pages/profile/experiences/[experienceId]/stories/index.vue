@@ -20,10 +20,12 @@ const experienceId = computed(() => route.params.experienceId as string);
 const companyName = ref<string>('');
 
 // Use new story list composable
-const { stories, loading, error, loadByExperience, deleteStory } = useStoryList();
+const { stories, loading, error, loadByExperienceId, loadForExperience, deleteStory } =
+  useStoryList();
 const experienceService = new ExperienceService();
 const storyService = new STARStoryService();
 const deleting = ref(false);
+const currentExperience = ref<Experience | null>(null);
 
 // Auto-generation state
 const isGenerating = ref(false);
@@ -48,8 +50,12 @@ const handleDelete = async (story: STARStory) => {
 
 // Handle refresh
 const handleRefresh = async () => {
-  if (experienceId.value) {
-    await loadByExperience(experienceId.value);
+  if (currentExperience.value) {
+    // Use cached Experience object to avoid refetch
+    await loadForExperience(currentExperience.value);
+  } else if (experienceId.value) {
+    // Fallback: fetch by ID
+    await loadByExperienceId(experienceId.value);
   }
 };
 
@@ -137,8 +143,8 @@ const handleAutoGenerate = async () => {
       await storyService.createAndLinkStory(completeStory, experienceId.value);
     }
 
-    // 5. Reload stories list
-    await loadByExperience(experienceId.value);
+    // 5. Reload stories list using cached experience
+    await loadForExperience(experience);
   } catch (err) {
     console.error('[Stories] Auto-generation error:', err);
     generationError.value = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -154,14 +160,17 @@ onMounted(async () => {
     try {
       const experience = await experienceService.getFullExperience(experienceId.value);
       if (experience) {
+        currentExperience.value = experience;
         companyName.value = experience.companyName || experience.title;
+
+        // Load stories using cached Experience object (no refetch!)
+        await loadForExperience(experience);
       }
     } catch (err) {
       console.error('[Stories] Error loading experience:', err);
+      // Fallback: try loading stories by ID
+      await loadByExperienceId(experienceId.value);
     }
-
-    // Load stories using new composable
-    await loadByExperience(experienceId.value);
   }
 });
 </script>

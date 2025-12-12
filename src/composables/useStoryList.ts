@@ -61,11 +61,12 @@ export function useStoryList(
   };
 
   /**
-   * Load stories for specific experience
-   * @param experienceIdOrObject - Experience ID string or Experience object
+   * Load stories for a specific experience by ID
+   * Fetches the Experience from database first, then loads stories.
+   * @param experienceId - Experience ID string
    */
-  const loadByExperience = async (experienceIdOrObject: string | Experience) => {
-    if (!experienceIdOrObject) {
+  const loadByExperienceId = async (experienceId: string) => {
+    if (!experienceId) {
       error.value = 'storyList.errors.missingExperienceId';
       return;
     }
@@ -74,11 +75,7 @@ export function useStoryList(
     error.value = null;
 
     try {
-      // If Experience object provided, use directly; otherwise fetch it
-      const experience =
-        typeof experienceIdOrObject === 'string'
-          ? await experienceRepo.get(experienceIdOrObject)
-          : experienceIdOrObject;
+      const experience = await experienceRepo.get(experienceId);
 
       if (!experience) {
         error.value = 'storyList.errors.experienceNotFound';
@@ -88,7 +85,31 @@ export function useStoryList(
       stories.value = await service.getStoriesByExperience(experience);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'storyList.errors.loadFailed';
-      console.error('[useStoryList] Load by experience error:', err);
+      console.error('[useStoryList] Load by experience ID error:', err);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
+   * Load stories for a specific experience (when Experience object already available)
+   * Use this to avoid refetching the Experience from database.
+   * @param experience - Experience object
+   */
+  const loadForExperience = async (experience: Experience) => {
+    if (!experience) {
+      error.value = 'storyList.errors.missingExperience';
+      return;
+    }
+
+    loading.value = true;
+    error.value = null;
+
+    try {
+      stories.value = await service.getStoriesByExperience(experience);
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'storyList.errors.loadFailed';
+      console.error('[useStoryList] Load for experience error:', err);
     } finally {
       loading.value = false;
     }
@@ -188,7 +209,8 @@ export function useStoryList(
 
     // Actions
     loadAll,
-    loadByExperience,
+    loadByExperienceId,
+    loadForExperience,
     groupByExperience,
     search,
     filterByExperience,

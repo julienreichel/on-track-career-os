@@ -61,7 +61,7 @@ describe('useStoryEngine', () => {
     });
   });
 
-  describe('loadStories', () => {
+  describe('loadStoriesByExperienceId', () => {
     it('should load stories for an experience', async () => {
       const mockExperience = {
         id: 'exp-123',
@@ -90,9 +90,9 @@ describe('useStoryEngine', () => {
       mockExperienceRepo.get.mockResolvedValue(mockExperience);
       mockService.getStoriesByExperience.mockResolvedValue(mockStories);
 
-      const { stories, loadStories, hasStories } = useStoryEngine();
+      const { stories, loadStoriesByExperienceId, hasStories } = useStoryEngine();
 
-      await loadStories('exp-123');
+      await loadStoriesByExperienceId('exp-123');
 
       expect(mockExperienceRepo.get).toHaveBeenCalledWith('exp-123');
       expect(mockService.getStoriesByExperience).toHaveBeenCalledWith(mockExperience);
@@ -111,9 +111,9 @@ describe('useStoryEngine', () => {
         () => new Promise((resolve) => setTimeout(() => resolve([]), 50))
       );
 
-      const { loading, loadStories } = useStoryEngine();
+      const { loading, loadStoriesByExperienceId } = useStoryEngine();
 
-      const promise = loadStories('exp-123');
+      const promise = loadStoriesByExperienceId('exp-123');
       expect(loading.value).toBe(true);
 
       await promise;
@@ -129,20 +129,67 @@ describe('useStoryEngine', () => {
       mockExperienceRepo.get.mockResolvedValue(mockExperience);
       mockService.getStoriesByExperience.mockRejectedValue(new Error('Database error'));
 
-      const { error, loadStories } = useStoryEngine();
+      const { error, loadStoriesByExperienceId } = useStoryEngine();
 
-      await loadStories('exp-123');
+      await loadStoriesByExperienceId('exp-123');
 
       expect(error.value).toBe('Database error');
     });
 
     it('should require experience ID', async () => {
-      const { error, loadStories } = useStoryEngine();
+      const { error, loadStoriesByExperienceId } = useStoryEngine();
 
-      await loadStories();
+      await loadStoriesByExperienceId();
 
       expect(error.value).toBe('Experience ID is required');
       expect(mockService.getStoriesByExperience).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('loadStoriesForExperience', () => {
+    it('should load stories for provided experience object', async () => {
+      const mockExperience = {
+        id: 'exp-123',
+        title: 'Test Experience',
+      } as Experience;
+
+      const mockStories: STARStory[] = [
+        {
+          id: 'story-1',
+          situation: 'S1',
+          task: 'T1',
+          action: 'A1',
+          result: 'R1',
+          experienceId: 'exp-123',
+        },
+      ] as STARStory[];
+
+      mockService.getStoriesByExperience.mockResolvedValue(mockStories);
+
+      const { stories, loadStoriesForExperience, hasStories } = useStoryEngine();
+
+      await loadStoriesForExperience(mockExperience);
+
+      expect(mockExperienceRepo.get).not.toHaveBeenCalled(); // Should NOT fetch
+      expect(mockService.getStoriesByExperience).toHaveBeenCalledWith(mockExperience);
+      expect(stories.value).toEqual(mockStories);
+      expect(hasStories.value).toBe(true);
+    });
+
+    it('should handle errors', async () => {
+      const mockExperience = {
+        id: 'exp-123',
+        title: 'Test Experience',
+      } as Experience;
+
+      mockService.getStoriesByExperience.mockRejectedValue(new Error('Database error'));
+
+      const { error, loadStoriesForExperience } = useStoryEngine();
+
+      await loadStoriesForExperience(mockExperience);
+
+      expect(error.value).toBe('Database error');
+      expect(mockExperienceRepo.get).not.toHaveBeenCalled(); // Should NOT fetch
     });
   });
 

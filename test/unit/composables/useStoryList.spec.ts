@@ -127,7 +127,7 @@ describe('useStoryList', () => {
     });
   });
 
-  describe('loadByExperience', () => {
+  describe('loadByExperienceId', () => {
     it('should load stories for specific experience', async () => {
       const mockExperience = {
         id: 'exp-1',
@@ -138,9 +138,9 @@ describe('useStoryList', () => {
       mockExperienceRepo.get.mockResolvedValue(mockExperience);
       mockService.getStoriesByExperience.mockResolvedValue(experienceStories);
 
-      const { loadByExperience, stories, loading } = useStoryList();
+      const { loadByExperienceId, stories, loading } = useStoryList();
 
-      const loadPromise = loadByExperience('exp-1');
+      const loadPromise = loadByExperienceId('exp-1');
       expect(loading.value).toBe(true);
 
       await loadPromise;
@@ -152,9 +152,9 @@ describe('useStoryList', () => {
     });
 
     it('should handle missing experience ID', async () => {
-      const { loadByExperience, error } = useStoryList();
+      const { loadByExperienceId, error } = useStoryList();
 
-      await loadByExperience('');
+      await loadByExperienceId('');
 
       expect(error.value).toBe('storyList.errors.missingExperienceId');
       expect(mockService.getStoriesByExperience).not.toHaveBeenCalled();
@@ -170,12 +170,56 @@ describe('useStoryList', () => {
       mockService.getStoriesByExperience.mockRejectedValue(new Error('API error'));
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      const { loadByExperience, error, loading } = useStoryList();
+      const { loadByExperienceId, error, loading } = useStoryList();
 
-      await loadByExperience('exp-1');
+      await loadByExperienceId('exp-1');
 
       expect(loading.value).toBe(false);
       expect(error.value).toBe('API error');
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('loadForExperience', () => {
+    it('should load stories for provided experience object', async () => {
+      const mockExperience = {
+        id: 'exp-1',
+        title: 'Test Experience',
+      } as Experience;
+
+      const experienceStories = mockStories.filter((s) => s.experienceId === 'exp-1');
+      mockService.getStoriesByExperience.mockResolvedValue(experienceStories);
+
+      const { loadForExperience, stories, loading } = useStoryList();
+
+      const loadPromise = loadForExperience(mockExperience);
+      expect(loading.value).toBe(true);
+
+      await loadPromise;
+
+      expect(stories.value).toEqual(experienceStories);
+      expect(loading.value).toBe(false);
+      expect(mockExperienceRepo.get).not.toHaveBeenCalled(); // Should NOT fetch
+      expect(mockService.getStoriesByExperience).toHaveBeenCalledWith(mockExperience);
+    });
+
+    it('should handle load errors', async () => {
+      const mockExperience = {
+        id: 'exp-1',
+        title: 'Test Experience',
+      } as Experience;
+
+      mockService.getStoriesByExperience.mockRejectedValue(new Error('API error'));
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const { loadForExperience, error, loading } = useStoryList();
+
+      await loadForExperience(mockExperience);
+
+      expect(loading.value).toBe(false);
+      expect(error.value).toBe('API error');
+      expect(mockExperienceRepo.get).not.toHaveBeenCalled(); // Should NOT fetch
 
       consoleErrorSpy.mockRestore();
     });
