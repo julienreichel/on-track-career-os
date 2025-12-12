@@ -34,7 +34,7 @@
         </div>
       </div>
     </template>
-    
+
     <!-- Content area that grows to fill available space -->
     <div class="flex-1 flex flex-col min-h-0">
       <UTextarea

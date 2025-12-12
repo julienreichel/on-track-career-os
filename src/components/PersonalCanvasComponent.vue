@@ -25,8 +25,8 @@
         <!-- Key Partners (1 col) -->
         <div class="flex w-full">
           <CanvasSectionCard
-            class="w-full"
             v-model:edit-value="localCanvas.keyPartners"
+            class="w-full"
             icon="i-heroicons-users"
             :title="t('canvas.sections.keyPartners')"
             :items="canvas.keyPartners"
@@ -43,8 +43,8 @@
         <div class="flex flex-col space-y-4 w-full">
           <div class="flex flex-1 w-full">
             <CanvasSectionCard
-              class="w-full"
               v-model:edit-value="localCanvas.keyActivities"
+              class="w-full"
               icon="i-heroicons-cog-6-tooth"
               :title="t('canvas.sections.keyActivities')"
               :items="canvas.keyActivities"
@@ -58,8 +58,8 @@
           </div>
           <div class="flex flex-1 w-full">
             <CanvasSectionCard
-              class="w-full"
               v-model:edit-value="localCanvas.keyResources"
+              class="w-full"
               icon="i-heroicons-cube"
               :title="t('canvas.sections.keyResources')"
               :items="canvas.keyResources"
@@ -76,8 +76,8 @@
         <!-- Value Proposition (1 col, center) -->
         <div class="flex w-full">
           <CanvasSectionCard
-            class="w-full"
             v-model:edit-value="localCanvas.valueProposition"
+            class="w-full"
             icon="i-heroicons-light-bulb"
             :title="t('canvas.sections.valueProposition')"
             :items="canvas.valueProposition"
@@ -94,8 +94,8 @@
         <div class="flex flex-col space-y-4 w-full">
           <div class="flex flex-1 w-full">
             <CanvasSectionCard
-              class="w-full"
               v-model:edit-value="localCanvas.customerRelationships"
+              class="w-full"
               icon="i-heroicons-heart"
               :title="t('canvas.sections.customerRelationships')"
               :items="canvas.customerRelationships"
@@ -109,8 +109,8 @@
           </div>
           <div class="flex flex-1 w-full">
             <CanvasSectionCard
-              class="w-full"
               v-model:edit-value="localCanvas.channels"
+              class="w-full"
               icon="i-heroicons-megaphone"
               :title="t('canvas.sections.channels')"
               :items="canvas.channels"
@@ -127,8 +127,8 @@
         <!-- Customer Segments (1 col) -->
         <div class="flex w-full">
           <CanvasSectionCard
-            class="w-full"
             v-model:edit-value="localCanvas.customerSegments"
+            class="w-full"
             icon="i-heroicons-user-group"
             :title="t('canvas.sections.customerSegments')"
             :items="canvas.customerSegments"
@@ -147,8 +147,8 @@
         <!-- Cost Structure (left half) -->
         <div class="flex w-full">
           <CanvasSectionCard
-            class="w-full"
             v-model:edit-value="localCanvas.costStructure"
+            class="w-full"
             icon="i-heroicons-currency-dollar"
             :title="t('canvas.sections.costStructure')"
             :items="canvas.costStructure"
@@ -164,8 +164,8 @@
         <!-- Revenue Streams (right half) -->
         <div class="flex w-full">
           <CanvasSectionCard
-            class="w-full"
             v-model:edit-value="localCanvas.revenueStreams"
+            class="w-full"
             icon="i-heroicons-banknotes"
             :title="t('canvas.sections.revenueStreams')"
             :items="canvas.revenueStreams"
