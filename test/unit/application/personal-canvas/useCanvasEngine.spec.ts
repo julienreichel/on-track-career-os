@@ -340,27 +340,23 @@ describe('useCanvasEngine', () => {
       expect(error.value).toBe('AI service error');
     });
 
-    it('should handle loading state during regeneration', async () => {
+    it('should not manage loading state during regeneration (caller manages it)', async () => {
       const input: PersonalCanvasInput = {
         profile: { fullName: 'John', headline: 'Dev', summary: '3 years' },
         experiences: [],
         stories: [],
       };
 
-      let resolvePromise: (value: PersonalCanvas) => void;
-      const promise = new Promise<PersonalCanvas>((resolve) => {
-        resolvePromise = resolve;
-      });
-      mockService.regenerateCanvas.mockReturnValue(promise);
+      mockService.regenerateCanvas.mockResolvedValue(mockPersonalCanvas);
 
       const { loading, regenerateCanvas } = useCanvasEngine();
 
-      const regeneratePromise = regenerateCanvas(input);
-      expect(loading.value).toBe(true);
+      // Loading state should remain false as it's managed by the caller (page component)
+      expect(loading.value).toBe(false);
+      
+      await regenerateCanvas(input);
 
-      resolvePromise!(mockPersonalCanvas);
-      await regeneratePromise;
-
+      // Loading state still false - caller is responsible for managing it
       expect(loading.value).toBe(false);
     });
 

@@ -84,7 +84,8 @@ export function useCanvasEngine() {
    * @returns Generated PersonalCanvas from AI
    */
   const regenerateCanvas = async (input: PersonalCanvasInput): Promise<PersonalCanvas | null> => {
-    loading.value = true;
+    // Note: loading state is managed by the caller (page component)
+    // to ensure loading shows before data fetching starts
     error.value = null;
 
     try {
@@ -95,8 +96,6 @@ export function useCanvasEngine() {
       error.value = err instanceof Error ? err.message : 'Unknown error occurred';
       console.error('[useCanvasEngine] Error regenerating canvas:', err);
       return null;
-    } finally {
-      loading.value = false;
     }
   };
 

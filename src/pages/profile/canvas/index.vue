@@ -153,6 +153,9 @@ const handleGenerate = async () => {
       return;
     }
 
+    // Set loading state before data fetching
+    loading.value = true;
+
     // Load experiences and stories for canvas generation
     const { experiences, stories } = await loadExperiencesAndStories();
 
@@ -171,7 +174,7 @@ const handleGenerate = async () => {
         responsibilities: exp.responsibilities?.filter((r): r is string => r !== null) || undefined,
         tasks: exp.tasks?.filter((t): t is string => t !== null) || undefined,
       })),
-      stories: stories.value.map((story) => ({
+      stories: stories.map((story) => ({
         situation: story.situation || undefined,
         task: story.task || undefined,
         action: story.action || undefined,
@@ -187,7 +190,7 @@ const handleGenerate = async () => {
     if (result) {
       successMessage.value = t('canvas.messages.generated');
 
-      // Save the generated canvas (owner field is auto-set by Amplify auth)
+      // Save the generated canvas (updates existing if canvas.value.id exists - one canvas per user)
       await saveCanvas({
         userId: profile.value.id,
         customerSegments: result.customerSegments,
@@ -206,6 +209,8 @@ const handleGenerate = async () => {
   } catch (err) {
     console.error('[canvas] Error generating:', err);
     error.value = err instanceof Error ? err.message : t('errors.unknown');
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -218,6 +223,9 @@ const handleRegenerate = async () => {
       error.value = t('canvas.messages.noProfile');
       return;
     }
+
+    // Set loading state before data fetching
+    loading.value = true;
 
     // Load experiences and stories for canvas regeneration
     const { experiences, stories } = await loadExperiencesAndStories();
@@ -253,7 +261,7 @@ const handleRegenerate = async () => {
     if (result) {
       successMessage.value = t('canvas.messages.regenerated');
 
-      // Update existing canvas (owner field is auto-set by Amplify auth)
+      // Update existing canvas (canvas.value.id will be set, ensures one canvas per user)
       await saveCanvas({
         userId: profile.value.id,
         customerSegments: result.customerSegments,
@@ -272,6 +280,8 @@ const handleRegenerate = async () => {
   } catch (err) {
     console.error('[canvas] Error regenerating:', err);
     error.value = err instanceof Error ? err.message : t('errors.unknown');
+  } finally {
+    loading.value = false;
   }
 };
 
