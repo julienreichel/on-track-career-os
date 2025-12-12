@@ -9,8 +9,6 @@ import { test, expect } from '@playwright/test';
 
 // Empty state tests - run serially FIRST before any experiences are created
 test.describe.serial('Home Page - Empty State', () => {
-  test.describe.configure({ retries: 2 });
-
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');

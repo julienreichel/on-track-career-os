@@ -59,7 +59,7 @@ async function createExperience(
 
   // Prefer URL + heading instead of networkidle
   await expect(page).toHaveURL(/\/profile\/experiences/);
-  await expect(page.getByRole('heading', { name: /Experiences/i })).toBeVisible();
+  await expect(page.locator('h1', { hasText: 'Experiences' })).toBeVisible();
 
   // Wait until the table actually has at least one row
   await expect(page.getByRole('row').nth(1)).toBeVisible();
@@ -69,8 +69,10 @@ async function createExperience(
     .getByRole('row')
     .filter({ has: page.getByRole('cell', { name: title, exact: true }) });
 
-  await experienceRow.getByRole('button', { name: 'Edit' }).click();
+  await experienceRow.getByLabel('Edit').click();
   await page.waitForLoadState('domcontentloaded'); // or drop completely if not needed
+
+  await expect(page).toHaveURL(/\/profile\/experiences\/[a-f0-9-]+$/);
 
   // Extract experience ID from URL
   const url = page.url();
