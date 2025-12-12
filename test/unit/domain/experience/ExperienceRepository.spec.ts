@@ -8,13 +8,19 @@ import type {
   ExperienceUpdateInput,
   Experience,
 } from '@/domain/experience/Experience';
+import type { UserProfile } from '@/domain/user-profile/UserProfile';
+import { loadLazyAll } from '@/data/graphql/lazy';
 
-// Mock gqlOptions
+// Mock gqlOptions and lazy loading utilities
 vi.mock('@/data/graphql/options', () => ({
   gqlOptions: (custom?: Record<string, unknown>) => ({
     authMode: 'userPool',
     ...custom,
   }),
+}));
+
+vi.mock('@/data/graphql/lazy', () => ({
+  loadLazyAll: vi.fn(),
 }));
 
 describe('ExperienceRepository', () => {
@@ -116,42 +122,39 @@ describe('ExperienceRepository', () => {
         },
       ] as unknown as Experience[];
 
-      mockModel.list.mockResolvedValue({
-        data: mockExperiences,
-      });
+      const mockUserProfile = {
+        id: 'user-123',
+        experiences: vi.fn(),
+      } as unknown as UserProfile;
 
-      const result = await repository.list();
+      vi.mocked(loadLazyAll).mockResolvedValue(mockExperiences);
 
-      expect(mockModel.list).toHaveBeenCalledWith(
-        expect.objectContaining({ authMode: 'userPool' })
-      );
+      const result = await repository.list(mockUserProfile);
+
       expect(result).toEqual(mockExperiences);
       expect(result).toHaveLength(2);
     });
 
-    it('should apply filters when provided', async () => {
-      const mockFilter = { status: 'complete' };
+    it('should return empty array when userProfile has no experiences', async () => {
+      const mockUserProfile = {
+        id: 'user-123',
+        experiences: undefined,
+      } as unknown as UserProfile;
 
-      mockModel.list.mockResolvedValue({
-        data: [],
-      });
+      const result = await repository.list(mockUserProfile);
 
-      await repository.list(mockFilter);
-
-      expect(mockModel.list).toHaveBeenCalledWith(
-        expect.objectContaining({
-          authMode: 'userPool',
-          status: 'complete',
-        })
-      );
+      expect(result).toEqual([]);
     });
 
     it('should return empty array when no experiences exist', async () => {
-      mockModel.list.mockResolvedValue({
-        data: [],
-      });
+      const mockUserProfile = {
+        id: 'user-123',
+        experiences: vi.fn(),
+      } as unknown as UserProfile;
 
-      const result = await repository.list();
+      vi.mocked(loadLazyAll).mockResolvedValue([]);
+
+      const result = await repository.list(mockUserProfile);
 
       expect(result).toEqual([]);
     });

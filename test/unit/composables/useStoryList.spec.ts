@@ -1,11 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useStoryList } from '@/composables/useStoryList';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
+import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { STARStory } from '@/domain/starstory/STARStory';
+import type { Experience } from '@/domain/experience/Experience';
 
-// Mock STARStoryService
+// Mock services
 vi.mock('@/domain/starstory/STARStoryService', () => ({
   STARStoryService: vi.fn(),
+}));
+vi.mock('@/domain/experience/ExperienceRepository', () => ({
+  ExperienceRepository: vi.fn(),
 }));
 
 describe('useStoryList', () => {
@@ -13,6 +18,9 @@ describe('useStoryList', () => {
     getAllStories: ReturnType<typeof vi.fn>;
     getStoriesByExperience: ReturnType<typeof vi.fn>;
     deleteStory: ReturnType<typeof vi.fn>;
+  };
+  let mockExperienceRepo: {
+    get: ReturnType<typeof vi.fn>;
   };
 
   const mockStories: STARStory[] = [
@@ -63,7 +71,11 @@ describe('useStoryList', () => {
       getStoriesByExperience: vi.fn(),
       deleteStory: vi.fn(),
     };
+    mockExperienceRepo = {
+      get: vi.fn(),
+    };
     vi.mocked(STARStoryService).mockImplementation(() => mockService as never);
+    vi.mocked(ExperienceRepository).mockImplementation(() => mockExperienceRepo as never);
   });
 
   describe('initialization', () => {
@@ -117,7 +129,13 @@ describe('useStoryList', () => {
 
   describe('loadByExperience', () => {
     it('should load stories for specific experience', async () => {
+      const mockExperience = {
+        id: 'exp-1',
+        title: 'Test Experience',
+      } as Experience;
+
       const experienceStories = mockStories.filter((s) => s.experienceId === 'exp-1');
+      mockExperienceRepo.get.mockResolvedValue(mockExperience);
       mockService.getStoriesByExperience.mockResolvedValue(experienceStories);
 
       const { loadByExperience, stories, loading } = useStoryList();
@@ -129,7 +147,8 @@ describe('useStoryList', () => {
 
       expect(stories.value).toEqual(experienceStories);
       expect(loading.value).toBe(false);
-      expect(mockService.getStoriesByExperience).toHaveBeenCalledWith('exp-1');
+      expect(mockExperienceRepo.get).toHaveBeenCalledWith('exp-1');
+      expect(mockService.getStoriesByExperience).toHaveBeenCalledWith(mockExperience);
     });
 
     it('should handle missing experience ID', async () => {
@@ -142,6 +161,12 @@ describe('useStoryList', () => {
     });
 
     it('should handle load errors', async () => {
+      const mockExperience = {
+        id: 'exp-1',
+        title: 'Test Experience',
+      } as Experience;
+
+      mockExperienceRepo.get.mockResolvedValue(mockExperience);
       mockService.getStoriesByExperience.mockRejectedValue(new Error('API error'));
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 

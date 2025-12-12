@@ -29,7 +29,10 @@ export interface GroupedStories {
  * - Search and filter capabilities
  */
 // eslint-disable-next-line max-lines-per-function -- Composable requires comprehensive interface
-export function useStoryList(service = new STARStoryService(), experienceRepo = new ExperienceRepository()) {
+export function useStoryList(
+  service = new STARStoryService(),
+  experienceRepo = new ExperienceRepository()
+) {
   // State
   const stories = ref<STARStory[]>([]);
   const loading = ref(false);

@@ -44,9 +44,7 @@ describe('STARStoryRepository', () => {
     };
 
     // Inject the mocks via constructor (dependency injection)
-    repository = new STARStoryRepository(
-      mockModel as AmplifySTARStoryModel
-    );
+    repository = new STARStoryRepository(mockModel as AmplifySTARStoryModel);
   });
 
   describe('get', () => {
