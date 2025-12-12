@@ -25,6 +25,7 @@ const i18n = createI18n({
           startDate: 'Start Date',
           endDate: 'End Date',
           status: 'Status',
+          stories: 'Stories',
           actions: 'Actions',
         },
         status: {
