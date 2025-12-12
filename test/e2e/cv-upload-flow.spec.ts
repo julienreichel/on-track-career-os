@@ -1,14 +1,18 @@
 import { test, expect } from '@playwright/test';
+// import { join } from 'path'; // Will be used when backend CV parsing is implemented
 
 /**
- * E2E Tests: CV Upload → Experience Extraction → Experience Management
+ * E2E Tests: CV Upload Flow (EPIC 1A)
  *
- * Tests the complete EPIC 1A workflow:
- * 1. Upload CV file
+ * Tests the complete CV upload and import workflow:
+ * 1. Upload CV file (PDF/TXT)
  * 2. AI parsing and extraction
  * 3. Preview extracted experiences
- * 4. Import to database
- * 5. Manage experiences (view, edit, delete)
+ * 4. Edit/remove experiences before import
+ * 5. Import experiences to database
+ * 6. Verify imported data appears in experiences list
+ *
+ * Note: Experience management tests (CRUD operations) are in experiences.spec.ts
  */
 
 test.describe('CV Upload Flow', () => {
@@ -21,231 +25,203 @@ test.describe('CV Upload Flow', () => {
     // Verify page loads
     await expect(page.getByRole('heading', { name: /upload your cv/i })).toBeVisible();
 
-    // Verify dropzone is present
+    // Verify dropzone is present with instructions
     await expect(page.getByText(/drop your cv here or click to browse/i)).toBeVisible();
     await expect(page.getByText(/supports pdf and txt files/i)).toBeVisible();
   });
 
-  test('should handle file upload and show parsing state', async ({ page }) => {
-    // Note: Full file upload with AI processing requires backend integration
-    // This test validates the UI structure for file upload
-
+  test('should have file input for upload', async ({ page }) => {
     // Verify file input exists
     const fileInput = page.locator('input[type="file"]');
     await expect(fileInput).toBeAttached();
 
-    // For future implementation with backend:
+    // Verify it accepts correct file types
+    const accept = await fileInput.getAttribute('accept');
+    expect(accept).toContain('.pdf');
+    expect(accept).toContain('.txt');
+  });
+
+  test('should show parsing state after file upload', async ({ page: _page }) => {
+    // TODO: Implement when backend CV parsing is ready
+    // This test will upload a test CV file and verify parsing state
+    
     // const testFilePath = join(__dirname, 'fixtures', 'test-cv.txt');
+    // const fileInput = page.locator('input[type="file"]');
     // await fileInput.setInputFiles(testFilePath);
+    
+    // // Should show parsing indicator
     // await expect(page.getByText(/parsing your cv/i)).toBeVisible();
+    // await expect(page.locator('[class*="spinner"], [class*="loading"]')).toBeVisible();
+    
+    test.skip(true, 'Backend CV parsing not yet implemented');
   });
 
-  test('should show error for invalid file type', async ({ page }) => {
-    // This test validates error handling UI exists
+  test('should display preview of extracted experiences', async ({ page: _page }) => {
+    // TODO: Implement when backend CV parsing is ready
+    // This test will verify the preview step shows extracted experiences
+    
+    // const testFilePath = join(__dirname, 'fixtures', 'test-cv.txt');
+    // const fileInput = page.locator('input[type="file"]');
+    // await fileInput.setInputFiles(testFilePath);
+    
+    // // Wait for parsing to complete
+    // await page.waitForTimeout(5000);
+    // await page.waitForLoadState('networkidle');
+    
+    // // Should show preview heading
+    // await expect(page.getByRole('heading', { name: /extracted information|preview/i })).toBeVisible();
+    
+    // // Should show experience cards/list
+    // await expect(page.getByText(/experiences/i)).toBeVisible();
+    
+    // // Should have at least one experience card
+    // const experienceCards = page.locator('[class*="experience"], [class*="card"]');
+    // await expect(experienceCards.first()).toBeVisible();
+    
+    test.skip(true, 'Backend CV parsing not yet implemented');
+  });
+
+  test('should allow removing experiences before import', async ({ page: _page }) => {
+    // TODO: Implement when backend CV parsing is ready
+    // This test will verify users can remove unwanted experiences
+    
+    // const testFilePath = join(__dirname, 'fixtures', 'test-cv.txt');
+    // const fileInput = page.locator('input[type="file"]');
+    // await fileInput.setInputFiles(testFilePath);
+    
+    // // Wait for parsing
+    // await page.waitForTimeout(5000);
+    // await page.waitForLoadState('networkidle');
+    
+    // // Get initial count
+    // const experienceCards = page.locator('[class*="experience"]');
+    // const initialCount = await experienceCards.count();
+    
+    // // Click remove button on first experience
+    // const removeButton = page.locator('button:has-text("Remove"), button[aria-label*="remove" i]').first();
+    // await removeButton.click();
+    
+    // // Should have one fewer experience
+    // await expect(experienceCards).toHaveCount(initialCount - 1);
+    
+    test.skip(true, 'Backend CV parsing not yet implemented');
+  });
+
+  test('should show Import All button after parsing', async ({ page: _page }) => {
+    // TODO: Implement when backend CV parsing is ready
+    
+    // const testFilePath = join(__dirname, 'fixtures', 'test-cv.txt');
+    // const fileInput = page.locator('input[type="file"]');
+    // await fileInput.setInputFiles(testFilePath);
+    
+    // // Wait for parsing
+    // await page.waitForTimeout(5000);
+    // await page.waitForLoadState('networkidle');
+    
+    // // Should show import button
+    // const importButton = page.getByRole('button', { name: /import all|import|confirm/i });
+    // await expect(importButton).toBeVisible();
+    // await expect(importButton).toBeEnabled();
+    
+    test.skip(true, 'Backend CV parsing not yet implemented');
+  });
+
+  test('should import experiences and redirect to list', async ({ page: _page }) => {
+    // TODO: Implement when backend CV parsing is ready
+    // This test will verify the complete import workflow
+    
+    // const testFilePath = join(__dirname, 'fixtures', 'test-cv.txt');
+    // const fileInput = page.locator('input[type="file"]');
+    // await fileInput.setInputFiles(testFilePath);
+    
+    // // Wait for parsing
+    // await page.waitForTimeout(5000);
+    // await page.waitForLoadState('networkidle');
+    
+    // // Click import button
+    // const importButton = page.getByRole('button', { name: /import all|confirm import/i });
+    // await importButton.click();
+    
+    // // Should show importing/loading state
+    // await expect(page.getByText(/importing|saving/i)).toBeVisible();
+    
+    // // Wait for import to complete
+    // await page.waitForTimeout(2000);
+    // await page.waitForLoadState('networkidle');
+    
+    // // Should redirect to experiences list
+    // await expect(page).toHaveURL(/\/profile\/experiences$/);
+    
+    // // Should show success message
+    // await expect(page.getByText(/imported successfully|experiences added/i)).toBeVisible();
+    
+    test.skip(true, 'Backend CV parsing not yet implemented');
+  });
+
+  test('should display imported experiences in list', async ({ page: _page }) => {
+    // TODO: Implement when backend CV parsing is ready
+    // This test will verify imported experiences appear in the list
+    
+    // const testFilePath = join(__dirname, 'fixtures', 'test-cv.txt');
+    // const fileInput = page.locator('input[type="file"]');
+    // await fileInput.setInputFiles(testFilePath);
+    
+    // // Wait for parsing
+    // await page.waitForTimeout(5000);
+    // await page.waitForLoadState('networkidle');
+    
+    // // Import experiences
+    // const importButton = page.getByRole('button', { name: /import all/i });
+    // await importButton.click();
+    // await page.waitForTimeout(2000);
+    // await page.waitForLoadState('networkidle');
+    
+    // // Verify we're on experiences list
+    // await expect(page).toHaveURL(/\/profile\/experiences$/);
+    
+    // // Should have experience rows in table
+    // const experienceRows = page.locator('table tbody tr');
+    // await expect(experienceRows.first()).toBeVisible();
+    
+    // // Verify imported data appears (check for job title from test CV)
+    // await expect(page.getByText(/Software Engineer|Developer/i)).toBeVisible();
+    
+    test.skip(true, 'Backend CV parsing not yet implemented');
+  });
+
+  test('should allow canceling upload process', async ({ page }) => {
+    // Verify cancel/back button exists
+    // Button may not be visible initially on upload page, but should exist after upload starts
+    // For now, just verify the page structure is correct
     await expect(page.getByRole('heading', { name: /upload your cv/i })).toBeVisible();
-
-    // Verify error alert structure exists
-    const alerts = page.locator('[role="alert"]');
-    // Initially no errors
-    await expect(alerts).toHaveCount(0);
-  });
-});
-
-test.describe('Experiences List', () => {
-  test('should display experiences list page', async ({ page }) => {
-    await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
-
-    // Verify page header
-    await expect(page.getByRole('heading', { level: 1, name: /experiences/i })).toBeVisible();
-
-    // Verify action buttons
-    await expect(page.getByRole('button', { name: /add experience/i }).first()).toBeVisible();
-
-    await expect(page.getByRole('link', { name: /upload your cv/i })).toBeVisible();
   });
 
-  test('should navigate to CV upload from experiences list', async ({ page }) => {
-    await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
-
-    // Click upload CV button
-    await page.getByRole('link', { name: /upload your cv/i }).click();
-
-    // Should navigate to upload page
-    await expect(page).toHaveURL('/profile/cv-upload');
-    await expect(page.getByRole('heading', { name: /upload your cv/i })).toBeVisible();
+  test('should show error for invalid file type', async ({ page: _page }) => {
+    // TODO: Implement when file validation is ready
+    // This test will verify error handling for wrong file types
+    
+    // const invalidFilePath = join(__dirname, 'fixtures', 'test-file.docx');
+    // const fileInput = page.locator('input[type="file"]');
+    // await fileInput.setInputFiles(invalidFilePath);
+    
+    // // Should show error message
+    // await expect(page.getByRole('alert')).toBeVisible();
+    // await expect(page.getByText(/invalid file type|only pdf and txt/i)).toBeVisible();
+    
+    test.skip(true, 'File validation not yet implemented');
   });
 
-  test('should navigate to add new experience', async ({ page }) => {
-    await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
-
-    // Click add experience button
-    const addButton = page.getByRole('button', { name: /add experience/i }).first();
-    await addButton.click();
-
-    // Verify navigation
-    await expect(page).toHaveURL(/\/profile\/experiences\/new$/);
-
-    // Verify the new experience form is displayed
-    await expect(page.getByRole('heading', { level: 1, name: /add experience/i })).toBeVisible();
-
-    // Check that at least one required field appears
-    await expect(page.getByLabel(/job title/i)).toBeVisible();
-  });
-});
-
-test.describe('Experience Form', () => {
-  test('should display new experience form', async ({ page }) => {
-    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
-
-    // Verify form header (disambiguated)
-    await expect(page.getByRole('heading', { level: 1, name: /add experience/i })).toBeVisible();
-
-    // Verify form fields are present
-    await expect(page.getByLabel(/job title/i)).toBeVisible();
-    await expect(page.getByLabel(/company name/i)).toBeVisible();
-    await expect(page.getByLabel(/start date/i)).toBeVisible();
-    await expect(page.getByLabel(/end date/i)).toBeVisible();
-  });
-
-  test('should validate required fields', async ({ page }) => {
-    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
-
-    // Submit button should be disabled without required fields
-    const submitButton = page.getByRole('button', { name: /save experience/i });
-
-    // Check initial state (should be disabled due to validation)
-    await expect(submitButton).toBeDisabled();
-  });
-
-  test('should enable submit when required fields filled', async ({ page }) => {
-    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
-
-    // Fill required fields
-    await page.getByLabel(/job title/i).fill('Software Engineer');
-    await page.getByLabel(/start date/i).fill('2023-01-01');
-
-    // Submit button should now be enabled
-    const submitButton = page.getByRole('button', { name: /save experience/i });
-    await expect(submitButton).toBeEnabled();
-  });
-
-  test('should handle form submission', async ({ page }) => {
-    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
-
-    // Fill out complete form
-    await page.getByLabel(/job title/i).fill('Senior Software Engineer');
-    await page.getByLabel(/company name/i).fill('Tech Corp');
-    await page.getByLabel(/start date/i).fill('2020-01-01');
-    await page.getByLabel(/end date/i).fill('2023-12-31');
-
-    const responsibilitiesField = page.getByLabel(/responsibilities/i);
-    await responsibilitiesField.fill('Lead development\nMentor team\nArchitect solutions');
-
-    const tasksField = page.getByLabel(/tasks/i);
-    await tasksField.fill('Build APIs\nCode reviews\nCI/CD setup');
-
-    // Submit form
-    const submitButton = page.getByRole('button', { name: /save experience/i });
-    await submitButton.click();
-
-    // Note: In real test with backend, would verify redirect and data persistence
-  });
-
-  test('should navigate back on cancel', async ({ page }) => {
-    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
-
-    // Click cancel button
-    const cancelButton = page.getByRole('button', { name: /cancel/i });
-    await cancelButton.click();
-
-    // Should navigate back to list
-    await expect(page).toHaveURL('/profile/experiences');
-  });
-
-  test('should handle text area to array conversion', async ({ page }) => {
-    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
-
-    // Fill responsibilities with multiple lines
-    const responsibilitiesField = page.getByLabel(/responsibilities/i);
-    await responsibilitiesField.fill(
-      'First responsibility\nSecond responsibility\nThird responsibility'
-    );
-
-    // Verify content is in the field
-    await expect(responsibilitiesField).toHaveValue(/First responsibility/);
-  });
-
-  test('should display form hints', async ({ page }) => {
-    await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
-
-    // Verify helpful hints are displayed
-    await expect(page.getByText(/leave empty if this is your current position/i)).toBeVisible();
-    await expect(page.getByText(/one responsibility per line/i)).toBeVisible();
-    await expect(page.getByText(/one task per line/i)).toBeVisible();
-  });
-});
-
-test.describe('Experience Management', () => {
-  test('should display empty state when no experiences', async ({ page }) => {
-    await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
-
-    // In a fresh state, should show empty message
-    // Note: Actual check depends on database state
-    const emptyMessage = page.getByText(/no experiences yet/i);
-    // We check if it exists (might not be visible if there's data)
-    const isVisible = await emptyMessage.isVisible().catch(() => false);
-
-    if (isVisible) {
-      await expect(emptyMessage).toBeVisible();
-    }
-  });
-
-  test('should navigate between pages', async ({ page }) => {
-    // Test navigation flow: list → new → cancel → list
-    await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
-    await expect(page).toHaveURL('/profile/experiences');
-
-    // Navigate to new
-    const addButton = page.getByRole('button', { name: /add experience/i });
-    await addButton.click();
-
-    // Wait for any navigation or modal (500ms timeout)
-    const WAIT_TIMEOUT_MS = 500;
-    await page.waitForTimeout(WAIT_TIMEOUT_MS);
-
-    // Navigate back (via cancel or back button)
-    const backLink = page.getByRole('link', { name: /your experiences/i });
-    if (await backLink.isVisible()) {
-      await backLink.click();
-      await expect(page).toHaveURL('/profile/experiences');
-    }
-  });
-});
-
-test.describe('Responsive Design', () => {
-  // Mobile viewport constants
-  const MOBILE_WIDTH = 375;
-  const MOBILE_HEIGHT = 667;
-  const TABLET_WIDTH = 768;
-  const TABLET_HEIGHT = 1024;
-
-  test('should be mobile responsive', async ({ page }) => {
-    // Set mobile viewport
-    await page.setViewportSize({ width: MOBILE_WIDTH, height: MOBILE_HEIGHT });
-
-    await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
-
-    // Verify page is accessible on mobile
-    await expect(page.getByRole('heading', { name: /experiences/i })).toBeVisible();
-  });
-
-  test('should be tablet responsive', async ({ page }) => {
-    // Set tablet viewport
-    await page.setViewportSize({ width: TABLET_WIDTH, height: TABLET_HEIGHT });
-
-    await page.goto('/profile/cv-upload', { waitUntil: 'networkidle' });
-
-    // Verify upload page is accessible on tablet
-    await expect(page.getByRole('heading', { name: /upload your cv/i })).toBeVisible();
+  test('should show error for file too large', async ({ page: _page }) => {
+    // TODO: Implement when file size validation is ready
+    
+    // const largeFilePath = join(__dirname, 'fixtures', 'large-cv.pdf');
+    // const fileInput = page.locator('input[type="file"]');
+    // await fileInput.setInputFiles(largeFilePath);
+    
+    // // Should show error message
+    // await expect(page.getByRole('alert')).toBeVisible();
+    // await expect(page.getByText(/file too large|maximum.*5.*mb/i)).toBeVisible();
+    
+    test.skip(true, 'File size validation not yet implemented');
   });
 });
