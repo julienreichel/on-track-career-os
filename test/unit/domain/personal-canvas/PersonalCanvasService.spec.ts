@@ -1,14 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PersonalCanvasService } from '@/domain/personal-canvas/PersonalCanvasService';
 import { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
+import { AiOperationsRepository } from '@/domain/ai-operations/AiOperationsRepository';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
+import type { PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas';
 
-// Mock the repository
+// Mock the repositories
 vi.mock('@/domain/personal-canvas/PersonalCanvasRepository');
+vi.mock('@/domain/ai-operations/AiOperationsRepository');
 
 describe('PersonalCanvasService', () => {
   let service: PersonalCanvasService;
   let mockRepository: ReturnType<typeof vi.mocked<PersonalCanvasRepository>>;
+  let mockAiRepository: ReturnType<typeof vi.mocked<AiOperationsRepository>>;
 
   beforeEach(() => {
     mockRepository = {
@@ -19,7 +23,11 @@ describe('PersonalCanvasService', () => {
       delete: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<PersonalCanvasRepository>>;
 
-    service = new PersonalCanvasService(mockRepository);
+    mockAiRepository = {
+      generatePersonalCanvas: vi.fn(),
+    } as unknown as ReturnType<typeof vi.mocked<AiOperationsRepository>>;
+
+    service = new PersonalCanvasService(mockRepository, mockAiRepository);
   });
 
   describe('getFullPersonalCanvas', () => {
@@ -169,16 +177,144 @@ describe('PersonalCanvasService', () => {
     });
   });
 
-  describe('constructor', () => {
-    it('should use default repository when not provided', () => {
-      const serviceWithDefaultRepo = new PersonalCanvasService();
-      expect(serviceWithDefaultRepo).toBeInstanceOf(PersonalCanvasService);
+  describe('regenerateCanvas', () => {
+    it('should call AI operation to generate PersonalCanvas', async () => {
+      const mockInput: PersonalCanvasInput = {
+        profile: {
+          name: 'John Doe',
+          currentRole: 'Senior Engineer',
+          yearsOfExperience: 8,
+          targetRole: 'Tech Lead',
+        },
+        experiences: [
+          {
+            title: 'Senior Software Engineer',
+            company: 'Tech Corp',
+            description: 'Led team of 5 engineers',
+          },
+        ],
+        stories: [
+          {
+            situation: 'Complex migration project',
+            task: 'Lead database migration',
+            action: 'Designed and executed migration strategy',
+            result: 'Zero downtime, 50% performance improvement',
+          },
+        ],
+      };
+
+      const mockGeneratedCanvas = {
+        id: 'generated-canvas-123',
+        userId: 'user-123',
+        valueProposition: 'Technical leader with proven track record',
+        keyActivities: ['Leadership', 'Architecture', 'Mentoring'],
+        strengthsAdvantage: 'Strong technical and people skills',
+        targetRoles: ['Tech Lead', 'Engineering Manager'],
+        channels: ['LinkedIn', 'GitHub', 'Conferences'],
+        resources: ['Technical expertise', 'Leadership experience'],
+        careerDirection: 'Technical leadership path',
+        painRelievers: ['Process improvement', 'Team enablement'],
+        gainCreators: ['High-quality delivery', 'Team growth'],
+        lastGeneratedAt: '2025-01-15T00:00:00Z',
+        needsUpdate: false,
+        createdAt: '2025-01-15T00:00:00Z',
+        updatedAt: '2025-01-15T00:00:00Z',
+        owner: 'user-123::user-123',
+      } as PersonalCanvas;
+
+      mockAiRepository.generatePersonalCanvas.mockResolvedValue(mockGeneratedCanvas);
+
+      const result = await service.regenerateCanvas(mockInput);
+
+      expect(mockAiRepository.generatePersonalCanvas).toHaveBeenCalledWith(mockInput);
+      expect(result).toEqual(mockGeneratedCanvas);
     });
 
-    it('should accept a custom repository', () => {
+    it('should handle AI operation errors', async () => {
+      const mockInput: PersonalCanvasInput = {
+        profile: { name: 'John Doe', currentRole: 'Engineer', yearsOfExperience: 5 },
+        experiences: [],
+        stories: [],
+      };
+
+      mockAiRepository.generatePersonalCanvas.mockRejectedValue(
+        new Error('AI service unavailable')
+      );
+
+      await expect(service.regenerateCanvas(mockInput)).rejects.toThrow('AI service unavailable');
+      expect(mockAiRepository.generatePersonalCanvas).toHaveBeenCalledWith(mockInput);
+    });
+
+    it('should pass through all input data to AI operation', async () => {
+      const complexInput: PersonalCanvasInput = {
+        profile: {
+          name: 'Jane Smith',
+          currentRole: 'Staff Engineer',
+          yearsOfExperience: 12,
+          targetRole: 'Principal Engineer',
+          skills: ['TypeScript', 'System Design', 'Leadership'],
+        },
+        experiences: [
+          {
+            title: 'Staff Engineer',
+            company: 'Big Tech',
+            description: 'Led multiple cross-functional initiatives',
+            achievements: ['Reduced latency by 60%', 'Mentored 10+ engineers'],
+          },
+          {
+            title: 'Senior Engineer',
+            company: 'Startup',
+            description: 'Built core platform from scratch',
+          },
+        ],
+        stories: [
+          {
+            situation: 'System scaling challenge',
+            task: 'Scale to 10x traffic',
+            action: 'Redesigned architecture',
+            result: 'Handled 10x load with 99.99% uptime',
+          },
+        ],
+      };
+
+      const mockResult = {
+        userId: 'user-123',
+        valueProposition: 'Generated from complex input',
+        keyActivities: ['Technical Strategy'],
+        strengthsAdvantage: 'Deep technical expertise',
+        targetRoles: ['Principal Engineer'],
+        channels: ['Tech Talks'],
+        resources: ['Network'],
+        careerDirection: 'IC leadership',
+        painRelievers: ['Scaling solutions'],
+        gainCreators: ['System reliability'],
+        lastGeneratedAt: '2025-01-15T00:00:00Z',
+        needsUpdate: false,
+        createdAt: '2025-01-15T00:00:00Z',
+        updatedAt: '2025-01-15T00:00:00Z',
+        owner: 'user-123::user-123',
+      } as PersonalCanvas;
+
+      mockAiRepository.generatePersonalCanvas.mockResolvedValue(mockResult);
+
+      const result = await service.regenerateCanvas(complexInput);
+
+      expect(mockAiRepository.generatePersonalCanvas).toHaveBeenCalledWith(complexInput);
+      expect(result).toEqual(mockResult);
+    });
+  });
+
+  describe('constructor', () => {
+    it('should use default repositories when not provided', () => {
+      const serviceWithDefaultRepos = new PersonalCanvasService();
+      expect(serviceWithDefaultRepos).toBeInstanceOf(PersonalCanvasService);
+    });
+
+    it('should accept custom repositories', () => {
       const customRepo = new PersonalCanvasRepository();
-      const serviceWithCustomRepo = new PersonalCanvasService(customRepo);
-      expect(serviceWithCustomRepo).toBeInstanceOf(PersonalCanvasService);
+      const customAiRepo = new AiOperationsRepository();
+      const serviceWithCustomRepos = new PersonalCanvasService(customRepo, customAiRepo);
+      expect(serviceWithCustomRepos).toBeInstanceOf(PersonalCanvasService);
     });
   });
 });
