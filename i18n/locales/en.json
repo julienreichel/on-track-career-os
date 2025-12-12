@@ -444,5 +444,56 @@
     "leave": "Leave",
     "discard": "Discard",
     "goBack": "Go back"
+  },
+  "canvas": {
+    "title": "Personal Business Model Canvas",
+    "description": "Your strategic career positioning and value proposition",
+    "needsUpdate": "Update recommended",
+    "empty": {
+      "title": "No Canvas Yet",
+      "description": "Generate your Personal Business Model Canvas to visualize your professional identity and career strategy.",
+      "field": "Not yet defined"
+    },
+    "page": {
+      "title": "Personal Canvas",
+      "description": "Visualize and manage your professional identity"
+    },
+    "sections": {
+      "valueProposition": "Value Proposition",
+      "keyActivities": "Key Activities",
+      "strengthsAdvantage": "Strengths & Competitive Advantages",
+      "targetRoles": "Target Roles / Customers",
+      "channels": "Channels",
+      "resources": "Personal Resources",
+      "careerDirection": "Career Direction",
+      "painRelievers": "Pain Relievers",
+      "gainCreators": "Gain Creators"
+    },
+    "placeholders": {
+      "valueProposition": "What unique value do you bring? What makes you different?",
+      "keyActivities": "What do you do best? What activities drive your value?",
+      "strengthsAdvantage": "What competitive advantages do you have?",
+      "targetRoles": "What roles or industries are you targeting?",
+      "channels": "How do you reach employers? LinkedIn, networks, conferences?",
+      "resources": "Skills, certifications, network, tools you leverage",
+      "careerDirection": "Where do you want your career to go?",
+      "painRelievers": "What problems do you solve for employers?",
+      "gainCreators": "What positive outcomes do you create?"
+    },
+    "actions": {
+      "generate": "Generate Canvas",
+      "regenerate": "Regenerate",
+      "edit": "Edit",
+      "save": "Save Changes",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "generated": "Canvas generated successfully!",
+      "regenerated": "Canvas regenerated successfully!",
+      "saved": "Canvas saved successfully!",
+      "error": "Error",
+      "noProfile": "Profile not found. Please create your profile first.",
+      "noCanvas": "Canvas not found"
+    }
   }
 }
