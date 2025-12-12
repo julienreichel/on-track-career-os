@@ -145,7 +145,7 @@ describe('CanvasSectionCard', () => {
     });
 
     const textarea = wrapper.find('textarea');
-    expect(textarea.attributes('rows')).toBe('8');
+    expect(textarea.attributes('rows')).toBe('12');
   });
 
   it('shows edit button when not editing', () => {

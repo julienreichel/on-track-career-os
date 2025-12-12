@@ -1,51 +1,57 @@
 <template>
-  <UCard>
+  <UCard class="flex flex-col h-full">
     <template #header>
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <UIcon :name="icon" class="w-5 h-5 text-primary" />
-          <h3 class="text-lg font-semibold">{{ title }}</h3>
-        </div>
-        <div class="flex items-center gap-2">
-          <UButton
-            v-if="isEditing"
-            icon="i-heroicons-check"
-            size="xs"
-            color="primary"
-            variant="soft"
-            @click="$emit('save')"
-          />
-          <UButton
-            v-if="isEditing"
-            icon="i-heroicons-x-mark"
-            size="xs"
-            color="gray"
-            variant="ghost"
-            @click="$emit('cancel')"
-          />
-          <UButton
-            v-if="!isEditing"
-            icon="i-heroicons-pencil"
-            size="xs"
-            color="gray"
-            variant="ghost"
-            @click="$emit('edit')"
-          />
-        </div>
+      <div class="flex flex-col items-center text-center gap-2">
+        <UIcon :name="icon" class="w-8 h-8 text-primary" />
+        <h3 class="text-lg font-semibold">{{ title }}</h3>
       </div>
     </template>
-    <UTextarea
-      v-if="isEditing"
-      :model-value="editValue"
-      :rows="8"
-      :placeholder="placeholder"
-      class="w-full"
-      @update:model-value="$emit('update:editValue', $event)"
-    />
-    <ul v-else-if="Array.isArray(items) && items.length > 0" class="space-y-1 text-sm">
-      <li v-for="(item, idx) in items" :key="idx">{{ item }}</li>
-    </ul>
-    <p v-else class="text-sm text-gray-500">{{ emptyText }}</p>
+    
+    <!-- Content area that grows to fill available space -->
+    <div class="flex-1 flex flex-col min-h-0">
+      <UTextarea
+        v-if="isEditing"
+        :model-value="editValue"
+        :rows="12"
+        :placeholder="placeholder"
+        class="w-full flex-1"
+        @update:model-value="$emit('update:editValue', $event)"
+      />
+      <div v-else class="flex-1 overflow-auto">
+        <ul v-if="Array.isArray(items) && items.length > 0" class="space-y-1 text-sm">
+          <li v-for="(item, idx) in items" :key="idx">{{ item }}</li>
+        </ul>
+        <p v-else class="text-sm text-gray-500">{{ emptyText }}</p>
+      </div>
+    </div>
+
+    <!-- Action buttons at the bottom -->
+    <div class="flex items-center justify-center gap-2 pt-4 mt-4 border-t border-default">
+      <UButton
+        v-if="isEditing"
+        icon="i-heroicons-check"
+        size="xs"
+        color="primary"
+        variant="soft"
+        @click="$emit('save')"
+      />
+      <UButton
+        v-if="isEditing"
+        icon="i-heroicons-x-mark"
+        size="xs"
+        color="gray"
+        variant="ghost"
+        @click="$emit('cancel')"
+      />
+      <UButton
+        v-if="!isEditing"
+        icon="i-heroicons-pencil"
+        size="xs"
+        color="gray"
+        variant="ghost"
+        @click="$emit('edit')"
+      />
+    </div>
   </UCard>
 </template>
 
