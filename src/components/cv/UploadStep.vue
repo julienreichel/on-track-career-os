@@ -23,6 +23,8 @@ function handleFileChange(file: File | null | undefined) {
     <div class="space-y-4">
       <UFileUpload
         :model-value="selectedFile"
+        :label="t('cvUpload.dropzoneText')"
+        :description="t('cvUpload.dropzoneHint')"
         accept=".pdf,.txt"
         @update:model-value="handleFileChange"
       />
