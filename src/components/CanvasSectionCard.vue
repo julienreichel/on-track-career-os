@@ -1,9 +1,37 @@
 <template>
   <UCard class="flex flex-col h-full">
     <template #header>
-      <div class="flex flex-col items-center text-center gap-2">
-        <UIcon :name="icon" class="w-8 h-8 text-primary" />
-        <h3 class="text-lg font-semibold">{{ title }}</h3>
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex flex-col items-center text-center gap-2 flex-1">
+          <UIcon :name="icon" class="w-8 h-8 text-primary" />
+          <h3 class="text-lg font-semibold">{{ title }}</h3>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <UButton
+            v-if="isEditing"
+            icon="i-heroicons-check"
+            size="xs"
+            color="primary"
+            variant="soft"
+            @click="$emit('save')"
+          />
+          <UButton
+            v-if="isEditing"
+            icon="i-heroicons-x-mark"
+            size="xs"
+            color="gray"
+            variant="ghost"
+            @click="$emit('cancel')"
+          />
+          <UButton
+            v-if="!isEditing"
+            icon="i-heroicons-pencil"
+            size="xs"
+            color="gray"
+            variant="ghost"
+            @click="$emit('edit')"
+          />
+        </div>
       </div>
     </template>
     
@@ -23,34 +51,6 @@
         </ul>
         <p v-else class="text-sm text-gray-500">{{ emptyText }}</p>
       </div>
-    </div>
-
-    <!-- Action buttons at the bottom -->
-    <div class="flex items-center justify-center gap-2 pt-4 mt-4 border-t border-default">
-      <UButton
-        v-if="isEditing"
-        icon="i-heroicons-check"
-        size="xs"
-        color="primary"
-        variant="soft"
-        @click="$emit('save')"
-      />
-      <UButton
-        v-if="isEditing"
-        icon="i-heroicons-x-mark"
-        size="xs"
-        color="gray"
-        variant="ghost"
-        @click="$emit('cancel')"
-      />
-      <UButton
-        v-if="!isEditing"
-        icon="i-heroicons-pencil"
-        size="xs"
-        color="gray"
-        variant="ghost"
-        @click="$emit('edit')"
-      />
     </div>
   </UCard>
 </template>

@@ -459,10 +459,10 @@
       "description": "Your strategic career positioning visualized as a Business Model Canvas"
     },
     "sections": {
-      "customerSegments": "Customer Segments",
+      "customerSegments": "Customer",
       "valueProposition": "Value Proposition",
       "channels": "Channels",
-      "customerRelationships": "Customer Relationships",
+      "customerRelationships": "Relationships",
       "keyActivities": "Key Activities",
       "keyResources": "Key Resources",
       "keyPartners": "Key Partners",
