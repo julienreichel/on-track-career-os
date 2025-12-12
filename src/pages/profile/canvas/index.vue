@@ -49,7 +49,6 @@ import { UserProfileRepository } from '@/domain/user-profile/UserProfileReposito
 import { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
-import type { Experience } from '@/domain/experience/Experience';
 import type { STARStory } from '@/domain/starstory/STARStory';
 
 definePageMeta({
@@ -78,8 +77,6 @@ const profile = ref<{
   headline?: string | null;
   summary?: string | null;
 } | null>(null);
-const experiences = ref<Experience[]>([]);
-const stories = ref<STARStory[]>([]);
 
 // Load profile and canvas when userId is available
 watch(
@@ -94,20 +91,6 @@ watch(
       if (!profile.value) {
         error.value = t('canvas.messages.noProfile');
         return;
-      }
-
-      // Load experiences
-      const userProfile = await userProfileRepo.get(newUserId);
-      if (userProfile) {
-        experiences.value = await experienceRepo.list(userProfile);
-
-        // Load all stories from all experiences
-        const allStories: STARStory[] = [];
-        for (const exp of experiences.value) {
-          const expStories = await storyService.getStoriesByExperience(exp);
-          allStories.push(...expStories);
-        }
-        stories.value = allStories;
       }
 
       // Try to load existing canvas for this user
@@ -138,6 +121,28 @@ watch(
   }
 );
 
+/**
+ * Load experiences and stories for AI canvas generation
+ * Only called when user clicks Generate or Regenerate
+ */
+const loadExperiencesAndStories = async () => {
+  if (!profile.value) return { experiences: [], stories: [] };
+
+  const userProfile = await userProfileRepo.get(profile.value.id);
+  if (!userProfile) return { experiences: [], stories: [] };
+
+  const experiences = await experienceRepo.list(userProfile);
+
+  // Load all stories from all experiences
+  const allStories: STARStory[] = [];
+  for (const exp of experiences) {
+    const expStories = await storyService.getStoriesByExperience(exp);
+    allStories.push(...expStories);
+  }
+
+  return { experiences, stories: allStories };
+};
+
 const handleGenerate = async () => {
   try {
     error.value = null;
@@ -148,6 +153,9 @@ const handleGenerate = async () => {
       return;
     }
 
+    // Load experiences and stories for canvas generation
+    const { experiences, stories } = await loadExperiencesAndStories();
+
     // Build input for AI generation
     const input: PersonalCanvasInput = {
       profile: {
@@ -155,7 +163,7 @@ const handleGenerate = async () => {
         headline: profile.value.headline || undefined,
         summary: profile.value.summary || undefined,
       },
-      experiences: experiences.value.map((exp) => ({
+      experiences: experiences.map((exp) => ({
         title: exp.title || undefined,
         company: exp.companyName || undefined,
         startDate: exp.startDate || undefined,
@@ -211,6 +219,9 @@ const handleRegenerate = async () => {
       return;
     }
 
+    // Load experiences and stories for canvas regeneration
+    const { experiences, stories } = await loadExperiencesAndStories();
+
     // Build input for AI regeneration
     const input: PersonalCanvasInput = {
       profile: {
@@ -218,7 +229,7 @@ const handleRegenerate = async () => {
         headline: profile.value.headline || undefined,
         summary: profile.value.summary || undefined,
       },
-      experiences: experiences.value.map((exp) => ({
+      experiences: experiences.map((exp) => ({
         title: exp.title || undefined,
         company: exp.companyName || undefined,
         startDate: exp.startDate || undefined,
@@ -226,7 +237,7 @@ const handleRegenerate = async () => {
         responsibilities: exp.responsibilities?.filter((r): r is string => r !== null) || undefined,
         tasks: exp.tasks?.filter((t): t is string => t !== null) || undefined,
       })),
-      stories: stories.value.map((story) => ({
+      stories: stories.map((story) => ({
         situation: story.situation || undefined,
         task: story.task || undefined,
         action: story.action || undefined,
