@@ -1,23 +1,48 @@
 <template>
   <UCard>
     <template #header>
-      <div class="flex items-center gap-2">
-        <UIcon :name="icon" class="w-5 h-5 text-primary" />
-        <h3 class="text-lg font-semibold">{{ title }}</h3>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <UIcon :name="icon" class="w-5 h-5 text-primary" />
+          <h3 class="text-lg font-semibold">{{ title }}</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <UButton
+            v-if="isEditing"
+            icon="i-heroicons-check"
+            size="xs"
+            color="primary"
+            variant="soft"
+            @click="$emit('save')"
+          />
+          <UButton
+            v-if="isEditing"
+            icon="i-heroicons-x-mark"
+            size="xs"
+            color="gray"
+            variant="ghost"
+            @click="$emit('cancel')"
+          />
+          <UButton
+            v-if="!isEditing"
+            icon="i-heroicons-pencil"
+            size="xs"
+            color="gray"
+            variant="ghost"
+            @click="$emit('edit')"
+          />
+        </div>
       </div>
     </template>
     <UTextarea
       v-if="isEditing"
       :model-value="editValue"
-      :rows="4"
+      :rows="8"
       :placeholder="placeholder"
       class="w-full"
       @update:model-value="$emit('update:editValue', $event)"
     />
-    <ul
-      v-else-if="Array.isArray(items) && items.length > 0"
-      class="space-y-1 text-sm"
-    >
+    <ul v-else-if="Array.isArray(items) && items.length > 0" class="space-y-1 text-sm">
       <li v-for="(item, idx) in items" :key="idx">{{ item }}</li>
     </ul>
     <p v-else class="text-sm text-gray-500">{{ emptyText }}</p>
@@ -42,5 +67,8 @@ defineProps<Props>();
 
 defineEmits<{
   'update:editValue': [value: string];
+  edit: [];
+  save: [];
+  cancel: [];
 }>();
 </script>

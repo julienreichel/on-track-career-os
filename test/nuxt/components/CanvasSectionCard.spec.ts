@@ -145,6 +145,87 @@ describe('CanvasSectionCard', () => {
     });
 
     const textarea = wrapper.find('textarea');
-    expect(textarea.attributes('rows')).toBe('4');
+    expect(textarea.attributes('rows')).toBe('8');
+  });
+
+  it('shows edit button when not editing', () => {
+    const wrapper = mount(CanvasSectionCard, {
+      props: defaultProps,
+    });
+
+    const buttons = wrapper.findAllComponents({ name: 'UButton' });
+    const editButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-pencil');
+    expect(editButton?.exists()).toBe(true);
+  });
+
+  it('emits edit event when edit button clicked', async () => {
+    const wrapper = mount(CanvasSectionCard, {
+      props: defaultProps,
+    });
+
+    const buttons = wrapper.findAllComponents({ name: 'UButton' });
+    const editButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-pencil');
+    await editButton?.vm.$emit('click');
+
+    expect(wrapper.emitted('edit')).toBeTruthy();
+  });
+
+  it('shows save and cancel buttons when editing', () => {
+    const wrapper = mount(CanvasSectionCard, {
+      props: {
+        ...defaultProps,
+        isEditing: true,
+      },
+    });
+
+    const buttons = wrapper.findAllComponents({ name: 'UButton' });
+    const saveButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-check');
+    const cancelButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-x-mark');
+    
+    expect(saveButton?.exists()).toBe(true);
+    expect(cancelButton?.exists()).toBe(true);
+  });
+
+  it('emits save event when save button clicked', async () => {
+    const wrapper = mount(CanvasSectionCard, {
+      props: {
+        ...defaultProps,
+        isEditing: true,
+      },
+    });
+
+    const buttons = wrapper.findAllComponents({ name: 'UButton' });
+    const saveButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-check');
+    await saveButton?.vm.$emit('click');
+
+    expect(wrapper.emitted('save')).toBeTruthy();
+  });
+
+  it('emits cancel event when cancel button clicked', async () => {
+    const wrapper = mount(CanvasSectionCard, {
+      props: {
+        ...defaultProps,
+        isEditing: true,
+      },
+    });
+
+    const buttons = wrapper.findAllComponents({ name: 'UButton' });
+    const cancelButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-x-mark');
+    await cancelButton?.vm.$emit('click');
+
+    expect(wrapper.emitted('cancel')).toBeTruthy();
+  });
+
+  it('hides edit button when editing', () => {
+    const wrapper = mount(CanvasSectionCard, {
+      props: {
+        ...defaultProps,
+        isEditing: true,
+      },
+    });
+
+    const buttons = wrapper.findAllComponents({ name: 'UButton' });
+    const editButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-pencil');
+    expect(editButton).toBeUndefined();
   });
 });

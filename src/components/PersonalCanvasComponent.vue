@@ -26,9 +26,12 @@
         icon="i-heroicons-user-group"
         :title="t('canvas.sections.customerSegments')"
         :items="canvas.customerSegments"
-        :is-editing="isEditing"
+        :is-editing="editingSection === 'customerSegments'"
         :placeholder="t('canvas.placeholders.customerSegments')"
         :empty-text="t('canvas.empty.field')"
+        @edit="startEditingSection('customerSegments')"
+        @save="saveSectionChanges"
+        @cancel="cancelEditingSection"
       />
 
       <!-- 2. Value Proposition -->
@@ -37,9 +40,12 @@
         icon="i-heroicons-light-bulb"
         :title="t('canvas.sections.valueProposition')"
         :items="canvas.valueProposition"
-        :is-editing="isEditing"
+        :is-editing="editingSection === 'valueProposition'"
         :placeholder="t('canvas.placeholders.valueProposition')"
         :empty-text="t('canvas.empty.field')"
+        @edit="startEditingSection('valueProposition')"
+        @save="saveSectionChanges"
+        @cancel="cancelEditingSection"
       />
 
       <!-- 3. Channels -->
@@ -48,9 +54,12 @@
         icon="i-heroicons-megaphone"
         :title="t('canvas.sections.channels')"
         :items="canvas.channels"
-        :is-editing="isEditing"
+        :is-editing="editingSection === 'channels'"
         :placeholder="t('canvas.placeholders.channels')"
         :empty-text="t('canvas.empty.field')"
+        @edit="startEditingSection('channels')"
+        @save="saveSectionChanges"
+        @cancel="cancelEditingSection"
       />
 
       <!-- 4. Customer Relationships -->
@@ -59,9 +68,12 @@
         icon="i-heroicons-heart"
         :title="t('canvas.sections.customerRelationships')"
         :items="canvas.customerRelationships"
-        :is-editing="isEditing"
+        :is-editing="editingSection === 'customerRelationships'"
         :placeholder="t('canvas.placeholders.customerRelationships')"
         :empty-text="t('canvas.empty.field')"
+        @edit="startEditingSection('customerRelationships')"
+        @save="saveSectionChanges"
+        @cancel="cancelEditingSection"
       />
 
       <!-- 5. Key Activities -->
@@ -70,9 +82,12 @@
         icon="i-heroicons-cog-6-tooth"
         :title="t('canvas.sections.keyActivities')"
         :items="canvas.keyActivities"
-        :is-editing="isEditing"
+        :is-editing="editingSection === 'keyActivities'"
         :placeholder="t('canvas.placeholders.keyActivities')"
         :empty-text="t('canvas.empty.field')"
+        @edit="startEditingSection('keyActivities')"
+        @save="saveSectionChanges"
+        @cancel="cancelEditingSection"
       />
 
       <!-- 6. Key Resources -->
@@ -81,9 +96,12 @@
         icon="i-heroicons-cube"
         :title="t('canvas.sections.keyResources')"
         :items="canvas.keyResources"
-        :is-editing="isEditing"
+        :is-editing="editingSection === 'keyResources'"
         :placeholder="t('canvas.placeholders.keyResources')"
         :empty-text="t('canvas.empty.field')"
+        @edit="startEditingSection('keyResources')"
+        @save="saveSectionChanges"
+        @cancel="cancelEditingSection"
       />
 
       <!-- 7. Key Partners -->
@@ -92,9 +110,12 @@
         icon="i-heroicons-users"
         :title="t('canvas.sections.keyPartners')"
         :items="canvas.keyPartners"
-        :is-editing="isEditing"
+        :is-editing="editingSection === 'keyPartners'"
         :placeholder="t('canvas.placeholders.keyPartners')"
         :empty-text="t('canvas.empty.field')"
+        @edit="startEditingSection('keyPartners')"
+        @save="saveSectionChanges"
+        @cancel="cancelEditingSection"
       />
 
       <!-- 8. Cost Structure -->
@@ -103,9 +124,12 @@
         icon="i-heroicons-currency-dollar"
         :title="t('canvas.sections.costStructure')"
         :items="canvas.costStructure"
-        :is-editing="isEditing"
+        :is-editing="editingSection === 'costStructure'"
         :placeholder="t('canvas.placeholders.costStructure')"
         :empty-text="t('canvas.empty.field')"
+        @edit="startEditingSection('costStructure')"
+        @save="saveSectionChanges"
+        @cancel="cancelEditingSection"
       />
 
       <!-- 9. Revenue Streams -->
@@ -114,9 +138,12 @@
         icon="i-heroicons-banknotes"
         :title="t('canvas.sections.revenueStreams')"
         :items="canvas.revenueStreams"
-        :is-editing="isEditing"
+        :is-editing="editingSection === 'revenueStreams'"
         :placeholder="t('canvas.placeholders.revenueStreams')"
         :empty-text="t('canvas.empty.field')"
+        @edit="startEditingSection('revenueStreams')"
+        @save="saveSectionChanges"
+        @cancel="cancelEditingSection"
       />
     </div>
 
@@ -128,30 +155,8 @@
       <div v-else />
 
       <div class="flex gap-3">
-        <UButton
-          v-if="!isEditing"
-          variant="outline"
-          icon="i-heroicons-pencil"
-          @click="startEditing"
-        >
-          {{ t('canvas.actions.edit') }}
-        </UButton>
-
-        <UButton
-          v-if="!isEditing"
-          variant="outline"
-          icon="i-heroicons-arrow-path"
-          @click="$emit('regenerate')"
-        >
+        <UButton variant="outline" icon="i-heroicons-arrow-path" @click="$emit('regenerate')">
           {{ t('canvas.actions.regenerate') }}
-        </UButton>
-
-        <UButton v-if="isEditing" variant="outline" @click="cancelEditing">
-          {{ t('canvas.actions.cancel') }}
-        </UButton>
-
-        <UButton v-if="isEditing" icon="i-heroicons-check" :loading="loading" @click="saveChanges">
-          {{ t('canvas.actions.save') }}
         </UButton>
       </div>
     </div>
@@ -179,7 +184,7 @@ const emit = defineEmits<{
   regenerate: [];
 }>();
 
-const isEditing = ref(false);
+const editingSection = ref<string | null>(null);
 const localCanvas = ref({
   customerSegments: '',
   valueProposition: '',
@@ -213,51 +218,36 @@ const stringToArray = (str: string): string[] => {
     .filter((s) => s.length > 0);
 };
 
-const startEditing = () => {
+const startEditingSection = (section: keyof typeof localCanvas.value) => {
   if (!props.canvas) return;
 
-  localCanvas.value = {
-    customerSegments: arrayToString(props.canvas.customerSegments),
-    valueProposition: arrayToString(props.canvas.valueProposition),
-    channels: arrayToString(props.canvas.channels),
-    customerRelationships: arrayToString(props.canvas.customerRelationships),
-    keyActivities: arrayToString(props.canvas.keyActivities),
-    keyResources: arrayToString(props.canvas.keyResources),
-    keyPartners: arrayToString(props.canvas.keyPartners),
-    costStructure: arrayToString(props.canvas.costStructure),
-    revenueStreams: arrayToString(props.canvas.revenueStreams),
-  };
-
-  isEditing.value = true;
+  // Load current value for this section
+  localCanvas.value[section] = arrayToString(props.canvas[section]);
+  editingSection.value = section;
 };
 
-const cancelEditing = () => {
-  isEditing.value = false;
+const cancelEditingSection = () => {
+  editingSection.value = null;
 };
 
-const saveChanges = () => {
+const saveSectionChanges = () => {
+  if (!editingSection.value) return;
+
+  const section = editingSection.value as keyof typeof localCanvas.value;
   const updated: Partial<PersonalCanvas> = {
-    customerSegments: stringToArray(localCanvas.value.customerSegments),
-    valueProposition: stringToArray(localCanvas.value.valueProposition),
-    channels: stringToArray(localCanvas.value.channels),
-    customerRelationships: stringToArray(localCanvas.value.customerRelationships),
-    keyActivities: stringToArray(localCanvas.value.keyActivities),
-    keyResources: stringToArray(localCanvas.value.keyResources),
-    keyPartners: stringToArray(localCanvas.value.keyPartners),
-    costStructure: stringToArray(localCanvas.value.costStructure),
-    revenueStreams: stringToArray(localCanvas.value.revenueStreams),
+    [section]: stringToArray(localCanvas.value[section]),
   };
 
   emit('save', updated);
-  isEditing.value = false;
+  editingSection.value = null;
 };
 
 // Reset editing state when canvas changes
 watch(
   () => props.canvas,
   () => {
-    if (isEditing.value) {
-      isEditing.value = false;
+    if (editingSection.value) {
+      editingSection.value = null;
     }
   }
 );
