@@ -2,16 +2,25 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useCanvasEngine } from '@/application/personal-canvas/useCanvasEngine';
 import { PersonalCanvasService } from '@/domain/personal-canvas/PersonalCanvasService';
 import { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
+import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
+import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
 import type { PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas';
 
 // Mock the dependencies
 vi.mock('@/domain/personal-canvas/PersonalCanvasService');
 vi.mock('@/domain/personal-canvas/PersonalCanvasRepository');
+vi.mock('@/domain/user-profile/UserProfileRepository');
+vi.mock('@/domain/experience/ExperienceRepository');
+vi.mock('@/domain/starstory/STARStoryService');
 
 describe('useCanvasEngine', () => {
   let mockService: ReturnType<typeof vi.mocked<PersonalCanvasService>>;
   let mockRepository: ReturnType<typeof vi.mocked<PersonalCanvasRepository>>;
+  let mockUserProfileRepo: ReturnType<typeof vi.mocked<UserProfileRepository>>;
+  let mockExperienceRepo: ReturnType<typeof vi.mocked<ExperienceRepository>>;
+  let mockStoryService: ReturnType<typeof vi.mocked<STARStoryService>>;
 
   const mockPersonalCanvas = {
     id: 'canvas-123',
@@ -35,6 +44,33 @@ describe('useCanvasEngine', () => {
     owner: 'user-123::user-123',
   } as unknown as PersonalCanvas;
 
+  const mockUserProfile = {
+    id: 'user-123',
+    fullName: 'John Doe',
+    headline: 'Senior Engineer',
+    summary: 'Experienced developer',
+  };
+
+  const mockExperience = {
+    id: 'exp-1',
+    title: 'Senior Engineer',
+    companyName: 'Tech Corp',
+    startDate: '2020-01',
+    endDate: '2024-01',
+    responsibilities: ['Lead development', 'Mentor team'],
+    tasks: ['Build features', 'Code reviews'],
+  };
+
+  const mockStory = {
+    id: 'story-1',
+    situation: 'System performance issues',
+    task: 'Improve response time',
+    action: 'Optimized database queries',
+    result: '50% faster response',
+    achievements: ['Reduced latency', 'Improved UX'],
+    kpiSuggestions: ['Response time: 200ms -> 100ms'],
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -51,9 +87,24 @@ describe('useCanvasEngine', () => {
       delete: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<PersonalCanvasRepository>>;
 
+    mockUserProfileRepo = {
+      get: vi.fn(),
+    } as unknown as ReturnType<typeof vi.mocked<UserProfileRepository>>;
+
+    mockExperienceRepo = {
+      list: vi.fn(),
+    } as unknown as ReturnType<typeof vi.mocked<ExperienceRepository>>;
+
+    mockStoryService = {
+      getStoriesByExperience: vi.fn(),
+    } as unknown as ReturnType<typeof vi.mocked<STARStoryService>>;
+
     // Mock constructor returns
     vi.mocked(PersonalCanvasService).mockImplementation(() => mockService);
     vi.mocked(PersonalCanvasRepository).mockImplementation(() => mockRepository);
+    vi.mocked(UserProfileRepository).mockImplementation(() => mockUserProfileRepo);
+    vi.mocked(ExperienceRepository).mockImplementation(() => mockExperienceRepo);
+    vi.mocked(STARStoryService).mockImplementation(() => mockStoryService);
   });
 
   describe('loadCanvas', () => {
@@ -397,6 +448,180 @@ describe('useCanvasEngine', () => {
 
       // Canvas should persist
       expect(canvas.value).toEqual(mockPersonalCanvas);
+    });
+  });
+
+  describe('initializeForUser', () => {
+    it('should load user profile and existing canvas', async () => {
+      mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
+      mockRepository.list.mockResolvedValue([mockPersonalCanvas]);
+      mockService.getFullPersonalCanvas.mockResolvedValue(mockPersonalCanvas);
+
+      const { profile, canvas, initializeForUser } = useCanvasEngine();
+
+      await initializeForUser('user-123');
+
+      expect(profile.value).toEqual(mockUserProfile);
+      expect(canvas.value).toEqual(mockPersonalCanvas);
+      expect(mockUserProfileRepo.get).toHaveBeenCalledWith('user-123');
+      expect(mockRepository.list).toHaveBeenCalledWith({ userId: { eq: 'user-123' } });
+    });
+
+    it('should handle missing user profile', async () => {
+      mockUserProfileRepo.get.mockResolvedValue(null);
+
+      const { error, initializeForUser } = useCanvasEngine();
+
+      await initializeForUser('user-123');
+
+      expect(error.value).toBe('User profile not found');
+    });
+
+    it('should handle user without existing canvas', async () => {
+      mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
+      mockRepository.list.mockResolvedValue([]);
+
+      const { profile, canvas, error, initializeForUser } = useCanvasEngine();
+
+      await initializeForUser('user-123');
+
+      expect(profile.value).toEqual(mockUserProfile);
+      expect(canvas.value).toBeNull();
+      expect(error.value).toBeNull(); // No error for missing canvas
+    });
+  });
+
+  describe('generateAndSave', () => {
+    it('should generate and save canvas successfully', async () => {
+      // Setup: user with no existing canvas
+      // AI returns canvas without ID (new canvas scenario)
+      const newCanvas = { ...mockPersonalCanvas };
+      delete (newCanvas as any).id;
+
+      mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
+      mockRepository.list.mockResolvedValue([]); // No existing canvas
+      mockExperienceRepo.list.mockResolvedValue([mockExperience]);
+      mockStoryService.getStoriesByExperience.mockResolvedValue([mockStory]);
+      mockService.regenerateCanvas.mockResolvedValue(newCanvas as PersonalCanvas);
+      mockRepository.create.mockResolvedValue(mockPersonalCanvas);
+
+      const { canvas, generateAndSave, initializeForUser } = useCanvasEngine();
+
+      // Initialize profile first (no canvas will be loaded)
+      await initializeForUser('user-123');
+      expect(canvas.value).toBeNull(); // Verify no canvas exists
+
+      const success = await generateAndSave();
+
+      expect(success).toBe(true);
+      expect(mockService.regenerateCanvas).toHaveBeenCalled();
+      expect(mockRepository.create).toHaveBeenCalled();
+    });
+
+    it('should update existing canvas instead of creating new one', async () => {
+      const existingCanvas = { ...mockPersonalCanvas, id: 'existing-id' };
+      mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
+      mockRepository.list.mockResolvedValue([existingCanvas]);
+      mockService.getFullPersonalCanvas.mockResolvedValue(existingCanvas);
+      mockExperienceRepo.list.mockResolvedValue([mockExperience]);
+      mockStoryService.getStoriesByExperience.mockResolvedValue([mockStory]);
+      mockService.regenerateCanvas.mockResolvedValue(mockPersonalCanvas);
+      mockRepository.update.mockResolvedValue(mockPersonalCanvas);
+
+      const { generateAndSave, initializeForUser } = useCanvasEngine();
+
+      await initializeForUser('user-123');
+      const success = await generateAndSave();
+
+      expect(success).toBe(true);
+      expect(mockRepository.update).toHaveBeenCalled();
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('should return false when no profile available', async () => {
+      const { generateAndSave } = useCanvasEngine();
+
+      const success = await generateAndSave();
+
+      expect(success).toBe(false);
+    });
+
+    it('should handle generation errors', async () => {
+      mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
+      mockExperienceRepo.list.mockResolvedValue([]);
+      mockStoryService.getStoriesByExperience.mockResolvedValue([]);
+      mockService.regenerateCanvas.mockRejectedValue(new Error('AI service error'));
+
+      const { error, generateAndSave, initializeForUser } = useCanvasEngine();
+
+      await initializeForUser('user-123');
+      const success = await generateAndSave();
+
+      expect(success).toBe(false);
+      expect(error.value).toBe('AI service error');
+    });
+  });
+
+  describe('regenerateAndSave', () => {
+    it('should regenerate and save canvas successfully', async () => {
+      mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
+      mockExperienceRepo.list.mockResolvedValue([mockExperience]);
+      mockStoryService.getStoriesByExperience.mockResolvedValue([mockStory]);
+      mockService.regenerateCanvas.mockResolvedValue(mockPersonalCanvas);
+      mockRepository.create.mockResolvedValue(mockPersonalCanvas);
+
+      const { canvas, regenerateAndSave, initializeForUser } = useCanvasEngine();
+
+      await initializeForUser('user-123');
+      const success = await regenerateAndSave();
+
+      expect(success).toBe(true);
+      expect(canvas.value).toEqual(mockPersonalCanvas);
+    });
+  });
+
+  describe('saveEdits', () => {
+    it('should save manual edits to canvas', async () => {
+      mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
+      mockRepository.list.mockResolvedValue([mockPersonalCanvas]);
+      mockService.getFullPersonalCanvas.mockResolvedValue(mockPersonalCanvas);
+      mockRepository.update.mockResolvedValue({
+        ...mockPersonalCanvas,
+        valueProposition: ['Updated value prop'],
+      });
+
+      const { saveEdits, initializeForUser } = useCanvasEngine();
+
+      await initializeForUser('user-123');
+
+      const updates = { valueProposition: ['Updated value prop'] };
+      const success = await saveEdits(updates);
+
+      expect(success).toBe(true);
+      expect(mockRepository.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          valueProposition: ['Updated value prop'],
+        })
+      );
+    });
+
+    it('should return false when no canvas available', async () => {
+      const { saveEdits } = useCanvasEngine();
+
+      const success = await saveEdits({ valueProposition: ['Test'] });
+
+      expect(success).toBe(false);
+    });
+
+    it('should return false when no profile available', async () => {
+      const engine = useCanvasEngine();
+
+      // Manually set canvas without profile
+      engine.canvas.value = mockPersonalCanvas;
+
+      const success = await engine.saveEdits({ valueProposition: ['Test'] });
+
+      expect(success).toBe(false);
     });
   });
 });
