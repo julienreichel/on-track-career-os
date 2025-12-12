@@ -3,10 +3,17 @@ import { test, expect } from '@playwright/test';
 /**
  * E2E Tests for Experience Management (EPIC 2)
  *
- * Tests the experience listing and creation flows:
- * - Experience listing page
- * - Experience creation with form validation
+ * Tests experience CRUD workflows and navigation.
+ * 
+ * Component/UI tests moved to:
+ * - test/nuxt/pages/profile/experiences/index.spec.ts (listing page)
+ * - test/nuxt/components/ExperienceForm.spec.ts (form component)
+ * 
+ * These E2E tests focus on:
+ * - Complete CRUD workflows (create → save → list → edit → delete)
+ * - Form submission and data persistence
  * - Navigation between experiences and stories
+ * - Backend integration
  */
 
 test.describe('Experience Management', () => {
@@ -29,38 +36,7 @@ test.describe('Experience Management', () => {
       await expect(body).toBeVisible();
     });
 
-    test('should display page header with title', async ({ page }) => {
-      // Look for experiences title/header
-      const heading = page
-        .locator('h1, h2')
-        .filter({ hasText: /experience/i })
-        .first();
 
-      await expect(heading).toBeVisible();
-    });
-
-    test('should have "New Experience" button', async ({ page }) => {
-      // Look for button to create new experience
-      const newButton = page
-        .locator('button:has-text("New"), a:has-text("New"), button:has-text("Add")')
-        .first();
-
-      // Wait a moment for buttons to render
-      await page.waitForTimeout(500);
-
-      await expect(newButton).toBeVisible();
-      await expect(newButton).toBeEnabled();
-    });
-
-    test('should display empty state if no experiences', async ({ page }) => {
-      // Check if empty state is shown - UEmpty component with specific text
-      const emptyState = page
-        .locator('text=/no experiences yet|upload.*cv|add.*manually/i')
-        .first();
-
-      // Empty state should be visible
-      await expect(emptyState).toBeVisible();
-    });
 
     test('should display experience cards or table if experiences exist', async ({ page }) => {
       // Wait for any data to load

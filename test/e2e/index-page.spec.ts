@@ -3,8 +3,18 @@ import { test, expect } from '@playwright/test';
 /**
  * E2E Tests for Home/Index Page
  *
- * Tests the main dashboard page functionality, feature cards,
- * and navigation links.
+ * Tests the main dashboard navigation and authentication workflows.
+ * 
+ * Component/UI tests moved to: test/nuxt/pages/index.spec.ts
+ * - Page header rendering
+ * - Feature card display
+ * - Responsive layout checks
+ * - Accessibility structure
+ * 
+ * These E2E tests focus on:
+ * - Navigation between pages (home → profile)
+ * - Authentication redirects
+ * - Full page load and interaction workflows
  */
 
 // Empty state tests - run serially FIRST before any experiences are created
@@ -29,24 +39,8 @@ test.describe('Home Page - Authenticated User', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
   });
-  test('should display page header with title and description', async ({ page }) => {
-    // Verify page has loaded with content
-    const mainContent = page.locator('main, [role="main"], body');
-    await expect(mainContent).toBeVisible();
-
-    // Verify we're on the home page (not login)
-    await expect(page).not.toHaveURL(/.*sign-in.*/);
-  });
-
-  // Retry this test due to occasional auth state timing issues
+  // Retry tests due to occasional auth state timing issues
   test.describe.configure({ retries: 2 });
-
-  test('should have profile feature card', async ({ page }) => {
-    // Look for profile link (UPageCard creates absolute positioned overlay)
-    const profileLink = page.locator('a[href="/profile"]');
-    await expect(profileLink).toHaveCount(1);
-    await expect(profileLink).toHaveAttribute('href', '/profile');
-  });
 
   test('should navigate to profile page when profile card is clicked', async ({ page }) => {
     // UPageCard creates an overlay link with absolute positioned span inside
@@ -68,52 +62,7 @@ test.describe('Home Page - Authenticated User', () => {
     expect(page.url()).toContain('profile');
   });
 
-  test('should display jobs feature card', async ({ page }) => {
-    // Check for jobs-related content
-    const jobsText = page.locator('text=/job/i').first();
 
-    await expect(jobsText).toBeVisible();
-  });
-
-  test('should display applications feature card', async ({ page }) => {
-    // Check for applications-related content
-    const applicationsText = page.locator('text=/application/i').first();
-
-    await expect(applicationsText).toBeVisible();
-  });
-
-  test('should display interview prep feature card', async ({ page }) => {
-    // Check for interview-related content
-    const interviewText = page.locator('text=/interview/i').first();
-
-    await expect(interviewText).toBeVisible();
-  });
-
-  test('should have responsive layout on mobile', async ({ page }) => {
-    // Set mobile viewport
-    await page.setViewportSize({ width: 375, height: 667 });
-
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
-    // Page should still be visible and scrollable
-    const body = page.locator('body');
-    await expect(body).toBeVisible();
-
-    // Check that content is not overflowing horizontally
-    const bodyWidth = await body.evaluate((el) => el.scrollWidth);
-    const viewportWidth = await page.evaluate(() => window.innerWidth);
-
-    // Allow small overflow for scrollbars
-    expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 20);
-  });
-
-  test('should have accessible navigation', async ({ page }) => {
-    // Check for header/navigation element
-    const header = page.locator('header, nav, [role="navigation"]').first();
-
-    await expect(header).toBeVisible();
-  });
 });
 
 test.describe('Home Page - Unauthenticated User', () => {

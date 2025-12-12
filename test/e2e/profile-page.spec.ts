@@ -3,8 +3,20 @@ import { test, expect } from '@playwright/test';
 /**
  * E2E Tests for Profile Page
  *
- * Tests the user profile page functionality including viewing,
- * editing, and managing profile information.
+ * Tests profile page workflows including edit mode, navigation, and auth.
+ * 
+ * Component/UI tests moved to: test/nuxt/pages/profile/index.spec.ts
+ * - Page header rendering
+ * - View/edit mode UI elements
+ * - Form input display
+ * - Button rendering
+ * - Responsive layout checks
+ * 
+ * These E2E tests focus on:
+ * - Edit mode toggle workflow (view → edit → cancel → view)
+ * - Navigation between pages (profile → experiences → canvas)
+ * - Authentication redirects
+ * - Form submission and data persistence
  */
 
 test.describe('Profile Page - View Mode', () => {
@@ -16,84 +28,7 @@ test.describe('Profile Page - View Mode', () => {
     await page.waitForLoadState('networkidle');
   });
 
-  test('should display profile page header', async ({ page }) => {
-    // Check for page header/title
-    const heading = page.locator('h1, h2').first();
 
-    // Give it a moment to render
-    await page.waitForTimeout(500);
-
-    await expect(heading).toBeVisible();
-  });
-
-  test('should display back to home button', async ({ page }) => {
-    // Look for back button - actual text is 'Back to Home'
-    const backButton = page
-      .locator('a:has-text("Back to Home"), button:has-text("Back to Home"), a:has-text("back")')
-      .first();
-
-    await expect(backButton).toBeVisible();
-  });
-
-  test('should have edit button in view mode', async ({ page }) => {
-    // Look for edit button - actual text is 'Edit Profile'
-    const editButton = page
-      .locator(
-        'button:has-text("Edit Profile"), button:has-text("Edit"), button[aria-label*="edit"]'
-      )
-      .first();
-
-    // Wait a moment for buttons to render
-    await page.waitForTimeout(500);
-
-    await expect(editButton).toBeVisible();
-    await expect(editButton).toBeEnabled();
-  });
-
-  test('should display profile sections', async ({ page }) => {
-    // Profile page should be visible (even if empty)
-    const body = page.locator('body');
-    await expect(body).toBeVisible();
-
-    // Verify we're on the profile page (not login)
-    await expect(page).toHaveURL(/.*profile.*/);
-
-    // Check for either profile sections OR edit button (if profile is empty)
-    const hasContent = (await page.locator('h3').count()) > 0;
-    const hasEditButton = (await page.getByRole('button', { name: /edit/i }).count()) > 0;
-
-    // Should have either content sections or an edit button
-    expect(hasContent || hasEditButton).toBe(true);
-  });
-
-  test('should display core identity section if data exists', async ({ page }) => {
-    // Wait for data to load
-    await page.waitForTimeout(1000);
-
-    // Verify page loaded and content is visible
-    const body = page.locator('body');
-    await expect(body).toBeVisible();
-  });
-
-  test('should display core identity section', async ({ page }) => {
-    // Look for Core Identity section that contains name input
-    const coreIdentitySection = page.locator('text=/core identity/i').first();
-
-    await expect(coreIdentitySection).toBeVisible();
-  });
-
-  test('should display profile management section', async ({ page }) => {
-    // Scroll to bottom to see management links
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-
-    // Wait for content to be visible
-    await page.waitForTimeout(500);
-
-    // Look for Profile Management section with management cards
-    const managementSection = page.locator('text=/profile management/i').first();
-
-    await expect(managementSection).toBeVisible();
-  });
 
   test('should have link to experiences page', async ({ page }) => {
     // Look for experiences link (UPageCard creates absolute positioned overlay)
@@ -146,38 +81,7 @@ test.describe('Profile Page - Edit Mode', () => {
     await expect(cancelButton).toBeVisible();
   });
 
-  test('should display form inputs in edit mode', async ({ page }) => {
-    // Enter edit mode
-    const editButton = page
-      .locator('button:has-text("Edit Profile"), button:has-text("Edit")')
-      .first();
 
-    await editButton.click();
-    await page.waitForTimeout(500);
-
-    // Should see input fields
-    const inputs = page.locator('input, textarea');
-
-    await expect(inputs.first()).toBeVisible();
-  });
-
-  test('should have cancel button in edit mode', async ({ page }) => {
-    const editButton = page
-      .locator('button:has-text("Edit Profile"), button:has-text("Edit")')
-      .first();
-
-    await editButton.click();
-    await page.waitForTimeout(500);
-
-    // Scroll to bottom to see Cancel button
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(300);
-
-    const cancelButton = page.locator('button:has-text("Cancel")').first();
-
-    await expect(cancelButton).toBeVisible();
-    await expect(cancelButton).toBeEnabled();
-  });
 
   test('should exit edit mode when cancel is clicked', async ({ page }) => {
     const editButton = page
@@ -201,47 +105,7 @@ test.describe('Profile Page - Edit Mode', () => {
   });
 });
 
-test.describe('Profile Page - Responsive Design', () => {
-  test('should be responsive on mobile viewport', async ({ page }) => {
-    // Set mobile viewport
-    await page.setViewportSize({ width: 375, height: 667 });
 
-    await page.goto('/profile');
-    await page.waitForLoadState('networkidle');
-
-    // Page should be visible
-    const body = page.locator('body');
-    await expect(body).toBeVisible();
-
-    // Check no horizontal overflow
-    const bodyWidth = await body.evaluate((el) => el.scrollWidth);
-    const viewportWidth = await page.evaluate(() => window.innerWidth);
-
-    expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 20);
-  });
-
-  test('should be responsive on tablet viewport', async ({ page }) => {
-    // Set tablet viewport
-    await page.setViewportSize({ width: 768, height: 1024 });
-
-    await page.goto('/profile');
-    await page.waitForLoadState('networkidle');
-
-    const body = page.locator('body');
-    await expect(body).toBeVisible();
-  });
-
-  test('should be responsive on desktop viewport', async ({ page }) => {
-    // Set desktop viewport
-    await page.setViewportSize({ width: 1920, height: 1080 });
-
-    await page.goto('/profile');
-    await page.waitForLoadState('networkidle');
-
-    const body = page.locator('body');
-    await expect(body).toBeVisible();
-  });
-});
 
 test.describe('Profile Page - Navigation', () => {
   test('should navigate back to home page', async ({ page }) => {
