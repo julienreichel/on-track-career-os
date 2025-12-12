@@ -57,7 +57,8 @@ export class STARStoryService {
       throw new Error('Source text cannot be empty');
     }
 
-    return await this.aiService.generateStarStory(sourceText);
+    const stories = await this.aiService.generateStarStory(sourceText);
+    return stories as STARStory[];
   }
 
   /**
