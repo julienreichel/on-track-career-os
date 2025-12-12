@@ -181,7 +181,7 @@ describe('CanvasSectionCard', () => {
     const buttons = wrapper.findAllComponents({ name: 'UButton' });
     const saveButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-check');
     const cancelButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-x-mark');
-    
+
     expect(saveButton?.exists()).toBe(true);
     expect(cancelButton?.exists()).toBe(true);
   });
