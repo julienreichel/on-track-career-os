@@ -149,12 +149,6 @@ The project has established a **strong backend and domain foundation** with comp
   - 2 Nuxt component tests (StoryBuilder, StoryForm)
   - 2 AI Lambda tests (generate-star-story, generate-achievements-and-kpis)
 
-**Minor Refinements Needed:**
-
-- ⚠️ Story search/filter functionality
-- ⚠️ Story categories/tags
-- ⚠️ Story export to CV/Letter
-
 **Validation:**
 
 - ✅ All 28 E2E story tests passing
