@@ -199,7 +199,7 @@ onMounted(async () => {
         <!-- Error Alert -->
         <UAlert
           v-if="error"
-          color="red"
+          color="error"
           icon="i-heroicons-exclamation-triangle"
           :title="t('common.error')"
           :description="error"
@@ -209,7 +209,7 @@ onMounted(async () => {
         <!-- Generation Error Alert -->
         <UAlert
           v-if="generationError"
-          color="red"
+          color="error"
           icon="i-heroicons-exclamation-triangle"
           :title="t('common.error')"
           :description="generationError"
