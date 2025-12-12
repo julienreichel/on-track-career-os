@@ -230,6 +230,75 @@ When implementing features:
 5. Add AI Lambda functions for operations
 6. Write tests FIRST
 
+## Nuxt MCP Integration
+
+**Model Context Protocol (MCP)** for Nuxt provides direct access to official Nuxt documentation, module information, and examples.
+
+### Available MCP Tools
+
+The Nuxt MCP is already configured in `.vscode/mcp.json` and provides these tools:
+
+**Documentation Tools:**
+
+- `mcp_nuxt_list-documentation-pages` - Browse all Nuxt docs (version 3.x, 4.x, or all)
+- `mcp_nuxt_get-documentation-page` - Get full content of specific doc page (e.g., `/docs/4.x/getting-started/introduction`)
+- `mcp_nuxt_get-getting-started-guide` - Quick access to getting started guide (3.x or 4.x)
+
+**Module Tools:**
+
+- `mcp_nuxt_list-modules` - Search/filter Nuxt modules by category, downloads, stars
+  - Parameters: `search`, `category`, `sort` (downloads/stars/publishedAt/createdAt), `order` (asc/desc)
+- `mcp_nuxt_get-module` - Get detailed info about specific module (README, compatibility, maintainers, stats)
+
+**Blog & Updates:**
+
+- `mcp_nuxt_list-blog-posts` - List all Nuxt blog posts with metadata
+- `mcp_nuxt_get-blog-post` - Get full blog post content (e.g., `/blog/v4`)
+
+**Deployment:**
+
+- `mcp_nuxt_list-deploy-providers` - List all deployment platforms (Vercel, Cloudflare, etc.)
+- `mcp_nuxt_get-deploy-provider` - Get deployment instructions for specific provider
+
+### When to Use Nuxt MCP
+
+✅ **USE WHEN:**
+
+- Need to verify Nuxt 4 API usage or breaking changes
+- Looking for best practices from official docs
+- Searching for compatible modules (e.g., authentication, UI, testing)
+- Need deployment instructions for specific platforms
+- Want to check latest features/announcements
+
+❌ **DON'T USE WHEN:**
+
+- Working with project-specific code (use grep_search/semantic_search instead)
+- Debugging application issues (check local code first)
+- Need AWS Amplify docs (MCP is Nuxt-specific)
+
+### Quick Reference: Common Paths
+
+**Nuxt 4.x Documentation:**
+
+- Introduction: `/docs/4.x/getting-started/introduction`
+- Installation: `/docs/4.x/getting-started/installation`
+- Upgrade guide: `/docs/4.x/getting-started/upgrade`
+- Rendering modes: `/docs/4.x/guide/concepts/rendering`
+- Auto-imports: `/docs/4.x/guide/concepts/auto-imports`
+- Server engine: `/docs/4.x/guide/concepts/server-engine`
+- Composables: `/docs/4.x/guide/directory-structure/composables`
+- Components: `/docs/4.x/guide/directory-structure/components`
+- Pages/Routing: `/docs/4.x/guide/directory-structure/pages`
+
+**Useful Module Categories:**
+
+- `UI` - UI component libraries (@nuxt/ui, primevue, etc.)
+- `Security` - Auth modules (@sidebase/nuxt-auth, nuxt-auth-utils)
+- `Database` - Database integrations (Supabase, Prisma, etc.)
+- `Testing` - Test utilities (@nuxt/test-utils)
+- `Performance` - Performance optimization modules
+- `SEO` - SEO and meta tag modules
+
 ## Secrets & Environment
 
 - AI provider keys: Amplify environment variables (separate dev/prod)
