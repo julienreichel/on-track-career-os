@@ -418,11 +418,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useUserProfile } from '@/application/user-profile/useUserProfile';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
 import type { UserProfile, UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
 
 // Profile page - manage user profile with view/edit mode
@@ -438,12 +439,20 @@ const loadError = ref<string | null>(null);
 
 // Experience check for CV upload
 const showCvUpload = ref(false);
+const userProfileRepo = new UserProfileRepository();
 const experienceRepo = new ExperienceRepository();
 
 // Check if user has any experiences
-onMounted(async () => {
+watch(userId, async (newUserId) => {
+  if (!newUserId) return;
+
   try {
-    const experiences = await experienceRepo.list();
+    const userProfile = await userProfileRepo.get(newUserId);
+    if (!userProfile) {
+      showCvUpload.value = true;
+      return;
+    }
+    const experiences = await experienceRepo.list(userProfile);
     // Show CV upload only if user has no experiences
     showCvUpload.value = !experiences || experiences.length === 0;
   } catch (error) {

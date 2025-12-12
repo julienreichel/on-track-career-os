@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, h, resolveComponent } from 'vue';
+import { ref, watch, computed, h, resolveComponent } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import type { TableColumn } from '@nuxt/ui';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { Experience } from '@/domain/experience/Experience';
+import { useAuthUser } from '@/composables/useAuthUser';
 
 const UButton = resolveComponent('UButton');
 const UBadge = resolveComponent('UBadge');
 
 const { t } = useI18n();
 const router = useRouter();
+const { userId } = useAuthUser();
+const userProfileRepo = new UserProfileRepository();
 const experienceRepo = new ExperienceRepository();
 const storyService = new STARStoryService();
 
@@ -117,18 +121,33 @@ const columns = computed<TableColumn<Experience>[]>(() => [
   },
 ]);
 
-// Load experiences on mount
-onMounted(async () => {
-  await loadExperiences();
-  await loadStoryCounts();
-});
+// Load experiences when userId becomes available
+watch(
+  userId,
+  async (newUserId) => {
+    if (newUserId) {
+      await loadExperiences();
+      await loadStoryCounts();
+    }
+  },
+  { immediate: true }
+);
 
 async function loadExperiences() {
+  if (!userId.value) {
+    return;
+  }
+
   loading.value = true;
   errorMessage.value = null;
 
   try {
-    const result = await experienceRepo.list();
+    const userProfile = await userProfileRepo.get(userId.value);
+    if (!userProfile) {
+      experiences.value = [];
+      return;
+    }
+    const result = await experienceRepo.list(userProfile);
     experiences.value = result || [];
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : 'Failed to load experiences';
@@ -142,7 +161,7 @@ async function loadStoryCounts() {
   // Load story counts for all experiences
   for (const experience of experiences.value) {
     try {
-      const stories = await storyService.getStoriesByExperience(experience.id);
+      const stories = await storyService.getStoriesByExperience(experience);
       storyCounts.value[experience.id] = stories.length;
     } catch (error) {
       console.error(`[experiences] Error loading stories for ${experience.id}:`, error);

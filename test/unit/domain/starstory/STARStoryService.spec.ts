@@ -5,6 +5,7 @@ import type { AiOperationsService } from '@/domain/ai-operations/AiOperationsSer
 import type { STARStory } from '@/domain/starstory/STARStory';
 import type { STARStory as AiSTARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
+import type { Experience } from '@/domain/experience/Experience';
 
 // Mock the dependencies
 vi.mock('@/domain/starstory/STARStoryRepository');
@@ -77,6 +78,11 @@ describe('STARStoryService', () => {
 
   describe('getStoriesByExperience', () => {
     it('should fetch all stories for an experience', async () => {
+      const mockExperience = {
+        id: 'exp-123',
+        title: 'Test Experience',
+      } as Experience;
+
       const mockStories: STARStory[] = [
         {
           id: 'story-1',
@@ -98,17 +104,22 @@ describe('STARStoryService', () => {
 
       mockRepository.getStoriesByExperience.mockResolvedValue(mockStories);
 
-      const result = await service.getStoriesByExperience('exp-123');
+      const result = await service.getStoriesByExperience(mockExperience);
 
-      expect(mockRepository.getStoriesByExperience).toHaveBeenCalledWith('exp-123');
+      expect(mockRepository.getStoriesByExperience).toHaveBeenCalledWith(mockExperience);
       expect(result).toEqual(mockStories);
       expect(result).toHaveLength(2);
     });
 
     it('should return empty array when experience has no stories', async () => {
+      const mockExperience = {
+        id: 'exp-no-stories',
+        title: 'Empty Experience',
+      } as Experience;
+
       mockRepository.getStoriesByExperience.mockResolvedValue([]);
 
-      const result = await service.getStoriesByExperience('exp-no-stories');
+      const result = await service.getStoriesByExperience(mockExperience);
 
       expect(result).toEqual([]);
     });

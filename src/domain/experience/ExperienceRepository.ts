@@ -1,4 +1,6 @@
 import { gqlOptions } from '@/data/graphql/options';
+import { loadLazyAll } from '@/data/graphql/lazy';
+import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { ExperienceCreateInput, ExperienceUpdateInput, Experience } from './Experience';
 
 export type AmplifyExperienceModel = {
@@ -47,9 +49,18 @@ export class ExperienceRepository {
     return res.data;
   }
 
-  async list(filter: Record<string, unknown> = {}) {
-    const { data } = await this.model.list(gqlOptions(filter));
-    return data;
+  /**
+   * List all experiences for a user profile using lazy loading
+   * Automatically handles pagination to fetch all experiences
+   * @param userProfile - UserProfile object with experiences relationship
+   * @returns Array of all experiences (all pages combined)
+   */
+  async list(userProfile: UserProfile): Promise<Experience[]> {
+    if (!userProfile?.experiences) {
+      return [];
+    }
+    // Load all pages automatically
+    return await loadLazyAll(userProfile.experiences);
   }
 
   async create(input: ExperienceCreateInput) {

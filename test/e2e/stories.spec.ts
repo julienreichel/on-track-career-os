@@ -11,43 +11,17 @@ import { test, expect, type Page } from '@playwright/test';
  */
 
 /**
- * Helper: Create a minimal experience (only required fields)
+ * Helper: Create an experience (minimal or full)
+ * @param page - Playwright page object
+ * @param title - Unique title for the experience (used to find it later)
+ * @param withFullData - If true, fills responsibilities and tasks for AI generation
+ * @returns Experience ID or null if creation failed
  */
-async function createMinimalExperience(page: Page, title: string): Promise<string | null> {
-  await page.goto('/profile/experiences/new');
-  await page.waitForLoadState('networkidle');
-  await page.waitForTimeout(1000);
-
-  // Fill required fields only
-  await page.locator('input[placeholder*="Senior Software Engineer"]').fill(title);
-  await page.locator('input[type="date"]').first().fill('2024-01-01');
-
-  // Scroll to bottom to see Save button
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-  await page.waitForTimeout(300);
-
-  // Save the experience
-  await page.locator('button[type="submit"]:has-text("Save Experience")').click();
-  await page.waitForLoadState('networkidle');
-  await page.waitForTimeout(2000);
-
-  // Navigate to experiences list to get the experience
-  await page.goto('/profile/experiences');
-  await page.waitForLoadState('networkidle');
-  const firstExperienceLink = page.locator('button[aria-label*="stories" i]').first();
-  await firstExperienceLink.click();
-  await page.waitForLoadState('networkidle');
-
-  // Extract experience ID from URL
-  const url = page.url();
-  const match = url.match(/\/experiences\/([a-f0-9-]+)/);
-  return match ? match[1] : null;
-}
-
-/**
- * Helper: Create a full experience with responsibilities and tasks (for AI story generation)
- */
-async function createFullExperience(page: Page, title: string): Promise<string | null> {
+async function createExperience(
+  page: Page,
+  title: string,
+  withFullData: boolean = false
+): Promise<string | null> {
   await page.goto('/profile/experiences/new');
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(1000);
@@ -56,19 +30,20 @@ async function createFullExperience(page: Page, title: string): Promise<string |
   await page.locator('input[placeholder*="Senior Software Engineer"]').fill(title);
   await page.locator('input[type="date"]').first().fill('2024-01-01');
 
-  // Fill responsibilities (needed for AI story generation)
-  await page
-    .locator('textarea[placeholder*="responsibility"]')
-    .fill(
-      'Led development team of 5 engineers\nArchitected cloud migration strategy\nImplemented CI/CD pipelines'
-    );
+  // Fill optional fields if full data requested
+  if (withFullData) {
+    await page
+      .locator('textarea[placeholder*="responsibility"]')
+      .fill(
+        'Led development team of 5 engineers\nArchitected cloud migration strategy\nImplemented CI/CD pipelines'
+      );
 
-  // Fill tasks & achievements (needed for AI story generation)
-  await page
-    .locator('textarea[placeholder*="task"]')
-    .fill(
-      'Migrated legacy system to microservices reducing costs by 40%\nImplemented automated testing increasing coverage to 85%\nReduced deployment time from 2 hours to 15 minutes'
-    );
+    await page
+      .locator('textarea[placeholder*="task"]')
+      .fill(
+        'Migrated legacy system to microservices reducing costs by 40%\nImplemented automated testing increasing coverage to 85%\nReduced deployment time from 2 hours to 15 minutes'
+      );
+  }
 
   // Scroll to bottom to see Save button
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -79,17 +54,42 @@ async function createFullExperience(page: Page, title: string): Promise<string |
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
 
-  // Navigate to experiences list to get the experience
+  // Navigate to experiences list to find the created experience by title
   await page.goto('/profile/experiences');
-  await page.waitForLoadState('networkidle');
-  const firstExperienceLink = page.locator('button[aria-label*="stories" i]').first();
-  await firstExperienceLink.click();
-  await page.waitForLoadState('networkidle');
+
+  // Prefer URL + heading instead of networkidle
+  await expect(page).toHaveURL(/\/profile\/experiences/);
+  await expect(page.getByRole('heading', { name: /Experiences/i })).toBeVisible();
+
+  // Wait until the table actually has at least one row
+  await expect(page.getByRole('row').nth(1)).toBeVisible();
+
+  // Find the row containing the experience title and click the edit button
+  const experienceRow = page
+    .getByRole('row')
+    .filter({ has: page.getByRole('cell', { name: title, exact: true }) });
+
+  await experienceRow.getByRole('button', { name: 'Edit' }).click();
+  await page.waitForLoadState('domcontentloaded'); // or drop completely if not needed
 
   // Extract experience ID from URL
   const url = page.url();
   const match = url.match(/\/experiences\/([a-f0-9-]+)/);
   return match ? match[1] : null;
+}
+
+/**
+ * Helper: Create a minimal experience (only required fields)
+ */
+async function createMinimalExperience(page: Page, title: string): Promise<string | null> {
+  return createExperience(page, title, false);
+}
+
+/**
+ * Helper: Create a full experience with responsibilities and tasks (for AI story generation)
+ */
+async function createFullExperience(page: Page, title: string): Promise<string | null> {
+  return createExperience(page, title, true);
 }
 
 /**
@@ -277,13 +277,15 @@ test.describe('Story Management', () => {
     test.beforeEach(async ({ page }) => {
       // Create a test experience if we don't have one yet
       if (!experienceId) {
-        experienceId = await createMinimalExperience(page, 'E2E Test Experience for Stories');
+        const timestamp = Date.now();
+        experienceId = await createMinimalExperience(
+          page,
+          `E2E Test Experience for Free Text Stories ${timestamp}`
+        );
       }
     });
 
     test('should navigate to manual story creation', async ({ page }) => {
-      test.skip(!experienceId, 'No experience ID available');
-
       // Navigate directly to new story page for this experience
       await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
@@ -293,12 +295,13 @@ test.describe('Story Management', () => {
     });
 
     test('should display STAR interview interface', async ({ page }) => {
-      test.skip(!experienceId, 'No experience ID available');
-
       // Navigate to new story page with experience context
       await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1000);
+
+      // Step 1 — select the Free Text creation mode
+      await page.getByRole('heading', { name: /Manual Entry/i }).click();
 
       // Look for STAR methodology elements
       const hasSituation = (await page.locator('text=/situation/i').count()) > 0;
@@ -311,11 +314,12 @@ test.describe('Story Management', () => {
     });
 
     test('should have text input for story content', async ({ page }) => {
-      test.skip(!experienceId, 'No experience ID available');
-
       await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
+
+      // Step 1 — select the Free Text creation mode
+      await page.getByRole('heading', { name: /Manual Entry/i }).click();
 
       // Look for text inputs or textareas
       const hasTextarea = (await page.locator('textarea').count()) > 0;
@@ -326,11 +330,12 @@ test.describe('Story Management', () => {
     });
 
     test('should allow filling STAR sections', async ({ page }) => {
-      test.skip(!experienceId, 'No experience ID available');
-
       await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
+
+      // Step 1 — select the Free Text creation mode
+      await page.getByRole('heading', { name: /Manual Entry/i }).click();
 
       // Try to fill in a textarea
       const textarea = page.locator('textarea').first();
@@ -341,11 +346,12 @@ test.describe('Story Management', () => {
     });
 
     test('should have save button', async ({ page }) => {
-      test.skip(!experienceId, 'No experience ID available');
-
       await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
+
+      // Step 1 — select the Free Text creation mode
+      await page.getByRole('heading', { name: /Manual Entry/i }).click();
 
       // Look for save button
       const saveButton = page
@@ -356,16 +362,47 @@ test.describe('Story Management', () => {
     });
 
     test('should have cancel button', async ({ page }) => {
-      test.skip(!experienceId, 'No experience ID available');
-
       await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
+
+      // Step 1 — select the Free Text creation mode
+      await page.getByRole('heading', { name: /Manual Entry/i }).click();
 
       // Look for cancel button
       const cancelButton = page.locator('button:has-text("Cancel"), a:has-text("Back")').first();
 
       await expect(cancelButton).toBeVisible();
+    });
+
+    test('should create a story successfully', async ({ page }) => {
+      await page.goto(`/profile/experiences/${experienceId}/stories/new`);
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(500);
+
+      // Step 1 — select the Manual Entry mode
+      await page.getByRole('heading', { name: /Manual Entry/i }).click();
+      await page.waitForTimeout(300);
+
+      // Step 2 — Fill all required STAR fields
+      await page.getByLabel(/Situation/i).fill('System outages affecting production.');
+      await page.getByLabel(/Task/i).fill('Implement monitoring solution.');
+      await page.getByLabel(/Action/i).fill('Deployed comprehensive observability stack.');
+      await page.getByLabel(/Result/i).fill('Reduced MTTR by 60%.');
+
+      // Step 3 — Save the story
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.waitForTimeout(300);
+      await page.getByRole('button', { name: /save/i }).click();
+
+      // Wait for save to complete
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(2000);
+
+      // Should redirect to stories list and show the new story
+      await expect(page).toHaveURL(/.*\/stories/);
+      const viewButtons = page.locator('button:has-text("View")');
+      await expect(viewButtons.first()).toBeVisible();
     });
   });
 
@@ -375,34 +412,21 @@ test.describe('Story Management', () => {
     test.beforeEach(async ({ page }) => {
       // Create a test experience if we don't have one yet
       if (!experienceId) {
+        const timestamp = Date.now();
         experienceId = await createMinimalExperience(
           page,
-          'E2E Test Experience for Free Text Stories'
+          `E2E Free Text Stories Experience ${timestamp}`
         );
       }
     });
 
-    test('should have free text input option', async ({ page }) => {
-      test.skip(!experienceId, 'No experience ID available');
-
-      await page.goto(`/profile/experiences/${experienceId}/stories/new`);
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(500);
-
-      // Look for a large text input or "paste text" option
-      const hasFreeTextArea = (await page.locator('textarea').count()) > 0;
-      const hasImportOption = (await page.locator('text=/paste|import|from text/i').count()) > 0;
-
-      // Should have some way to input free text
-      expect(hasFreeTextArea || hasImportOption).toBe(true);
-    });
-
     test('should show generate button for AI processing', async ({ page }) => {
-      test.skip(!experienceId, 'No experience ID available');
-
       await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
+
+      // Step 1 — select the Free Text creation mode
+      await page.getByRole('heading', { name: /Generate from Free Text/i }).click();
 
       // Look for generate/AI button
       const generateButton = page
@@ -413,24 +437,70 @@ test.describe('Story Management', () => {
     });
 
     test('should allow pasting text content', async ({ page }) => {
-      test.skip(!experienceId, 'No experience ID available');
+      await page.goto(`/profile/experiences/${experienceId}/stories/new`);
+      await page.waitForLoadState('networkidle');
 
+      // Step 1 — select the Free Text creation mode
+      await page.getByRole('heading', { name: /Generate from Free Text/i }).click();
+
+      // Step 2 — textarea should now exist
+      const textarea = page.getByRole('textbox').first(); // better than raw 'textarea'
+
+      const testText = `
+    In my role as a Senior Engineer, I led the migration of our legacy system.
+    The task was to migrate 50+ microservices with zero downtime.
+    I designed a phased migration approach and coordinated with 5 teams.
+    We successfully completed the migration, reducing deployment time by 85%.
+  `;
+
+      await textarea.fill(testText);
+      await expect(textarea).toHaveValue(/Senior Engineer/);
+    });
+
+    test('should generate story from free text successfully', async ({ page }) => {
       await page.goto(`/profile/experiences/${experienceId}/stories/new`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
 
-      const textarea = page.locator('textarea').first();
+      // Step 1 — select the Free Text creation mode
+      await page.getByRole('heading', { name: /Generate from Free Text/i }).click();
+      await page.waitForTimeout(300);
 
+      // Step 2 — Fill in free text content
+      const textarea = page.getByRole('textbox').first();
       const testText = `
         In my role as a Senior Engineer, I led the migration of our legacy system.
         The task was to migrate 50+ microservices with zero downtime.
         I designed a phased migration approach and coordinated with 5 teams.
         We successfully completed the migration, reducing deployment time by 85%.
       `;
-
       await textarea.fill(testText);
-      const value = await textarea.inputValue();
-      expect(value).toContain('Senior Engineer');
+
+      // Step 3 — Click generate button
+      const generateButton = page
+        .locator('button:has-text("Generate"), button:has-text("Create")')
+        .first();
+      await generateButton.click();
+
+      // Step 4 — Wait for AI generation and STAR fields to be populated
+      await page.waitForTimeout(5000);
+      await page.waitForLoadState('networkidle');
+
+      // Verify STAR fields are populated by AI
+      await expect(page.getByLabel(/Situation/i)).not.toBeEmpty();
+
+      // Step 5 — Save the generated story
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.waitForTimeout(300);
+      await page.getByRole('button', { name: /Save/i }).click();
+
+      // Step 6 — Wait for redirect to stories list
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(2000);
+      await expect(page).toHaveURL(/\/stories$/);
+
+      // Step 7 — Verify story appears in the list
+      await expect(page.getByRole('button', { name: /View/i }).first()).toBeVisible();
     });
   });
 
@@ -523,7 +593,8 @@ test.describe('Story Management', () => {
     test.beforeEach(async ({ page }) => {
       // Create experience and story if needed
       if (!experienceId) {
-        experienceId = await createMinimalExperience(page, 'E2E Experience for Story Enhancement');
+        const timestamp = Date.now();
+        experienceId = await createMinimalExperience(page, `E2E Story Enhancement ${timestamp}`);
         if (experienceId) {
           storyCreated = await createManualStory(
             page,
@@ -578,7 +649,8 @@ test.describe('Story Management', () => {
     test.beforeEach(async ({ page }) => {
       // Create experience and story if needed
       if (!experienceId) {
-        experienceId = await createMinimalExperience(page, 'E2E Experience for Global Stories');
+        const timestamp = Date.now();
+        experienceId = await createMinimalExperience(page, `E2E Global Stories ${timestamp}`);
         if (experienceId) {
           storyCreated = await createManualStory(
             page,

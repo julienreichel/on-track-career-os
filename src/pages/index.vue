@@ -40,20 +40,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
+import { useAuthUser } from '@/composables/useAuthUser';
 
 // Home page - requires authentication
 const { t } = useI18n();
+const { userId } = useAuthUser();
 
 const showCvUpload = ref(false);
+const userProfileRepo = new UserProfileRepository();
 const experienceRepo = new ExperienceRepository();
 
-// Check if user has any experiences
-onMounted(async () => {
+// Check if user has any experiences when userId is available
+watch(userId, async (newUserId) => {
+  if (!newUserId) return;
+
   try {
-    const experiences = await experienceRepo.list();
+    const userProfile = await userProfileRepo.get(newUserId);
+    if (!userProfile) {
+      showCvUpload.value = true;
+      return;
+    }
+    const experiences = await experienceRepo.list(userProfile);
     // Show CV upload only if user has no experiences
     showCvUpload.value = !experiences || experiences.length === 0;
   } catch (error) {

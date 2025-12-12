@@ -3,6 +3,7 @@ import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService'
 import type { STARStory, STARStoryCreateInput, STARStoryUpdateInput } from './STARStory';
 import type { STARStory as AiSTARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
+import type { Experience } from '@/domain/experience/Experience';
 
 /**
  * Service for STAR Story business logic
@@ -31,11 +32,11 @@ export class STARStoryService {
 
   /**
    * Get all stories for a specific experience
-   * @param experienceId - Experience ID
+   * @param experience - Experience object
    * @returns Array of stories
    */
-  async getStoriesByExperience(experienceId: string): Promise<STARStory[]> {
-    return await this.repo.getStoriesByExperience(experienceId);
+  async getStoriesByExperience(experience: Experience): Promise<STARStory[]> {
+    return await this.repo.getStoriesByExperience(experience);
   }
 
   /**

@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
+import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { STARStory } from '@/domain/starstory/STARStory';
 
 /**
@@ -27,7 +28,8 @@ export interface GroupedStories {
  * - Group stories by experience
  * - Search and filter capabilities
  */
-export function useStoryList(service = new STARStoryService()) {
+// eslint-disable-next-line max-lines-per-function -- Composable requires comprehensive interface
+export function useStoryList(service = new STARStoryService(), experienceRepo = new ExperienceRepository()) {
   // State
   const stories = ref<STARStory[]>([]);
   const loading = ref(false);
@@ -67,7 +69,13 @@ export function useStoryList(service = new STARStoryService()) {
     error.value = null;
 
     try {
-      stories.value = await service.getStoriesByExperience(experienceId);
+      const experience = await experienceRepo.get(experienceId);
+      if (!experience) {
+        error.value = 'storyList.errors.experienceNotFound';
+        stories.value = [];
+        return;
+      }
+      stories.value = await service.getStoriesByExperience(experience);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'storyList.errors.loadFailed';
       console.error('[useStoryList] Load by experience error:', err);

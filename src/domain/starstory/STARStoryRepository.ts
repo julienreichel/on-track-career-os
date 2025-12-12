@@ -1,6 +1,6 @@
 import { gqlOptions } from '@/data/graphql/options';
-import { loadLazy } from '@/data/graphql/lazy';
-import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import { loadLazyAll } from '@/data/graphql/lazy';
+import type { Experience } from '@/domain/experience/Experience';
 import type { STARStoryCreateInput, STARStoryUpdateInput, STARStory } from './STARStory';
 
 export type AmplifySTARStoryModel = {
@@ -29,14 +29,12 @@ export type AmplifySTARStoryModel = {
  */
 export class STARStoryRepository {
   private readonly _model: AmplifySTARStoryModel;
-  private readonly experienceRepo: ExperienceRepository;
 
   /**
    * Constructor with optional dependency injection for testing
    * @param model - Optional Amplify model instance (for testing)
-   * @param experienceRepository - Optional Experience repository instance (for testing)
    */
-  constructor(model?: AmplifySTARStoryModel, experienceRepository?: ExperienceRepository) {
+  constructor(model?: AmplifySTARStoryModel) {
     if (model) {
       // Use injected model (for tests)
       this._model = model;
@@ -44,7 +42,6 @@ export class STARStoryRepository {
       // Use Nuxt's auto-imported useNuxtApp (for production)
       this._model = useNuxtApp().$Amplify.GraphQL.client.models.STARStory;
     }
-    this.experienceRepo = experienceRepository || new ExperienceRepository();
   }
 
   private get model() {
@@ -72,17 +69,17 @@ export class STARStoryRepository {
   }
 
   /**
-   * Get all stories for a specific experience using GraphQL relationship
-   * @param experienceId - Experience ID to filter by
-   * @returns Array of stories for that experience
+   * Get all stories for an experience using GraphQL relationship
+   * Automatically handles pagination to fetch all stories
+   * @param experience - Experience object with stories relationship
+   * @returns Array of all stories for that experience (all pages combined)
    */
-  async getStoriesByExperience(experienceId: string): Promise<STARStory[]> {
-    const experience = await this.experienceRepo.get(experienceId);
+  async getStoriesByExperience(experience: Experience): Promise<STARStory[]> {
     if (!experience?.stories) {
       return [];
     }
-    const { data } = await loadLazy(experience.stories);
-    return data;
+    // Load all pages automatically
+    return await loadLazyAll(experience.stories);
   }
 
   /**

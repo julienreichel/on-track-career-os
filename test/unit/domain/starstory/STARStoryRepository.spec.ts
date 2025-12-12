@@ -8,7 +8,7 @@ import type {
   STARStoryUpdateInput,
   STARStory,
 } from '@/domain/starstory/STARStory';
-import type { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import type { Experience } from '@/domain/experience/Experience';
 
 // Mock gqlOptions
 vi.mock('@/data/graphql/options', () => ({
@@ -18,9 +18,9 @@ vi.mock('@/data/graphql/options', () => ({
   }),
 }));
 
-// Mock loadLazy
+// Mock loadLazyAll
 vi.mock('@/data/graphql/lazy', () => ({
-  loadLazy: vi.fn(),
+  loadLazyAll: vi.fn(),
 }));
 
 describe('STARStoryRepository', () => {
@@ -31,9 +31,6 @@ describe('STARStoryRepository', () => {
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
-  };
-  let mockExperienceRepo: {
-    get: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -46,14 +43,9 @@ describe('STARStoryRepository', () => {
       delete: vi.fn(),
     };
 
-    mockExperienceRepo = {
-      get: vi.fn(),
-    };
-
     // Inject the mocks via constructor (dependency injection)
     repository = new STARStoryRepository(
-      mockModel as AmplifySTARStoryModel,
-      mockExperienceRepo as unknown as ExperienceRepository
+      mockModel as AmplifySTARStoryModel
     );
   });
 
@@ -200,18 +192,15 @@ describe('STARStoryRepository', () => {
       const mockExperience = {
         id: 'exp-123',
         stories: vi.fn(),
-      };
+      } as unknown as Experience;
 
-      mockExperienceRepo.get.mockResolvedValue(mockExperience);
+      // Mock loadLazyAll
+      const { loadLazyAll } = await import('@/data/graphql/lazy');
+      vi.mocked(loadLazyAll).mockResolvedValue(mockStories);
 
-      // Mock loadLazy
-      const { loadLazy } = await import('@/data/graphql/lazy');
-      vi.mocked(loadLazy).mockResolvedValue({ data: mockStories });
+      const result = await repository.getStoriesByExperience(mockExperience);
 
-      const result = await repository.getStoriesByExperience('exp-123');
-
-      expect(mockExperienceRepo.get).toHaveBeenCalledWith('exp-123');
-      expect(loadLazy).toHaveBeenCalledWith(mockExperience.stories);
+      expect(loadLazyAll).toHaveBeenCalledWith(mockExperience.stories);
       expect(result).toEqual(mockStories);
       expect(result).toHaveLength(2);
     });
@@ -220,13 +209,10 @@ describe('STARStoryRepository', () => {
       const mockExperience = {
         id: 'exp-123',
         stories: null,
-      };
+      } as unknown as Experience;
 
-      mockExperienceRepo.get.mockResolvedValue(mockExperience);
+      const result = await repository.getStoriesByExperience(mockExperience);
 
-      const result = await repository.getStoriesByExperience('exp-123');
-
-      expect(mockExperienceRepo.get).toHaveBeenCalledWith('exp-123');
       expect(result).toEqual([]);
     });
   });
