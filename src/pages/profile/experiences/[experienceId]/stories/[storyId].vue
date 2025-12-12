@@ -94,10 +94,10 @@ const handleSubmitFreeText = async () => {
     if (aiStories && aiStories.length > 0) {
       const story = aiStories[0];
       // Populate form state with generated story
-      updateField('situation', story.situation);
-      updateField('task', story.task);
-      updateField('action', story.action);
-      updateField('result', story.result);
+      updateField('situation', story?.situation);
+      updateField('task', story?.task);
+      updateField('action', story?.action);
+      updateField('result', story?.result);
 
       // Switch to manual mode to show the form
       selectedMode.value = 'manual';
@@ -228,7 +228,7 @@ onMounted(async () => {
         <!-- Error Alert -->
         <UAlert
           v-if="error"
-          color="red"
+          color="error"
           icon="i-heroicons-exclamation-triangle"
           :title="t('common.error')"
           :description="error"
@@ -382,7 +382,7 @@ onMounted(async () => {
         <!-- Not Found (editing non-existent story) -->
         <UAlert
           v-else-if="!isNew && !formState && !loading"
-          color="yellow"
+          color="warning"
           icon="i-heroicons-exclamation-triangle"
           :title="t('stories.builder.notFound')"
           :description="t('stories.builder.notFoundDescription')"
