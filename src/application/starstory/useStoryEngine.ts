@@ -78,13 +78,15 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
       if (!experience) {
         error.value = 'Experience not found';
         stories.value = [];
+        loading.value = false;
         return;
       }
-      stories.value = await service.getStoriesByExperience(experience);
+
+      // Delegate to loadStoriesForExperience to avoid code duplication
+      await loadStoriesForExperience(experience);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load stories';
       console.error('[useStoryEngine] Error:', err);
-    } finally {
       loading.value = false;
     }
   };

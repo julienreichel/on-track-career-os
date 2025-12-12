@@ -80,13 +80,15 @@ export function useStoryList(
       if (!experience) {
         error.value = 'storyList.errors.experienceNotFound';
         stories.value = [];
+        loading.value = false;
         return;
       }
-      stories.value = await service.getStoriesByExperience(experience);
+
+      // Delegate to loadForExperience to avoid code duplication
+      await loadForExperience(experience);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'storyList.errors.loadFailed';
       console.error('[useStoryList] Load by experience ID error:', err);
-    } finally {
       loading.value = false;
     }
   };
