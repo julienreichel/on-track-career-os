@@ -1,18 +1,5 @@
 <template>
   <div class="space-y-6">
-    <!-- Canvas Section Header -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h2 class="text-2xl font-bold">{{ t('canvas.title') }}</h2>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          {{ t('canvas.description') }}
-        </p>
-      </div>
-      <UBadge v-if="canvas?.needsUpdate" color="warning" variant="soft">
-        {{ t('canvas.needsUpdate') }}
-      </UBadge>
-    </div>
-
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center py-12">
       <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-primary" />
@@ -244,27 +231,34 @@
     </div>
 
     <!-- Action Buttons -->
-    <div v-if="canvas && !loading" class="flex justify-end gap-3 pt-4 border-t">
-      <UButton v-if="!isEditing" variant="outline" icon="i-heroicons-pencil" @click="startEditing">
-        {{ t('canvas.actions.edit') }}
-      </UButton>
+    <div v-if="canvas && !loading" class="flex items-center justify-between pt-4 border-t">
+      <UBadge v-if="canvas.needsUpdate" color="warning" variant="soft">
+        {{ t('canvas.needsUpdate') }}
+      </UBadge>
+      <div v-else />
+      
+      <div class="flex gap-3">
+        <UButton v-if="!isEditing" variant="outline" icon="i-heroicons-pencil" @click="startEditing">
+          {{ t('canvas.actions.edit') }}
+        </UButton>
 
-      <UButton
-        v-if="!isEditing"
-        variant="outline"
-        icon="i-heroicons-arrow-path"
-        @click="$emit('regenerate')"
-      >
-        {{ t('canvas.actions.regenerate') }}
-      </UButton>
+        <UButton
+          v-if="!isEditing"
+          variant="outline"
+          icon="i-heroicons-arrow-path"
+          @click="$emit('regenerate')"
+        >
+          {{ t('canvas.actions.regenerate') }}
+        </UButton>
 
-      <UButton v-if="isEditing" variant="outline" @click="cancelEditing">
-        {{ t('canvas.actions.cancel') }}
-      </UButton>
+        <UButton v-if="isEditing" variant="outline" @click="cancelEditing">
+          {{ t('canvas.actions.cancel') }}
+        </UButton>
 
-      <UButton v-if="isEditing" icon="i-heroicons-check" :loading="loading" @click="saveChanges">
-        {{ t('canvas.actions.save') }}
-      </UButton>
+        <UButton v-if="isEditing" icon="i-heroicons-check" :loading="loading" @click="saveChanges">
+          {{ t('canvas.actions.save') }}
+        </UButton>
+      </div>
     </div>
   </div>
 </template>

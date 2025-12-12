@@ -1,34 +1,35 @@
 <template>
-  <UPage>
-    <UPageHeader :title="t('canvas.page.title')" :description="t('canvas.page.description')" />
-
-    <UPageBody>
-      <!-- Error Alert -->
-      <UAlert
-        v-if="error"
-        icon="i-heroicons-exclamation-triangle"
-        color="error"
-        variant="soft"
-        :title="t('canvas.messages.error')"
-        :description="error"
-        class="mb-6"
-        :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-        @close="error = null"
+  <UContainer>
+    <UPage>
+      <UPageHeader
+        :title="t('canvas.page.title')"
+        :description="t('canvas.page.description')"
       />
 
-      <!-- Success Alert -->
-      <UAlert
-        v-if="successMessage"
-        icon="i-heroicons-check-circle"
-        color="success"
-        variant="soft"
-        :title="successMessage"
-        class="mb-6"
-        :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'success', variant: 'link' }"
-        @close="successMessage = null"
-      />
+      <UPageBody>
+        <!-- Error Alert -->
+        <UAlert
+          v-if="error"
+          icon="i-heroicons-exclamation-triangle"
+          color="error"
+          variant="soft"
+          :title="t('canvas.messages.error')"
+          :description="error"
+          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+          @close="error = null"
+        />
 
-      <UContainer>
+        <!-- Success Alert -->
+        <UAlert
+          v-if="successMessage"
+          icon="i-heroicons-check-circle"
+          color="success"
+          variant="soft"
+          :title="successMessage"
+          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'success', variant: 'link' }"
+          @close="successMessage = null"
+        />
+
         <PersonalCanvasComponent
           :canvas="canvas"
           :loading="loading"
@@ -36,9 +37,9 @@
           @regenerate="handleRegenerate"
           @save="handleSave"
         />
-      </UContainer>
-    </UPageBody>
-  </UPage>
+      </UPageBody>
+    </UPage>
+  </UContainer>
 </template>
 
 <script setup lang="ts">
@@ -48,6 +49,10 @@ import { useAuthUser } from '@/composables/useAuthUser';
 import type { PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
 import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
+
+definePageMeta({
+  breadcrumbLabel: 'Canvas',
+});
 
 const { t } = useI18n();
 const {

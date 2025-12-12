@@ -451,12 +451,12 @@
     "needsUpdate": "Update recommended",
     "empty": {
       "title": "No Canvas Yet",
-      "description": "Generate your Personal Business Model Canvas to visualize your professional identity and career strategy.",
+      "description": "Generate your canvas from your profile and experiences to visualize your career strategy.",
       "field": "Not yet defined"
     },
     "page": {
       "title": "Personal Canvas",
-      "description": "Visualize and manage your professional identity"
+      "description": "Your strategic career positioning visualized as a Business Model Canvas"
     },
     "sections": {
       "customerSegments": "Customer Segments",
