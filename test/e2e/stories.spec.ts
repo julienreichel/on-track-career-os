@@ -115,23 +115,35 @@ async function createManualStory(
       return false;
     }
 
-    // Check if textarea exists
+    // Step 1: Click on "Manual Entry" mode
+    const manualEntryButton = page.getByRole('heading', { name: /Manual Entry/i });
+    await manualEntryButton.click();
+    await page.waitForTimeout(500);
+
+    // Check if STAR form fields exist
     const textareaCount = await page.locator('textarea').count();
-    if (textareaCount === 0) {
-      console.warn('No textarea found on story creation page - form may not be ready');
+    if (textareaCount < 4) {
+      console.warn('STAR form fields not found - form may not be ready');
       return false;
     }
 
-    // Fill story content (first textarea)
-    const textarea = page.locator('textarea').first();
-    await textarea.fill(content);
+    // Step 2: Fill all 4 STAR fields (required to enable Save button)
+    // Parse content or use default values for STAR sections
+    await page.getByLabel(/Situation/i).fill('System outages affecting production.');
+    await page.getByLabel(/Task/i).fill('Implement monitoring and alerting solution.');
+    await page.getByLabel(/Action/i).fill(content || 'Deployed comprehensive observability stack.');
+    await page.getByLabel(/Result/i).fill('Reduced MTTR by 60% and improved system reliability.');
+
+    // Wait for form validation
+    await page.waitForTimeout(300);
 
     // Scroll to bottom to see Save button
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(300);
 
-    // Save the story
-    await page.locator('button[type="submit"]:has-text("Save")').first().click();
+    // Step 3: Save the story (should now be enabled)
+    const saveButton = page.getByRole('button', { name: /Save/i });
+    await saveButton.click();
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -507,30 +519,19 @@ test.describe('Story Management', () => {
   });
 
   test.describe('Story Creation - From Experience (Auto-generation)', () => {
+    let experienceId: string | null = null;
+
     test.beforeEach(async ({ page }) => {
-      // Check if experience with full data exists
-      await page.goto('/profile/experiences');
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1500);
-
-      const hasExperiences = (await page.locator('table tbody tr').count()) > 0;
-
-      // Create full experience if none exist (needed for AI generation)
-      if (!hasExperiences) {
+      // Create a test experience with full data if we don't have one yet
+      if (!experienceId) {
         const timestamp = Date.now();
-        await createFullExperience(page, `E2E Full Experience ${timestamp}`);
+        experienceId = await createFullExperience(page, `E2E Full Experience ${timestamp}`);
       }
-
-      // Navigate back to experiences list
-      await page.goto('/profile/experiences');
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000);
     });
 
     test('should trigger auto-generation from experience page', async ({ page }) => {
-      // Navigate to first experience stories page
-      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
-      await viewStoriesButton.click();
+      // Navigate directly to the experience stories page
+      await page.goto(`/profile/experiences/${experienceId}/stories`);
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
 
@@ -544,9 +545,8 @@ test.describe('Story Management', () => {
     });
 
     test('should show loading state when generating stories', async ({ page }) => {
-      // Navigate to first experience stories page
-      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
-      await viewStoriesButton.click();
+      // Navigate directly to the experience stories page
+      await page.goto(`/profile/experiences/${experienceId}/stories`);
       await page.waitForLoadState('networkidle');
 
       const generateButton = page
@@ -566,9 +566,8 @@ test.describe('Story Management', () => {
     });
 
     test('should display generated stories after auto-generation', async ({ page }) => {
-      // Navigate to first experience stories page
-      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
-      await viewStoriesButton.click();
+      // Navigate directly to the experience stories page
+      await page.goto(`/profile/experiences/${experienceId}/stories`);
       await page.waitForLoadState('networkidle');
 
       const generateButton = page

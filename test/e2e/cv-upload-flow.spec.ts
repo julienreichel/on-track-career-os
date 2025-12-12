@@ -56,10 +56,11 @@ test.describe('Experiences List', () => {
     await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
 
     // Verify page header
-    await expect(page.getByRole('heading', { name: /experiences/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /experiences/i })).toBeVisible();
 
     // Verify action buttons
-    await expect(page.getByRole('button', { name: /add experience/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /add experience/i }).first()).toBeVisible();
+
     await expect(page.getByRole('link', { name: /upload your cv/i })).toBeVisible();
   });
 
@@ -78,11 +79,17 @@ test.describe('Experiences List', () => {
     await page.goto('/profile/experiences', { waitUntil: 'networkidle' });
 
     // Click add experience button
-    const addButton = page.getByRole('button', { name: /add experience/i });
+    const addButton = page.getByRole('button', { name: /add experience/i }).first();
     await addButton.click();
 
-    // Note: This triggers an event that navigates, check for form
-    // In a real test with data, we'd verify the navigation
+    // Verify navigation
+    await expect(page).toHaveURL(/\/profile\/experiences\/new$/);
+
+    // Verify the new experience form is displayed
+    await expect(page.getByRole('heading', { level: 1, name: /add experience/i })).toBeVisible();
+
+    // Check that at least one required field appears
+    await expect(page.getByLabel(/job title/i)).toBeVisible();
   });
 });
 
@@ -90,8 +97,8 @@ test.describe('Experience Form', () => {
   test('should display new experience form', async ({ page }) => {
     await page.goto('/profile/experiences/new', { waitUntil: 'networkidle' });
 
-    // Verify form header
-    await expect(page.getByRole('heading', { name: /add experience/i })).toBeVisible();
+    // Verify form header (disambiguated)
+    await expect(page.getByRole('heading', { level: 1, name: /add experience/i })).toBeVisible();
 
     // Verify form fields are present
     await expect(page.getByLabel(/job title/i)).toBeVisible();
