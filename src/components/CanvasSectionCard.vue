@@ -1,12 +1,12 @@
 <template>
   <UCard class="flex flex-col h-full">
     <template #header>
-      <div class="flex items-start justify-between gap-3">
-        <div class="flex flex-col items-center text-center gap-2 flex-1">
+      <div class="relative">
+        <div class="flex flex-col items-center text-center gap-2">
           <UIcon :name="icon" class="w-8 h-8 text-primary" />
           <h3 class="text-lg font-semibold">{{ title }}</h3>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="absolute top-0 right-0 flex items-center gap-2">
           <UButton
             v-if="isEditing"
             icon="i-heroicons-check"
