@@ -64,13 +64,20 @@ describe('ai.generateAchievementsAndKpis - E2E Sandbox', () => {
 
   afterAll(async () => {
     try {
-      await signIn({ username: testEmail, password: testPassword });
-      // Cleanup handled by test framework
-      await signOut();
-    } catch {
-      // Ignore cleanup errors
+      if (testUserId) {
+        // Sign in to perform cleanup
+        await signIn({
+          username: testEmail,
+          password: testPassword,
+        });
+        // Delete both UserProfile and Cognito user in one call
+        await client.mutations.deleteUserProfileWithAuth({ userId: testUserId });
+        console.log('Test user cleaned up:', testUserId);
+      }
+    } catch (error) {
+      console.error('Cleanup error:', error);
     }
-  });
+  }, 30000);
 
   it('should generate achievements and KPIs from a detailed STAR story', async () => {
     const starStory = {
