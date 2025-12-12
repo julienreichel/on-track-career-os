@@ -353,7 +353,7 @@ describe('useCanvasEngine', () => {
 
       // Loading state should remain false as it's managed by the caller (page component)
       expect(loading.value).toBe(false);
-      
+
       await regenerateCanvas(input);
 
       // Loading state still false - caller is responsible for managing it

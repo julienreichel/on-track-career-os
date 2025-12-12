@@ -21,213 +21,103 @@
     <!-- Canvas Grid - Official Business Model Canvas 9 Blocks -->
     <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- 1. Customer Segments -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-user-group" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.customerSegments') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.customerSegments"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.customerSegments')"
-        />
-        <ul
-          v-else-if="Array.isArray(canvas.customerSegments) && canvas.customerSegments.length > 0"
-          class="list-disc list-inside space-y-1 text-sm"
-        >
-          <li v-for="(item, idx) in canvas.customerSegments" :key="idx">{{ item }}</li>
-        </ul>
-        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
-      </UCard>
+      <CanvasSectionCard
+        v-model:edit-value="localCanvas.customerSegments"
+        icon="i-heroicons-user-group"
+        :title="t('canvas.sections.customerSegments')"
+        :items="canvas.customerSegments"
+        :is-editing="isEditing"
+        :placeholder="t('canvas.placeholders.customerSegments')"
+        :empty-text="t('canvas.empty.field')"
+      />
 
       <!-- 2. Value Proposition -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-light-bulb" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.valueProposition') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.valueProposition"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.valueProposition')"
-        />
-        <ul
-          v-else-if="Array.isArray(canvas.valueProposition) && canvas.valueProposition.length > 0"
-          class="list-disc list-inside space-y-1 text-sm"
-        >
-          <li v-for="(item, idx) in canvas.valueProposition" :key="idx">{{ item }}</li>
-        </ul>
-        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
-      </UCard>
+      <CanvasSectionCard
+        v-model:edit-value="localCanvas.valueProposition"
+        icon="i-heroicons-light-bulb"
+        :title="t('canvas.sections.valueProposition')"
+        :items="canvas.valueProposition"
+        :is-editing="isEditing"
+        :placeholder="t('canvas.placeholders.valueProposition')"
+        :empty-text="t('canvas.empty.field')"
+      />
 
       <!-- 3. Channels -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-megaphone" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.channels') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.channels"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.channels')"
-        />
-        <ul
-          v-else-if="Array.isArray(canvas.channels) && canvas.channels.length > 0"
-          class="list-disc list-inside space-y-1 text-sm"
-        >
-          <li v-for="(item, idx) in canvas.channels" :key="idx">{{ item }}</li>
-        </ul>
-        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
-      </UCard>
+      <CanvasSectionCard
+        v-model:edit-value="localCanvas.channels"
+        icon="i-heroicons-megaphone"
+        :title="t('canvas.sections.channels')"
+        :items="canvas.channels"
+        :is-editing="isEditing"
+        :placeholder="t('canvas.placeholders.channels')"
+        :empty-text="t('canvas.empty.field')"
+      />
 
       <!-- 4. Customer Relationships -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-heart" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.customerRelationships') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.customerRelationships"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.customerRelationships')"
-        />
-        <ul
-          v-else-if="
-            Array.isArray(canvas.customerRelationships) && canvas.customerRelationships.length > 0
-          "
-          class="list-disc list-inside space-y-1 text-sm"
-        >
-          <li v-for="(item, idx) in canvas.customerRelationships" :key="idx">{{ item }}</li>
-        </ul>
-        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
-      </UCard>
+      <CanvasSectionCard
+        v-model:edit-value="localCanvas.customerRelationships"
+        icon="i-heroicons-heart"
+        :title="t('canvas.sections.customerRelationships')"
+        :items="canvas.customerRelationships"
+        :is-editing="isEditing"
+        :placeholder="t('canvas.placeholders.customerRelationships')"
+        :empty-text="t('canvas.empty.field')"
+      />
 
       <!-- 5. Key Activities -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-cog-6-tooth" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.keyActivities') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.keyActivities"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.keyActivities')"
-        />
-        <ul
-          v-else-if="Array.isArray(canvas.keyActivities) && canvas.keyActivities.length > 0"
-          class="list-disc list-inside space-y-1 text-sm"
-        >
-          <li v-for="(item, idx) in canvas.keyActivities" :key="idx">{{ item }}</li>
-        </ul>
-        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
-      </UCard>
+      <CanvasSectionCard
+        v-model:edit-value="localCanvas.keyActivities"
+        icon="i-heroicons-cog-6-tooth"
+        :title="t('canvas.sections.keyActivities')"
+        :items="canvas.keyActivities"
+        :is-editing="isEditing"
+        :placeholder="t('canvas.placeholders.keyActivities')"
+        :empty-text="t('canvas.empty.field')"
+      />
 
       <!-- 6. Key Resources -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-cube" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.keyResources') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.keyResources"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.keyResources')"
-        />
-        <ul
-          v-else-if="Array.isArray(canvas.keyResources) && canvas.keyResources.length > 0"
-          class="list-disc list-inside space-y-1 text-sm"
-        >
-          <li v-for="(item, idx) in canvas.keyResources" :key="idx">{{ item }}</li>
-        </ul>
-        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
-      </UCard>
+      <CanvasSectionCard
+        v-model:edit-value="localCanvas.keyResources"
+        icon="i-heroicons-cube"
+        :title="t('canvas.sections.keyResources')"
+        :items="canvas.keyResources"
+        :is-editing="isEditing"
+        :placeholder="t('canvas.placeholders.keyResources')"
+        :empty-text="t('canvas.empty.field')"
+      />
 
       <!-- 7. Key Partners -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-users" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.keyPartners') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.keyPartners"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.keyPartners')"
-        />
-        <ul
-          v-else-if="Array.isArray(canvas.keyPartners) && canvas.keyPartners.length > 0"
-          class="list-disc list-inside space-y-1 text-sm"
-        >
-          <li v-for="(item, idx) in canvas.keyPartners" :key="idx">{{ item }}</li>
-        </ul>
-        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
-      </UCard>
+      <CanvasSectionCard
+        v-model:edit-value="localCanvas.keyPartners"
+        icon="i-heroicons-users"
+        :title="t('canvas.sections.keyPartners')"
+        :items="canvas.keyPartners"
+        :is-editing="isEditing"
+        :placeholder="t('canvas.placeholders.keyPartners')"
+        :empty-text="t('canvas.empty.field')"
+      />
 
       <!-- 8. Cost Structure -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-currency-dollar" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.costStructure') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.costStructure"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.costStructure')"
-        />
-        <ul
-          v-else-if="Array.isArray(canvas.costStructure) && canvas.costStructure.length > 0"
-          class="list-disc list-inside space-y-1 text-sm"
-        >
-          <li v-for="(item, idx) in canvas.costStructure" :key="idx">{{ item }}</li>
-        </ul>
-        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
-      </UCard>
+      <CanvasSectionCard
+        v-model:edit-value="localCanvas.costStructure"
+        icon="i-heroicons-currency-dollar"
+        :title="t('canvas.sections.costStructure')"
+        :items="canvas.costStructure"
+        :is-editing="isEditing"
+        :placeholder="t('canvas.placeholders.costStructure')"
+        :empty-text="t('canvas.empty.field')"
+      />
 
       <!-- 9. Revenue Streams -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-banknotes" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.revenueStreams') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.revenueStreams"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.revenueStreams')"
-        />
-        <ul
-          v-else-if="Array.isArray(canvas.revenueStreams) && canvas.revenueStreams.length > 0"
-          class="list-disc list-inside space-y-1 text-sm"
-        >
-          <li v-for="(item, idx) in canvas.revenueStreams" :key="idx">{{ item }}</li>
-        </ul>
-        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
-      </UCard>
+      <CanvasSectionCard
+        v-model:edit-value="localCanvas.revenueStreams"
+        icon="i-heroicons-banknotes"
+        :title="t('canvas.sections.revenueStreams')"
+        :items="canvas.revenueStreams"
+        :is-editing="isEditing"
+        :placeholder="t('canvas.placeholders.revenueStreams')"
+        :empty-text="t('canvas.empty.field')"
+      />
     </div>
 
     <!-- Action Buttons -->
