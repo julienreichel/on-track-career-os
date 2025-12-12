@@ -86,7 +86,7 @@ test.describe('CV Upload Flow', () => {
   test.skip('should allow removing experiences before import', async ({ page }) => {
     // TODO: Implement when remove button UI is added to preview page
     // Currently the preview page doesn't have remove buttons based on actual UI
-    
+
     const testFilePath = join(__dirname, 'fixtures', 'test-cv.txt');
     const fileInput = page.locator('input[type="file"]');
     await fileInput.setInputFiles(testFilePath);
