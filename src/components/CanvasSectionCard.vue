@@ -11,11 +11,12 @@
       :model-value="editValue"
       :rows="4"
       :placeholder="placeholder"
+      class="w-full"
       @update:model-value="$emit('update:editValue', $event)"
     />
     <ul
       v-else-if="Array.isArray(items) && items.length > 0"
-      class="list-disc list-inside space-y-1 text-sm"
+      class="space-y-1 text-sm"
     >
       <li v-for="(item, idx) in items" :key="idx">{{ item }}</li>
     </ul>
