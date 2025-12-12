@@ -156,6 +156,9 @@ const handleGenerate = async () => {
     // Set loading state before data fetching
     loading.value = true;
 
+    // Preserve existing canvas ID if it exists (for update instead of create)
+    const existingCanvasId = canvas.value?.id;
+
     // Load experiences and stories for canvas generation
     const { experiences, stories } = await loadExperiencesAndStories();
 
@@ -188,6 +191,11 @@ const handleGenerate = async () => {
     const result = await regenerateCanvas(input);
 
     if (result) {
+      // Restore canvas ID if it existed (ensures update instead of create)
+      if (existingCanvasId && canvas.value) {
+        canvas.value.id = existingCanvasId;
+      }
+
       successMessage.value = t('canvas.messages.generated');
 
       // Save the generated canvas (updates existing if canvas.value.id exists - one canvas per user)
@@ -227,6 +235,9 @@ const handleRegenerate = async () => {
     // Set loading state before data fetching
     loading.value = true;
 
+    // Preserve existing canvas ID (ensures update instead of create)
+    const existingCanvasId = canvas.value?.id;
+
     // Load experiences and stories for canvas regeneration
     const { experiences, stories } = await loadExperiencesAndStories();
 
@@ -259,6 +270,11 @@ const handleRegenerate = async () => {
     const result = await regenerateCanvas(input);
 
     if (result) {
+      // Restore canvas ID (ensures update instead of create)
+      if (existingCanvasId && canvas.value) {
+        canvas.value.id = existingCanvasId;
+      }
+
       successMessage.value = t('canvas.messages.regenerated');
 
       // Update existing canvas (canvas.value.id will be set, ensures one canvas per user)
