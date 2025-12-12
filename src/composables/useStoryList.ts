@@ -2,6 +2,7 @@ import { ref, computed } from 'vue';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { STARStory } from '@/domain/starstory/STARStory';
+import type { Experience } from '@/domain/experience/Experience';
 
 /**
  * Story with Experience Context
@@ -61,9 +62,10 @@ export function useStoryList(
 
   /**
    * Load stories for specific experience
+   * @param experienceIdOrObject - Experience ID string or Experience object
    */
-  const loadByExperience = async (experienceId: string) => {
-    if (!experienceId) {
+  const loadByExperience = async (experienceIdOrObject: string | Experience) => {
+    if (!experienceIdOrObject) {
       error.value = 'storyList.errors.missingExperienceId';
       return;
     }
@@ -72,7 +74,12 @@ export function useStoryList(
     error.value = null;
 
     try {
-      const experience = await experienceRepo.get(experienceId);
+      // If Experience object provided, use directly; otherwise fetch it
+      const experience =
+        typeof experienceIdOrObject === 'string'
+          ? await experienceRepo.get(experienceIdOrObject)
+          : experienceIdOrObject;
+
       if (!experience) {
         error.value = 'storyList.errors.experienceNotFound';
         stories.value = [];

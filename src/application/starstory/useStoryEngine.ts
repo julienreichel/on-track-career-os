@@ -63,18 +63,26 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
   };
 
   // Load stories for experience
-  const loadStories = async (expId?: string) => {
-    const targetId = getExperienceId(expId);
-    if (!targetId) {
-      error.value = 'Experience ID is required';
-      return;
+  const loadStories = async (expIdOrExperience?: string | Experience) => {
+    if (!expIdOrExperience) {
+      const targetId = getExperienceId();
+      if (!targetId) {
+        error.value = 'Experience ID is required';
+        return;
+      }
+      expIdOrExperience = targetId;
     }
 
     loading.value = true;
     error.value = null;
 
     try {
-      const experience = await experienceRepo.get(targetId);
+      // If Experience object provided, use directly; otherwise fetch it
+      const experience =
+        typeof expIdOrExperience === 'string'
+          ? await experienceRepo.get(expIdOrExperience)
+          : expIdOrExperience;
+
       if (!experience) {
         error.value = 'Experience not found';
         stories.value = [];
@@ -157,9 +165,20 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
     try {
       const aiStories = await service.generateStar(sourceText);
 
+      if (aiStories.length === 0) {
+        error.value = 'No stories generated';
+        return;
+      }
+
       // Pick a random story from the array (AI may generate multiple)
       const randomIndex = Math.floor(Math.random() * aiStories.length);
       const aiStory = aiStories[randomIndex];
+
+      // TypeScript safety check (should never happen after length check)
+      if (!aiStory) {
+        error.value = 'Failed to select story';
+        return;
+      }
 
       if (draftStory.value) {
         Object.assign(draftStory.value, {
@@ -170,7 +189,10 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
         });
       } else {
         draftStory.value = {
-          ...aiStory,
+          situation: aiStory.situation,
+          task: aiStory.task,
+          action: aiStory.action,
+          result: aiStory.result,
           achievements: [],
           kpiSuggestions: [],
         };
@@ -178,7 +200,13 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
 
       // Automatically generate achievements and KPIs for the generated story
       try {
-        const achievements = await service.generateAchievements(aiStory);
+        const aiStoryForAchievements: AiSTARStory = {
+          situation: aiStory.situation,
+          task: aiStory.task,
+          action: aiStory.action,
+          result: aiStory.result,
+        };
+        const achievements = await service.generateAchievements(aiStoryForAchievements);
         generatedAchievements.value = achievements;
 
         if (draftStory.value) {

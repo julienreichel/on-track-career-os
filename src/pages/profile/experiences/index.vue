@@ -159,6 +159,7 @@ async function loadExperiences() {
 
 async function loadStoryCounts() {
   // Load story counts for all experiences
+  // Note: Passing Experience objects directly to avoid refetching
   for (const experience of experiences.value) {
     try {
       const stories = await storyService.getStoriesByExperience(experience);
