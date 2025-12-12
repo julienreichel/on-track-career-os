@@ -69,7 +69,8 @@ const stubs = {
     props: ['icon', 'to', 'color', 'variant'],
   },
   UTable: {
-    template: '<table class="u-table"><tbody><tr v-for="row in rows" :key="row.id"><td>{{ row.title }}</td></tr></tbody></table>',
+    template:
+      '<table class="u-table"><tbody><tr v-for="row in rows" :key="row.id"><td>{{ row.title }}</td></tr></tbody></table>',
     props: ['rows', 'columns'],
   },
   UEmpty: {

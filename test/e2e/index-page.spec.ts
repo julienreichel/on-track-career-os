@@ -4,13 +4,13 @@ import { test, expect } from '@playwright/test';
  * E2E Tests for Home/Index Page
  *
  * Tests the main dashboard navigation and authentication workflows.
- * 
+ *
  * Component/UI tests moved to: test/nuxt/pages/index.spec.ts
  * - Page header rendering
  * - Feature card display
  * - Responsive layout checks
  * - Accessibility structure
- * 
+ *
  * These E2E tests focus on:
  * - Navigation between pages (home → profile)
  * - Authentication redirects
@@ -61,8 +61,6 @@ test.describe('Home Page - Authenticated User', () => {
     // Verify we're on profile page
     expect(page.url()).toContain('profile');
   });
-
-
 });
 
 test.describe('Home Page - Unauthenticated User', () => {

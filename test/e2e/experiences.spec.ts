@@ -4,11 +4,11 @@ import { test, expect } from '@playwright/test';
  * E2E Tests for Experience Management (EPIC 2)
  *
  * Tests experience CRUD workflows and navigation.
- * 
+ *
  * Component/UI tests moved to:
  * - test/nuxt/pages/profile/experiences/index.spec.ts (listing page)
  * - test/nuxt/components/ExperienceForm.spec.ts (form component)
- * 
+ *
  * These E2E tests focus on:
  * - Complete CRUD workflows (create → save → list → edit → delete)
  * - Form submission and data persistence
@@ -35,8 +35,6 @@ test.describe('Experience Management', () => {
       const body = page.locator('body');
       await expect(body).toBeVisible();
     });
-
-
 
     test('should display experience cards or table if experiences exist', async ({ page }) => {
       // Wait for any data to load

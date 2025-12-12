@@ -4,14 +4,14 @@ import { test, expect } from '@playwright/test';
  * E2E Tests for Profile Page
  *
  * Tests profile page workflows including edit mode, navigation, and auth.
- * 
+ *
  * Component/UI tests moved to: test/nuxt/pages/profile/index.spec.ts
  * - Page header rendering
  * - View/edit mode UI elements
  * - Form input display
  * - Button rendering
  * - Responsive layout checks
- * 
+ *
  * These E2E tests focus on:
  * - Edit mode toggle workflow (view → edit → cancel → view)
  * - Navigation between pages (profile → experiences → canvas)
@@ -27,8 +27,6 @@ test.describe('Profile Page - View Mode', () => {
     await page.goto('/profile');
     await page.waitForLoadState('networkidle');
   });
-
-
 
   test('should have link to experiences page', async ({ page }) => {
     // Look for experiences link (UPageCard creates absolute positioned overlay)
@@ -81,8 +79,6 @@ test.describe('Profile Page - Edit Mode', () => {
     await expect(cancelButton).toBeVisible();
   });
 
-
-
   test('should exit edit mode when cancel is clicked', async ({ page }) => {
     const editButton = page
       .locator('button:has-text("Edit Profile"), button:has-text("Edit")')
@@ -104,8 +100,6 @@ test.describe('Profile Page - Edit Mode', () => {
     await expect(editButton).toBeVisible();
   });
 });
-
-
 
 test.describe('Profile Page - Navigation', () => {
   test('should navigate back to home page', async ({ page }) => {
