@@ -6,15 +6,15 @@ describe('PersonalCanvas', () => {
   describe('isPersonalCanvas', () => {
     it('should return true for valid PersonalCanvas', () => {
       const validCanvas: PersonalCanvas = {
+        customerSegments: ['Segment 1', 'Segment 2'],
         valueProposition: ['Value 1', 'Value 2'],
-        keyActivities: ['Activity 1'],
-        strengthsAdvantage: ['Strength 1'],
-        targetRoles: ['Role 1', 'Role 2'],
         channels: ['Channel 1'],
-        resources: ['Resource 1'],
-        careerDirection: ['Direction 1'],
-        painRelievers: ['Pain reliever 1'],
-        gainCreators: ['Gain creator 1'],
+        customerRelationships: ['Relationship 1'],
+        keyActivities: ['Activity 1'],
+        keyResources: ['Resource 1'],
+        keyPartners: ['Partner 1'],
+        costStructure: ['Cost 1'],
+        revenueStreams: ['Revenue 1'],
       };
 
       expect(isPersonalCanvas(validCanvas)).toBe(true);
@@ -22,15 +22,15 @@ describe('PersonalCanvas', () => {
 
     it('should return true for PersonalCanvas with empty arrays', () => {
       const canvasWithEmptyArrays: PersonalCanvas = {
+        customerSegments: [],
         valueProposition: [],
-        keyActivities: [],
-        strengthsAdvantage: [],
-        targetRoles: [],
         channels: [],
-        resources: [],
-        careerDirection: [],
-        painRelievers: [],
-        gainCreators: [],
+        customerRelationships: [],
+        keyActivities: [],
+        keyResources: [],
+        keyPartners: [],
+        costStructure: [],
+        revenueStreams: [],
       };
 
       expect(isPersonalCanvas(canvasWithEmptyArrays)).toBe(true);
@@ -63,15 +63,15 @@ describe('PersonalCanvas', () => {
 
     it('should return false when field is not an array', () => {
       const invalidCanvas = {
+        customerSegments: ['Segment 1'],
         valueProposition: 'not an array',
-        keyActivities: ['Activity 1'],
-        strengthsAdvantage: ['Strength 1'],
-        targetRoles: ['Role 1'],
         channels: ['Channel 1'],
-        resources: ['Resource 1'],
-        careerDirection: ['Direction 1'],
-        painRelievers: ['Pain reliever 1'],
-        gainCreators: ['Gain creator 1'],
+        customerRelationships: ['Relationship 1'],
+        keyActivities: ['Activity 1'],
+        keyResources: ['Resource 1'],
+        keyPartners: ['Partner 1'],
+        costStructure: ['Cost 1'],
+        revenueStreams: ['Revenue 1'],
       };
 
       expect(isPersonalCanvas(invalidCanvas)).toBe(false);
@@ -79,15 +79,15 @@ describe('PersonalCanvas', () => {
 
     it('should return false when array contains non-string items', () => {
       const invalidCanvas = {
+        customerSegments: ['Segment 1'],
         valueProposition: ['Value 1', 123],
-        keyActivities: ['Activity 1'],
-        strengthsAdvantage: ['Strength 1'],
-        targetRoles: ['Role 1'],
         channels: ['Channel 1'],
-        resources: ['Resource 1'],
-        careerDirection: ['Direction 1'],
-        painRelievers: ['Pain reliever 1'],
-        gainCreators: ['Gain creator 1'],
+        customerRelationships: ['Relationship 1'],
+        keyActivities: ['Activity 1'],
+        keyResources: ['Resource 1'],
+        keyPartners: ['Partner 1'],
+        costStructure: ['Cost 1'],
+        revenueStreams: ['Revenue 1'],
       };
 
       expect(isPersonalCanvas(invalidCanvas)).toBe(false);
@@ -95,15 +95,15 @@ describe('PersonalCanvas', () => {
 
     it('should return false when array contains null', () => {
       const invalidCanvas = {
+        customerSegments: ['Segment 1'],
         valueProposition: ['Value 1', null],
-        keyActivities: ['Activity 1'],
-        strengthsAdvantage: ['Strength 1'],
-        targetRoles: ['Role 1'],
         channels: ['Channel 1'],
-        resources: ['Resource 1'],
-        careerDirection: ['Direction 1'],
-        painRelievers: ['Pain reliever 1'],
-        gainCreators: ['Gain creator 1'],
+        customerRelationships: ['Relationship 1'],
+        keyActivities: ['Activity 1'],
+        keyResources: ['Resource 1'],
+        keyPartners: ['Partner 1'],
+        costStructure: ['Cost 1'],
+        revenueStreams: ['Revenue 1'],
       };
 
       expect(isPersonalCanvas(invalidCanvas)).toBe(false);
@@ -111,15 +111,15 @@ describe('PersonalCanvas', () => {
 
     it('should return false when array contains objects', () => {
       const invalidCanvas = {
+        customerSegments: ['Segment 1'],
         valueProposition: ['Value 1', { nested: 'object' }],
-        keyActivities: ['Activity 1'],
-        strengthsAdvantage: ['Strength 1'],
-        targetRoles: ['Role 1'],
         channels: ['Channel 1'],
-        resources: ['Resource 1'],
-        careerDirection: ['Direction 1'],
-        painRelievers: ['Pain reliever 1'],
-        gainCreators: ['Gain creator 1'],
+        customerRelationships: ['Relationship 1'],
+        keyActivities: ['Activity 1'],
+        keyResources: ['Resource 1'],
+        keyPartners: ['Partner 1'],
+        costStructure: ['Cost 1'],
+        revenueStreams: ['Revenue 1'],
       };
 
       expect(isPersonalCanvas(invalidCanvas)).toBe(false);
@@ -127,28 +127,28 @@ describe('PersonalCanvas', () => {
 
     it('should validate all required fields', () => {
       const requiredFields = [
+        'customerSegments',
         'valueProposition',
-        'keyActivities',
-        'strengthsAdvantage',
-        'targetRoles',
         'channels',
-        'resources',
-        'careerDirection',
-        'painRelievers',
-        'gainCreators',
+        'customerRelationships',
+        'keyActivities',
+        'keyResources',
+        'keyPartners',
+        'costStructure',
+        'revenueStreams',
       ];
 
       requiredFields.forEach((field) => {
         const baseCanvas = {
+          customerSegments: ['Segment'],
           valueProposition: ['Value'],
-          keyActivities: ['Activity'],
-          strengthsAdvantage: ['Strength'],
-          targetRoles: ['Role'],
           channels: ['Channel'],
-          resources: ['Resource'],
-          careerDirection: ['Direction'],
-          painRelievers: ['Pain reliever'],
-          gainCreators: ['Gain creator'],
+          customerRelationships: ['Relationship'],
+          keyActivities: ['Activity'],
+          keyResources: ['Resource'],
+          keyPartners: ['Partner'],
+          costStructure: ['Cost'],
+          revenueStreams: ['Revenue'],
         };
 
         // Create canvas without one required field
@@ -162,15 +162,15 @@ describe('PersonalCanvas', () => {
 
     it('should allow extra fields beyond required ones', () => {
       const canvasWithExtra = {
+        customerSegments: ['Segment 1'],
         valueProposition: ['Value 1'],
-        keyActivities: ['Activity 1'],
-        strengthsAdvantage: ['Strength 1'],
-        targetRoles: ['Role 1'],
         channels: ['Channel 1'],
-        resources: ['Resource 1'],
-        careerDirection: ['Direction 1'],
-        painRelievers: ['Pain reliever 1'],
-        gainCreators: ['Gain creator 1'],
+        customerRelationships: ['Relationship 1'],
+        keyActivities: ['Activity 1'],
+        keyResources: ['Resource 1'],
+        keyPartners: ['Partner 1'],
+        costStructure: ['Cost 1'],
+        revenueStreams: ['Revenue 1'],
         extraField: 'extra value',
       };
 

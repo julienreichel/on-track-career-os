@@ -459,26 +459,26 @@
       "description": "Visualize and manage your professional identity"
     },
     "sections": {
+      "customerSegments": "Customer Segments",
       "valueProposition": "Value Proposition",
-      "keyActivities": "Key Activities",
-      "strengthsAdvantage": "Strengths & Competitive Advantages",
-      "targetRoles": "Target Roles / Customers",
       "channels": "Channels",
-      "resources": "Personal Resources",
-      "careerDirection": "Career Direction",
-      "painRelievers": "Pain Relievers",
-      "gainCreators": "Gain Creators"
+      "customerRelationships": "Customer Relationships",
+      "keyActivities": "Key Activities",
+      "keyResources": "Key Resources",
+      "keyPartners": "Key Partners",
+      "costStructure": "Cost Structure",
+      "revenueStreams": "Revenue Streams"
     },
     "placeholders": {
-      "valueProposition": "What unique value do you bring? What makes you different?",
-      "keyActivities": "What do you do best? What activities drive your value?",
-      "strengthsAdvantage": "What competitive advantages do you have?",
-      "targetRoles": "What roles or industries are you targeting?",
-      "channels": "How do you reach employers? LinkedIn, networks, conferences?",
-      "resources": "Skills, certifications, network, tools you leverage",
-      "careerDirection": "Where do you want your career to go?",
-      "painRelievers": "What problems do you solve for employers?",
-      "gainCreators": "What positive outcomes do you create?"
+      "customerSegments": "Who are your target companies/roles? What industries or organizations do you want to serve?",
+      "valueProposition": "What unique value do you offer? What makes you different from other candidates?",
+      "channels": "How do you reach employers? (LinkedIn, job boards, networking events, referrals, etc.)",
+      "customerRelationships": "How do you build relationships with employers? (Networking, personal branding, follow-ups, etc.)",
+      "keyActivities": "What are your core professional activities? What do you do best?",
+      "keyResources": "What skills, knowledge, network, certifications, and tools do you have?",
+      "keyPartners": "Who helps you in your career? (Mentors, recruiters, professional associations, coaches, etc.)",
+      "costStructure": "What investments do you make? (Courses, certifications, conferences, tools, subscriptions, etc.)",
+      "revenueStreams": "What compensation/benefits do you seek? (Salary, bonuses, equity, benefits, growth opportunities, etc.)"
     },
     "actions": {
       "generate": "Generate Canvas",

@@ -19,29 +19,78 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 // System prompt - constant as per AIC
 const SYSTEM_PROMPT = `You produce the Personal Business Model Canvas strictly from user data.
-Analyze the user's profile, experiences, and stories to generate all 9 canvas sections.
+Analyze the user's profile, experiences, and stories to generate all 9 official Business Model Canvas sections.
 No invented skills. No fictional strengths. Only facts from the provided data.
 Return ONLY valid JSON with no markdown wrappers.
+
+OFFICIAL 9 BLOCKS WITH GUIDANCE:
+
+1. CUSTOMER SEGMENTS (Who you help)
+   - Which people do you create Value for?
+   - Who is your most important Customer?
+   - Who depends on your work in order to get their own jobs done?
+   - Who are your actual "Customers"?
+
+2. VALUE PROPOSITION (How you create value)
+   - What Value do you deliver to Customers?
+   - Which Customer problems are you helping to solve?
+   - What Customer needs do you satisfy?
+   - Describe specific benefits Customers derive from your work
+   
+3. CHANNELS (How they know you & how you deliver)
+   - Through which Channels do your Customers want to be reached?
+   - How are you reaching them now?
+   - Which Channels work best?
+
+4. CUSTOMER RELATIONSHIPS (How you interact)
+   - What kind of relationships do your Customers expect you to establish and maintain?
+   - Describe the types of relationships you have in place now
+
+5. KEY ACTIVITIES (What you do)
+   - List activities you perform at work each day that describe your occupation
+   - Which activities does your Value Proposition require?
+   - Which activities do your Channels and Customer Relationships require?
+   
+6. KEY RESOURCES (Who you are & what you have)
+   - What do you need most at work to perform your Key Activities?
+   - Do you rely on mental strength? Interpersonal skills? Physical strength? Experience?
+   - What do you do particularly well (comes easily without effort)?
+   - What are you known for? (Talents, Strengths, Skills)
+   
+7. KEY PARTNERS (Who helps you)
+   - Who helps you provide Value to others?
+   - Who helps you reach and work with your Customers?
+   - Who supports you in what you do, why, and how?
+   - Are there people who focus on part of your Key Activities on your behalf?
+
+8. COST STRUCTURE (What you give)
+   - What do you give to your work (time, energy, etc.)?
+   - Which Key Activities cost you time or energy (professional or personal)?
+   - Which Key Activities are most "expensive" (draining, stressful)?
+
+9. REVENUE STREAMS (What you get)
+   - For what Value are your Customers truly willing to pay?
+   - For what do they pay you now?
+   - How do they pay you now?
+   - How might they prefer to pay?
 
 RULES:
 - Extract insights only from provided profile, experiences, and stories
 - Do not infer skills or experiences not explicitly stated
-- Value proposition should be grounded in actual achievements and experiences
-- Target roles should align with demonstrated experience
-- Strengths should come from actual accomplishments in stories
+- Ground all blocks in actual achievements and demonstrated experience
 - Return ONLY valid JSON matching the specified schema`;
 
-// Output schema for retry
+// Output schema for retry - Official Business Model Canvas 9 blocks
 const OUTPUT_SCHEMA = `{
+  "customerSegments": ["string"],
   "valueProposition": ["string"],
-  "keyActivities": ["string"],
-  "strengthsAdvantage": ["string"],
-  "targetRoles": ["string"],
   "channels": ["string"],
-  "resources": ["string"],
-  "careerDirection": ["string"],
-  "painRelievers": ["string"],
-  "gainCreators": ["string"]
+  "customerRelationships": ["string"],
+  "keyActivities": ["string"],
+  "keyResources": ["string"],
+  "keyPartners": ["string"],
+  "costStructure": ["string"],
+  "revenueStreams": ["string"]
 }`;
 
 // Type definitions matching AI Interaction Contract
@@ -70,15 +119,15 @@ export interface PersonalCanvasInput {
 }
 
 export interface PersonalCanvasOutput {
+  customerSegments: string[];
   valueProposition: string[];
-  keyActivities: string[];
-  strengthsAdvantage: string[];
-  targetRoles: string[];
   channels: string[];
-  resources: string[];
-  careerDirection: string[];
-  painRelievers: string[];
-  gainCreators: string[];
+  customerRelationships: string[];
+  keyActivities: string[];
+  keyResources: string[];
+  keyPartners: string[];
+  costStructure: string[];
+  revenueStreams: string[];
 }
 
 /**
@@ -87,35 +136,36 @@ export interface PersonalCanvasOutput {
  */
 function validateAndNormalizeOutput(data: Record<string, unknown>): PersonalCanvasOutput {
   const normalized: PersonalCanvasOutput = {
+    customerSegments: [],
     valueProposition: [],
-    keyActivities: [],
-    strengthsAdvantage: [],
-    targetRoles: [],
     channels: [],
-    resources: [],
-    careerDirection: [],
-    painRelievers: [],
-    gainCreators: [],
+    customerRelationships: [],
+    keyActivities: [],
+    keyResources: [],
+    keyPartners: [],
+    costStructure: [],
+    revenueStreams: [],
   };
 
   // Map snake_case to camelCase and normalize
   const fieldMappings: Record<string, keyof PersonalCanvasOutput> = {
+    customer_segments: 'customerSegments',
+    customerSegments: 'customerSegments',
     value_proposition: 'valueProposition',
     valueProposition: 'valueProposition',
+    channels: 'channels',
+    customer_relationships: 'customerRelationships',
+    customerRelationships: 'customerRelationships',
     key_activities: 'keyActivities',
     keyActivities: 'keyActivities',
-    strengths_advantage: 'strengthsAdvantage',
-    strengthsAdvantage: 'strengthsAdvantage',
-    target_roles: 'targetRoles',
-    targetRoles: 'targetRoles',
-    channels: 'channels',
-    resources: 'resources',
-    career_direction: 'careerDirection',
-    careerDirection: 'careerDirection',
-    pain_relievers: 'painRelievers',
-    painRelievers: 'painRelievers',
-    gain_creators: 'gainCreators',
-    gainCreators: 'gainCreators',
+    key_resources: 'keyResources',
+    keyResources: 'keyResources',
+    key_partners: 'keyPartners',
+    keyPartners: 'keyPartners',
+    cost_structure: 'costStructure',
+    costStructure: 'costStructure',
+    revenue_streams: 'revenueStreams',
+    revenueStreams: 'revenueStreams',
   };
 
   for (const [sourceKey, targetKey] of Object.entries(fieldMappings)) {
@@ -131,53 +181,89 @@ function validateAndNormalizeOutput(data: Record<string, unknown>): PersonalCanv
 
 /**
  * Apply fallback strategies for missing/empty canvas sections
+ * Uses guidance questions instead of invented answers
  */
 function applyFallbacks(output: PersonalCanvasOutput): PersonalCanvasOutput {
   const result = { ...output };
 
-  // Fallback for value proposition
+  // Fallback for customer segments - use guidance questions
+  if (result.customerSegments.length === 0) {
+    result.customerSegments = [
+      'Which people do you create Value for?',
+      'Who is your most important Customer?',
+      'Who depends on your work to get their own jobs done?',
+    ];
+  }
+
+  // Fallback for value proposition - use guidance questions
   if (result.valueProposition.length === 0) {
-    result.valueProposition = ['Experienced professional with diverse background'];
+    result.valueProposition = [
+      'What Value do you deliver to Customers?',
+      'Which Customer problems are you helping to solve?',
+      'What Customer needs do you satisfy?',
+    ];
   }
 
-  // Fallback for key activities
-  if (result.keyActivities.length === 0) {
-    result.keyActivities = ['Professional responsibilities and tasks'];
-  }
-
-  // Fallback for strengths advantage
-  if (result.strengthsAdvantage.length === 0) {
-    result.strengthsAdvantage = ['Professional experience and skills'];
-  }
-
-  // Fallback for target roles
-  if (result.targetRoles.length === 0) {
-    result.targetRoles = ['Roles aligned with experience'];
-  }
-
-  // Fallback for channels
+  // Fallback for channels - use guidance questions
   if (result.channels.length === 0) {
-    result.channels = ['Professional networks', 'Job platforms'];
+    result.channels = [
+      'Through which Channels do your Customers want to be reached?',
+      'How are you reaching them now?',
+      'Which Channels work best?',
+    ];
   }
 
-  // Fallback for resources
-  if (result.resources.length === 0) {
-    result.resources = ['Skills', 'Experience', 'Network'];
+  // Fallback for customer relationships - use guidance questions
+  if (result.customerRelationships.length === 0) {
+    result.customerRelationships = [
+      'What kind of relationships do your Customers expect you to establish?',
+      'Describe the types of relationships you have in place now',
+    ];
   }
 
-  // Fallback for career direction
-  if (result.careerDirection.length === 0) {
-    result.careerDirection = ['Continue professional growth'];
+  // Fallback for key activities - use guidance questions
+  if (result.keyActivities.length === 0) {
+    result.keyActivities = [
+      'List activities you perform at work each day',
+      'Which activities does your Value Proposition require?',
+      'Consider: Creating, Building, Selling, Supporting',
+    ];
   }
 
-  // Fallback for pain relievers
-  if (result.painRelievers.length === 0) {
-    result.painRelievers = ['Address organizational challenges'];
+  // Fallback for key resources - use guidance questions
+  if (result.keyResources.length === 0) {
+    result.keyResources = [
+      'What do you need most at work to perform your Key Activities?',
+      'What do you do particularly well?',
+      'What are you known for? (Talents, Strengths, Skills)',
+    ];
   }
 
-  // Fallback for gain creators
-  if (result.gainCreators.length === 0) {
-    result.gainCreators = ['Drive value through expertise'];
+  // Fallback for key partners - use guidance questions
+  if (result.keyPartners.length === 0) {
+    result.keyPartners = [
+      'Who helps you provide Value to others?',
+      'Who helps you reach and work with your Customers?',
+      'Who supports you in what you do?',
+    ];
+  }
+
+  // Fallback for cost structure - use guidance questions
+  if (result.costStructure.length === 0) {
+    result.costStructure = [
+      'What do you give to your work (time, energy)?',
+      'Which Key Activities cost you time or energy?',
+      'Which activities are most expensive (draining, stressful)?',
+    ];
+  }
+
+  // Fallback for revenue streams - use guidance questions
+  if (result.revenueStreams.length === 0) {
+    result.revenueStreams = [
+      'For what Value are your Customers truly willing to pay?',
+      'For what do they pay you now?',
+      'How might they prefer to pay?',
+    ];
   }
 
   return result;

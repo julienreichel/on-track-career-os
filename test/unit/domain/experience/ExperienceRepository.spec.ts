@@ -62,7 +62,7 @@ describe('ExperienceRepository', () => {
         rawText: 'Experience text',
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-01T00:00:00Z',
-      } as unknown as Experience;
+      } as Experience;
 
       mockModel.get.mockResolvedValue({
         data: mockExperience,
@@ -120,7 +120,7 @@ describe('ExperienceRepository', () => {
           createdAt: '2025-01-01T00:00:00Z',
           updatedAt: '2025-01-01T00:00:00Z',
         },
-      ] as unknown as Experience[];
+      ] as Experience[];
 
       const mockUserProfile = {
         id: 'user-123',
@@ -179,7 +179,7 @@ describe('ExperienceRepository', () => {
         ...mockInput,
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-01T00:00:00Z',
-      } as unknown as Experience;
+      } as Experience;
 
       mockModel.create.mockResolvedValue({
         data: mockCreatedExperience,
@@ -238,7 +238,7 @@ describe('ExperienceRepository', () => {
         rawText: 'Text',
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-02T00:00:00Z',
-      } as unknown as Experience;
+      } as Experience;
 
       mockModel.update.mockResolvedValue({
         data: mockUpdatedExperience,

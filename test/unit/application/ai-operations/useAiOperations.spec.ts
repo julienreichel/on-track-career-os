@@ -187,7 +187,7 @@ describe('useAiOperations', () => {
         rawBlocks: [],
       },
       confidence: 0.9,
-    } as unknown as ParsedCV;
+    } as ParsedCV;
     experiences.value = { experiences: [] };
     starStories.value = [
       {

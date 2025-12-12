@@ -10,7 +10,7 @@ import type { PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas'
 
 /**
  * Canvas Engine Composable
- * 
+ *
  * Provides functionality for loading, saving, and regenerating Personal Canvas
  * using AI operations. This is the main interface for UI components to interact
  * with PersonalCanvas domain logic.

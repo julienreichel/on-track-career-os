@@ -31,9 +31,32 @@
       </UButton>
     </UCard>
 
-    <!-- Canvas Grid -->
-    <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Value Proposition -->
+    <!-- Canvas Grid - Official Business Model Canvas 9 Blocks -->
+    <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- 1. Customer Segments -->
+      <UCard>
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-user-group" class="w-5 h-5 text-primary" />
+            <h3 class="text-lg font-semibold">{{ t('canvas.sections.customerSegments') }}</h3>
+          </div>
+        </template>
+        <UTextarea
+          v-if="isEditing"
+          v-model="localCanvas.customerSegments"
+          :rows="4"
+          :placeholder="t('canvas.placeholders.customerSegments')"
+        />
+        <ul
+          v-else-if="Array.isArray(canvas.customerSegments) && canvas.customerSegments.length > 0"
+          class="list-disc list-inside space-y-1 text-sm"
+        >
+          <li v-for="(item, idx) in canvas.customerSegments" :key="idx">{{ item }}</li>
+        </ul>
+        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
+      </UCard>
+
+      <!-- 2. Value Proposition -->
       <UCard>
         <template #header>
           <div class="flex items-center gap-2">
@@ -47,77 +70,16 @@
           :rows="4"
           :placeholder="t('canvas.placeholders.valueProposition')"
         />
-        <p v-else class="text-sm">
-          {{ canvas.valueProposition || t('canvas.empty.field') }}
-        </p>
-      </UCard>
-
-      <!-- Key Activities -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-cog-6-tooth" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.keyActivities') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.keyActivities"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.keyActivities')"
-        />
         <ul
-          v-else-if="Array.isArray(canvas.keyActivities) && canvas.keyActivities.length > 0"
+          v-else-if="Array.isArray(canvas.valueProposition) && canvas.valueProposition.length > 0"
           class="list-disc list-inside space-y-1 text-sm"
         >
-          <li v-for="(item, idx) in canvas.keyActivities" :key="idx">{{ item }}</li>
+          <li v-for="(item, idx) in canvas.valueProposition" :key="idx">{{ item }}</li>
         </ul>
         <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
       </UCard>
 
-      <!-- Strengths & Advantage -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-star" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.strengthsAdvantage') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.strengthsAdvantage"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.strengthsAdvantage')"
-        />
-        <p v-else class="text-sm">
-          {{ canvas.strengthsAdvantage || t('canvas.empty.field') }}
-        </p>
-      </UCard>
-
-      <!-- Target Roles -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-briefcase" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.targetRoles') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.targetRoles"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.targetRoles')"
-        />
-        <ul
-          v-else-if="Array.isArray(canvas.targetRoles) && canvas.targetRoles.length > 0"
-          class="list-disc list-inside space-y-1 text-sm"
-        >
-          <li v-for="(item, idx) in canvas.targetRoles" :key="idx">{{ item }}</li>
-        </ul>
-        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
-      </UCard>
-
-      <!-- Channels -->
+      <!-- 3. Channels -->
       <UCard>
         <template #header>
           <div class="flex items-center gap-2">
@@ -140,90 +102,142 @@
         <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
       </UCard>
 
-      <!-- Resources -->
+      <!-- 4. Customer Relationships -->
+      <UCard>
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-heart" class="w-5 h-5 text-primary" />
+            <h3 class="text-lg font-semibold">{{ t('canvas.sections.customerRelationships') }}</h3>
+          </div>
+        </template>
+        <UTextarea
+          v-if="isEditing"
+          v-model="localCanvas.customerRelationships"
+          :rows="4"
+          :placeholder="t('canvas.placeholders.customerRelationships')"
+        />
+        <ul
+          v-else-if="
+            Array.isArray(canvas.customerRelationships) && canvas.customerRelationships.length > 0
+          "
+          class="list-disc list-inside space-y-1 text-sm"
+        >
+          <li v-for="(item, idx) in canvas.customerRelationships" :key="idx">{{ item }}</li>
+        </ul>
+        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
+      </UCard>
+
+      <!-- 5. Key Activities -->
+      <UCard>
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-cog-6-tooth" class="w-5 h-5 text-primary" />
+            <h3 class="text-lg font-semibold">{{ t('canvas.sections.keyActivities') }}</h3>
+          </div>
+        </template>
+        <UTextarea
+          v-if="isEditing"
+          v-model="localCanvas.keyActivities"
+          :rows="4"
+          :placeholder="t('canvas.placeholders.keyActivities')"
+        />
+        <ul
+          v-else-if="Array.isArray(canvas.keyActivities) && canvas.keyActivities.length > 0"
+          class="list-disc list-inside space-y-1 text-sm"
+        >
+          <li v-for="(item, idx) in canvas.keyActivities" :key="idx">{{ item }}</li>
+        </ul>
+        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
+      </UCard>
+
+      <!-- 6. Key Resources -->
       <UCard>
         <template #header>
           <div class="flex items-center gap-2">
             <UIcon name="i-heroicons-cube" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.resources') }}</h3>
+            <h3 class="text-lg font-semibold">{{ t('canvas.sections.keyResources') }}</h3>
           </div>
         </template>
         <UTextarea
           v-if="isEditing"
-          v-model="localCanvas.resources"
+          v-model="localCanvas.keyResources"
           :rows="4"
-          :placeholder="t('canvas.placeholders.resources')"
+          :placeholder="t('canvas.placeholders.keyResources')"
         />
         <ul
-          v-else-if="Array.isArray(canvas.resources) && canvas.resources.length > 0"
+          v-else-if="Array.isArray(canvas.keyResources) && canvas.keyResources.length > 0"
           class="list-disc list-inside space-y-1 text-sm"
         >
-          <li v-for="(item, idx) in canvas.resources" :key="idx">{{ item }}</li>
+          <li v-for="(item, idx) in canvas.keyResources" :key="idx">{{ item }}</li>
         </ul>
         <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
       </UCard>
 
-      <!-- Career Direction -->
+      <!-- 7. Key Partners -->
       <UCard>
         <template #header>
           <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-arrow-trending-up" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.careerDirection') }}</h3>
+            <UIcon name="i-heroicons-users" class="w-5 h-5 text-primary" />
+            <h3 class="text-lg font-semibold">{{ t('canvas.sections.keyPartners') }}</h3>
           </div>
         </template>
         <UTextarea
           v-if="isEditing"
-          v-model="localCanvas.careerDirection"
+          v-model="localCanvas.keyPartners"
           :rows="4"
-          :placeholder="t('canvas.placeholders.careerDirection')"
-        />
-        <p v-else class="text-sm">
-          {{ canvas.careerDirection || t('canvas.empty.field') }}
-        </p>
-      </UCard>
-
-      <!-- Pain Relievers -->
-      <UCard>
-        <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-shield-check" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.painRelievers') }}</h3>
-          </div>
-        </template>
-        <UTextarea
-          v-if="isEditing"
-          v-model="localCanvas.painRelievers"
-          :rows="4"
-          :placeholder="t('canvas.placeholders.painRelievers')"
+          :placeholder="t('canvas.placeholders.keyPartners')"
         />
         <ul
-          v-else-if="Array.isArray(canvas.painRelievers) && canvas.painRelievers.length > 0"
+          v-else-if="Array.isArray(canvas.keyPartners) && canvas.keyPartners.length > 0"
           class="list-disc list-inside space-y-1 text-sm"
         >
-          <li v-for="(item, idx) in canvas.painRelievers" :key="idx">{{ item }}</li>
+          <li v-for="(item, idx) in canvas.keyPartners" :key="idx">{{ item }}</li>
         </ul>
         <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
       </UCard>
 
-      <!-- Gain Creators -->
+      <!-- 8. Cost Structure -->
       <UCard>
         <template #header>
           <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-rocket-launch" class="w-5 h-5 text-primary" />
-            <h3 class="text-lg font-semibold">{{ t('canvas.sections.gainCreators') }}</h3>
+            <UIcon name="i-heroicons-currency-dollar" class="w-5 h-5 text-primary" />
+            <h3 class="text-lg font-semibold">{{ t('canvas.sections.costStructure') }}</h3>
           </div>
         </template>
         <UTextarea
           v-if="isEditing"
-          v-model="localCanvas.gainCreators"
+          v-model="localCanvas.costStructure"
           :rows="4"
-          :placeholder="t('canvas.placeholders.gainCreators')"
+          :placeholder="t('canvas.placeholders.costStructure')"
         />
         <ul
-          v-else-if="Array.isArray(canvas.gainCreators) && canvas.gainCreators.length > 0"
+          v-else-if="Array.isArray(canvas.costStructure) && canvas.costStructure.length > 0"
           class="list-disc list-inside space-y-1 text-sm"
         >
-          <li v-for="(item, idx) in canvas.gainCreators" :key="idx">{{ item }}</li>
+          <li v-for="(item, idx) in canvas.costStructure" :key="idx">{{ item }}</li>
+        </ul>
+        <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
+      </UCard>
+
+      <!-- 9. Revenue Streams -->
+      <UCard>
+        <template #header>
+          <div class="flex items-center gap-2">
+            <UIcon name="i-heroicons-banknotes" class="w-5 h-5 text-primary" />
+            <h3 class="text-lg font-semibold">{{ t('canvas.sections.revenueStreams') }}</h3>
+          </div>
+        </template>
+        <UTextarea
+          v-if="isEditing"
+          v-model="localCanvas.revenueStreams"
+          :rows="4"
+          :placeholder="t('canvas.placeholders.revenueStreams')"
+        />
+        <ul
+          v-else-if="Array.isArray(canvas.revenueStreams) && canvas.revenueStreams.length > 0"
+          class="list-disc list-inside space-y-1 text-sm"
+        >
+          <li v-for="(item, idx) in canvas.revenueStreams" :key="idx">{{ item }}</li>
         </ul>
         <p v-else class="text-sm text-gray-500">{{ t('canvas.empty.field') }}</p>
       </UCard>
@@ -278,20 +292,26 @@ const emit = defineEmits<{
 
 const isEditing = ref(false);
 const localCanvas = ref({
+  customerSegments: '',
   valueProposition: '',
-  keyActivities: '',
-  strengthsAdvantage: '',
-  targetRoles: '',
   channels: '',
-  resources: '',
-  careerDirection: '',
-  painRelievers: '',
-  gainCreators: '',
+  customerRelationships: '',
+  keyActivities: '',
+  keyResources: '',
+  keyPartners: '',
+  costStructure: '',
+  revenueStreams: '',
 });
 
 // Helper to convert arrays to newline-separated strings for editing
-const arrayToString = (arr: string[] | string | null | undefined): string => {
-  if (Array.isArray(arr)) return arr.filter(s => s !== null && s !== undefined).join('\n');
+// Handles Amplify Nullable<string>[] types from GraphQL schema
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const arrayToString = (arr: any): string => {
+  if (Array.isArray(arr)) {
+    return arr
+      .filter((s): s is string => s !== null && s !== undefined && typeof s === 'string')
+      .join('\n');
+  }
   if (typeof arr === 'string') return arr;
   return '';
 };
@@ -308,15 +328,15 @@ const startEditing = () => {
   if (!props.canvas) return;
 
   localCanvas.value = {
+    customerSegments: arrayToString(props.canvas.customerSegments),
     valueProposition: arrayToString(props.canvas.valueProposition),
-    keyActivities: arrayToString(props.canvas.keyActivities),
-    strengthsAdvantage: arrayToString(props.canvas.strengthsAdvantage),
-    targetRoles: arrayToString(props.canvas.targetRoles),
     channels: arrayToString(props.canvas.channels),
-    resources: arrayToString(props.canvas.resources),
-    careerDirection: arrayToString(props.canvas.careerDirection),
-    painRelievers: arrayToString(props.canvas.painRelievers),
-    gainCreators: arrayToString(props.canvas.gainCreators),
+    customerRelationships: arrayToString(props.canvas.customerRelationships),
+    keyActivities: arrayToString(props.canvas.keyActivities),
+    keyResources: arrayToString(props.canvas.keyResources),
+    keyPartners: arrayToString(props.canvas.keyPartners),
+    costStructure: arrayToString(props.canvas.costStructure),
+    revenueStreams: arrayToString(props.canvas.revenueStreams),
   };
 
   isEditing.value = true;
@@ -328,15 +348,15 @@ const cancelEditing = () => {
 
 const saveChanges = () => {
   const updated: Partial<PersonalCanvas> = {
-    valueProposition: localCanvas.value.valueProposition,
-    keyActivities: stringToArray(localCanvas.value.keyActivities),
-    strengthsAdvantage: localCanvas.value.strengthsAdvantage,
-    targetRoles: stringToArray(localCanvas.value.targetRoles),
+    customerSegments: stringToArray(localCanvas.value.customerSegments),
+    valueProposition: stringToArray(localCanvas.value.valueProposition),
     channels: stringToArray(localCanvas.value.channels),
-    resources: stringToArray(localCanvas.value.resources),
-    careerDirection: localCanvas.value.careerDirection,
-    painRelievers: stringToArray(localCanvas.value.painRelievers),
-    gainCreators: stringToArray(localCanvas.value.gainCreators),
+    customerRelationships: stringToArray(localCanvas.value.customerRelationships),
+    keyActivities: stringToArray(localCanvas.value.keyActivities),
+    keyResources: stringToArray(localCanvas.value.keyResources),
+    keyPartners: stringToArray(localCanvas.value.keyPartners),
+    costStructure: stringToArray(localCanvas.value.costStructure),
+    revenueStreams: stringToArray(localCanvas.value.revenueStreams),
   };
 
   emit('save', updated);

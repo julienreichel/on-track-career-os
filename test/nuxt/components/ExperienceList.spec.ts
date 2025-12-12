@@ -113,7 +113,7 @@ const mockExperiences: Experience[] = [
     owner: 'user-1',
     rawText: '',
   },
-] as unknown as Experience[];
+] as Experience[];
 
 describe('ExperienceList', () => {
   const createWrapper = (props = {}) => {

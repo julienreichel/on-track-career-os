@@ -35,15 +35,18 @@ describe('PersonalCanvasService', () => {
       const mockPersonalCanvas = {
         id: 'personalcanvas-123',
         userId: 'user-123',
-        valueProposition: 'Experienced software engineer passionate about AI',
-        keyActivities: ['Coding', 'Mentoring', 'System Design'],
-        strengthsAdvantage: 'Strong technical leadership and problem-solving skills',
-        targetRoles: ['Senior Engineer', 'Tech Lead', 'Engineering Manager'],
+        customerSegments: ['Tech Companies', 'Startups', 'AI Companies'],
+        valueProposition: [
+          'Experienced software engineer passionate about AI',
+          'Strong technical leadership',
+        ],
         channels: ['LinkedIn', 'GitHub', 'Tech Conferences'],
-        resources: ['AWS Certification', 'Open Source Contributions', 'Technical Blog'],
-        careerDirection: 'Moving towards technical leadership roles',
-        painRelievers: ['Streamlining development processes', 'Reducing technical debt'],
-        gainCreators: ['Improving team productivity', 'Delivering high-quality software'],
+        customerRelationships: ['Professional networking', 'Open source contributions'],
+        keyActivities: ['Coding', 'Mentoring', 'System Design'],
+        keyResources: ['AWS Certification', 'Open Source Contributions', 'Technical Blog'],
+        keyPartners: ['Tech mentors', 'Professional associations'],
+        costStructure: ['Certifications', 'Conference attendance', 'Tool subscriptions'],
+        revenueStreams: ['Salary', 'Stock options', 'Performance bonuses'],
         lastGeneratedAt: '2025-01-15T00:00:00Z',
         needsUpdate: false,
         createdAt: '2025-01-01T00:00:00Z',
@@ -97,12 +100,15 @@ describe('PersonalCanvasService', () => {
       const canvasWithEmptyArrays = {
         id: 'personalcanvas-123',
         userId: 'user-123',
-        keyActivities: [],
-        targetRoles: [],
+        customerSegments: [],
+        valueProposition: [],
         channels: [],
-        resources: [],
-        painRelievers: [],
-        gainCreators: [],
+        customerRelationships: [],
+        keyActivities: [],
+        keyResources: [],
+        keyPartners: [],
+        costStructure: [],
+        revenueStreams: [],
         needsUpdate: true,
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-01T00:00:00Z',
@@ -114,17 +120,17 @@ describe('PersonalCanvasService', () => {
       const result = await service.getFullPersonalCanvas('personalcanvas-123');
 
       expect(result).toEqual(canvasWithEmptyArrays);
-      expect(result?.keyActivities).toEqual([]);
-      expect(result?.targetRoles).toEqual([]);
+      expect(result?.customerSegments).toEqual([]);
+      expect(result?.valueProposition).toEqual([]);
       expect(result?.channels).toEqual([]);
-      expect(result?.resources).toEqual([]);
+      expect(result?.keyActivities).toEqual([]);
     });
 
     it('should handle PersonalCanvas with needsUpdate flag set to true', async () => {
       const canvasNeedingUpdate = {
         id: 'personalcanvas-123',
         userId: 'user-123',
-        valueProposition: 'Outdated value proposition',
+        valueProposition: ['Outdated value proposition'],
         needsUpdate: true,
         lastGeneratedAt: '2025-01-01T00:00:00Z',
         createdAt: '2025-01-01T00:00:00Z',
@@ -144,15 +150,15 @@ describe('PersonalCanvasService', () => {
       const completeCanvas = {
         id: 'personalcanvas-123',
         userId: 'user-123',
-        valueProposition: 'Full-stack engineer with cloud expertise',
-        keyActivities: ['Development', 'Architecture', 'Code Review'],
-        strengthsAdvantage: 'Comprehensive technical skills across stack',
-        targetRoles: ['Staff Engineer', 'Principal Engineer'],
+        customerSegments: ['Fortune 500', 'Tech Startups'],
+        valueProposition: ['Full-stack engineer with cloud expertise'],
         channels: ['LinkedIn', 'Conferences', 'Meetups'],
-        resources: ['GitHub Portfolio', 'Technical Certifications', 'Network'],
-        careerDirection: 'Senior individual contributor path',
-        painRelievers: ['Automation', 'Documentation', 'Best Practices'],
-        gainCreators: ['Scalable Solutions', 'Team Efficiency', 'Innovation'],
+        customerRelationships: ['Direct networking', 'Referrals'],
+        keyActivities: ['Development', 'Architecture', 'Code Review'],
+        keyResources: ['GitHub Portfolio', 'Technical Certifications', 'Network'],
+        keyPartners: ['Recruiters', 'Tech mentors', 'Professional associations'],
+        costStructure: ['Certifications', 'Conferences', 'Tools'],
+        revenueStreams: ['Salary', 'Equity', 'Bonuses'],
         lastGeneratedAt: '2025-01-15T00:00:00Z',
         needsUpdate: false,
         createdAt: '2025-01-01T00:00:00Z',
@@ -165,32 +171,31 @@ describe('PersonalCanvasService', () => {
       const result = await service.getFullPersonalCanvas('personalcanvas-123');
 
       expect(result).toEqual(completeCanvas);
+      expect(result?.customerSegments).toBeDefined();
       expect(result?.valueProposition).toBeDefined();
-      expect(result?.keyActivities).toBeDefined();
-      expect(result?.strengthsAdvantage).toBeDefined();
-      expect(result?.targetRoles).toBeDefined();
       expect(result?.channels).toBeDefined();
-      expect(result?.resources).toBeDefined();
-      expect(result?.careerDirection).toBeDefined();
-      expect(result?.painRelievers).toBeDefined();
-      expect(result?.gainCreators).toBeDefined();
+      expect(result?.customerRelationships).toBeDefined();
+      expect(result?.keyActivities).toBeDefined();
+      expect(result?.keyResources).toBeDefined();
+      expect(result?.keyPartners).toBeDefined();
+      expect(result?.costStructure).toBeDefined();
+      expect(result?.revenueStreams).toBeDefined();
     });
   });
 
   describe('regenerateCanvas', () => {
     it('should call AI operation to generate PersonalCanvas', async () => {
-      const mockInput: PersonalCanvasInput = {
+      const mockInput = {
         profile: {
-          name: 'John Doe',
-          currentRole: 'Senior Engineer',
-          yearsOfExperience: 8,
-          targetRole: 'Tech Lead',
+          fullName: 'John Doe',
+          headline: 'Senior Engineer with 8 years experience',
+          summary: 'Aspiring Tech Lead',
         },
         experiences: [
           {
             title: 'Senior Software Engineer',
             company: 'Tech Corp',
-            description: 'Led team of 5 engineers',
+            responsibilities: ['Led team of 5 engineers'],
           },
         ],
         stories: [
@@ -201,28 +206,21 @@ describe('PersonalCanvasService', () => {
             result: 'Zero downtime, 50% performance improvement',
           },
         ],
-      };
+      } as PersonalCanvasInput;
 
       const mockGeneratedCanvas = {
-        id: 'generated-canvas-123',
-        userId: 'user-123',
-        valueProposition: 'Technical leader with proven track record',
-        keyActivities: ['Leadership', 'Architecture', 'Mentoring'],
-        strengthsAdvantage: 'Strong technical and people skills',
-        targetRoles: ['Tech Lead', 'Engineering Manager'],
+        customerSegments: ['Tech Companies', 'Engineering Teams'],
+        valueProposition: ['Technical leader with proven track record'],
         channels: ['LinkedIn', 'GitHub', 'Conferences'],
-        resources: ['Technical expertise', 'Leadership experience'],
-        careerDirection: 'Technical leadership path',
-        painRelievers: ['Process improvement', 'Team enablement'],
-        gainCreators: ['High-quality delivery', 'Team growth'],
-        lastGeneratedAt: '2025-01-15T00:00:00Z',
-        needsUpdate: false,
-        createdAt: '2025-01-15T00:00:00Z',
-        updatedAt: '2025-01-15T00:00:00Z',
-        owner: 'user-123::user-123',
-      } as PersonalCanvas;
+        customerRelationships: ['Professional networking', 'Thought leadership'],
+        keyActivities: ['Leadership', 'Architecture', 'Mentoring'],
+        keyResources: ['Technical expertise', 'Leadership experience'],
+        keyPartners: ['Executive coaches', 'Peer network'],
+        costStructure: ['Leadership training', 'Conference speaking'],
+        revenueStreams: ['Salary', 'Equity', 'Performance bonuses'],
+      };
 
-      mockAiRepository.generatePersonalCanvas.mockResolvedValue(mockGeneratedCanvas);
+      mockAiRepository.generatePersonalCanvas.mockResolvedValue(mockGeneratedCanvas as any);
 
       const result = await service.regenerateCanvas(mockInput);
 
@@ -232,7 +230,7 @@ describe('PersonalCanvasService', () => {
 
     it('should handle AI operation errors', async () => {
       const mockInput: PersonalCanvasInput = {
-        profile: { name: 'John Doe', currentRole: 'Engineer', yearsOfExperience: 5 },
+        profile: { fullName: 'John Doe', headline: 'Engineer', summary: '5 years experience' },
         experiences: [],
         stories: [],
       };
@@ -248,23 +246,25 @@ describe('PersonalCanvasService', () => {
     it('should pass through all input data to AI operation', async () => {
       const complexInput: PersonalCanvasInput = {
         profile: {
-          name: 'Jane Smith',
-          currentRole: 'Staff Engineer',
-          yearsOfExperience: 12,
-          targetRole: 'Principal Engineer',
-          skills: ['TypeScript', 'System Design', 'Leadership'],
+          fullName: 'Jane Smith',
+          headline: 'Staff Engineer with 12 years experience',
+          summary:
+            'Aspiring Principal Engineer with skills in TypeScript, System Design, and Leadership',
         },
         experiences: [
           {
             title: 'Staff Engineer',
             company: 'Big Tech',
-            description: 'Led multiple cross-functional initiatives',
-            achievements: ['Reduced latency by 60%', 'Mentored 10+ engineers'],
+            responsibilities: [
+              'Led multiple cross-functional initiatives',
+              'Reduced latency by 60%',
+            ],
+            tasks: ['Mentored 10+ engineers'],
           },
           {
             title: 'Senior Engineer',
             company: 'Startup',
-            description: 'Built core platform from scratch',
+            responsibilities: ['Built core platform from scratch'],
           },
         ],
         stories: [
@@ -278,24 +278,18 @@ describe('PersonalCanvasService', () => {
       };
 
       const mockResult = {
-        userId: 'user-123',
-        valueProposition: 'Generated from complex input',
+        customerSegments: ['Enterprise Companies', 'Tech Giants'],
+        valueProposition: ['Generated from complex input'],
+        channels: ['Tech Talks', 'Publications'],
+        customerRelationships: ['Thought leadership', 'Advisory'],
         keyActivities: ['Technical Strategy'],
-        strengthsAdvantage: 'Deep technical expertise',
-        targetRoles: ['Principal Engineer'],
-        channels: ['Tech Talks'],
-        resources: ['Network'],
-        careerDirection: 'IC leadership',
-        painRelievers: ['Scaling solutions'],
-        gainCreators: ['System reliability'],
-        lastGeneratedAt: '2025-01-15T00:00:00Z',
-        needsUpdate: false,
-        createdAt: '2025-01-15T00:00:00Z',
-        updatedAt: '2025-01-15T00:00:00Z',
-        owner: 'user-123::user-123',
-      } as PersonalCanvas;
+        keyResources: ['Deep technical expertise', 'Network'],
+        keyPartners: ['Industry leaders', 'Open source communities'],
+        costStructure: ['Conference speaking', 'Research time'],
+        revenueStreams: ['Salary', 'Stock options', 'Advisory fees'],
+      };
 
-      mockAiRepository.generatePersonalCanvas.mockResolvedValue(mockResult);
+      mockAiRepository.generatePersonalCanvas.mockResolvedValue(mockResult as any);
 
       const result = await service.regenerateCanvas(complexInput);
 

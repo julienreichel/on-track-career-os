@@ -13,7 +13,7 @@ export type { PersonalCanvasInput };
 export type PersonalCanvas = PersonalCanvasOutput;
 
 /**
- * Validates that an object is a valid PersonalCanvas
+ * Validates that an object is a valid PersonalCanvas (9 official Business Model Canvas blocks)
  */
 export function isPersonalCanvas(obj: unknown): obj is PersonalCanvas {
   if (!obj || typeof obj !== 'object') {
@@ -23,15 +23,15 @@ export function isPersonalCanvas(obj: unknown): obj is PersonalCanvas {
   const typed = obj as Record<string, unknown>;
 
   const requiredArrayFields: (keyof PersonalCanvas)[] = [
+    'customerSegments',
     'valueProposition',
-    'keyActivities',
-    'strengthsAdvantage',
-    'targetRoles',
     'channels',
-    'resources',
-    'careerDirection',
-    'painRelievers',
-    'gainCreators',
+    'customerRelationships',
+    'keyActivities',
+    'keyResources',
+    'keyPartners',
+    'costStructure',
+    'revenueStreams',
   ];
 
   return requiredArrayFields.every(

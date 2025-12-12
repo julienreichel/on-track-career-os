@@ -27,6 +27,7 @@ describe('ai.generatePersonalCanvas', () => {
   /**
    * Mock AI response generator that creates realistic canvas output
    * Extracts insights from user profile, experiences, and stories
+   * Uses official Business Model Canvas 9 blocks
    */
   const generateMockResponse = (input: PersonalCanvasInput): PersonalCanvasOutput => {
     // Extract skills and technologies from experiences
@@ -38,20 +39,20 @@ describe('ai.generatePersonalCanvas', () => {
       input.stories.map((story) => story.result || 'Delivered successful outcomes').slice(0, 3) ||
       [];
 
-    // Generate target roles from experience titles
-    const targetRoles =
-      input.experiences.map((exp) => exp.title || 'Professional role').slice(0, 3) || [];
+    // Extract customer segments from experiences
+    const customerSegs =
+      input.experiences.map((exp) => exp.company || 'Target companies').slice(0, 3) || [];
 
     return {
+      customerSegments: customerSegs.length > 0 ? customerSegs : ['Tech companies', 'Startups'],
       valueProposition: valueProps.length > 0 ? valueProps : ['Experienced professional'],
-      keyActivities: skills.length > 0 ? skills : ['Core professional activities'],
-      strengthsAdvantage: ['Technical expertise', 'Leadership skills'],
-      targetRoles: targetRoles.length > 0 ? targetRoles : ['Professional roles'],
       channels: ['LinkedIn', 'Job boards', 'Professional networks'],
-      resources: ['Skills', 'Experience', 'Network'],
-      careerDirection: ['Growth in current field', 'Leadership opportunities'],
-      painRelievers: ['Solve technical challenges', 'Improve team efficiency'],
-      gainCreators: ['Drive business value', 'Mentor team members'],
+      customerRelationships: ['Professional networking', 'Direct applications', 'Referrals'],
+      keyActivities: skills.length > 0 ? skills : ['Core professional activities'],
+      keyResources: ['Technical skills', 'Experience', 'Professional network'],
+      keyPartners: ['Mentors', 'Recruiters', 'Professional associations'],
+      costStructure: ['Time investment', 'Professional development', 'Certifications'],
+      revenueStreams: ['Salary', 'Benefits', 'Stock options'],
     };
   };
 
@@ -120,36 +121,38 @@ describe('ai.generatePersonalCanvas', () => {
       const result = await handler({ arguments: input });
 
       expect(result).toBeDefined();
+      expect(result.customerSegments).toBeDefined();
+      expect(Array.isArray(result.customerSegments)).toBe(true);
+
       expect(result.valueProposition).toBeDefined();
       expect(Array.isArray(result.valueProposition)).toBe(true);
       expect(result.valueProposition.length).toBeGreaterThan(0);
 
+      expect(result.channels).toBeDefined();
+      expect(Array.isArray(result.channels)).toBe(true);
+
+      expect(result.customerRelationships).toBeDefined();
+      expect(Array.isArray(result.customerRelationships)).toBe(true);
+
       expect(result.keyActivities).toBeDefined();
       expect(Array.isArray(result.keyActivities)).toBe(true);
 
-      expect(result.strengthsAdvantage).toBeDefined();
-      expect(Array.isArray(result.strengthsAdvantage)).toBe(true);
-
-      expect(result.targetRoles).toBeDefined();
-      expect(Array.isArray(result.targetRoles)).toBe(true);
-
-      expect(result.channels).toBeDefined();
-      expect(result.resources).toBeDefined();
-      expect(result.careerDirection).toBeDefined();
-      expect(result.painRelievers).toBeDefined();
-      expect(result.gainCreators).toBeDefined();
+      expect(result.keyResources).toBeDefined();
+      expect(result.keyPartners).toBeDefined();
+      expect(result.costStructure).toBeDefined();
+      expect(result.revenueStreams).toBeDefined();
 
       // Verify all arrays contain strings
       const allFields = [
+        ...result.customerSegments,
         ...result.valueProposition,
-        ...result.keyActivities,
-        ...result.strengthsAdvantage,
-        ...result.targetRoles,
         ...result.channels,
-        ...result.resources,
-        ...result.careerDirection,
-        ...result.painRelievers,
-        ...result.gainCreators,
+        ...result.customerRelationships,
+        ...result.keyActivities,
+        ...result.keyResources,
+        ...result.keyPartners,
+        ...result.costStructure,
+        ...result.revenueStreams,
       ];
       expect(allFields.every((item) => typeof item === 'string')).toBe(true);
     });
@@ -171,15 +174,15 @@ describe('ai.generatePersonalCanvas', () => {
                 content: [
                   {
                     text: JSON.stringify({
+                      customer_segments: [],
                       value_proposition: [],
-                      key_activities: [],
-                      strengths_advantage: [],
-                      target_roles: [],
                       channels: [],
-                      resources: [],
-                      career_direction: [],
-                      pain_relievers: [],
-                      gain_creators: [],
+                      customer_relationships: [],
+                      key_activities: [],
+                      key_resources: [],
+                      key_partners: [],
+                      cost_structure: [],
+                      revenue_streams: [],
                     }),
                   },
                 ],
@@ -192,15 +195,15 @@ describe('ai.generatePersonalCanvas', () => {
       const result = await handler({ arguments: input });
 
       // All fields should have fallback values
+      expect(result.customerSegments.length).toBeGreaterThan(0);
       expect(result.valueProposition.length).toBeGreaterThan(0);
-      expect(result.keyActivities.length).toBeGreaterThan(0);
-      expect(result.strengthsAdvantage.length).toBeGreaterThan(0);
-      expect(result.targetRoles.length).toBeGreaterThan(0);
       expect(result.channels.length).toBeGreaterThan(0);
-      expect(result.resources.length).toBeGreaterThan(0);
-      expect(result.careerDirection.length).toBeGreaterThan(0);
-      expect(result.painRelievers.length).toBeGreaterThan(0);
-      expect(result.gainCreators.length).toBeGreaterThan(0);
+      expect(result.customerRelationships.length).toBeGreaterThan(0);
+      expect(result.keyActivities.length).toBeGreaterThan(0);
+      expect(result.keyResources.length).toBeGreaterThan(0);
+      expect(result.keyPartners.length).toBeGreaterThan(0);
+      expect(result.costStructure.length).toBeGreaterThan(0);
+      expect(result.revenueStreams.length).toBeGreaterThan(0);
     });
 
     it('should support snake_case field names from AI response', async () => {
@@ -218,15 +221,15 @@ describe('ai.generatePersonalCanvas', () => {
                 content: [
                   {
                     text: JSON.stringify({
+                      customer_segments: ['Tech companies'],
                       value_proposition: ['Strong technical skills'],
-                      key_activities: ['Software development'],
-                      strengths_advantage: ['Problem solving'],
-                      target_roles: ['Senior Engineer'],
                       channels: ['LinkedIn'],
-                      resources: ['Technical skills'],
-                      career_direction: ['Technical leadership'],
-                      pain_relievers: ['Solve complex problems'],
-                      gain_creators: ['Deliver quality software'],
+                      customer_relationships: ['Professional networking'],
+                      key_activities: ['Software development'],
+                      key_resources: ['Technical skills'],
+                      key_partners: ['Mentors'],
+                      cost_structure: ['Time investment'],
+                      revenue_streams: ['Salary'],
                     }),
                   },
                 ],
@@ -238,10 +241,10 @@ describe('ai.generatePersonalCanvas', () => {
 
       const result = await handler({ arguments: input });
 
+      expect(result.customerSegments).toEqual(['Tech companies']);
       expect(result.valueProposition).toEqual(['Strong technical skills']);
+      expect(result.channels).toEqual(['LinkedIn']);
       expect(result.keyActivities).toEqual(['Software development']);
-      expect(result.strengthsAdvantage).toEqual(['Problem solving']);
-      expect(result.targetRoles).toEqual(['Senior Engineer']);
     });
 
     it('should filter out empty strings from arrays', async () => {
@@ -259,15 +262,15 @@ describe('ai.generatePersonalCanvas', () => {
                 content: [
                   {
                     text: JSON.stringify({
+                      customerSegments: ['Segment 1', ''],
                       valueProposition: ['Valid value', '', '  ', 'Another value'],
-                      keyActivities: ['', 'Valid activity'],
-                      strengthsAdvantage: ['Strength 1', ''],
-                      targetRoles: ['Role 1'],
                       channels: ['Channel 1'],
-                      resources: ['Resource 1'],
-                      careerDirection: ['Direction 1'],
-                      painRelievers: ['Reliever 1'],
-                      gainCreators: ['Creator 1'],
+                      customerRelationships: ['Relationship 1'],
+                      keyActivities: ['', 'Valid activity'],
+                      keyResources: ['Resource 1', ''],
+                      keyPartners: ['Partner 1'],
+                      costStructure: ['Cost 1'],
+                      revenueStreams: ['Revenue 1'],
                     }),
                   },
                 ],
@@ -279,9 +282,10 @@ describe('ai.generatePersonalCanvas', () => {
 
       const result = await handler({ arguments: input });
 
+      expect(result.customerSegments).toEqual(['Segment 1']);
       expect(result.valueProposition).toEqual(['Valid value', 'Another value']);
       expect(result.keyActivities).toEqual(['Valid activity']);
-      expect(result.strengthsAdvantage).toEqual(['Strength 1']);
+      expect(result.keyResources).toEqual(['Resource 1']);
     });
 
     it('should handle experiences with missing optional fields', async () => {
@@ -319,8 +323,9 @@ describe('ai.generatePersonalCanvas', () => {
       const result = await handler({ arguments: input });
 
       expect(result).toBeDefined();
+      expect(result.customerSegments).toBeDefined();
       expect(result.valueProposition).toBeDefined();
-      expect(result.targetRoles).toBeDefined();
+      expect(result.keyActivities).toBeDefined();
     });
 
     it('should handle stories with missing optional fields', async () => {
@@ -412,13 +417,13 @@ describe('ai.generatePersonalCanvas', () => {
       const result = await handler({ arguments: input });
 
       expect(result).toBeDefined();
+      expect(result.customerSegments.length).toBeGreaterThan(0);
       expect(result.valueProposition.length).toBeGreaterThan(0);
       expect(result.keyActivities.length).toBeGreaterThan(0);
-      expect(result.targetRoles.length).toBeGreaterThan(0);
 
       // Verify output derives from input data
-      const hasExperienceData = result.targetRoles.some((role) =>
-        ['Role 1', 'Role 2', 'Professional role'].some((exp) => role.includes(exp))
+      const hasExperienceData = result.customerSegments.some((seg) =>
+        ['Company 1', 'Company 2', 'Tech companies', 'Startups'].some((exp) => seg.includes(exp))
       );
       expect(hasExperienceData).toBe(true);
     });

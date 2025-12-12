@@ -83,18 +83,38 @@ export const schema = a
 
     PersonalCanvas: a
       .model({
-        valueProposition: a.string(),
-        keyActivities: a.string().array(),
-        strengthsAdvantage: a.string(),
-        targetRoles: a.string().array(),
+        // 1. Customer Segments
+        customerSegments: a.string().array(),
+
+        // 2. Value Proposition
+        valueProposition: a.string().array(),
+
+        // 3. Channels
         channels: a.string().array(),
-        resources: a.string().array(),
-        careerDirection: a.string(),
-        painRelievers: a.string().array(),
-        gainCreators: a.string().array(),
+
+        // 4. Customer Relationships
+        customerRelationships: a.string().array(),
+
+        // 5. Key Activities
+        keyActivities: a.string().array(),
+
+        // 6. Key Resources
+        keyResources: a.string().array(),
+
+        // 7. Key Partners
+        keyPartners: a.string().array(),
+
+        // 8. Cost Structure
+        costStructure: a.string().array(),
+
+        // 9. Revenue Streams
+        revenueStreams: a.string().array(),
+
+        // Meta fields for platform workflow
         lastGeneratedAt: a.date(),
         needsUpdate: a.boolean().default(false),
 
+        // Relationship to the user
         userId: a.id().required(),
         user: a.belongsTo('UserProfile', 'userId'),
       })
