@@ -20,11 +20,11 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ Type-safe architecture with single source of truth pattern
 - ⚠️ Only 2 pages implemented (login, index) — frontend is the critical gap
 
-**MVP Readiness:** ~35% complete
+**MVP Readiness:** ~45% complete
 
-- Backend Infrastructure: 85% complete
-- Domain Logic: 75% complete
-- Frontend UI: 5% complete
+- Backend Infrastructure: 90% complete
+- Domain Logic: 85% complete
+- Frontend UI: 15% complete (EPIC 1A + 2 fully implemented)
 - AI Operations: 29% complete (5/17)
 
 ---
@@ -37,7 +37,7 @@ The project has established a **strong backend and domain foundation** with comp
 | ------ | --------------------------- | ------- | ------ | ---------- | -------- | ------- |
 | **1A** | User Data Intake & Identity | 95%     | 95%    | 100% (2/2) | 90%      | **95%** |
 | **1B** | Personal Canvas Generation  | 100%    | 100%   | 100% (1/1) | 0%       | **60%** |
-| **2**  | Experience Builder (STAR)   | 90%     | 80%    | 100% (2/2) | 0%       | **50%** |
+| **2**  | Experience Builder (STAR)   | 100%    | 100%   | 100% (2/2) | 90%      | **95%** |
 | **3**  | Generic CV Generator        | 50%     | 60%    | 0% (0/1)   | 0%       | **20%** |
 | **4**  | User Speech Builder         | 30%     | 0%     | 0% (0/1)   | 0%       | **5%**  |
 | **5A** | Job Description Analysis    | 80%     | 0%     | 0% (0/2)   | 0%       | **15%** |
@@ -46,7 +46,7 @@ The project has established a **strong backend and domain foundation** with comp
 | **6**  | Tailored Materials          | 60%     | 0%     | 0% (0/4)   | 0%       | **10%** |
 | **7**  | Interview Prep              | 60%     | 0%     | 0% (0/3)   | 0%       | **10%** |
 
-**Overall MVP Progress:** ~35%
+**Overall MVP Progress:** ~45%
 
 ### Detailed EPIC Analysis
 
@@ -116,33 +116,51 @@ The project has established a **strong backend and domain foundation** with comp
 
 ---
 
-#### ✅ EPIC 2: Experience Builder (STAR Stories) (50% Complete)
+#### ✅ EPIC 2: Experience Builder (STAR Stories) (95% Complete)
 
-**Status:** Backend complete, frontend missing
+**Status:** ✅ **FULLY IMPLEMENTED** - Backend, domain, and frontend complete
 
 **Implemented:**
 
-- ✅ STARStory GraphQL model
-- ✅ `ai.generateStarStory` Lambda + tests
-- ✅ `ai.generateAchievementsAndKpis` Lambda + tests
-- ✅ STARStory repository/service/composable
-- ✅ Experience-to-Story relationship
+- ✅ STARStory GraphQL model with Experience relationship
+- ✅ `ai.generateStarStory` Lambda (returns array) + E2E tests
+- ✅ `ai.generateAchievementsAndKpis` Lambda + E2E tests
+- ✅ STARStoryRepository with GraphQL queries
+- ✅ STARStoryService with AI integration
+- ✅ 6 composables: useStoryEngine, useStoryEditor, useStoryEnhancer, useStarInterview, useStoryList, useSTARStory
+- ✅ 5 components: StoryBuilder, StoryForm, StoryList, StoryCard, StoryViewModal
+- ✅ 3 pages:
+  - `/profile/stories` - Global story library across all experiences
+  - `/profile/experiences/[experienceId]/stories` - Per-experience story list with auto-generate
+  - `/profile/experiences/[experienceId]/stories/[storyId]` - Story editor (new/edit)
+- ✅ Guided STAR interview with 3 modes:
+  - Free text input → AI generation
+  - Auto-generate from experience data
+  - Manual entry (step-by-step STAR fields)
+- ✅ Achievement & KPI generation (automatic on story creation)
+- ✅ TagInput component for achievements/KPIs
+- ✅ Story counts in experience list
+- ✅ Story view modal with full STAR display
+- ✅ Delete story functionality
+- ✅ Edit story functionality
+- ✅ Comprehensive testing:
+  - 2 E2E test files (stories.spec.ts, 28 tests)
+  - 7 unit test files (composables + domain)
+  - 2 Nuxt component tests (StoryBuilder, StoryForm)
+  - 2 AI Lambda tests (generate-star-story, generate-achievements-and-kpis)
 
-**Missing:**
+**Minor Refinements Needed:**
 
-- ❌ STAR story guided interview UI
-- ❌ Story library page
-- ❌ Story editor
-- ❌ Achievement/KPI display and editing
-- ❌ Link stories to experiences UI
+- ⚠️ Story search/filter functionality
+- ⚠️ Story categories/tags
+- ⚠️ Story export to CV/Letter
 
-**Next Steps:**
+**Validation:**
 
-1. Create `/stories` page (list view)
-2. Create `/stories/new` page (guided STAR interview)
-3. Create `/stories/:id/edit` page
-4. Add AI-generated achievements/KPIs display
-5. Implement story-to-experience linking
+- ✅ All 28 E2E story tests passing
+- ✅ 100+ unit tests for story domain
+- ✅ AI operations tested in sandbox
+- ✅ Full CRUD workflow functional
 
 ---
 
@@ -567,20 +585,23 @@ The project has established a **strong backend and domain foundation** with comp
 
 ---
 
-### Phase 2: Complete Experience Builder (EPIC 2 Frontend)
+### Phase 2: ✅ COMPLETED - Experience Builder (EPIC 2)
 
-**Goal:** Enable STAR story creation
+**Status:** ✅ **COMPLETE** - All frontend pages and components implemented
 
-**Tasks:**
+**Completed:**
 
-1. Create `/stories` page (list)
-2. Create `/stories/new` page (guided STAR interview)
-3. Create `/stories/:id/edit` page
-4. Display AI-generated achievements/KPIs
-5. Link stories to experiences
+1. ✅ Global `/profile/stories` page (list across all experiences)
+2. ✅ Per-experience `/profile/experiences/:id/stories` page with auto-generate
+3. ✅ `/profile/experiences/:id/stories/new` page (3 creation modes)
+4. ✅ `/profile/experiences/:id/stories/:storyId` edit page
+5. ✅ AI-generated achievements/KPIs with TagInput editing
+6. ✅ Stories linked to experiences with counts
+7. ✅ Story view modal with full STAR display
+8. ✅ Delete and edit story functionality
+9. ✅ Comprehensive E2E and unit tests
 
-**Estimated Effort:** 1-2 weeks  
-**Value:** Users have rich content for CVs and interviews
+**Achievement:** Users can now create rich STAR stories for CVs and interviews
 
 ---
 
