@@ -210,7 +210,7 @@ const handleGenerate = async () => {
         keyPartners: result.keyPartners,
         costStructure: result.costStructure,
         revenueStreams: result.revenueStreams,
-        lastGeneratedAt: new Date().toISOString(),
+        lastGeneratedAt: new Date().toISOString().split('T')[0],
         needsUpdate: false,
       });
     }
@@ -289,7 +289,7 @@ const handleRegenerate = async () => {
         keyPartners: result.keyPartners,
         costStructure: result.costStructure,
         revenueStreams: result.revenueStreams,
-        lastGeneratedAt: new Date().toISOString(),
+        lastGeneratedAt: new Date().toISOString().split('T')[0],
         needsUpdate: false,
       });
     }
