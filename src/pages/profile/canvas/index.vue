@@ -16,17 +16,6 @@
           @close="error = null"
         />
 
-        <!-- Success Alert -->
-        <UAlert
-          v-if="successMessage"
-          icon="i-heroicons-check-circle"
-          color="success"
-          variant="soft"
-          :title="successMessage"
-          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'success', variant: 'link' }"
-          @close="successMessage = null"
-        />
-
         <PersonalCanvasComponent
           :canvas="canvas"
           :loading="loading"
@@ -56,6 +45,7 @@ definePageMeta({
 });
 
 const { t } = useI18n();
+const toast = useToast();
 const {
   canvas,
   loading,
@@ -70,7 +60,6 @@ const experienceRepo = new ExperienceRepository();
 const storyService = new STARStoryService();
 
 const error = ref<string | null>(null);
-const successMessage = ref<string | null>(null);
 const profile = ref<{
   id: string;
   fullName?: string | null;
@@ -196,8 +185,6 @@ const handleGenerate = async () => {
         canvas.value.id = existingCanvasId;
       }
 
-      successMessage.value = t('canvas.messages.generated');
-
       // Save the generated canvas (updates existing if canvas.value.id exists - one canvas per user)
       await saveCanvas({
         userId: profile.value.id,
@@ -213,6 +200,12 @@ const handleGenerate = async () => {
         lastGeneratedAt: new Date().toISOString().split('T')[0],
         needsUpdate: false,
       });
+
+      toast.add({
+        title: t('canvas.messages.generated'),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      });
     }
   } catch (err) {
     console.error('[canvas] Error generating:', err);
@@ -225,7 +218,6 @@ const handleGenerate = async () => {
 const handleRegenerate = async () => {
   try {
     error.value = null;
-    successMessage.value = null;
 
     if (!profile.value) {
       error.value = t('canvas.messages.noProfile');
@@ -275,8 +267,6 @@ const handleRegenerate = async () => {
         canvas.value.id = existingCanvasId;
       }
 
-      successMessage.value = t('canvas.messages.regenerated');
-
       // Update existing canvas (canvas.value.id will be set, ensures one canvas per user)
       await saveCanvas({
         userId: profile.value.id,
@@ -292,6 +282,12 @@ const handleRegenerate = async () => {
         lastGeneratedAt: new Date().toISOString().split('T')[0],
         needsUpdate: false,
       });
+
+      toast.add({
+        title: t('canvas.messages.regenerated'),
+        icon: 'i-heroicons-check-circle',
+        color: 'success',
+      });
     }
   } catch (err) {
     console.error('[canvas] Error regenerating:', err);
@@ -304,7 +300,6 @@ const handleRegenerate = async () => {
 const handleSave = async (updates: Partial<PersonalCanvas>) => {
   try {
     error.value = null;
-    successMessage.value = null;
 
     if (!canvas.value) {
       error.value = t('canvas.messages.noCanvas');
@@ -332,7 +327,11 @@ const handleSave = async (updates: Partial<PersonalCanvas>) => {
       needsUpdate: false,
     });
 
-    successMessage.value = t('canvas.messages.saved');
+    toast.add({
+      title: t('canvas.messages.saved'),
+      icon: 'i-heroicons-check-circle',
+      color: 'success',
+    });
   } catch (err) {
     console.error('[canvas] Error saving:', err);
     error.value = err instanceof Error ? err.message : t('errors.unknown');
