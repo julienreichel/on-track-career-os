@@ -39,19 +39,41 @@
     </template>
 
     <!-- Content area that grows to fill available space -->
-    <div class="flex-1 flex flex-col min-h-0">
-      <UTextarea
-        v-if="isEditing"
-        :model-value="editValue"
-        :rows="12"
-        :placeholder="placeholder"
-        class="w-full flex-1"
-        @update:model-value="$emit('update:editValue', $event)"
-      />
+    <div class="flex-1 flex flex-col min-h-0 p-4">
+      <!-- Edit mode: TagInput -->
+      <div v-if="isEditing" class="space-y-2">
+        <UInput
+          v-model="inputValue"
+          :placeholder="placeholder"
+          @keydown.enter.prevent="handleAdd"
+        />
+        <div v-if="editItems.length > 0" class="flex flex-wrap gap-2">
+          <UBadge
+            v-for="(item, index) in editItems"
+            :key="index"
+            color="primary"
+            variant="subtle"
+          >
+            {{ item }}
+            <UButton
+              icon="i-heroicons-x-mark-20-solid"
+              size="xs"
+              color="primary"
+              variant="link"
+              :padded="false"
+              @click="handleRemove(index)"
+            />
+          </UBadge>
+        </div>
+      </div>
+
+      <!-- Display mode: Tags only -->
       <div v-else class="flex-1 overflow-auto">
-        <ul v-if="Array.isArray(items) && items.length > 0" class="space-y-1 text-sm">
-          <li v-for="(item, idx) in items" :key="idx">{{ item }}</li>
-        </ul>
+        <div v-if="Array.isArray(items) && items.length > 0" class="flex flex-wrap gap-2">
+          <UBadge v-for="(item, idx) in items" :key="idx" color="neutral" variant="subtle">
+            {{ item }}
+          </UBadge>
+        </div>
         <p v-else class="text-sm text-gray-500">{{ emptyText }}</p>
       </div>
     </div>
@@ -59,6 +81,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -71,17 +94,54 @@ interface Props {
   title: string;
   items: NullableStringArray;
   isEditing: boolean;
-  editValue: string;
   placeholder: string;
   emptyText: string;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
-defineEmits<{
-  'update:editValue': [value: string];
+const emit = defineEmits<{
+  'update:items': [value: string[]];
   edit: [];
   save: [];
   cancel: [];
 }>();
+
+// Local state for editing
+const inputValue = ref('');
+const editItems = ref<string[]>([]);
+
+// Initialize editItems when entering edit mode
+watch(
+  () => props.isEditing,
+  (newVal) => {
+    if (newVal) {
+      editItems.value = Array.isArray(props.items) ? [...props.items] : [];
+    }
+  },
+  { immediate: true }
+);
+
+// Watch items prop changes
+watch(
+  () => props.items,
+  (newItems) => {
+    if (props.isEditing) {
+      editItems.value = Array.isArray(newItems) ? [...newItems] : [];
+    }
+  }
+);
+
+const handleAdd = () => {
+  if (inputValue.value.trim()) {
+    editItems.value.push(inputValue.value.trim());
+    emit('update:items', editItems.value);
+    inputValue.value = '';
+  }
+};
+
+const handleRemove = (index: number) => {
+  editItems.value.splice(index, 1);
+  emit('update:items', editItems.value);
+};
 </script>

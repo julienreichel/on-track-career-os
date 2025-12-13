@@ -25,7 +25,6 @@
         <!-- Key Partners (1 col) -->
         <div class="flex w-full">
           <CanvasSectionCard
-            v-model:edit-value="localCanvas.keyPartners"
             class="w-full"
             icon="i-heroicons-users"
             :title="t('canvas.sections.keyPartners')"
@@ -34,7 +33,8 @@
             :placeholder="t('canvas.placeholders.keyPartners')"
             :empty-text="t('canvas.empty.field')"
             @edit="startEditingSection('keyPartners')"
-            @save="saveSectionChanges"
+            @update:items="updateSection('keyPartners', $event)"
+            @save="saveSectionChanges('keyPartners')"
             @cancel="cancelEditingSection"
           />
         </div>
@@ -43,7 +43,6 @@
         <div class="flex flex-col space-y-4 w-full">
           <div class="flex flex-1 w-full">
             <CanvasSectionCard
-              v-model:edit-value="localCanvas.keyActivities"
               class="w-full"
               icon="i-heroicons-cog-6-tooth"
               :title="t('canvas.sections.keyActivities')"
@@ -52,13 +51,13 @@
               :placeholder="t('canvas.placeholders.keyActivities')"
               :empty-text="t('canvas.empty.field')"
               @edit="startEditingSection('keyActivities')"
-              @save="saveSectionChanges"
+              @update:items="updateSection('keyActivities', $event)"
+              @save="saveSectionChanges('keyActivities')"
               @cancel="cancelEditingSection"
             />
           </div>
           <div class="flex flex-1 w-full">
             <CanvasSectionCard
-              v-model:edit-value="localCanvas.keyResources"
               class="w-full"
               icon="i-heroicons-cube"
               :title="t('canvas.sections.keyResources')"
@@ -67,7 +66,8 @@
               :placeholder="t('canvas.placeholders.keyResources')"
               :empty-text="t('canvas.empty.field')"
               @edit="startEditingSection('keyResources')"
-              @save="saveSectionChanges"
+              @update:items="updateSection('keyResources', $event)"
+              @save="saveSectionChanges('keyResources')"
               @cancel="cancelEditingSection"
             />
           </div>
@@ -76,7 +76,6 @@
         <!-- Value Proposition (1 col, center) -->
         <div class="flex w-full">
           <CanvasSectionCard
-            v-model:edit-value="localCanvas.valueProposition"
             class="w-full"
             icon="i-heroicons-light-bulb"
             :title="t('canvas.sections.valueProposition')"
@@ -85,7 +84,8 @@
             :placeholder="t('canvas.placeholders.valueProposition')"
             :empty-text="t('canvas.empty.field')"
             @edit="startEditingSection('valueProposition')"
-            @save="saveSectionChanges"
+            @update:items="updateSection('valueProposition', $event)"
+            @save="saveSectionChanges('valueProposition')"
             @cancel="cancelEditingSection"
           />
         </div>
@@ -94,7 +94,6 @@
         <div class="flex flex-col space-y-4 w-full">
           <div class="flex flex-1 w-full">
             <CanvasSectionCard
-              v-model:edit-value="localCanvas.customerRelationships"
               class="w-full"
               icon="i-heroicons-heart"
               :title="t('canvas.sections.customerRelationships')"
@@ -103,13 +102,13 @@
               :placeholder="t('canvas.placeholders.customerRelationships')"
               :empty-text="t('canvas.empty.field')"
               @edit="startEditingSection('customerRelationships')"
-              @save="saveSectionChanges"
+              @update:items="updateSection('customerRelationships', $event)"
+              @save="saveSectionChanges('customerRelationships')"
               @cancel="cancelEditingSection"
             />
           </div>
           <div class="flex flex-1 w-full">
             <CanvasSectionCard
-              v-model:edit-value="localCanvas.channels"
               class="w-full"
               icon="i-heroicons-megaphone"
               :title="t('canvas.sections.channels')"
@@ -118,7 +117,8 @@
               :placeholder="t('canvas.placeholders.channels')"
               :empty-text="t('canvas.empty.field')"
               @edit="startEditingSection('channels')"
-              @save="saveSectionChanges"
+              @update:items="updateSection('channels', $event)"
+              @save="saveSectionChanges('channels')"
               @cancel="cancelEditingSection"
             />
           </div>
@@ -127,7 +127,6 @@
         <!-- Customer Segments (1 col) -->
         <div class="flex w-full">
           <CanvasSectionCard
-            v-model:edit-value="localCanvas.customerSegments"
             class="w-full"
             icon="i-heroicons-user-group"
             :title="t('canvas.sections.customerSegments')"
@@ -136,7 +135,8 @@
             :placeholder="t('canvas.placeholders.customerSegments')"
             :empty-text="t('canvas.empty.field')"
             @edit="startEditingSection('customerSegments')"
-            @save="saveSectionChanges"
+            @update:items="updateSection('customerSegments', $event)"
+            @save="saveSectionChanges('customerSegments')"
             @cancel="cancelEditingSection"
           />
         </div>
@@ -147,7 +147,6 @@
         <!-- Cost Structure (left half) -->
         <div class="flex w-full">
           <CanvasSectionCard
-            v-model:edit-value="localCanvas.costStructure"
             class="w-full"
             icon="i-heroicons-currency-dollar"
             :title="t('canvas.sections.costStructure')"
@@ -156,7 +155,8 @@
             :placeholder="t('canvas.placeholders.costStructure')"
             :empty-text="t('canvas.empty.field')"
             @edit="startEditingSection('costStructure')"
-            @save="saveSectionChanges"
+            @update:items="updateSection('costStructure', $event)"
+            @save="saveSectionChanges('costStructure')"
             @cancel="cancelEditingSection"
           />
         </div>
@@ -164,7 +164,6 @@
         <!-- Revenue Streams (right half) -->
         <div class="flex w-full">
           <CanvasSectionCard
-            v-model:edit-value="localCanvas.revenueStreams"
             class="w-full"
             icon="i-heroicons-banknotes"
             :title="t('canvas.sections.revenueStreams')"
@@ -173,7 +172,8 @@
             :placeholder="t('canvas.placeholders.revenueStreams')"
             :empty-text="t('canvas.empty.field')"
             @edit="startEditingSection('revenueStreams')"
-            @save="saveSectionChanges"
+            @update:items="updateSection('revenueStreams', $event)"
+            @save="saveSectionChanges('revenueStreams')"
             @cancel="cancelEditingSection"
           />
         </div>
@@ -218,44 +218,9 @@ const emit = defineEmits<{
 }>();
 
 const editingSection = ref<string | null>(null);
-const localCanvas = ref({
-  customerSegments: '',
-  valueProposition: '',
-  channels: '',
-  customerRelationships: '',
-  keyActivities: '',
-  keyResources: '',
-  keyPartners: '',
-  costStructure: '',
-  revenueStreams: '',
-});
+const localCanvas = ref<Partial<PersonalCanvas>>({});
 
-// Helper to convert arrays to newline-separated strings for editing
-// Handles Amplify Nullable<string>[] types from GraphQL schema
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const arrayToString = (arr: any): string => {
-  if (Array.isArray(arr)) {
-    return arr
-      .filter((s): s is string => s !== null && s !== undefined && typeof s === 'string')
-      .join('\n');
-  }
-  if (typeof arr === 'string') return arr;
-  return '';
-};
-
-// Helper to convert newline-separated strings to arrays
-const stringToArray = (str: string): string[] => {
-  return str
-    .split('\n')
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
-};
-
-const startEditingSection = (section: keyof typeof localCanvas.value) => {
-  if (!props.canvas) return;
-
-  // Load current value for this section
-  localCanvas.value[section] = arrayToString(props.canvas[section]);
+const startEditingSection = (section: string) => {
   editingSection.value = section;
 };
 
@@ -263,16 +228,23 @@ const cancelEditingSection = () => {
   editingSection.value = null;
 };
 
-const saveSectionChanges = () => {
-  if (!editingSection.value) return;
+const updateSection = (section: string, items: string[]) => {
+  localCanvas.value = {
+    ...localCanvas.value,
+    [section]: items,
+  };
+};
 
-  const section = editingSection.value as keyof typeof localCanvas.value;
+const saveSectionChanges = (section: string) => {
+  if (!localCanvas.value[section as keyof PersonalCanvas]) return;
+
   const updated: Partial<PersonalCanvas> = {
-    [section]: stringToArray(localCanvas.value[section]),
+    [section]: localCanvas.value[section as keyof PersonalCanvas],
   };
 
   emit('save', updated);
   editingSection.value = null;
+  localCanvas.value = {};
 };
 
 // Reset editing state when canvas changes
@@ -281,6 +253,7 @@ watch(
   () => {
     if (editingSection.value) {
       editingSection.value = null;
+      localCanvas.value = {};
     }
   }
 );

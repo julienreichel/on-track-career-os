@@ -335,17 +335,26 @@ test.describe('Personal Canvas E2E Flow', () => {
     await editButton.click();
     await page.waitForTimeout(500);
 
-    // Look for textarea (editing mode)
-    const textarea = page.locator('textarea').first();
-    await textarea.waitFor({ state: 'visible', timeout: 5000 });
+    // Look for input field (editing mode with TagInput)
+    const input = page.locator('input[type="text"]').first();
+    await input.waitFor({ state: 'visible', timeout: 5000 });
 
-    // Add new content
+    // Add new tags
     const timestamp = Date.now();
-    await textarea.fill(`E2E Test Edit - ${timestamp}\nUpdated content for testing`);
+    await input.fill(`E2E Test Item 1 - ${timestamp}`);
+    await input.press('Enter');
     await page.waitForTimeout(300);
 
+    await input.fill(`E2E Test Item 2 - ${timestamp}`);
+    await input.press('Enter');
+    await page.waitForTimeout(300);
+
+    // Verify tags are visible
+    const tags = page.locator('text=/E2E Test Item/');
+    await expect(tags.first()).toBeVisible();
+
     // Look for Save button
-    const saveButton = page.getByRole('button', { name: /Save|save/i }).first();
+    const saveButton = page.getByRole('button', { name: 'Save section' });
     await saveButton.click();
     await page.waitForTimeout(2000);
 
