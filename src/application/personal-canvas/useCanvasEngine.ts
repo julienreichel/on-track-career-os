@@ -193,8 +193,6 @@ export function useCanvasEngine() {
     return { experiences, stories: allStories };
   };
 
-
-
   /**
    * Regenerate PersonalCanvas using AI operation
    * @param input - User profile, experiences, and stories for canvas generation

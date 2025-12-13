@@ -13,22 +13,25 @@
             size="xs"
             color="primary"
             variant="soft"
+            :aria-label="t('canvas.aria.saveSection')"
             @click="$emit('save')"
           />
           <UButton
             v-if="isEditing"
             icon="i-heroicons-x-mark"
             size="xs"
-            color="gray"
+            color="neutral"
             variant="ghost"
+            :aria-label="t('canvas.aria.cancelEdit')"
             @click="$emit('cancel')"
           />
           <UButton
             v-if="!isEditing"
             icon="i-heroicons-pencil"
             size="xs"
-            color="gray"
+            color="neutral"
             variant="ghost"
+            :aria-label="t('canvas.aria.editSection')"
             @click="$emit('edit')"
           />
         </div>
@@ -56,6 +59,10 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type NullableStringArray = any;
 

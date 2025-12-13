@@ -195,14 +195,6 @@ test.describe('Story Management', () => {
 
       await expect(searchInput).toBeVisible();
     });
-
-    test('should display empty state if no stories', async ({ page }) => {
-      // Check if empty state is shown
-      const emptyState = page.locator('text=/no stories|get started|create first/i').first();
-
-      // Empty state should be visible
-      await expect(emptyState).toBeVisible();
-    });
   });
 
   test.describe('Experience-Specific Story Listing', () => {

@@ -541,6 +541,7 @@ const headerLinks = computed(() => {
       icon: 'i-heroicons-pencil',
       color: 'primary',
       onClick: startEditing,
+      ariaLabel: t('canvas.aria.editProfile'),
     });
   }
 

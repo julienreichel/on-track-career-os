@@ -487,6 +487,12 @@
       "save": "Save Changes",
       "cancel": "Cancel"
     },
+    "aria": {
+      "editSection": "Edit section",
+      "saveSection": "Save section",
+      "cancelEdit": "Cancel edit",
+      "editProfile": "Edit profile"
+    },
     "messages": {
       "generated": "Canvas generated successfully!",
       "regenerated": "Canvas regenerated successfully!",
