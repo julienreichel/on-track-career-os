@@ -22,26 +22,54 @@ export function useCvParsing() {
   const extractedExperiences = ref<ExtractedExperience[]>([]);
   const extractedProfile = ref<ParseCvTextOutput['profile'] | null>(null);
 
-  async function parseFile(file: File): Promise<void> {
-    let text: string;
+  /**
+   * Extract text from PDF file
+   */
+  async function extractPdfText(file: File): Promise<string> {
+    const arrayBuffer = await file.arrayBuffer();
+    const parser = new PDFParse({ data: arrayBuffer });
+    const result = await parser.getText();
+    await parser.destroy();
+    return result.text;
+  }
 
-    // Check file type and parse accordingly
-    if (file.type === 'application/pdf') {
-      // Parse PDF file using pdf-parse
-      const arrayBuffer = await file.arrayBuffer();
-      const parser = new PDFParse({ data: arrayBuffer });
-      const result = await parser.getText();
-      await parser.destroy();
-      text = result.text;
-    } else {
-      // Read text file (txt, doc, docx - for now just txt)
-      const reader = new FileReader();
-      text = await new Promise<string>((resolve, reject) => {
-        reader.onload = (e) => resolve(e.target?.result as string);
-        reader.onerror = (e) => reject(e);
-        reader.readAsText(file);
-      });
+  /**
+   * Extract text from plain text file
+   */
+  async function extractTextFileContent(file: File): Promise<string> {
+    const reader = new FileReader();
+    return new Promise<string>((resolve, reject) => {
+      reader.onload = (e) => resolve(e.target?.result as string);
+      reader.onerror = (e) => reject(e);
+      reader.readAsText(file);
+    });
+  }
+
+  /**
+   * Extract experiences from a section (work or education)
+   */
+  async function extractExperiencesFromSection(
+    sections: string[]
+  ): Promise<ExtractedExperience[]> {
+    if (sections.length === 0) {
+      return [];
     }
+
+    await aiOps.extractExperiences(sections);
+
+    if (aiOps.error.value) {
+      throw new Error(aiOps.error.value);
+    }
+
+    return aiOps.experiences.value?.experiences || [];
+  }
+
+  async function parseFile(file: File): Promise<void> {
+    // Extract text based on file type
+    const text =
+      file.type === 'application/pdf'
+        ? await extractPdfText(file)
+        : await extractTextFileContent(file);
 
     if (!text || text.trim().length === 0) {
       throw new Error(t('cvUpload.errors.noTextExtracted'));
@@ -49,7 +77,7 @@ export function useCvParsing() {
 
     extractedText.value = text;
 
-    // Step 1: Parse CV text to extract sections
+    // Parse CV text to extract sections
     await aiOps.parseCv(text);
 
     if (aiOps.error.value) {
@@ -68,37 +96,15 @@ export function useCvParsing() {
       extractedProfile.value = aiOps.parsedCv.value.profile;
     }
 
-    // Step 2: Extract experience blocks from parsed sections
-    const allExperiences: ExtractedExperience[] = [];
+    // Extract experiences from both work and education sections
+    const workExperiences = await extractExperiencesFromSection(
+      aiOps.parsedCv.value.sections.experiences
+    );
+    const educationExperiences = await extractExperiencesFromSection(
+      aiOps.parsedCv.value.sections.education || []
+    );
 
-    // Extract work experiences
-    if (aiOps.parsedCv.value.sections.experiences.length > 0) {
-      await aiOps.extractExperiences(aiOps.parsedCv.value.sections.experiences);
-
-      if (aiOps.error.value) {
-        throw new Error(aiOps.error.value);
-      }
-
-      if (aiOps.experiences.value?.experiences) {
-        allExperiences.push(...aiOps.experiences.value.experiences);
-      }
-    }
-
-    // Extract education experiences
-    if (
-      aiOps.parsedCv.value.sections.education &&
-      aiOps.parsedCv.value.sections.education.length > 0
-    ) {
-      await aiOps.extractExperiences(aiOps.parsedCv.value.sections.education);
-
-      if (aiOps.error.value) {
-        throw new Error(aiOps.error.value);
-      }
-
-      if (aiOps.experiences.value?.experiences) {
-        allExperiences.push(...aiOps.experiences.value.experiences);
-      }
-    }
+    const allExperiences = [...workExperiences, ...educationExperiences];
 
     if (allExperiences.length === 0) {
       throw new Error(t('cvUpload.errors.extractionFailed'));
