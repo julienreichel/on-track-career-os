@@ -48,9 +48,7 @@ export function useCvParsing() {
   /**
    * Extract experiences from a section (work or education)
    */
-  async function extractExperiencesFromSection(
-    sections: string[]
-  ): Promise<ExtractedExperience[]> {
+  async function extractExperiencesFromSection(sections: string[]): Promise<ExtractedExperience[]> {
     if (sections.length === 0) {
       return [];
     }

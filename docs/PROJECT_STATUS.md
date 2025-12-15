@@ -38,13 +38,13 @@ The project has established a **strong backend and domain foundation** with comp
 | **1A** | User Data Intake & Identity | 95%     | 95%    | 100% (2/2) | 90%      | **95%**  |
 | **1B** | Personal Canvas Generation  | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **2**  | Experience Builder (STAR)   | 100%    | 100%   | 100% (2/2) | 90%      | **95%**  |
-| **3**  | Generic CV Generator        | 50%     | 60%    | 0% (0/1)   | 0%       | **20%** |
-| **4**  | User Speech Builder         | 30%     | 0%     | 0% (0/1)   | 0%       | **5%**  |
-| **5A** | Job Description Analysis    | 80%     | 0%     | 0% (0/2)   | 0%       | **15%** |
-| **5B** | Company Analysis            | 80%     | 0%     | 0% (0/2)   | 0%       | **15%** |
-| **5C** | User-Job-Company Matching   | 70%     | 0%     | 0% (0/1)   | 0%       | **10%** |
-| **6**  | Tailored Materials          | 60%     | 0%     | 0% (0/4)   | 0%       | **10%** |
-| **7**  | Interview Prep              | 60%     | 0%     | 0% (0/3)   | 0%       | **10%** |
+| **3**  | Generic CV Generator        | 50%     | 60%    | 0% (0/1)   | 0%       | **20%**  |
+| **4**  | User Speech Builder         | 30%     | 0%     | 0% (0/1)   | 0%       | **5%**   |
+| **5A** | Job Description Analysis    | 80%     | 0%     | 0% (0/2)   | 0%       | **15%**  |
+| **5B** | Company Analysis            | 80%     | 0%     | 0% (0/2)   | 0%       | **15%**  |
+| **5C** | User-Job-Company Matching   | 70%     | 0%     | 0% (0/1)   | 0%       | **10%**  |
+| **6**  | Tailored Materials          | 60%     | 0%     | 0% (0/4)   | 0%       | **10%**  |
+| **7**  | Interview Prep              | 60%     | 0%     | 0% (0/3)   | 0%       | **10%**  |
 
 **Overall MVP Progress:** ~45%
 
@@ -443,10 +443,12 @@ The project has established a **strong backend and domain foundation** with comp
 ### Implemented Pages (15+)
 
 **Auth & Home:**
+
 - ✅ `/login` — Login/signup page
 - ✅ `/` — Index page (placeholder)
 
 **Profile & Identity (7 pages):**
+
 - ✅ `/profile` — View/edit user profile (all fields)
 - ✅ `/profile/cv-upload` — Upload CV and AI extraction
 - ✅ `/profile/experiences` — List experiences with story counts
@@ -457,9 +459,11 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ `/profile/experiences/:id/stories/:storyId` — Edit STAR story
 
 **Personal Canvas (1 page):**
+
 - ✅ `/profile/canvas` — Business Model Canvas with per-section editing
 
 **Stories (1 page):**
+
 - ✅ `/profile/stories` — Global story library
 
 ### Components (11)
