@@ -1,4 +1,4 @@
-import { ref, type Ref } from 'vue';
+import { ref } from 'vue';
 import { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
 import { CVDocumentService, type CVBlock } from '@/domain/cvdocument/CVDocumentService';
 import type {
@@ -10,10 +10,7 @@ import type {
 /**
  * Update an item in the items array
  */
-function updateItemInArray(
-  items: CVDocument[],
-  updated: CVDocument | null | undefined
-): void {
+function updateItemInArray(items: CVDocument[], updated: CVDocument | null | undefined): void {
   if (!updated) return;
   const index = items.findIndex((item) => item.id === updated.id);
   if (index !== -1) {
@@ -22,95 +19,9 @@ function updateItemInArray(
 }
 
 /**
- * Block management operations
- */
-function useBlockOperations(
-  items: Ref<CVDocument[]>,
-  loading: Ref<boolean>,
-  error: Ref<string | null>,
-  service: CVDocumentService
-) {
-  const addBlock = async (
-    cvId: string,
-    block: Omit<CVBlock, 'order'>
-  ): Promise<CVDocument | null> => {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const updated = await service.addBlock(cvId, block);
-      updateItemInArray(items.value, updated);
-      return updated;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to add block';
-      console.error('[useCvDocuments] Error adding block:', err);
-      return null;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  const updateBlock = async (
-    cvId: string,
-    blockId: string,
-    updates: Partial<Omit<CVBlock, 'id'>>
-  ): Promise<CVDocument | null> => {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const updated = await service.updateBlock(cvId, blockId, updates);
-      updateItemInArray(items.value, updated);
-      return updated;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to update block';
-      console.error('[useCvDocuments] Error updating block:', err);
-      return null;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  const removeBlock = async (cvId: string, blockId: string): Promise<CVDocument | null> => {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const updated = await service.removeBlock(cvId, blockId);
-      updateItemInArray(items.value, updated);
-      return updated;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to remove block';
-      console.error('[useCvDocuments] Error removing block:', err);
-      return null;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  const reorderBlocks = async (cvId: string, blockIds: string[]): Promise<CVDocument | null> => {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const updated = await service.reorderBlocks(cvId, blockIds);
-      updateItemInArray(items.value, updated);
-      return updated;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to reorder blocks';
-      console.error('[useCvDocuments] Error reordering blocks:', err);
-      return null;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  return { addBlock, updateBlock, removeBlock, reorderBlocks };
-}
-
-/**
  * Composable for managing CV documents list and block operations
  */
+// eslint-disable-next-line max-lines-per-function
 export function useCvDocuments() {
   const items = ref<CVDocument[]>([]);
   const loading = ref(false);
@@ -197,8 +108,86 @@ export function useCvDocuments() {
     }
   };
 
-  // Block operations
-  const blockOps = useBlockOperations(items, loading, error, service);
+  /**
+   * Add a new block to a CV document
+   */
+  const addBlock = async (
+    cvId: string,
+    block: Omit<CVBlock, 'order'>
+  ): Promise<CVDocument | null> => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const updated = await service.addBlock(cvId, block);
+      updateItemInArray(items.value, updated);
+      return updated;
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to add block';
+      console.error('[useCvDocuments] Error adding block:', err);
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const updateBlock = async (
+    cvId: string,
+    blockId: string,
+    updates: Partial<Omit<CVBlock, 'id'>>
+  ): Promise<CVDocument | null> => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const updated = await service.updateBlock(cvId, blockId, updates);
+      updateItemInArray(items.value, updated);
+      return updated;
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to update block';
+      console.error('[useCvDocuments] Error updating block:', err);
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const removeBlock = async (cvId: string, blockId: string): Promise<CVDocument | null> => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const updated = await service.removeBlock(cvId, blockId);
+      updateItemInArray(items.value, updated);
+      return updated;
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to remove block';
+      console.error('[useCvDocuments] Error removing block:', err);
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /**
+   * Reorder blocks in a CV document
+   */
+  const reorderBlocks = async (cvId: string, blockIds: string[]): Promise<CVDocument | null> => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const updated = await service.reorderBlocks(cvId, blockIds);
+      updateItemInArray(items.value, updated);
+      return updated;
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to reorder blocks';
+      console.error('[useCvDocuments] Error reordering blocks:', err);
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
 
   return {
     items,
@@ -208,6 +197,9 @@ export function useCvDocuments() {
     createDocument,
     updateDocument,
     deleteDocument,
-    ...blockOps,
+    addBlock,
+    updateBlock,
+    removeBlock,
+    reorderBlocks,
   };
 }
