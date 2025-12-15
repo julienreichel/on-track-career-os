@@ -1,6 +1,6 @@
 <template>
   <div class="cv-editor-page">
-    <CvEditor
+    <CvRenderEditor
       :cv-id="cvId"
       :user-id="userId"
       :selected-experience-ids="selectedExperienceIds"
@@ -11,11 +11,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import CvEditor from '@/components/cv/CvEditor.vue';
-
-definePageMeta({
-  middleware: 'auth',
-});
 
 const route = useRoute();
 

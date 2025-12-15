@@ -15,6 +15,7 @@ import { useToast } from '#app';
  *
  * This composable provides the core editing logic for the Notion-style block editor.
  */
+// eslint-disable-next-line max-lines-per-function
 export function useCvEditor(cvId?: string) {
   const document = ref<CVDocument | null>(null);
   const blocks = ref<CVBlock[]>([]);
@@ -139,9 +140,7 @@ export function useCvEditor(cvId?: string) {
     // Save state for undo
     undoStack.value = [...blocks.value];
 
-    blocks.value = blocks.value
-      .filter((b) => b.id !== blockId)
-      .map((b, i) => ({ ...b, order: i }));
+    blocks.value = blocks.value.filter((b) => b.id !== blockId).map((b, i) => ({ ...b, order: i }));
 
     isDirty.value = true;
   };

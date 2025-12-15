@@ -13,11 +13,7 @@
 
       <!-- Actions -->
       <div class="mb-6">
-        <UButton
-          icon="i-heroicons-plus"
-          size="lg"
-          :to="{ name: 'cv-new' }"
-        >
+        <UButton icon="i-heroicons-plus" size="lg" :to="{ name: 'cv-new' }">
           {{ $t('cvList.actions.create') }}
         </UButton>
       </div>
@@ -42,11 +38,7 @@
         <p class="text-gray-600 mb-6">
           {{ $t('cvList.emptyState.description') }}
         </p>
-        <UButton
-          icon="i-heroicons-plus"
-          size="lg"
-          :to="{ name: 'cv-new' }"
-        >
+        <UButton icon="i-heroicons-plus" size="lg" :to="{ name: 'cv-new' }">
           {{ $t('cvList.emptyState.action') }}
         </UButton>
       </div>
@@ -69,7 +61,7 @@
                 <UButton
                   icon="i-heroicons-ellipsis-vertical"
                   size="xs"
-                  color="gray"
+                  color="neutral"
                   variant="ghost"
                   @click.stop
                 />
@@ -90,7 +82,7 @@
             <div class="pt-3 border-t border-gray-200">
               <UButton
                 block
-                color="gray"
+                color="neutral"
                 variant="outline"
                 size="sm"
                 @click.stop="navigateTo({ name: 'cv-id', params: { id: cv.id } })"
@@ -109,10 +101,6 @@
 import { onMounted } from 'vue';
 import { useCvDocuments } from '@/application/cvdocument/useCvDocuments';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
-
-definePageMeta({
-  middleware: 'auth',
-});
 
 const { t } = useI18n();
 const toast = useToast();

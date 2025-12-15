@@ -1,24 +1,17 @@
 <template>
   <UCard
+    :variant="isSelected ? 'subtle' : 'outline'"
     :ui="{
       body: { padding: 'p-4' },
       header: { padding: 'p-3' },
     }"
-    class="cv-block"
-    :class="{
-      'cv-block--dragging': isDragging,
-      'cv-block--selected': isSelected,
-    }"
+    :class="['transition-all duration-200', { 'opacity-50 scale-95': isDragging }]"
   >
     <template #header>
       <div class="flex items-center justify-between gap-2">
         <div class="flex items-center gap-2 flex-1 min-w-0">
-          <UIcon
-            v-if="isDraggable"
-            name="i-heroicons-bars-3"
-            class="text-gray-400 cursor-move flex-shrink-0"
-          />
-          <span class="text-sm font-medium text-gray-700 truncate">
+          <UIcon v-if="isDraggable" name="i-heroicons-bars-3" class="cursor-move shrink-0" />
+          <span class="truncate">
             {{ blockTitle }}
           </span>
         </div>
@@ -26,7 +19,7 @@
       </div>
     </template>
 
-    <div class="cv-block__content">
+    <div>
       <slot :block="block">
         <!-- Default rendering based on block type -->
         <div v-if="block.type === 'summary'" class="prose prose-sm max-w-none">
@@ -34,17 +27,17 @@
         </div>
 
         <div v-else-if="block.type === 'experience'" class="space-y-2">
-          <h3 v-if="blockContent.title" class="text-base font-semibold text-gray-900">
+          <h3 v-if="blockContent.title" class="font-semibold">
             {{ blockContent.title }}
           </h3>
-          <div v-html="formattedContent" class="prose prose-sm max-w-none" />
+          <div class="prose prose-sm max-w-none" v-html="formattedContent" />
         </div>
 
         <div v-else-if="block.type === 'education'" class="space-y-2">
-          <h3 v-if="blockContent.title" class="text-base font-semibold text-gray-900">
+          <h3 v-if="blockContent.title" class="font-semibold">
             {{ blockContent.title }}
           </h3>
-          <div v-html="formattedContent" class="prose prose-sm max-w-none" />
+          <div class="prose prose-sm max-w-none" v-html="formattedContent" />
         </div>
 
         <div v-else-if="block.type === 'skills'" class="prose prose-sm max-w-none">
@@ -64,7 +57,7 @@
         </div>
 
         <div v-else class="prose prose-sm max-w-none">
-          <h3 v-if="blockContent.title" class="text-base font-semibold text-gray-900">
+          <h3 v-if="blockContent.title" class="font-semibold">
             {{ blockContent.title }}
           </h3>
           <div v-html="formattedContent" />
@@ -137,34 +130,3 @@ const formattedContent = computed(() => {
   return html;
 });
 </script>
-
-<style scoped>
-.cv-block {
-  @apply transition-all duration-200;
-}
-
-.cv-block--dragging {
-  @apply opacity-50 scale-95;
-}
-
-.cv-block--selected {
-  @apply ring-2 ring-primary-500;
-}
-
-.cv-block__content {
-  @apply text-gray-700;
-}
-
-/* Prose styling for content */
-.cv-block__content :deep(ul) {
-  @apply list-disc pl-5 space-y-1;
-}
-
-.cv-block__content :deep(strong) {
-  @apply font-semibold text-gray-900;
-}
-
-.cv-block__content :deep(em) {
-  @apply italic;
-}
-</style>

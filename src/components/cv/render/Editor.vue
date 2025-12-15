@@ -1,20 +1,20 @@
 <template>
   <div class="cv-editor">
     <!-- Header -->
-    <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-4">
+    <div class="sticky top-0 z-10 bg-[--ui-bg] border-b px-6 py-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4">
           <UButton
             icon="i-heroicons-arrow-left"
-            color="gray"
+            color="neutral"
             variant="ghost"
             @click="navigateBack"
           />
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">
+            <h1 class="text-2xl font-bold">
               {{ document?.name || $t('cvEditor.untitled') }}
             </h1>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm opacity-75">
               {{ savingStatus }}
             </p>
           </div>
@@ -24,19 +24,14 @@
           <UButton
             v-if="canUndo"
             icon="i-heroicons-arrow-uturn-left"
-            color="gray"
+            color="neutral"
             variant="outline"
             @click="undo()"
           >
             {{ $t('cvEditor.actions.undo') }}
           </UButton>
 
-          <UButton
-            icon="i-heroicons-printer"
-            color="gray"
-            variant="outline"
-            @click="print"
-          >
+          <UButton icon="i-heroicons-printer" color="neutral" variant="outline" @click="print">
             {{ $t('cvEditor.actions.print') }}
           </UButton>
         </div>
@@ -46,13 +41,13 @@
     <!-- Main Content -->
     <div class="max-w-4xl mx-auto px-6 py-8">
       <div v-if="loading" class="flex justify-center py-12">
-        <UIcon name="i-heroicons-arrow-path" class="animate-spin text-4xl text-gray-400" />
+        <UIcon name="i-heroicons-arrow-path" class="animate-spin size-16" />
       </div>
 
       <div v-else-if="error" class="text-center py-12">
-        <UIcon name="i-heroicons-exclamation-triangle" class="text-4xl text-red-500 mx-auto mb-4" />
-        <p class="text-gray-700">{{ error }}</p>
-        <UButton color="primary" class="mt-4" @click="retry">
+        <UIcon name="i-heroicons-exclamation-triangle" class="size-16 mx-auto mb-4 text-error" />
+        <p class="mb-4">{{ error }}</p>
+        <UButton color="primary" @click="retry">
           {{ $t('cvEditor.actions.retry') }}
         </UButton>
       </div>
@@ -60,13 +55,13 @@
       <div v-else class="space-y-4">
         <!-- Empty state -->
         <div v-if="!hasBlocks" class="text-center py-12">
-          <UIcon name="i-heroicons-document" class="text-4xl text-gray-400 mx-auto mb-4" />
-          <p class="text-gray-700 mb-4">{{ $t('cvEditor.emptyState') }}</p>
-          <CvSectionAdd :existing-types="existingBlockTypes" @add="handleAddSection" />
+          <UIcon name="i-heroicons-document" class="size-16 mx-auto mb-4" />
+          <p class="mb-4">{{ $t('cvEditor.emptyState') }}</p>
+          <CvRenderSectionAdd :existing-types="existingBlockTypes" @add="handleAddSection" />
         </div>
 
         <!-- Blocks -->
-        <draggable
+        <Draggable
           v-else
           v-model="blocksList"
           item-key="id"
@@ -75,8 +70,8 @@
           @end="handleDragEnd"
         >
           <template #item="{ element: block, index }">
-            <div class="cv-editor__block">
-              <CvBlock
+            <div class="mb-4">
+              <CvRenderBlock
                 :block="block"
                 :is-draggable="true"
                 :is-dragging="draggedBlockId === block.id"
@@ -84,7 +79,7 @@
                 @click="selectBlock(block.id)"
               >
                 <template #actions>
-                  <CvBlockActions
+                  <CvRenderBlockActions
                     :is-first="index === 0"
                     :is-last="index === blocks.length - 1"
                     :is-regenerating="regeneratingBlockId === block.id"
@@ -95,13 +90,13 @@
                     @remove="removeBlock(block.id)"
                   />
                 </template>
-              </CvBlock>
+              </CvRenderBlock>
             </div>
           </template>
-        </draggable>
+        </Draggable>
 
         <!-- Add Section Button -->
-        <CvSectionAdd
+        <CvRenderSectionAdd
           v-if="hasBlocks"
           :existing-types="existingBlockTypes"
           @add="handleAddSection"
@@ -110,7 +105,7 @@
     </div>
 
     <!-- Block Editor Modal -->
-    <CvBlockEditor
+    <CvRenderBlockEditor
       v-model="editorOpen"
       :block="editingBlock"
       :saving="saving"
@@ -120,16 +115,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import draggable from 'vuedraggable';
+import Draggable from 'vuedraggable';
 import { useCvEditor } from '@/application/cvdocument/useCvEditor';
 import { useCvGenerator } from '@/application/cvdocument/useCvGenerator';
 import type { CVBlock } from '@/domain/cvdocument/CVDocumentService';
-import CvBlock from './CvBlock.vue';
-import CvBlockActions from './CvBlockActions.vue';
-import CvBlockEditor from './CvBlockEditor.vue';
-import CvSectionAdd from './CvSectionAdd.vue';
 
 interface Props {
   cvId: string;
@@ -156,7 +147,6 @@ const {
   hasBlocks,
   canUndo,
   load,
-  save,
   addBlock,
   removeBlock: removeBlockFromEditor,
   updateBlock,
@@ -189,8 +179,7 @@ const existingBlockTypes = computed(() => {
 const blocksList = computed({
   get: () => blocks.value,
   set: (newBlocks) => {
-    const newOrder = newBlocks.map((b) => b.id);
-    // This will be handled by the drag end event
+    // Handled by drag end event
   },
 });
 
@@ -228,7 +217,7 @@ const saveBlockEdit = async (updates: { title?: string; content: string }) => {
 
   toast.add({
     title: t('cvEditor.toast.blockUpdated'),
-    color: 'green',
+    color: 'success',
   });
 };
 
@@ -262,7 +251,7 @@ const removeBlock = (blockId: string) => {
   removeBlockFromEditor(blockId);
   toast.add({
     title: t('cvEditor.toast.blockRemoved'),
-    color: 'green',
+    color: 'success',
   });
 };
 
@@ -281,12 +270,12 @@ const regenerateBlock = async (block: CVBlock) => {
       replaceBlock(block.id, regenerated);
       toast.add({
         title: t('cvEditor.toast.blockRegenerated'),
-        color: 'green',
+        color: 'success',
       });
     } else {
       toast.add({
         title: t('cvEditor.toast.regenerationFailed'),
-        color: 'red',
+        color: 'error',
       });
     }
   } finally {
@@ -301,9 +290,6 @@ const handleDragStart = (event: { item: { dataset: { id: string } } }) => {
 
 const handleDragEnd = () => {
   draggedBlockId.value = null;
-  // Reorder is handled automatically by v-model binding in draggable
-  const newOrder = blocksList.value.map((b) => b.id);
-  // The useCvEditor composable will handle the reorder via the blocks ref
 };
 
 const print = () => {
@@ -318,19 +304,15 @@ const retry = () => {
 </script>
 
 <style scoped>
-.cv-editor__block {
-  @apply mb-4;
-}
-
 /* Print styles */
 @media print {
   .sticky,
-  .cv-editor__block :deep(.cv-block-actions) {
-    @apply hidden;
+  :deep(.cv-render-block-actions) {
+    display: none;
   }
 
   .cv-editor {
-    @apply max-w-none;
+    max-width: none;
   }
 }
 </style>

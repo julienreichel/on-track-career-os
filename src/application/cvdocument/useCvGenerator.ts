@@ -22,6 +22,7 @@ import type { STARStory } from '@/domain/starstory/STARStory';
  *
  * This composable bridges the AI operations and the CV editor.
  */
+// eslint-disable-next-line max-lines-per-function
 export function useCvGenerator() {
   const generating = ref(false);
   const error = ref<string | null>(null);
@@ -153,8 +154,7 @@ export function useCvGenerator() {
 
       return input;
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : 'cvGenerator.errors.buildInputFailed';
+      error.value = err instanceof Error ? err.message : 'cvGenerator.errors.buildInputFailed';
       console.error('[useCvGenerator] Error building input:', err);
       return null;
     }
@@ -185,8 +185,7 @@ export function useCvGenerator() {
 
       return cvBlocks;
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : 'cvGenerator.errors.generationFailed';
+      error.value = err instanceof Error ? err.message : 'cvGenerator.errors.generationFailed';
       console.error('[useCvGenerator] Error generating blocks:', err);
       return null;
     } finally {
@@ -233,8 +232,7 @@ export function useCvGenerator() {
       // Convert to block while preserving original order
       return sectionToBlock(regeneratedSection, blockToRegenerate.order);
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : 'cvGenerator.errors.regenerationFailed';
+      error.value = err instanceof Error ? err.message : 'cvGenerator.errors.regenerationFailed';
       console.error('[useCvGenerator] Error regenerating block:', err);
       return null;
     } finally {
@@ -274,8 +272,7 @@ export function useCvGenerator() {
       // Convert first section to block
       return sectionToBlock(result.sections[0], 0);
     } catch (err) {
-      error.value =
-        err instanceof Error ? err.message : 'cvGenerator.errors.generationFailed';
+      error.value = err instanceof Error ? err.message : 'cvGenerator.errors.generationFailed';
       console.error('[useCvGenerator] Error generating single block:', err);
       return null;
     } finally {

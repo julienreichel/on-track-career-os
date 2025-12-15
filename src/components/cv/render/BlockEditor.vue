@@ -3,12 +3,12 @@
     <UCard>
       <template #header>
         <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold">
+          <h3 class="font-semibold">
             {{ $t('cvBlockEditor.title') }}
           </h3>
           <UButton
             icon="i-heroicons-x-mark"
-            color="gray"
+            color="neutral"
             variant="ghost"
             size="sm"
             @click="close"
@@ -18,11 +18,7 @@
 
       <div class="space-y-4">
         <!-- Block Title (optional for some types) -->
-        <UFormGroup
-          v-if="showTitleField"
-          :label="$t('cvBlockEditor.fields.title')"
-          name="title"
-        >
+        <UFormGroup v-if="showTitleField" :label="$t('cvBlockEditor.fields.title')" name="title">
           <UInput v-model="localTitle" :placeholder="$t('cvBlockEditor.placeholders.title')" />
         </UFormGroup>
 
@@ -37,19 +33,19 @@
         </UFormGroup>
 
         <!-- Formatting help -->
-        <div class="text-sm text-gray-500 space-y-1">
-          <p class="font-medium">{{ $t('cvBlockEditor.formatting.title') }}:</p>
-          <ul class="list-disc pl-5 space-y-0.5">
+        <UCard variant="soft">
+          <p class="font-medium mb-2">{{ $t('cvBlockEditor.formatting.title') }}:</p>
+          <ul class="space-y-1 text-sm">
             <li>**{{ $t('cvBlockEditor.formatting.bold') }}** → <strong>bold</strong></li>
             <li>*{{ $t('cvBlockEditor.formatting.italic') }}* → <em>italic</em></li>
             <li>- {{ $t('cvBlockEditor.formatting.bullet') }}</li>
           </ul>
-        </div>
+        </UCard>
       </div>
 
       <template #footer>
         <div class="flex justify-end gap-2">
-          <UButton color="gray" variant="ghost" @click="close">
+          <UButton color="neutral" variant="ghost" @click="close">
             {{ $t('cvBlockEditor.actions.cancel') }}
           </UButton>
           <UButton :loading="saving" @click="save">

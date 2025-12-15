@@ -16,9 +16,18 @@
         <div class="flex items-center justify-center gap-4">
           <div
             class="flex items-center gap-2"
-            :class="{ 'text-primary-600 font-semibold': currentStep === 1, 'text-gray-400': currentStep !== 1 }"
+            :class="{
+              'text-primary-600 font-semibold': currentStep === 1,
+              'text-gray-400': currentStep !== 1,
+            }"
           >
-            <div class="flex items-center justify-center w-8 h-8 rounded-full border-2" :class="{ 'border-primary-600 bg-primary-50': currentStep === 1, 'border-gray-300': currentStep !== 1 }">
+            <div
+              class="flex items-center justify-center w-8 h-8 rounded-full border-2"
+              :class="{
+                'border-primary-600 bg-primary-50': currentStep === 1,
+                'border-gray-300': currentStep !== 1,
+              }"
+            >
               1
             </div>
             <span>{{ $t('cvNew.steps.selectExperiences') }}</span>
@@ -26,9 +35,18 @@
           <UIcon name="i-heroicons-chevron-right" class="text-gray-400" />
           <div
             class="flex items-center gap-2"
-            :class="{ 'text-primary-600 font-semibold': currentStep === 2, 'text-gray-400': currentStep !== 2 }"
+            :class="{
+              'text-primary-600 font-semibold': currentStep === 2,
+              'text-gray-400': currentStep !== 2,
+            }"
           >
-            <div class="flex items-center justify-center w-8 h-8 rounded-full border-2" :class="{ 'border-primary-600 bg-primary-50': currentStep === 2, 'border-gray-300': currentStep !== 2 }">
+            <div
+              class="flex items-center justify-center w-8 h-8 rounded-full border-2"
+              :class="{
+                'border-primary-600 bg-primary-50': currentStep === 2,
+                'border-gray-300': currentStep !== 2,
+              }"
+            >
               2
             </div>
             <span>{{ $t('cvNew.steps.generate') }}</span>
@@ -48,23 +66,13 @@
             </p>
           </div>
 
-          <CvExperiencePicker
-            v-model="selectedExperienceIds"
-            :user-id="userId"
-          />
+          <CvRenderExperiencePicker v-model="selectedExperienceIds" :user-id="userId" />
 
           <div class="flex justify-end gap-3 pt-4 border-t">
-            <UButton
-              color="gray"
-              variant="outline"
-              @click="cancel"
-            >
+            <UButton color="gray" variant="outline" @click="cancel">
               {{ $t('cvNew.actions.cancel') }}
             </UButton>
-            <UButton
-              :disabled="selectedExperienceIds.length === 0"
-              @click="nextStep"
-            >
+            <UButton :disabled="selectedExperienceIds.length === 0" @click="nextStep">
               {{ $t('cvNew.actions.next') }}
             </UButton>
           </div>
@@ -85,10 +93,7 @@
 
           <!-- CV Name -->
           <UFormGroup :label="$t('cvNew.step2.fields.name')" required>
-            <UInput
-              v-model="cvName"
-              :placeholder="$t('cvNew.step2.placeholders.name')"
-            />
+            <UInput v-model="cvName" :placeholder="$t('cvNew.step2.placeholders.name')" />
           </UFormGroup>
 
           <!-- Optional Sections -->
@@ -97,22 +102,13 @@
               {{ $t('cvNew.step2.fields.optionalSections') }}
             </label>
             <div class="grid grid-cols-2 gap-2">
-              <UCheckbox
-                v-model="includeSkills"
-                :label="$t('cvNew.step2.sections.skills')"
-              />
-              <UCheckbox
-                v-model="includeLanguages"
-                :label="$t('cvNew.step2.sections.languages')"
-              />
+              <UCheckbox v-model="includeSkills" :label="$t('cvNew.step2.sections.skills')" />
+              <UCheckbox v-model="includeLanguages" :label="$t('cvNew.step2.sections.languages')" />
               <UCheckbox
                 v-model="includeCertifications"
                 :label="$t('cvNew.step2.sections.certifications')"
               />
-              <UCheckbox
-                v-model="includeInterests"
-                :label="$t('cvNew.step2.sections.interests')"
-              />
+              <UCheckbox v-model="includeInterests" :label="$t('cvNew.step2.sections.interests')" />
             </div>
           </div>
 
@@ -129,18 +125,10 @@
           </UFormGroup>
 
           <div class="flex justify-end gap-3 pt-4 border-t">
-            <UButton
-              color="gray"
-              variant="outline"
-              @click="previousStep"
-            >
+            <UButton color="gray" variant="outline" @click="previousStep">
               {{ $t('cvNew.actions.back') }}
             </UButton>
-            <UButton
-              :loading="generating"
-              :disabled="!cvName.trim()"
-              @click="generateCV"
-            >
+            <UButton :loading="generating" :disabled="!cvName.trim()" @click="generateCV">
               {{ $t('cvNew.actions.generate') }}
             </UButton>
           </div>
@@ -155,11 +143,6 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCvDocuments } from '@/application/cvdocument/useCvDocuments';
 import { useCvGenerator } from '@/application/cvdocument/useCvGenerator';
-import CvExperiencePicker from '@/components/cv/CvExperiencePicker.vue';
-
-definePageMeta({
-  middleware: 'auth',
-});
 
 const { t } = useI18n();
 const router = useRouter();
@@ -206,17 +189,13 @@ const generateCV = async () => {
 
   try {
     // Generate blocks with AI
-    const blocks = await generateBlocks(
-      userId.value,
-      selectedExperienceIds.value,
-      {
-        includeSkills: includeSkills.value,
-        includeLanguages: includeLanguages.value,
-        includeCertifications: includeCertifications.value,
-        includeInterests: includeInterests.value,
-        jobDescription: jobDescription.value || undefined,
-      }
-    );
+    const blocks = await generateBlocks(userId.value, selectedExperienceIds.value, {
+      includeSkills: includeSkills.value,
+      includeLanguages: includeLanguages.value,
+      includeCertifications: includeCertifications.value,
+      includeInterests: includeInterests.value,
+      jobDescription: jobDescription.value || undefined,
+    });
 
     if (!blocks) {
       toast.add({

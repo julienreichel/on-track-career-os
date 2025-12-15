@@ -1,12 +1,6 @@
 <template>
-  <div class="cv-section-add">
-    <UButton
-      icon="i-heroicons-plus"
-      color="gray"
-      variant="outline"
-      block
-      @click="isOpen = true"
-    >
+  <div>
+    <UButton icon="i-heroicons-plus" color="neutral" variant="outline" block @click="isOpen = true">
       {{ $t('cvSectionAdd.addSection') }}
     </UButton>
 
@@ -14,12 +8,12 @@
       <UCard>
         <template #header>
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold">
+            <h3 class="font-semibold">
               {{ $t('cvSectionAdd.title') }}
             </h3>
             <UButton
               icon="i-heroicons-x-mark"
-              color="gray"
+              color="neutral"
               variant="ghost"
               size="sm"
               @click="isOpen = false"
@@ -32,7 +26,7 @@
             v-for="section in availableSections"
             :key="section.type"
             :icon="section.icon"
-            color="gray"
+            color="neutral"
             variant="ghost"
             block
             class="justify-start"
@@ -40,7 +34,7 @@
           >
             <div class="flex-1 text-left">
               <div class="font-medium">{{ section.label }}</div>
-              <div class="text-xs text-gray-500">{{ section.description }}</div>
+              <div class="text-sm opacity-75">{{ section.description }}</div>
             </div>
           </UButton>
         </div>

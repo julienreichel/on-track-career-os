@@ -1,32 +1,30 @@
 <template>
-  <div class="cv-experience-picker space-y-4">
+  <div class="space-y-4">
     <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold">
+      <h3 class="font-semibold">
         {{ $t('cvExperiencePicker.title') }}
       </h3>
       <UButton
         v-if="experiences.length > 0"
         size="xs"
-        color="gray"
+        color="neutral"
         variant="ghost"
         @click="toggleAll"
       >
-        {{ allSelected ? $t('cvExperiencePicker.deselectAll') : $t('cvExperiencePicker.selectAll') }}
+        {{
+          allSelected ? $t('cvExperiencePicker.deselectAll') : $t('cvExperiencePicker.selectAll')
+        }}
       </UButton>
     </div>
 
     <div v-if="loading" class="flex justify-center py-8">
-      <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-gray-400" />
+      <UIcon name="i-heroicons-arrow-path" class="animate-spin size-8" />
     </div>
 
     <div v-else-if="experiences.length === 0" class="text-center py-8">
-      <UIcon name="i-heroicons-briefcase" class="text-4xl text-gray-400 mx-auto mb-2" />
-      <p class="text-gray-600">{{ $t('cvExperiencePicker.noExperiences') }}</p>
-      <UButton
-        :to="{ name: 'profile-experiences' }"
-        color="primary"
-        class="mt-4"
-      >
+      <UIcon name="i-heroicons-briefcase" class="size-16 mx-auto mb-2" />
+      <p class="mb-4">{{ $t('cvExperiencePicker.noExperiences') }}</p>
+      <UButton :to="{ name: 'profile-experiences' }" color="primary">
         {{ $t('cvExperiencePicker.addExperience') }}
       </UButton>
     </div>
@@ -35,9 +33,9 @@
       <UCard
         v-for="experience in experiences"
         :key="experience.id"
+        :variant="isSelected(experience.id) ? 'subtle' : 'outline'"
         :ui="{ body: { padding: 'p-4' } }"
-        class="cursor-pointer hover:bg-gray-50 transition-colors"
-        :class="{ 'ring-2 ring-primary-500': isSelected(experience.id) }"
+        class="cursor-pointer transition-colors"
         @click="toggle(experience.id)"
       >
         <div class="flex items-start gap-3">
@@ -48,19 +46,19 @@
           />
           <div class="flex-1 min-w-0">
             <div class="flex items-baseline gap-2 flex-wrap">
-              <h4 class="font-semibold text-gray-900">{{ experience.title }}</h4>
-              <span v-if="experience.companyName" class="text-sm text-gray-600">
+              <h4 class="font-semibold">{{ experience.title }}</h4>
+              <span v-if="experience.companyName" class="text-sm">
                 @ {{ experience.companyName }}
               </span>
             </div>
-            <div v-if="experience.startDate || experience.endDate" class="text-sm text-gray-500 mt-1">
+            <div v-if="experience.startDate || experience.endDate" class="text-sm mt-1">
               {{ formatDateRange(experience.startDate, experience.endDate) }}
             </div>
             <div v-if="experience.experienceType" class="mt-2">
               <UBadge
                 :label="$t(`experience.types.${experience.experienceType}`)"
                 size="xs"
-                color="gray"
+                color="neutral"
                 variant="subtle"
               />
             </div>
@@ -70,7 +68,7 @@
     </div>
 
     <div v-if="modelValue.length > 0" class="pt-4 border-t">
-      <p class="text-sm text-gray-600">
+      <p class="text-sm">
         {{ $t('cvExperiencePicker.selected', { count: modelValue.length }) }}
       </p>
     </div>
@@ -125,7 +123,10 @@ const toggleAll = () => {
   if (allSelected.value) {
     emit('update:modelValue', []);
   } else {
-    emit('update:modelValue', experiences.value.map((e) => e.id));
+    emit(
+      'update:modelValue',
+      experiences.value.map((e) => e.id)
+    );
   }
 };
 
@@ -168,7 +169,10 @@ onMounted(() => {
   loadExperiences();
 });
 
-watch(() => props.userId, () => {
-  loadExperiences();
-});
+watch(
+  () => props.userId,
+  () => {
+    loadExperiences();
+  }
+);
 </script>
