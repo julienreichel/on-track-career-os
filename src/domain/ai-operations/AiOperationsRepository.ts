@@ -265,8 +265,13 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     }
 
     // GraphQL schema returns a.json() which is a JSON string - parse it to get CVBlocksResult object
-    const parsed = JSON.parse(data as string) as CVBlocksResult;
+    let parsed = JSON.parse(data as string);
+    
+    // Handle double-stringification (Lambda returns JSON string, which gets stringified again by GraphQL)
+    if (typeof parsed === 'string') {
+      parsed = JSON.parse(parsed);
+    }
 
-    return parsed;
+    return parsed as CVBlocksResult;
   }
 }
