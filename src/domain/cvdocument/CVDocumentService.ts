@@ -75,13 +75,16 @@ export class CVDocumentService {
     const blockIndex = blocks.findIndex((b) => b.id === blockId);
     if (blockIndex === -1) return null;
 
-    const updatedBlocks = [...blocks];
-    const existingBlock = updatedBlocks[blockIndex];
-    updatedBlocks[blockIndex] = {
-      ...existingBlock,
-      ...updates,
-      id: existingBlock.id, // Preserve required id field
-    };
+    const existingBlock = blocks[blockIndex];
+    const updatedBlocks = blocks.map((block, index) =>
+      index === blockIndex
+        ? {
+            ...existingBlock,
+            ...updates,
+            id: existingBlock.id, // Preserve required id field
+          }
+        : block
+    );
 
     const updatedContentJSON = {
       ...contentJSON,
