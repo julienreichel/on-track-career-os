@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, type Ref } from 'vue';
 import { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
 import { CVDocumentService, type CVBlock } from '@/domain/cvdocument/CVDocumentService';
 import type {
@@ -10,7 +10,10 @@ import type {
 /**
  * Update an item in the items array
  */
-function updateItemInArray(items: CVDocument[], updated: CVDocument | null | undefined) {
+function updateItemInArray(
+  items: CVDocument[],
+  updated: CVDocument | null | undefined
+): void {
   if (!updated) return;
   const index = items.findIndex((item) => item.id === updated.id);
   if (index !== -1) {
@@ -22,9 +25,9 @@ function updateItemInArray(items: CVDocument[], updated: CVDocument | null | und
  * Block management operations
  */
 function useBlockOperations(
-  items: ReturnType<typeof ref<CVDocument[]>>,
-  loading: ReturnType<typeof ref<boolean>>,
-  error: ReturnType<typeof ref<string | null>>,
+  items: Ref<CVDocument[]>,
+  loading: Ref<boolean>,
+  error: Ref<string | null>,
   service: CVDocumentService
 ) {
   const addBlock = async (
