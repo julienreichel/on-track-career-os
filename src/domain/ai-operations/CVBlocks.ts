@@ -8,6 +8,8 @@
  * @see docs/AI_Interaction_Contract.md - Operation 11 (generateCvBlocks)
  */
 
+import type { GenerateCvBlocksOutput } from '@amplify/data/ai-operations/generateCvBlocks';
+
 export type {
   SectionType,
   CVSection,
@@ -19,7 +21,7 @@ export type {
 } from '@amplify/data/ai-operations/generateCvBlocks';
 
 // Alias for consistency with other AI operations
-export type { GenerateCvBlocksOutput as CVBlocksResult } from '@amplify/data/ai-operations/generateCvBlocks';
+export type CVBlocksResult = GenerateCvBlocksOutput;
 
 /**
  * Type guard to validate CVBlocksResult structure
