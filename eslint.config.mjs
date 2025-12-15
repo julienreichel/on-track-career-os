@@ -18,6 +18,7 @@ export default withNuxt(
             'error',
             'index',
             'login',
+            'new',
             '[id]',
             '[...slug]',
             // Components in cv/render subfolder

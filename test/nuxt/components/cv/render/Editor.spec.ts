@@ -17,7 +17,7 @@ const mockUndo = vi.fn();
 const mockReplaceBlock = vi.fn();
 const mockRegenerateBlock = vi.fn();
 
-vi.mock('@/application/cvdocument/useCvEditor', () => ({
+vi.mock('@/composables/useCvEditor', () => ({
   useCvEditor: () => ({
     blocks: ref([]),
     isDirty: ref(false),
@@ -35,7 +35,7 @@ vi.mock('@/application/cvdocument/useCvEditor', () => ({
   }),
 }));
 
-vi.mock('@/application/cvdocument/useCvGenerator', () => ({
+vi.mock('@/composables/useCvGenerator', () => ({
   useCvGenerator: () => ({
     regenerateBlock: mockRegenerateBlock,
   }),
@@ -131,17 +131,20 @@ const stubs = {
   },
 };
 
-describe.skip('CvEditor', () => {
-  const createMockBlock = (overrides: Partial<CVBlock> = {}): CVBlock => ({
-    id: 'block-1',
-    type: 'summary',
-    content: {
-      text: 'Test content',
-    },
-    order: 0,
-    ...overrides,
-  });
+// Helper function to create mock blocks
+const createMockBlock = (overrides: Partial<CVBlock> = {}): CVBlock => ({
+  id: 'block-1',
+  type: 'summary',
+  content: {
+    text: 'Test content',
+  },
+  order: 0,
+  ...overrides,
+});
 
+// Test suite is skipped - requires complex mocking of composables and router
+// Split into multiple describe blocks to avoid max-lines-per-function error
+describe.skip('CvEditor - Basic Rendering', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -375,6 +378,12 @@ describe.skip('CvEditor', () => {
     await undoButton?.trigger('click');
 
     expect(mockUndo).toHaveBeenCalled();
+  });
+});
+
+describe.skip('CvEditor - Block Actions', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
   it('calls moveBlock when move up clicked', async () => {

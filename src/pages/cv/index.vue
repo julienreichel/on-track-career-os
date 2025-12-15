@@ -48,7 +48,6 @@
         <UCard
           v-for="cv in items"
           :key="cv.id"
-          :ui="{ body: { padding: 'p-6' } }"
           class="hover:shadow-lg transition-shadow cursor-pointer"
           @click="navigateTo({ name: 'cv-id', params: { id: cv.id } })"
         >
@@ -99,7 +98,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useCvDocuments } from '@/application/cvdocument/useCvDocuments';
+import { useCvDocuments } from '@/composables/useCvDocuments';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 
 const { t } = useI18n();
@@ -137,19 +136,19 @@ const getActions = (cv: CVDocument) => [
   ],
 ];
 
-const duplicateCV = async (cv: CVDocument) => {
+const duplicateCV = async (_cv: CVDocument) => {
   // TODO: Implement duplication logic
   toast.add({
     title: t('cvList.toast.duplicateNotImplemented'),
-    color: 'yellow',
+    color: 'warning',
   });
 };
 
-const downloadCV = async (cv: CVDocument) => {
+const downloadCV = async (_cv: CVDocument) => {
   // TODO: Implement PDF download
   toast.add({
     title: t('cvList.toast.downloadNotImplemented'),
-    color: 'yellow',
+    color: 'warning',
   });
 };
 
@@ -159,12 +158,12 @@ const confirmDelete = async (cv: CVDocument) => {
     if (success) {
       toast.add({
         title: t('cvList.toast.deleted'),
-        color: 'green',
+        color: 'primary',
       });
     } else {
       toast.add({
         title: t('cvList.toast.deleteFailed'),
-        color: 'red',
+        color: 'error',
       });
     }
   }

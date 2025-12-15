@@ -49,17 +49,24 @@ export function useCvGenerator() {
   };
 
   /**
-   * Convert CVBlock back to section for regeneration
+   * Load experiences and stories for selected experience IDs
    */
-  const blockToSection = (block: CVBlock): CVSection => {
-    const content = block.content as { title?: string; text?: string; experienceId?: string };
+  const loadExperiencesAndStories = async (
+    profile: { id: string },
+    selectedExperienceIds: string[]
+  ) => {
+    const allExperiences = await experienceRepo.list(profile);
+    const selectedExperiences = allExperiences.filter((exp) =>
+      selectedExperienceIds.includes(exp.id)
+    );
 
-    return {
-      type: block.type as CVSection['type'],
-      title: content.title || null,
-      content: content.text || '',
-      experienceId: content.experienceId || null,
-    };
+    const allStories: STARStory[] = [];
+    for (const exp of selectedExperiences) {
+      const stories = await storyService.getStoriesByExperience(exp);
+      allStories.push(...stories);
+    }
+
+    return { selectedExperiences, allStories };
   };
 
   /**
@@ -86,18 +93,11 @@ export function useCvGenerator() {
         return null;
       }
 
-      // Load selected experiences
-      const allExperiences = await experienceRepo.list(profile);
-      const selectedExperiences = allExperiences.filter((exp) =>
-        selectedExperienceIds.includes(exp.id)
+      // Load selected experiences and stories
+      const { selectedExperiences, allStories } = await loadExperiencesAndStories(
+        profile,
+        selectedExperienceIds
       );
-
-      // Load stories for selected experiences
-      const allStories: STARStory[] = [];
-      for (const exp of selectedExperiences) {
-        const stories = await storyService.getStoriesByExperience(exp);
-        allStories.push(...stories);
-      }
 
       // Build input
       const input: GenerateCvBlocksInput = {
@@ -127,30 +127,24 @@ export function useCvGenerator() {
         })),
       };
 
-      // Add optional fields
-      if (options.includeSkills) {
-        input.skills = profile.skills?.filter((s): s is string => s !== null);
-      }
+      // Add optional profile fields
+      const profileFields = [
+        { condition: options.includeSkills, key: 'skills', value: profile.skills },
+        { condition: options.includeLanguages, key: 'languages', value: profile.languages },
+        { condition: options.includeCertifications, key: 'certifications', value: profile.certifications },
+        { condition: options.includeInterests, key: 'interests', value: profile.interests },
+      ];
 
-      if (options.includeLanguages) {
-        input.languages = profile.languages?.filter((l): l is string => l !== null);
-      }
+      profileFields.forEach(({ condition, key, value }) => {
+        if (condition && value) {
+          const filtered = value.filter((v): v is string => v !== null);
+          Object.assign(input, { [key]: filtered });
+        }
+      });
 
-      if (options.includeCertifications) {
-        input.certifications = profile.certifications?.filter((c): c is string => c !== null);
-      }
-
-      if (options.includeInterests) {
-        input.interests = profile.interests?.filter((i): i is string => i !== null);
-      }
-
-      if (options.sectionsToGenerate) {
-        input.sectionsToGenerate = options.sectionsToGenerate;
-      }
-
-      if (options.jobDescription) {
-        input.jobDescription = options.jobDescription;
-      }
+      // Add optional generation options
+      if (options.sectionsToGenerate) input.sectionsToGenerate = options.sectionsToGenerate;
+      if (options.jobDescription) input.jobDescription = options.jobDescription;
 
       return input;
     } catch (err) {
@@ -166,6 +160,7 @@ export function useCvGenerator() {
   const generateBlocks = async (
     userId: string,
     selectedExperienceIds: string[],
+    // eslint-disable-next-line no-magic-numbers
     options: Parameters<typeof buildGenerationInput>[2] = {}
   ): Promise<CVBlock[] | null> => {
     generating.value = true;
@@ -200,21 +195,18 @@ export function useCvGenerator() {
     userId: string,
     selectedExperienceIds: string[],
     blockToRegenerate: CVBlock,
-    allBlocks: CVBlock[],
-    options: Parameters<typeof buildGenerationInput>[2] = {}
+    // eslint-disable-next-line no-magic-numbers
+    _generationOptions: Parameters<typeof buildGenerationInput>[2] = {}
   ): Promise<CVBlock | null> => {
     generating.value = true;
     error.value = null;
 
     try {
-      const input = await buildGenerationInput(userId, selectedExperienceIds, options);
+      const input = await buildGenerationInput(userId, selectedExperienceIds, _generationOptions);
 
       if (!input) {
         return null;
       }
-
-      // Add context about existing blocks
-      const contextSections = allBlocks.map((block) => blockToSection(block));
 
       // For single block regeneration, we request only that section type
       input.sectionsToGenerate = [blockToRegenerate.type];
@@ -247,6 +239,7 @@ export function useCvGenerator() {
     userId: string,
     selectedExperienceIds: string[],
     blockType: string,
+    // eslint-disable-next-line no-magic-numbers
     options: Parameters<typeof buildGenerationInput>[2] = {}
   ): Promise<CVBlock | null> => {
     generating.value = true;

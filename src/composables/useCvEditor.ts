@@ -1,8 +1,6 @@
 import { ref, computed, watch } from 'vue';
 import { CVDocumentService, type CVBlock } from '@/domain/cvdocument/CVDocumentService';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
-import { useToast } from '#app';
-
 /**
  * CV Editor Composable
  *
@@ -81,7 +79,7 @@ export function useCvEditor(cvId?: string) {
         isDirty.value = false;
         toast.add({
           title: 'cvEditor.saveSuccess',
-          color: 'green',
+          color: 'primary',
         });
         return true;
       }
@@ -92,7 +90,7 @@ export function useCvEditor(cvId?: string) {
       console.error('[useCvEditor] Error saving CV:', err);
       toast.add({
         title: 'cvEditor.errors.saveFailed',
-        color: 'red',
+        color: 'error',
       });
       return false;
     } finally {
@@ -269,10 +267,11 @@ export function useCvEditor(cvId?: string) {
       clearTimeout(saveTimeout);
     }
 
-    // Set new timeout (3 seconds)
+    // Set new timeout for autosave
+    const AUTOSAVE_DELAY_MS = 3000;
     saveTimeout = setTimeout(() => {
       save();
-    }, 3000);
+    }, AUTOSAVE_DELAY_MS);
   });
 
   // Initialize if cvId provided

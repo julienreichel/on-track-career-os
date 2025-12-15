@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useCvDocuments } from '@/application/cvdocument/useCvDocuments';
+import { useCvDocuments } from '@/composables/useCvDocuments';
 import { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';

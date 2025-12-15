@@ -118,8 +118,8 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import Draggable from 'vuedraggable';
-import { useCvEditor } from '@/application/cvdocument/useCvEditor';
-import { useCvGenerator } from '@/application/cvdocument/useCvGenerator';
+import { useCvEditor } from '@/composables/useCvEditor';
+import { useCvGenerator } from '@/composables/useCvGenerator';
 import type { CVBlock } from '@/domain/cvdocument/CVDocumentService';
 
 interface Props {
@@ -155,7 +155,7 @@ const {
   replaceBlock,
 } = useCvEditor(props.cvId);
 
-const { generating: regenerating, regenerateBlock: regenerateBlockAI } = useCvGenerator();
+const { regenerateBlock: regenerateBlockAI } = useCvGenerator();
 
 // Local state
 const draggedBlockId = ref<string | null>(null);
@@ -178,7 +178,7 @@ const existingBlockTypes = computed(() => {
 // Make blocks draggable
 const blocksList = computed({
   get: () => blocks.value,
-  set: (newBlocks) => {
+  set: () => {
     // Handled by drag end event
   },
 });
@@ -234,13 +234,14 @@ const handleAddSection = async (sectionType: string) => {
 
   addBlock(newBlock);
 
-  // Open editor for the new block
+  // Open editor for the new block after DOM update
+  const EDITOR_OPEN_DELAY_MS = 100;
   setTimeout(() => {
     const addedBlock = blocks.value.find((b) => b.id === newBlock.id);
     if (addedBlock) {
       openEditor(addedBlock);
     }
-  }, 100);
+  }, EDITOR_OPEN_DELAY_MS);
 };
 
 const moveBlock = (blockId: string, direction: 'up' | 'down') => {

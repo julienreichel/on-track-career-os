@@ -18,6 +18,7 @@
     <div>
       <slot :block="block">
         <!-- Default rendering for all block types -->
+        <!-- eslint-disable-next-line vue/no-v-html -->
         <div class="prose prose-sm max-w-none" v-html="safeHtmlContent" />
       </slot>
     </div>

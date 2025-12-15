@@ -55,7 +55,7 @@
       </div>
 
       <!-- Step 1: Select Experiences -->
-      <UCard v-if="currentStep === 1" :ui="{ body: { padding: 'p-6' } }">
+      <UCard v-if="currentStep === 1">
         <div class="space-y-6">
           <div>
             <h2 class="text-xl font-semibold text-gray-900 mb-2">
@@ -69,7 +69,7 @@
           <CvRenderExperiencePicker v-model="selectedExperienceIds" :user-id="userId" />
 
           <div class="flex justify-end gap-3 pt-4 border-t">
-            <UButton color="gray" variant="outline" @click="cancel">
+            <UButton color="neutral" variant="outline" @click="cancel">
               {{ $t('cvNew.actions.cancel') }}
             </UButton>
             <UButton :disabled="selectedExperienceIds.length === 0" @click="nextStep">
@@ -80,7 +80,7 @@
       </UCard>
 
       <!-- Step 2: Generate CV -->
-      <UCard v-if="currentStep === 2" :ui="{ body: { padding: 'p-6' } }">
+      <UCard v-if="currentStep === 2">
         <div class="space-y-6">
           <div>
             <h2 class="text-xl font-semibold text-gray-900 mb-2">
@@ -125,7 +125,7 @@
           </UFormGroup>
 
           <div class="flex justify-end gap-3 pt-4 border-t">
-            <UButton color="gray" variant="outline" @click="previousStep">
+            <UButton color="neutral" variant="outline" @click="previousStep">
               {{ $t('cvNew.actions.back') }}
             </UButton>
             <UButton :loading="generating" :disabled="!cvName.trim()" @click="generateCV">
@@ -141,8 +141,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useCvDocuments } from '@/application/cvdocument/useCvDocuments';
-import { useCvGenerator } from '@/application/cvdocument/useCvGenerator';
+import { useCvDocuments } from '@/composables/useCvDocuments';
+import { useCvGenerator } from '@/composables/useCvGenerator';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -166,14 +166,17 @@ const includeCertifications = ref(false);
 const includeInterests = ref(false);
 const jobDescription = ref('');
 
+const LAST_STEP = 2;
+const FIRST_STEP = 1;
+
 const nextStep = () => {
-  if (currentStep.value < 2) {
+  if (currentStep.value < LAST_STEP) {
     currentStep.value++;
   }
 };
 
 const previousStep = () => {
-  if (currentStep.value > 1) {
+  if (currentStep.value > FIRST_STEP) {
     currentStep.value--;
   }
 };
@@ -201,7 +204,7 @@ const generateCV = async () => {
       toast.add({
         title: t('cvNew.toast.generationFailed'),
         description: generationError.value || undefined,
-        color: 'red',
+        color: 'error',
       });
       return;
     }
@@ -219,7 +222,7 @@ const generateCV = async () => {
     if (cvDocument) {
       toast.add({
         title: t('cvNew.toast.created'),
-        color: 'green',
+        color: 'primary',
       });
 
       // Navigate to editor
@@ -231,14 +234,14 @@ const generateCV = async () => {
     } else {
       toast.add({
         title: t('cvNew.toast.createFailed'),
-        color: 'red',
+        color: 'error',
       });
     }
   } catch (err) {
     console.error('[cvNew] Error generating CV:', err);
     toast.add({
       title: t('cvNew.toast.error'),
-      color: 'red',
+      color: 'error',
     });
   }
 };

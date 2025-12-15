@@ -127,7 +127,7 @@ function handleCancel() {
           variant="soft"
           :title="t('cvUpload.errors.unknown')"
           :description="errorMessage"
-          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'red', variant: 'link' }"
+          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
           @close="errorMessage = null"
         />
 

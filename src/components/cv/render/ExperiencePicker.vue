@@ -34,7 +34,6 @@
         v-for="experience in experiences"
         :key="experience.id"
         :variant="isSelected(experience.id) ? 'subtle' : 'outline'"
-        :ui="{ body: { padding: 'p-4' } }"
         class="cursor-pointer transition-colors"
         @click="toggle(experience.id)"
       >

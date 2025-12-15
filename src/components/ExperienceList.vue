@@ -146,7 +146,7 @@ function getTypeBadge(type: string) {
   return {
     work: { color: 'primary' as const, label: t('experiences.types.work') },
     education: { color: 'blue' as const, label: t('experiences.types.education') },
-    volunteer: { color: 'green' as const, label: t('experiences.types.volunteer') },
+    volunteer: { color: 'primary' as const, label: t('experiences.types.volunteer') },
     project: { color: 'purple' as const, label: t('experiences.types.project') },
   }[type as 'work' | 'education' | 'volunteer' | 'project'];
 }
