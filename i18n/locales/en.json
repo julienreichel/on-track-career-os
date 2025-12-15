@@ -509,5 +509,193 @@
       "noProfile": "Profile not found. Please create your profile first.",
       "noCanvas": "Canvas not found"
     }
+  },
+  "cvList": {
+    "title": "My CVs",
+    "subtitle": "Manage your CV documents and create new ones",
+    "untitled": "Untitled CV",
+    "tailored": "Tailored for job",
+    "updated": "Updated",
+    "confirmDelete": "Are you sure you want to delete \"{name}\"?",
+    "actions": {
+      "create": "Create New CV",
+      "edit": "Edit CV",
+      "duplicate": "Duplicate",
+      "download": "Download PDF",
+      "delete": "Delete"
+    },
+    "emptyState": {
+      "title": "No CVs yet",
+      "description": "Create your first CV by selecting experiences and generating content with AI",
+      "action": "Create Your First CV"
+    },
+    "toast": {
+      "deleted": "CV deleted successfully",
+      "deleteFailed": "Failed to delete CV",
+      "duplicateNotImplemented": "Duplicate feature coming soon",
+      "downloadNotImplemented": "PDF download coming soon"
+    }
+  },
+  "cvNew": {
+    "title": "Create New CV",
+    "subtitle": "Follow the wizard to create a tailored CV",
+    "steps": {
+      "selectExperiences": "Select Experiences",
+      "generate": "Generate CV"
+    },
+    "step1": {
+      "title": "Select Your Experiences",
+      "description": "Choose which experiences to include in your CV. The AI will generate content based on your selection."
+    },
+    "step2": {
+      "title": "Configure Your CV",
+      "description": "Provide details and optional sections for your CV generation",
+      "fields": {
+        "name": "CV Name",
+        "optionalSections": "Optional Sections",
+        "jobDescription": "Job Description (Optional)"
+      },
+      "placeholders": {
+        "name": "e.g., Senior Software Engineer CV",
+        "jobDescription": "Paste the job description here to tailor your CV..."
+      },
+      "sections": {
+        "skills": "Skills",
+        "languages": "Languages",
+        "certifications": "Certifications",
+        "interests": "Interests"
+      },
+      "help": {
+        "jobDescription": "Pasting a job description will tailor your CV to match the role requirements"
+      }
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "next": "Next",
+      "back": "Back",
+      "generate": "Generate CV"
+    },
+    "toast": {
+      "created": "CV created successfully!",
+      "createFailed": "Failed to create CV",
+      "generationFailed": "Failed to generate CV content",
+      "error": "An error occurred"
+    }
+  },
+  "cvEditor": {
+    "title": "CV Editor",
+    "untitled": "Untitled CV",
+    "emptyState": "Your CV is empty. Add sections to get started.",
+    "newSection": "New Section",
+    "status": {
+      "saving": "Saving...",
+      "unsaved": "Unsaved changes",
+      "saved": "All changes saved"
+    },
+    "actions": {
+      "undo": "Undo",
+      "print": "Print / Export PDF",
+      "retry": "Retry"
+    },
+    "toast": {
+      "blockUpdated": "Block updated successfully",
+      "blockRemoved": "Block removed",
+      "blockRegenerated": "Block regenerated successfully",
+      "regenerationFailed": "Failed to regenerate block"
+    },
+    "errors": {
+      "loadFailed": "Failed to load CV",
+      "saveFailed": "Failed to save changes"
+    }
+  },
+  "cvBlock": {
+    "types": {
+      "summary": "Summary",
+      "experience": "Experience",
+      "education": "Education",
+      "skills": "Skills",
+      "languages": "Languages",
+      "certifications": "Certifications",
+      "interests": "Interests",
+      "custom": "Custom Section"
+    }
+  },
+  "cvBlockActions": {
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "edit": "Edit",
+    "regenerate": "Regenerate with AI",
+    "remove": "Remove",
+    "confirmRemove": "Are you sure you want to remove this block?"
+  },
+  "cvBlockEditor": {
+    "title": "Edit Block",
+    "fields": {
+      "title": "Title",
+      "content": "Content"
+    },
+    "placeholders": {
+      "title": "Enter section title...",
+      "content": "Enter content..."
+    },
+    "formatting": {
+      "title": "Formatting",
+      "bold": "bold",
+      "italic": "italic",
+      "bullet": "Bullet point"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save"
+    }
+  },
+  "cvSectionAdd": {
+    "addSection": "Add Section",
+    "title": "Choose Section Type",
+    "sections": {
+      "summary": {
+        "label": "Summary",
+        "description": "Professional summary or objective"
+      },
+      "skills": {
+        "label": "Skills",
+        "description": "Technical and soft skills"
+      },
+      "languages": {
+        "label": "Languages",
+        "description": "Languages you speak"
+      },
+      "certifications": {
+        "label": "Certifications",
+        "description": "Professional certifications"
+      },
+      "interests": {
+        "label": "Interests",
+        "description": "Personal interests and hobbies"
+      },
+      "custom": {
+        "label": "Custom Section",
+        "description": "Add a custom section with your own content"
+      }
+    }
+  },
+  "cvExperiencePicker": {
+    "title": "Select Experiences",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "noExperiences": "No experiences found",
+    "addExperience": "Add Experience",
+    "selected": "{count} experiences selected",
+    "unknown": "Unknown",
+    "present": "Present"
+  },
+  "cvGenerator": {
+    "errors": {
+      "profileNotFound": "User profile not found",
+      "buildInputFailed": "Failed to prepare data for generation",
+      "generationFailed": "Failed to generate CV",
+      "regenerationFailed": "Failed to regenerate block",
+      "noSectionGenerated": "No content was generated"
+    }
   }
 }

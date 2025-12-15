@@ -158,4 +158,20 @@ export class CVDocumentService {
       contentJSON: updatedContentJSON,
     } as CVDocumentUpdateInput);
   }
+
+  /**
+   * Update the entire contentJSON of the CV document
+   * @param cvId - CV document ID
+   * @param contentJSON - Complete contentJSON object
+   * @returns Updated CV document
+   */
+  async updateContent(cvId: string, contentJSON: CVContentJSON): Promise<CVDocument | null> {
+    const cv = await this.repo.get(cvId);
+    if (!cv) return null;
+
+    return await this.repo.update({
+      id: cvId,
+      contentJSON,
+    } as CVDocumentUpdateInput);
+  }
 }
