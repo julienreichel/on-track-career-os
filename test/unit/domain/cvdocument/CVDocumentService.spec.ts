@@ -206,9 +206,7 @@ describe('CVDocumentService', () => {
         name: 'My CV',
         userId: 'user-123',
         contentJSON: {
-          blocks: [
-            { id: 'block-1', type: 'header', content: { title: 'John Doe' }, order: 0 },
-          ],
+          blocks: [{ id: 'block-1', type: 'header', content: { title: 'John Doe' }, order: 0 }],
         },
       } as CVDocument;
 

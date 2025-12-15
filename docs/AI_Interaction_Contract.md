@@ -509,17 +509,239 @@ Produce the User × Job × Company Fit Summary.
 
 ## AI OPERATIONS 11–14 — Tailored Documents
 
-### Tailored CV Blocks
+### AI OPERATION 11 — `ai.generateCvBlocks`
 
-```json
+#### Purpose
+
+Generate a **job-tailored CV** as a sequence of structured blocks (“sections”), using:
+
+- User profile
+- Selected experiences (with stories / achievements / KPIs already available in the data layer)
+- Skills, languages, certifications, interests
+- An optional job description
+- A soft constraint that the CV should be **around 2 pages**
+
+This operation outputs **Notion-style sections** that the CV editor can render, reorder, or partially edit, without any free-form AI text.
+
+---
+
+#### System Prompt
+
+```text
+You are an assistant that generates a tailored CV as a sequence of structured sections.
+
+GOAL:
+- Produce a coherent CV that fits in approximately 2 pages.
+- Use ONLY the information provided in the input profile, experiences, stories, and job description.
+- DO NOT invent new experiences, employers, or responsibilities.
+- You MAY slightly infer impact phrasing (achievements, outcomes) as long as it clearly follows from the input.
+
+CONTENT & STRUCTURE RULES:
+- The CV is made of ordered sections ("blocks").
+- Each section has:
+  - type
+  - optional title
+  - content (plain text, no markdown)
+  - optional experienceId for experience-related blocks
+- Use only these section types:
+  - "summary"
+  - "experience"
+  - "education"
+  - "skills"
+  - "languages"
+  - "certifications"
+  - "interests"
+
+- For "summary":
+  - 3–5 concise sentences describing the user, aligned with the job if a job description is provided.
+- For "experience"/"education":
+  - One block per selected experience.
+  - Each block should be concise and focused on impact, using achievements/KPIs if available.
+- For "skills", "languages", "certifications", "interests":
+  - Summarize and group items logically into a short paragraph or bullet-like sentence list inside `content`.
+
+LENGTH HEURISTIC:
+- Aim for ~2 pages of CV content in total.
+- If there are MANY experiences (for example 7 or more), shorten each experience description.
+- If there are FEW experiences (for example 1–3), use richer narrative per experience.
+- Prefer clarity and focus over verbosity.
+
+TAILORING:
+- If a job description is provided:
+  - Emphasize experiences, skills, and achievements that best match the role.
+  - Reorder experience blocks to put the most relevant first.
+- If no job description is provided:
+  - Produce a generic but coherent CV that reflects the user's overall profile.
+
+OUTPUT RULES:
+- Return ONLY valid JSON, no markdown or extra text.
+- Respect the exact JSON schema provided in the user prompt.
+```
+
+---
+
+#### User Prompt
+
+```text
+Generate a tailored CV as ordered sections based on the following data.
+
+User profile:
+{{userProfileJson}}
+
+Selected experiences:
+{{selectedExperiencesJson}}
+
+Stories, achievements, and KPIs (optional, may be empty):
+{{storiesAndKpisJson}}
+
+Skills:
+{{skillsListJson}}
+
+Languages:
+{{languagesListJson}}
+
+Certifications:
+{{certificationsListJson}}
+
+Interests:
+{{interestsListJson}}
+
+Job description (optional, may be empty):
+{{jobDescriptionText}}
+
+Sections to generate (ordered list of section types):
+{{sectionsToGenerateJson}}
+
+Remember:
+- Use ONLY the information provided above.
+- Respect the requested section order.
+- Keep the overall length around 2 pages.
+- Use shorter descriptions when many experiences are selected; use richer descriptions when there are only a few.
+
+Return ONLY a JSON object with this exact structure:
+
 {
-  "cvBlocks": [
-    { "type": "experience", "content": "string" },
-    { "type": "skills", "content": ["string"] },
-    { "type": "achievements", "content": ["string"] }
+  "sections": [
+    {
+      "type": "summary" | "experience" | "skills" | "languages" | "certifications" | "interests" | "custom",
+      "title": "string (optional, can be empty for sections like 'summary' or when no title is needed)",
+      "content": "string (plain text, basic markdown: bullets, bold, emphasis)",
+      "experienceId": "string (optional, only for experience-related blocks)"
+    }
   ]
 }
 ```
+
+---
+
+#### Input Schema
+
+```json
+{
+  "userProfile": {
+    "id": "string",
+    "fullName": "string",
+    "headline": "string",
+    "location": "string",
+    "seniorityLevel": "string",
+    "goals": ["string"],
+    "aspirations": ["string"],
+    "personalValues": ["string"],
+    "strengths": ["string"]
+  },
+  "selectedExperiences": [
+    {
+      "id": "string",
+      "title": "string",
+      "company": "string",
+      "startDate": "string",
+      "endDate": "string",
+      "location": "string",
+      "responsibilities": ["string"],
+      "tasks": ["string"]
+    }
+  ],
+  "stories": [
+    {
+      "experienceId": "string",
+      "situation": "string",
+      "task": "string",
+      "action": "string",
+      "result": "string",
+      "achievements": ["string"],
+      "kpiSuggestions": ["string"]
+    }
+  ],
+  "skills": ["string"],
+  "languages": ["string"],
+  "certifications": ["string"],
+  "interests": ["string"],
+  "sectionsToGenerate": [
+    "summary",
+    "experience",
+    "skills",
+    "languages",
+    "certifications",
+    "interests",
+    "custom"
+  ],
+  "jobDescription": "string | null"
+}
+```
+
+_(You can relax individual fields to `optional` in your TS/Zod validator if needed for MVP.)_
+
+---
+
+#### Output Schema
+
+```json
+{
+  "sections": [
+    {
+      "type": "summary | experience | skills | languages | certifications | interests | custom",
+      "title": "string | null",
+      "content": "string",
+      "experienceId": "string | null"
+    }
+  ]
+}
+```
+
+- `type` is required and must be one of the fixed literals.
+- `title`:
+  - Optional / nullable.
+  - May be empty for sections where a title is not needed.
+
+- `content`:
+  - Required plain text (no markdown, no HTML).
+
+- `experienceId`:
+  - Optional; used only for `"experience"` (or any block directly derived from a specific experience).
+
+---
+
+#### Fallback Strategy
+
+- If the model returns non-JSON text:
+  - Try to extract the first JSON object substring.
+  - If parsing fails, **reissue** the prompt once with an extra instruction:
+
+    > "Your previous answer was invalid. Return ONLY VALID JSON matching the schema below, with no explanation or extra text."
+
+- If `sections` is missing or not an array:
+  - Replace with an empty array `[]`.
+
+- If a section is missing required fields:
+  - Drop that section OR
+  - Fill missing `title` with `null`, missing `experienceId` with `null`.
+
+- If `type` is invalid:
+  - Try to map to the closest valid type based on context (e.g. "profile" → "summary").
+  - If no safe mapping: drop the section.
+
+- If the result is clearly too verbose (e.g. a single section containing thousands of characters):
+  - Truncate to a reasonable length in the Lambda, and set an internal `lengthWarning` flag (for logging; UI can ignore for MVP).
 
 ### Cover Letter
 

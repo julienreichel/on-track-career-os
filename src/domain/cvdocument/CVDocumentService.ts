@@ -29,10 +29,7 @@ export class CVDocumentService {
    * @param block - Block to add (without order, will be appended)
    * @returns Updated CV document
    */
-  async addBlock(
-    cvId: string,
-    block: Omit<CVBlock, 'order'>
-  ): Promise<CVDocument | null> {
+  async addBlock(cvId: string, block: Omit<CVBlock, 'order'>): Promise<CVDocument | null> {
     const cv = await this.repo.get(cvId);
     if (!cv) return null;
 
