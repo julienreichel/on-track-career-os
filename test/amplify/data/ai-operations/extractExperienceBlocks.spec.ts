@@ -152,8 +152,8 @@ describe('ai.extractExperienceBlocks', () => {
       expect(result.experiences).toHaveLength(1);
       expect(result.experiences[0].title).toBe('Senior Software Engineer');
       expect(result.experiences[0].company).toBe('TechCorp Inc.');
-      expect(result.experiences[0].startDate).toBe('2020-03');
-      expect(result.experiences[0].endDate).toBe('2023-12');
+      expect(result.experiences[0].startDate).toBe('2020-03-01');
+      expect(result.experiences[0].endDate).toBe('2023-12-01');
       expect(result.experiences[0].responsibilities).toContain('Lead development team');
       expect(result.experiences[0].tasks).toContain('Implemented microservices');
     });
@@ -194,8 +194,8 @@ describe('ai.extractExperienceBlocks', () => {
       expect(result.experiences[0].endDate).toBeNull();
       expect(result.experiences[1].title).toBe('Junior Developer');
       expect(result.experiences[1].company).toBe('Company B');
-      expect(result.experiences[1].startDate).toBe('2018-06');
-      expect(result.experiences[1].endDate).toBe('2019-12');
+      expect(result.experiences[1].startDate).toBe('2018-06-01');
+      expect(result.experiences[1].endDate).toBe('2019-12-01');
     });
 
     it('should apply operation-specific validation fallbacks', async () => {

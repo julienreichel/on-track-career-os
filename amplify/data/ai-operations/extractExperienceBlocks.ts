@@ -93,6 +93,29 @@ ${OUTPUT_SCHEMA}`;
 }
 
 /**
+ * Normalize date to YYYY-MM-DD format
+ * Handles YYYY-MM format by adding -01 for the day
+ */
+function normalizeDate(date: string | null): string | null {
+  if (date === null || date === '') {
+    return null;
+  }
+
+  // Already in YYYY-MM-DD format
+  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return date;
+  }
+
+  // YYYY-MM format - add -01 for first day of month
+  if (/^\d{4}-\d{2}$/.test(date)) {
+    return `${date}-01`;
+  }
+
+  // Invalid format - return null
+  return null;
+}
+
+/**
  * Validate output and apply fallback rules per AIC
  */
 function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
@@ -109,7 +132,7 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
         {
           title: 'Experience 1',
           company: 'Unknown Company',
-          startDate: '',
+          startDate: '2020-01-01',
           endDate: null,
           responsibilities: [],
           tasks: [],
@@ -128,18 +151,22 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
       const title = typeof expObj.title === 'string' ? expObj.title : `Experience ${index + 1}`;
       const company = typeof expObj.company === 'string' ? expObj.company : 'Unknown Company';
       // Support both camelCase and snake_case from AI response
-      const startDate =
+      const rawStartDate =
         typeof expObj.startDate === 'string'
           ? expObj.startDate
           : typeof expObj.start_date === 'string'
             ? expObj.start_date
             : '';
-      const endDate =
+      const rawEndDate =
         expObj.endDate === null || typeof expObj.endDate === 'string'
           ? expObj.endDate
           : expObj.end_date === null || typeof expObj.end_date === 'string'
             ? expObj.end_date
             : null;
+
+      // Normalize dates to YYYY-MM-DD format
+      const startDate = normalizeDate(rawStartDate) || '';
+      const endDate = normalizeDate(rawEndDate);
 
       // Array fields with fallbacks
       const responsibilities = Array.isArray(expObj.responsibilities)
