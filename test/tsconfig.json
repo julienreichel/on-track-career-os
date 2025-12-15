@@ -10,7 +10,7 @@
       "#app": ["node_modules/nuxt/dist/app"],
       "#app/*": ["node_modules/nuxt/dist/app/*"]
     },
-    "types": ["vitest/globals", "@nuxt/test-utils", "node"]
+    "types": ["vitest/globals", "node"]
   },
   "include": [
     "**/*.ts",

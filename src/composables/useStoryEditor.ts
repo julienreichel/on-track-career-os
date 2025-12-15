@@ -40,8 +40,8 @@ function storyToFormState(story: STARStory): StoryFormState {
     task: story.task,
     action: story.action,
     result: story.result,
-    achievements: [...(story.achievements || [])],
-    kpiSuggestions: [...(story.kpiSuggestions || [])],
+    achievements: (story.achievements || []).filter((a): a is string => a !== null),
+    kpiSuggestions: (story.kpiSuggestions || []).filter((k): k is string => k !== null),
     experienceId: story.experienceId,
   };
 }

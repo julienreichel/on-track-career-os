@@ -123,7 +123,9 @@ describe('Post-Confirmation Flow (E2E Sandbox)', () => {
       // Fallback: verify we can still get our profile directly
       const directProfile = await repository.get(testUserId!);
       expect(directProfile).toBeDefined();
-      console.log('Note: List query returned 0 profiles, but direct get succeeded (eventual consistency)');
+      console.log(
+        'Note: List query returned 0 profiles, but direct get succeeded (eventual consistency)'
+      );
     } else {
       expect(profiles.length).toBeGreaterThanOrEqual(1);
       // Find our profile in the list

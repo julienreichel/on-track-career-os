@@ -218,7 +218,7 @@ describe('CVDocumentService', () => {
             { id: 'block-2', type: 'experience', content: { company: 'Tech Corp' }, order: 1 },
           ],
         },
-      };
+      } as CVDocument;
 
       mockRepository.get.mockResolvedValue(mockCV);
       mockRepository.update.mockResolvedValue(mockUpdatedCV);
@@ -247,7 +247,7 @@ describe('CVDocumentService', () => {
         contentJSON: {
           blocks: [{ id: 'block-1', type: 'header', content: { title: 'John Doe' }, order: 0 }],
         },
-      };
+      } as CVDocument;
 
       mockRepository.get.mockResolvedValue(mockCV);
       mockRepository.update.mockResolvedValue(mockUpdatedCV);
@@ -297,7 +297,7 @@ describe('CVDocumentService', () => {
             { id: 'block-2', type: 'experience', content: { company: 'Tech Corp' }, order: 1 },
           ],
         },
-      };
+      } as CVDocument;
 
       mockRepository.get.mockResolvedValue(mockCV);
       mockRepository.update.mockResolvedValue(mockUpdatedCV);
@@ -361,7 +361,7 @@ describe('CVDocumentService', () => {
             { id: 'block-3', type: 'skills', content: {}, order: 1 },
           ],
         },
-      };
+      } as CVDocument;
 
       mockRepository.get.mockResolvedValue(mockCV);
       mockRepository.update.mockResolvedValue(mockUpdatedCV);
@@ -422,7 +422,7 @@ describe('CVDocumentService', () => {
             { id: 'block-2', type: 'experience', content: {}, order: 2 },
           ],
         },
-      };
+      } as CVDocument;
 
       mockRepository.get.mockResolvedValue(mockCV);
       mockRepository.update.mockResolvedValue(mockUpdatedCV);

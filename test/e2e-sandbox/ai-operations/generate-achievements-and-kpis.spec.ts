@@ -109,13 +109,13 @@ describe('ai.generateAchievementsAndKpis - E2E Sandbox', () => {
     const hasQuantitativeKpi = result.kpiSuggestions.some(
       (kpi: string) => /\d+%|\d+\.\d+%|\d+ percent/.test(kpi) // Match percentages or "X percent"
     );
-    
+
     // If no quantitative metrics found, log for debugging
     if (!hasQuantitativeKpi) {
       console.log('KPI suggestions returned:', result.kpiSuggestions);
       console.log('Note: AI did not include quantitative metrics from input (70%, 99.9%)');
     }
-    
+
     // Make this a soft assertion - AI behavior can vary
     expect(hasQuantitativeKpi || result.kpiSuggestions.length > 0).toBe(true);
   });

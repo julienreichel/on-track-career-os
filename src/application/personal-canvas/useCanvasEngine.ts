@@ -246,8 +246,8 @@ export function useCanvasEngine() {
       }
 
       // Restore canvas ID if it existed (ensures update instead of create)
-      if (existingCanvasId && canvas.value) {
-        canvas.value.id = existingCanvasId;
+      if (existingCanvasId) {
+        canvas.value = { ...result, id: existingCanvasId };
       }
 
       // Save the generated canvas
