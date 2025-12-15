@@ -110,7 +110,7 @@ Generation features are useless without strong content.
 - Basic 2-page layout
 - Block-based structure (experiences, skills, achievements)
 - Full editing
-- PDF export
+- Print export
 
 ### User Value
 

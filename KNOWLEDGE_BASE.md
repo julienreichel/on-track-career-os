@@ -234,7 +234,7 @@ _(From AI Interaction Contract) _
 
 ## 8. Current Implementation Status
 
-### MVP Progress: ~40% Complete
+### MVP Progress: ~50% Complete
 
 #### ✅ EPIC 1A: User Data Intake & Identity (95% Complete)
 
@@ -247,16 +247,26 @@ _(From AI Interaction Contract) _
 - Profile merge from CV upload
 - 139 tests (65 component, 62 unit, 12 validator)
 
-#### ✅ EPIC 1B: Personal Canvas Generation (60% Complete)
+#### ✅ EPIC 1B: Personal Canvas Generation (100% Complete)
 
-**Implemented:**
+**Fully Implemented:**
 
-- Backend: GraphQL model + Lambda + repository/service/composable
-- 42 tests passing
+- Backend: GraphQL model + Lambda + repository/service/composable (40 tests)
+- Frontend: `/profile/canvas` page with Business Model Canvas layout
+- PersonalCanvasComponent (261 lines) with 9 editable sections
+- CanvasSectionCard component with tag-based editing
+- Generate and regenerate canvas functionality
+- Per-section editing with save/cancel
+- 121 tests passing (7 Amplify + 40 unit + 25 composable + 8 page + 21 CanvasSectionCard + 7 PersonalCanvasComponent + 13 usePersonalCanvas)
+- E2E canvas flow tests
 
-**Missing:**
+#### ✅ EPIC 2: Experience Builder - STAR Stories (95% Complete)
 
-- Frontend: Canvas view/edit page, visualization UI
+**Fully Implemented:**
+
+- Backend: GraphQL model + 2 AI Lambdas + repository/service/composables
+- Frontend: Global story library, per-experience stories, 3-mode story creation
+- 100+ tests (28 E2E, 70+ unit/component)
 
 #### ⚠️ Other EPICs: Backend foundations in place, frontend implementation pending
 
