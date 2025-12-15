@@ -4,6 +4,7 @@ import type { ExperiencesResult } from './Experience';
 import type { STARStory } from './STARStory';
 import type { AchievementsAndKpis } from './AchievementsAndKpis';
 import type { PersonalCanvas, PersonalCanvasInput } from './PersonalCanvas';
+import type { CVBlocksResult, GenerateCvBlocksInput } from './CVBlocks';
 
 /**
  * Repository interface for AI operations
@@ -46,6 +47,13 @@ export interface IAiOperationsRepository {
    * @returns Complete Personal Canvas with all 9 sections
    */
   generatePersonalCanvas(input: PersonalCanvasInput): Promise<PersonalCanvas>;
+
+  /**
+   * Generate tailored CV blocks from user profile and experiences
+   * @param input - User profile, experiences, stories, skills, and optional job description
+   * @returns Structured CV sections (blocks) ready for rendering
+   */
+  generateCvBlocks(input: GenerateCvBlocksInput): Promise<CVBlocksResult>;
 }
 
 /**
@@ -85,6 +93,21 @@ export type AmplifyAiOperations = {
       profile: string;
       experiences: string;
       stories: string;
+    },
+    options?: Record<string, unknown>
+  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
+
+  generateCvBlocks: (
+    input: {
+      userProfile: string;
+      selectedExperiences: string;
+      stories?: string;
+      skills?: string[];
+      languages?: string[];
+      certifications?: string[];
+      interests?: string[];
+      sectionsToGenerate?: string[];
+      jobDescription?: string;
     },
     options?: Record<string, unknown>
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
@@ -213,6 +236,36 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     // GraphQL schema returns a.json() which is a JSON string - parse it to get PersonalCanvas object
     // Cast unknown to string since we know a.json() returns a JSON string
     const parsed = JSON.parse(data as string) as PersonalCanvas;
+
+    return parsed;
+  }
+
+  async generateCvBlocks(input: GenerateCvBlocksInput): Promise<CVBlocksResult> {
+    // GraphQL schema uses a.json() for complex objects, which expects JSON strings
+    const stringifiedInput = {
+      userProfile: JSON.stringify(input.userProfile),
+      selectedExperiences: JSON.stringify(input.selectedExperiences),
+      stories: input.stories ? JSON.stringify(input.stories) : undefined,
+      skills: input.skills,
+      languages: input.languages,
+      certifications: input.certifications,
+      interests: input.interests,
+      sectionsToGenerate: input.sectionsToGenerate,
+      jobDescription: input.jobDescription ?? undefined,
+    };
+
+    const { data, errors } = await this.client.generateCvBlocks(stringifiedInput, gqlOptions());
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    // GraphQL schema returns a.json() which is a JSON string - parse it to get CVBlocksResult object
+    const parsed = JSON.parse(data as string) as CVBlocksResult;
 
     return parsed;
   }
