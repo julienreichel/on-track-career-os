@@ -1,10 +1,6 @@
 <template>
   <UCard
     :variant="isSelected ? 'subtle' : 'outline'"
-    :ui="{
-      body: { padding: 'p-4' },
-      header: { padding: 'p-3' },
-    }"
     :class="['transition-all duration-200', { 'opacity-50 scale-95': isDragging }]"
   >
     <template #header>
@@ -21,47 +17,8 @@
 
     <div>
       <slot :block="block">
-        <!-- Default rendering based on block type -->
-        <div v-if="block.type === 'summary'" class="prose prose-sm max-w-none">
-          <p v-html="formattedContent" />
-        </div>
-
-        <div v-else-if="block.type === 'experience'" class="space-y-2">
-          <h3 v-if="blockContent.title" class="font-semibold">
-            {{ blockContent.title }}
-          </h3>
-          <div class="prose prose-sm max-w-none" v-html="formattedContent" />
-        </div>
-
-        <div v-else-if="block.type === 'education'" class="space-y-2">
-          <h3 v-if="blockContent.title" class="font-semibold">
-            {{ blockContent.title }}
-          </h3>
-          <div class="prose prose-sm max-w-none" v-html="formattedContent" />
-        </div>
-
-        <div v-else-if="block.type === 'skills'" class="prose prose-sm max-w-none">
-          <div v-html="formattedContent" />
-        </div>
-
-        <div v-else-if="block.type === 'languages'" class="prose prose-sm max-w-none">
-          <div v-html="formattedContent" />
-        </div>
-
-        <div v-else-if="block.type === 'certifications'" class="prose prose-sm max-w-none">
-          <div v-html="formattedContent" />
-        </div>
-
-        <div v-else-if="block.type === 'interests'" class="prose prose-sm max-w-none">
-          <div v-html="formattedContent" />
-        </div>
-
-        <div v-else class="prose prose-sm max-w-none">
-          <h3 v-if="blockContent.title" class="font-semibold">
-            {{ blockContent.title }}
-          </h3>
-          <div v-html="formattedContent" />
-        </div>
+        <!-- Default rendering for all block types -->
+        <div class="prose prose-sm max-w-none" v-html="safeHtmlContent" />
       </slot>
     </div>
   </UCard>
@@ -69,6 +26,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import type { CVBlock } from '@/domain/cvdocument/CVDocumentService';
 
 interface Props {
@@ -102,31 +61,19 @@ const blockTitle = computed(() => {
   return t(`cvBlock.types.${props.block.type}`);
 });
 
-// Format content with basic markdown support (bold, italic, lists)
-const formattedContent = computed(() => {
+// Safe HTML content with markdown parsing and XSS protection
+const safeHtmlContent = computed(() => {
   const content = blockContent.value;
   const text = (content.text as string) || '';
 
   if (!text) return '';
 
-  // Convert basic markdown to HTML
-  let html = text
-    // Bold: **text** or __text__
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/__(.+?)__/g, '<strong>$1</strong>')
-    // Italic: *text* or _text_
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/_(.+?)_/g, '<em>$1</em>')
-    // Bullet lists: lines starting with - or *
-    .replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>')
-    // Numbered lists: lines starting with 1. 2. etc
-    .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
-    // Line breaks
-    .replace(/\n/g, '<br>');
+  // Convert markdown to HTML using marked library
+  const rawHtml = marked.parse(text, { async: false }) as string;
 
-  // Wrap list items
-  html = html.replace(/(<li>.*<\/li>)+/gs, '<ul>$&</ul>');
-
-  return html;
+  // Sanitize HTML to prevent XSS attacks
+  return DOMPurify.sanitize(rawHtml, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'b', 'i', 'ul', 'ol', 'li'],
+  });
 });
 </script>

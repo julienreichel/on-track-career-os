@@ -8,11 +8,22 @@ const MAX_FUNCTION_PARAMETERS = 4;
 export default withNuxt(
   {
     rules: {
-      // Allow single-word component names for pages, layouts, and app.vue
+      // Allow single-word component names for pages, layouts, app.vue, and components in subfolders
       'vue/multi-word-component-names': [
         'error',
         {
-          ignores: ['default', 'empty', 'error', 'index', 'login', '[id]', '[...slug]'],
+          ignores: [
+            'default',
+            'empty',
+            'error',
+            'index',
+            'login',
+            '[id]',
+            '[...slug]',
+            // Components in cv/render subfolder
+            'Block',
+            'Editor',
+          ],
         },
       ],
 

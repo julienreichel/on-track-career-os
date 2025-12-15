@@ -79,7 +79,6 @@ describe.skip('CvExperiencePicker', () => {
   });
 
   it('displays loading state initially', () => {
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue([]);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -102,7 +101,6 @@ describe.skip('CvExperiencePicker', () => {
       createMockExperience({ id: 'exp-2', companyName: 'StartupCo' }),
     ];
 
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue(experiences);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -124,7 +122,6 @@ describe.skip('CvExperiencePicker', () => {
   });
 
   it('displays empty state when no experiences', async () => {
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue([]);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -154,7 +151,6 @@ describe.skip('CvExperiencePicker', () => {
       }),
     ];
 
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue(experiences);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -184,7 +180,6 @@ describe.skip('CvExperiencePicker', () => {
       }),
     ];
 
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue(experiences);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -214,7 +209,6 @@ describe.skip('CvExperiencePicker', () => {
       }),
     ];
 
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue(experiences);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -240,7 +234,6 @@ describe.skip('CvExperiencePicker', () => {
       createMockExperience({ id: 'exp-2' }),
     ];
 
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue(experiences);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -265,7 +258,6 @@ describe.skip('CvExperiencePicker', () => {
   it('emits update:modelValue when experience selected', async () => {
     const experiences = [createMockExperience({ id: 'exp-1' })];
 
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue(experiences);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -292,7 +284,6 @@ describe.skip('CvExperiencePicker', () => {
   it('emits update:modelValue when experience deselected', async () => {
     const experiences = [createMockExperience({ id: 'exp-1' })];
 
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue(experiences);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -319,7 +310,6 @@ describe.skip('CvExperiencePicker', () => {
   it('shows select all button', async () => {
     const experiences = [createMockExperience()];
 
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue(experiences);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -346,7 +336,6 @@ describe.skip('CvExperiencePicker', () => {
       createMockExperience({ id: 'exp-2' }),
     ];
 
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue(experiences);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -376,7 +365,6 @@ describe.skip('CvExperiencePicker', () => {
       createMockExperience({ id: 'exp-2' }),
     ];
 
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue(experiences);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -403,7 +391,6 @@ describe.skip('CvExperiencePicker', () => {
       createMockExperience({ id: 'exp-2' }),
     ];
 
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue(experiences);
 
     const wrapper = mount(CvExperiencePicker, {
@@ -433,7 +420,6 @@ describe.skip('CvExperiencePicker', () => {
       createMockExperience({ id: 'exp-2', startDate: '2023-01-01' }),
     ];
 
-    
     vi.mocked(ExperienceRepository.getAll).mockResolvedValue(experiences);
 
     const wrapper = mount(CvExperiencePicker, {

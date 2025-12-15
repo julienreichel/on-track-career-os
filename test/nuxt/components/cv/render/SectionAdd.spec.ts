@@ -56,7 +56,8 @@ const stubs = {
     props: ['modelValue'],
   },
   UCard: {
-    template: '<div class="card"><div class="header"><slot name="header" /></div><div class="body"><slot /></div></div>',
+    template:
+      '<div class="card"><div class="header"><slot name="header" /></div><div class="body"><slot /></div></div>',
   },
   UButton: {
     template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
@@ -93,7 +94,7 @@ describe('CvSectionAdd', () => {
     });
 
     // Open modal by clicking the button
-    await wrapper.find("button").trigger("click");
+    await wrapper.find('button').trigger('click');
     await wrapper.vm.$nextTick();
 
     const text = wrapper.text();
@@ -116,7 +117,7 @@ describe('CvSectionAdd', () => {
       },
     });
 
-    await wrapper.find("button").trigger("click");
+    await wrapper.find('button').trigger('click');
     await wrapper.vm.$nextTick();
 
     const text = wrapper.text();
@@ -138,7 +139,7 @@ describe('CvSectionAdd', () => {
       },
     });
 
-    await wrapper.find("button").trigger("click");
+    await wrapper.find('button').trigger('click');
     await wrapper.vm.$nextTick();
 
     const text = wrapper.text();
@@ -156,7 +157,7 @@ describe('CvSectionAdd', () => {
       },
     });
 
-    await wrapper.find("button").trigger("click");
+    await wrapper.find('button').trigger('click');
     await wrapper.vm.$nextTick();
 
     const buttons = wrapper.findAll('button');
@@ -179,7 +180,7 @@ describe('CvSectionAdd', () => {
       },
     });
 
-    await wrapper.find("button").trigger("click");
+    await wrapper.find('button').trigger('click');
     await wrapper.vm.$nextTick();
 
     const buttons = wrapper.findAll('button');
@@ -201,7 +202,7 @@ describe('CvSectionAdd', () => {
       },
     });
 
-    await wrapper.find("button").trigger("click");
+    await wrapper.find('button').trigger('click');
     await wrapper.vm.$nextTick();
 
     const text = wrapper.text();
@@ -221,7 +222,7 @@ describe('CvSectionAdd', () => {
       },
     });
 
-    await wrapper.find("button").trigger("click");
+    await wrapper.find('button').trigger('click');
     await wrapper.vm.$nextTick();
 
     const icons = wrapper.findAll('i');
@@ -239,7 +240,7 @@ describe('CvSectionAdd', () => {
       },
     });
 
-    await wrapper.find("button").trigger("click");
+    await wrapper.find('button').trigger('click');
     await wrapper.vm.$nextTick();
 
     const buttons = wrapper.findAll('button').filter((b) => b.text().length > 0);
@@ -257,7 +258,7 @@ describe('CvSectionAdd', () => {
       },
     });
 
-    await wrapper.find("button").trigger("click");
+    await wrapper.find('button').trigger('click');
     await wrapper.vm.$nextTick();
 
     const buttons = wrapper.findAll('button');
@@ -279,7 +280,7 @@ describe('CvSectionAdd', () => {
       },
     });
 
-    await wrapper.find("button").trigger("click");
+    await wrapper.find('button').trigger('click');
     await wrapper.vm.$nextTick();
 
     expect(wrapper.text()).toContain('Professional Summary');
@@ -296,7 +297,7 @@ describe('CvSectionAdd', () => {
       },
     });
 
-    await wrapper.find("button").trigger("click");
+    await wrapper.find('button').trigger('click');
     await wrapper.vm.$nextTick();
 
     const text = wrapper.text();

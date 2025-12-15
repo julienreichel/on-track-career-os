@@ -101,16 +101,27 @@ const stubs = {
         <button @click="$emit('remove')">Remove</button>
       </div>
     `,
-    props: ['showMove', 'showEdit', 'showRegenerate', 'showRemove', 'isFirst', 'isLast', 'isRegenerating', 'confirmRemove'],
+    props: [
+      'showMove',
+      'showEdit',
+      'showRegenerate',
+      'showRemove',
+      'isFirst',
+      'isLast',
+      'isRegenerating',
+      'confirmRemove',
+    ],
     emits: ['move-up', 'move-down', 'edit', 'regenerate', 'remove'],
   },
   CvBlockEditor: {
-    template: '<div v-if="modelValue" class="editor-modal"><button @click="$emit(\'save\', { title: \'Test\', content: \'Updated\' })">Save</button></div>',
+    template:
+      '<div v-if="modelValue" class="editor-modal"><button @click="$emit(\'save\', { title: \'Test\', content: \'Updated\' })">Save</button></div>',
     props: ['modelValue', 'block', 'saving'],
     emits: ['update:modelValue', 'save'],
   },
   CvSectionAdd: {
-    template: '<div class="section-add"><button @click="$emit(\'add\', \'summary\')">Add Summary</button></div>',
+    template:
+      '<div class="section-add"><button @click="$emit(\'add\', \'summary\')">Add Summary</button></div>',
     emits: ['add'],
   },
   Draggable: {
@@ -200,10 +211,7 @@ describe.skip('CvEditor', () => {
   });
 
   it('renders blocks when available', () => {
-    const blocks = [
-      createMockBlock({ id: 'block-1' }),
-      createMockBlock({ id: 'block-2' }),
-    ];
+    const blocks = [createMockBlock({ id: 'block-1' }), createMockBlock({ id: 'block-2' })];
 
     useCvEditor.mockReturnValue({
       blocks: vi.fn(() => blocks),
@@ -561,7 +569,9 @@ describe.skip('CvEditor', () => {
 
   it('calls regenerateBlock when regenerate clicked', async () => {
     const blocks = [createMockBlock({ id: 'block-1', type: 'summary' })];
-    mockRegenerateBlock.mockResolvedValue(createMockBlock({ id: 'block-1', content: { text: 'Regenerated' } }));
+    mockRegenerateBlock.mockResolvedValue(
+      createMockBlock({ id: 'block-1', content: { text: 'Regenerated' } })
+    );
 
     useCvEditor.mockReturnValue({
       blocks: vi.fn(() => blocks),
