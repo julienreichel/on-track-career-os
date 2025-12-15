@@ -101,9 +101,9 @@ describe('PersonalCanvasComponent', () => {
         stubs: {
           UCard: { template: '<div class="u-card"><slot name="header" /><slot /></div>' },
           UIcon: true,
-          UTextarea: true,
+          UInput: true,
           UButton: true,
-          UBadge: true,
+          UBadge: { template: '<span class="u-badge"><slot /></span>' },
         },
       },
     });

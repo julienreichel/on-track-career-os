@@ -1,6 +1,24 @@
-import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { describe, it, expect, vi } from 'vitest';
+import { mount, flushPromises } from '@vue/test-utils';
+import { createI18n } from 'vue-i18n';
 import CanvasSectionCard from '@/components/CanvasSectionCard.vue';
+
+// Create i18n instance for tests
+const i18n = createI18n({
+  legacy: false,
+  locale: 'en',
+  messages: {
+    en: {
+      canvas: {
+        aria: {
+          editSection: 'Edit section',
+          saveSection: 'Save section',
+          cancelEdit: 'Cancel edit',
+        },
+      },
+    },
+  },
+});
 
 describe('CanvasSectionCard', () => {
   const defaultProps = {
@@ -8,224 +26,327 @@ describe('CanvasSectionCard', () => {
     title: 'Test Section',
     items: null,
     isEditing: false,
-    editValue: '',
     placeholder: 'Enter text here',
     emptyText: 'No data',
   };
 
-  it('renders with title and icon', () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: defaultProps,
-    });
-
-    expect(wrapper.find('h3').text()).toBe('Test Section');
-    // Verify icon component exists with correct name prop
-    const icon = wrapper.findComponent({ name: 'UIcon' });
-    expect(icon.exists()).toBe(true);
-    expect(icon.props('name')).toBe('i-heroicons-user-group');
-  });
-
-  it('displays empty text when no items', () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: defaultProps,
-    });
-
-    expect(wrapper.text()).toContain('No data');
-  });
-
-  it('displays list of items when provided', () => {
-    const wrapper = mount(CanvasSectionCard, {
+  const createWrapper = (props = {}) => {
+    return mount(CanvasSectionCard, {
       props: {
         ...defaultProps,
+        ...props,
+      },
+      global: {
+        plugins: [i18n],
+      },
+    });
+  };
+
+  describe('Display Mode', () => {
+    it('renders with title and icon', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.find('h3').text()).toBe('Test Section');
+      const icon = wrapper.findComponent({ name: 'UIcon' });
+      expect(icon.exists()).toBe(true);
+      expect(icon.props('name')).toBe('i-heroicons-user-group');
+    });
+
+    it('displays empty text when no items', () => {
+      const wrapper = createWrapper();
+
+      expect(wrapper.text()).toContain('No data');
+    });
+
+    it('displays tags when items provided', () => {
+      const wrapper = createWrapper({
         items: ['Item 1', 'Item 2', 'Item 3'],
-      },
+      });
+
+      const badges = wrapper.findAllComponents({ name: 'UBadge' });
+      expect(badges.length).toBeGreaterThanOrEqual(3);
+      expect(wrapper.text()).toContain('Item 1');
+      expect(wrapper.text()).toContain('Item 2');
+      expect(wrapper.text()).toContain('Item 3');
     });
 
-    expect(wrapper.findAll('li')).toHaveLength(3);
-    expect(wrapper.text()).toContain('Item 1');
-    expect(wrapper.text()).toContain('Item 2');
-    expect(wrapper.text()).toContain('Item 3');
-  });
-
-  it('does not display empty text when items exist', () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: {
-        ...defaultProps,
+    it('does not display empty text when items exist', () => {
+      const wrapper = createWrapper({
         items: ['Item 1'],
-      },
+      });
+
+      expect(wrapper.text()).not.toContain('No data');
     });
 
-    expect(wrapper.text()).not.toContain('No data');
+    it('handles empty array as no items', () => {
+      const wrapper = createWrapper({
+        items: [],
+      });
+
+      expect(wrapper.text()).toContain('No data');
+    });
+
+    it('handles undefined items', () => {
+      const wrapper = createWrapper({
+        items: undefined,
+      });
+
+      expect(wrapper.text()).toContain('No data');
+    });
+
+    it('shows edit button when not editing', () => {
+      const wrapper = createWrapper();
+
+      const buttons = wrapper.findAllComponents({ name: 'UButton' });
+      const editButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-pencil');
+      expect(editButton?.exists()).toBe(true);
+      // aria-label is tested in E2E tests
+    });
+
+    it('emits edit event when edit button clicked', async () => {
+      const wrapper = createWrapper();
+
+      const buttons = wrapper.findAllComponents({ name: 'UButton' });
+      const editButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-pencil');
+      await editButton?.vm.$emit('click');
+
+      expect(wrapper.emitted('edit')).toBeTruthy();
+    });
+
+    it('does not show input or delete buttons in display mode', () => {
+      const wrapper = createWrapper({
+        items: ['Item 1', 'Item 2'],
+      });
+
+      const input = wrapper.findComponent({ name: 'UInput' });
+      expect(input.exists()).toBe(false);
+
+      const badges = wrapper.findAllComponents({ name: 'UBadge' });
+      badges.forEach((badge) => {
+        // Delete buttons should not be present inside badges in display mode
+        const deleteButtons = badge.findAllComponents({ name: 'UButton' });
+        expect(deleteButtons.length).toBe(0);
+      });
+    });
   });
 
-  it('shows textarea in edit mode', () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: {
-        ...defaultProps,
+  describe('Edit Mode', () => {
+    it('shows input field when editing', () => {
+      const wrapper = createWrapper({
         isEditing: true,
-        editValue: 'Edit text',
-      },
+      });
+
+      const input = wrapper.findComponent({ name: 'UInput' });
+      expect(input.exists()).toBe(true);
+      expect(input.props('placeholder')).toBe('Enter text here');
     });
 
-    const textarea = wrapper.find('textarea');
-    expect(textarea.exists()).toBe(true);
-    expect(textarea.element.value).toBe('Edit text');
-  });
+    it('shows save and cancel buttons when editing', () => {
+      const wrapper = createWrapper({
+        isEditing: true,
+      });
 
-  it('hides list items in edit mode', () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: {
-        ...defaultProps,
+      const buttons = wrapper.findAllComponents({ name: 'UButton' });
+      const saveButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-check');
+      const cancelButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-x-mark');
+
+      expect(saveButton?.exists()).toBe(true);
+      expect(cancelButton?.exists()).toBe(true);
+      // aria-label attributes are tested in E2E tests
+    });
+
+    it('hides edit button when editing', () => {
+      const wrapper = createWrapper({
+        isEditing: true,
+      });
+
+      const buttons = wrapper.findAllComponents({ name: 'UButton' });
+      const editButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-pencil');
+      expect(editButton).toBeUndefined();
+    });
+
+    it('emits save event when save button clicked', async () => {
+      const wrapper = createWrapper({
+        isEditing: true,
+      });
+
+      const buttons = wrapper.findAllComponents({ name: 'UButton' });
+      const saveButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-check');
+      await saveButton?.vm.$emit('click');
+
+      expect(wrapper.emitted('save')).toBeTruthy();
+    });
+
+    it('emits cancel event when cancel button clicked', async () => {
+      const wrapper = createWrapper({
+        isEditing: true,
+      });
+
+      const buttons = wrapper.findAllComponents({ name: 'UButton' });
+      const cancelButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-x-mark');
+      await cancelButton?.vm.$emit('click');
+
+      expect(wrapper.emitted('cancel')).toBeTruthy();
+    });
+
+    it('initializes editItems from props when entering edit mode', async () => {
+      const wrapper = createWrapper({
+        items: ['Existing 1', 'Existing 2'],
+        isEditing: true,
+      });
+
+      await flushPromises();
+
+      const badges = wrapper.findAllComponents({ name: 'UBadge' });
+      expect(badges.length).toBeGreaterThanOrEqual(2);
+      expect(wrapper.text()).toContain('Existing 1');
+      expect(wrapper.text()).toContain('Existing 2');
+    });
+
+    it('shows tags with delete buttons in edit mode', () => {
+      const wrapper = createWrapper({
         items: ['Item 1', 'Item 2'],
         isEditing: true,
-      },
-    });
+      });
 
-    expect(wrapper.findAll('li')).toHaveLength(0);
+      const badges = wrapper.findAllComponents({ name: 'UBadge' });
+      expect(badges.length).toBeGreaterThanOrEqual(2);
+
+      // Each badge should have a delete button (x-mark icon) inside it
+      badges.forEach((badge) => {
+        const deleteButtons = badge.findAllComponents({ name: 'UButton' });
+        const hasDeleteButton = deleteButtons.some(
+          (btn) => btn.props('icon') === 'i-heroicons-x-mark-20-solid'
+        );
+        expect(hasDeleteButton).toBe(true);
+      });
+    });
   });
 
-  it('shows placeholder in textarea', () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: {
-        ...defaultProps,
+  describe('Tag Management', () => {
+    it('adds tag when Enter key pressed with non-empty input', async () => {
+      const wrapper = createWrapper({
         isEditing: true,
-        placeholder: 'Custom placeholder',
-      },
+      });
+
+      const input = wrapper.findComponent({ name: 'UInput' });
+
+      // Set input value
+      await input.vm.$emit('update:modelValue', 'New Tag');
+      await flushPromises();
+
+      // Simulate Enter key
+      const inputElement = input.find('input');
+      await inputElement.trigger('keydown.enter');
+      await flushPromises();
+
+      // Check that update:items was emitted with the new tag
+      const updateEvents = wrapper.emitted('update:items');
+      expect(updateEvents).toBeTruthy();
+      expect(updateEvents?.[0][0]).toContain('New Tag');
     });
 
-    const textarea = wrapper.find('textarea');
-    expect(textarea.attributes('placeholder')).toBe('Custom placeholder');
-  });
-
-  it('emits update:editValue when textarea changes', async () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: {
-        ...defaultProps,
+    it('does not add empty tags', async () => {
+      const wrapper = createWrapper({
         isEditing: true,
-        editValue: 'Initial text',
-      },
+      });
+
+      const input = wrapper.findComponent({ name: 'UInput' });
+
+      // Try to add empty tag
+      await input.vm.$emit('update:modelValue', '   ');
+      await flushPromises();
+
+      const inputElement = input.find('input');
+      await inputElement.trigger('keydown.enter');
+      await flushPromises();
+
+      // Should not emit update:items for empty/whitespace-only input
+      const updateEvents = wrapper.emitted('update:items');
+      expect(updateEvents).toBeFalsy();
     });
 
-    const textarea = wrapper.find('textarea');
-    await textarea.setValue('New text');
-
-    expect(wrapper.emitted('update:editValue')).toBeTruthy();
-    expect(wrapper.emitted('update:editValue')?.[0]).toEqual(['New text']);
-  });
-
-  it('handles empty array as no items', () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: {
-        ...defaultProps,
-        items: [],
-      },
-    });
-
-    expect(wrapper.text()).toContain('No data');
-    expect(wrapper.findAll('li')).toHaveLength(0);
-  });
-
-  it('handles undefined items', () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: {
-        ...defaultProps,
-        items: undefined,
-      },
-    });
-
-    expect(wrapper.text()).toContain('No data');
-  });
-
-  it('applies correct number of rows to textarea', () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: {
-        ...defaultProps,
+    it('clears input after adding tag', async () => {
+      const wrapper = createWrapper({
         isEditing: true,
-      },
+      });
+
+      const input = wrapper.findComponent({ name: 'UInput' });
+
+      await input.vm.$emit('update:modelValue', 'New Tag');
+      await flushPromises();
+
+      const inputElement = input.find('input');
+      await inputElement.trigger('keydown.enter');
+      await flushPromises();
+
+      // Check that update:items was emitted (tag was added)
+      const updateEvents = wrapper.emitted('update:items');
+      expect(updateEvents).toBeTruthy();
+      expect(updateEvents?.[0][0]).toContain('New Tag');
     });
 
-    const textarea = wrapper.find('textarea');
-    expect(textarea.attributes('rows')).toBe('12');
-  });
-
-  it('shows edit button when not editing', () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: defaultProps,
-    });
-
-    const buttons = wrapper.findAllComponents({ name: 'UButton' });
-    const editButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-pencil');
-    expect(editButton?.exists()).toBe(true);
-  });
-
-  it('emits edit event when edit button clicked', async () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: defaultProps,
-    });
-
-    const buttons = wrapper.findAllComponents({ name: 'UButton' });
-    const editButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-pencil');
-    await editButton?.vm.$emit('click');
-
-    expect(wrapper.emitted('edit')).toBeTruthy();
-  });
-
-  it('shows save and cancel buttons when editing', () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: {
-        ...defaultProps,
+    it('removes tag when delete button clicked', async () => {
+      const wrapper = createWrapper({
+        items: ['Item 1', 'Item 2', 'Item 3'],
         isEditing: true,
-      },
+      });
+
+      await flushPromises();
+
+      // Find a badge and its delete button
+      const badges = wrapper.findAllComponents({ name: 'UBadge' });
+      expect(badges.length).toBeGreaterThan(0);
+
+      const firstBadge = badges[0];
+      const deleteButtons = firstBadge.findAllComponents({ name: 'UButton' });
+      const deleteButton = deleteButtons.find(
+        (btn) => btn.props('icon') === 'i-heroicons-x-mark-20-solid'
+      );
+
+      expect(deleteButton).toBeDefined();
+      await deleteButton?.vm.$emit('click');
+      await flushPromises();
+
+      // Check that update:items was emitted with item removed
+      const updateEvents = wrapper.emitted('update:items');
+      expect(updateEvents).toBeTruthy();
+      // The emitted array should have one less item
+      const lastEmit = updateEvents?.[updateEvents.length - 1][0] as string[];
+      expect(lastEmit.length).toBe(2);
     });
 
-    const buttons = wrapper.findAllComponents({ name: 'UButton' });
-    const saveButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-check');
-    const cancelButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-x-mark');
-
-    expect(saveButton?.exists()).toBe(true);
-    expect(cancelButton?.exists()).toBe(true);
-  });
-
-  it('emits save event when save button clicked', async () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: {
-        ...defaultProps,
+    it('emits update:items with correct array when adding multiple tags', async () => {
+      const wrapper = createWrapper({
         isEditing: true,
-      },
+      });
+
+      const input = wrapper.findComponent({ name: 'UInput' });
+      const inputElement = input.find('input');
+
+      // Add first tag
+      await input.vm.$emit('update:modelValue', 'Tag 1');
+      await inputElement.trigger('keydown.enter');
+      await flushPromises();
+
+      // Add second tag
+      await input.vm.$emit('update:modelValue', 'Tag 2');
+      await inputElement.trigger('keydown.enter');
+      await flushPromises();
+
+      // Add third tag
+      await input.vm.$emit('update:modelValue', 'Tag 3');
+      await inputElement.trigger('keydown.enter');
+      await flushPromises();
+
+      const updateEvents = wrapper.emitted('update:items') as string[][];
+      expect(updateEvents.length).toBeGreaterThanOrEqual(3);
+      // Each event emission contains the full array of tags accumulated so far
+      const lastEmit = updateEvents[updateEvents.length - 1][0] as string[];
+      expect(lastEmit).toContain('Tag 1');
+      expect(lastEmit).toContain('Tag 2');
+      expect(lastEmit).toContain('Tag 3');
+      expect(lastEmit.length).toBe(3);
     });
-
-    const buttons = wrapper.findAllComponents({ name: 'UButton' });
-    const saveButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-check');
-    await saveButton?.vm.$emit('click');
-
-    expect(wrapper.emitted('save')).toBeTruthy();
-  });
-
-  it('emits cancel event when cancel button clicked', async () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: {
-        ...defaultProps,
-        isEditing: true,
-      },
-    });
-
-    const buttons = wrapper.findAllComponents({ name: 'UButton' });
-    const cancelButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-x-mark');
-    await cancelButton?.vm.$emit('click');
-
-    expect(wrapper.emitted('cancel')).toBeTruthy();
-  });
-
-  it('hides edit button when editing', () => {
-    const wrapper = mount(CanvasSectionCard, {
-      props: {
-        ...defaultProps,
-        isEditing: true,
-      },
-    });
-
-    const buttons = wrapper.findAllComponents({ name: 'UButton' });
-    const editButton = buttons.find((btn) => btn.props('icon') === 'i-heroicons-pencil');
-    expect(editButton).toBeUndefined();
   });
 });

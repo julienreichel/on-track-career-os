@@ -48,12 +48,7 @@
           @keydown.enter.prevent="handleAdd"
         />
         <div v-if="editItems.length > 0" class="flex flex-wrap gap-2">
-          <UBadge
-            v-for="(item, index) in editItems"
-            :key="index"
-            color="primary"
-            variant="subtle"
-          >
+          <UBadge v-for="(item, index) in editItems" :key="index" color="primary" variant="subtle">
             {{ item }}
             <UButton
               icon="i-heroicons-x-mark-20-solid"
