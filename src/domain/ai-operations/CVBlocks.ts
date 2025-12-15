@@ -20,3 +20,21 @@ export type {
 
 // Alias for consistency with other AI operations
 export type { GenerateCvBlocksOutput as CVBlocksResult } from '@amplify/data/ai-operations/generateCvBlocks';
+
+/**
+ * Type guard to validate CVBlocksResult structure
+ */
+export function isCVBlocksResult(data: unknown): data is CVBlocksResult {
+  if (typeof data !== 'object' || data === null) return false;
+
+  const result = data as Record<string, unknown>;
+
+  if (!Array.isArray(result.sections)) return false;
+
+  // Validate each section has required fields
+  return result.sections.every((section: unknown) => {
+    if (typeof section !== 'object' || section === null) return false;
+    const s = section as Record<string, unknown>;
+    return typeof s.type === 'string' && typeof s.content === 'string';
+  });
+}

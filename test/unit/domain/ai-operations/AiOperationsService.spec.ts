@@ -5,6 +5,7 @@ import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
 import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
 import type { STARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
+import type { CVBlocksResult, GenerateCvBlocksInput } from '@/domain/ai-operations/CVBlocks';
 
 // Mock the repository
 vi.mock('@/domain/ai-operations/AiOperationsRepository');
@@ -16,6 +17,7 @@ describe('AiOperationsService', () => {
     extractExperienceBlocks: ReturnType<typeof vi.fn>;
     generateStarStory: ReturnType<typeof vi.fn>;
     generateAchievementsAndKpis: ReturnType<typeof vi.fn>;
+    generateCvBlocks: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -25,6 +27,7 @@ describe('AiOperationsService', () => {
       extractExperienceBlocks: vi.fn(),
       generateStarStory: vi.fn(),
       generateAchievementsAndKpis: vi.fn(),
+      generateCvBlocks: vi.fn(),
     };
 
     // Create service with mocked repo
@@ -310,6 +313,155 @@ describe('AiOperationsService', () => {
       // Act & Assert
       await expect(service.generateAchievementsAndKpis(mockStarStory)).rejects.toThrow(
         'Invalid achievements and KPIs result structure'
+      );
+    });
+  });
+
+  describe('generateCvBlocks', () => {
+    const mockInput: GenerateCvBlocksInput = {
+      userProfile: {
+        id: 'user-1',
+        fullName: 'Jane Smith',
+        headline: 'Senior Product Manager',
+        location: 'New York, NY',
+      },
+      selectedExperiences: [
+        {
+          id: 'exp-1',
+          title: 'Senior PM',
+          company: 'TechCorp',
+          startDate: '2020-01-01',
+          endDate: '2023-12-01',
+        },
+      ],
+      skills: ['Product Strategy', 'Agile'],
+    };
+
+    it('should successfully generate CV blocks with valid input', async () => {
+      // Arrange
+      const mockResult: CVBlocksResult = {
+        sections: [
+          {
+            type: 'summary',
+            title: null,
+            content: 'Jane Smith is a Senior Product Manager...',
+            experienceId: null,
+          },
+          {
+            type: 'experience',
+            title: 'Senior PM at TechCorp',
+            content: 'Led product roadmap...',
+            experienceId: 'exp-1',
+          },
+        ],
+      };
+
+      mockRepo.generateCvBlocks.mockResolvedValue(mockResult);
+
+      // Act
+      const result = await service.generateCvBlocks(mockInput);
+
+      // Assert
+      expect(result).toEqual(mockResult);
+      expect(mockRepo.generateCvBlocks).toHaveBeenCalledWith(mockInput);
+    });
+
+    it('should throw error for invalid input structure', async () => {
+      // Act & Assert
+      await expect(service.generateCvBlocks(null as unknown as GenerateCvBlocksInput)).rejects.toThrow(
+        'Invalid input structure'
+      );
+      expect(mockRepo.generateCvBlocks).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when user profile is missing', async () => {
+      // Arrange
+      const invalidInput = { ...mockInput, userProfile: null };
+
+      // Act & Assert
+      await expect(
+        service.generateCvBlocks(invalidInput as unknown as GenerateCvBlocksInput)
+      ).rejects.toThrow('User profile is required');
+      expect(mockRepo.generateCvBlocks).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when fullName is missing', async () => {
+      // Arrange
+      const invalidInput = {
+        ...mockInput,
+        userProfile: { ...mockInput.userProfile, fullName: '' },
+      };
+
+      // Act & Assert
+      await expect(service.generateCvBlocks(invalidInput)).rejects.toThrow(
+        'User profile must have a fullName'
+      );
+      expect(mockRepo.generateCvBlocks).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when selectedExperiences is not an array', async () => {
+      // Arrange
+      const invalidInput = { ...mockInput, selectedExperiences: null };
+
+      // Act & Assert
+      await expect(
+        service.generateCvBlocks(invalidInput as unknown as GenerateCvBlocksInput)
+      ).rejects.toThrow('Selected experiences must be an array');
+      expect(mockRepo.generateCvBlocks).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when no experiences are selected', async () => {
+      // Arrange
+      const invalidInput = { ...mockInput, selectedExperiences: [] };
+
+      // Act & Assert
+      await expect(service.generateCvBlocks(invalidInput)).rejects.toThrow(
+        'At least one experience must be selected'
+      );
+      expect(mockRepo.generateCvBlocks).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when experience is missing required fields', async () => {
+      // Arrange
+      const invalidInput = {
+        ...mockInput,
+        selectedExperiences: [{ id: 'exp-1', title: '', company: 'TechCorp' }],
+      };
+
+      // Act & Assert
+      await expect(service.generateCvBlocks(invalidInput)).rejects.toThrow(
+        'Each experience must have id, title, and company'
+      );
+      expect(mockRepo.generateCvBlocks).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when repository fails', async () => {
+      // Arrange
+      mockRepo.generateCvBlocks.mockRejectedValue(new Error('AI operation failed'));
+
+      // Act & Assert
+      await expect(service.generateCvBlocks(mockInput)).rejects.toThrow(
+        'Failed to generate CV blocks: AI operation failed'
+      );
+    });
+
+    it('should throw error when result structure is invalid', async () => {
+      // Arrange
+      mockRepo.generateCvBlocks.mockResolvedValue({ invalid: 'structure' });
+
+      // Act & Assert
+      await expect(service.generateCvBlocks(mockInput)).rejects.toThrow(
+        'Invalid CV blocks result structure'
+      );
+    });
+
+    it('should throw error when no sections are generated', async () => {
+      // Arrange
+      mockRepo.generateCvBlocks.mockResolvedValue({ sections: [] });
+
+      // Act & Assert
+      await expect(service.generateCvBlocks(mockInput)).rejects.toThrow(
+        'CV generation produced no sections'
       );
     });
   });

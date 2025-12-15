@@ -327,9 +327,7 @@ function prepareInputForLogging(input: GenerateCvBlocksInput): Record<string, un
 /**
  * Main Lambda handler
  */
-export const handler = async (event: {
-  arguments: GenerateCvBlocksInput;
-}): Promise<string> => {
+export const handler = async (event: { arguments: GenerateCvBlocksInput }): Promise<string> => {
   return withAiOperationHandler(
     'generateCvBlocks',
     event,
