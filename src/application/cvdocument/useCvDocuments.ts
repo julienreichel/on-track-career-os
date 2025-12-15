@@ -10,7 +10,7 @@ import type {
 /**
  * Update an item in the items array
  */
-function updateItemInArray(items: CVDocument[], updated: CVDocument | null) {
+function updateItemInArray(items: CVDocument[], updated: CVDocument | null | undefined) {
   if (!updated) return;
   const index = items.findIndex((item) => item.id === updated.id);
   if (index !== -1) {

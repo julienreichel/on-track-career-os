@@ -17,7 +17,7 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => {
  * Tests the actual implementation with mocked Bedrock responses
  */
 describe('ai.generateCvBlocks', () => {
-  let handler: (event: { arguments: Record<string, unknown> }) => Promise<string>;
+  let handler: any;
   let mockSend: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
