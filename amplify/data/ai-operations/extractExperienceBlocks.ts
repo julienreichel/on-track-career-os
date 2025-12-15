@@ -18,7 +18,7 @@ import { truncateForLog, withAiOperationHandler } from './utils/common';
 
 // System prompt - constant as per AIC
 const SYSTEM_PROMPT = `You transform experience text into structured experience blocks.
-Extract: title, company, dates, responsibilities, tasks & achievements.
+Extract: title, company, dates, responsibilities, tasks & achievements, and experience type.
 Never infer seniority or technologies not present.
 Return JSON only.
 
@@ -30,6 +30,12 @@ RULES:
 - Responsibilities are high-level duties and roles
 - Tasks include specific actions, deliverables, achievements, and measurable results
 - Tasks should capture accomplishments, metrics, and outcomes (e.g., "Increased sales by 30%", "Led team of 5 developers")
+- experienceType must be one of: "work", "education", "volunteer", "project"
+  - "work": Professional employment experiences
+  - "education": Schools, universities, degrees, certifications
+  - "volunteer": Volunteering, community service, non-profit work
+  - "project": Personal or side projects, freelance work
+- Default to "work" if the type is ambiguous
 - Return ONLY valid JSON with no markdown wrappers`;
 
 // Output schema for retry
@@ -41,7 +47,8 @@ const OUTPUT_SCHEMA = `{
       "startDate": "YYYY-MM-DD or YYYY-MM",
       "endDate": "YYYY-MM-DD or YYYY-MM or null",
       "responsibilities": ["string"],
-      "tasks": ["string"]
+      "tasks": ["string"],
+      "experienceType": "work | education | volunteer | project"
     }
   ]
 }`;
@@ -54,6 +61,7 @@ export interface ExperienceBlock {
   endDate: string | null;
   responsibilities: string[];
   tasks: string[];
+  experienceType: 'work' | 'education' | 'volunteer' | 'project';
 }
 
 export interface ExtractExperienceBlocksOutput {
@@ -105,6 +113,7 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
           endDate: null,
           responsibilities: [],
           tasks: [],
+          experienceType: 'work' as const,
         },
       ],
     };
@@ -138,6 +147,25 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
         : [];
       const tasks = Array.isArray(expObj.tasks) ? expObj.tasks : [];
 
+      // experienceType field with validation and fallback
+      const expType =
+        typeof expObj.experienceType === 'string'
+          ? expObj.experienceType
+          : typeof expObj.experience_type === 'string'
+            ? expObj.experience_type
+            : 'work';
+      const validTypes: Array<'work' | 'education' | 'volunteer' | 'project'> = [
+        'work',
+        'education',
+        'volunteer',
+        'project',
+      ];
+      const experienceType = validTypes.includes(
+        expType as 'work' | 'education' | 'volunteer' | 'project'
+      )
+        ? (expType as 'work' | 'education' | 'volunteer' | 'project')
+        : 'work';
+
       return {
         title,
         company,
@@ -147,6 +175,7 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
           (r: unknown) => typeof r === 'string'
         ) as string[],
         tasks: tasks.filter((t: unknown) => typeof t === 'string') as string[],
+        experienceType,
       };
     }
   );

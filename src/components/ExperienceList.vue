@@ -37,6 +37,19 @@ const columns: TableColumn<Experience>[] = [
     header: t('experiences.table.company'),
   },
   {
+    accessorKey: 'experienceType',
+    header: t('experiences.table.type'),
+    cell: ({ row }) => {
+      const type = row.original.experienceType || 'work';
+      const badge = getTypeBadge(type);
+      return h(UBadge, {
+        color: badge?.color,
+        label: badge?.label,
+        size: 'xs',
+      });
+    },
+  },
+  {
     accessorKey: 'startDate',
     header: t('experiences.table.startDate'),
     cell: ({ row }) => formatDate(row.original.startDate),
@@ -127,6 +140,15 @@ function getStatusBadge(status: string | null | undefined) {
     draft: { color: 'neutral' as const, label: t('experiences.status.draft') },
     complete: { color: 'success' as const, label: t('experiences.status.complete') },
   }[statusValue];
+}
+
+function getTypeBadge(type: string) {
+  return {
+    work: { color: 'primary' as const, label: t('experiences.types.work') },
+    education: { color: 'blue' as const, label: t('experiences.types.education') },
+    volunteer: { color: 'green' as const, label: t('experiences.types.volunteer') },
+    project: { color: 'purple' as const, label: t('experiences.types.project') },
+  }[type as 'work' | 'education' | 'volunteer' | 'project'];
 }
 </script>
 

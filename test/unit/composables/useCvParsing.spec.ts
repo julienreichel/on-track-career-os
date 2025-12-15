@@ -188,7 +188,17 @@ describe('useCvParsing', () => {
       };
 
       mockAiOps.experiences.value = {
-        experiences: [],
+        experiences: [
+          {
+            title: 'Software Engineer',
+            company: 'Tech Corp',
+            experienceType: 'work',
+            startDate: '2020-01',
+            endDate: '2023-12',
+            responsibilities: ['Build software'],
+            tasks: ['Code'],
+          },
+        ],
       };
 
       await parsing.parseFile(textFile);

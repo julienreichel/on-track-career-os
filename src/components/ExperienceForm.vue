@@ -30,6 +30,7 @@ const form = ref<ExperienceCreateInput>({
   tasks: [],
   rawText: '',
   status: 'draft',
+  experienceType: 'work',
   userId: '', // Will be set by the page/parent
 });
 
@@ -47,6 +48,7 @@ watch(
         tasks: experience.tasks || [],
         rawText: experience.rawText || '',
         status: experience.status || 'draft',
+        experienceType: experience.experienceType || 'work',
         userId: experience.userId,
       };
     }
@@ -128,6 +130,20 @@ function handleCancel() {
         <UInput
           v-model="form.companyName"
           :placeholder="t('experiences.form.companyPlaceholder')"
+          class="w-full lg:w-1/2"
+        />
+      </UFormField>
+
+      <!-- Experience Type -->
+      <UFormField :label="t('experiences.form.type')">
+        <USelect
+          v-model="form.experienceType"
+          :options="[
+            { value: 'work', label: t('experiences.types.work') },
+            { value: 'education', label: t('experiences.types.education') },
+            { value: 'volunteer', label: t('experiences.types.volunteer') },
+            { value: 'project', label: t('experiences.types.project') },
+          ]"
           class="w-full lg:w-1/2"
         />
       </UFormField>

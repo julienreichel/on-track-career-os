@@ -87,6 +87,7 @@ const mockExperiences: Experience[] = [
     id: '1',
     title: 'Senior Software Engineer',
     companyName: 'Tech Corp',
+    experienceType: 'work',
     startDate: '2020-01-01',
     endDate: '2023-12-31',
     responsibilities: ['Lead development', 'Mentor team'],
@@ -102,6 +103,7 @@ const mockExperiences: Experience[] = [
     id: '2',
     title: 'Software Engineer',
     companyName: 'StartupCo',
+    experienceType: 'work',
     startDate: '2018-06-01',
     endDate: '',
     responsibilities: ['Write code'],
@@ -176,7 +178,7 @@ describe('ExperienceList', () => {
   it('displays correct number of table columns', () => {
     const wrapper = createWrapper({ experiences: mockExperiences });
     const headers = wrapper.findAll('th');
-    expect(headers.length).toBe(7); // title, company, startDate, endDate, status, stories, actions
+    expect(headers.length).toBe(8); // title, company, type, startDate, endDate, status, stories, actions
   });
 
   it('formats dates correctly', () => {

@@ -122,11 +122,18 @@
     "table": {
       "title": "Title",
       "company": "Company",
+      "type": "Type",
       "startDate": "Start Date",
       "endDate": "End Date",
       "status": "Status",
       "stories": "Stories",
       "actions": "Actions"
+    },
+    "types": {
+      "work": "Work",
+      "education": "Education",
+      "volunteer": "Volunteer",
+      "project": "Project"
     },
     "form": {
       "createTitle": "Add Experience",
@@ -135,6 +142,7 @@
       "titlePlaceholder": "e.g., Senior Software Engineer",
       "company": "Company Name",
       "companyPlaceholder": "e.g., Acme Corporation",
+      "type": "Experience Type",
       "startDate": "Start Date",
       "endDate": "End Date",
       "endDateHint": "Leave empty if this is your current position",

@@ -69,17 +69,42 @@ export function useCvParsing() {
     }
 
     // Step 2: Extract experience blocks from parsed sections
-    await aiOps.extractExperiences(aiOps.parsedCv.value.sections.experiences);
+    const allExperiences: ExtractedExperience[] = [];
 
-    if (aiOps.error.value) {
-      throw new Error(aiOps.error.value);
+    // Extract work experiences
+    if (aiOps.parsedCv.value.sections.experiences.length > 0) {
+      await aiOps.extractExperiences(aiOps.parsedCv.value.sections.experiences);
+
+      if (aiOps.error.value) {
+        throw new Error(aiOps.error.value);
+      }
+
+      if (aiOps.experiences.value?.experiences) {
+        allExperiences.push(...aiOps.experiences.value.experiences);
+      }
     }
 
-    if (!aiOps.experiences.value?.experiences) {
+    // Extract education experiences
+    if (
+      aiOps.parsedCv.value.sections.education &&
+      aiOps.parsedCv.value.sections.education.length > 0
+    ) {
+      await aiOps.extractExperiences(aiOps.parsedCv.value.sections.education);
+
+      if (aiOps.error.value) {
+        throw new Error(aiOps.error.value);
+      }
+
+      if (aiOps.experiences.value?.experiences) {
+        allExperiences.push(...aiOps.experiences.value.experiences);
+      }
+    }
+
+    if (allExperiences.length === 0) {
       throw new Error(t('cvUpload.errors.extractionFailed'));
     }
 
-    extractedExperiences.value = aiOps.experiences.value.experiences;
+    extractedExperiences.value = allExperiences;
   }
 
   function removeExperience(index: number) {

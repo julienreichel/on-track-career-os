@@ -134,6 +134,7 @@ export const schema = a
         tasks: a.string().array(),
         rawText: a.string(),
         status: a.enum(['draft', 'complete']),
+        experienceType: a.enum(['work', 'education', 'volunteer', 'project']),
 
         userId: a.id().required(),
         user: a.belongsTo('UserProfile', 'userId'),

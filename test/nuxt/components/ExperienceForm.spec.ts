@@ -82,6 +82,7 @@ const mockExperience: Experience = {
   id: '1',
   title: 'Senior Software Engineer',
   companyName: 'Tech Corp',
+  experienceType: 'work',
   startDate: '2020-01-01',
   endDate: '2023-12-31',
   responsibilities: ['Lead development', 'Mentor team'],

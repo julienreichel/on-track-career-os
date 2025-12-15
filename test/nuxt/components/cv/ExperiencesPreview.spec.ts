@@ -48,6 +48,7 @@ const mockExperiences: ExtractedExperience[] = [
   {
     title: 'Senior Software Engineer',
     company: 'Tech Corp',
+    experienceType: 'work',
     startDate: '2020-01',
     endDate: '2023-12',
     responsibilities: ['Lead development team', 'Architect solutions'],
@@ -56,6 +57,7 @@ const mockExperiences: ExtractedExperience[] = [
   {
     title: 'Software Engineer',
     company: 'StartUp Inc',
+    experienceType: 'work',
     startDate: '2018-06',
     endDate: null,
     responsibilities: ['Develop web applications'],
@@ -137,6 +139,7 @@ describe('ExperiencesPreview', () => {
       {
         title: 'Developer',
         company: 'Company',
+        experienceType: 'work',
         startDate: '2020-01',
         endDate: '2021-01',
         responsibilities: [],
@@ -153,6 +156,7 @@ describe('ExperiencesPreview', () => {
       {
         title: 'Developer',
         company: 'Company',
+        experienceType: 'work',
         startDate: '2020-01',
         endDate: '2021-01',
         responsibilities: ['Responsibility 1'],
