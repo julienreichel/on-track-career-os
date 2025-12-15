@@ -1,287 +1,349 @@
-# ✅ MASTER PROMPT 1 — Implement PersonalCanvas Domain Layer
+# ✅ EPIC 3 — MASTER PROMPT PACK
 
-(Repository + Service + Composable)
+**Generic CV Generator (Notion-style Editor)**
+Covers:
 
-### 1. CONTEXT
-
-The backend for EPIC 1B is fully implemented: GraphQL model, AI operation (`ai.generatePersonalCanvas`), repository/service/composable tests already exist (as per the project status).
-BUT the **frontend domain layer is missing**: we need to expose the data to UI pages through clean composables, following your architecture.
-See: high-level architecture and data model.
-
-### 2. COMPONENTS / COMPOSABLES
-
-Create or use:
-
-- `PersonalCanvasRepository` (wraps GraphQL queries/mutations)
-- `PersonalCanvasService` (business logic)
-- `useCanvasEngine()` (exposes load/save/regenerate for UI)
-  — already mentioned in Component/Page Mapping:
-
-### 3. PAGES INVOLVED
-
-None yet — this is backend/frontend domain foundation.
-
-### 4. IMPLEMENTATION INSTRUCTIONS
-
-- Follow existing patterns from Experience, STARStory, CVDocument.
-- Implement in `/domain/personal-canvas/` folder.
-- Methods:
-  - `loadCanvas(userId)`
-  - `saveCanvas(canvasInput)`
-  - `regenerateCanvas(profile, experiences, stories)`
-
-- `regenerateCanvas()` must call `ai.generatePersonalCanvas` using AIC contract.
-- Ensure all types are imported from the Lambda re-export (single source of truth).
-- Keep functions pure, TDD-first, max line thresholds respected.
-
-### 5. TESTING INSTRUCTIONS
-
-Create unit tests mirroring other domains:
-
-- Repository: GraphQL calls, optimistic update.
-- Service: correct merge/update logic; regeneration calls AIC with valid schema.
-- Composable: state management + error states + loading states.
-
-### 6. ACCEPTANCE CRITERIA
-
-- All repository, service, composable functions implemented + tested.
-- `useCanvasEngine()` exposes `canvas`, `loadCanvas()`, `saveCanvas()`, `regenerateCanvas()`.
-- Calling `regenerateCanvas()` returns a validated PersonalCanvas JSON.
-- No UI work yet.
-- All tests pass.
+- Block editor
+- Layout engine
+- Regenerate-one-block
+- Add/remove/reorder blocks
+- Include/skip experiences & sections
+- 2-page length heuristics
+- PDF export
+- DRY composables and components
 
 ---
 
-# ✅ MASTER PROMPT 2 — Implement `/canvas` Page (View + Edit)
+# 🔷 **MASTER PROMPT 3.1 — Create the CV Domain Layer (Repository + Service + Types)**
 
-### 1. CONTEXT
+### **Reason for this prompt**
 
-EPIC 1B requires **a visual, editable canvas**. According to navigation + component mapping, this is page **1.5**.
-See: Navigation and Component Mapping.
+Before building UI and AI features, the CV feature requires a clean domain layer to store and retrieve CVs, manage blocks, and support regeneration. Backend models already exist (CVDocument), but no domain logic is implemented.
 
-### 2. COMPONENTS TO USE
+### **Components / Composables Needed**
 
-- **UI:** `<UContainer>`, `<UCard>`, `<UFormGroup>`, `<UTextarea>`, `<UButton>`
-- **Custom components:**
-  - `PersonalCanvasComponent.vue` (displays 9 sections)
+- `CVDocumentRepository`
+- `CVDocumentService`
+- `useCvDocuments()` composable
 
-- **Composables:**
-  - `useCanvasEngine()`
-  - `useUserProfile()`
-  - `useExperienceStore()`
-  - `useStoryEngine()` (for regeneration source data)
+### **Pages to Create/Update**
 
-### 3. PAGE TO IMPLEMENT
+None yet (domain layer only).
 
-- `/canvas` displaying:
-  - All 9 fields:
-    valueProposition, keyActivities, strengthsAdvantage, targetRoles, channels, resources, careerDirection, painRelievers, gainCreators
-  - “Regenerate Canvas” button
-  - “Save” button
-  - Simple column layout (no drag & drop for MVP)
+### **Acceptance Criteria**
 
-### 4. IMPLEMENTATION INSTRUCTIONS
+- Creates repository and service aligned with existing project conventions
+- Supports:
+  - createDocument()
+  - updateDocument()
+  - deleteDocument()
+  - addBlock()
+  - updateBlock()
+  - removeBlock()
+  - reorderBlocks()
 
-- Load existing canvas via `useCanvasEngine().loadCanvas()`.
-- If no canvas exists → display “Generate canvas” button.
-- Editing uses `<UForm>` or inline `<UTextarea>` depending on simplicity.
-- On save, call `saveCanvas()`.
-- On regenerate, call `regenerateCanvas(profile, experiences, stories)` using data from composables.
-
-### 5. TESTING INSTRUCTIONS
-
-- Component tests:
-  - Page renders 9 editable sections.
-  - Buttons trigger composable functions.
-  - Loading state displayed.
-
-- Integration tests:
-  - Mock composable return values.
-  - Canvas persists after edit.
-  - Regenerate replaces existing canvas content.
-
-### 6. ACCEPTANCE CRITERIA
-
-- Page loads existing canvas when user returns.
-- Editing works for all fields.
-- Regeneration uses latest profile/experience/story data.
-- Responsive and minimal.
-- No drag & drop (YAGNI).
-- Adheres to Nuxt UI conventions.
+- Uses existing GraphQL CVDocument model
+- Includes full test suite (Vitest)
+- Zero duplicated logic (follow patterns from **Experience**, **PersonalCanvas**)
+- No UI code yet
 
 ---
 
-# ✅ MASTER PROMPT 3 — Implement `<PersonalCanvasComponent/>`
+# 🔷 **MASTER PROMPT 3.2 — Implement `ai.generateGenericCv` Lambda + Types**
 
-### 1. CONTEXT
+### **Reason**
 
-This reusable component is required for multiple views (future: versioning, matching explanations).
-See architecture component list.
+EPIC 3 requires a generic CV generator based on:
 
-### 2. COMPONENTS TO CREATE
+- UserProfile
+- Selected Experiences
+- Stories, achievements, KPIs
+- Skills, languages, certifications
+- Interest section
+- Auto-length control (~2 pages)
 
-`components/personal-canvas/PersonalCanvasComponent.vue`
+This Lambda does not yet exist.
 
-### 3. REQUIRED FEATURES (MVP ONLY)
+### **Components / Composables Needed**
 
-- Display all 9 sections
-- Editable mode using slots or props
-- Optional read-only mode
+- None (AI layer only)
 
-### 4. IMPLEMENTATION INSTRUCTIONS
+### **Pages to Create/Update**
 
-- Props:
-  - `modelValue` (the full PersonalCanvas object)
-  - `readonly`
+- None here (AI only)
 
-- Emit:
-  - `update:modelValue` for each field
+### **Acceptance Criteria**
 
-- UI:
-  - Wrap each section in `<UCard>` with `<UTextarea>` when editable.
+- Creates `ai.generateGenericCv` in Amplify style (matching existing AI ops)
+- Input includes:
+  - userProfile
+  - selectedExperiences[]
+  - skills/languages/certs/interests
+  - section order
 
-- No drag & drop yet — too costly for MVP (YAGNI).
+- Output must be:
 
-### 5. TESTING INSTRUCTIONS
+  ```
+  {
+    sections: [
+      {
+        id: string
+        type: "experience" | "summary" | "skills" | "languages" | "certifications" | "interests" | "custom"
+        title?: string
+        content: string
+        experienceId?: string
+      }
+    ],
+    approxPageLength: number
+  }
+  ```
 
-- Test that each field renders.
-- Editing updates modelValue via emitted event.
-- Readonly mode disables inputs.
+- Enforces 2-page heuristic:
+  - Many experiences → shorter descriptions
+  - Few → longer narratives
 
-### 6. ACCEPTANCE CRITERIA
-
-- The component is fully controlled via v-model.
-- No business logic inside, only UI and events.
-- Re-usable in future canvases.
-
----
-
-# ✅ MASTER PROMPT 4 — Implement AI Regeneration Flow (Frontend)
-
-### 1. CONTEXT
-
-`ai.generatePersonalCanvas` is fully available and validated.
-We implement its **frontend orchestration**.
-See AI Interaction Contract.
-
-### 2. COMPOSABLES
-
-Modify `useCanvasEngine()` to:
-
-- `async regenerateCanvas()`:
-  - fetch profile (`useUserProfile`)
-  - fetch experiences (`useExperienceStore`)
-  - fetch stories (`useStoryEngine`)
-  - call AI op with validated schema
-  - save result to backend
-
-### 3. IMPLEMENTATION INSTRUCTIONS
-
-- Validate inputs before calling AI.
-- Use existing Amplify GraphQL client with owner-based auth.
-- Ensure loading/error states in composable state.
-- Cache updated canvas in in-memory state to avoid re-fetch.
-
-### 4. TESTING INSTRUCTIONS
-
-- Mock AI operation (AIC schema).
-- Tests for:
-  - correct payload
-  - missing data fallback
-  - canvas gets updated
-  - errors surface correctly
-
-### 5. ACCEPTANCE CRITERIA
-
-- Regeneration always produces a valid PersonalCanvas object.
-- Works even with partial user data (AIC fallback rules).
-- UI instantly displays the regenerated content.
+- Includes regeneration of a single block by passing:
+  `{ regenerateBlockId: string }`
+- Includes schema validation + recovery attempt
+- Includes 7 tests (mirroring other lambdas)
 
 ---
 
-# ✅ MASTER PROMPT 5 — Glue Navigation: Add Canvas Entry Point
+# 🔷 **MASTER PROMPT 3.3 — Build the Notion-Style Block Editor (UI Components)**
 
-### 1. CONTEXT
+### **Reason**
 
-Navigation tree already defines the page.
-See High-Level Navigation.
+Users must reorder, edit, add, remove blocks, and regenerate individual blocks in a minimal, clean interface.
 
-### 2. IMPLEMENTATION INSTRUCTIONS
+### **Components Needed**
 
-- Add link to `/canvas` in:
-  - Sidebar (“My Profile”)
-  - Dashboard card (“Personal Canvas Status”)
+- `<CvEditor />` — master component
+- `<CvBlock />` — displays blocks (summary, experience, skills…)
+- `<CvBlockEditor />` — inline edit modal
+- `<CvBlockActions />` — remove / regenerate / move
+- `<CvSectionAdd />` — add custom section
+- `<CvExperiencePicker />` — select experiences to include
 
-- Indicate:
-  - “Generated”
-  - “Needs update” (use canvas.needsUpdate flag)
+### **Composables Needed**
 
-### 3. TESTING
+- `useCvEditor()` — manages local block state
+- `useCvGenerator()` — wraps AI call to regenerate block(s)
 
-- Click navigation → open canvas page.
-- Status reflects `needsUpdate`.
+### **Pages to Create/Update**
 
-### 4. ACCEPTANCE CRITERIA
+- `/cv` — list all CV documents
+- `/cv/new` — create new CV (wizard: pick experiences + generate)
+- `/cv/[id]` — full editor
 
-- User can reach canvas page from ≥2 places.
-- Status displayed correctly.
+### **Acceptance Criteria**
 
----
+- Editor supports:
+  - Add/remove/reorder blocks
+  - Inline editing
+  - Regenerate one block
+  - Add custom empty section
 
-# ✅ MASTER PROMPT 6 — Implement E2E Canvas Flow (Minimal)
-
-### 1. CONTEXT
-
-EPIC 1B must be validated end-to-end.
-See Project Status and roadmap dependency for EPIC 1B.
-
-### 2. END-TO-END FLOW
-
-1. User logs in
-2. Profile filled
-3. Experiences exist
-4. User visits `/canvas`
-5. User clicks “Generate Canvas”
-6. Canvas is displayed
-7. User edits → Save
-8. Reload page → changes persist
-
-### 3. TESTING INSTRUCTIONS
-
-- Use Playwright minimal tests.
-- Mock AI only if required by testing environment.
-- Validate canvas is persisted in GraphQL.
-
-### 4. ACCEPTANCE CRITERIA
-
-- Canvas can be generated, edited, saved, reloaded.
-- Zero console errors.
+- Uses `<UCard>`, `<UDraggable>`, `<UButton>` (Nuxt UI only)
+- Auto-save every change
+- Clean, minimal UI (not rich-text, only bold/italic + block structure)
+- Fully tested:
+  - Rendering
+  - Drag/reorder
+  - Edit/save
+  - Remove block
 
 ---
 
-# ✅ MASTER PROMPT 7 — Implement “Canvas Weak Sections” Indicators (MVP-Lite)
+# 🔷 **MASTER PROMPT 3.4 — CV Generation Flow (Wizard: Select Experiences → Generate CV)**
 
-### 1. CONTEXT
+### **Reason**
 
-The EPIC mentions “AI suggestions for weak sections,” but fully implementing suggestions is NOT MVP.
-We do a minimal display: weak sections = empty or too short.
-(YAGNI: no AI improvement flow.)
+Users choose which experiences appear in the CV. This determines content length.
 
-### 2. COMPONENTS
+### **Components Needed**
 
-Add small badges or warnings in `PersonalCanvasComponent.vue`.
+- `<CvExperiencePicker />`
+- `<CvGenerationWizard />` (simple 2-step flow)
 
-### 3. IMPLEMENTATION
+### **Pages to Create/Update**
 
-- Compute weak sections in `useCanvasEngine()` (pure function).
-- Expose `weakSections: string[]`.
-- Component shows small `<UBadge color="yellow">Needs attention</UBadge>`.
+- `/cv/new`
 
-### 4. TESTS
+### **Acceptance Criteria**
 
-- Test detection logic: empty, whitespace-only, or < 5 chars.
+- Step 1: Select experiences (multi-select)
+- Step 2: Generate with `ai.generateGenericCv`
+- Persist result to CVDocumentRepository
+- Navigate to `/cv/[id]`
+- If user has **no experiences**, show clear empty state
+- If user has **1–2 experiences**, Lambda returns expanded text
+- If **8+ experiences**, Lambda compresses content
 
-### 5. ACCEPTANCE CRITERIA
+---
 
-- MVP visual cue works.
-- No AI calls triggered for this feature.
+# 🔷 **MASTER PROMPT 3.5 — Add Block-Level AI Regeneration**
+
+### **Reason**
+
+Users must regenerate _one_ block without touching the rest.
+
+### **Components Needed**
+
+- `<CvBlockActions />` update (Regenerate)
+- Reuse composable: `useCvGenerator()`
+
+### **Pages to Update**
+
+- `/cv/[id]`
+
+### **Acceptance Criteria**
+
+- Click “Regenerate block” → calls `ai.generateGenericCv` with:
+
+  ```
+  regenerateBlockId
+  existingCvDocument
+  ```
+
+- Only that block is replaced
+- All IDs except regenerated one remain stable
+- Undo capability: single-level undo stored in composable
+- Toasts for success/error
+
+---
+
+# 🔷 **MASTER PROMPT 3.6 — Add Support for Optional Sections (Skills, Languages, Certifications, Interests + Custom)**
+
+### **Reason**
+
+EPIC requires flexible sections that users can add/remove anywhere in the CV.
+
+### **Components Needed**
+
+- `<CvSectionAdd />` — button to add section
+- `<CvSectionChooser />` — modal listing available section types
+
+### **Pages to Update**
+
+- `/cv/[id]`
+
+### **Acceptance Criteria**
+
+- User can add:
+  - Summary (top)
+  - Skills
+  - Languages
+  - Certifications
+  - Interests
+  - Custom section (title optional)
+
+- Section can be removed
+- Section can be reordered
+- If removed, no side-effects
+
+---
+
+# 🔷 **MASTER PROMPT 3.7 — Implement 2-Page Length Estimation + Warnings**
+
+### **Reason**
+
+CV must stay ~2 pages. No complex pagination now (YAGNI), but we need heuristics.
+
+### **Components Needed**
+
+- `<CvLengthIndicator />`
+
+### **Composables Needed**
+
+- `useCvLengthEstimator()`
+
+### **Pages to Update**
+
+- `/cv/[id]`
+
+### **Acceptance Criteria**
+
+- Compute approximate length = total chars / 1800
+- Display:
+  - Green (<2 pages)
+  - Yellow (2–3 pages)
+  - Red (>3 pages)
+
+- Auto-refresh on each block change
+- No blocking behaviour
+
+---
+
+# 🔷 **MASTER PROMPT 3.8 — PDF Export (MVP)**
+
+### **Reason**
+
+Exporting is part of EPIC 3 MVP.
+
+### **Components Needed**
+
+- None (simple button + backend print route OR client-side print)
+
+### **Pages to Update**
+
+- `/cv/[id]`
+
+### **Acceptance Criteria**
+
+MVP solution (YAGNI):
+
+- Implement **browser print to PDF**:
+  - `<CvPrintableView />` with minimal styling
+  - Print button → `window.print()`
+  - Layout optimized for A4
+
+- No server-side PDF generation
+
+---
+
+# 🔷 **MASTER PROMPT 3.9 — Full Test Suite for CV Editor**
+
+### **Reason**
+
+Your architecture requires 80%+ test coverage
+(see **Tech Foundation Spec** — criteria from file: ).
+
+### **Tests to Include**
+
+- Block rendering
+- Reordering
+- Adding/removing blocks
+- Editing
+- Regenerate one block (mock AI)
+- Saving (auto-save)
+- PDF print view snapshot tests
+
+### **Acceptance Criteria**
+
+- All tests pass
+- Coverage ≥ 80%
+- No flaky tests
+
+---
+
+# 🔷 **MASTER PROMPT 3.10 — Final Integration: Add CV Entry Points Across UI**
+
+### **Reason**
+
+Users must be able to create or edit CVs from dashboard and profile.
+
+### **Components Needed**
+
+None new.
+
+### **Pages to Update**
+
+- `/profile`
+- `/dashboard`
+- `/applications/cv` if exists
+
+### **Acceptance Criteria**
+
+- Dashboard includes “Generate CV” shortcut
+- Profile includes “Create CV from profile”
+- CV list accessible from navigation sidebar
