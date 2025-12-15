@@ -151,6 +151,7 @@ const {
   removeBlock: removeBlockFromEditor,
   updateBlock,
   moveBlock: moveBlockInEditor,
+  reorderBlocks,
   undo,
   replaceBlock,
 } = useCvEditor(props.cvId);
@@ -178,8 +179,9 @@ const existingBlockTypes = computed(() => {
 // Make blocks draggable
 const blocksList = computed({
   get: () => blocks.value,
-  set: () => {
-    // Handled by drag end event
+  set: (newBlocks: CVBlock[]) => {
+    // Update block order when drag and drop completes
+    reorderBlocks(newBlocks.map((b) => b.id));
   },
 });
 

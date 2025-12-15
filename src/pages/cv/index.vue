@@ -89,11 +89,23 @@
         </UCard>
       </div>
     </UPageBody>
+
+    <!-- Delete Confirmation Modal -->
+    <ConfirmModal
+      v-model:open="deleteModalOpen"
+      :title="t('cvList.confirmDelete', { name: cvToDelete?.name || t('cvList.untitled') })"
+      :description="t('cvList.confirmDeleteDescription')"
+      :confirm-label="t('common.delete')"
+      :cancel-label="t('common.cancel')"
+      confirm-color="red"
+      :loading="deleting"
+      @confirm="handleDelete"
+    />
   </UPage>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useCvDocuments } from '@/composables/useCvDocuments';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 
@@ -101,6 +113,10 @@ const { t } = useI18n();
 const toast = useToast();
 
 const { items, loading, error, loadAll, deleteDocument } = useCvDocuments();
+
+const deleteModalOpen = ref(false);
+const cvToDelete = ref<CVDocument | null>(null);
+const deleting = ref(false);
 
 onMounted(() => {
   loadAll();
@@ -148,20 +164,32 @@ const downloadCV = async (_cv: CVDocument) => {
   });
 };
 
-const confirmDelete = async (cv: CVDocument) => {
-  if (confirm(t('cvList.confirmDelete', { name: cv.name || t('cvList.untitled') }))) {
-    const success = await deleteDocument(cv.id);
+const confirmDelete = (cv: CVDocument) => {
+  cvToDelete.value = cv;
+  deleteModalOpen.value = true;
+};
+
+const handleDelete = async () => {
+  if (!cvToDelete.value) return;
+
+  deleting.value = true;
+  try {
+    const success = await deleteDocument(cvToDelete.value.id);
     if (success) {
       toast.add({
         title: t('cvList.toast.deleted'),
         color: 'primary',
       });
+      deleteModalOpen.value = false;
     } else {
       toast.add({
         title: t('cvList.toast.deleteFailed'),
         color: 'error',
       });
     }
+  } finally {
+    deleting.value = false;
+    cvToDelete.value = null;
   }
 };
 </script>

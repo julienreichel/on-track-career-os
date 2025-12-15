@@ -4,23 +4,8 @@
       {{ $t('cvSectionAdd.addSection') }}
     </UButton>
 
-    <UModal v-model="isOpen">
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h3 class="font-semibold">
-              {{ $t('cvSectionAdd.title') }}
-            </h3>
-            <UButton
-              icon="i-heroicons-x-mark"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              @click="isOpen = false"
-            />
-          </div>
-        </template>
-
+    <UModal v-model:open="isOpen" :title="$t('cvSectionAdd.title')" :description="$t('cvSectionAdd.description')" close>
+      <template #body>
         <div class="space-y-2">
           <UButton
             v-for="section in availableSections"
@@ -38,7 +23,7 @@
             </div>
           </UButton>
         </div>
-      </UCard>
+      </template>
     </UModal>
   </div>
 </template>

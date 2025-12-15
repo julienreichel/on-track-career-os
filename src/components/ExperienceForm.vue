@@ -138,7 +138,7 @@ function handleCancel() {
       <UFormField :label="t('experiences.form.type')">
         <USelect
           v-model="form.experienceType"
-          :options="[
+          :items="[
             { value: 'work', label: t('experiences.types.work') },
             { value: 'education', label: t('experiences.types.education') },
             { value: 'volunteer', label: t('experiences.types.volunteer') },

@@ -179,7 +179,7 @@ const cancel = () => {
 };
 
 const generateCV = async () => {
-  if (!cvName.value.trim()) {
+  if (!cvName.value.trim() || !userId.value) {
     return;
   }
 
@@ -219,12 +219,13 @@ const generateCV = async () => {
       });
 
       // Navigate to editor
-      router.push({
+      await router.push({
         name: 'cv-id',
         params: { id: cvDocument.id },
         query: { experiences: selectedExperienceIds.value.join(',') },
       });
     } else {
+      console.error('[cvNew] Failed to create CV document - createDocument returned null');
       toast.add({
         title: t('cvNew.toast.createFailed'),
         color: 'error',

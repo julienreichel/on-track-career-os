@@ -1,36 +1,21 @@
 <template>
-  <UModal v-model="isOpen">
-    <UCard>
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h3 class="font-semibold">
-            {{ $t('cvBlockEditor.title') }}
-          </h3>
-          <UButton
-            icon="i-heroicons-x-mark"
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            @click="close"
-          />
-        </div>
-      </template>
-
+  <UModal v-model:open="isOpen" :title="$t('cvBlockEditor.title')" :description="$t('cvBlockEditor.description')" close>
+    <template #body>
       <div class="space-y-4">
         <!-- Block Title (optional for some types) -->
-        <UFormGroup v-if="showTitleField" :label="$t('cvBlockEditor.fields.title')" name="title">
+        <UFormField v-if="showTitleField" :label="$t('cvBlockEditor.fields.title')" name="title">
           <UInput v-model="localTitle" :placeholder="$t('cvBlockEditor.placeholders.title')" />
-        </UFormGroup>
+        </UFormField>
 
         <!-- Block Content (main text) -->
-        <UFormGroup :label="$t('cvBlockEditor.fields.content')" name="content" required>
+        <UFormField :label="$t('cvBlockEditor.fields.content')" name="content" required>
           <UTextarea
             v-model="localContent"
             :placeholder="$t('cvBlockEditor.placeholders.content')"
             :rows="12"
             autoresize
           />
-        </UFormGroup>
+        </UFormField>
 
         <!-- Formatting help -->
         <UCard variant="soft">
@@ -42,18 +27,18 @@
           </ul>
         </UCard>
       </div>
+    </template>
 
-      <template #footer>
-        <div class="flex justify-end gap-2">
-          <UButton color="neutral" variant="ghost" @click="close">
-            {{ $t('cvBlockEditor.actions.cancel') }}
-          </UButton>
-          <UButton :loading="saving" @click="save">
-            {{ $t('cvBlockEditor.actions.save') }}
-          </UButton>
-        </div>
-      </template>
-    </UCard>
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <UButton color="neutral" variant="ghost" @click="close">
+          {{ $t('cvBlockEditor.actions.cancel') }}
+        </UButton>
+        <UButton :loading="saving" @click="save">
+          {{ $t('cvBlockEditor.actions.save') }}
+        </UButton>
+      </div>
+    </template>
   </UModal>
 </template>
 

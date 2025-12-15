@@ -517,6 +517,7 @@
     "tailored": "Tailored for job",
     "updated": "Updated",
     "confirmDelete": "Are you sure you want to delete \"{name}\"?",
+    "confirmDeleteDescription": "This action cannot be undone.",
     "actions": {
       "create": "Create New CV",
       "edit": "Edit CV",
@@ -597,6 +598,7 @@
       "print": "Print / Export PDF",
       "retry": "Retry"
     },
+    "saveSuccess": "CV saved successfully",
     "toast": {
       "blockUpdated": "Block updated successfully",
       "blockRemoved": "Block removed",
@@ -626,10 +628,12 @@
     "edit": "Edit",
     "regenerate": "Regenerate with AI",
     "remove": "Remove",
-    "confirmRemove": "Are you sure you want to remove this block?"
+    "confirmRemove": "Are you sure you want to remove this block?",
+    "confirmRemoveDescription": "This action cannot be undone."
   },
   "cvBlockEditor": {
     "title": "Edit Block",
+    "description": "Edit the content of this CV block",
     "fields": {
       "title": "Title",
       "content": "Content"
@@ -652,6 +656,7 @@
   "cvSectionAdd": {
     "addSection": "Add Section",
     "title": "Choose Section Type",
+    "description": "Select a section to add to your CV",
     "sections": {
       "summary": {
         "label": "Summary",

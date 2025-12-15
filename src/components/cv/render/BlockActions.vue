@@ -51,9 +51,21 @@
       @click="handleRemove"
     />
   </div>
+
+  <!-- Remove Confirmation Modal -->
+  <ConfirmModal
+    v-model:open="removeModalOpen"
+    :title="t('cvBlockActions.confirmRemove')"
+    :description="t('cvBlockActions.confirmRemoveDescription')"
+    :confirm-label="t('common.delete')"
+    :cancel-label="t('common.cancel')"
+    confirm-color="red"
+    @confirm="handleConfirmRemove"
+  />
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 interface Props {
   showMove?: boolean;
   showEdit?: boolean;
@@ -86,13 +98,18 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
+const removeModalOpen = ref(false);
+
 const handleRemove = () => {
   if (props.confirmRemove) {
-    if (confirm(t('cvBlockActions.confirmRemove'))) {
-      emit('remove');
-    }
+    removeModalOpen.value = true;
   } else {
     emit('remove');
   }
+};
+
+const handleConfirmRemove = () => {
+  emit('remove');
+  removeModalOpen.value = false;
 };
 </script>
