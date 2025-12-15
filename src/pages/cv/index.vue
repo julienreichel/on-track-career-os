@@ -1,9 +1,6 @@
 <template>
   <UPage>
-    <UPageHeader
-      :title="$t('cvList.title')"
-      :description="$t('cvList.subtitle')"
-    >
+    <UPageHeader :title="$t('cvList.title')" :description="$t('cvList.subtitle')">
       <template #actions>
         <UButton icon="i-heroicons-plus" :to="{ name: 'cv-new' }">
           {{ $t('cvList.actions.create') }}
@@ -55,7 +52,7 @@
               <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">
                 {{ cv.name || $t('cvList.untitled') }}
               </h3>
-              <UDropdown :items="getActions(cv)">
+              <UDropdownMenu :items="getActions(cv)">
                 <UButton
                   icon="i-heroicons-ellipsis-vertical"
                   size="xs"
@@ -63,7 +60,7 @@
                   variant="ghost"
                   @click.stop
                 />
-              </UDropdown>
+              </UDropdownMenu>
             </div>
 
             <div class="space-y-1 text-sm text-gray-600">

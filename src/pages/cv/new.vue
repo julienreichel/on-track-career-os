@@ -84,9 +84,9 @@
           </div>
 
           <!-- CV Name -->
-          <UFormGroup :label="$t('cvNew.step2.fields.name')" required>
+          <UFormField :label="$t('cvNew.step2.fields.name')" required>
             <UInput v-model="cvName" :placeholder="$t('cvNew.step2.placeholders.name')" />
-          </UFormGroup>
+          </UFormField>
 
           <!-- Optional Sections -->
           <div>
@@ -105,16 +105,16 @@
           </div>
 
           <!-- Job Description (Optional) -->
-          <UFormGroup :label="$t('cvNew.step2.fields.jobDescription')">
+          <UFormField
+            :label="$t('cvNew.step2.fields.jobDescription')"
+            :help="$t('cvNew.step2.help.jobDescription')"
+          >
             <UTextarea
               v-model="jobDescription"
               :placeholder="$t('cvNew.step2.placeholders.jobDescription')"
               :rows="4"
             />
-            <template #help>
-              {{ $t('cvNew.step2.help.jobDescription') }}
-            </template>
-          </UFormGroup>
+          </UFormField>
 
           <div class="flex justify-end gap-3 pt-4 border-t">
             <UButton color="neutral" variant="outline" @click="previousStep">
@@ -133,6 +133,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthUser } from '@/composables/useAuthUser';
 import { useCvDocuments } from '@/composables/useCvDocuments';
 import { useCvGenerator } from '@/composables/useCvGenerator';
 
@@ -140,8 +141,8 @@ const { t } = useI18n();
 const router = useRouter();
 const toast = useToast();
 
-// Get current user ID (you'll need to implement this based on your auth setup)
-const userId = ref(''); // TODO: Get from auth context
+// Get current user ID from auth
+const { userId } = useAuthUser();
 
 const { createDocument } = useCvDocuments();
 const { generateBlocks, generating, error: generationError } = useCvGenerator();

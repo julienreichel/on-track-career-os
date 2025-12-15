@@ -55,7 +55,9 @@
             </div>
             <div v-if="experience.experienceType" class="mt-2">
               <UBadge
-                :label="$t(`experience.types.${experience.experienceType}`)"
+                :label="
+                  $t(`experiences.types.${experience.experienceType}`, experience.experienceType)
+                "
                 size="xs"
                 color="neutral"
                 variant="subtle"
@@ -82,7 +84,7 @@ import type { Experience } from '@/domain/experience/Experience';
 
 interface Props {
   modelValue: string[];
-  userId: string;
+  userId: string | null;
 }
 
 const props = defineProps<Props>();
@@ -139,6 +141,11 @@ const formatDateRange = (startDate?: string | null, endDate?: string | null): st
 };
 
 const loadExperiences = async () => {
+  // Don't load if userId is not available yet
+  if (!props.userId) {
+    return;
+  }
+
   loading.value = true;
 
   try {
