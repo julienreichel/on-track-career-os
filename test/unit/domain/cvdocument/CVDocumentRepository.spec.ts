@@ -166,7 +166,10 @@ describe('CVDocumentRepository', () => {
       const result = await repository.create(input);
 
       expect(mockModel.create).toHaveBeenCalledWith(
-        input,
+        {
+          ...input,
+          contentJSON: JSON.stringify(input.contentJSON),
+        },
         expect.objectContaining({ authMode: 'userPool' })
       );
       expect(result).toEqual(mockCreatedCV);

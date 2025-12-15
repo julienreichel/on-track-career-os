@@ -52,12 +52,9 @@ const i18n = createI18n({
 
 const stubs = {
   UModal: {
-    template: '<div v-if="modelValue" class="modal"><slot /></div>',
-    props: ['modelValue'],
-  },
-  UCard: {
-    template:
-      '<div class="card"><div class="header"><slot name="header" /></div><div class="body"><slot /></div></div>',
+    template: '<div v-if="open" class="modal"><div class="modal-body"><slot name="body" /></div></div>',
+    props: ['open', 'title', 'description', 'close'],
+    emits: ['update:open'],
   },
   UButton: {
     template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',

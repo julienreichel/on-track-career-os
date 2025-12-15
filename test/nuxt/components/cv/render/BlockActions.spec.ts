@@ -193,8 +193,6 @@ describe('CvBlockActions', () => {
   });
 
   it('confirms before emitting remove event when confirmRemove is true', async () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
-
     const wrapper = mount(CvBlockActions, {
       props: {
         showRemove: true,
@@ -206,20 +204,24 @@ describe('CvBlockActions', () => {
       },
     });
 
+    // Click remove button to open modal
     const removeBtn = wrapper
       .findAll('button')
       .find((b) => b.attributes('icon') === 'i-heroicons-trash');
     await removeBtn?.trigger('click');
 
-    expect(confirmSpy).toHaveBeenCalled();
-    expect(wrapper.emitted('remove')).toBeTruthy();
+    // Modal should be open now, simulate confirm
+    const confirmModal = wrapper.findComponent({ name: 'ConfirmModal' });
+    expect(confirmModal.exists()).toBe(true);
+    
+    // Simulate confirm event
+    await confirmModal.vm.$emit('confirm');
+    await wrapper.vm.$nextTick();
 
-    confirmSpy.mockRestore();
+    expect(wrapper.emitted('remove')).toBeTruthy();
   });
 
   it('does not emit remove event when confirmation is cancelled', async () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
-
     const wrapper = mount(CvBlockActions, {
       props: {
         showRemove: true,
@@ -231,15 +233,21 @@ describe('CvBlockActions', () => {
       },
     });
 
+    // Click remove button to open modal
     const removeBtn = wrapper
       .findAll('button')
       .find((b) => b.attributes('icon') === 'i-heroicons-trash');
     await removeBtn?.trigger('click');
 
-    expect(confirmSpy).toHaveBeenCalled();
-    expect(wrapper.emitted('remove')).toBeFalsy();
+    // Modal should be open now, simulate cancel
+    const confirmModal = wrapper.findComponent({ name: 'ConfirmModal' });
+    expect(confirmModal.exists()).toBe(true);
+    
+    // Simulate cancel event
+    await confirmModal.vm.$emit('cancel');
+    await wrapper.vm.$nextTick();
 
-    confirmSpy.mockRestore();
+    expect(wrapper.emitted('remove')).toBeFalsy();
   });
 
   it('emits remove immediately when confirmRemove is false', async () => {
