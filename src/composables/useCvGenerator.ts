@@ -8,6 +8,7 @@ import type {
   GenerateCvBlocksInput,
   CVBlocksResult,
   CVSection,
+  SectionType,
 } from '@/domain/ai-operations/CVBlocks';
 import type { Experience } from '@/domain/experience/Experience';
 import type { STARStory } from '@/domain/starstory/STARStory';
@@ -52,9 +53,13 @@ export function useCvGenerator() {
    * Load experiences and stories for selected experience IDs
    */
   const loadExperiencesAndStories = async (
-    profile: { id: string },
+    profile: Awaited<ReturnType<typeof userProfileRepo.get>>,
     selectedExperienceIds: string[]
   ) => {
+    if (!profile) {
+      return { selectedExperiences: [], allStories: [] };
+    }
+
     const allExperiences = await experienceRepo.list(profile);
     const selectedExperiences = allExperiences.filter((exp) =>
       selectedExperienceIds.includes(exp.id)
@@ -77,7 +82,7 @@ export function useCvGenerator() {
     selectedExperienceIds: string[],
     options: {
       jobDescription?: string;
-      sectionsToGenerate?: string[];
+      sectionsToGenerate?: SectionType[];
       includeSkills?: boolean;
       includeLanguages?: boolean;
       includeCertifications?: boolean;
@@ -102,14 +107,14 @@ export function useCvGenerator() {
       // Build input
       const input: GenerateCvBlocksInput = {
         userProfile: {
-          fullName: profile.fullName || undefined,
+          id: profile.id,
+          fullName: profile.fullName || '',
           headline: profile.headline || undefined,
-          summary: profile.summary || undefined,
         },
         selectedExperiences: selectedExperiences.map((exp: Experience) => ({
           id: exp.id,
-          title: exp.title || undefined,
-          company: exp.companyName || undefined,
+          title: exp.title || '',
+          company: exp.companyName || '',
           startDate: exp.startDate || undefined,
           endDate: exp.endDate || undefined,
           responsibilities: exp.responsibilities?.filter((r): r is string => r !== null),
@@ -131,7 +136,11 @@ export function useCvGenerator() {
       const profileFields = [
         { condition: options.includeSkills, key: 'skills', value: profile.skills },
         { condition: options.includeLanguages, key: 'languages', value: profile.languages },
-        { condition: options.includeCertifications, key: 'certifications', value: profile.certifications },
+        {
+          condition: options.includeCertifications,
+          key: 'certifications',
+          value: profile.certifications,
+        },
         { condition: options.includeInterests, key: 'interests', value: profile.interests },
       ];
 
@@ -209,7 +218,7 @@ export function useCvGenerator() {
       }
 
       // For single block regeneration, we request only that section type
-      input.sectionsToGenerate = [blockToRegenerate.type];
+      input.sectionsToGenerate = [blockToRegenerate.type as SectionType];
 
       const result: CVBlocksResult = await aiService.generateCvBlocks(input);
 
@@ -253,7 +262,7 @@ export function useCvGenerator() {
       }
 
       // Request only the specific section type
-      input.sectionsToGenerate = [blockType];
+      input.sectionsToGenerate = [blockType as SectionType];
 
       const result: CVBlocksResult = await aiService.generateCvBlocks(input);
 
@@ -263,7 +272,7 @@ export function useCvGenerator() {
       }
 
       // Convert first section to block
-      return sectionToBlock(result.sections[0], 0);
+      return sectionToBlock(result.sections[0]!, 0);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'cvGenerator.errors.generationFailed';
       console.error('[useCvGenerator] Error generating single block:', err);

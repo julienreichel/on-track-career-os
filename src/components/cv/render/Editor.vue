@@ -260,12 +260,7 @@ const regenerateBlock = async (block: CVBlock) => {
   regeneratingBlockId.value = block.id;
 
   try {
-    const regenerated = await regenerateBlockAI(
-      props.userId,
-      props.selectedExperienceIds,
-      block,
-      blocks.value
-    );
+    const regenerated = await regenerateBlockAI(props.userId, props.selectedExperienceIds, block);
 
     if (regenerated) {
       replaceBlock(block.id, regenerated);

@@ -148,19 +148,19 @@ export function useCvEditor(cvId?: string) {
    */
   const updateBlock = (blockId: string, updates: Partial<CVBlock>): void => {
     const index = blocks.value.findIndex((b) => b.id === blockId);
+    if (index === -1) return;
 
-    if (index === -1) {
-      return;
-    }
+    const currentBlock = blocks.value[index]!; // Safe: index check guarantees existence
 
     // Save state for undo
     undoStack.value = [...blocks.value];
 
+    // Merge updates while preserving required fields
     blocks.value[index] = {
-      ...blocks.value[index],
-      ...updates,
-      id: blocks.value[index].id, // Preserve ID
-      order: blocks.value[index].order, // Preserve order
+      id: currentBlock.id,
+      type: updates.type ?? currentBlock.type,
+      content: updates.content ?? currentBlock.content,
+      order: currentBlock.order,
     };
 
     isDirty.value = true;
@@ -204,8 +204,10 @@ export function useCvEditor(cvId?: string) {
     // Save state for undo
     undoStack.value = [...blocks.value];
 
-    // Swap blocks
-    [blocks.value[index], blocks.value[newIndex]] = [blocks.value[newIndex], blocks.value[index]];
+    // Swap blocks (safe: indices validated above)
+    const temp = blocks.value[index]!;
+    blocks.value[index] = blocks.value[newIndex]!;
+    blocks.value[newIndex] = temp;
 
     // Update orders
     blocks.value = blocks.value.map((b, i) => ({ ...b, order: i }));
@@ -231,17 +233,16 @@ export function useCvEditor(cvId?: string) {
    */
   const replaceBlock = (blockId: string, newBlock: Omit<CVBlock, 'order'>): void => {
     const index = blocks.value.findIndex((b) => b.id === blockId);
+    if (index === -1) return;
 
-    if (index === -1) {
-      return;
-    }
+    const currentOrder = blocks.value[index]!.order; // Safe: index check guarantees existence
 
     // Save state for undo
     undoStack.value = [...blocks.value];
 
     blocks.value[index] = {
       ...newBlock,
-      order: blocks.value[index].order,
+      order: currentOrder,
     };
 
     isDirty.value = true;
