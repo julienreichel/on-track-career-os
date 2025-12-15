@@ -10,7 +10,8 @@ import type {
 /**
  * Update an item in the items array
  */
-function updateItemInArray(items: CVDocument[], updated: CVDocument) {
+function updateItemInArray(items: CVDocument[], updated: CVDocument | null) {
+  if (!updated) return;
   const index = items.findIndex((item) => item.id === updated.id);
   if (index !== -1) {
     items[index] = updated;
@@ -35,9 +36,7 @@ function useBlockOperations(
 
     try {
       const updated = await service.addBlock(cvId, block);
-      if (updated) {
-        updateItemInArray(items.value, updated);
-      }
+      updateItemInArray(items.value, updated);
       return updated;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to add block';
@@ -58,9 +57,7 @@ function useBlockOperations(
 
     try {
       const updated = await service.updateBlock(cvId, blockId, updates);
-      if (updated) {
-        updateItemInArray(items.value, updated);
-      }
+      updateItemInArray(items.value, updated);
       return updated;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to update block';
@@ -77,9 +74,7 @@ function useBlockOperations(
 
     try {
       const updated = await service.removeBlock(cvId, blockId);
-      if (updated) {
-        updateItemInArray(items.value, updated);
-      }
+      updateItemInArray(items.value, updated);
       return updated;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to remove block';
@@ -96,9 +91,7 @@ function useBlockOperations(
 
     try {
       const updated = await service.reorderBlocks(cvId, blockIds);
-      if (updated) {
-        updateItemInArray(items.value, updated);
-      }
+      updateItemInArray(items.value, updated);
       return updated;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to reorder blocks';
@@ -170,9 +163,7 @@ export function useCvDocuments() {
 
     try {
       const updated = await repository.update(input);
-      if (updated) {
-        updateItemInArray(items.value, updated);
-      }
+      updateItemInArray(items.value, updated);
       return updated;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to update CV document';

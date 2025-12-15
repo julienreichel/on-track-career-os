@@ -368,9 +368,9 @@ describe('AiOperationsService', () => {
 
     it('should throw error for invalid input structure', async () => {
       // Act & Assert
-      await expect(service.generateCvBlocks(null as unknown as GenerateCvBlocksInput)).rejects.toThrow(
-        'Invalid input structure'
-      );
+      await expect(
+        service.generateCvBlocks(null as unknown as GenerateCvBlocksInput)
+      ).rejects.toThrow('Invalid input structure');
       expect(mockRepo.generateCvBlocks).not.toHaveBeenCalled();
     });
 
