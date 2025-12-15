@@ -1,47 +1,46 @@
 <template>
-  <div class="cv-list-page">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">
-          {{ $t('cvList.title') }}
-        </h1>
-        <p class="mt-2 text-gray-600">
-          {{ $t('cvList.subtitle') }}
-        </p>
-      </div>
-
-      <!-- Actions -->
-      <div class="mb-6">
-        <UButton icon="i-heroicons-plus" size="lg" :to="{ name: 'cv-new' }">
+  <UPage>
+    <UPageHeader
+      :title="$t('cvList.title')"
+      :description="$t('cvList.subtitle')"
+    >
+      <template #actions>
+        <UButton icon="i-heroicons-plus" :to="{ name: 'cv-new' }">
           {{ $t('cvList.actions.create') }}
         </UButton>
-      </div>
+      </template>
+    </UPageHeader>
+
+    <UPageBody>
+      <!-- Error Alert -->
+      <UAlert
+        v-if="error"
+        color="error"
+        icon="i-heroicons-exclamation-triangle"
+        :title="$t('common.error')"
+        :description="error"
+        class="mb-6"
+      />
 
       <!-- Loading State -->
-      <div v-if="loading" class="flex justify-center py-12">
-        <UIcon name="i-heroicons-arrow-path" class="animate-spin text-4xl text-gray-400" />
-      </div>
-
-      <!-- Error State -->
-      <div v-else-if="error" class="text-center py-12">
-        <UIcon name="i-heroicons-exclamation-triangle" class="text-4xl text-red-500 mx-auto mb-4" />
-        <p class="text-gray-700">{{ error }}</p>
-      </div>
+      <UCard v-if="loading">
+        <USkeleton class="h-8 w-full" />
+      </UCard>
 
       <!-- Empty State -->
-      <div v-else-if="items.length === 0" class="text-center py-12">
-        <UIcon name="i-heroicons-document-text" class="text-6xl text-gray-400 mx-auto mb-4" />
-        <h3 class="text-xl font-semibold text-gray-900 mb-2">
-          {{ $t('cvList.emptyState.title') }}
-        </h3>
-        <p class="text-gray-600 mb-6">
-          {{ $t('cvList.emptyState.description') }}
-        </p>
-        <UButton icon="i-heroicons-plus" size="lg" :to="{ name: 'cv-new' }">
-          {{ $t('cvList.emptyState.action') }}
-        </UButton>
-      </div>
+      <UCard v-else-if="items.length === 0">
+        <UEmpty
+          :title="$t('cvList.emptyState.title')"
+          :description="$t('cvList.emptyState.description')"
+          icon="i-heroicons-document-text"
+        >
+          <template #actions>
+            <UButton icon="i-heroicons-plus" :to="{ name: 'cv-new' }">
+              {{ $t('cvList.emptyState.action') }}
+            </UButton>
+          </template>
+        </UEmpty>
+      </UCard>
 
       <!-- CV List -->
       <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -92,8 +91,8 @@
           </div>
         </UCard>
       </div>
-    </div>
-  </div>
+    </UPageBody>
+  </UPage>
 </template>
 
 <script setup lang="ts">

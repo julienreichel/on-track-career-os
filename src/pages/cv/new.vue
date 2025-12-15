@@ -1,18 +1,10 @@
 <template>
-  <div class="cv-new-page">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">
-          {{ $t('cvNew.title') }}
-        </h1>
-        <p class="mt-2 text-gray-600">
-          {{ $t('cvNew.subtitle') }}
-        </p>
-      </div>
+  <UPage>
+    <UPageHeader :title="$t('cvNew.title')" :description="$t('cvNew.subtitle')" />
 
+    <UPageBody>
       <!-- Wizard Steps -->
-      <div class="mb-8">
+      <div class="mb-6">
         <div class="flex items-center justify-center gap-4">
           <div
             class="flex items-center gap-2"
@@ -134,8 +126,8 @@
           </div>
         </div>
       </UCard>
-    </div>
-  </div>
+    </UPageBody>
+  </UPage>
 </template>
 
 <script setup lang="ts">
