@@ -211,7 +211,11 @@ const generateCV = async () => {
     const selectedExperiences = experiences.filter((exp) => exp !== null);
 
     // Load all stories for selected experiences
-    const allStories = await storyService.listByExperienceIds(selectedExperienceIds.value);
+    const allStories: STARStory[] = [];
+    for (const exp of selectedExperiences) {
+      const stories = await storyService.getStoriesByExperience(exp);
+      allStories.push(...stories);
+    }
 
     // Build input for generateCv
     const input: GenerateCvInput = {
