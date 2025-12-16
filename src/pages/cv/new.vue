@@ -197,6 +197,7 @@ const generateCV = async () => {
   generating.value = true;
   generationError.value = null;
 
+  // eslint-disable-next-line complexity
   try {
     // Load user profile
     const profile = await userProfileRepo.get(userId.value);

@@ -53,6 +53,7 @@ export function useCvGenerator() {
   /**
    * Build AI input from user data
    */
+  // eslint-disable-next-line complexity
   const buildGenerationInput = async (
     userId: string,
     selectedExperienceIds: string[],

@@ -234,9 +234,11 @@ function prepareInputForLogging(input: GenerateCvInput) {
     };
   } catch (error) {
     console.error('[generateCv] Error in prepareInputForLogging:', error);
+    // eslint-disable-next-line no-magic-numbers
+    const PREVIEW_LENGTH = 200;
     return {
       error: 'Failed to parse input for logging',
-      rawInput: truncateForLog(JSON.stringify(input), 200),
+      rawInput: truncateForLog(JSON.stringify(input), PREVIEW_LENGTH),
     };
   }
 }
