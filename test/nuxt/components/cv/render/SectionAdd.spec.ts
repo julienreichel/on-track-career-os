@@ -52,7 +52,8 @@ const i18n = createI18n({
 
 const stubs = {
   UModal: {
-    template: '<div v-if="open" class="modal"><div class="modal-body"><slot name="body" /></div></div>',
+    template:
+      '<div v-if="open" class="modal"><div class="modal-body"><slot name="body" /></div></div>',
     props: ['open', 'title', 'description', 'close'],
     emits: ['update:open'],
   },

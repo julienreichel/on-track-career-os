@@ -8,14 +8,14 @@ const props = withDefaults(
     description?: string;
     confirmLabel?: string;
     cancelLabel?: string;
-    confirmColor?: 'primary' | 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'neutral';
+    confirmColor?: 'primary' | 'error' | 'warning' | 'neutral';
     loading?: boolean;
   }>(),
   {
     description: undefined,
     confirmLabel: 'Confirm',
     cancelLabel: 'Cancel',
-    confirmColor: 'red',
+    confirmColor: 'error',
     loading: false,
   }
 );
@@ -42,15 +42,15 @@ const handleConfirm = () => {
 </script>
 
 <template>
-  <UModal
-    v-model:open="isOpen"
-    :title="title"
-    :description="description"
-    close
-  >
+  <UModal v-model:open="isOpen" :title="title" :description="description" close>
     <template #footer>
       <UButton :label="cancelLabel" variant="ghost" color="neutral" @click="handleCancel" />
-      <UButton :label="confirmLabel" :color="confirmColor" :loading="loading" @click="handleConfirm" />
+      <UButton
+        :label="confirmLabel"
+        :color="confirmColor"
+        :loading="loading"
+        @click="handleConfirm"
+      />
     </template>
   </UModal>
 </template>

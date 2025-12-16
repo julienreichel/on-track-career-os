@@ -47,8 +47,7 @@ const stubs = {
     emits: ['update:open'],
   },
   UCard: {
-    template:
-      '<div class="card"><slot /></div>',
+    template: '<div class="card"><slot /></div>',
   },
   UButton: {
     template:
@@ -314,7 +313,7 @@ describe('CvBlockEditor', () => {
     // Find the modal div and check if close functionality works
     const modal = wrapper.find('.modal');
     expect(modal.exists()).toBe(true);
-    
+
     // Since the close button is handled by the UModal's `close` prop internally,
     // we just verify that the modal rendered with close enabled
     // The actual close behavior is handled by Nuxt UI

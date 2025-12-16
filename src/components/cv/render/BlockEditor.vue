@@ -1,5 +1,10 @@
 <template>
-  <UModal v-model:open="isOpen" :title="$t('cvBlockEditor.title')" :description="$t('cvBlockEditor.description')" close>
+  <UModal
+    v-model:open="isOpen"
+    :title="$t('cvBlockEditor.title')"
+    :description="$t('cvBlockEditor.description')"
+    close
+  >
     <template #body>
       <div class="space-y-4">
         <!-- Block Title (optional for some types) -->

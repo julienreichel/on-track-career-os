@@ -213,7 +213,7 @@ describe('CvBlockActions', () => {
     // Modal should be open now, simulate confirm
     const confirmModal = wrapper.findComponent({ name: 'ConfirmModal' });
     expect(confirmModal.exists()).toBe(true);
-    
+
     // Simulate confirm event
     await confirmModal.vm.$emit('confirm');
     await wrapper.vm.$nextTick();
@@ -242,7 +242,7 @@ describe('CvBlockActions', () => {
     // Modal should be open now, simulate cancel
     const confirmModal = wrapper.findComponent({ name: 'ConfirmModal' });
     expect(confirmModal.exists()).toBe(true);
-    
+
     // Simulate cancel event
     await confirmModal.vm.$emit('cancel');
     await wrapper.vm.$nextTick();

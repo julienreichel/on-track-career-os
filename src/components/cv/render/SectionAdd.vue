@@ -4,7 +4,12 @@
       {{ $t('cvSectionAdd.addSection') }}
     </UButton>
 
-    <UModal v-model:open="isOpen" :title="$t('cvSectionAdd.title')" :description="$t('cvSectionAdd.description')" close>
+    <UModal
+      v-model:open="isOpen"
+      :title="$t('cvSectionAdd.title')"
+      :description="$t('cvSectionAdd.description')"
+      close
+    >
       <template #body>
         <div class="space-y-2">
           <UButton
