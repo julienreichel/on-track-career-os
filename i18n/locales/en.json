@@ -610,6 +610,21 @@
       "saveFailed": "Failed to save changes"
     }
   },
+  "cvDisplay": {
+    "untitled": "Untitled CV",
+    "markdownPlaceholder": "Enter your CV content in Markdown format...",
+    "markdownHelp": "Use Markdown syntax: # for headings, ** for bold, * for italic, - for lists",
+    "actions": {
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "retry": "Retry"
+    },
+    "toast": {
+      "saved": "CV saved successfully",
+      "saveFailed": "Failed to save CV"
+    }
+  },
   "cvBlock": {
     "types": {
       "summary": "Summary",

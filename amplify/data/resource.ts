@@ -282,7 +282,7 @@ export const schema = a
         name: a.string().required(),
         templateId: a.string(),
         isTailored: a.boolean(),
-        contentJSON: a.json(),
+        content: a.string(),
 
         userId: a.id().required(),
         user: a.belongsTo('UserProfile', 'userId'),

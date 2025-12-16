@@ -135,7 +135,11 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useCvDocuments } from '@/composables/useCvDocuments';
-import { useCvGenerator } from '@/composables/useCvGenerator';
+import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
+import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
+import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import { STARStoryService } from '@/domain/starstory/STARStoryService';
+import type { GenerateCvInput } from '@/domain/ai-operations/types/generateCv';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -145,7 +149,14 @@ const toast = useToast();
 const { userId } = useAuthUser();
 
 const { createDocument } = useCvDocuments();
-const { generateBlocks, generating, error: generationError } = useCvGenerator();
+
+// Services
+const aiService = new AiOperationsService();
+const userProfileRepo = new UserProfileRepository();
+const experienceRepo = new ExperienceRepository();
+const storyService = new STARStoryService();
+const generating = ref(false);
+const generationError = ref<string | null>(null);
 
 // Wizard state
 const currentStep = ref(1);
@@ -183,17 +194,66 @@ const generateCV = async () => {
     return;
   }
 
-  try {
-    // Generate blocks with AI
-    const blocks = await generateBlocks(userId.value, selectedExperienceIds.value, {
-      includeSkills: includeSkills.value,
-      includeLanguages: includeLanguages.value,
-      includeCertifications: includeCertifications.value,
-      includeInterests: includeInterests.value,
-      jobDescription: jobDescription.value || undefined,
-    });
+  generating.value = true;
+  generationError.value = null;
 
-    if (!blocks) {
+  try {
+    // Load user profile
+    const profile = await userProfileRepo.get(userId.value);
+    if (!profile) {
+      throw new Error('User profile not found');
+    }
+
+    // Load selected experiences
+    const experiences = await Promise.all(
+      selectedExperienceIds.value.map((id) => experienceRepo.get(id))
+    );
+    const selectedExperiences = experiences.filter((exp) => exp !== null);
+
+    // Load all stories for selected experiences
+    const allStories = await storyService.listByExperienceIds(selectedExperienceIds.value);
+
+    // Build input for generateCv
+    const input: GenerateCvInput = {
+      userProfile: {
+        fullName: profile.fullName || '',
+        headline: profile.headline || undefined,
+        location: profile.location || undefined,
+        goals: profile.goals?.filter((g): g is string => g !== null),
+        strengths: profile.strengths?.filter((s): s is string => s !== null),
+      },
+      selectedExperiences: selectedExperiences.map((exp) => ({
+        id: exp.id,
+        title: exp.title || '',
+        company: exp.companyName || '',
+        startDate: exp.startDate || '',
+        endDate: exp.endDate || undefined,
+        responsibilities: exp.responsibilities?.filter((r): r is string => r !== null),
+        tasks: exp.tasks?.filter((t): t is string => t !== null),
+      })),
+      stories: allStories.map((story) => ({
+        situation: story.situation,
+        task: story.task,
+        action: story.action,
+        result: story.result,
+      })),
+      skills: includeSkills.value ? profile.skills?.filter((s): s is string => s !== null) : [],
+      languages: includeLanguages.value
+        ? profile.languages?.filter((l): l is string => l !== null)
+        : [],
+      certifications: includeCertifications.value
+        ? profile.certifications?.filter((c): c is string => c !== null)
+        : [],
+      interests: includeInterests.value
+        ? profile.interests?.filter((i): i is string => i !== null)
+        : [],
+      jobDescription: jobDescription.value || undefined,
+    };
+
+    // Generate CV markdown with AI
+    const cvMarkdown = await aiService.generateCv(input);
+
+    if (!cvMarkdown) {
       toast.add({
         title: t('cvNew.toast.generationFailed'),
         description: generationError.value || undefined,
@@ -202,14 +262,12 @@ const generateCV = async () => {
       return;
     }
 
-    // Create CV document
+    // Create CV document with markdown content
     const cvDocument = await createDocument({
       name: cvName.value,
       userId: userId.value,
       isTailored: !!jobDescription.value,
-      contentJSON: {
-        blocks,
-      },
+      content: cvMarkdown,
     });
 
     if (cvDocument) {
@@ -222,7 +280,6 @@ const generateCV = async () => {
       await router.push({
         name: 'cv-id',
         params: { id: cvDocument.id },
-        query: { experiences: selectedExperienceIds.value.join(',') },
       });
     } else {
       console.error('[cvNew] Failed to create CV document - createDocument returned null');
@@ -233,10 +290,13 @@ const generateCV = async () => {
     }
   } catch (err) {
     console.error('[cvNew] Error generating CV:', err);
+    generationError.value = err instanceof Error ? err.message : 'Unknown error';
     toast.add({
       title: t('cvNew.toast.error'),
       color: 'error',
     });
+  } finally {
+    generating.value = false;
   }
 };
 </script>

@@ -42,61 +42,24 @@ export class CVDocumentRepository {
     return this._model;
   }
 
-  /**
-   * Parse contentJSON if it's a string
-   */
-  private parseContentJSON(doc: CVDocument | null): CVDocument | null {
-    if (!doc) return null;
-
-    if (doc.contentJSON && typeof doc.contentJSON === 'string') {
-      try {
-        return {
-          ...doc,
-          contentJSON: JSON.parse(doc.contentJSON),
-        };
-      } catch (error) {
-        console.error('[CVDocumentRepository] Failed to parse contentJSON:', error);
-        return doc;
-      }
-    }
-
-    return doc;
-  }
-
   async get(id: string) {
     const res = await this.model.get({ id }, gqlOptions());
-    return this.parseContentJSON(res.data);
+    return res.data;
   }
 
   async list(filter: Record<string, unknown> = {}) {
     const { data } = await this.model.list(gqlOptions(filter));
-    return data.map((doc) => this.parseContentJSON(doc));
+    return data;
   }
 
   async create(input: CVDocumentCreateInput) {
-    // Stringify contentJSON if it's an object (but not null)
-    const processedInput = {
-      ...input,
-      contentJSON:
-        input.contentJSON && typeof input.contentJSON === 'object'
-          ? JSON.stringify(input.contentJSON)
-          : input.contentJSON,
-    };
-    const { data } = await this.model.create(processedInput as CVDocumentCreateInput, gqlOptions());
-    return this.parseContentJSON(data);
+    const { data } = await this.model.create(input, gqlOptions());
+    return data;
   }
 
   async update(input: CVDocumentUpdateInput) {
-    // Stringify contentJSON if it's an object
-    const processedInput = {
-      ...input,
-      contentJSON:
-        input.contentJSON && typeof input.contentJSON === 'object'
-          ? JSON.stringify(input.contentJSON)
-          : input.contentJSON,
-    };
-    const { data } = await this.model.update(processedInput as CVDocumentUpdateInput, gqlOptions());
-    return this.parseContentJSON(data);
+    const { data } = await this.model.update(input, gqlOptions());
+    return data;
   }
 
   async delete(id: string) {
