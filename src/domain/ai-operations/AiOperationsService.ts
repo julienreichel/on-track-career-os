@@ -264,15 +264,7 @@ export class AiOperationsService {
     }
   }
 
-  /**
-   * Type guard to validate GenerateCvResult structure
-   * @private
-   */
-  private isGenerateCvResult(result: unknown): result is GenerateCvResult {
-    if (!result || typeof result !== 'object') return false;
-    const r = result as Record<string, unknown>;
-    return typeof r.markdown === 'string' && Array.isArray(r.sections);
-  }
+
 
   /**
    * Validate CV input structure
@@ -310,7 +302,7 @@ export class AiOperationsService {
   /**
    * Generate complete CV in Markdown format with validation
    * @param input - User profile, experiences, stories, skills, and optional job description
-   * @returns CV markdown and extracted section names
+   * @returns CV as plain Markdown text
    * @throws Error if generation fails or validation fails
    */
   async generateCv(input: GenerateCvInput): Promise<GenerateCvResult> {
@@ -320,17 +312,13 @@ export class AiOperationsService {
     try {
       const result = await this.repo.generateCv(input);
 
-      // Validate output structure
-      if (!this.isGenerateCvResult(result)) {
-        throw new Error('Invalid CV result structure');
+      // Validate output is a non-empty string
+      if (typeof result !== 'string') {
+        throw new Error('Invalid CV result: expected string');
       }
 
-      if (!result.markdown.trim()) {
+      if (!result.trim()) {
         throw new Error('CV generation produced empty markdown');
-      }
-
-      if (result.sections.length === 0) {
-        throw new Error('CV generation produced no sections');
       }
 
       return result;

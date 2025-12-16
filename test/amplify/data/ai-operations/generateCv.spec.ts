@@ -105,14 +105,13 @@ Python, JavaScript, AWS, Docker, Kubernetes
       },
     });
 
-    const parsed = JSON.parse(result);
-    expect(parsed.markdown).toContain('# John Doe');
-    expect(parsed.markdown).toContain('Senior Software Engineer');
-    expect(parsed.sections).toBeInstanceOf(Array);
-    expect(parsed.sections.length).toBeGreaterThan(0);
+    expect(typeof result).toBe('string');
+    expect(result).toContain('# John Doe');
+    expect(result).toContain('Senior Software Engineer');
+    expect(result.length).toBeGreaterThan(0);
   });
 
-  it('should extract sections from Markdown headers', async () => {
+  it('should generate CV with multiple Markdown sections', async () => {
     const mockMarkdown = `# Jane Smith
 
 ## Professional Summary
@@ -150,15 +149,14 @@ CS Degree`;
       },
     });
 
-    const parsed = JSON.parse(result);
-    expect(parsed.markdown).toBe(mockMarkdown);
-    expect(parsed.sections).toContain('summary');
-    expect(parsed.sections).toContain('experience');
-    expect(parsed.sections).toContain('skills');
-    expect(parsed.sections).toContain('education');
+    expect(result).toBe(mockMarkdown);
+    expect(result).toContain('## Professional Summary');
+    expect(result).toContain('## Professional Experience');
+    expect(result).toContain('## Skills');
+    expect(result).toContain('## Education');
   });
 
-  it('should use fallback sections when no headers found', async () => {
+  it('should handle CV without multiple headers', async () => {
     const mockMarkdown = `# Test User
 
 Some content without headers`;
@@ -182,9 +180,9 @@ Some content without headers`;
       },
     });
 
-    const parsed = JSON.parse(result);
-    expect(parsed.markdown).toBe(mockMarkdown);
-    expect(parsed.sections).toEqual(['summary', 'experience']); // Fallback
+    expect(result).toBe(mockMarkdown);
+    expect(result).toContain('# Test User');
+    expect(result.length).toBeGreaterThan(0);
   });
 
   it('should handle minimal input', async () => {
@@ -213,12 +211,12 @@ Seeking opportunities`;
       },
     });
 
-    const parsed = JSON.parse(result);
-    expect(parsed.markdown).toBeTruthy();
-    expect(parsed.sections.length).toBeGreaterThan(0);
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+    expect(result).toContain('# Professional');
   });
 
-  it('should map various section header names', async () => {
+  it('should generate CV with various section headers', async () => {
     const mockMarkdown = `# Test
 
 ## Professional Profile
@@ -252,9 +250,9 @@ Skills list`;
       },
     });
 
-    const parsed = JSON.parse(result);
-    expect(parsed.sections).toContain('summary'); // "Professional Profile" → summary
-    expect(parsed.sections).toContain('experience'); // "Work History" → experience
-    expect(parsed.sections).toContain('skills'); // "Technical Skills" → skills
+    expect(result).toBe(mockMarkdown);
+    expect(result).toContain('## Professional Profile');
+    expect(result).toContain('## Work History');
+    expect(result).toContain('## Technical Skills');
   });
 });

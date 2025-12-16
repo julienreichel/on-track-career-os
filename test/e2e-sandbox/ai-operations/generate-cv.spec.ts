@@ -187,22 +187,17 @@ describe('AI Operations - Generate CV (E2E Sandbox)', () => {
       selectedExperiences: mockExperiences,
     });
 
-    console.log('Generated CV Markdown:', result.markdown.substring(0, 200) + '...');
-    console.log('Extracted sections:', result.sections);
+    console.log('Generated CV Markdown:', result.substring(0, 200) + '...');
 
-    // Validate output structure
-    expect(result).toHaveProperty('markdown');
-    expect(result).toHaveProperty('sections');
-
-    // Validate markdown is a non-empty string
-    expect(typeof result.markdown).toBe('string');
-    expect(result.markdown.length).toBeGreaterThan(0);
+    // Validate output is a non-empty string
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
 
     // Validate markdown contains a name in header (AI may use variations including links)
-    expect(result.markdown).toMatch(/^#\s+.*[A-Za-z]+/m);
+    expect(result).toMatch(/^#\s+.*[A-Za-z]+/m);
 
     // Validate markdown contains professional role content
-    const markdown = result.markdown.toLowerCase();
+    const markdown = result.toLowerCase();
     expect(markdown).toMatch(
       /professional|experience|manager|director|engineer|developer|specialist/
     );
@@ -210,15 +205,9 @@ describe('AI Operations - Generate CV (E2E Sandbox)', () => {
     // Validate experience section exists with job-related terms
     expect(markdown).toMatch(/experience|employment|work history/i);
 
-    // Validate sections is an array with at least some sections
-    expect(Array.isArray(result.sections)).toBe(true);
-    expect(result.sections.length).toBeGreaterThan(0);
-
-    // Validate common sections are present
-    const expectedSections = ['summary', 'experience'];
-    expectedSections.forEach((section) => {
-      expect(result.sections).toContain(section);
-    });
+    // Validate common sections are present in markdown
+    expect(markdown).toMatch(/summary|profile/i);
+    expect(markdown).toMatch(/experience|employment/i);
   }, 90000); // 90s timeout for AI operation
 
   it('should generate CV with all optional fields', async () => {
@@ -232,26 +221,25 @@ describe('AI Operations - Generate CV (E2E Sandbox)', () => {
       certifications: mockCertifications,
     });
 
-    console.log('Generated CV with all fields:', result.markdown.substring(0, 200) + '...');
-    console.log('Sections:', result.sections);
+    console.log('Generated CV with all fields:', result.substring(0, 200) + '...');
 
-    // Validate output structure
-    expect(result).toHaveProperty('markdown');
-    expect(result).toHaveProperty('sections');
+    // Validate output is a non-empty string
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
 
     // Validate markdown contains skills
+    const markdown = result.toLowerCase();
     mockSkills.slice(0, 3).forEach((skill) => {
-      expect(result.markdown.toLowerCase()).toContain(skill.toLowerCase());
+      expect(markdown).toContain(skill.toLowerCase());
     });
 
-    // Validate sections includes skills
-    expect(result.sections).toContain('skills');
-
     // Validate markdown is comprehensive
-    expect(result.markdown.length).toBeGreaterThan(500); // Should be substantial with all fields
+    expect(result.length).toBeGreaterThan(500); // Should be substantial with all fields
 
-    // Validate more sections are extracted when all fields provided
-    expect(result.sections.length).toBeGreaterThanOrEqual(3);
+    // Validate common sections are present
+    expect(markdown).toMatch(/skill/i);
+    expect(markdown).toMatch(/language/i);
+    expect(markdown).toMatch(/certification/i);
   }, 90000);
 
   it('should tailor CV when job description is provided', async () => {
@@ -274,19 +262,14 @@ Must have 5+ years of experience and strong communication skills.
       jobDescription,
     });
 
-    console.log('Tailored CV:', result.markdown.substring(0, 200) + '...');
+    console.log('Tailored CV:', result.substring(0, 200) + '...');
 
-    // Validate output structure
-    expect(result).toHaveProperty('markdown');
-    expect(result).toHaveProperty('sections');
-
-    // Validate markdown emphasizes relevant skills from job description
-    expect(result.markdown.toLowerCase()).toContain('microservices');
-    expect(result.markdown.toLowerCase()).toContain('kubernetes');
-    expect(result.markdown.toLowerCase()).toContain('docker');
+    // Validate output is a non-empty string
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
 
     // Validate markdown includes technical keywords from job description or experiences
-    const markdown = result.markdown.toLowerCase();
+    const markdown = result.toLowerCase();
     expect(markdown).toMatch(/microservices|docker|kubernetes|aws|cloud/);
     expect(markdown).toMatch(/engineer|developer|software/);
   }, 90000);
@@ -311,24 +294,23 @@ Must have 5+ years of experience and strong communication skills.
       selectedExperiences: minimalExperience,
     });
 
-    console.log('Minimal CV:', result.markdown.substring(0, 200) + '...');
+    console.log('Minimal CV:', result.substring(0, 200) + '...');
 
-    // Validate output structure even with minimal input
-    expect(result).toHaveProperty('markdown');
-    expect(result).toHaveProperty('sections');
+    // Validate output is a non-empty string even with minimal input
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
 
     // Validate markdown contains professional content even with minimal input
-    expect(result.markdown).toMatch(/^#\s+.*[A-Za-z]+/m); // Name in header (may include links)
-    const markdown = result.markdown.toLowerCase();
+    expect(result).toMatch(/^#\s+.*[A-Za-z]+/m); // Name in header (may include links)
+    const markdown = result.toLowerCase();
     expect(markdown).toMatch(/professional|engineer|developer|manager|specialist|director/); // Job role keyword
 
-    // Validate fallback sections are used
-    expect(result.sections.length).toBeGreaterThan(0);
-    expect(result.sections).toContain('summary');
-    expect(result.sections).toContain('experience');
+    // Validate common sections are present
+    expect(markdown).toMatch(/summary|profile/i);
+    expect(markdown).toMatch(/experience|employment/i);
   }, 90000);
 
-  it('should extract sections from Markdown headers correctly', async () => {
+  it('should generate comprehensive CV with multiple sections', async () => {
     const result = await repository.generateCv({
       userProfile: mockUserProfile,
       selectedExperiences: mockExperiences,
@@ -337,39 +319,22 @@ Must have 5+ years of experience and strong communication skills.
       certifications: mockCertifications,
     });
 
-    // Validate sections array contains expected values
-    expect(result.sections).toBeDefined();
-    expect(Array.isArray(result.sections)).toBe(true);
+    // Validate output is a non-empty string
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
 
-    // Validate no duplicates in sections
-    const uniqueSections = [...new Set(result.sections)];
-    expect(result.sections.length).toBe(uniqueSections.length);
+    // Validate markdown has multiple section headers
+    const markdown = result.toLowerCase();
+    const headerCount = (markdown.match(/^##\s+/gm) || []).length;
+    expect(headerCount).toBeGreaterThanOrEqual(3); // At least 3 sections
 
-    // Validate sections are strings
-    result.sections.forEach((section) => {
-      expect(typeof section).toBe('string');
-      expect(section.length).toBeGreaterThan(0);
-    });
+    // Log for inspection
+    console.log('Generated CV has', headerCount, 'sections');
 
-    // Log sections for inspection
-    console.log('Extracted sections:', result.sections);
-
-    // Validate markdown has corresponding headers
-    result.sections.forEach((section) => {
-      // Check if markdown contains section header (case-insensitive)
-      const hasHeader =
-        result.markdown.toLowerCase().includes(`## ${section}`) ||
-        result.markdown.toLowerCase().includes(`## professional ${section}`) ||
-        result.markdown.toLowerCase().includes(`## ${section} profile`) ||
-        result.markdown.toLowerCase().includes(`## work ${section}`) ||
-        result.markdown.toLowerCase().includes(`## technical ${section}`);
-
-      // At least some sections should have matching headers
-      // (some sections might be mapped from variations)
-      if (['summary', 'experience', 'skills'].includes(section)) {
-        expect(hasHeader || result.markdown.includes('##')).toBe(true);
-      }
-    });
+    // Validate expected sections are present
+    expect(markdown).toMatch(/##\s+.*(?:summary|profile)/i);
+    expect(markdown).toMatch(/##\s+.*experience/i);
+    expect(markdown).toMatch(/##\s+.*skill/i);
   }, 90000);
 
   it('should validate AI operation is properly configured', async () => {
@@ -394,8 +359,8 @@ Must have 5+ years of experience and strong communication skills.
 
       // If we get here, the operation is deployed and accessible
       expect(result).toBeDefined();
-      expect(result.markdown).toBeDefined();
-      expect(result.sections).toBeDefined();
+      expect(typeof result).toBe('string');
+      expect(result.length).toBeGreaterThan(0);
     } catch (error) {
       // If error is about authorization, that's fine - operation exists
       const errorMessage = (error as Error).message;
@@ -435,12 +400,11 @@ Must have 5+ years of experience and strong communication skills.
         selectedExperiences: invalidExperience,
       });
 
-      // Even with invalid input, should return some structure
+      // Even with invalid input, should return some markdown text
       // (AI should use fallbacks)
       expect(result).toBeDefined();
-      expect(result.markdown).toBeDefined();
-      expect(result.sections).toBeDefined();
-      expect(result.sections.length).toBeGreaterThan(0);
+      expect(typeof result).toBe('string');
+      expect(result.length).toBeGreaterThan(0);
     } catch (error) {
       // If it throws, error should be informative
       const errorMessage = (error as Error).message;

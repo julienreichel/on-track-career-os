@@ -1,5 +1,5 @@
 import { invokeBedrock } from './utils/bedrock';
-import { truncateForLog, withAiOperationHandler } from './utils/common';
+import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 /**
  * AI Operation: generateCv
@@ -18,8 +18,7 @@ import { truncateForLog, withAiOperationHandler } from './utils/common';
  * - jobDescription: Optional job description for tailoring
  *
  * Output Schema:
- * - markdown: Complete CV in Markdown format
- * - sections: Array of section identifiers included in the CV
+ * - Returns complete CV as plain Markdown text
  */
 
 interface GenerateCvInput {
@@ -31,11 +30,6 @@ interface GenerateCvInput {
   certifications?: string[];
   interests?: string[];
   jobDescription?: string;
-}
-
-interface GenerateCvOutput {
-  markdown: string;
-  sections: string[];
 }
 
 interface UserProfile {
@@ -221,64 +215,7 @@ function buildUserPrompt(input: GenerateCvInput): string {
   return prompt;
 }
 
-/**
- * Parse AI response (pure Markdown) and extract sections
- */
-function parseResponse(markdownText: string): GenerateCvOutput {
-  console.log('[generateCv] Parsing AI response, length:', markdownText.length);
-  console.log('[generateCv] First 200 chars:', markdownText.substring(0, 200));
 
-  // AI returns pure Markdown, we extract sections from ## headers or **bold** headers
-  const sections: string[] = [];
-  const lines = markdownText.split('\n');
-
-  for (const line of lines) {
-    let sectionName = '';
-
-    // Check for ## headers
-    if (line.startsWith('## ')) {
-      sectionName = line.substring(3).trim().toLowerCase();
-    }
-    // Check for **Bold** headers (AI sometimes uses this format)
-    else if (line.match(/^\*\*[A-Za-z\s]+\*\*\s*$/)) {
-      sectionName = line.replace(/\*\*/g, '').trim().toLowerCase();
-    }
-
-    if (sectionName) {
-      // Map common section names to standardized values
-      if (sectionName.includes('summary') || sectionName.includes('profile')) {
-        if (!sections.includes('summary')) sections.push('summary');
-      } else if (
-        sectionName.includes('experience') ||
-        sectionName.includes('work') ||
-        sectionName.includes('employment')
-      ) {
-        if (!sections.includes('experience')) sections.push('experience');
-      } else if (sectionName.includes('skill')) {
-        if (!sections.includes('skills')) sections.push('skills');
-      } else if (sectionName.includes('education')) {
-        if (!sections.includes('education')) sections.push('education');
-      } else if (sectionName.includes('language')) {
-        if (!sections.includes('languages')) sections.push('languages');
-      } else if (sectionName.includes('certification')) {
-        if (!sections.includes('certifications')) sections.push('certifications');
-      } else if (sectionName.includes('interest') || sectionName.includes('hobbies')) {
-        if (!sections.includes('interests')) sections.push('interests');
-      }
-    }
-  }
-
-  // Fallback if no sections found
-  if (sections.length === 0) {
-    console.warn('[generateCv] No sections found in Markdown, using fallback');
-    sections.push('summary', 'experience');
-  }
-
-  return {
-    markdown: markdownText.trim(),
-    sections: [...new Set(sections)], // Remove duplicates
-  };
-}
 
 /**
  * Prepare input for logging (truncate long strings)
@@ -310,13 +247,14 @@ function prepareInputForLogging(input: GenerateCvInput) {
  * Lambda handler for generateCv operation
  */
 export const handler = async (event: { arguments: GenerateCvInput }): Promise<string> => {
-  return withAiOperationHandler(
+  return withAiOperationHandlerObject(
     'generateCv',
     event,
     async (args) => {
       const userPrompt = buildUserPrompt(args);
       const responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);
-      return parseResponse(responseText);
+      console.log('[generateCv] Generated CV length:', responseText.length);
+      return responseText.trim();
     },
     prepareInputForLogging
   );

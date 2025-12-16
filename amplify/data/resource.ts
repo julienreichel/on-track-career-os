@@ -453,7 +453,7 @@ export const schema = a
         interests: a.string().array(),
         jobDescription: a.string(),
       })
-      .returns(a.json())
+      .returns(a.string())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateCvFunction)),
 

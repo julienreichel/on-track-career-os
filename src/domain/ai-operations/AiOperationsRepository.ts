@@ -320,14 +320,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    // GraphQL schema returns a.json() which is a JSON string - parse it to get GenerateCvResult object
-    let parsed = JSON.parse(data as string);
-
-    // Handle double-stringification (Lambda returns JSON string, which gets stringified again by GraphQL)
-    if (typeof parsed === 'string') {
-      parsed = JSON.parse(parsed);
-    }
-
-    return parsed as GenerateCvResult;
+    // GraphQL schema returns a.string() - plain Markdown text
+    return data as string;
   }
 }

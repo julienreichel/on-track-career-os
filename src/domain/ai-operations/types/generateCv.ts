@@ -41,8 +41,6 @@ export interface GenerateCvInput {
 
 /**
  * Result from generateCv AI operation
+ * Returns the complete CV as plain Markdown text
  */
-export interface GenerateCvResult {
-  markdown: string;
-  sections: string[];
-}
+export type GenerateCvResult = string;
