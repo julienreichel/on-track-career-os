@@ -26,12 +26,7 @@
           <UButton color="neutral" variant="outline" @click="cancelEdit">
             {{ $t('cvDisplay.actions.cancel') }}
           </UButton>
-          <UButton
-            icon="i-heroicons-check"
-            color="primary"
-            :loading="saving"
-            @click="saveEdit"
-          >
+          <UButton icon="i-heroicons-check" color="primary" :loading="saving" @click="saveEdit">
             {{ $t('cvDisplay.actions.save') }}
           </UButton>
         </template>

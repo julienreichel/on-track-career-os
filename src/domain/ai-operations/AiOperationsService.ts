@@ -264,8 +264,6 @@ export class AiOperationsService {
     }
   }
 
-
-
   /**
    * Validate CV input structure
    * @private

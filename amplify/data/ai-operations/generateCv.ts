@@ -215,8 +215,6 @@ function buildUserPrompt(input: GenerateCvInput): string {
   return prompt;
 }
 
-
-
 /**
  * Prepare input for logging (truncate long strings)
  */
