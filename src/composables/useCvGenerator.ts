@@ -53,7 +53,6 @@ export function useCvGenerator() {
   /**
    * Build AI input from user data
    */
-  // eslint-disable-next-line complexity
   const buildGenerationInput = async (
     userId: string,
     selectedExperienceIds: string[],
@@ -64,6 +63,7 @@ export function useCvGenerator() {
       includeCertifications?: boolean;
       includeInterests?: boolean;
     } = {}
+    // eslint-disable-next-line complexity
   ): Promise<GenerateCvInput | null> => {
     try {
       // Load user profile

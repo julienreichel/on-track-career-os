@@ -133,13 +133,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import { useToast } from '#app';
+
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useCvDocuments } from '@/composables/useCvDocuments';
-import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
-import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
-import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import { STARStoryService } from '@/domain/starstory/STARStoryService';
-import type { GenerateCvInput } from '@/domain/ai-operations/types/generateCv';
+import { useCvGenerator } from '@/composables/useCvGenerator';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -149,14 +148,7 @@ const toast = useToast();
 const { userId } = useAuthUser();
 
 const { createDocument } = useCvDocuments();
-
-// Services
-const aiService = new AiOperationsService();
-const userProfileRepo = new UserProfileRepository();
-const experienceRepo = new ExperienceRepository();
-const storyService = new STARStoryService();
-const generating = ref(false);
-const generationError = ref<string | null>(null);
+const { generateCv, generating, error: generationError } = useCvGenerator();
 
 // Wizard state
 const currentStep = ref(1);
@@ -194,69 +186,15 @@ const generateCV = async () => {
     return;
   }
 
-  generating.value = true;
-  generationError.value = null;
-
-  // eslint-disable-next-line complexity
   try {
-    // Load user profile
-    const profile = await userProfileRepo.get(userId.value);
-    if (!profile) {
-      throw new Error('User profile not found');
-    }
-
-    // Load selected experiences
-    const experiences = await Promise.all(
-      selectedExperienceIds.value.map((id) => experienceRepo.get(id))
-    );
-    const selectedExperiences = experiences.filter((exp) => exp !== null);
-
-    // Load all stories for selected experiences
-    const allStories: STARStory[] = [];
-    for (const exp of selectedExperiences) {
-      const stories = await storyService.getStoriesByExperience(exp);
-      allStories.push(...stories);
-    }
-
-    // Build input for generateCv
-    const input: GenerateCvInput = {
-      userProfile: {
-        fullName: profile.fullName || '',
-        headline: profile.headline || undefined,
-        location: profile.location || undefined,
-        goals: profile.goals?.filter((g): g is string => g !== null),
-        strengths: profile.strengths?.filter((s): s is string => s !== null),
-      },
-      selectedExperiences: selectedExperiences.map((exp) => ({
-        id: exp.id,
-        title: exp.title || '',
-        company: exp.companyName || '',
-        startDate: exp.startDate || '',
-        endDate: exp.endDate || undefined,
-        responsibilities: exp.responsibilities?.filter((r): r is string => r !== null),
-        tasks: exp.tasks?.filter((t): t is string => t !== null),
-      })),
-      stories: allStories.map((story) => ({
-        situation: story.situation,
-        task: story.task,
-        action: story.action,
-        result: story.result,
-      })),
-      skills: includeSkills.value ? profile.skills?.filter((s): s is string => s !== null) : [],
-      languages: includeLanguages.value
-        ? profile.languages?.filter((l): l is string => l !== null)
-        : [],
-      certifications: includeCertifications.value
-        ? profile.certifications?.filter((c): c is string => c !== null)
-        : [],
-      interests: includeInterests.value
-        ? profile.interests?.filter((i): i is string => i !== null)
-        : [],
+    // Generate CV markdown using composable
+    const cvMarkdown = await generateCv(userId.value, selectedExperienceIds.value, {
       jobDescription: jobDescription.value || undefined,
-    };
-
-    // Generate CV markdown with AI
-    const cvMarkdown = await aiService.generateCv(input);
+      includeSkills: includeSkills.value,
+      includeLanguages: includeLanguages.value,
+      includeCertifications: includeCertifications.value,
+      includeInterests: includeInterests.value,
+    });
 
     if (!cvMarkdown) {
       toast.add({
