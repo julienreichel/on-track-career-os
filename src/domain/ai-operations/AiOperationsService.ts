@@ -11,6 +11,7 @@ import type { PersonalCanvas, PersonalCanvasInput } from './PersonalCanvas';
 import { isPersonalCanvas } from './PersonalCanvas';
 import type { CVBlocksResult, GenerateCvBlocksInput } from './CVBlocks';
 import { isCVBlocksResult } from './CVBlocks';
+import type { GenerateCvInput, GenerateCvResult } from './types/generateCv';
 
 /**
  * Service for AI-powered CV and experience operations
@@ -259,6 +260,84 @@ export class AiOperationsService {
       // Re-throw with more context
       throw new Error(
         `Failed to generate CV blocks: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Type guard to validate GenerateCvResult structure
+   * @private
+   */
+  private isGenerateCvResult(result: unknown): result is GenerateCvResult {
+    if (!result || typeof result !== 'object') return false;
+    const r = result as Record<string, unknown>;
+    return typeof r.markdown === 'string' && Array.isArray(r.sections);
+  }
+
+  /**
+   * Validate CV input structure
+   * @private
+   */
+  private validateCvInput(input: GenerateCvInput): void {
+    if (!input || typeof input !== 'object') {
+      throw new Error('Invalid input structure');
+    }
+
+    if (!input.userProfile || typeof input.userProfile !== 'object') {
+      throw new Error('User profile is required');
+    }
+
+    if (!input.userProfile.fullName?.trim()) {
+      throw new Error('User profile must have a fullName');
+    }
+
+    if (!Array.isArray(input.selectedExperiences)) {
+      throw new Error('Selected experiences must be an array');
+    }
+
+    if (input.selectedExperiences.length === 0) {
+      throw new Error('At least one experience must be selected');
+    }
+
+    // Validate each experience has required fields
+    for (const exp of input.selectedExperiences) {
+      if (!exp.id || !exp.title || !exp.company) {
+        throw new Error('Each experience must have id, title, and company');
+      }
+    }
+  }
+
+  /**
+   * Generate complete CV in Markdown format with validation
+   * @param input - User profile, experiences, stories, skills, and optional job description
+   * @returns CV markdown and extracted section names
+   * @throws Error if generation fails or validation fails
+   */
+  async generateCv(input: GenerateCvInput): Promise<GenerateCvResult> {
+    // Validate input
+    this.validateCvInput(input);
+
+    try {
+      const result = await this.repo.generateCv(input);
+
+      // Validate output structure
+      if (!this.isGenerateCvResult(result)) {
+        throw new Error('Invalid CV result structure');
+      }
+
+      if (!result.markdown.trim()) {
+        throw new Error('CV generation produced empty markdown');
+      }
+
+      if (result.sections.length === 0) {
+        throw new Error('CV generation produced no sections');
+      }
+
+      return result;
+    } catch (error) {
+      // Re-throw with more context
+      throw new Error(
+        `Failed to generate CV: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }

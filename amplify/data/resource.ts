@@ -54,6 +54,14 @@ export const generateCvBlocksFunction = defineFunction({
   timeoutSeconds: 90, // Longer timeout for CV generation
 });
 
+export const generateCvFunction = defineFunction({
+  entry: './ai-operations/generateCv.ts',
+  environment: {
+    MODEL_ID,
+  },
+  timeoutSeconds: 90, // Longer timeout for full CV generation
+});
+
 export const schema = a
   .schema({
     // =====================================================
@@ -432,6 +440,22 @@ export const schema = a
       .returns(a.json())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateCvBlocksFunction)),
+
+    generateCv: a
+      .query()
+      .arguments({
+        userProfile: a.json().required(),
+        selectedExperiences: a.json().required(),
+        stories: a.json(),
+        skills: a.string().array(),
+        languages: a.string().array(),
+        certifications: a.string().array(),
+        interests: a.string().array(),
+        jobDescription: a.string(),
+      })
+      .returns(a.json())
+      .authorization((allow) => [allow.authenticated()])
+      .handler(a.handler.function(generateCvFunction)),
 
     // =====================================================
     // UTILITY FUNCTIONS (Custom Queries)

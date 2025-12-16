@@ -47,7 +47,7 @@ export class CVDocumentRepository {
    */
   private parseContentJSON(doc: CVDocument | null): CVDocument | null {
     if (!doc) return null;
-    
+
     if (doc.contentJSON && typeof doc.contentJSON === 'string') {
       try {
         return {
@@ -59,7 +59,7 @@ export class CVDocumentRepository {
         return doc;
       }
     }
-    
+
     return doc;
   }
 
@@ -77,9 +77,10 @@ export class CVDocumentRepository {
     // Stringify contentJSON if it's an object (but not null)
     const processedInput = {
       ...input,
-      contentJSON: input.contentJSON && typeof input.contentJSON === 'object' 
-        ? JSON.stringify(input.contentJSON) 
-        : input.contentJSON,
+      contentJSON:
+        input.contentJSON && typeof input.contentJSON === 'object'
+          ? JSON.stringify(input.contentJSON)
+          : input.contentJSON,
     };
     const { data } = await this.model.create(processedInput as CVDocumentCreateInput, gqlOptions());
     return this.parseContentJSON(data);
@@ -89,7 +90,10 @@ export class CVDocumentRepository {
     // Stringify contentJSON if it's an object
     const processedInput = {
       ...input,
-      contentJSON: input.contentJSON && typeof input.contentJSON === 'object' ? JSON.stringify(input.contentJSON) : input.contentJSON,
+      contentJSON:
+        input.contentJSON && typeof input.contentJSON === 'object'
+          ? JSON.stringify(input.contentJSON)
+          : input.contentJSON,
     };
     const { data } = await this.model.update(processedInput as CVDocumentUpdateInput, gqlOptions());
     return this.parseContentJSON(data);

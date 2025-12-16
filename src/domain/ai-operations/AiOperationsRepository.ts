@@ -5,6 +5,7 @@ import type { STARStory } from './STARStory';
 import type { AchievementsAndKpis } from './AchievementsAndKpis';
 import type { PersonalCanvas, PersonalCanvasInput } from './PersonalCanvas';
 import type { CVBlocksResult, GenerateCvBlocksInput } from './CVBlocks';
+import type { GenerateCvInput, GenerateCvResult } from './types/generateCv';
 
 /**
  * Repository interface for AI operations
@@ -54,6 +55,13 @@ export interface IAiOperationsRepository {
    * @returns Structured CV sections (blocks) ready for rendering
    */
   generateCvBlocks(input: GenerateCvBlocksInput): Promise<CVBlocksResult>;
+
+  /**
+   * Generate complete CV in Markdown format
+   * @param input - User profile, experiences, stories, skills, and optional job description
+   * @returns CV markdown and extracted section names
+   */
+  generateCv(input: GenerateCvInput): Promise<GenerateCvResult>;
 }
 
 /**
@@ -107,6 +115,20 @@ export type AmplifyAiOperations = {
       certifications?: string[];
       interests?: string[];
       sectionsToGenerate?: string[];
+      jobDescription?: string;
+    },
+    options?: Record<string, unknown>
+  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
+
+  generateCv: (
+    input: {
+      userProfile: string;
+      selectedExperiences: string;
+      stories?: string;
+      skills?: string[];
+      languages?: string[];
+      certifications?: string[];
+      interests?: string[];
       jobDescription?: string;
     },
     options?: Record<string, unknown>
@@ -273,5 +295,39 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     }
 
     return parsed as CVBlocksResult;
+  }
+
+  async generateCv(input: GenerateCvInput): Promise<GenerateCvResult> {
+    // GraphQL schema uses a.json() for complex objects, which expects JSON strings
+    const stringifiedInput = {
+      userProfile: JSON.stringify(input.userProfile),
+      selectedExperiences: JSON.stringify(input.selectedExperiences),
+      stories: input.stories ? JSON.stringify(input.stories) : undefined,
+      skills: input.skills,
+      languages: input.languages,
+      certifications: input.certifications,
+      interests: input.interests,
+      jobDescription: input.jobDescription ?? undefined,
+    };
+
+    const { data, errors } = await this.client.generateCv(stringifiedInput, gqlOptions());
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    // GraphQL schema returns a.json() which is a JSON string - parse it to get GenerateCvResult object
+    let parsed = JSON.parse(data as string);
+
+    // Handle double-stringification (Lambda returns JSON string, which gets stringified again by GraphQL)
+    if (typeof parsed === 'string') {
+      parsed = JSON.parse(parsed);
+    }
+
+    return parsed as GenerateCvResult;
   }
 }
