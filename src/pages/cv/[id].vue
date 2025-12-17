@@ -159,3 +159,79 @@ onMounted(() => {
   load();
 });
 </script>
+
+<style scoped>
+:deep(.prose) {
+  /* Heading 1 - Main title */
+  h1 {
+    font-size: 2.25rem; /* 36px */
+    line-height: 2.5rem; /* 40px */
+    font-weight: 700;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgb(var(--color-primary-500));
+  }
+
+  /* Heading 2 - Section titles */
+  h2 {
+    font-size: 1.5rem; /* 24px */
+    line-height: 2rem; /* 32px */
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid;
+  }
+
+  /* Heading 3 - Subsection titles */
+  h3 {
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.75rem; /* 28px */
+    font-weight: 500;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Additional spacing and styling for better readability */
+  p {
+    margin-bottom: 0.75rem;
+  }
+
+  ul,
+  ol {
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  ul > li + li,
+  ol > li + li {
+    margin-top: 0.25rem;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+
+  em {
+    font-style: italic;
+    opacity: 0.8;
+  }
+
+  code {
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    opacity: 0.9;
+  }
+
+  a {
+    color: rgb(var(--color-primary-500));
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+}
+</style>
