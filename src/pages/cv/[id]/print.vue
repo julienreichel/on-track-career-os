@@ -73,7 +73,7 @@ const load = async () => {
 
   try {
     document.value = await service.getFullCVDocument(cvId.value);
-    
+
     // Auto-trigger print dialog after content loads
     await nextTick();
     setTimeout(() => {
@@ -193,71 +193,81 @@ onMounted(() => {
 }
 
 /* CV heading styles (matching main view) */
-.prose h1 {
+:deep(.prose h1) {
   font-size: 2.25rem;
   line-height: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgb(var(--color-primary-500));
+  border-bottom: 2px solid #333;
+  color: #000;
 }
 
-.prose h2 {
+:deep(.prose h2) {
   font-size: 1.5rem;
   line-height: 2rem;
   font-weight: 600;
   margin-top: 2rem;
   margin-bottom: 0.75rem;
   padding-bottom: 0.25rem;
-  border-bottom: 1px solid;
+  border-bottom: 1px solid #666;
+  color: #000;
 }
 
-.prose h3 {
+:deep(.prose h3) {
   font-size: 1.25rem;
   line-height: 1.75rem;
   font-weight: 500;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
+  color: #000;
 }
 
-.prose p {
+:deep(.prose p) {
   margin-bottom: 0.75rem;
+  color: #000;
 }
 
-.prose ul,
-.prose ol {
+:deep(.prose ul),
+:deep(.prose ol) {
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
 }
 
-.prose ul > li + li,
-.prose ol > li + li {
+:deep(.prose ul > li + li),
+:deep(.prose ol > li + li) {
   margin-top: 0.25rem;
 }
 
-.prose strong {
+:deep(.prose li) {
+  color: #000;
+}
+
+:deep(.prose strong) {
   font-weight: 600;
+  color: #000;
 }
 
-.prose em {
+:deep(.prose em) {
   font-style: italic;
-  opacity: 0.8;
+  color: #333;
 }
 
-.prose code {
+:deep(.prose code) {
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
   font-size: 0.875rem;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  opacity: 0.9;
+  background-color: #f0f0f0;
+  color: #000;
 }
 
-.prose a {
-  color: rgb(var(--color-primary-500));
-  text-decoration: none;
+:deep(.prose a) {
+  color: #000;
+  text-decoration: underline;
 }
 
-.prose a:hover {
+:deep(.prose a:hover) {
   text-decoration: underline;
 }
 </style>
