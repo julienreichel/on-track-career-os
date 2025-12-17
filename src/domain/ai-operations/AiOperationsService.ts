@@ -9,8 +9,6 @@ import type { AchievementsAndKpis } from './AchievementsAndKpis';
 import { isAchievementsAndKpis } from './AchievementsAndKpis';
 import type { PersonalCanvas, PersonalCanvasInput } from './PersonalCanvas';
 import { isPersonalCanvas } from './PersonalCanvas';
-import type { CVBlocksResult, GenerateCvBlocksInput } from './CVBlocks';
-import { isCVBlocksResult } from './CVBlocks';
 import type { GenerateCvInput, GenerateCvResult } from './types/generateCv';
 
 /**
@@ -196,70 +194,6 @@ export class AiOperationsService {
       // Re-throw with more context
       throw new Error(
         `Failed to generate Personal Canvas: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    }
-  }
-
-  /**
-   * Validate CV blocks input structure
-   * @private
-   */
-  private validateCvBlocksInput(input: GenerateCvBlocksInput): void {
-    if (!input || typeof input !== 'object') {
-      throw new Error('Invalid input structure');
-    }
-
-    if (!input.userProfile || typeof input.userProfile !== 'object') {
-      throw new Error('User profile is required');
-    }
-
-    if (!input.userProfile.fullName?.trim()) {
-      throw new Error('User profile must have a fullName');
-    }
-
-    if (!Array.isArray(input.selectedExperiences)) {
-      throw new Error('Selected experiences must be an array');
-    }
-
-    if (input.selectedExperiences.length === 0) {
-      throw new Error('At least one experience must be selected');
-    }
-
-    // Validate each experience has required fields
-    for (const exp of input.selectedExperiences) {
-      if (!exp.id || !exp.title || !exp.company) {
-        throw new Error('Each experience must have id, title, and company');
-      }
-    }
-  }
-
-  /**
-   * Generate tailored CV blocks from user profile and experiences with validation
-   * @param input - User profile, experiences, stories, skills, and optional job description
-   * @returns Structured CV sections (blocks) ready for rendering
-   * @throws Error if generation fails or validation fails
-   */
-  async generateCvBlocks(input: GenerateCvBlocksInput): Promise<CVBlocksResult> {
-    // Validate input
-    this.validateCvBlocksInput(input);
-
-    try {
-      const result = await this.repo.generateCvBlocks(input);
-
-      // Validate output structure
-      if (!isCVBlocksResult(result)) {
-        throw new Error('Invalid CV blocks result structure');
-      }
-
-      if (result.sections.length === 0) {
-        throw new Error('CV generation produced no sections');
-      }
-
-      return result;
-    } catch (error) {
-      // Re-throw with more context
-      throw new Error(
-        `Failed to generate CV blocks: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }

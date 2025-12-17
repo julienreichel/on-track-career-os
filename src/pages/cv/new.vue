@@ -54,8 +54,8 @@
               {{ $t('cvNew.step1.title') }}
             </h2>
             <p class="text-gray-600">
-          {{ $t('cvNew.step1.description') }}
-          </p>
+              {{ $t('cvNew.step1.description') }}
+            </p>
           </div>
 
           <CvExperiencePicker v-model="selectedExperienceIds" :user-id="userId" />

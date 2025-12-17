@@ -509,11 +509,11 @@ Produce the User × Job × Company Fit Summary.
 
 ## AI OPERATIONS 11–14 — Tailored Documents
 
-### AI OPERATION 11 — `ai.generateCvBlocks`
+### AI OPERATION 11 — `ai.generateCv`
 
 #### Purpose
 
-Generate a **job-tailored CV** as a sequence of structured blocks (“sections”), using:
+Generate a **job-tailored CV in Markdown format**, using:
 
 - User profile
 - Selected experiences (with stories / achievements / KPIs already available in the data layer)
@@ -521,61 +521,45 @@ Generate a **job-tailored CV** as a sequence of structured blocks (“sections�
 - An optional job description
 - A soft constraint that the CV should be **around 2 pages**
 
-This operation outputs **Notion-style sections** that the CV editor can render, reorder, or partially edit, without any free-form AI text.
+This operation outputs **complete CV as Markdown text** that follows CV best practices and is ATS-optimized.
 
 ---
 
 #### System Prompt
 
 ```text
-You are an assistant that generates a tailored CV as a sequence of structured sections.
+You are an expert CV writer and career coach. Your task is to generate a professional, ATS-optimized CV in Markdown format.
+
+CRITICAL REQUIREMENTS:
+1. Output ONLY valid Markdown - no additional commentary
+2. Use proper Markdown syntax (# for headers, ** for bold, - for lists, etc.)
+3. Follow CV best practices:
+   - Start with contact info and professional summary
+   - Use action verbs and quantifiable achievements
+   - Keep bullet points concise (1-2 lines max)
+   - Prioritize relevant experience for the role
+   - Use reverse chronological order
+4. When a job description is provided, tailor the CV to highlight relevant skills and experiences
+5. Structure sections logically: Summary → Experience → Education → Skills → Additional sections
+6. Ensure proper spacing between sections for readability
+
+FORMATTING GUIDELINES:
+- Use # for name/header
+- Use ## for section headers
+- Use ### for job titles/institutions
+- Use **bold** for emphasis on key achievements
+- Use - for bullet points
+- Include dates in format: Month Year - Month Year (or Present)
+- Keep total length appropriate (1-2 pages worth of content)
 
 GOAL:
-- Produce a coherent CV that fits in approximately 2 pages.
-- Use ONLY the information provided in the input profile, experiences, stories, and job description.
-- DO NOT invent new experiences, employers, or responsibilities.
-- You MAY slightly infer impact phrasing (achievements, outcomes) as long as it clearly follows from the input.
+- Produce a coherent CV that fits in approximately 2 pages
+- Use ONLY the information provided in the input profile, experiences, stories, and job description
+- DO NOT invent new experiences, employers, or responsibilities
 
-CONTENT & STRUCTURE RULES:
-- The CV is made of ordered sections ("blocks").
-- Each section has:
-  - type
-  - optional title
-  - content (plain text, no markdown)
-  - optional experienceId for experience-related blocks
-- Use only these section types:
-  - "summary"
-  - "experience"
-  - "education"
-  - "skills"
-  - "languages"
-  - "certifications"
-  - "interests"
-
-- For "summary":
-  - 3–5 concise sentences describing the user, aligned with the job if a job description is provided.
-- For "experience"/"education":
-  - One block per selected experience.
-  - Each block should be concise and focused on impact, using achievements/KPIs if available.
-- For "skills", "languages", "certifications", "interests":
-  - Summarize and group items logically into a short paragraph or bullet-like sentence list inside `content`.
-
-LENGTH HEURISTIC:
-- Aim for ~2 pages of CV content in total.
-- If there are MANY experiences (for example 7 or more), shorten each experience description.
-- If there are FEW experiences (for example 1–3), use richer narrative per experience.
-- Prefer clarity and focus over verbosity.
-
-TAILORING:
-- If a job description is provided:
-  - Emphasize experiences, skills, and achievements that best match the role.
-  - Reorder experience blocks to put the most relevant first.
-- If no job description is provided:
-  - Produce a generic but coherent CV that reflects the user's overall profile.
-
-OUTPUT RULES:
-- Return ONLY valid JSON, no markdown or extra text.
-- Respect the exact JSON schema provided in the user prompt.
+OUTPUT FORMAT:
+Output ONLY pure Markdown text - no JSON, no code blocks, no wrapping.
+Start directly with the CV content.
 ```
 
 ---
@@ -583,165 +567,117 @@ OUTPUT RULES:
 #### User Prompt
 
 ```text
-Generate a tailored CV as ordered sections based on the following data.
+Generate a professional CV in Markdown format. YOU MUST USE THE EXACT DATA PROVIDED BELOW - do not invent or substitute information.
 
-User profile:
-{{userProfileJson}}
+## USER PROFILE
+Name: {{fullName}}
+Professional Title: {{headline}}
+Location: {{location}}
+Seniority: {{seniorityLevel}}
 
-Selected experiences:
-{{selectedExperiencesJson}}
+Career Goals:
+{{goals}}
 
-Stories, achievements, and KPIs (optional, may be empty):
-{{storiesAndKpisJson}}
+Key Strengths:
+{{strengths}}
 
-Skills:
-{{skillsListJson}}
+## WORK EXPERIENCE ({{experienceCount}} positions)
+{{experiences}}
 
-Languages:
-{{languagesListJson}}
+## ACHIEVEMENT STORIES ({{storyCount}} stories)
+{{stories}}
 
-Certifications:
-{{certificationsListJson}}
+## SKILLS
+{{skills}}
 
-Interests:
-{{interestsListJson}}
+## LANGUAGES
+{{languages}}
 
-Job description (optional, may be empty):
-{{jobDescriptionText}}
+## CERTIFICATIONS
+{{certifications}}
 
-Sections to generate (ordered list of section types):
-{{sectionsToGenerateJson}}
+## INTERESTS
+{{interests}}
 
-Remember:
-- Use ONLY the information provided above.
-- Respect the requested section order.
-- Keep the overall length around 2 pages.
-- Use shorter descriptions when many experiences are selected; use richer descriptions when there are only a few.
+## TARGET JOB DESCRIPTION (if provided)
+{{jobDescription}}
 
-Return ONLY a JSON object with this exact structure:
+IMPORTANT: Tailor the CV to highlight experiences, skills, and achievements most relevant to this job description. Emphasize matching keywords and requirements.
 
-{
-  "sections": [
-    {
-      "type": "summary" | "experience" | "skills" | "languages" | "certifications" | "interests" | "custom",
-      "title": "string (optional, can be empty for sections like 'summary' or when no title is needed)",
-      "content": "string (plain text, basic markdown: bullets, bold, emphasis)",
-      "experienceId": "string (optional, only for experience-related blocks)"
-    }
-  ]
-}
+CRITICAL REMINDER: Use ONLY the information provided above. Do not use placeholder names like "John Doe" or invent any data. The CV MUST contain the exact names, titles, companies, and dates from the input data.
 ```
 
 ---
 
 #### Input Schema
 
-```json
+```typescript
 {
-  "userProfile": {
-    "id": "string",
-    "fullName": "string",
-    "headline": "string",
-    "location": "string",
-    "seniorityLevel": "string",
-    "goals": ["string"],
-    "aspirations": ["string"],
-    "personalValues": ["string"],
-    "strengths": ["string"]
-  },
-  "selectedExperiences": [
-    {
-      "id": "string",
-      "title": "string",
-      "company": "string",
-      "startDate": "string",
-      "endDate": "string",
-      "location": "string",
-      "responsibilities": ["string"],
-      "tasks": ["string"]
-    }
-  ],
-  "stories": [
-    {
-      "experienceId": "string",
-      "situation": "string",
-      "task": "string",
-      "action": "string",
-      "result": "string",
-      "achievements": ["string"],
-      "kpiSuggestions": ["string"]
-    }
-  ],
-  "skills": ["string"],
-  "languages": ["string"],
-  "certifications": ["string"],
-  "interests": ["string"],
-  "sectionsToGenerate": [
-    "summary",
-    "experience",
-    "skills",
-    "languages",
-    "certifications",
-    "interests",
-    "custom"
-  ],
-  "jobDescription": "string | null"
+  userProfile: {
+    fullName: string;
+    headline?: string;
+    location?: string;
+    goals?: string[];
+    strengths?: string[];
+  };
+  selectedExperiences: Array<{
+    id: string;
+    title: string;
+    company: string;
+    startDate: string;
+    endDate?: string;
+    isCurrent?: boolean;
+    responsibilities?: string[];
+    tasks?: string[];
+  }>;
+  stories?: Array<{
+    situation: string;
+    task: string;
+    action: string;
+    result: string;
+  }>;
+  skills?: string[];
+  languages?: string[];
+  certifications?: string[];
+  interests?: string[];
+  jobDescription?: string;
 }
 ```
-
-_(You can relax individual fields to `optional` in your TS/Zod validator if needed for MVP.)_
 
 ---
 
 #### Output Schema
 
-```json
-{
-  "sections": [
-    {
-      "type": "summary | experience | skills | languages | certifications | interests | custom",
-      "title": "string | null",
-      "content": "string",
-      "experienceId": "string | null"
-    }
-  ]
-}
+```typescript
+string; // Complete CV as Markdown text
 ```
 
-- `type` is required and must be one of the fixed literals.
-- `title`:
-  - Optional / nullable.
-  - May be empty for sections where a title is not needed.
+The output is plain Markdown text that includes:
 
-- `content`:
-  - Required plain text (no markdown, no HTML).
+- Name and professional summary
+- Work experience with bullet points
+- Skills, languages, certifications
+- Education (if applicable)
+- Additional sections as needed
 
-- `experienceId`:
-  - Optional; used only for `"experience"` (or any block directly derived from a specific experience).
+The Markdown follows standard formatting conventions and is ready to be rendered or exported.
 
 ---
 
 #### Fallback Strategy
 
-- If the model returns non-JSON text:
-  - Try to extract the first JSON object substring.
-  - If parsing fails, **reissue** the prompt once with an extra instruction:
+- If the model returns invalid or empty content:
+  - Retry once with simplified prompt
+  - Log error for monitoring
 
-    > "Your previous answer was invalid. Return ONLY VALID JSON matching the schema below, with no explanation or extra text."
+- If the result is clearly too verbose (>10,000 characters):
+  - Log warning for monitoring
+  - Return as-is (application can handle display)
 
-- If `sections` is missing or not an array:
-  - Replace with an empty array `[]`.
-
-- If a section is missing required fields:
-  - Drop that section OR
-  - Fill missing `title` with `null`, missing `experienceId` with `null`.
-
-- If `type` is invalid:
-  - Try to map to the closest valid type based on context (e.g. "profile" → "summary").
-  - If no safe mapping: drop the section.
-
-- If the result is clearly too verbose (e.g. a single section containing thousands of characters):
-  - Truncate to a reasonable length in the Lambda, and set an internal `lengthWarning` flag (for logging; UI can ignore for MVP).
+- Markdown validation:
+  - Ensure output contains at least one header (#)
+  - Verify minimum length (>100 characters)
+  - Log warning if format seems incorrect but don't fail
 
 ### Cover Letter
 

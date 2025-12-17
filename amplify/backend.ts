@@ -8,7 +8,6 @@ import {
   generateStarStoryFunction,
   generateAchievementsAndKpisFunction,
   generatePersonalCanvasFunction,
-  generateCvBlocksFunction,
   generateCvFunction,
 } from './data/resource';
 import { deleteUserProfile } from './data/delete-user-profile/resource';
@@ -24,7 +23,6 @@ const backend = defineBackend({
   generateStarStoryFunction,
   generateAchievementsAndKpisFunction,
   generatePersonalCanvasFunction,
-  generateCvBlocksFunction,
   generateCvFunction,
   deleteUserProfile,
 });
@@ -64,14 +62,6 @@ backend.generateAchievementsAndKpisFunction.resources.lambda.addToRolePolicy(
 );
 
 backend.generatePersonalCanvasFunction.resources.lambda.addToRolePolicy(
-  new PolicyStatement({
-    effect: Effect.ALLOW,
-    actions: ['bedrock:InvokeModel'],
-    resources: ['arn:aws:bedrock:*::foundation-model/*', 'arn:aws:bedrock:*:*:inference-profile/*'],
-  })
-);
-
-backend.generateCvBlocksFunction.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     effect: Effect.ALLOW,
     actions: ['bedrock:InvokeModel'],
