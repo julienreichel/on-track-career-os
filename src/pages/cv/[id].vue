@@ -1,75 +1,114 @@
 <template>
-  <UPage>
-    <UPageHeader>
-      <template #title>
-        <div class="flex items-center gap-4">
-          <UButton
-            icon="i-heroicons-arrow-left"
-            color="neutral"
-            variant="ghost"
-            @click="navigateTo({ name: 'cv' })"
-          />
-          <span>{{ document?.name || $t('cvDisplay.untitled') }}</span>
-        </div>
-      </template>
-      <template #actions>
-        <UButton
-          v-if="!isEditing"
-          icon="i-heroicons-pencil"
-          color="neutral"
-          variant="outline"
-          @click="toggleEdit"
-        >
-          {{ $t('cvDisplay.actions.edit') }}
-        </UButton>
-        <template v-else>
-          <UButton color="neutral" variant="outline" @click="cancelEdit">
-            {{ $t('cvDisplay.actions.cancel') }}
-          </UButton>
-          <UButton icon="i-heroicons-check" color="primary" :loading="saving" @click="saveEdit">
-            {{ $t('cvDisplay.actions.save') }}
-          </UButton>
-        </template>
-      </template>
-    </UPageHeader>
+  <UContainer>
+    <UPage>
+      <UPageHeader
+        :title="document?.name || $t('cvDisplay.untitled')"
+        :links="[
+          {
+            label: $t('cvDisplay.backToCvs'),
+            to: '/cv',
+            icon: 'i-heroicons-arrow-left',
+          },
+        ]"
+      />
 
-    <UPageBody>
-      <div v-if="loading" class="flex justify-center py-12">
-        <UIcon name="i-heroicons-arrow-path" class="animate-spin size-16" />
-      </div>
+      <UPageBody>
+        <!-- Error Alert -->
+        <UAlert
+          v-if="error"
+          color="error"
+          icon="i-heroicons-exclamation-triangle"
+          :title="$t('common.error')"
+          :description="error"
+          class="mb-6"
+        />
 
-      <div v-else-if="error" class="text-center py-12">
-        <UIcon name="i-heroicons-exclamation-triangle" class="size-16 mx-auto mb-4 text-error" />
-        <p class="mb-4">{{ error }}</p>
-        <UButton color="primary" @click="load">
-          {{ $t('cvDisplay.actions.retry') }}
-        </UButton>
-      </div>
-
-      <div v-else class="max-w-4xl mx-auto">
-        <!-- Edit Mode: Markdown Editor -->
-        <UCard v-if="isEditing">
-          <UTextarea
-            v-model="editContent"
-            :rows="20"
-            :placeholder="$t('cvDisplay.markdownPlaceholder')"
-            class="font-mono text-sm"
-          />
-          <template #footer>
-            <p class="text-sm text-gray-600">
-              {{ $t('cvDisplay.markdownHelp') }}
+        <!-- Loading State -->
+        <div v-if="loading" class="flex items-center justify-center py-12">
+          <div class="text-center">
+            <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('cvDisplay.loading') }}
             </p>
-          </template>
-        </UCard>
+          </div>
+        </div>
 
-        <!-- View Mode: Rendered HTML -->
-        <UCard v-else>
-          <!-- eslint-disable-next-line vue/no-v-html -->
-          <div class="prose prose-gray max-w-none" v-html="renderedHtml" />
-        </UCard>
-      </div>
-    </UPageBody>
-  </UPage>
+        <!-- Saving State -->
+        <div v-else-if="saving" class="flex items-center justify-center py-12">
+          <div class="text-center">
+            <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('cvDisplay.saving') }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div v-else-if="document" class="space-y-6">
+          <!-- Edit Mode: Markdown Editor -->
+          <UCard v-if="isEditing">
+            <div class="space-y-4">
+              <div>
+                <h3 class="text-lg font-semibold mb-2">
+                  {{ $t('cvDisplay.editMode') }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ $t('cvDisplay.markdownHelp') }}
+                </p>
+              </div>
+
+              <UFormField :label="$t('cvDisplay.contentLabel')" required>
+                <UTextarea
+                  v-model="editContent"
+                  :rows="25"
+                  :placeholder="$t('cvDisplay.markdownPlaceholder')"
+                  class="font-mono text-sm"
+                />
+              </UFormField>
+            </div>
+          </UCard>
+
+          <!-- View Mode: Rendered HTML -->
+          <UCard v-else>
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div class="prose prose-gray max-w-none" v-html="renderedHtml" />
+          </UCard>
+
+          <!-- Action Buttons -->
+          <div v-if="isEditing" class="flex justify-end gap-3">
+            <UButton :label="$t('common.cancel')" variant="ghost" @click="handleCancel" />
+            <UButton
+              :label="$t('common.save')"
+              icon="i-heroicons-check"
+              :disabled="!hasChanges || saving"
+              :loading="saving"
+              @click="saveEdit"
+            />
+          </div>
+          <div v-else class="flex justify-end">
+            <UButton
+              :label="$t('cvDisplay.actions.edit')"
+              icon="i-heroicons-pencil"
+              variant="outline"
+              @click="toggleEdit"
+            />
+          </div>
+        </div>
+
+        <!-- Not Found -->
+        <UAlert
+          v-else-if="!loading"
+          color="warning"
+          icon="i-heroicons-exclamation-triangle"
+          :title="$t('cvDisplay.notFound')"
+          :description="$t('cvDisplay.notFoundDescription')"
+        />
+      </UPageBody>
+    </UPage>
+
+    <!-- Unsaved Changes Modal -->
+    <UnsavedChangesModal v-model:open="showCancelConfirm" @discard="handleConfirmCancel" />
+  </UContainer>
 </template>
 
 <script setup lang="ts">
@@ -93,10 +132,16 @@ const error = ref<string | null>(null);
 
 const isEditing = ref(false);
 const editContent = ref('');
+const originalContent = ref('');
+const showCancelConfirm = ref(false);
 
 const renderedHtml = computed(() => {
   if (!document.value?.content) return '';
   return marked(document.value.content);
+});
+
+const hasChanges = computed(() => {
+  return editContent.value !== originalContent.value;
 });
 
 const load = async () => {
@@ -107,6 +152,7 @@ const load = async () => {
     document.value = await service.getFullCVDocument(cvId.value);
     if (document.value) {
       editContent.value = document.value.content || '';
+      originalContent.value = document.value.content || '';
     }
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load CV';
@@ -119,11 +165,22 @@ const load = async () => {
 const toggleEdit = () => {
   isEditing.value = true;
   editContent.value = document.value?.content || '';
+  originalContent.value = document.value?.content || '';
 };
 
-const cancelEdit = () => {
+const handleCancel = () => {
+  if (hasChanges.value) {
+    showCancelConfirm.value = true;
+    return;
+  }
   isEditing.value = false;
-  editContent.value = document.value?.content || '';
+  editContent.value = originalContent.value;
+};
+
+const handleConfirmCancel = () => {
+  showCancelConfirm.value = false;
+  isEditing.value = false;
+  editContent.value = originalContent.value;
 };
 
 const saveEdit = async () => {
@@ -138,6 +195,7 @@ const saveEdit = async () => {
 
     if (updated) {
       document.value = updated;
+      originalContent.value = editContent.value;
       isEditing.value = false;
       toast.add({
         title: t('cvDisplay.toast.saved'),

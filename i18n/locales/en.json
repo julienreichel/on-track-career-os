@@ -613,8 +613,15 @@
   },
   "cvDisplay": {
     "untitled": "Untitled CV",
+    "backToCvs": "Back to CVs",
+    "loading": "Loading CV...",
+    "saving": "Saving changes...",
+    "editMode": "Edit CV Content",
+    "contentLabel": "Markdown Content",
     "markdownPlaceholder": "Enter your CV content in Markdown format...",
     "markdownHelp": "Use Markdown syntax: # for headings, ** for bold, * for italic, - for lists",
+    "notFound": "CV Not Found",
+    "notFoundDescription": "The CV you're looking for doesn't exist or has been deleted.",
     "actions": {
       "edit": "Edit",
       "cancel": "Cancel",
