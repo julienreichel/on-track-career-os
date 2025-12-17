@@ -107,7 +107,8 @@ EDUCATION HANDLING:
 
 OUTPUT FORMAT:
 Output ONLY pure Markdown text - no JSON, no code blocks, no wrapping.
-Start directly with the CV content.`;
+Start directly with the CV content.
+DO NOT add notes, disclaimers, or comments at the end of the CV.`;
 
 /**
  * Format user profile section
@@ -169,6 +170,18 @@ function formatSingleExperience(exp: Experience, stories: Story[] | undefined): 
 }
 
 /**
+ * Sort experiences by start date (most recent first)
+ */
+function sortExperiencesByDate(experiences: Experience[]): Experience[] {
+  return [...experiences].sort((a, b) => {
+    const dateA = a.startDate || '';
+    const dateB = b.startDate || '';
+    // Sort descending (most recent first)
+    return dateB.localeCompare(dateA);
+  });
+}
+
+/**
  * Format experiences section - grouped by type with related stories
  */
 function formatExperiencesWithStories(
@@ -187,37 +200,37 @@ function formatExperiencesWithStories(
 
   let output = '';
 
-  // Format work experiences
+  // Format work experiences (sorted by most recent first)
   if (workExperiences.length > 0) {
     output += `## WORK EXPERIENCE\n`;
-    workExperiences.forEach((exp) => {
+    sortExperiencesByDate(workExperiences).forEach((exp) => {
       output += formatSingleExperience(exp, stories);
     });
     output += '\n';
   }
 
-  // Format education
+  // Format education (sorted by most recent first)
   if (educationExperiences.length > 0) {
     output += `## EDUCATION\n`;
-    educationExperiences.forEach((exp) => {
+    sortExperiencesByDate(educationExperiences).forEach((exp) => {
       output += formatSingleExperience(exp, stories);
     });
     output += '\n';
   }
 
-  // Format volunteer work
+  // Format volunteer work (sorted by most recent first)
   if (volunteerExperiences.length > 0) {
     output += `## VOLUNTEER EXPERIENCE\n`;
-    volunteerExperiences.forEach((exp) => {
+    sortExperiencesByDate(volunteerExperiences).forEach((exp) => {
       output += formatSingleExperience(exp, stories);
     });
     output += '\n';
   }
 
-  // Format projects
+  // Format projects (sorted by most recent first)
   if (projectExperiences.length > 0) {
     output += `## PROJECTS\n`;
-    projectExperiences.forEach((exp) => {
+    sortExperiencesByDate(projectExperiences).forEach((exp) => {
       output += formatSingleExperience(exp, stories);
     });
     output += '\n';
