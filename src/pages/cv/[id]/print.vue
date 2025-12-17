@@ -38,10 +38,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { marked } from 'marked';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
+
+defineOptions({
+  name: 'CvPrintView',
+});
 
 definePageMeta({
   layout: false,
@@ -52,10 +56,10 @@ useHead({
 });
 
 const route = useRoute();
-const router = useRouter();
-const { t } = useI18n();
 
 const cvId = computed(() => route.params.id as string);
+
+const PRINT_DELAY_MS = 500;
 
 const service = new CVDocumentService();
 const document = ref<CVDocument | null>(null);
@@ -78,7 +82,7 @@ const load = async () => {
     await nextTick();
     setTimeout(() => {
       window.print();
-    }, 500);
+    }, PRINT_DELAY_MS);
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load CV';
     console.error('[cvPrint] Error loading CV:', err);
