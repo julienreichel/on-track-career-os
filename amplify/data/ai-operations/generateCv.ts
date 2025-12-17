@@ -38,11 +38,14 @@ interface Experience {
   startDate?: string;
   endDate?: string;
   isCurrent?: boolean;
+  experienceType?: 'work' | 'education' | 'volunteer' | 'project';
   responsibilities?: string[];
   tasks?: string[];
 }
 
 interface Story {
+  id?: string;
+  experienceId?: string;
   situation?: string;
   task?: string;
   action?: string;
@@ -68,25 +71,40 @@ const SYSTEM_PROMPT = `You are an expert CV writer and career coach. Your task i
 
 CRITICAL REQUIREMENTS:
 1. Output ONLY valid Markdown - no additional commentary
-2. Use proper Markdown syntax (# for headers, ** for bold, - for lists, etc.)
-3. Follow CV best practices:
-   - Start with contact info and professional summary
+2. SYNTHESIZE and CONDENSE: Transform verbose input into concise, impactful statements
+3. Use proper Markdown syntax (# for headers, ** for bold, - for lists, etc.)
+4. Follow CV best practices:
+   - Start with contact info and professional summary (2-3 lines max)
    - Use action verbs and quantifiable achievements
-   - Keep bullet points concise (1-2 lines max)
+   - Keep bullet points concise (1 line max, 2 lines only for major achievements)
    - Prioritize relevant experience for the role
    - Use reverse chronological order
-4. When a job description is provided, tailor the CV to highlight relevant skills and experiences
-5. Structure sections logically: Summary → Experience → Education → Skills → Additional sections
-6. Ensure proper spacing between sections for readability
+5. When a job description is provided, tailor the CV to highlight relevant skills and experiences
+6. Structure sections logically: Summary → Work Experience → Education → Skills → Additional sections
+7. Ensure proper spacing between sections for readability
+
+SYNTHESIS GUIDELINES:
+- Combine similar responsibilities/tasks into single, powerful bullet points
+- Extract KEY achievements from STAR stories - use metrics when available
+- For skills: group by category (Technical, Languages, Soft Skills) and list only relevant ones
+- For interests: select 3-5 professional/relevant interests only
+- Eliminate redundancy and generic statements
+- Each bullet point must demonstrate impact or value
 
 FORMATTING GUIDELINES:
 - Use # for name/header
-- Use ## for section headers
-- Use ### for job titles/institutions
-- Use **bold** for emphasis on key achievements
-- Use - for bullet points
+- Use ## for section headers (Work Experience, Education, Skills, etc.)
+- Use ### for job titles/institutions  
+- Use **bold** for company names, institutions, and key metrics
+- Use - for bullet points (3-5 per position max)
 - Include dates in format: Month Year - Month Year (or Present)
 - Keep total length appropriate (1-2 pages worth of content)
+- Separate Education from Work Experience - do NOT mix them
+
+EDUCATION HANDLING:
+- Create separate "## Education" section for all education experiences
+- Format: ### Degree/Certification at **Institution**
+- Include relevant coursework, honors, or achievements only if notable
 
 OUTPUT FORMAT:
 Output ONLY pure Markdown text - no JSON, no code blocks, no wrapping.
@@ -112,49 +130,99 @@ function formatUserProfile(profile: UserProfile): string {
 }
 
 /**
- * Format experiences section
+ * Format a single experience with its related stories
  */
-function formatExperiences(experiences: Experience[]): string {
-  if (experiences.length === 0) return '';
-
-  let section = `## WORK EXPERIENCE (${experiences.length} positions)\n`;
-  experiences.forEach((exp, idx) => {
-    section += `\n### Experience ${idx + 1}\n`;
-    section += `Title: ${exp.title || 'Not provided'}\n`;
-    const companyName = exp.company || exp.companyName;
-    if (companyName) section += `Company: ${companyName}\n`;
-    if (exp.startDate) {
-      const endDate = exp.endDate || (exp.isCurrent ? 'Present' : 'Not specified');
-      section += `Period: ${exp.startDate} - ${endDate}\n`;
-    }
-    if (exp.responsibilities?.length) {
-      section += `Responsibilities:\n${exp.responsibilities.map((r) => `- ${r}`).join('\n')}\n`;
-    }
-    if (exp.tasks?.length) {
-      section += `Key Tasks:\n${exp.tasks.map((t) => `- ${t}`).join('\n')}\n`;
-    }
-  });
-  return section + '\n';
+function formatSingleExperience(exp: Experience, stories: Story[] | undefined): string {
+  let output = `\n### ${exp.title || 'Position'}\n`;
+  const companyName = exp.company || exp.companyName;
+  if (companyName) output += `**${companyName}**\n`;
+  if (exp.startDate) {
+    const endDate = exp.endDate || (exp.isCurrent ? 'Present' : 'Not specified');
+    output += `${exp.startDate} - ${endDate}\n`;
+  }
+  
+  // Add responsibilities
+  if (exp.responsibilities?.length) {
+    output += `\nResponsibilities:\n${exp.responsibilities.map((r) => `- ${r}`).join('\n')}\n`;
+  }
+  
+  // Add tasks
+  if (exp.tasks?.length) {
+    output += `\nKey Tasks:\n${exp.tasks.map((t) => `- ${t}`).join('\n')}\n`;
+  }
+  
+  // Add related stories
+  const relatedStories = stories?.filter((s) => s.experienceId === exp.id) || [];
+  if (relatedStories.length > 0) {
+    output += `\nKey Achievements (from STAR stories):\n`;
+    relatedStories.forEach((story) => {
+      output += `- **Situation:** ${story.situation}\n`;
+      output += `  **Task:** ${story.task}\n`;
+      output += `  **Action:** ${story.action}\n`;
+      output += `  **Result:** ${story.result}\n`;
+      if (story.achievements?.length) {
+        output += `  **Highlights:** ${story.achievements.join('; ')}\n`;
+      }
+    });
+  }
+  
+  return output;
 }
 
 /**
- * Format STAR stories section
+ * Format experiences section - grouped by type with related stories
  */
-function formatStories(stories: Story[] | undefined): string {
-  if (!stories || stories.length === 0) return '';
+function formatExperiencesWithStories(
+  experiences: Experience[],
+  stories: Story[] | undefined
+): string {
+  if (experiences.length === 0) return '';
 
-  let section = `## ACHIEVEMENT STORIES (${stories.length} stories)\n`;
-  stories.forEach((story, idx) => {
-    section += `\n### Story ${idx + 1}\n`;
-    if (story.situation) section += `Situation: ${story.situation}\n`;
-    if (story.task) section += `Task: ${story.task}\n`;
-    if (story.action) section += `Action: ${story.action}\n`;
-    if (story.result) section += `Result: ${story.result}\n`;
-    if (story.achievements?.length) {
-      section += `Key Achievements:\n${story.achievements.map((a) => `- ${a}`).join('\n')}\n`;
-    }
-  });
-  return section + '\n';
+  // Group experiences by type
+  const workExperiences = experiences.filter((exp) => !exp.experienceType || exp.experienceType === 'work');
+  const educationExperiences = experiences.filter((exp) => exp.experienceType === 'education');
+  const volunteerExperiences = experiences.filter((exp) => exp.experienceType === 'volunteer');
+  const projectExperiences = experiences.filter((exp) => exp.experienceType === 'project');
+
+  let output = '';
+
+  // Format work experiences
+  if (workExperiences.length > 0) {
+    output += `## WORK EXPERIENCE\n`;
+    workExperiences.forEach((exp) => {
+      output += formatSingleExperience(exp, stories);
+    });
+    output += '\n';
+  }
+
+  // Format education
+  if (educationExperiences.length > 0) {
+    output += `## EDUCATION\n`;
+    educationExperiences.forEach((exp) => {
+      output += formatSingleExperience(exp, stories);
+    });
+    output += '\n';
+  }
+
+  // Format volunteer work
+  if (volunteerExperiences.length > 0) {
+    output += `## VOLUNTEER EXPERIENCE\n`;
+    volunteerExperiences.forEach((exp) => {
+      output += formatSingleExperience(exp, stories);
+    });
+    output += '\n';
+  }
+
+  // Format projects
+  if (projectExperiences.length > 0) {
+    output += `## PROJECTS\n`;
+    projectExperiences.forEach((exp) => {
+      output += formatSingleExperience(exp, stories);
+    });
+    output += '\n';
+  }
+
+  return output;
 }
 
 /**
@@ -162,15 +230,23 @@ function formatStories(stories: Story[] | undefined): string {
  */
 function buildUserPrompt(input: GenerateCvInput): string {
   let prompt =
-    'Generate a professional CV in Markdown format. YOU MUST USE THE EXACT DATA PROVIDED BELOW - do not invent or substitute information.\n\n';
+    'Generate a professional, CONCISE CV in Markdown format.\n\n';
+  prompt += 'SYNTHESIS INSTRUCTIONS:\n';
+  prompt += '- CONDENSE verbose descriptions into impactful 1-line bullets\n';
+  prompt += '- EXTRACT key metrics and achievements from STAR stories\n';
+  prompt += '- ELIMINATE redundant or generic statements\n';
+  prompt += '- SELECT only the most relevant skills/interests (not all)\n';
+  prompt += '- COMBINE similar responsibilities into single points\n';
+  prompt += '- Professional summary: 2-3 lines maximum\n\n';
 
   prompt += formatUserProfile(input.userProfile);
-  prompt += formatExperiences(input.selectedExperiences);
-  prompt += formatStories(input.stories);
+  prompt += formatExperiencesWithStories(input.selectedExperiences, input.stories);
 
-  // Add skills
+  // Add skills with guidance
   if (input.skills?.length) {
-    prompt += `## SKILLS\n${input.skills.join(', ')}\n\n`;
+    prompt += `## SKILLS (RAW LIST - SYNTHESIZE INTO CATEGORIES)\n`;
+    prompt += `Available skills: ${input.skills.join(', ')}\n`;
+    prompt += `Instructions: Organize into 2-4 categories (e.g., Technical, Languages, Soft Skills). Select only relevant skills.\n\n`;
   }
 
   // Add languages
@@ -183,18 +259,28 @@ function buildUserPrompt(input: GenerateCvInput): string {
     prompt += `## CERTIFICATIONS\n${input.certifications.map((c) => `- ${c}`).join('\n')}\n\n`;
   }
 
-  // Add interests
+  // Add interests with guidance
   if (input.interests?.length) {
-    prompt += `## INTERESTS\n${input.interests.join(', ')}\n\n`;
+    prompt += `## INTERESTS (RAW LIST - SELECT 3-5 MOST PROFESSIONAL)\n`;
+    prompt += `Available interests: ${input.interests.join(', ')}\n`;
+    prompt += `Instructions: Choose only 3-5 professional/relevant interests. Omit casual hobbies.\n\n`;
   }
 
   // Add job description for tailoring
   if (input.jobDescription) {
     prompt += `## TARGET JOB DESCRIPTION\n${input.jobDescription}\n\n`;
-    prompt += `IMPORTANT: Tailor the CV to highlight experiences, skills, and achievements most relevant to this job description. Emphasize matching keywords and requirements.\n\n`;
+    prompt += `TAILORING INSTRUCTIONS:\n`;
+    prompt += `- Prioritize experiences and skills matching this job description\n`;
+    prompt += `- Use keywords from the job posting\n`;
+    prompt += `- Emphasize relevant achievements from STAR stories\n`;
+    prompt += `- Adjust professional summary to align with role\n\n`;
   }
 
-  prompt += `CRITICAL REMINDER: Use ONLY the information provided above. Do not use placeholder names like "John Doe" or invent any data. The CV MUST contain the exact names, titles, companies, and dates from the input data.`;
+  prompt += `CRITICAL REMINDERS:\n`;
+  prompt += `- Use ONLY the information provided above - do not invent data\n`;
+  prompt += `- Keep the CV CONCISE (1-2 pages worth)\n`;
+  prompt += `- Separate Education from Work Experience\n`;
+  prompt += `- Transform verbose input into professional, impactful output`;
 
   return prompt;
 }

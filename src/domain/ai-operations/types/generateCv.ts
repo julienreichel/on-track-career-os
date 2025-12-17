@@ -23,14 +23,18 @@ export interface GenerateCvInput {
     startDate: string;
     endDate?: string;
     isCurrent?: boolean;
+    experienceType?: 'work' | 'education' | 'volunteer' | 'project';
     responsibilities?: string[];
     tasks?: string[];
   }>;
   stories?: Array<{
+    id?: string;
+    experienceId?: string;
     situation: string;
     task: string;
     action: string;
     result: string;
+    achievements?: string[];
   }>;
   skills?: string[];
   languages?: string[];

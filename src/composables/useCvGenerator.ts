@@ -95,14 +95,18 @@ export function useCvGenerator() {
           company: exp.companyName || '',
           startDate: exp.startDate || '',
           endDate: exp.endDate || undefined,
+          experienceType: exp.experienceType as 'work' | 'education' | 'volunteer' | 'project' | undefined,
           responsibilities: exp.responsibilities?.filter((r): r is string => r !== null),
           tasks: exp.tasks?.filter((t): t is string => t !== null),
         })),
         stories: allStories.map((story) => ({
+          id: story.id,
+          experienceId: story.experienceId,
           situation: story.situation,
           task: story.task,
           action: story.action,
           result: story.result,
+          achievements: story.achievements?.filter((a): a is string => a !== null),
         })),
       };
 
