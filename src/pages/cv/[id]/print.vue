@@ -43,10 +43,6 @@ import { marked } from 'marked';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 
-defineOptions({
-  name: 'CvPrintView',
-});
-
 definePageMeta({
   layout: false,
 });
