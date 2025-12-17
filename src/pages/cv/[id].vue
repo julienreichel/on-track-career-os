@@ -62,7 +62,7 @@
                   v-model="editContent"
                   :rows="25"
                   :placeholder="$t('cvDisplay.markdownPlaceholder')"
-                  class="font-mono text-sm"
+                  class="font-mono text-sm w-full"
                 />
               </UFormField>
             </div>
@@ -85,7 +85,13 @@
               @click="saveEdit"
             />
           </div>
-          <div v-else class="flex justify-end">
+          <div v-else class="flex justify-end gap-3">
+            <UButton
+              :label="$t('cvDisplay.actions.exportPdf')"
+              icon="i-heroicons-arrow-down-tray"
+              variant="outline"
+              @click="handlePrint"
+            />
             <UButton
               :label="$t('cvDisplay.actions.edit')"
               icon="i-heroicons-pencil"
@@ -213,12 +219,96 @@ const saveEdit = async () => {
   }
 };
 
+const handlePrint = () => {
+  window.print();
+};
+
 onMounted(() => {
   load();
 });
 </script>
 
 <style scoped>
+/* Print styles for PDF export */
+@media print {
+  /* Hide non-printable elements */
+  :deep(.u-page-header),
+  :deep(.u-page-body > *:not(.max-w-4xl)),
+  button,
+  .flex.justify-end {
+    display: none !important;
+  }
+
+  /* Optimize layout for A4 */
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  :deep(.u-container) {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  :deep(.u-card) {
+    border: none;
+    box-shadow: none;
+    padding: 1.5cm 2cm;
+    margin: 0;
+  }
+
+  /* A4 page settings */
+  @page {
+    size: A4;
+    margin: 1.5cm 2cm;
+  }
+
+  /* Ensure proper page breaks */
+  :deep(.prose) {
+    page-break-inside: avoid;
+  }
+
+  :deep(.prose h1),
+  :deep(.prose h2),
+  :deep(.prose h3) {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  :deep(.prose ul),
+  :deep(.prose ol),
+  :deep(.prose p) {
+    page-break-inside: avoid;
+  }
+
+  /* Adjust colors for print */
+  :deep(.prose h1) {
+    border-bottom-color: #333 !important;
+    color: #000 !important;
+  }
+
+  :deep(.prose h2) {
+    border-bottom-color: #666 !important;
+    color: #000 !important;
+  }
+
+  :deep(.prose h3),
+  :deep(.prose p),
+  :deep(.prose li) {
+    color: #000 !important;
+  }
+
+  :deep(.prose a) {
+    color: #000 !important;
+    text-decoration: underline !important;
+  }
+
+  :deep(.prose code) {
+    background-color: #f0f0f0 !important;
+    color: #000 !important;
+  }
+}
+
 :deep(.prose) {
   /* Heading 1 - Main title */
   h1 {
