@@ -580,6 +580,10 @@
       "back": "Back",
       "generate": "Generate CV"
     },
+    "generating": {
+      "title": "Generating Your CV",
+      "description": "AI is crafting your professional CV based on your experiences..."
+    },
     "toast": {
       "created": "CV created successfully!",
       "createFailed": "Failed to create CV",

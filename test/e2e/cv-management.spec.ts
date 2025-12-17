@@ -266,7 +266,7 @@ test.describe('CV Auto-Save Functionality', () => {
 });
 
 test.describe('PDF Export and Print', () => {
-  test('should open print view in new tab', async ({ page, context }) => {
+  test('should open print view in new tab', async ({ page }) => {
     // Navigate to CV listing
     await page.goto('/cv');
     await page.waitForLoadState('networkidle');

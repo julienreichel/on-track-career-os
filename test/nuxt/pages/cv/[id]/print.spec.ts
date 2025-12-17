@@ -320,11 +320,6 @@ describe.skip('CV Print Page - Layout', () => {
   });
 
   it('should have no layout (layout: false)', async () => {
-    const CvPrintPage = (await import('@/pages/cv/[id]/print.vue')).default;
-
-    // Check page meta
-    const pageMeta = (CvPrintPage as { __pageMeta?: { layout: boolean } }).__pageMeta;
-
     // Note: This assertion may need adjustment based on how definePageMeta is compiled
     // The key point is the page should not render with the default app layout
     expect((wrapper) => !wrapper.find('header').exists()).toBeTruthy();

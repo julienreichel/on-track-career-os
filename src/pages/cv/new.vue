@@ -71,8 +71,11 @@
         </div>
       </UCard>
 
+      <!-- Generating State -->
+      <CvGeneratingStep v-if="generating" />
+
       <!-- Step 2: Generate CV -->
-      <UCard v-if="currentStep === 2">
+      <UCard v-else-if="currentStep === 2">
         <div class="space-y-6">
           <div>
             <h2 class="text-xl font-semibold text-gray-900 mb-2">
@@ -120,7 +123,7 @@
             <UButton color="neutral" variant="outline" @click="previousStep">
               {{ $t('cvNew.actions.back') }}
             </UButton>
-            <UButton :loading="generating" :disabled="!cvName.trim()" @click="generateCV">
+            <UButton :disabled="!cvName.trim()" @click="generateCV">
               {{ $t('cvNew.actions.generate') }}
             </UButton>
           </div>
