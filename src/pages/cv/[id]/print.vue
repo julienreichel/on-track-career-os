@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { marked } from 'marked';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
@@ -45,6 +45,10 @@ import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 
 definePageMeta({
   layout: false,
+});
+
+useHead({
+  title: 'Print CV',
 });
 
 const route = useRoute();
@@ -69,6 +73,12 @@ const load = async () => {
 
   try {
     document.value = await service.getFullCVDocument(cvId.value);
+    
+    // Auto-trigger print dialog after content loads
+    await nextTick();
+    setTimeout(() => {
+      window.print();
+    }, 500);
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load CV';
     console.error('[cvPrint] Error loading CV:', err);
