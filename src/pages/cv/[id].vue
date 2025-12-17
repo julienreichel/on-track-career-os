@@ -220,7 +220,9 @@ const saveEdit = async () => {
 };
 
 const handlePrint = () => {
-  window.print();
+  // Open print view in new window
+  const printUrl = `/cv/${cvId.value}/print`;
+  window.open(printUrl, '_blank');
 };
 
 onMounted(() => {
@@ -228,114 +230,7 @@ onMounted(() => {
 });
 </script>
 
-<style>
-/* Print styles for PDF export */
-@media print {
-  /* Hide all non-content elements */
-  header,
-  nav,
-  aside,
-  footer,
-  button,
-  [role="navigation"],
-  .u-page-header,
-  .flex.justify-end,
-  .space-y-6 > *:not(.u-card) {
-    display: none !important;
-  }
-
-  /* Reset all containers and wrappers */
-  html,
-  body {
-    width: 100%;
-    height: 100%;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: visible !important;
-  }
-
-  body * {
-    visibility: hidden;
-  }
-
-  /* Show only the CV content */
-  .u-card,
-  .u-card * {
-    visibility: visible;
-  }
-
-  .u-card {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    border: none !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    background: white !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  .prose {
-    max-width: 100% !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* A4 page settings */
-  @page {
-    size: A4;
-    margin: 1.5cm 2cm;
-  }
-
-  /* Ensure proper page breaks */
-  :deep(.prose) {
-    page-break-inside: avoid;
-  }
-
-  :deep(.prose h1),
-  :deep(.prose h2),
-  :deep(.prose h3) {
-    page-break-after: avoid;
-    page-break-inside: avoid;
-  }
-
-  :deep(.prose ul),
-  :deep(.prose ol),
-  :deep(.prose p) {
-    page-break-inside: avoid;
-  }
-
-  /* Adjust colors for print */
-  :deep(.prose h1) {
-    border-bottom-color: #333 !important;
-    color: #000 !important;
-  }
-
-  :deep(.prose h2) {
-    border-bottom-color: #666 !important;
-    color: #000 !important;
-  }
-
-  :deep(.prose h3),
-  :deep(.prose p),
-  :deep(.prose li) {
-    color: #000 !important;
-  }
-
-  :deep(.prose a) {
-    color: #000 !important;
-    text-decoration: underline !important;
-  }
-
-  :deep(.prose code) {
-    background-color: #f0f0f0 !important;
-    color: #000 !important;
-  }
-}
-
+<style scoped>
 :deep(.prose) {
   /* Heading 1 - Main title */
   h1 {

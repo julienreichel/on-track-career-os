@@ -627,7 +627,8 @@
       "cancel": "Cancel",
       "save": "Save",
       "retry": "Retry",
-      "exportPdf": "Export to PDF"
+      "exportPdf": "Export to PDF",
+      "print": "Print"
     },
     "toast": {
       "saved": "CV saved successfully",
