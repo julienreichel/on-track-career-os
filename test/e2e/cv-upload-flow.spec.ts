@@ -138,25 +138,24 @@ test.describe('CV Upload Flow', () => {
   test('should import experiences and redirect to success page', async ({ page }) => {
     const testFilePath = join(__dirname, 'fixtures', 'test-cv.txt');
     const fileInput = page.locator('input[type="file"]');
+
     await fileInput.setInputFiles(testFilePath);
 
-    // Wait for parsing
-    await page.waitForTimeout(5000);
-    await page.waitForLoadState('networkidle');
+    // Wait until parsing is finished → Import button appears
+    const importButton = page.getByRole('button', { name: /import all/i });
 
-    // Click import button
-    const importButton = page.getByRole('button', { name: /Import All/i });
+    await expect(importButton).toBeVisible({ timeout: 20000 });
+    await expect(importButton).toBeEnabled();
+
     await importButton.click();
 
-    // Wait for import to complete
-    await page.waitForLoadState('networkidle');
+    // Assert success state (don’t rely on networkidle)
+    await expect(page.getByText(/successfully imported.*experience/i)).toBeVisible({
+      timeout: 15000,
+    });
 
-    // Should show success message
-    await expect(page.getByText(/Successfully imported.*experience/i)).toBeVisible();
-
-    // Should show navigation buttons
-    await expect(page.getByRole('button', { name: /View Profile/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /View Experiences/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /view profile/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /view experiences/i })).toBeVisible();
   });
 
   test('should display imported experiences in list', async ({ page }) => {
