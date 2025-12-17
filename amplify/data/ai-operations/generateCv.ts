@@ -8,9 +8,9 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
  * Follows CV best practices and tailors content when a job description is provided.
  *
  * Input Schema:
- * - userProfile: JSON string containing user's profile information
- * - selectedExperiences: JSON string array of experience objects to include
- * - stories: Optional JSON string array of STAR stories
+ * - userProfile: Object containing user's profile information (fullName, headline, location, goals, strengths)
+ * - selectedExperiences: Array of experience objects to include
+ * - stories: Optional array of STAR stories
  * - skills: Optional array of skills
  * - languages: Optional array of languages
  * - certifications: Optional array of certifications
@@ -20,17 +20,6 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
  * Output Schema:
  * - Returns complete CV as plain Markdown text
  */
-
-interface GenerateCvInput {
-  userProfile: string;
-  selectedExperiences: string;
-  stories?: string;
-  skills?: string[];
-  languages?: string[];
-  certifications?: string[];
-  interests?: string[];
-  jobDescription?: string;
-}
 
 interface UserProfile {
   fullName?: string;
@@ -42,10 +31,13 @@ interface UserProfile {
 }
 
 interface Experience {
+  id?: string;
   title?: string;
+  company?: string;
   companyName?: string;
   startDate?: string;
   endDate?: string;
+  isCurrent?: boolean;
   responsibilities?: string[];
   tasks?: string[];
 }
@@ -56,6 +48,17 @@ interface Story {
   action?: string;
   result?: string;
   achievements?: string[];
+}
+
+interface GenerateCvInput {
+  userProfile: UserProfile;
+  selectedExperiences: Experience[];
+  stories?: Story[];
+  skills?: string[];
+  languages?: string[];
+  certifications?: string[];
+  interests?: string[];
+  jobDescription?: string;
 }
 
 /**
@@ -92,85 +95,66 @@ Start directly with the CV content.`;
 /**
  * Format user profile section
  */
-function formatUserProfile(userProfileJson: string): string {
-  try {
-    const profile: UserProfile = JSON.parse(userProfileJson);
-    let section = `## USER PROFILE\n`;
-    section += `Name: ${profile.fullName || 'Not provided'}\n`;
-    if (profile.headline) section += `Professional Title: ${profile.headline}\n`;
-    if (profile.location) section += `Location: ${profile.location}\n`;
-    if (profile.seniorityLevel) section += `Seniority: ${profile.seniorityLevel}\n`;
+function formatUserProfile(profile: UserProfile): string {
+  let section = `## USER PROFILE\n`;
+  section += `Name: ${profile.fullName || 'Not provided'}\n`;
+  if (profile.headline) section += `Professional Title: ${profile.headline}\n`;
+  if (profile.location) section += `Location: ${profile.location}\n`;
+  if (profile.seniorityLevel) section += `Seniority: ${profile.seniorityLevel}\n`;
 
-    if (profile.goals && profile.goals.length > 0) {
-      section += `\nCareer Goals:\n${profile.goals.map((g) => `- ${g}`).join('\n')}\n`;
-    }
-    if (profile.strengths && profile.strengths.length > 0) {
-      section += `\nKey Strengths:\n${profile.strengths.map((s) => `- ${s}`).join('\n')}\n`;
-    }
-    return section + '\n';
-  } catch (error) {
-    console.error('[generateCv] Failed to parse userProfile:', error);
-    return '';
+  if (profile.goals && profile.goals.length > 0) {
+    section += `\nCareer Goals:\n${profile.goals.map((g) => `- ${g}`).join('\n')}\n`;
   }
+  if (profile.strengths && profile.strengths.length > 0) {
+    section += `\nKey Strengths:\n${profile.strengths.map((s) => `- ${s}`).join('\n')}\n`;
+  }
+  return section + '\n';
 }
 
 /**
  * Format experiences section
  */
-function formatExperiences(experiencesJson: string): string {
-  try {
-    const experiences: Experience[] = JSON.parse(experiencesJson);
-    if (experiences.length === 0) return '';
+function formatExperiences(experiences: Experience[]): string {
+  if (experiences.length === 0) return '';
 
-    let section = `## WORK EXPERIENCE (${experiences.length} positions)\n`;
-    experiences.forEach((exp, idx) => {
-      section += `\n### Experience ${idx + 1}\n`;
-      section += `Title: ${exp.title || 'Not provided'}\n`;
-      if (exp.companyName) section += `Company: ${exp.companyName}\n`;
-      if (exp.startDate) {
-        const endDate = exp.endDate || 'Present';
-        section += `Period: ${exp.startDate} - ${endDate}\n`;
-      }
-      if (exp.responsibilities?.length) {
-        section += `Responsibilities:\n${exp.responsibilities.map((r) => `- ${r}`).join('\n')}\n`;
-      }
-      if (exp.tasks?.length) {
-        section += `Key Tasks:\n${exp.tasks.map((t) => `- ${t}`).join('\n')}\n`;
-      }
-    });
-    return section + '\n';
-  } catch (error) {
-    console.error('[generateCv] Failed to parse selectedExperiences:', error);
-    return '';
-  }
+  let section = `## WORK EXPERIENCE (${experiences.length} positions)\n`;
+  experiences.forEach((exp, idx) => {
+    section += `\n### Experience ${idx + 1}\n`;
+    section += `Title: ${exp.title || 'Not provided'}\n`;
+    const companyName = exp.company || exp.companyName;
+    if (companyName) section += `Company: ${companyName}\n`;
+    if (exp.startDate) {
+      const endDate = exp.endDate || (exp.isCurrent ? 'Present' : 'Not specified');
+      section += `Period: ${exp.startDate} - ${endDate}\n`;
+    }
+    if (exp.responsibilities?.length) {
+      section += `Responsibilities:\n${exp.responsibilities.map((r) => `- ${r}`).join('\n')}\n`;
+    }
+    if (exp.tasks?.length) {
+      section += `Key Tasks:\n${exp.tasks.map((t) => `- ${t}`).join('\n')}\n`;
+    }
+  });
+  return section + '\n';
 }
 
 /**
  * Format STAR stories section
  */
-function formatStories(storiesJson: string | undefined): string {
-  if (!storiesJson) return '';
+function formatStories(stories: Story[] | undefined): string {
+  if (!stories || stories.length === 0) return '';
 
-  try {
-    const stories: Story[] = JSON.parse(storiesJson);
-    if (stories.length === 0) return '';
-
-    let section = `## ACHIEVEMENT STORIES (${stories.length} stories)\n`;
-    stories.forEach((story, idx) => {
-      section += `\n### Story ${idx + 1}\n`;
-      if (story.situation) section += `Situation: ${story.situation}\n`;
-      if (story.task) section += `Task: ${story.task}\n`;
-      if (story.action) section += `Action: ${story.action}\n`;
-      if (story.result) section += `Result: ${story.result}\n`;
-      if (story.achievements?.length) {
-        section += `Key Achievements:\n${story.achievements.map((a) => `- ${a}`).join('\n')}\n`;
-      }
-    });
-    return section + '\n';
-  } catch (error) {
-    console.error('[generateCv] Failed to parse stories:', error);
-    return '';
-  }
+  let section = `## ACHIEVEMENT STORIES (${stories.length} stories)\n`;
+  stories.forEach((story, idx) => {
+    section += `\n### Story ${idx + 1}\n`;
+    if (story.situation) section += `Situation: ${story.situation}\n`;
+    if (story.task) section += `Task: ${story.task}\n`;
+    if (story.action) section += `Action: ${story.action}\n`;
+    if (story.result) section += `Result: ${story.result}\n`;
+    if (story.achievements?.length) {
+      section += `Key Achievements:\n${story.achievements.map((a) => `- ${a}`).join('\n')}\n`;
+    }
+  });
+  return section + '\n';
 }
 
 /**
@@ -221,26 +205,16 @@ function buildUserPrompt(input: GenerateCvInput): string {
 function prepareInputForLogging(input: GenerateCvInput) {
   const LOG_TRUNCATE_LENGTH = 100;
 
-  try {
-    return {
-      userProfile: input.userProfile ? JSON.parse(input.userProfile) : null,
-      experienceCount: input.selectedExperiences ? JSON.parse(input.selectedExperiences).length : 0,
-      storyCount: input.stories ? JSON.parse(input.stories).length : 0,
-      skillCount: input.skills?.length || 0,
-      hasJobDescription: !!input.jobDescription,
-      jobDescriptionPreview: input.jobDescription
-        ? truncateForLog(input.jobDescription, LOG_TRUNCATE_LENGTH)
-        : null,
-    };
-  } catch (error) {
-    console.error('[generateCv] Error in prepareInputForLogging:', error);
-
-    const PREVIEW_LENGTH = 200;
-    return {
-      error: 'Failed to parse input for logging',
-      rawInput: truncateForLog(JSON.stringify(input), PREVIEW_LENGTH),
-    };
-  }
+  return {
+    userProfile: input.userProfile,
+    experienceCount: input.selectedExperiences?.length || 0,
+    storyCount: input.stories?.length || 0,
+    skillCount: input.skills?.length || 0,
+    hasJobDescription: !!input.jobDescription,
+    jobDescriptionPreview: input.jobDescription
+      ? truncateForLog(input.jobDescription, LOG_TRUNCATE_LENGTH)
+      : null,
+  };
 }
 
 /**

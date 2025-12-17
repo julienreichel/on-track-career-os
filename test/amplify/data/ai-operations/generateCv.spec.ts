@@ -43,7 +43,7 @@ describe('ai.generateCv', () => {
    * Mock AI response generator that creates CV Markdown from user profile
    */
   const generateMockCvMarkdown = (profile: any) => {
-    const profileData = JSON.parse(profile.userProfile);
+    const profileData = profile.userProfile;
     return `# ${profileData.fullName || 'Professional'}
 
 **${profileData.headline || 'Professional'}** | ${profileData.location || 'Remote'}
@@ -73,13 +73,13 @@ Python, JavaScript, AWS, Docker, Kubernetes
 
   it('should generate CV with complete user data', async () => {
     const mockMarkdown = generateMockCvMarkdown({
-      userProfile: JSON.stringify({
+      userProfile: {
         fullName: 'John Doe',
         headline: 'Senior Software Engineer',
         location: 'San Francisco, CA',
         goals: ['Lead technical teams'],
         strengths: ['Cloud architecture'],
-      }),
+      },
     });
 
     mockSend.mockResolvedValue({
@@ -96,12 +96,12 @@ Python, JavaScript, AWS, Docker, Kubernetes
 
     const result = await handler({
       arguments: {
-        userProfile: JSON.stringify({
+        userProfile: {
           fullName: 'John Doe',
           headline: 'Senior Software Engineer',
           location: 'San Francisco, CA',
-        }),
-        selectedExperiences: JSON.stringify([]),
+        },
+        selectedExperiences: [],
       },
     });
 
@@ -144,8 +144,8 @@ CS Degree`;
 
     const result = await handler({
       arguments: {
-        userProfile: JSON.stringify({ fullName: 'Jane Smith' }),
-        selectedExperiences: JSON.stringify([]),
+        userProfile: { fullName: 'Jane Smith' },
+        selectedExperiences: [],
       },
     });
 
@@ -175,8 +175,8 @@ Some content without headers`;
 
     const result = await handler({
       arguments: {
-        userProfile: JSON.stringify({ fullName: 'Test User' }),
-        selectedExperiences: JSON.stringify([]),
+        userProfile: { fullName: 'Test User' },
+        selectedExperiences: [],
       },
     });
 
@@ -206,8 +206,8 @@ Seeking opportunities`;
 
     const result = await handler({
       arguments: {
-        userProfile: JSON.stringify({ fullName: 'Professional' }),
-        selectedExperiences: JSON.stringify([]),
+        userProfile: { fullName: 'Professional' },
+        selectedExperiences: [],
       },
     });
 
@@ -245,8 +245,8 @@ Skills list`;
 
     const result = await handler({
       arguments: {
-        userProfile: JSON.stringify({ fullName: 'Test' }),
-        selectedExperiences: JSON.stringify([]),
+        userProfile: { fullName: 'Test' },
+        selectedExperiences: [],
       },
     });
 
