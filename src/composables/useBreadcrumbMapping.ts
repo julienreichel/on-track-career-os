@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
+import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
 
 /**
  * Composable for managing breadcrumb ID to name mappings
@@ -12,6 +13,7 @@ interface BreadcrumbMapping {
 
 const mappingCache = ref<BreadcrumbMapping>({});
 let experienceService: ExperienceService | null = null;
+let cvDocumentService: CVDocumentService | null = null;
 
 export function useBreadcrumbMapping() {
   /**
@@ -45,6 +47,36 @@ export function useBreadcrumbMapping() {
   };
 
   /**
+   * Get display name for a CV document ID
+   */
+  const getCVDocumentName = async (cvId: string): Promise<string> => {
+    // Lazy initialize service to avoid issues in test environment
+    if (!cvDocumentService) {
+      cvDocumentService = new CVDocumentService();
+    }
+
+    // Check cache first
+    if (mappingCache.value[cvId]) {
+      return mappingCache.value[cvId];
+    }
+
+    // Fetch from API
+    try {
+      const cvDocument = await cvDocumentService!.getFullCVDocument(cvId);
+      const name = cvDocument?.name;
+      if (name) {
+        mappingCache.value[cvId] = name;
+        return name;
+      }
+    } catch (err) {
+      console.error('[useBreadcrumbMapping] Error fetching CV document:', err);
+    }
+
+    // Return ID as fallback
+    return cvId;
+  };
+
+  /**
    * Check if a string looks like a UUID
    */
   const isUUID = (str: string): boolean => {
@@ -68,6 +100,10 @@ export function useBreadcrumbMapping() {
     // Determine what type of ID this is based on the previous segment
     if (previousSegment === 'experiences') {
       return await getExperienceName(segment);
+    }
+
+    if (previousSegment === 'cv') {
+      return await getCVDocumentName(segment);
     }
 
     // Add more mappings here as needed for other entity types
