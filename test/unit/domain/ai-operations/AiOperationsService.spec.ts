@@ -112,6 +112,7 @@ describe('AiOperationsService', () => {
             endDate: '2023-12',
             responsibilities: ['Lead team', 'Code review'],
             tasks: ['Development', 'Mentoring'],
+            experienceType: 'work',
           },
         ],
       };
