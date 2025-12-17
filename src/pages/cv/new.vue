@@ -54,11 +54,11 @@
               {{ $t('cvNew.step1.title') }}
             </h2>
             <p class="text-gray-600">
-              {{ $t('cvNew.step1.description') }}
-            </p>
+          {{ $t('cvNew.step1.description') }}
+          </p>
           </div>
 
-          <CvRenderExperiencePicker v-model="selectedExperienceIds" :user-id="userId" />
+          <CvExperiencePicker v-model="selectedExperienceIds" :user-id="userId" />
 
           <div class="flex justify-end gap-3 pt-4 border-t">
             <UButton color="neutral" variant="outline" @click="cancel">
@@ -134,7 +134,6 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { useToast } from '#app';
 
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useCvDocuments } from '@/composables/useCvDocuments';
