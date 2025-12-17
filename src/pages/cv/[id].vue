@@ -228,33 +228,60 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style>
 /* Print styles for PDF export */
 @media print {
-  /* Hide non-printable elements */
-  :deep(.u-page-header),
-  :deep(.u-page-body > *:not(.max-w-4xl)),
+  /* Hide all non-content elements */
+  header,
+  nav,
+  aside,
+  footer,
   button,
-  .flex.justify-end {
+  [role="navigation"],
+  .u-page-header,
+  .flex.justify-end,
+  .space-y-6 > *:not(.u-card) {
     display: none !important;
   }
 
-  /* Optimize layout for A4 */
+  /* Reset all containers and wrappers */
+  html,
   body {
-    margin: 0;
-    padding: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
   }
 
-  :deep(.u-container) {
-    max-width: 100%;
-    padding: 0;
+  body * {
+    visibility: hidden;
   }
 
-  :deep(.u-card) {
-    border: none;
-    box-shadow: none;
-    padding: 1.5cm 2cm;
-    margin: 0;
+  /* Show only the CV content */
+  .u-card,
+  .u-card * {
+    visibility: visible;
+  }
+
+  .u-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .prose {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   /* A4 page settings */
