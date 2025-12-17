@@ -228,6 +228,8 @@
       "starStoriesDescription": "Build achievement stories with AI assistance",
       "personalCanvas": "Personal Canvas",
       "personalCanvasDescription": "Your business model canvas",
+      "cvDocuments": "CV Documents",
+      "cvDocumentsDescription": "Manage and export your CV documents",
       "communication": "Communication Profile",
       "communicationDescription": "Your strengths and style (Coming soon)"
     }

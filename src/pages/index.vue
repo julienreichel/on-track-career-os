@@ -27,11 +27,7 @@
             :title="t('features.applications.title')"
             :description="t('features.applications.description')"
             icon="i-heroicons-document-text"
-          />
-          <UPageCard
-            :title="t('features.interview.title')"
-            :description="t('features.interview.description')"
-            icon="i-heroicons-chat-bubble-left-right"
+            :to="{ name: 'cv' }"
           />
         </UPageGrid>
       </UCard>

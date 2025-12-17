@@ -406,6 +406,13 @@
           />
 
           <UPageCard
+            :title="t('profile.links.cvDocuments')"
+            :description="t('profile.links.cvDocumentsDescription')"
+            icon="i-heroicons-document-duplicate"
+            to="/cv"
+          />
+
+          <UPageCard
             :title="t('profile.links.communication')"
             :description="t('profile.links.communicationDescription')"
             icon="i-heroicons-chat-bubble-left-right"
