@@ -81,7 +81,6 @@ CRITICAL REQUIREMENTS:
    - Use reverse chronological order
 5. When a job description is provided, tailor the CV to highlight relevant skills and experiences
 6. Structure sections logically: Summary → Work Experience → Education → Skills → Additional sections
-7. Ensure proper spacing between sections for readability
 
 SYNTHESIS GUIDELINES:
 - Combine similar responsibilities/tasks into single, powerful bullet points
@@ -98,7 +97,7 @@ FORMATTING GUIDELINES:
 - Use **bold** for company names, institutions, and key metrics
 - Use - for bullet points (3-5 per position max)
 - Include dates in format: Month Year - Month Year (or Present)
-- Keep total length appropriate (1-2 pages worth of content)
+- Keep total length appropriate (2 pages worth of content)
 - Separate Education from Work Experience - do NOT mix them
 
 EDUCATION HANDLING:
@@ -140,17 +139,17 @@ function formatSingleExperience(exp: Experience, stories: Story[] | undefined): 
     const endDate = exp.endDate || (exp.isCurrent ? 'Present' : 'Not specified');
     output += `${exp.startDate} - ${endDate}\n`;
   }
-  
+
   // Add responsibilities
   if (exp.responsibilities?.length) {
     output += `\nResponsibilities:\n${exp.responsibilities.map((r) => `- ${r}`).join('\n')}\n`;
   }
-  
+
   // Add tasks
   if (exp.tasks?.length) {
     output += `\nKey Tasks:\n${exp.tasks.map((t) => `- ${t}`).join('\n')}\n`;
   }
-  
+
   // Add related stories
   const relatedStories = stories?.filter((s) => s.experienceId === exp.id) || [];
   if (relatedStories.length > 0) {
@@ -165,7 +164,7 @@ function formatSingleExperience(exp: Experience, stories: Story[] | undefined): 
       }
     });
   }
-  
+
   return output;
 }
 
@@ -179,7 +178,9 @@ function formatExperiencesWithStories(
   if (experiences.length === 0) return '';
 
   // Group experiences by type
-  const workExperiences = experiences.filter((exp) => !exp.experienceType || exp.experienceType === 'work');
+  const workExperiences = experiences.filter(
+    (exp) => !exp.experienceType || exp.experienceType === 'work'
+  );
   const educationExperiences = experiences.filter((exp) => exp.experienceType === 'education');
   const volunteerExperiences = experiences.filter((exp) => exp.experienceType === 'volunteer');
   const projectExperiences = experiences.filter((exp) => exp.experienceType === 'project');
@@ -229,8 +230,7 @@ function formatExperiencesWithStories(
  * Build the user prompt for CV generation
  */
 function buildUserPrompt(input: GenerateCvInput): string {
-  let prompt =
-    'Generate a professional, CONCISE CV in Markdown format.\n\n';
+  let prompt = 'Generate a professional, CONCISE CV in Markdown format.\n\n';
   prompt += 'SYNTHESIS INSTRUCTIONS:\n';
   prompt += '- CONDENSE verbose descriptions into impactful 1-line bullets\n';
   prompt += '- EXTRACT key metrics and achievements from STAR stories\n';

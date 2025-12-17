@@ -95,7 +95,12 @@ export function useCvGenerator() {
           company: exp.companyName || '',
           startDate: exp.startDate || '',
           endDate: exp.endDate || undefined,
-          experienceType: exp.experienceType as 'work' | 'education' | 'volunteer' | 'project' | undefined,
+          experienceType: exp.experienceType as
+            | 'work'
+            | 'education'
+            | 'volunteer'
+            | 'project'
+            | undefined,
           responsibilities: exp.responsibilities?.filter((r): r is string => r !== null),
           tasks: exp.tasks?.filter((t): t is string => t !== null),
         })),
