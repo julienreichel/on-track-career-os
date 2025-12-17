@@ -63,6 +63,26 @@
                 <span>{{ $t('cvList.updated') }}: {{ formatDate(cv.updatedAt) }}</span>
               </div>
             </div>
+
+            <!-- Custom Actions -->
+            <template #actions>
+              <UButton
+                :label="$t('cvList.actions.print')"
+                icon="i-heroicons-printer"
+                size="xs"
+                color="neutral"
+                variant="soft"
+                @click="handlePrint(cv)"
+              />
+              <UButton
+                :label="$t('common.edit')"
+                icon="i-heroicons-pencil"
+                size="xs"
+                color="primary"
+                variant="soft"
+                @click="navigateTo({ name: 'cv-id', params: { id: cv.id } })"
+              />
+            </template>
           </ItemCard>
         </div>
       </UPageBody>
@@ -131,5 +151,10 @@ const handleDelete = async () => {
     deleting.value = false;
     cvToDelete.value = null;
   }
+};
+
+const handlePrint = (cv: CVDocument) => {
+  const printUrl = `/cv/${cv.id}/print`;
+  window.open(printUrl, '_blank');
 };
 </script>

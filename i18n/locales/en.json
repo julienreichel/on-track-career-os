@@ -522,6 +522,7 @@
     "actions": {
       "create": "Create New CV",
       "edit": "Edit CV",
+      "print": "Print",
       "duplicate": "Duplicate",
       "download": "Download PDF",
       "delete": "Delete"
