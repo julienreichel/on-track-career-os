@@ -326,7 +326,10 @@ describe('useCvGenerator', () => {
       expect(experience?.startDate).toBe('2022-01-01');
       expect(experience?.endDate).toBe('2024-01-01');
       expect(experience?.experienceType).toBe('work');
-      expect(experience?.responsibilities).toEqual(['Lead development team', 'Architect solutions']);
+      expect(experience?.responsibilities).toEqual([
+        'Lead development team',
+        'Architect solutions',
+      ]);
       expect(experience?.tasks).toEqual(['Code reviews', 'Sprint planning']);
     });
 

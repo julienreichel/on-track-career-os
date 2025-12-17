@@ -306,14 +306,14 @@ function stripTrailingNotes(cvText: string): string {
   // Match separator line followed by note/notes (case insensitive)
   const notePattern = /\n---+\s*\n.*?\b(note|notes)\b:?.*/is;
   const match = cvText.match(notePattern);
-  
+
   if (match) {
     // Remove everything from the separator onwards
     const cleanedText = cvText.substring(0, match.index);
     console.log('[generateCv] Stripped trailing notes from AI response');
     return cleanedText.trim();
   }
-  
+
   return cvText;
 }
 
@@ -346,10 +346,10 @@ export const handler = async (event: { arguments: GenerateCvInput }): Promise<st
       const userPrompt = buildUserPrompt(args);
       const responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);
       console.log('[generateCv] Generated CV length:', responseText.length);
-      
+
       // Strip any trailing notes the AI might have added
       const cleanedText = stripTrailingNotes(responseText);
-      
+
       return cleanedText.trim();
     },
     prepareInputForLogging

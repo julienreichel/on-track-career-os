@@ -8,13 +8,13 @@ function stripTrailingNotes(cvText: string): string {
   // Match separator line followed by note/notes (case insensitive)
   const notePattern = /\n---+\s*\n.*?\b(note|notes)\b:?.*/is;
   const match = cvText.match(notePattern);
-  
+
   if (match) {
     // Remove everything from the separator onwards
     const cleanedText = cvText.substring(0, match.index);
     return cleanedText.trim();
   }
-  
+
   return cvText;
 }
 
@@ -34,7 +34,7 @@ describe('generateCv - stripTrailingNotes', () => {
 **Note:** This CV is tailored to highlight experiences and skills relevant to the Head of Engineering position at Bigblue, emphasizing leadership, technical depth, and people management.`;
 
     const cleaned = stripTrailingNotes(cvWithNote);
-    
+
     expect(cleaned).not.toContain('Note:');
     expect(cleaned).not.toContain('---');
     expect(cleaned).toContain('Shipped major features');
@@ -53,7 +53,7 @@ describe('generateCv - stripTrailingNotes', () => {
 note: This document was generated based on provided information.`;
 
     const cleaned = stripTrailingNotes(cvWithNote);
-    
+
     expect(cleaned).not.toContain('note:');
     expect(cleaned).not.toContain('---');
     expect(cleaned).toContain('Python');
@@ -71,7 +71,7 @@ Notes:
 - More details`;
 
     const cleaned = stripTrailingNotes(cvWithNote);
-    
+
     expect(cleaned).not.toContain('Notes:');
     expect(cleaned).not.toContain('Additional info');
   });
@@ -86,7 +86,7 @@ Work experience here
 **NOTE:** Tailored for specific role`;
 
     const cleaned = stripTrailingNotes(cvWithNote);
-    
+
     expect(cleaned).not.toContain('NOTE:');
     expect(cleaned).toContain('Work experience here');
   });
@@ -101,7 +101,7 @@ Work experience here
 - Led development team`;
 
     const cleaned = stripTrailingNotes(cvWithoutNote);
-    
+
     expect(cleaned).toBe(cvWithoutNote);
   });
 
@@ -117,7 +117,7 @@ Content here
 More content`;
 
     const cleaned = stripTrailingNotes(cvWithSeparator);
-    
+
     // Should keep everything since there's no "note" keyword
     expect(cleaned).toContain('Section 2');
     expect(cleaned).toContain('---');
@@ -130,27 +130,18 @@ Some content
 Note: This is just part of content`;
 
     const cleaned = stripTrailingNotes(cvWithoutSeparator);
-    
+
     // Should keep everything since there's no separator before the note
     expect(cleaned).toBe(cvWithoutSeparator);
   });
 
   it('should handle case insensitive note variations', () => {
-    const testCases = [
-      'Note:',
-      'NOTE:',
-      'note:',
-      'Notes:',
-      'NOTES:',
-      'notes:',
-      'Note',
-      'NOTE',
-    ];
+    const testCases = ['Note:', 'NOTE:', 'note:', 'Notes:', 'NOTES:', 'notes:', 'Note', 'NOTE'];
 
     testCases.forEach((noteVariation) => {
       const cv = `# CV\n\nContent\n\n---\n\n${noteVariation} Some disclaimer`;
       const cleaned = stripTrailingNotes(cv);
-      
+
       expect(cleaned).not.toContain(noteVariation);
       expect(cleaned).not.toContain('disclaimer');
     });
@@ -168,7 +159,7 @@ It highlights relevant skills and experiences.
 Additional information about customization.`;
 
     const cleaned = stripTrailingNotes(cvWithMultilineNote);
-    
+
     expect(cleaned).not.toContain('Note:');
     expect(cleaned).not.toContain('tailored');
     expect(cleaned).not.toContain('customization');
@@ -199,17 +190,17 @@ Experienced software engineer with 10 years in the industry.
 Note: This CV emphasizes cloud and DevOps experience.`;
 
     const cleaned = stripTrailingNotes(cv);
-    
+
     // Should preserve all CV content
     expect(cleaned).toContain('John Doe');
     expect(cleaned).toContain('Experienced software engineer');
     expect(cleaned).toContain('Senior Engineer');
     expect(cleaned).toContain('AWS, Docker, Kubernetes');
-    
+
     // Should remove note
     expect(cleaned).not.toContain('Note:');
     expect(cleaned).not.toContain('emphasizes cloud');
-    
+
     // Should not end with separator
     expect(cleaned.trim().endsWith('---')).toBe(false);
   });
