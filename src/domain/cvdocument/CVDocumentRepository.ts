@@ -53,12 +53,24 @@ export class CVDocumentRepository {
   }
 
   async create(input: CVDocumentCreateInput) {
-    const { data } = await this.model.create(input, gqlOptions());
+    const { data } = await this.model.create(
+      {
+        ...input,
+        contentJSON: input.contentJSON ? JSON.stringify(input.contentJSON) : undefined,
+      },
+      gqlOptions()
+    );
     return data;
   }
 
   async update(input: CVDocumentUpdateInput) {
-    const { data } = await this.model.update(input, gqlOptions());
+    const { data } = await this.model.update(
+      {
+        ...input,
+        contentJSON: input.contentJSON ? JSON.stringify(input.contentJSON) : undefined,
+      },
+      gqlOptions()
+    );
     return data;
   }
 

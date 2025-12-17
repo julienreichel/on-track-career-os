@@ -388,6 +388,7 @@
     }
   },
   "storyCard": {
+    "noTitle": "Untitled Story",
     "noContent": "No content",
     "clickToView": "Click to view details",
     "deleteConfirm": {

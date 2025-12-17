@@ -19,6 +19,8 @@ const { t } = useI18n();
 
 const showDeleteConfirm = ref(false);
 
+const title = computed(() => props.companyName || props.experienceName || t('storyCard.noTitle'));
+
 const preview = computed(() => {
   const maxLength = 120;
   const text = props.story.situation || props.story.task || t('storyCard.noContent');
@@ -35,13 +37,11 @@ const handleView = (event: Event) => {
   emit('view', props.story);
 };
 
-const handleEdit = (event: Event) => {
-  event.stopPropagation();
+const handleEdit = () => {
   emit('edit', props.story);
 };
 
-const handleDelete = (event: Event) => {
-  event.stopPropagation();
+const handleDelete = () => {
   showDeleteConfirm.value = true;
 };
 
@@ -56,69 +56,44 @@ const cancelDelete = () => {
 </script>
 
 <template>
-  <UCard class="h-full flex flex-col">
-    <template #header>
-      <div class="space-y-2">
-        <!-- Company/Experience Name -->
-        <div
-          v-if="companyName || experienceName"
-          class="text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
-          {{ companyName || experienceName }}
-        </div>
-      </div>
-    </template>
-
-    <!-- Preview Text - grows to fill space -->
-    <div class="text-sm text-gray-700 dark:text-gray-300 flex-grow line-clamp-4">
+  <ItemCard :title="title" @edit="handleEdit" @delete="handleDelete">
+    <!-- Preview Text Content -->
+    <div class="text-sm text-gray-700 dark:text-gray-300 line-clamp-4">
       {{ preview }}
     </div>
 
-    <template #footer>
-      <div class="space-y-3">
-        <!-- Badges Row -->
-        <div class="flex items-center gap-2">
-          <UBadge v-if="hasAchievements" color="primary" variant="subtle" size="xs">
-            <UIcon name="i-heroicons-trophy" class="w-3 h-3 mr-1" />
-            {{ achievementCount }}
-          </UBadge>
-          <UBadge v-if="hasKpis" color="green" variant="subtle" size="xs">
-            <UIcon name="i-heroicons-chart-bar" class="w-3 h-3 mr-1" />
-            {{ kpiCount }}
-          </UBadge>
-        </div>
-
-        <!-- Action Buttons Row -->
-        <div class="flex items-center justify-between gap-2">
-          <div class="flex gap-2">
-            <UButton
-              :label="t('common.view')"
-              icon="i-heroicons-eye"
-              size="xs"
-              color="gray"
-              variant="soft"
-              @click="handleView"
-            />
-            <UButton
-              :label="t('common.edit')"
-              icon="i-heroicons-pencil"
-              size="xs"
-              color="primary"
-              variant="soft"
-              @click="handleEdit"
-            />
-          </div>
-          <UButton
-            icon="i-heroicons-trash"
-            size="xs"
-            color="red"
-            variant="ghost"
-            @click="handleDelete"
-          />
-        </div>
-      </div>
+    <!-- Badges -->
+    <template #badges>
+      <UBadge v-if="hasAchievements" color="primary" variant="subtle" size="xs">
+        <UIcon name="i-heroicons-trophy" class="w-3 h-3 mr-1" />
+        {{ achievementCount }}
+      </UBadge>
+      <UBadge v-if="hasKpis" color="primary" variant="subtle" size="xs">
+        <UIcon name="i-heroicons-chart-bar" class="w-3 h-3 mr-1" />
+        {{ kpiCount }}
+      </UBadge>
     </template>
-  </UCard>
+
+    <!-- Custom Actions -->
+    <template #actions>
+      <UButton
+        :label="t('common.view')"
+        icon="i-heroicons-eye"
+        size="xs"
+        color="neutral"
+        variant="soft"
+        @click="handleView"
+      />
+      <UButton
+        :label="t('common.edit')"
+        icon="i-heroicons-pencil"
+        size="xs"
+        color="primary"
+        variant="soft"
+        @click="handleEdit"
+      />
+    </template>
+  </ItemCard>
 
   <!-- Delete Confirmation Modal -->
   <UModal
@@ -133,8 +108,8 @@ const cancelDelete = () => {
     </template>
 
     <template #footer>
-      <UButton :label="t('common.cancel')" color="gray" variant="soft" @click="cancelDelete" />
-      <UButton :label="t('common.delete')" color="red" @click="confirmDelete" />
+      <UButton :label="t('common.cancel')" color="neutral" variant="soft" @click="cancelDelete" />
+      <UButton :label="t('common.delete')" color="error" @click="confirmDelete" />
     </template>
   </UModal>
 </template>

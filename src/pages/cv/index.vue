@@ -45,18 +45,15 @@
 
         <!-- CV List -->
         <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <UCard v-for="cv in items" :key="cv.id" class="h-full flex flex-col">
-            <template #header>
-              <div class="space-y-2">
-                <!-- CV Name -->
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">
-                  {{ cv.name || $t('cvList.untitled') }}
-                </h3>
-              </div>
-            </template>
-
-            <!-- CV Info - grows to fill space -->
-            <div class="space-y-1 text-sm text-gray-600 dark:text-gray-400 flex-grow">
+          <ItemCard
+            v-for="cv in items"
+            :key="cv.id"
+            :title="cv.name || $t('cvList.untitled')"
+            @edit="navigateTo({ name: 'cv-id', params: { id: cv.id } })"
+            @delete="confirmDelete(cv)"
+          >
+            <!-- CV Info Content -->
+            <div class="space-y-1 text-sm text-gray-600 dark:text-gray-400">
               <div v-if="cv.isTailored" class="flex items-center gap-1">
                 <UIcon name="i-heroicons-briefcase" class="flex-shrink-0" />
                 <span>{{ $t('cvList.tailored') }}</span>
@@ -66,27 +63,7 @@
                 <span>{{ $t('cvList.updated') }}: {{ formatDate(cv.updatedAt) }}</span>
               </div>
             </div>
-
-            <template #footer>
-              <div class="flex items-center justify-between gap-2">
-                <UButton
-                  :label="$t('common.edit')"
-                  icon="i-heroicons-pencil"
-                  size="xs"
-                  color="primary"
-                  variant="soft"
-                  :to="{ name: 'cv-id', params: { id: cv.id } }"
-                />
-                <UButton
-                  icon="i-heroicons-trash"
-                  size="xs"
-                  color="red"
-                  variant="ghost"
-                  @click="confirmDelete(cv)"
-                />
-              </div>
-            </template>
-          </UCard>
+          </ItemCard>
         </div>
       </UPageBody>
 
