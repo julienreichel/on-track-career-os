@@ -18,6 +18,16 @@ function stripTrailingNotes(cvText: string): string {
   return cvText;
 }
 
+function stripCodeFences(cvText: string): string {
+  const fencePattern = /^```[a-zA-Z0-9-]*\s*\n([\s\S]*?)\n```$/;
+  const match = cvText.match(fencePattern);
+  if (match) {
+    return match[1];
+  }
+
+  return cvText.replace(/^```[a-zA-Z0-9-]*\s*\n?/, '').replace(/\n```$/, '');
+}
+
 describe('generateCv - stripTrailingNotes', () => {
   it('should remove trailing note with separator', () => {
     const cvWithNote = `# John Doe
@@ -203,5 +213,22 @@ Note: This CV emphasizes cloud and DevOps experience.`;
 
     // Should not end with separator
     expect(cleaned.trim().endsWith('---')).toBe(false);
+  });
+});
+
+describe('generateCv - stripCodeFences', () => {
+  it('should remove fenced code block with language', () => {
+    const fenced = '```markdown\n# Title\n\nContent\n```';
+    expect(stripCodeFences(fenced)).toBe('# Title\n\nContent');
+  });
+
+  it('should remove fenced code block without language', () => {
+    const fenced = '```\n# Title\nContent\n```';
+    expect(stripCodeFences(fenced)).toBe('# Title\nContent');
+  });
+
+  it('should handle missing starting fence gracefully', () => {
+    const text = '# Title\nContent\n```';
+    expect(stripCodeFences(text)).toBe('# Title\nContent');
   });
 });
