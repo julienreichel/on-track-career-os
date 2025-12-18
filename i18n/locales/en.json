@@ -599,7 +599,8 @@
         "skills": "Skills",
         "languages": "Languages",
         "certifications": "Certifications",
-        "interests": "Interests"
+        "interests": "Interests",
+        "profilePhoto": "Profile photo"
       },
       "help": {
         "jobDescription": "Pasting a job description will tailor your CV to match the role requirements"
@@ -671,7 +672,15 @@
     "toast": {
       "saved": "CV saved successfully",
       "saveFailed": "Failed to save CV"
-    }
+    },
+    "photoToggleLabel": "Profile photo",
+    "photoToggleDescription": "Show or hide your profile photo in the CV preview and print view",
+    "photoToggleOn": "Photo included",
+    "photoToggleOff": "Photo hidden",
+    "photoLoading": "Loading profile photo...",
+    "photoUnavailable": "No profile photo found. Upload one from your profile page.",
+    "photoPreviewHelp": "This preview shows how your profile photo will appear in the CV header.",
+    "photoAlt": "Profile photo"
   },
   "cvBlock": {
     "types": {

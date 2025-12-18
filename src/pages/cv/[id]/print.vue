@@ -30,8 +30,13 @@
       </div>
 
       <!-- CV Content -->
-      <!-- eslint-disable-next-line vue/no-v-html -->
-      <div class="cv-printable prose prose-gray" v-html="renderedHtml" />
+      <div class="relative">
+        <div v-if="showPhoto" class="print-photo">
+          <img :src="profilePhotoUrl!" :alt="$t('cvDisplay.photoAlt')" />
+        </div>
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <div class="cv-printable prose prose-gray" v-html="renderedHtml" />
+      </div>
     </div>
   </div>
 </template>
@@ -41,6 +46,8 @@ import { ref, computed, onMounted, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { marked } from 'marked';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
+import { UserProfileService } from '@/domain/user-profile/UserProfileService';
+import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 
 definePageMeta({
@@ -58,14 +65,44 @@ const cvId = computed(() => route.params.id as string);
 const PRINT_DELAY_MS = 500;
 
 const service = new CVDocumentService();
+const userProfileService = new UserProfileService();
+const profilePhotoService = new ProfilePhotoService();
 const document = ref<CVDocument | null>(null);
 const loading = ref(false);
 const error = ref<string | null>(null);
+const profilePhotoUrl = ref<string | null>(null);
+const profilePhotoLoading = ref(false);
+const profilePhotoError = ref<string | null>(null);
 
 const renderedHtml = computed(() => {
   if (!document.value?.content) return '';
   return marked(document.value.content);
 });
+
+const showPhoto = computed(() => {
+  return (document.value?.showProfilePhoto ?? true) && !!profilePhotoUrl.value;
+});
+
+const loadProfilePhoto = async (userId: string) => {
+  profilePhotoLoading.value = true;
+  profilePhotoError.value = null;
+
+  try {
+    const profile = await userProfileService.getFullUserProfile(userId);
+    const key = profile?.profilePhotoKey;
+    if (key) {
+      profilePhotoUrl.value = await profilePhotoService.getSignedUrl(key);
+    } else {
+      profilePhotoUrl.value = null;
+    }
+  } catch (err) {
+    profilePhotoUrl.value = null;
+    profilePhotoError.value = err instanceof Error ? err.message : 'Failed to load profile photo';
+    console.error('[cvPrint] Error loading profile photo:', err);
+  } finally {
+    profilePhotoLoading.value = false;
+  }
+};
 
 const load = async () => {
   loading.value = true;
@@ -73,6 +110,9 @@ const load = async () => {
 
   try {
     document.value = await service.getFullCVDocument(cvId.value);
+    if (document.value) {
+      await loadProfilePhoto(document.value.userId);
+    }
 
     // Auto-trigger print dialog after content loads
     await nextTick();
@@ -127,6 +167,24 @@ onMounted(() => {
 
 .cv-printable {
   max-width: 100%;
+}
+
+.print-photo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 3px solid #333;
+  background: white;
+}
+
+.print-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Print styles */

@@ -65,13 +65,61 @@
                   class="font-mono text-sm w-full"
                 />
               </UFormField>
+
+              <div class="border-t border-gray-200 pt-4 dark:border-gray-800">
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      {{ $t('cvDisplay.photoToggleLabel') }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      {{ $t('cvDisplay.photoToggleDescription') }}
+                    </p>
+                  </div>
+                  <USwitch
+                    v-model="showProfilePhotoSetting"
+                    :label="
+                      showProfilePhotoSetting
+                        ? $t('cvDisplay.photoToggleOn')
+                        : $t('cvDisplay.photoToggleOff')
+                    "
+                  />
+                </div>
+                <div class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                  <span v-if="profilePhotoLoading">{{ $t('cvDisplay.photoLoading') }}</span>
+                  <span v-else-if="profilePhotoError">{{ profilePhotoError }}</span>
+                  <span v-else-if="!profilePhotoUrl">{{ $t('cvDisplay.photoUnavailable') }}</span>
+                </div>
+                <div
+                  v-if="profilePhotoUrl"
+                  class="mt-3 flex items-center gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800"
+                >
+                  <img
+                    :src="profilePhotoUrl"
+                    :alt="$t('cvDisplay.photoAlt')"
+                    class="h-16 w-16 rounded-full object-cover border border-gray-200 dark:border-gray-700"
+                  />
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ $t('cvDisplay.photoPreviewHelp') }}
+                  </p>
+                </div>
+              </div>
             </div>
           </UCard>
 
           <!-- View Mode: Rendered HTML -->
           <UCard v-else>
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <div class="prose prose-gray max-w-none" v-html="renderedHtml" />
+            <div class="relative">
+              <div v-if="previewShowsPhoto" class="cv-photo-badge">
+                <img
+                  :src="profilePhotoUrl!"
+                  :alt="$t('cvDisplay.photoAlt')"
+                  class="cv-photo-image"
+                />
+              </div>
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div class="prose prose-gray max-w-none" v-html="renderedHtml" />
+            </div>
           </UCard>
 
           <!-- Action Buttons -->
@@ -122,6 +170,8 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { marked } from 'marked';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
+import { UserProfileService } from '@/domain/user-profile/UserProfileService';
+import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 
 const { t } = useI18n();
@@ -131,6 +181,8 @@ const toast = useToast();
 const cvId = computed(() => route.params.id as string);
 
 const service = new CVDocumentService();
+const userProfileService = new UserProfileService();
+const profilePhotoService = new ProfilePhotoService();
 const document = ref<CVDocument | null>(null);
 const loading = ref(false);
 const saving = ref(false);
@@ -139,16 +191,53 @@ const error = ref<string | null>(null);
 const isEditing = ref(false);
 const editContent = ref('');
 const originalContent = ref('');
+const showProfilePhotoSetting = ref(true);
+const originalShowProfilePhoto = ref(true);
 const showCancelConfirm = ref(false);
+const profilePhotoUrl = ref<string | null>(null);
+const profilePhotoLoading = ref(false);
+const profilePhotoError = ref<string | null>(null);
 
 const renderedHtml = computed(() => {
   if (!document.value?.content) return '';
   return marked(document.value.content);
 });
 
-const hasChanges = computed(() => {
-  return editContent.value !== originalContent.value;
+const previewShowsPhoto = computed(() => {
+  const enabled = isEditing.value
+    ? showProfilePhotoSetting.value
+    : (document.value?.showProfilePhoto ?? true);
+  return enabled && !!profilePhotoUrl.value;
 });
+
+const hasChanges = computed(() => {
+  return (
+    editContent.value !== originalContent.value ||
+    showProfilePhotoSetting.value !== originalShowProfilePhoto.value
+  );
+});
+
+const loadProfilePhoto = async (userId: string) => {
+  profilePhotoLoading.value = true;
+  profilePhotoError.value = null;
+
+  try {
+    const profile = await userProfileService.getFullUserProfile(userId);
+    const key = profile?.profilePhotoKey;
+
+    if (key) {
+      profilePhotoUrl.value = await profilePhotoService.getSignedUrl(key);
+    } else {
+      profilePhotoUrl.value = null;
+    }
+  } catch (err) {
+    profilePhotoUrl.value = null;
+    profilePhotoError.value = err instanceof Error ? err.message : 'Failed to load profile photo';
+    console.error('[cvDisplay] Error loading profile photo:', err);
+  } finally {
+    profilePhotoLoading.value = false;
+  }
+};
 
 const load = async () => {
   loading.value = true;
@@ -159,6 +248,10 @@ const load = async () => {
     if (document.value) {
       editContent.value = document.value.content || '';
       originalContent.value = document.value.content || '';
+      const shouldShow = document.value.showProfilePhoto ?? true;
+      showProfilePhotoSetting.value = shouldShow;
+      originalShowProfilePhoto.value = shouldShow;
+      await loadProfilePhoto(document.value.userId);
     }
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load CV';
@@ -172,6 +265,9 @@ const toggleEdit = () => {
   isEditing.value = true;
   editContent.value = document.value?.content || '';
   originalContent.value = document.value?.content || '';
+  const shouldShow = document.value?.showProfilePhoto ?? true;
+  showProfilePhotoSetting.value = shouldShow;
+  originalShowProfilePhoto.value = shouldShow;
 };
 
 const handleCancel = () => {
@@ -181,12 +277,14 @@ const handleCancel = () => {
   }
   isEditing.value = false;
   editContent.value = originalContent.value;
+  showProfilePhotoSetting.value = originalShowProfilePhoto.value;
 };
 
 const handleConfirmCancel = () => {
   showCancelConfirm.value = false;
   isEditing.value = false;
   editContent.value = originalContent.value;
+  showProfilePhotoSetting.value = originalShowProfilePhoto.value;
 };
 
 const saveEdit = async () => {
@@ -197,11 +295,13 @@ const saveEdit = async () => {
     const updated = await service.updateCVDocument({
       id: document.value.id,
       content: editContent.value,
+      showProfilePhoto: showProfilePhotoSetting.value,
     });
 
     if (updated) {
       document.value = updated;
       originalContent.value = editContent.value;
+      originalShowProfilePhoto.value = showProfilePhotoSetting.value;
       isEditing.value = false;
       toast.add({
         title: t('cvDisplay.toast.saved'),
@@ -303,5 +403,24 @@ onMounted(() => {
   a:hover {
     text-decoration: underline;
   }
+}
+
+.cv-photo-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 3px solid rgba(59, 130, 246, 0.4);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  background: white;
+}
+
+.cv-photo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 </style>

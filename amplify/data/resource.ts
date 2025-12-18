@@ -280,6 +280,7 @@ export const schema = a
         templateId: a.string(),
         isTailored: a.boolean(),
         content: a.string(),
+        showProfilePhoto: a.boolean().default(true),
 
         userId: a.id().required(),
         user: a.belongsTo('UserProfile', 'userId'),

@@ -105,6 +105,12 @@
               />
               <UCheckbox v-model="includeInterests" :label="$t('cvNew.step2.sections.interests')" />
             </div>
+            <div class="mt-2">
+              <UCheckbox
+                v-model="includeProfilePhoto"
+                :label="$t('cvNew.step2.sections.profilePhoto')"
+              />
+            </div>
           </div>
 
           <!-- Job Description (Optional) -->
@@ -162,6 +168,7 @@ const includeSkills = ref(true);
 const includeLanguages = ref(false);
 const includeCertifications = ref(false);
 const includeInterests = ref(false);
+const includeProfilePhoto = ref(true);
 const jobDescription = ref('');
 
 const LAST_STEP = 2;
@@ -213,6 +220,7 @@ const generateCV = async () => {
       userId: userId.value,
       isTailored: !!jobDescription.value,
       content: cvMarkdown,
+      showProfilePhoto: includeProfilePhoto.value,
     });
 
     if (cvDocument) {
