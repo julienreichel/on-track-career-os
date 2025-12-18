@@ -19,7 +19,7 @@ import { test, expect } from '@playwright/test';
  * - Form submission and data persistence
  */
 
-test.describe('Profile Page - View Mode', () => {
+test.describe('Profile Summary Page', () => {
   // Retry tests in this suite due to occasional auth state timing issues
   test.describe.configure({ retries: 2 });
 
@@ -41,62 +41,42 @@ test.describe('Profile Page - View Mode', () => {
     await expect(canvasLink).toHaveCount(1);
     await expect(canvasLink).toHaveAttribute('href', '/profile/canvas');
   });
+
+  test('should navigate to full profile when edit button clicked', async ({ page }) => {
+    const editButton = page.locator('button:has-text("Edit profile")').first();
+    await editButton.click();
+    await page.waitForTimeout(500);
+    expect(page.url()).toContain('/profile/full');
+  });
 });
 
-test.describe('Profile Page - Edit Mode', () => {
+test.describe('Full Profile Page - Edit Mode', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/profile');
+    await page.goto('/profile/full');
     await page.waitForLoadState('networkidle');
   });
 
-  test('should enter edit mode when edit button is clicked', async ({ page }) => {
-    // Find and click edit button - text is 'Edit Profile'
-    const editButton = page
-      .locator(
-        'button:has-text("Edit Profile"), button:has-text("Edit"), button[aria-label*="edit"]'
-      )
-      .first();
-
-    // Wait for button to be ready
-    await page.waitForTimeout(500);
-
+  test('should show save/cancel buttons in edit mode', async ({ page }) => {
+    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit")').first();
     await editButton.click();
-
-    // Wait for edit mode to activate
     await page.waitForTimeout(500);
 
-    // Scroll to bottom to see Save/Cancel buttons
-    // TODO: Improve UI with floating buttons that are always visible
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(300);
 
-    // Should now see save/cancel buttons - actual text is 'Save Profile' and 'Cancel'
-    const saveButton = page.locator('button[type="submit"]:has-text("Save Profile")');
-    const cancelButton = page.locator('button[type="button"]:has-text("Cancel")').first();
-
-    // Both buttons should be visible in edit mode
-    await expect(saveButton).toBeVisible();
-    await expect(cancelButton).toBeVisible();
+    await expect(page.locator('button[type="submit"]:has-text("Save Profile")')).toBeVisible();
+    await expect(page.locator('button:has-text("Cancel")').first()).toBeVisible();
   });
 
-  test('should exit edit mode when cancel is clicked', async ({ page }) => {
-    const editButton = page
-      .locator('button:has-text("Edit Profile"), button:has-text("Edit")')
-      .first();
-
+  test('should exit edit mode when cancel clicked', async ({ page }) => {
+    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit")').first();
     await editButton.click();
     await page.waitForTimeout(500);
-
-    // Scroll to bottom to see Cancel button
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(300);
 
-    const cancelButton = page.locator('button:has-text("Cancel")').first();
-
-    await cancelButton.click();
+    await page.locator('button:has-text("Cancel")').first().click();
     await page.waitForTimeout(500);
-
-    // Should be back in view mode - edit button should be visible again
     await expect(editButton).toBeVisible();
   });
 });
@@ -144,7 +124,7 @@ test.describe('Profile Page - Navigation', () => {
   });
 });
 
-test.describe('Profile Page - Unauthenticated Access', () => {
+test.describe('Profile Summary - Unauthenticated Access', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test('should redirect to login when not authenticated', async ({ page }) => {

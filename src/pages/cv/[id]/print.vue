@@ -32,7 +32,7 @@
       <!-- CV Content -->
       <div class="relative">
         <div v-if="showPhoto" class="print-photo">
-          <img :src="profilePhotoUrl!" :alt="$t('cvDisplay.photoAlt')" />
+          <img :src="profilePhotoUrl!" :alt="$t('cvDisplay.photoAlt')">
         </div>
         <!-- eslint-disable-next-line vue/no-v-html -->
         <div class="cv-printable prose prose-gray" v-html="renderedHtml" />

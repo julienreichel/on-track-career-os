@@ -228,6 +228,15 @@
       "empty": "Add a professional photo to personalize your profile.",
       "help": "JPG, PNG, or WebP up to 5 MB."
     },
+    "summary": {
+      "emptyName": "Complete your profile",
+      "emptyHeadline": "Add a short professional headline",
+      "careerDirection": "Career direction",
+      "careerDirectionEmpty": "Add goals or aspirations to highlight your direction.",
+      "viewFullProfile": "View full profile",
+      "editFromSummary": "Edit profile",
+      "fullProfileDescription": "Update contact details, strengths, and complete career history."
+    },
     "actions": {
       "save": "Save Profile",
       "cancel": "Cancel",
@@ -262,7 +271,8 @@
       "cvDocuments": "CV Documents",
       "cvDocumentsDescription": "Manage and export your CV documents",
       "communication": "Communication Profile",
-      "communicationDescription": "Your strengths and style (Coming soon)"
+      "communicationDescription": "Your strengths and style (Coming soon)",
+      "backToSummary": "Profile summary"
     }
   },
   "stories": {
