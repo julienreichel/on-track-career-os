@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createI18n } from 'vue-i18n';
-import ProfileSummaryCard from '@/components/profile/ProfileSummaryCard.vue';
+import ProfileSummaryCard from '@/components/profile/SummaryCard.vue';
 
 const i18n = createI18n({
   legacy: false,

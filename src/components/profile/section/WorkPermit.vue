@@ -32,6 +32,10 @@ import { inject } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 
+defineOptions({
+  name: 'ProfileSectionWorkPermit',
+});
+
 const context = inject(profileFormContextKey);
 
 if (!context) {

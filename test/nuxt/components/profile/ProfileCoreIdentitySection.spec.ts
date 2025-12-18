@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createI18n } from 'vue-i18n';
 import { ref } from 'vue';
-import ProfileCoreIdentitySection from '@/components/profile/sections/ProfileCoreIdentitySection.vue';
+import ProfileSectionCoreIdentity from '@/components/profile/section/CoreIdentity.vue';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 import type { ProfileForm } from '@/components/profile/types';
 
@@ -76,7 +76,7 @@ const createWrapper = (isEditing = false) => {
     socialLinks: [],
   });
 
-  const wrapper = mount(ProfileCoreIdentitySection, {
+  return mount(ProfileSectionCoreIdentity, {
     global: {
       plugins: [i18n],
       stubs,
@@ -105,8 +105,6 @@ const createWrapper = (isEditing = false) => {
       },
     },
   });
-
-  return wrapper;
 };
 
 describe('ProfileCoreIdentitySection', () => {

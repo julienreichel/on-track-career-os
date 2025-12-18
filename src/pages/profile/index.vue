@@ -111,7 +111,6 @@ import { UserProfileRepository } from '@/domain/user-profile/UserProfileReposito
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
-import ProfileSummaryCard from '@/components/profile/ProfileSummaryCard.vue';
 
 const { t } = useI18n();
 const router = useRouter();

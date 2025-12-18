@@ -46,6 +46,10 @@ import { inject } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 
+defineOptions({
+  name: 'ProfileSectionContact',
+});
+
 const context = inject(profileFormContextKey);
 
 if (!context) {

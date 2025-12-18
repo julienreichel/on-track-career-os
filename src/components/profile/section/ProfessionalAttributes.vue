@@ -85,6 +85,10 @@ import { useI18n } from 'vue-i18n';
 import TagInput from '@/components/TagInput.vue';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 
+defineOptions({
+  name: 'ProfileSectionProfessionalAttributes',
+});
+
 const context = inject(profileFormContextKey);
 
 if (!context) {

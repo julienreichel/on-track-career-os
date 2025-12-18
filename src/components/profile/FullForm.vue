@@ -33,13 +33,13 @@
       />
 
       <form @submit.prevent="handleSubmit">
-        <ProfileCoreIdentitySection />
-        <ProfileWorkPermitSection />
-        <ProfileContactSection />
-        <ProfileSocialLinksSection />
-        <ProfileCareerDirectionSection />
-        <ProfileIdentityValuesSection />
-        <ProfileProfessionalAttributesSection />
+        <ProfileSectionCoreIdentity />
+        <ProfileSectionWorkPermit />
+        <ProfileSectionContact />
+        <ProfileSectionSocialLinks />
+        <ProfileSectionCareerDirection />
+        <ProfileSectionIdentityValues />
+        <ProfileSectionProfessionalAttributes />
 
         <div v-if="isEditing" class="flex justify-end gap-3">
           <UButton type="button" color="neutral" variant="ghost" @click="cancelEditing">
@@ -71,13 +71,6 @@ import { isValidEmail, isValidPhone } from '@/domain/user-profile/contactValidat
 import type { UserProfile, UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 import type { ProfileForm } from '@/components/profile/types';
-import ProfileCoreIdentitySection from '@/components/profile/sections/ProfileCoreIdentitySection.vue';
-import ProfileWorkPermitSection from '@/components/profile/sections/ProfileWorkPermitSection.vue';
-import ProfileContactSection from '@/components/profile/sections/ProfileContactSection.vue';
-import ProfileSocialLinksSection from '@/components/profile/sections/ProfileSocialLinksSection.vue';
-import ProfileCareerDirectionSection from '@/components/profile/sections/ProfileCareerDirectionSection.vue';
-import ProfileIdentityValuesSection from '@/components/profile/sections/ProfileIdentityValuesSection.vue';
-import ProfileProfessionalAttributesSection from '@/components/profile/sections/ProfileProfessionalAttributesSection.vue';
 
 const { t } = useI18n();
 const route = useRoute();
