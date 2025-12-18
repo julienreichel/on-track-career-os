@@ -101,15 +101,14 @@ Generation features are useless without strong content.
 
 ---
 
-## EPIC 3 — Generic CV Generator (Notion-style Editor)
+## EPIC 3 — Generic CV Generator
 
 **Goal:** Provide users with a clean, coherent, ready-to-export CV.
 
 ### Includes
 
 - Basic 2-page layout
-- Block-based structure (experiences, skills, achievements)
-- Full editing
+- Markdown editing of CV
 - Print export
 
 ### User Value

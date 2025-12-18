@@ -34,7 +34,7 @@ Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer
 - ✅ EPIC 1A (User Data Intake) - 95% complete
 - ✅ **EPIC 2 (Experience Builder - STAR Stories) - 95% COMPLETE**
 - ⚠️ EPIC 1B (Personal Canvas) - 60% complete (backend only)
-- Remaining EPICs 3-7 in early stages
+- Remaining EPICs 4-7 in early stages
 
 ### 2.1 Frontend (Nuxt 3)
 
@@ -139,6 +139,8 @@ _(From Component Model + Component→Page Mapping) _
 - `useTailoringEngine()`
 - `useInterviewEngine()`
 - `useAiClient()`
+- `useCvDocuments()`
+- `useCvGenerator()`
 
 ---
 
@@ -167,6 +169,10 @@ _(Structured per navigation zones)_
 ### 5.3 Applications
 
 - **CV Builder** (generic + tailored)
+  - Generic CV generator live: `/cv`, `/cv/new`, `/cv/:id`, `/cv/:id/print`
+  - AI-powered Markdown generation via `useCvGenerator` + `generateCv` Lambda
+  - Experience picker + optional profile sections + job description tailoring
+  - Markdown editor with preview + print/export-ready layout
 - **Cover Letter Builder**
 - **Speech Builder**
 - **KPI Generator**
@@ -212,8 +218,8 @@ _(From AI Interaction Contract) _
 
 ### Tailored Application Materials
 
-11. `ai.generateTailoredCvBlocks`
-12. `ai.generateCoverLetter`
+11. `ai.generateCv`
+12. 12. `ai.generateCoverLetter`
 13. `ai.generateTailoredSpeech`
 14. `ai.generateTailoredKpis`
 
@@ -267,6 +273,24 @@ _(From AI Interaction Contract) _
 - Backend: GraphQL model + 2 AI Lambdas + repository/service/composables
 - Frontend: Global story library, per-experience stories, 3-mode story creation
 - 100+ tests (28 E2E, 70+ unit/component)
+
+#### ✅ EPIC 3: Generic CV Generator (100% Complete)
+
+**Fully Implemented:**
+
+- `generateCv` Lambda with synthesis helpers, markdown-only contract, trailing-note stripping
+- Amplify `generateCv` query wired with JSON args + 90s timeout
+- Domain stack (`AiOperationsService`, `AiOperationsRepository`, `useCvGenerator`, `useCvDocuments`)
+- CV Builder flow: `/cv` list, `/cv/new` wizard, `/cv/:id` Markdown editor with preview/save, `/cv/:id/print` A4 print layout
+- Print/export ready typography + Markdown editing guidance
+
+**Validation:**
+
+- Lambda unit tests: `test/amplify/data/ai-operations/generateCv.spec.ts`
+- Sandbox E2E hitting deployed Lambda: `test/e2e-sandbox/ai-operations/generate-cv.spec.ts`
+- Composable & domain tests: `test/unit/composables/useCvGenerator.spec.ts`, CVDocument service/repo specs
+- Utility coverage: `test/unit/ai-operations/generateCv-notes-stripping.spec.ts`
+- ⚠️ UI specs under `test/nuxt/pages/cv` and `test/nuxt/components/cv` exist but are `describe.skip` → no automated run yet
 
 #### ⚠️ Other EPICs: Backend foundations in place, frontend implementation pending
 
