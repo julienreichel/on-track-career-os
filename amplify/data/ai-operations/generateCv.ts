@@ -106,7 +106,8 @@ Rewrite each bullet as:
 1. **Header + Contact**
    * Name
    * Main title / headline
-   * Location | Contacts | Work authorization if provided | Raw social links if relevant
+   * Location | Contacts
+   * Work authorization if provided | Raw social links if relevant (e.g. linkedin.com/in/fullname/)
 2. **Professional Summary (3-5 compact lines)**
    * Identity + specialization
    * Core domain expertise
@@ -117,7 +118,7 @@ Rewrite each bullet as:
 3. **Work Experience (reverse chronological)**
    For each role:
    * Job title
-   * Company | Dates
+   * Company | Dates (Formated as Month Year, i.e. Nov 2021)
    * 4-7 bullets MAX, For senior roles (5+ years), produce 6-7 bullets whenever data supports it.
    * Each bullet must show IMPACT (not duties)
 4. **Education**
@@ -131,26 +132,14 @@ Rewrite each bullet as:
 
 ## LANGUAGE GUIDELINES
 Use strong verbs:
-* Led
-* Architected
-* Built
-* Launched
-* Delivered
-* Reduced
-* Enabled
-* Scaled
-* Automated
-* Designed
+* Led, Architected, Built, Launched, Delivered, Reduced, Enabled, Scaled, Automated, Designed, Directed, Implemented, Modernized, Improved.
 
 Avoid weak / generic verbs:
-* Helped
-* Participated
-* Worked on
-* Assisted
+ * Helped, Worked on, Assisted, Participated, generic duty verbs.
 
 ## REQUIRED BULLET STYLE RULES
-* Single-line bullets only
-* Maximum 6 bullets per job
+* One line each (use commas or “;” to combine multiple outcomes)
+* Unique phrasing per role (do NOT repeat bullet templates).
 * Quantify wherever possible
 * Avoid vague language
 * Avoid buzzwords
@@ -403,13 +392,16 @@ function stripTrailingNotes(cvText: string): string {
  * Remove Markdown code fences (```markdown ... ```) if present
  */
 function stripCodeFences(cvText: string): string {
-  const fencePattern = /^```[a-zA-Z0-9-]*\s*\n([\s\S]*?)\n```$/;
-  const match = cvText.match(fencePattern);
+  const trimmed = cvText.trim();
+  const fencePattern = /^```[a-zA-Z0-9-]*\s*[\r\n]+([\s\S]*?)\s*```$/;
+  const match = trimmed.match(fencePattern);
   if (match) {
-    return match[1];
+    return match[1].trimEnd();
   }
 
-  return cvText.replace(/^```[a-zA-Z0-9-]*\s*\n?/, '').replace(/\n```$/, '');
+  const withoutLeadingFence = trimmed.replace(/^```[a-zA-Z0-9-]*\s*[\r\n]*/, '');
+  const withoutTrailingFence = withoutLeadingFence.replace(/[\r\n]*```$/, '');
+  return withoutTrailingFence;
 }
 
 /**

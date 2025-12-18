@@ -19,13 +19,16 @@ function stripTrailingNotes(cvText: string): string {
 }
 
 function stripCodeFences(cvText: string): string {
-  const fencePattern = /^```[a-zA-Z0-9-]*\s*\n([\s\S]*?)\n```$/;
-  const match = cvText.match(fencePattern);
+  const trimmed = cvText.trim();
+  const fencePattern = /^```[a-zA-Z0-9-]*\s*[\r\n]+([\s\S]*?)\s*```$/;
+  const match = trimmed.match(fencePattern);
   if (match) {
-    return match[1];
+    return match[1].trimEnd();
   }
 
-  return cvText.replace(/^```[a-zA-Z0-9-]*\s*\n?/, '').replace(/\n```$/, '');
+  const withoutLeadingFence = trimmed.replace(/^```[a-zA-Z0-9-]*\s*[\r\n]*/, '');
+  const withoutTrailingFence = withoutLeadingFence.replace(/[\r\n]*```$/, '');
+  return withoutTrailingFence;
 }
 
 describe('generateCv - stripTrailingNotes', () => {
@@ -230,5 +233,15 @@ describe('generateCv - stripCodeFences', () => {
   it('should handle missing starting fence gracefully', () => {
     const text = '# Title\nContent\n```';
     expect(stripCodeFences(text)).toBe('# Title\nContent');
+  });
+
+  it('should handle trailing fence with trailing whitespace', () => {
+    const fenced = '```markdown\n# Title\nContent\n```\n';
+    expect(stripCodeFences(fenced)).toBe('# Title\nContent');
+  });
+
+  it('should handle carriage returns in fences', () => {
+    const fenced = '```markdown\r\n# Title\r\n\r\nContent\r\n```\r\n';
+    expect(stripCodeFences(fenced)).toBe('# Title\r\n\r\nContent');
   });
 });
