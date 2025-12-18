@@ -121,6 +121,33 @@ A CV is an essential deliverable in any job search.
 
 ---
 
+## **EPIC 3B — CV Header & Contact Information**
+
+**Goal:**
+Enhance the UserProfile and generic CV system with photo, socials, contact and work-permit data, enabling cleaner and more professional CV headers.
+
+**Why:**
+The CV currently lacks essential header information required for employability (photo, email, social links, phone, work permit). Today, these must be manually added into text blocks, which is inefficient and inconsistent.
+
+**Scope:**
+Extend the UserProfile model to store:
+
+- Profile photo (stored in S3)
+- Social links list
+- Contact information (email/phone)
+- Work eligibility info
+
+Add visibility toggles so users control what appears on their CV.
+Update CV generation, preview and print pages to render the new header elements.
+
+**Success Criteria:**
+User can upload a photo through their profile, add socials and contact fields, and decide if they show on CVs. CV preview/print layout displays the information top-right of the header.
+
+**Risks / Constraints:**
+Cross-template formatting, user-controlled toggles, and print layout visual design alignment.
+
+---
+
 ## EPIC 4 — User Speech Builder (Elevator Pitch & Career Story)
 
 **Goal:** Help users articulate their narrative verbally and in writing.
