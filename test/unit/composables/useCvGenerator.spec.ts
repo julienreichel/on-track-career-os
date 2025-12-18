@@ -107,6 +107,17 @@ describe('useCvGenerator', () => {
     },
   ];
 
+  const withSilencedConsoleError = (testFn: () => Promise<void> | void) => {
+    return async () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      try {
+        await testFn();
+      } finally {
+        consoleSpy.mockRestore();
+      }
+    };
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -237,7 +248,7 @@ describe('useCvGenerator', () => {
       expect(aiInput.userProfile.socialLinks).toEqual(['https://example.com']);
     });
 
-    it('should handle profile not found', async () => {
+    it('should handle profile not found', withSilencedConsoleError(async () => {
       mockUserProfileRepo.get.mockResolvedValue(null);
 
       const { generateCv, error } = useCvGenerator();
@@ -246,9 +257,9 @@ describe('useCvGenerator', () => {
       expect(result).toBeNull();
       expect(error.value).toBe('cvGenerator.errors.profileNotFound');
       expect(mockAiService.generateCv).not.toHaveBeenCalled();
-    });
+    }));
 
-    it('should handle AI service errors', async () => {
+    it('should handle AI service errors', withSilencedConsoleError(async () => {
       mockAiService.generateCv.mockRejectedValue(new Error('AI service failed'));
 
       const { generateCv, error, generating } = useCvGenerator();
@@ -257,19 +268,22 @@ describe('useCvGenerator', () => {
       expect(result).toBeNull();
       expect(error.value).toBe('AI service failed');
       expect(generating.value).toBe(false);
-    });
+    }));
 
-    it('should handle repository errors during input building', async () => {
-      mockExperienceRepo.list.mockRejectedValue(new Error('Database error'));
+    it(
+      'should handle repository errors during input building',
+      withSilencedConsoleError(async () => {
+        mockExperienceRepo.list.mockRejectedValue(new Error('Database error'));
 
-      const { generateCv, error } = useCvGenerator();
-      const result = await generateCv('user-123', ['exp-1']);
+        const { generateCv, error } = useCvGenerator();
+        const result = await generateCv('user-123', ['exp-1']);
 
-      expect(result).toBeNull();
-      expect(error.value).toBe('Database error');
-    });
+        expect(result).toBeNull();
+        expect(error.value).toBe('Database error');
+      })
+    );
 
-    it('should handle story loading errors gracefully', async () => {
+    it('should handle story loading errors gracefully', withSilencedConsoleError(async () => {
       mockStoryService.getStoriesByExperience.mockRejectedValue(new Error('Story load failed'));
 
       const { generateCv, error } = useCvGenerator();
@@ -277,9 +291,9 @@ describe('useCvGenerator', () => {
 
       expect(result).toBeNull();
       expect(error.value).toBe('Story load failed');
-    });
+    }));
 
-    it('should reset error state on new generation', async () => {
+    it('should reset error state on new generation', withSilencedConsoleError(async () => {
       const { generateCv, error } = useCvGenerator();
 
       // First call fails
@@ -291,7 +305,7 @@ describe('useCvGenerator', () => {
       mockAiService.generateCv.mockResolvedValueOnce('# New CV');
       await generateCv('user-123', ['exp-1']);
       expect(error.value).toBeNull();
-    });
+    }));
   });
 
   describe('buildGenerationInput', () => {
@@ -416,7 +430,7 @@ describe('useCvGenerator', () => {
       expect(input?.interests).toBeUndefined();
     });
 
-    it('should return null when profile not found', async () => {
+    it('should return null when profile not found', withSilencedConsoleError(async () => {
       mockUserProfileRepo.get.mockResolvedValue(null);
 
       const { buildGenerationInput, error } = useCvGenerator();
@@ -424,9 +438,9 @@ describe('useCvGenerator', () => {
 
       expect(input).toBeNull();
       expect(error.value).toBe('cvGenerator.errors.profileNotFound');
-    });
+    }));
 
-    it('should handle errors during input building', async () => {
+    it('should handle errors during input building', withSilencedConsoleError(async () => {
       mockExperienceRepo.list.mockRejectedValue(new Error('List failed'));
 
       const { buildGenerationInput, error } = useCvGenerator();
@@ -434,7 +448,7 @@ describe('useCvGenerator', () => {
 
       expect(input).toBeNull();
       expect(error.value).toBe('List failed');
-    });
+    }));
   });
 
   describe('edge cases', () => {
@@ -459,14 +473,14 @@ describe('useCvGenerator', () => {
       expect(result).toBe('# John Doe\n\nSenior Software Engineer');
     });
 
-    it('should handle unknown error types', async () => {
+    it('should handle unknown error types', withSilencedConsoleError(async () => {
       mockAiService.generateCv.mockRejectedValue('String error');
 
       const { generateCv, error } = useCvGenerator();
       await generateCv('user-123', ['exp-1']);
 
       expect(error.value).toBe('cvGenerator.errors.generationFailed');
-    });
+    }));
 
     it('should filter null values from experience arrays', async () => {
       const expWithNulls = {

@@ -71,6 +71,17 @@ describe('useCanvasEngine', () => {
     kpiSuggestions: ['Response time: 200ms -> 100ms'],
   };
 
+  const withSilencedConsoleError = (fn: () => Promise<void> | void) => {
+    return async () => {
+      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      try {
+        await fn();
+      } finally {
+        spy.mockRestore();
+      }
+    };
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -142,7 +153,7 @@ describe('useCanvasEngine', () => {
       expect(loading.value).toBe(false);
     });
 
-    it('should handle errors when loading canvas', async () => {
+    it('should handle errors when loading canvas', withSilencedConsoleError(async () => {
       const errorMessage = 'Failed to load canvas';
       mockService.getFullPersonalCanvas.mockRejectedValue(new Error(errorMessage));
 
@@ -153,9 +164,9 @@ describe('useCanvasEngine', () => {
       expect(canvas.value).toBeNull();
       expect(loading.value).toBe(false);
       expect(error.value).toBe(errorMessage);
-    });
+    }));
 
-    it('should clear previous error on new load', async () => {
+    it('should clear previous error on new load', withSilencedConsoleError(async () => {
       // First call fails
       mockService.getFullPersonalCanvas.mockRejectedValueOnce(new Error('First error'));
       const { error, loadCanvas } = useCanvasEngine();
@@ -168,7 +179,7 @@ describe('useCanvasEngine', () => {
       await loadCanvas('canvas-123');
 
       expect(error.value).toBeNull();
-    });
+    }));
   });
 
   describe('saveCanvas', () => {
@@ -250,7 +261,7 @@ describe('useCanvasEngine', () => {
       expect(canvas.value).toEqual(updatedCanvas);
     });
 
-    it('should handle save errors', async () => {
+    it('should handle save errors', withSilencedConsoleError(async () => {
       const canvasData = {
         userId: 'user-123',
         customerSegments: [],
@@ -274,7 +285,7 @@ describe('useCanvasEngine', () => {
       await saveCanvas(canvasData as any);
 
       expect(error.value).toBe('Save failed');
-    });
+    }));
 
     it('should handle loading state during save', async () => {
       const canvasData = {
@@ -373,7 +384,7 @@ describe('useCanvasEngine', () => {
       expect(error.value).toBeNull();
     });
 
-    it('should handle regeneration errors', async () => {
+    it('should handle regeneration errors', withSilencedConsoleError(async () => {
       const mockInput: PersonalCanvasInput = {
         profile: { fullName: 'John Doe', headline: 'Engineer', summary: '5 years' },
         experiences: [],
@@ -389,7 +400,7 @@ describe('useCanvasEngine', () => {
       expect(result).toBeNull();
       expect(canvas.value).toBeNull();
       expect(error.value).toBe('AI service error');
-    });
+    }));
 
     it('should not manage loading state during regeneration (caller manages it)', async () => {
       const input: PersonalCanvasInput = {
@@ -546,7 +557,7 @@ describe('useCanvasEngine', () => {
       expect(success).toBe(false);
     });
 
-    it('should handle generation errors', async () => {
+    it('should handle generation errors', withSilencedConsoleError(async () => {
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
       mockExperienceRepo.list.mockResolvedValue([]);
       mockStoryService.getStoriesByExperience.mockResolvedValue([]);
@@ -559,7 +570,7 @@ describe('useCanvasEngine', () => {
 
       expect(success).toBe(false);
       expect(error.value).toBe('AI service error');
-    });
+    }));
   });
 
   describe('regenerateAndSave', () => {

@@ -24,6 +24,17 @@ describe('useCvDocuments', () => {
     reorderBlocks: ReturnType<typeof vi.fn>;
   };
 
+  const withSilencedConsoleError = (fn: () => Promise<void> | void) => {
+    return async () => {
+      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      try {
+        await fn();
+      } finally {
+        spy.mockRestore();
+      }
+    };
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -81,7 +92,7 @@ describe('useCvDocuments', () => {
       expect(items.value).toEqual(mockCVs);
     });
 
-    it('should handle errors during load', async () => {
+    it('should handle errors during load', withSilencedConsoleError(async () => {
       mockRepository.list.mockRejectedValue(new Error('Load failed'));
 
       const { items, error, loadAll } = useCvDocuments();
@@ -90,7 +101,7 @@ describe('useCvDocuments', () => {
 
       expect(items.value).toEqual([]);
       expect(error.value).toBe('Load failed');
-    });
+    }));
 
     it('should set loading state correctly', async () => {
       mockRepository.list.mockImplementation(
@@ -133,7 +144,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockCreated);
     });
 
-    it('should handle creation errors', async () => {
+    it('should handle creation errors', withSilencedConsoleError(async () => {
       mockRepository.create.mockRejectedValue(new Error('Creation failed'));
 
       const { error, createDocument } = useCvDocuments();
@@ -142,7 +153,7 @@ describe('useCvDocuments', () => {
 
       expect(result).toBeNull();
       expect(error.value).toBe('Creation failed');
-    });
+    }));
 
     it('should not add to items if creation returns null', async () => {
       mockRepository.create.mockResolvedValue(null);
@@ -172,7 +183,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle update errors', async () => {
+    it('should handle update errors', withSilencedConsoleError(async () => {
       mockRepository.update.mockRejectedValue(new Error('Update failed'));
 
       const { error, updateDocument } = useCvDocuments();
@@ -181,7 +192,7 @@ describe('useCvDocuments', () => {
 
       expect(result).toBeNull();
       expect(error.value).toBe('Update failed');
-    });
+    }));
   });
 
   describe('deleteDocument', () => {
@@ -204,7 +215,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0].id).toBe('cv-2');
     });
 
-    it('should handle deletion errors', async () => {
+    it('should handle deletion errors', withSilencedConsoleError(async () => {
       mockRepository.delete.mockRejectedValue(new Error('Deletion failed'));
 
       const { error, deleteDocument } = useCvDocuments();
@@ -213,7 +224,7 @@ describe('useCvDocuments', () => {
 
       expect(result).toBe(false);
       expect(error.value).toBe('Deletion failed');
-    });
+    }));
   });
 
   describe('addBlock', () => {
@@ -248,7 +259,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle addBlock errors', async () => {
+    it('should handle addBlock errors', withSilencedConsoleError(async () => {
       mockService.addBlock.mockRejectedValue(new Error('Add block failed'));
 
       const { error, addBlock } = useCvDocuments();
@@ -257,7 +268,7 @@ describe('useCvDocuments', () => {
 
       expect(result).toBeNull();
       expect(error.value).toBe('Add block failed');
-    });
+    }));
   });
 
   describe('updateBlock', () => {
@@ -292,7 +303,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle updateBlock errors', async () => {
+    it('should handle updateBlock errors', withSilencedConsoleError(async () => {
       mockService.updateBlock.mockRejectedValue(new Error('Update block failed'));
 
       const { error, updateBlock } = useCvDocuments();
@@ -301,7 +312,7 @@ describe('useCvDocuments', () => {
 
       expect(result).toBeNull();
       expect(error.value).toBe('Update block failed');
-    });
+    }));
   });
 
   describe('removeBlock', () => {
@@ -337,7 +348,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle removeBlock errors', async () => {
+    it('should handle removeBlock errors', withSilencedConsoleError(async () => {
       mockService.removeBlock.mockRejectedValue(new Error('Remove block failed'));
 
       const { error, removeBlock } = useCvDocuments();
@@ -346,7 +357,7 @@ describe('useCvDocuments', () => {
 
       expect(result).toBeNull();
       expect(error.value).toBe('Remove block failed');
-    });
+    }));
   });
 
   describe('reorderBlocks', () => {
@@ -385,7 +396,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle reorderBlocks errors', async () => {
+    it('should handle reorderBlocks errors', withSilencedConsoleError(async () => {
       mockService.reorderBlocks.mockRejectedValue(new Error('Reorder failed'));
 
       const { error, reorderBlocks } = useCvDocuments();
@@ -394,6 +405,6 @@ describe('useCvDocuments', () => {
 
       expect(result).toBeNull();
       expect(error.value).toBe('Reorder failed');
-    });
+    }));
   });
 });
