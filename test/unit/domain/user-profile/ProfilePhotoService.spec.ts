@@ -4,11 +4,16 @@ import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 const mockUploadData = vi.fn();
 const mockRemove = vi.fn();
 const mockGetUrl = vi.fn();
+const mockFetchAuthSession = vi.fn();
 
 vi.mock('aws-amplify/storage', () => ({
   uploadData: (...args: unknown[]) => mockUploadData(...args),
   remove: (...args: unknown[]) => mockRemove(...args),
   getUrl: (...args: unknown[]) => mockGetUrl(...args),
+}));
+
+vi.mock('aws-amplify/auth', () => ({
+  fetchAuthSession: (...args: unknown[]) => mockFetchAuthSession(...args),
 }));
 
 describe('ProfilePhotoService', () => {
@@ -18,6 +23,7 @@ describe('ProfilePhotoService', () => {
     vi.clearAllMocks();
     mockUploadData.mockResolvedValue({ result: Promise.resolve() });
     mockGetUrl.mockResolvedValue({ url: new URL('https://example.com/photo.jpg') });
+    mockFetchAuthSession.mockResolvedValue({ identityId: 'eu-central-1:identity-123' });
   });
 
   it('should upload file and return key', async () => {
@@ -25,7 +31,7 @@ describe('ProfilePhotoService', () => {
 
     const key = await service.upload('user-1', file);
 
-    expect(key).toMatch(/profile-photos\/user-1\//);
+    expect(key).toMatch(/profile-photos\/eu-central-1:identity-123\/user-1\//);
     expect(mockUploadData).toHaveBeenCalledWith(
       expect.objectContaining({
         path: key,

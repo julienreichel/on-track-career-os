@@ -1,4 +1,5 @@
 import { uploadData, remove, getUrl } from 'aws-amplify/storage';
+import { fetchAuthSession } from 'aws-amplify/auth';
 
 const PHOTO_PREFIX = 'profile-photos';
 const RANDOM_BASE = 36;
@@ -22,13 +23,22 @@ function extractExtension(file: File) {
 }
 
 export class ProfilePhotoService {
-  buildObjectKey(userId: string, extension: string) {
-    return `${PHOTO_PREFIX}/${userId}/${Date.now()}-${randomSuffix()}.${extension}`;
+  private async getIdentityId(): Promise<string> {
+    const session = await fetchAuthSession();
+    if (!session.identityId) {
+      throw new Error('Missing Cognito identity for storage access');
+    }
+    return session.identityId;
+  }
+
+  buildObjectKey(identityId: string, userId: string, extension: string) {
+    return `${PHOTO_PREFIX}/${identityId}/${userId}/${Date.now()}-${randomSuffix()}.${extension}`;
   }
 
   async upload(userId: string, file: File): Promise<string> {
     const extension = extractExtension(file);
-    const key = this.buildObjectKey(userId, extension);
+    const identityId = await this.getIdentityId();
+    const key = this.buildObjectKey(identityId, userId, extension);
 
     const uploadTask = uploadData({
       path: key,
