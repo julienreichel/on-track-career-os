@@ -67,6 +67,11 @@ export const schema = a
         headline: a.string(),
         location: a.string(),
         seniorityLevel: a.string(),
+        primaryEmail: a.string(),
+        primaryPhone: a.string(),
+        workPermitInfo: a.string(),
+        profilePhotoKey: a.string(),
+        socialLinks: a.string().array(),
 
         goals: a.string().array(),
         aspirations: a.string().array(),

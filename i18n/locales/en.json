@@ -171,6 +171,9 @@
       "careerDirection": "Career Direction",
       "identityValues": "Identity & Values",
       "professionalAttributes": "Professional Attributes",
+      "contactInfo": "Contact Information",
+      "socialLinks": "Social Links",
+      "workPermit": "Work Authorization",
       "profileManagement": "Profile Management",
       "relatedPages": "Profile Management"
     },
@@ -183,6 +186,17 @@
       "locationPlaceholder": "San Francisco, CA",
       "seniorityLevel": "Seniority Level",
       "seniorityLevelPlaceholder": "Senior",
+      "primaryEmail": "Primary Email",
+      "emailPlaceholder": "you[at]example.com",
+      "primaryPhone": "Primary Phone",
+      "phonePlaceholder": "+1 415 555 0101",
+      "socialLinks": "Social Links",
+      "socialLinksEmpty": "No social links added yet",
+      "socialLinksHint": "Press Enter to add each link",
+      "socialUrlPlaceholder": "https://linkedin.com/in/you",
+      "workPermitInfo": "Work Authorization",
+      "workPermitPlaceholder": "e.g., Eligible to work in EU & US",
+      "workPermitEmpty": "Work permit information not provided",
       "goals": "Career Goals",
       "goalsPlaceholder": "e.g., Become engineering manager",
       "goalsHint": "Press Enter to add each goal",
@@ -208,6 +222,12 @@
       "languagesPlaceholder": "e.g., English",
       "languagesHint": "Press Enter to add each language"
     },
+    "photo": {
+      "upload": "Upload Photo",
+      "remove": "Remove Photo",
+      "empty": "Add a professional photo to personalize your profile.",
+      "help": "JPG, PNG, or WebP up to 5 MB."
+    },
     "actions": {
       "save": "Save Profile",
       "cancel": "Cancel",
@@ -218,6 +238,17 @@
       "saveSuccess": "Profile saved successfully",
       "saveError": "Failed to save profile. Please try again.",
       "loadError": "Failed to load profile. Please try again."
+    },
+    "validation": {
+      "invalidEmail": "Enter a valid email address",
+      "invalidPhone": "Enter a valid phone number",
+      "invalidUrl": "Enter a valid URL (include https://)",
+      "photoTooLarge": "Photo must be smaller than 5 MB",
+      "photoUnsupported": "Only JPG, PNG, or WebP files are supported",
+      "photoUploadFailed": "We couldn't upload that photo. Please try again.",
+      "photoRemoveFailed": "We couldn't remove the photo. Please try again.",
+      "photoPersistFailed": "We couldn't save the photo reference. Please try again.",
+      "photoUserMissing": "We need your user account before uploading a photo."
     },
     "links": {
       "uploadCv": "Upload CV",

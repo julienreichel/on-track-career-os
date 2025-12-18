@@ -26,8 +26,12 @@ interface UserProfile {
   headline?: string;
   location?: string;
   seniorityLevel?: string;
+  primaryEmail?: string;
+  primaryPhone?: string;
+  workPermitInfo?: string;
   goals?: string[];
   strengths?: string[];
+  socialLinks?: string[];
 }
 
 interface Experience {
@@ -119,12 +123,22 @@ function formatUserProfile(profile: UserProfile): string {
   if (profile.headline) section += `Professional Title: ${profile.headline}\n`;
   if (profile.location) section += `Location: ${profile.location}\n`;
   if (profile.seniorityLevel) section += `Seniority: ${profile.seniorityLevel}\n`;
+  if (profile.primaryEmail) section += `Email: ${profile.primaryEmail}\n`;
+  if (profile.primaryPhone) section += `Phone: ${profile.primaryPhone}\n`;
 
   if (profile.goals && profile.goals.length > 0) {
     section += `\nCareer Goals:\n${profile.goals.map((g) => `- ${g}`).join('\n')}\n`;
   }
   if (profile.strengths && profile.strengths.length > 0) {
     section += `\nKey Strengths:\n${profile.strengths.map((s) => `- ${s}`).join('\n')}\n`;
+  }
+  if (profile.socialLinks && profile.socialLinks.length > 0) {
+    section += `\nSocial Links:\n`;
+    section += profile.socialLinks.map((link) => `- ${link}`).join('\n');
+    section += '\n';
+  }
+  if (profile.workPermitInfo) {
+    section += `\nWork Authorization:\n- ${profile.workPermitInfo}\n`;
   }
   return section + '\n';
 }

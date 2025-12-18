@@ -11,6 +11,7 @@ import {
   generateCvFunction,
 } from './data/resource';
 import { deleteUserProfile } from './data/delete-user-profile/resource';
+import { storage } from './storage/resource';
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
@@ -18,6 +19,7 @@ import { deleteUserProfile } from './data/delete-user-profile/resource';
 const backend = defineBackend({
   auth,
   data,
+  storage,
   parseCvTextFunction,
   extractExperienceBlocksFunction,
   generateStarStoryFunction,

@@ -86,6 +86,12 @@ export function useCvGenerator() {
           fullName: profile.fullName || '',
           headline: profile.headline || undefined,
           location: profile.location || undefined,
+          primaryEmail: profile.primaryEmail || undefined,
+          primaryPhone: profile.primaryPhone || undefined,
+          workPermitInfo: profile.workPermitInfo || undefined,
+          socialLinks: profile.socialLinks
+            ?.map((link) => (typeof link === 'string' ? link.trim() : ''))
+            .filter((link): link is string => !!link),
           goals: profile.goals?.filter((g): g is string => g !== null),
           strengths: profile.strengths?.filter((s): s is string => s !== null),
         },

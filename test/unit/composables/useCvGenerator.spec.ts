@@ -37,6 +37,10 @@ describe('useCvGenerator', () => {
     fullName: 'John Doe',
     headline: 'Senior Software Engineer',
     location: 'San Francisco, CA',
+    primaryEmail: 'john@example.com',
+    primaryPhone: '+1 555 0100',
+    workPermitInfo: 'Eligible to work in EU & US',
+    socialLinks: ['https://linkedin.com/in/johndoe', 'https://github.com/johndoe'],
     goals: ['Lead technical teams', 'Build scalable systems'],
     strengths: ['Problem solving', 'Team leadership'],
     skills: ['TypeScript', 'Vue.js', 'Node.js'],
@@ -219,6 +223,7 @@ describe('useCvGenerator', () => {
         goals: ['Goal 1', null, 'Goal 2'],
         strengths: [null, 'Strength 1'],
         skills: ['Skill 1', null],
+        socialLinks: ['https://example.com', '', null as unknown as string],
       };
       mockUserProfileRepo.get.mockResolvedValue(profileWithNulls);
 
@@ -229,6 +234,7 @@ describe('useCvGenerator', () => {
       expect(aiInput.userProfile.goals).toEqual(['Goal 1', 'Goal 2']);
       expect(aiInput.userProfile.strengths).toEqual(['Strength 1']);
       expect(aiInput.skills).toEqual(['Skill 1']);
+      expect(aiInput.userProfile.socialLinks).toEqual(['https://example.com']);
     });
 
     it('should handle profile not found', async () => {
@@ -304,6 +310,13 @@ describe('useCvGenerator', () => {
       expect(input?.userProfile.fullName).toBe('John Doe');
       expect(input?.userProfile.headline).toBe('Senior Software Engineer');
       expect(input?.userProfile.location).toBe('San Francisco, CA');
+      expect(input?.userProfile.primaryEmail).toBe('john@example.com');
+      expect(input?.userProfile.primaryPhone).toBe('+1 555 0100');
+      expect(input?.userProfile.workPermitInfo).toBe('Eligible to work in EU & US');
+      expect(input?.userProfile.socialLinks).toEqual([
+        'https://linkedin.com/in/johndoe',
+        'https://github.com/johndoe',
+      ]);
       expect(input?.userProfile.goals).toEqual(['Lead technical teams', 'Build scalable systems']);
       expect(input?.selectedExperiences).toHaveLength(1);
       expect(input?.stories).toHaveLength(2);

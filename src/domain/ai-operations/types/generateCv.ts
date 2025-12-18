@@ -4,14 +4,13 @@
 export interface GenerateCvInput {
   userProfile: {
     fullName: string;
-    email?: string;
-    phone?: string;
-    location?: string;
     headline?: string;
-    summary?: string;
-    linkedinUrl?: string;
-    githubUrl?: string;
-    portfolioUrl?: string;
+    location?: string;
+    seniorityLevel?: string;
+    primaryEmail?: string;
+    primaryPhone?: string;
+    workPermitInfo?: string;
+    socialLinks?: string[];
     goals?: string[];
     strengths?: string[];
   };

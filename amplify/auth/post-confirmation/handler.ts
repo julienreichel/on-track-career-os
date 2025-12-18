@@ -24,6 +24,8 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
       id,
       fullName: userAttributes.fullname?.trim() || email,
       owner: `${id}::${id}`,
+      primaryEmail: email,
+      primaryPhone: userAttributes.phone_number || undefined,
     });
   } catch (err) {
     console.log(err);

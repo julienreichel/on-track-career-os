@@ -117,16 +117,27 @@ describe('UserProfile GraphQL Operations (E2E Sandbox)', () => {
     const userProfile = {
       id: testUserId,
       fullName: updatedName,
+      primaryEmail: 'updated@example.com',
+      primaryPhone: '+1 415 555 0101',
+      workPermitInfo: 'Eligible to work in US & EU',
+      socialLinks: ['https://portfolio.example.com'],
     } as unknown as UserProfileUpdateInput;
     const updatedProfile = await repository.update(userProfile);
 
     // Validate update
     expect(updatedProfile).toBeDefined();
     expect(updatedProfile?.fullName).toBe(updatedName);
+    expect(updatedProfile?.primaryEmail).toBe('updated@example.com');
+    expect(updatedProfile?.primaryPhone).toBe('+1 415 555 0101');
+    expect(updatedProfile?.workPermitInfo).toBe('Eligible to work in US & EU');
+    expect(updatedProfile?.socialLinks).toEqual(['https://portfolio.example.com']);
 
     // Re-fetch to confirm
     const refetchedProfile = await repository.get(testUserId);
     expect(refetchedProfile?.fullName).toBe(updatedName);
+    expect(refetchedProfile?.primaryEmail).toBe('updated@example.com');
+    expect(refetchedProfile?.primaryPhone).toBe('+1 415 555 0101');
+    expect(refetchedProfile?.socialLinks).toEqual(['https://portfolio.example.com']);
   }, 30000);
 
   it('should enforce owner field in create operation', async () => {

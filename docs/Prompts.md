@@ -7,11 +7,11 @@ Extend the `UserProfile` schema to support new CV header fields while analysing 
 ### **Components / Composables (Create/Update)**
 
 - Update UserProfile Model:
-  - `profilePhotoKey`
-  - `socialLinks[]` (label + url + includeInCv flag)
-  - `primaryPhone` + boolean
-  - `primaryEmail` + boolean
-  - `workPermitInfo` + boolean
+  - `profilePhotoKey` (will be implemented in the next prompt)
+- `socialLinks[]` (url)
+  - `primaryPhone`
+  - `primaryEmail`
+  - `workPermitInfo`
 
 - Update repositories/services:
   - `UserProfileRepository`
@@ -20,10 +20,9 @@ Extend the `UserProfile` schema to support new CV header fields while analysing 
 ### **Pages to Modify**
 
 - `/profile` → add sections for:
-  - Photo upload
   - Social links editor
   - Contact inputs
-  - Work permit input + toggles
+  - Work permit input
 
 ### **Tests**
 

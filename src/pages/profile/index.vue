@@ -41,6 +41,60 @@
             </h3>
           </template>
 
+          <div
+            class="mb-4 flex flex-col gap-4 border-b border-gray-200 pb-4 dark:border-gray-800 sm:flex-row sm:items-center"
+          >
+            <UAvatar
+              size="xl"
+              class="ring-2 ring-primary-100 dark:ring-primary-900"
+              :src="photoPreviewUrl || undefined"
+              :alt="form.fullName || t('profile.fields.fullName')"
+              icon="i-heroicons-user-circle"
+            />
+            <div class="flex-1 space-y-2">
+              <p v-if="!photoPreviewUrl" class="text-sm text-gray-600 dark:text-gray-400">
+                {{ t('profile.photo.empty') }}
+              </p>
+              <div v-if="isEditing" class="flex flex-wrap gap-2">
+                <UButton
+                  color="primary"
+                  variant="soft"
+                  icon="i-heroicons-arrow-up-on-square"
+                  :loading="uploadingPhoto"
+                  :disabled="uploadingPhoto"
+                  @click="triggerPhotoPicker"
+                >
+                  {{ t('profile.photo.upload') }}
+                </UButton>
+                <UButton
+                  v-if="form.profilePhotoKey"
+                  color="neutral"
+                  variant="ghost"
+                  icon="i-heroicons-trash"
+                  :loading="uploadingPhoto"
+                  :disabled="uploadingPhoto"
+                  @click="handleRemovePhoto"
+                >
+                  {{ t('profile.photo.remove') }}
+                </UButton>
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                {{ t('profile.photo.help') }}
+              </p>
+              <p v-if="photoError" class="text-sm text-red-500">
+                {{ photoError }}
+              </p>
+            </div>
+          </div>
+
+          <input
+            ref="photoInputRef"
+            type="file"
+            class="hidden"
+            accept="image/png,image/jpeg,image/webp"
+            @change="handlePhotoSelected"
+          >
+
           <!-- Display Mode -->
           <div v-if="!isEditing" class="space-y-4">
             <div v-if="form.fullName">
@@ -111,6 +165,124 @@
                 :placeholder="t('profile.fields.seniorityLevelPlaceholder')"
               />
             </UFormField>
+          </div>
+        </UCard>
+
+        <!-- SECTION: Work Authorization -->
+        <UCard v-if="isEditing || hasWorkPermit" class="mb-6">
+          <template #header>
+            <h3 class="text-lg font-semibold">
+              {{ t('profile.sections.workPermit') }}
+            </h3>
+          </template>
+
+          <div v-if="!isEditing">
+            <p v-if="form.workPermitInfo" class="text-base text-gray-900 dark:text-gray-100">
+              {{ form.workPermitInfo }}
+            </p>
+            <p v-else class="text-sm text-gray-500">
+              {{ t('profile.fields.workPermitEmpty') }}
+            </p>
+          </div>
+
+          <div v-else>
+            <UFormField :label="t('profile.fields.workPermitInfo')">
+              <UTextarea
+                v-model="form.workPermitInfo"
+                :rows="3"
+                :placeholder="t('profile.fields.workPermitPlaceholder')"
+              />
+            </UFormField>
+          </div>
+        </UCard>
+
+        <!-- SECTION: Contact Info -->
+        <UCard v-if="isEditing || hasContactInfo" class="mb-6">
+          <template #header>
+            <h3 class="text-lg font-semibold">
+              {{ t('profile.sections.contactInfo') }}
+            </h3>
+          </template>
+
+          <div v-if="!isEditing" class="space-y-4">
+            <div v-if="form.primaryEmail">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.primaryEmail') }}
+              </label>
+              <a
+                class="text-primary-600 dark:text-primary-400"
+                :href="`mailto:${form.primaryEmail}`"
+              >
+                {{ form.primaryEmail }}
+              </a>
+            </div>
+            <div v-if="form.primaryPhone">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {{ t('profile.fields.primaryPhone') }}
+              </label>
+              <p class="text-base text-gray-900 dark:text-gray-100">
+                {{ form.primaryPhone }}
+              </p>
+            </div>
+          </div>
+
+          <div v-else class="space-y-4">
+            <UFormField :label="t('profile.fields.primaryEmail')" :error="emailError">
+              <UInput
+                v-model="form.primaryEmail"
+                type="email"
+                :placeholder="t('profile.fields.emailPlaceholder')"
+              />
+            </UFormField>
+
+            <UFormField :label="t('profile.fields.primaryPhone')" :error="phoneError">
+              <UInput
+                v-model="form.primaryPhone"
+                :placeholder="t('profile.fields.phonePlaceholder')"
+              />
+            </UFormField>
+          </div>
+        </UCard>
+
+        <!-- SECTION: Social Links -->
+        <UCard v-if="isEditing || hasSocialLinks" class="mb-6">
+          <template #header>
+            <h3 class="text-lg font-semibold">
+              {{ t('profile.sections.socialLinks') }}
+            </h3>
+          </template>
+
+          <div v-if="!isEditing" class="space-y-2">
+            <div v-if="form.socialLinks.length === 0" class="text-sm text-gray-500">
+              {{ t('profile.fields.socialLinksEmpty') }}
+            </div>
+            <ul v-else class="space-y-2">
+              <li
+                v-for="(link, index) in form.socialLinks"
+                :key="`social-display-${index}`"
+                class="flex items-center gap-2"
+              >
+                <UIcon name="i-heroicons-link" class="text-primary-500" />
+                <a
+                  class="text-primary-600 dark:text-primary-400 truncate"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :href="formatSocialLink(link)"
+                >
+                  {{ link }}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div v-else>
+            <TagInput
+              v-model="form.socialLinks"
+              :label="t('profile.fields.socialLinks')"
+              :placeholder="t('profile.fields.socialUrlPlaceholder')"
+              :hint="t('profile.fields.socialLinksHint')"
+              color="primary"
+            />
           </div>
         </UCard>
 
@@ -360,7 +532,7 @@
             type="submit"
             color="primary"
             :loading="loading"
-            :disabled="!form.fullName || loading"
+            :disabled="!form.fullName || loading || hasValidationErrors"
           >
             {{ loading ? t('profile.actions.saving') : t('profile.actions.save') }}
           </UButton>
@@ -431,6 +603,9 @@ import { useAuthUser } from '@/composables/useAuthUser';
 import { useUserProfile } from '@/application/user-profile/useUserProfile';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
+import { UserProfileService } from '@/domain/user-profile/UserProfileService';
+import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
+import { isValidEmail, isValidPhone } from '@/domain/user-profile/contactValidation';
 import type { UserProfile, UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
 
 // Profile page - manage user profile with view/edit mode
@@ -499,6 +674,10 @@ interface ProfileForm {
   headline: string;
   location: string;
   seniorityLevel: string;
+  primaryEmail: string;
+  primaryPhone: string;
+  workPermitInfo: string;
+  profilePhotoKey: string | null;
   goals: string[];
   aspirations: string[];
   personalValues: string[];
@@ -507,6 +686,7 @@ interface ProfileForm {
   skills: string[];
   certifications: string[];
   languages: string[];
+  socialLinks: string[];
 }
 
 const form = ref<ProfileForm>({
@@ -514,6 +694,10 @@ const form = ref<ProfileForm>({
   headline: '',
   location: '',
   seniorityLevel: '',
+  primaryEmail: '',
+  primaryPhone: '',
+  workPermitInfo: '',
+  profilePhotoKey: null,
   goals: [],
   aspirations: [],
   personalValues: [],
@@ -522,6 +706,7 @@ const form = ref<ProfileForm>({
   skills: [],
   certifications: [],
   languages: [],
+  socialLinks: [],
 });
 
 // Keep a copy of original data for cancel functionality
@@ -531,6 +716,41 @@ const originalForm = ref<ProfileForm | null>(null);
 const isEditing = ref(false);
 const error = ref<string | null>(null);
 const saveSuccess = ref(false);
+const photoPreviewUrl = ref<string | null>(null);
+const uploadingPhoto = ref(false);
+const photoError = ref<string | null>(null);
+const photoInputRef = ref<HTMLInputElement | null>(null);
+
+const profilePhotoService = new ProfilePhotoService();
+const directProfileService = new UserProfileService();
+const BYTES_PER_KILOBYTE = 1024;
+const BYTES_PER_MEGABYTE = BYTES_PER_KILOBYTE * 1024; // eslint-disable-line no-magic-numbers
+const MAX_PHOTO_SIZE_MB = 5;
+const MAX_PHOTO_BYTES = MAX_PHOTO_SIZE_MB * BYTES_PER_MEGABYTE;
+const ACCEPTED_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+const toSafeString = (value?: string | null) => value ?? '';
+const toOptionalString = (value?: string | null) => value ?? undefined;
+const toSafeArray = (value?: (string | null | undefined)[] | null) =>
+  (value?.filter((entry): entry is string => typeof entry === 'string') ?? []);
+
+const sanitizeSocialLinks = (links: string[]): string[] => {
+  const seen = new Set<string>();
+
+  return links
+    .map((link) => link.trim())
+    .filter((link) => {
+      if (!link) return false;
+      if (seen.has(link)) return false;
+      seen.add(link);
+      return true;
+    });
+};
+
+const formatSocialLink = (link: string): string => {
+  if (!link) return '';
+  return /^https?:\/\//i.test(link) ? link : `https://${link}`;
+};
 
 // Header links
 const headerLinks = computed(() => {
@@ -585,26 +805,151 @@ const hasProfessionalAttributes = computed(() => {
   );
 });
 
+const hasContactInfo = computed(() => {
+  return !!(form.value.primaryEmail || form.value.primaryPhone);
+});
+
+const hasSocialLinks = computed(() => form.value.socialLinks.length > 0);
+
+const hasWorkPermit = computed(() => !!form.value.workPermitInfo);
+
+const emailError = computed<string | undefined>(() => {
+  if (!form.value.primaryEmail) return undefined;
+  return isValidEmail(form.value.primaryEmail) ? undefined : t('profile.validation.invalidEmail');
+});
+
+const phoneError = computed<string | undefined>(() => {
+  if (!form.value.primaryPhone) return undefined;
+  return isValidPhone(form.value.primaryPhone) ? undefined : t('profile.validation.invalidPhone');
+});
+
+const hasValidationErrors = computed(() => {
+  return Boolean(emailError.value) || Boolean(phoneError.value);
+});
+
+const loadPhotoPreview = async (key: string | null) => {
+  if (!key) {
+    photoPreviewUrl.value = null;
+    return;
+  }
+  try {
+    const url = await profilePhotoService.getSignedUrl(key);
+    photoPreviewUrl.value = url || null;
+  } catch (err) {
+    console.error('[profile] Failed to load photo preview:', err);
+    photoPreviewUrl.value = null;
+  }
+};
+
+const persistProfilePhotoKey = async (key: string | null) => {
+  if (!profile.value?.id) return;
+  try {
+    const updated = await directProfileService.updateUserProfile({
+      id: profile.value.id,
+      profilePhotoKey: key,
+    });
+    if (updated) {
+      profile.value = updated;
+      form.value.profilePhotoKey = updated.profilePhotoKey || null;
+      if (originalForm.value) {
+        originalForm.value = {
+          ...originalForm.value,
+          profilePhotoKey: form.value.profilePhotoKey,
+        };
+      }
+    }
+  } catch (err) {
+    console.error('[profile] Failed to persist photo key:', err);
+    photoError.value = t('profile.validation.photoPersistFailed');
+  }
+};
+
+const triggerPhotoPicker = () => {
+  photoInputRef.value?.click();
+};
+
+const handlePhotoSelected = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  target.value = '';
+  if (!file) return;
+  photoError.value = null;
+
+  if (!ACCEPTED_PHOTO_TYPES.includes(file.type)) {
+    photoError.value = t('profile.validation.photoUnsupported');
+    return;
+  }
+
+  if (file.size > MAX_PHOTO_BYTES) {
+    photoError.value = t('profile.validation.photoTooLarge');
+    return;
+  }
+
+  if (!userId.value) {
+    photoError.value = t('profile.validation.photoUserMissing');
+    return;
+  }
+
+  uploadingPhoto.value = true;
+  const previousKey = form.value.profilePhotoKey;
+  try {
+    const key = await profilePhotoService.upload(userId.value, file);
+    await persistProfilePhotoKey(key);
+    await loadPhotoPreview(key);
+    if (previousKey && previousKey !== key) {
+      await profilePhotoService.delete(previousKey);
+    }
+  } catch (err) {
+    console.error('[profile] Photo upload failed:', err);
+    photoError.value = t('profile.validation.photoUploadFailed');
+  } finally {
+    uploadingPhoto.value = false;
+  }
+};
+
+const handleRemovePhoto = async () => {
+  if (!form.value.profilePhotoKey) return;
+  uploadingPhoto.value = true;
+  photoError.value = null;
+  try {
+    await profilePhotoService.delete(form.value.profilePhotoKey);
+    await persistProfilePhotoKey(null);
+    await loadPhotoPreview(null);
+  } catch (err) {
+    console.error('[profile] Photo removal failed:', err);
+    photoError.value = t('profile.validation.photoRemoveFailed');
+  } finally {
+    uploadingPhoto.value = false;
+  }
+};
+
 // Load profile data into form
 const loadProfileToForm = () => {
-  if (profile.value) {
-    form.value = {
-      fullName: profile.value.fullName || '',
-      headline: profile.value.headline || '',
-      location: profile.value.location || '',
-      seniorityLevel: profile.value.seniorityLevel || '',
-      goals: (profile.value.goals || []).filter((g): g is string => g !== null),
-      aspirations: (profile.value.aspirations || []).filter((a): a is string => a !== null),
-      personalValues: (profile.value.personalValues || []).filter((v): v is string => v !== null),
-      strengths: (profile.value.strengths || []).filter((s): s is string => s !== null),
-      interests: (profile.value.interests || []).filter((i): i is string => i !== null),
-      skills: (profile.value.skills || []).filter((s): s is string => s !== null),
-      certifications: (profile.value.certifications || []).filter((c): c is string => c !== null),
-      languages: (profile.value.languages || []).filter((l): l is string => l !== null),
-    };
-    // Save original form state for cancel
-    originalForm.value = { ...form.value };
-  }
+  const currentProfile = profile.value;
+  if (!currentProfile) return;
+
+  form.value = {
+    fullName: toSafeString(currentProfile.fullName),
+    headline: toSafeString(currentProfile.headline),
+    location: toSafeString(currentProfile.location),
+    seniorityLevel: toSafeString(currentProfile.seniorityLevel),
+    primaryEmail: toSafeString(currentProfile.primaryEmail),
+    primaryPhone: toSafeString(currentProfile.primaryPhone),
+    workPermitInfo: toSafeString(currentProfile.workPermitInfo),
+    profilePhotoKey: currentProfile.profilePhotoKey || null,
+    goals: toSafeArray(currentProfile.goals),
+    aspirations: toSafeArray(currentProfile.aspirations),
+    personalValues: toSafeArray(currentProfile.personalValues),
+    strengths: toSafeArray(currentProfile.strengths),
+    interests: toSafeArray(currentProfile.interests),
+    skills: toSafeArray(currentProfile.skills),
+    certifications: toSafeArray(currentProfile.certifications),
+    languages: toSafeArray(currentProfile.languages),
+    socialLinks: sanitizeSocialLinks(toSafeArray(currentProfile.socialLinks)),
+  };
+  // Save original form state for cancel
+  originalForm.value = { ...form.value };
+  loadPhotoPreview(form.value.profilePhotoKey);
 };
 
 // Edit mode handlers
@@ -624,18 +969,18 @@ const cancelEditing = () => {
 };
 
 // Form submission
-const handleSubmit = async () => {
-  if (!form.value.fullName || !profile.value?.id || !saveProfile) return;
-
-  error.value = null;
-  saveSuccess.value = false;
-
-  const input: UserProfileUpdateInput = {
+const buildProfileUpdateInput = (): UserProfileUpdateInput => {
+  const sanitizedLinks = sanitizeSocialLinks(form.value.socialLinks);
+  return {
     id: profile.value.id,
     fullName: form.value.fullName,
-    headline: form.value.headline || undefined,
-    location: form.value.location || undefined,
-    seniorityLevel: form.value.seniorityLevel || undefined,
+    headline: toOptionalString(form.value.headline),
+    location: toOptionalString(form.value.location),
+    seniorityLevel: toOptionalString(form.value.seniorityLevel),
+    primaryEmail: toOptionalString(form.value.primaryEmail),
+    primaryPhone: toOptionalString(form.value.primaryPhone),
+    workPermitInfo: toOptionalString(form.value.workPermitInfo),
+    profilePhotoKey: form.value.profilePhotoKey || null,
     goals: form.value.goals,
     aspirations: form.value.aspirations,
     personalValues: form.value.personalValues,
@@ -644,7 +989,17 @@ const handleSubmit = async () => {
     skills: form.value.skills,
     certifications: form.value.certifications,
     languages: form.value.languages,
+    socialLinks: sanitizedLinks,
   };
+};
+
+const handleSubmit = async () => {
+  if (!form.value.fullName || !profile.value?.id || !saveProfile) return;
+
+  error.value = null;
+  saveSuccess.value = false;
+
+  const input = buildProfileUpdateInput();
 
   const success = await saveProfile(input);
 

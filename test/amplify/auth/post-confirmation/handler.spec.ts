@@ -76,11 +76,14 @@ describe('post-confirmation handler', () => {
 
       const result = await handler(event);
 
-      expect(mockCreate).toHaveBeenCalledWith({
-        id: 'user-123',
-        fullName: 'john@example.com',
-        owner: 'user-123::user-123',
-      });
+      expect(mockCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'user-123',
+          fullName: 'john@example.com',
+          owner: 'user-123::user-123',
+          primaryEmail: 'john@example.com',
+        })
+      );
       expect(result).toEqual(event);
     });
 
@@ -95,11 +98,14 @@ describe('post-confirmation handler', () => {
 
       const result = await handler(event);
 
-      expect(mockCreate).toHaveBeenCalledWith({
-        id: 'user-456',
-        fullName: 'Jane Doe',
-        owner: 'user-456::user-456',
-      });
+      expect(mockCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'user-456',
+          fullName: 'Jane Doe',
+          owner: 'user-456::user-456',
+          primaryEmail: 'jane@example.com',
+        })
+      );
       expect(result).toEqual(event);
     });
 
@@ -114,12 +120,35 @@ describe('post-confirmation handler', () => {
 
       const result = await handler(event);
 
-      expect(mockCreate).toHaveBeenCalledWith({
-        id: 'user-789',
-        fullName: 'Spaced Name',
-        owner: 'user-789::user-789',
-      });
+      expect(mockCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'user-789',
+          fullName: 'Spaced Name',
+          owner: 'user-789::user-789',
+          primaryEmail: 'test@example.com',
+        })
+      );
       expect(result).toEqual(event);
+    });
+
+    it('should persist primary phone when provided', async () => {
+      mockCreate.mockResolvedValueOnce({ data: { id: 'test-user-id' } });
+
+      const event = createEvent({
+        sub: 'user-phone',
+        email: 'phone@example.com',
+        phone_number: '+12025550123',
+      });
+
+      await handler(event);
+
+      expect(mockCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'user-phone',
+          primaryPhone: '+12025550123',
+          primaryEmail: 'phone@example.com',
+        })
+      );
     });
 
     it('should fallback to email when fullname is empty after trimming', async () => {
@@ -133,11 +162,14 @@ describe('post-confirmation handler', () => {
 
       const result = await handler(event);
 
-      expect(mockCreate).toHaveBeenCalledWith({
-        id: 'user-999',
-        fullName: 'fallback@example.com',
-        owner: 'user-999::user-999',
-      });
+      expect(mockCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'user-999',
+          fullName: 'fallback@example.com',
+          owner: 'user-999::user-999',
+          primaryEmail: 'fallback@example.com',
+        })
+      );
       expect(result).toEqual(event);
     });
 
@@ -206,6 +238,7 @@ describe('post-confirmation handler', () => {
       expect(mockCreate).toHaveBeenCalledWith(
         expect.objectContaining({
           owner: 'abc-123-xyz::abc-123-xyz',
+          primaryEmail: 'owner@example.com',
         })
       );
     });
