@@ -16,8 +16,9 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ 6 of 17 AI operations implemented (35%)
 - ✅ 16 data models in GraphQL schema (complete for MVP)
 - ✅ 6 domain modules with full repository/service/composable layers
-- ✅ 291 tests passing across 27 test suites
+- ✅ 291 tests passing across 27 test suites (lint + unit runs all green)
 - ✅ Type-safe architecture with single source of truth pattern
+- ✅ CV header now renders profile photo, contact, work-permit, and social links sourced from profile data with user-controlled toggles
 - ⚠️ Applications area still thin, but `/cv`, `/cv/new`, `/cv/:id`, and `/cv/:id/print` now deliver the full Generic CV generator flow
 
 **MVP Readiness:** ~50% complete
@@ -39,6 +40,7 @@ The project has established a **strong backend and domain foundation** with comp
 | **1B** | Personal Canvas Generation  | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **2**  | Experience Builder (STAR)   | 100%    | 100%   | 100% (2/2) | 90%      | **95%**  |
 | **3**  | Generic CV Generator        | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
+| **3B** | CV Header & Contact Info    | 100%    | 100%   | 100% (0/0) | 100%     | **100%** |
 | **4**  | User Speech Builder         | 30%     | 0%     | 0% (0/1)   | 0%       | **5%**   |
 | **5A** | Job Description Analysis    | 80%     | 0%     | 0% (0/2)   | 0%       | **15%**  |
 | **5B** | Company Analysis            | 80%     | 0%     | 0% (0/2)   | 0%       | **15%**  |
@@ -198,6 +200,29 @@ The project has established a **strong backend and domain foundation** with comp
 - ⚠️ Nuxt component specs for CV pages (`test/nuxt/pages/cv/*.spec.ts`, `test/nuxt/components/cv/*.spec.ts`) are checked in but `describe.skip` keeps them inactive → need to re-enable/UI-test coverage.
 
 **Next Improvements:**
+
+#### ✅ EPIC 3B: CV Header & Contact Information (100% Complete)
+
+**Status:** ✅ **FULLY IMPLEMENTED** — Profile data, storage, and CV rendering aligned.
+
+**Implemented:**
+
+- ✅ `UserProfile` model now stores `primaryEmail`, `primaryPhone`, `workPermitInfo`, `socialLinks[]`, and `profilePhotoKey`
+- ✅ Profile form updates (`/profile`) with validation, TagInput-based social links, and work permit/contact editors
+- ✅ `ProfilePhotoService` wraps Amplify Storage upload & signed URL retrieval with Cognito identity-aware key scoping + unit tests
+- ✅ Upload UI with preview state, validation, and failure handling (Aligns with Amplify recommended storage pattern)
+- ✅ CV creation wizard exposes an “Include profile photo” toggle so new CVs opt-in by default
+- ✅ CV detail page adds a switch, helper copy, and live badge preview that fetches the signed photo URL
+- ✅ CV print view mirrors the preview, positioning the photo at the top-right of the exported page
+- ✅ `generateCv` Lambda ensures social links + work permit info appear in the header instructions and strips stray ``` fences before returning Markdown
+
+**Validation:**
+
+- ✅ `npm run lint` clean
+- ✅ `npx vitest run test/unit/domain/user-profile/ProfilePhotoService.spec.ts`
+- ✅ `npx vitest run test/unit/ai-operations/generateCv-notes-stripping.spec.ts`
+- ✅ Manual upload flow verified against S3 PUT logs (403 resolved after identity scoping)
+- ✅ CV preview + print manually verified with and without the `showProfilePhoto` flag
 
 1. Add visual regression/E2E coverage for `/cv` flow (experience selection → Markdown save → print).
 2. Layer optional templates/themes + PDF export shortcuts if needed for V1.

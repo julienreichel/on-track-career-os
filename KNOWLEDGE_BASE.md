@@ -29,12 +29,14 @@ The workflow is:
 
 Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer**.
 
-**Current Implementation Status (January 2025):**
+**Current Implementation Status (December 2025):**
 
-- ✅ EPIC 1A (User Data Intake) - 95% complete
-- ✅ **EPIC 2 (Experience Builder - STAR Stories) - 95% COMPLETE**
-- ⚠️ EPIC 1B (Personal Canvas) - 60% complete (backend only)
-- Remaining EPICs 4-7 in early stages
+- ✅ EPIC 1A (User Data Intake) — 95% complete
+- ✅ EPIC 1B (Personal Canvas) — 100% complete end-to-end
+- ✅ EPIC 2 (Experience Builder - STAR Stories) — 95% complete
+- ✅ EPIC 3 (Generic CV Generator) — 100% complete
+- ✅ EPIC 3B (CV Header & Contact Information) — 100% complete
+- ⚠️ Remaining EPICs 4-7 still in early implementation stages
 
 ### 2.1 Frontend (Nuxt 3)
 
@@ -74,7 +76,7 @@ _(Condensed from full CDM; only key-developer-relevant models.)_
 
 ### 3.1 User Identity Domain
 
-- **UserProfile**: identity, goals, values, strengths, skills, languages
+- **UserProfile**: identity, goals, values, strengths, skills, languages, contact data (`primaryEmail`, `primaryPhone`), work authorization, `socialLinks[]`, and `profilePhotoKey` (S3 key used for CV header)
 - **PersonalCanvas**: value prop, key activities, strengths, target roles, etc.
 - **CommunicationProfile** (V1)
 
@@ -151,7 +153,7 @@ _(Structured per navigation zones)_
 
 ### 5.1 My Profile
 
-- **Profile Overview** → edit identity, goals, values
+- **Profile Overview** → edit identity, goals, values, contact fields, work permit, TagInput-powered social links, and upload/manage a profile photo (Amplify Storage pipeline + preview)
 - **Experience List** → CRUD experiences
 - **Experience Editor** → edit experience fields, trigger achievements/KPIs
 - **STAR Story Builder** → chat-guided story creation
@@ -170,9 +172,9 @@ _(Structured per navigation zones)_
 
 - **CV Builder** (generic + tailored)
   - Generic CV generator live: `/cv`, `/cv/new`, `/cv/:id`, `/cv/:id/print`
-  - AI-powered Markdown generation via `useCvGenerator` + `generateCv` Lambda
-  - Experience picker + optional profile sections + job description tailoring
-  - Markdown editor with preview + print/export-ready layout
+  - AI-powered Markdown generation via `useCvGenerator` + `generateCv` Lambda (now strips stray ``` fences)
+  - Experience picker + optional profile sections + job description tailoring + toggle to include profile photo
+  - Markdown editor with preview + print/export-ready layout, including top-right profile photo badge when enabled
 - **Cover Letter Builder**
 - **Speech Builder**
 - **KPI Generator**
