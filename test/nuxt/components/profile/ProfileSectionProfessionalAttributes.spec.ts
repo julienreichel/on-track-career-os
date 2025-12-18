@@ -1,0 +1,97 @@
+import { describe, it, expect } from 'vitest';
+import { mount } from '@vue/test-utils';
+import { createI18n } from 'vue-i18n';
+import { ref } from 'vue';
+import ProfileSectionProfessionalAttributes from '@/components/profile/section/ProfessionalAttributes.vue';
+import { profileFormContextKey } from '@/components/profile/profileFormContext';
+import type { ProfileForm } from '@/components/profile/types';
+
+const i18n = createI18n({
+  legacy: false,
+  locale: 'en',
+  missingWarn: false,
+  fallbackWarn: false,
+  messages: {
+    en: {
+      profile: {
+        sections: {
+          professionalAttributes: 'Professional Attributes',
+        },
+        fields: {
+          skills: 'Skills',
+          certifications: 'Certifications',
+          languages: 'Languages',
+          skillsPlaceholder: 'Add skill',
+          certificationsPlaceholder: 'Add certification',
+          languagesPlaceholder: 'Add language',
+          skillsHint: 'Hint',
+          certificationsHint: 'Hint',
+          languagesHint: 'Hint',
+        },
+      },
+    },
+  },
+});
+
+const stubs = {
+  UCard: {
+    template: '<div class="u-card"><slot name="header" /><slot /></div>',
+  },
+  UBadge: {
+    template: '<span class="u-badge"><slot /></span>',
+  },
+  TagInput: {
+    template: '<div class="tag-input"><slot /></div>',
+    props: ['modelValue', 'label'],
+  },
+};
+
+const mountSection = (isEditing = false) => {
+  const form = ref<ProfileForm>({
+    fullName: 'Ada Lovelace',
+    headline: '',
+    location: '',
+    seniorityLevel: '',
+    primaryEmail: '',
+    primaryPhone: '',
+    workPermitInfo: '',
+    profilePhotoKey: null,
+    goals: [],
+    aspirations: [],
+    personalValues: [],
+    strengths: [],
+    interests: [],
+    skills: ['Leadership'],
+    certifications: ['Scrum Master'],
+    languages: ['English'],
+    socialLinks: [],
+  });
+
+  return mount(ProfileSectionProfessionalAttributes, {
+    global: {
+      plugins: [i18n],
+      stubs,
+      provide: {
+        [profileFormContextKey as symbol]: {
+          form,
+          isEditing: ref(isEditing),
+          hasProfessionalAttributes: ref(true),
+        },
+      },
+    },
+  });
+};
+
+describe('ProfileSectionProfessionalAttributes', () => {
+  it('renders skills, certifications, and languages', () => {
+    const wrapper = mountSection(false);
+    expect(wrapper.text()).toContain('Professional Attributes');
+    expect(wrapper.text()).toContain('Leadership');
+    expect(wrapper.text()).toContain('Scrum Master');
+  });
+
+  it('renders tag inputs in edit mode', () => {
+    const wrapper = mountSection(true);
+    expect(wrapper.findAll('.tag-input')).toHaveLength(3);
+  });
+});

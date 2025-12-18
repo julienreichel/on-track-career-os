@@ -9,6 +9,8 @@ import type { ProfileForm } from '@/components/profile/types';
 const i18n = createI18n({
   legacy: false,
   locale: 'en',
+  missingWarn: false,
+  fallbackWarn: false,
   messages: {
     en: {
       profile: {
