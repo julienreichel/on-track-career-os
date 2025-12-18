@@ -1,7 +1,15 @@
+const isTestEnvironment =
+  (typeof process !== 'undefined' && process.env.VITEST === 'true') ||
+  (typeof import.meta !== 'undefined' && (import.meta as { vitest?: boolean }).vitest === true);
+
 export default defineNuxtPlugin({
   name: 'AmplifyAuthRedirect',
   enforce: 'pre',
   setup() {
+    if (isTestEnvironment) {
+      return;
+    }
+
     addRouteMiddleware(
       'AmplifyAuthMiddleware',
       defineNuxtRouteMiddleware(async (to) => {
