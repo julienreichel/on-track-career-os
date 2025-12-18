@@ -154,21 +154,11 @@ async function createManualStory(
  * Helper: Check if profile is filled (minimal requirement)
  */
 async function ensureProfileFilled(page: Page): Promise<void> {
-  await page.goto('/profile');
+  await page.goto('/profile/full?mode=edit');
   await page.waitForLoadState('networkidle');
-  await page.waitForTimeout(1000);
 
-  // Check if we need to click Edit button (if in view mode)
-  const editButton = page.getByRole('button', { name: 'Edit profile' });
-  const editButtonVisible = await editButton.isVisible().catch(() => false);
-
-  if (editButtonVisible) {
-    await editButton.click();
-    await page.waitForTimeout(500);
-  }
-
-  // Check if Full Name field is empty
   const fullNameInput = page.getByRole('textbox', { name: /Full Name/i }).first();
+  await expect(fullNameInput).toBeVisible();
   const fullNameValue = await fullNameInput.inputValue();
 
   if (!fullNameValue || fullNameValue.trim() === '') {
