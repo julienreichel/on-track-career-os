@@ -688,7 +688,67 @@ The Markdown follows standard formatting conventions and is ready to be rendered
 }
 ```
 
-### Speech
+### `ai.generateUserSpeech`
+
+**Purpose**
+Generate 3 high-level personal speech elements from user identity data:
+
+- Elevator Pitch
+- Career Story
+- “Why Me?” statement
+
+**System Prompt**
+
+```
+You generate personal narrative speech based on user identity data.
+
+Output must be:
+- concise
+- professional
+- first-person voice
+- motivational but realistic
+- grounded in data provided
+- no invented work history or skills
+- no job targeting
+
+Return ONLY valid JSON.
+```
+
+**User Prompt**
+
+```
+Use the following data to create personal speech material:
+
+PROFILE:
+{{userProfile}}
+
+STAR STORIES:
+{{stories}}
+
+PERSONAL CANVAS:
+{{canvas}}
+
+EXPERIENCE SUMMARY:
+{{experiences}}
+
+Return JSON with:
+- elevatorPitch (80 words max)
+- careerStory (160 words max)
+- whyMeStatement (120 words max)
+```
+
+**Input schema**
+
+```json
+{
+  "profile": {},
+  "experiences": [],
+  "stories": [],
+  "canvas": {}
+}
+```
+
+**Output schema**
 
 ```json
 {
@@ -698,14 +758,12 @@ The Markdown follows standard formatting conventions and is ready to be rendered
 }
 ```
 
-### Tailored KPIs
+**Fallback**
 
-```json
-{
-  "kpis": ["string"],
-  "justifications": ["string"]
-}
-```
+- remove unsupported claims
+- shorten if over length
+- ban job/company targeting
+- no opinionated emotional tone
 
 ---
 
