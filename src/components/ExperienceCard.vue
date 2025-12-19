@@ -66,7 +66,10 @@ function formatDate(dateString: string | null | undefined): string {
     return dateString;
   }
 
-  return date.toLocaleDateString();
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
 }
 
 function handleViewStories() {

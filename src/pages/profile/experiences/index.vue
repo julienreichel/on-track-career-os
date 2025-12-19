@@ -14,6 +14,14 @@ const { userId } = useAuthUser();
 const experienceRepo = new ExperienceRepository();
 const storyService = new STARStoryService();
 
+function toTimestamp(dateString: string | null | undefined): number {
+  if (!dateString) {
+    return 0;
+  }
+  const timestamp = new Date(dateString).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
 const experiences = ref<Experience[]>([]);
 const storyCounts = ref<Record<string, number>>({});
 const loading = ref(false);
@@ -55,7 +63,11 @@ async function loadExperiences() {
 
   try {
     const result = await experienceRepo.list(userId.value);
-    experiences.value = result || [];
+    experiences.value = (result || []).sort((a, b) => {
+      const aTime = toTimestamp(a.startDate);
+      const bTime = toTimestamp(b.startDate);
+      return bTime - aTime;
+    });
     await loadStoryCounts();
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : 'Failed to load experiences';
