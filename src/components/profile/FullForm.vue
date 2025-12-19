@@ -402,7 +402,15 @@ type HeaderLink = {
   label: string;
   icon?: string;
   to?: string;
-  color?: string;
+  color?:
+    | 'error'
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'info'
+    | 'warning'
+    | 'neutral'
+    | undefined;
   onClick?: () => void;
   ariaLabel?: string;
 };
