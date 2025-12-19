@@ -70,15 +70,16 @@ export function useStoryList(service = new STARStoryService()) {
     loading.value = true;
     error.value = null;
 
-    try {
-      const loadedStories = await service.getStoriesByExperience(experienceId);
-      stories.value = loadedStories;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'storyList.errors.loadFailed';
-      console.error('[useStoryList] Load by experience ID error:', err);
-      loading.value = false;
-    }
-  };
+  try {
+    const loadedStories = await service.getStoriesByExperience(experienceId);
+    stories.value = loadedStories;
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'storyList.errors.loadFailed';
+    console.error('[useStoryList] Load by experience ID error:', err);
+  } finally {
+    loading.value = false;
+  }
+};
 
   /**
    * Load stories for a specific experience (when Experience object already available)

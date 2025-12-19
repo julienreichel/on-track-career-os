@@ -195,9 +195,7 @@ describe('STARStoryRepository', () => {
       mockExperienceModel.get.mockResolvedValue({
         data: {
           id: 'exp-123',
-          stories: {
-            items: mockStories,
-          },
+          stories: mockStories,
         },
       });
 
@@ -219,9 +217,7 @@ describe('STARStoryRepository', () => {
       mockExperienceModel.get.mockResolvedValue({
         data: {
           id: 'exp-123',
-          stories: {
-            items: [],
-          },
+          stories: [],
         },
       });
 

@@ -293,12 +293,20 @@ describe('useCvGenerator', () => {
       'should handle story loading errors gracefully',
       withSilencedConsoleError(async () => {
         mockStoryService.getStoriesByExperience.mockRejectedValue(new Error('Story load failed'));
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
         const { generateCv, error } = useCvGenerator();
         const result = await generateCv('user-123', ['exp-1']);
 
-        expect(result).toBeNull();
-        expect(error.value).toBe('Story load failed');
+        expect(result).toBe('# John Doe\n\nSenior Software Engineer');
+        expect(error.value).toBeNull();
+        expect(consoleSpy).toHaveBeenCalledWith(
+          '[useCvGenerator] Failed to load stories for experience:',
+          'exp-1',
+          expect.any(Error)
+        );
+
+        consoleSpy.mockRestore();
       })
     );
 

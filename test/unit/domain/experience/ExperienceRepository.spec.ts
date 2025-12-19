@@ -8,8 +8,7 @@ import type {
   ExperienceUpdateInput,
   Experience,
 } from '@/domain/experience/Experience';
-import type { UserProfile } from '@/domain/user-profile/UserProfile';
-import { loadLazyAll } from '@/data/graphql/lazy';
+import type { AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
 
 // Mock gqlOptions and lazy loading utilities
 vi.mock('@/data/graphql/options', () => ({
@@ -17,10 +16,6 @@ vi.mock('@/data/graphql/options', () => ({
     authMode: 'userPool',
     ...custom,
   }),
-}));
-
-vi.mock('@/data/graphql/lazy', () => ({
-  loadLazyAll: vi.fn(),
 }));
 
 describe('ExperienceRepository', () => {
@@ -31,6 +26,9 @@ describe('ExperienceRepository', () => {
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
+  };
+  let mockUserProfileModel: {
+    get: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -43,8 +41,14 @@ describe('ExperienceRepository', () => {
       delete: vi.fn(),
     };
 
-    // Inject the mocks via constructor (dependency injection)
-    repository = new ExperienceRepository(mockModel as AmplifyExperienceModel);
+    mockUserProfileModel = {
+      get: vi.fn(),
+    };
+
+    repository = new ExperienceRepository(
+      mockModel as AmplifyExperienceModel,
+      mockUserProfileModel as AmplifyUserProfileModel
+    );
   });
 
   describe('get', () => {
@@ -122,39 +126,47 @@ describe('ExperienceRepository', () => {
         },
       ] as Experience[];
 
-      const mockUserProfile = {
-        id: 'user-123',
-        experiences: vi.fn(),
-      } as unknown as UserProfile;
+      mockUserProfileModel.get.mockResolvedValue({
+        data: {
+          id: 'user-123',
+          experiences: mockExperiences,
+        },
+      });
 
-      vi.mocked(loadLazyAll).mockResolvedValue(mockExperiences);
+      const result = await repository.list('user-123');
 
-      const result = await repository.list(mockUserProfile);
-
+      expect(mockUserProfileModel.get).toHaveBeenCalledWith(
+        { id: 'user-123' },
+        expect.objectContaining({
+          selectionSet: ['id', 'experiences.*'],
+        })
+      );
       expect(result).toEqual(mockExperiences);
       expect(result).toHaveLength(2);
     });
 
     it('should return empty array when userProfile has no experiences', async () => {
-      const mockUserProfile = {
-        id: 'user-123',
-        experiences: undefined,
-      } as unknown as UserProfile;
+      mockUserProfileModel.get.mockResolvedValue({
+        data: {
+          id: 'user-123',
+          experiences: null,
+        },
+      });
 
-      const result = await repository.list(mockUserProfile);
+      const result = await repository.list('user-123');
 
       expect(result).toEqual([]);
     });
 
     it('should return empty array when no experiences exist', async () => {
-      const mockUserProfile = {
-        id: 'user-123',
-        experiences: vi.fn(),
-      } as unknown as UserProfile;
+      mockUserProfileModel.get.mockResolvedValue({
+        data: {
+          id: 'user-123',
+          experiences: [],
+        },
+      });
 
-      vi.mocked(loadLazyAll).mockResolvedValue([]);
-
-      const result = await repository.list(mockUserProfile);
+      const result = await repository.list('user-123');
 
       expect(result).toEqual([]);
     });

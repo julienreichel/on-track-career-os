@@ -158,6 +158,10 @@ describe('useStoryList', () => {
 
   describe('loadForExperience', () => {
     it('should load stories for provided experience object', async () => {
+      const mockExperience = {
+        id: 'exp-1',
+        title: 'Test Experience',
+      } as Experience;
       const experienceStories = mockStories.filter((s) => s.experienceId === 'exp-1');
       mockService.getStoriesByExperience.mockResolvedValue(experienceStories);
 
@@ -170,8 +174,7 @@ describe('useStoryList', () => {
 
       expect(stories.value).toEqual(experienceStories);
       expect(loading.value).toBe(false);
-      expect(mockExperienceRepo.get).not.toHaveBeenCalled(); // Should NOT fetch
-      expect(mockService.getStoriesByExperience).toHaveBeenCalledWith(mockExperience);
+      expect(mockService.getStoriesByExperience).toHaveBeenCalledWith('exp-1');
     });
 
     it('should handle load errors', async () => {
@@ -189,7 +192,7 @@ describe('useStoryList', () => {
 
       expect(loading.value).toBe(false);
       expect(error.value).toBe('API error');
-      expect(mockExperienceRepo.get).not.toHaveBeenCalled(); // Should NOT fetch
+      expect(mockService.getStoriesByExperience).toHaveBeenCalledWith('exp-1');
 
       consoleErrorSpy.mockRestore();
     });

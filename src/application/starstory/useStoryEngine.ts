@@ -76,6 +76,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load stories';
       console.error('[useStoryEngine] Error:', err);
+    } finally {
       loading.value = false;
     }
   };
