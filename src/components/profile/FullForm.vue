@@ -398,8 +398,17 @@ const handleSubmit = async () => {
   }
 };
 
-const headerLinks = computed(() => {
-  const links = [
+type HeaderLink = {
+  label: string;
+  icon?: string;
+  to?: string;
+  color?: string;
+  onClick?: () => void;
+  ariaLabel?: string;
+};
+
+const headerLinks = computed<HeaderLink[]>(() => {
+  const links: HeaderLink[] = [
     {
       label: t('profile.links.backToSummary'),
       icon: 'i-heroicons-user',
