@@ -120,7 +120,7 @@ const ACCEPTED_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 const toSafeString = (value?: string | null) => value ?? '';
 const toSafeArray = (value?: (string | null | undefined)[] | null) =>
-  (value?.filter((entry): entry is string => typeof entry === 'string') ?? []);
+  value?.filter((entry): entry is string => typeof entry === 'string') ?? [];
 
 const sanitizeSocialLinks = (links: string[]): string[] => {
   const seen = new Set<string>();
@@ -400,11 +400,6 @@ const handleSubmit = async () => {
 
 const headerLinks = computed(() => {
   const links = [
-    {
-      label: t('navigation.backToHome'),
-      icon: 'i-heroicons-arrow-left',
-      to: '/',
-    },
     {
       label: t('profile.links.backToSummary'),
       icon: 'i-heroicons-user',

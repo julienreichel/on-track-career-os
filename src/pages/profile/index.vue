@@ -20,39 +20,22 @@
 
       <UCard class="mt-6">
         <template #header>
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="text-lg font-semibold">
-                {{ t('profile.summary.viewFullProfile') }}
-              </h3>
-              <p class="text-sm text-gray-500">
-                {{ t('profile.summary.fullProfileDescription') }}
-              </p>
-            </div>
-            <UButton color="primary" icon="i-heroicons-pencil-square" @click="goToFullProfile('edit')">
-              {{ t('profile.summary.editFromSummary') }}
-            </UButton>
-          </div>
-        </template>
-
-        <UButton
-          color="neutral"
-          variant="soft"
-          icon="i-heroicons-arrow-right-circle"
-          @click="goToFullProfile()"
-        >
-          {{ t('profile.summary.viewFullProfile') }}
-        </UButton>
-      </UCard>
-
-      <UCard class="mt-6">
-        <template #header>
           <h3 class="text-lg font-semibold">
             {{ t('profile.sections.relatedPages') }}
           </h3>
         </template>
 
         <UPageGrid>
+          <UPageCard
+            :title="t('profile.summary.viewFullProfile')"
+            :description="t('profile.summary.fullProfileDescription')"
+            icon="i-heroicons-user-circle"
+            to="/profile/full"
+            :links="[
+              { label: t('profile.summary.editFromSummary'), icon: 'i-heroicons-pencil-square', to: '/profile/full?mode=edit' },
+            ]"
+          />
+
           <UPageCard
             v-if="showCvUpload"
             :title="t('profile.links.uploadCv')"
