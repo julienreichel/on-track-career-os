@@ -79,7 +79,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
 import type { Experience } from '@/domain/experience/Experience';
 
 interface Props {
@@ -97,7 +96,6 @@ const { t } = useI18n();
 const experiences = ref<Experience[]>([]);
 const loading = ref(false);
 const experienceRepo = new ExperienceRepository();
-const userProfileRepo = new UserProfileRepository();
 
 const allSelected = computed(() => {
   return experiences.value.length > 0 && props.modelValue.length === experiences.value.length;
@@ -149,13 +147,7 @@ const loadExperiences = async () => {
   loading.value = true;
 
   try {
-    const profile = await userProfileRepo.get(props.userId);
-    if (!profile) {
-      console.error('[CvExperiencePicker] User profile not found');
-      return;
-    }
-
-    experiences.value = await experienceRepo.list(profile);
+    experiences.value = await experienceRepo.list(props.userId);
 
     // Sort by start date (most recent first)
     experiences.value.sort((a, b) => {

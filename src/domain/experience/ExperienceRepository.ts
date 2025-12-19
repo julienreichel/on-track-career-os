@@ -1,5 +1,5 @@
 import { gqlOptions } from '@/data/graphql/options';
-import { loadLazyAll } from '@/data/graphql/lazy';
+import type { AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { ExperienceCreateInput, ExperienceUpdateInput, Experience } from './Experience';
 
@@ -23,20 +23,28 @@ export type AmplifyExperienceModel = {
   ) => Promise<{ data: Experience | null }>;
 };
 
+type UserProfileWithExperiences = UserProfile & {
+  experiences?: (Experience | null)[] | null;
+};
+
 export class ExperienceRepository {
   private readonly _model: AmplifyExperienceModel;
+  private readonly _userProfileModel: AmplifyUserProfileModel;
 
   /**
    * Constructor with optional dependency injection for testing
    * @param model - Optional Amplify model instance (for testing)
    */
-  constructor(model?: AmplifyExperienceModel) {
-    if (model) {
+  constructor(model?: AmplifyExperienceModel, userProfileModel?: AmplifyUserProfileModel) {
+    if (model && userProfileModel) {
       // Use injected model (for tests)
       this._model = model;
+      this._userProfileModel = userProfileModel;
     } else {
       // Use Nuxt's auto-imported useNuxtApp (for production)
-      this._model = useNuxtApp().$Amplify.GraphQL.client.models.Experience;
+      const amplify = useNuxtApp().$Amplify.GraphQL.client;
+      this._model = amplify.models.Experience;
+      this._userProfileModel = amplify.models.UserProfile;
     }
   }
 
@@ -50,17 +58,26 @@ export class ExperienceRepository {
   }
 
   /**
-   * List all experiences for a user profile using lazy loading
-   * Automatically handles pagination to fetch all experiences
-   * @param userProfile - UserProfile object with experiences relationship
-   * @returns Array of all experiences (all pages combined)
+   * List all experiences for a user using a single GraphQL query
+   * Utilizes selection sets to fetch the user profile with nested experiences.
+   * @param userId - User ID to load experiences for
+   * @returns Array of experiences (all items returned by the selection set)
    */
-  async list(userProfile: UserProfile): Promise<Experience[]> {
-    if (!userProfile?.experiences) {
+  async list(userId: string): Promise<Experience[]> {
+    if (!userId) {
       return [];
     }
-    // Load all pages automatically
-    return await loadLazyAll(userProfile.experiences);
+
+    const selectionSet = ['id', 'experiences.*'];
+
+    const { data } = await this._userProfileModel.get(
+      { id: userId },
+      gqlOptions({ selectionSet })
+    );
+
+    const profile = data as UserProfileWithExperiences | null;
+    const items = profile?.experiences ?? [];
+    return items.filter((item): item is Experience => Boolean(item));
   }
 
   async create(input: ExperienceCreateInput) {

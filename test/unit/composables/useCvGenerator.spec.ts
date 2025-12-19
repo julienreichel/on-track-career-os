@@ -134,8 +134,8 @@ describe('useCvGenerator', () => {
     };
 
     mockStoryService = {
-      getStoriesByExperience: vi.fn().mockImplementation((exp: Experience) => {
-        return Promise.resolve(mockStories.filter((s) => s.experienceId === exp.id));
+      getStoriesByExperience: vi.fn().mockImplementation((experienceId: string) => {
+        return Promise.resolve(mockStories.filter((s) => s.experienceId === experienceId));
       }),
     };
 
@@ -164,8 +164,8 @@ describe('useCvGenerator', () => {
       expect(error.value).toBeNull();
       expect(result).toBe('# John Doe\n\nSenior Software Engineer');
       expect(mockUserProfileRepo.get).toHaveBeenCalledWith('user-123');
-      expect(mockExperienceRepo.list).toHaveBeenCalledWith(mockUserProfile);
-      expect(mockStoryService.getStoriesByExperience).toHaveBeenCalledWith(mockExperiences[0]);
+      expect(mockExperienceRepo.list).toHaveBeenCalledWith('user-123');
+      expect(mockStoryService.getStoriesByExperience).toHaveBeenCalledWith('exp-1');
       expect(mockAiService.generateCv).toHaveBeenCalled();
     });
 

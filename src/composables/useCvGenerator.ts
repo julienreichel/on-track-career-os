@@ -29,23 +29,30 @@ export function useCvGenerator() {
    * Load experiences and stories for selected experience IDs
    */
   const loadExperiencesAndStories = async (
-    profile: Awaited<ReturnType<typeof userProfileRepo.get>>,
+    userId: string,
     selectedExperienceIds: string[]
-  ) => {
-    if (!profile) {
+  ): Promise<{ selectedExperiences: Experience[]; allStories: STARStory[] }> => {
+    if (!userId) {
       return { selectedExperiences: [], allStories: [] };
     }
 
-    const allExperiences = await experienceRepo.list(profile);
+    const allExperiences = await experienceRepo.list(userId);
     const selectedExperiences = allExperiences.filter((exp) =>
       selectedExperienceIds.includes(exp.id)
     );
 
-    const allStories: STARStory[] = [];
-    for (const exp of selectedExperiences) {
-      const stories = await storyService.getStoriesByExperience(exp);
-      allStories.push(...stories);
-    }
+    const storyResponses = await Promise.all(
+      selectedExperiences.map(async (exp) => {
+        try {
+          return await storyService.getStoriesByExperience(exp.id);
+        } catch (err) {
+          console.error('[useCvGenerator] Failed to load stories for experience:', exp.id, err);
+          return [];
+        }
+      })
+    );
+
+    const allStories = storyResponses.flat();
 
     return { selectedExperiences, allStories };
   };
@@ -76,7 +83,7 @@ export function useCvGenerator() {
 
       // Load selected experiences and stories
       const { selectedExperiences, allStories } = await loadExperiencesAndStories(
-        profile,
+        profile.id,
         selectedExperienceIds
       );
 

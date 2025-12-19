@@ -176,19 +176,20 @@ export function useCanvasEngine() {
       return { experiences: [], stories: [] };
     }
 
-    const userProfile = await userProfileRepo.get(profile.value.id);
-    if (!userProfile) {
-      return { experiences: [], stories: [] };
-    }
+    const experiences = await experienceRepo.list(profile.value.id);
 
-    const experiences = await experienceRepo.list(userProfile);
+    const storyResponses = await Promise.all(
+      experiences.map(async (exp) => {
+        try {
+          return await storyService.getStoriesByExperience(exp.id);
+        } catch (err) {
+          console.error('[useCanvasEngine] Error loading stories for experience:', exp.id, err);
+          return [];
+        }
+      })
+    );
 
-    // Load all stories from all experiences
-    const allStories: STARStory[] = [];
-    for (const exp of experiences) {
-      const expStories = await storyService.getStoriesByExperience(exp);
-      allStories.push(...expStories);
-    }
+    const allStories = storyResponses.flat();
 
     return { experiences, stories: allStories };
   };

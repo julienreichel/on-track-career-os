@@ -1,6 +1,5 @@
 import { gqlOptions } from '@/data/graphql/options';
-import { loadLazyAll } from '@/data/graphql/lazy';
-import type { Experience } from '@/domain/experience/Experience';
+import type { AmplifyExperienceModel } from '@/domain/experience/ExperienceRepository';
 import type { STARStoryCreateInput, STARStoryUpdateInput, STARStory } from './STARStory';
 
 export type AmplifySTARStoryModel = {
@@ -29,18 +28,22 @@ export type AmplifySTARStoryModel = {
  */
 export class STARStoryRepository {
   private readonly _model: AmplifySTARStoryModel;
+  private readonly _experienceModel: AmplifyExperienceModel;
 
   /**
    * Constructor with optional dependency injection for testing
    * @param model - Optional Amplify model instance (for testing)
    */
-  constructor(model?: AmplifySTARStoryModel) {
-    if (model) {
+  constructor(model?: AmplifySTARStoryModel, experienceModel?: AmplifyExperienceModel) {
+    if (model && experienceModel) {
       // Use injected model (for tests)
       this._model = model;
+      this._experienceModel = experienceModel;
     } else {
       // Use Nuxt's auto-imported useNuxtApp (for production)
-      this._model = useNuxtApp().$Amplify.GraphQL.client.models.STARStory;
+      const amplify = useNuxtApp().$Amplify.GraphQL.client;
+      this._model = amplify.models.STARStory;
+      this._experienceModel = amplify.models.Experience;
     }
   }
 
@@ -69,17 +72,25 @@ export class STARStoryRepository {
   }
 
   /**
-   * Get all stories for an experience using GraphQL relationship
-   * Automatically handles pagination to fetch all stories
-   * @param experience - Experience object with stories relationship
+   * Get all stories for an experience using a single GraphQL query
+   * Fetches the experience along with its nested stories via selection set.
+   * @param experienceId - Experience ID to load stories for
    * @returns Array of all stories for that experience (all pages combined)
    */
-  async getStoriesByExperience(experience: Experience): Promise<STARStory[]> {
-    if (!experience?.stories) {
+  async getStoriesByExperience(experienceId: string): Promise<STARStory[]> {
+    if (!experienceId) {
       return [];
     }
-    // Load all pages automatically
-    return await loadLazyAll(experience.stories);
+
+    const selectionSet = ['id', 'stories.*'];
+
+    const { data } = await this._experienceModel.get(
+      { id: experienceId },
+      gqlOptions({ selectionSet })
+    );
+
+    const stories = data?.stories ?? [];
+    return stories.filter((story): story is STARStory => Boolean(story));
   }
 
   /**

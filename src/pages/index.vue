@@ -39,7 +39,6 @@
 import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
 import { useAuthUser } from '@/composables/useAuthUser';
 
 // Home page - requires authentication
@@ -47,7 +46,6 @@ const { t } = useI18n();
 const { userId } = useAuthUser();
 
 const showCvUpload = ref(false);
-const userProfileRepo = new UserProfileRepository();
 const experienceRepo = new ExperienceRepository();
 
 // Check if user has any experiences when userId is available
@@ -55,12 +53,7 @@ watch(userId, async (newUserId) => {
   if (!newUserId) return;
 
   try {
-    const userProfile = await userProfileRepo.get(newUserId);
-    if (!userProfile) {
-      showCvUpload.value = true;
-      return;
-    }
-    const experiences = await experienceRepo.list(userProfile);
+    const experiences = await experienceRepo.list(newUserId);
     // Show CV upload only if user has no experiences
     showCvUpload.value = !experiences || experiences.length === 0;
   } catch (error) {

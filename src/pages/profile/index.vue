@@ -32,7 +32,11 @@
             icon="i-heroicons-user-circle"
             to="/profile/full"
             :links="[
-              { label: t('profile.summary.editFromSummary'), icon: 'i-heroicons-pencil-square', to: '/profile/full?mode=edit' },
+              {
+                label: t('profile.summary.editFromSummary'),
+                icon: 'i-heroicons-pencil-square',
+                to: '/profile/full?mode=edit',
+              },
             ]"
           />
 
@@ -90,7 +94,6 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useUserProfile } from '@/application/user-profile/useUserProfile';
-import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
@@ -107,7 +110,6 @@ const photoPreviewUrl = ref<string | null>(null);
 const showCvUpload = ref(false);
 
 const profilePhotoService = new ProfilePhotoService();
-const userProfileRepo = new UserProfileRepository();
 const experienceRepo = new ExperienceRepository();
 
 const goToFullProfile = (mode?: 'edit') => {
@@ -163,13 +165,8 @@ watch(
     }
 
     try {
-      const userProfile = await userProfileRepo.get(newUserId);
-      if (!userProfile) {
-        showCvUpload.value = true;
-        return;
-      }
-      const experiences = await experienceRepo.list(userProfile);
-      showCvUpload.value = !experiences || experiences.length === 0;
+      const experiences = await experienceRepo.list(newUserId);
+      showCvUpload.value = experiences.length === 0;
     } catch (err) {
       console.error('[profile-summary] Experience check failed:', err);
       showCvUpload.value = true;

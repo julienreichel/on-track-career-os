@@ -1,7 +1,6 @@
 import { ref, computed } from 'vue';
 import type { Ref } from 'vue';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
-import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { STARStory } from '@/domain/starstory/STARStory';
 import type { STARStory as AiSTARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
@@ -46,7 +45,6 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
   const error = ref<string | null>(null);
 
   const service = new STARStoryService();
-  const experienceRepo = new ExperienceRepository();
 
   // Computed
   const hasStories = computed(() => stories.value.length > 0);
@@ -74,16 +72,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
     error.value = null;
 
     try {
-      const experience = await experienceRepo.get(targetId);
-      if (!experience) {
-        error.value = 'Experience not found';
-        stories.value = [];
-        loading.value = false;
-        return;
-      }
-
-      // Delegate to loadStoriesForExperience to avoid code duplication
-      await loadStoriesForExperience(experience);
+      stories.value = await service.getStoriesByExperience(targetId);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load stories';
       console.error('[useStoryEngine] Error:', err);
@@ -102,7 +91,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
     error.value = null;
 
     try {
-      stories.value = await service.getStoriesByExperience(experience);
+      stories.value = await service.getStoriesByExperience(experience.id);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load stories';
       console.error('[useStoryEngine] Error:', err);

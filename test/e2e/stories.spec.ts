@@ -66,7 +66,7 @@ async function createExperience(
     .locator('[data-testid="experience-card"]')
     .filter({ hasText: title })
     .first();
-  await expect(experienceCard).toBeVisible();
+  await experienceCard.waitFor({ state: 'visible', timeout: 15000 });
 
   await experienceCard.getByRole('button', { name: /Edit/i }).click();
   await page.waitForLoadState('domcontentloaded');

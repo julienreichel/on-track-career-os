@@ -3,7 +3,6 @@ import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { Experience } from '@/domain/experience/Experience';
 import { useAuthUser } from '@/composables/useAuthUser';
@@ -12,7 +11,6 @@ import type { PageHeaderLink } from '@/types/ui';
 const { t } = useI18n();
 const router = useRouter();
 const { userId } = useAuthUser();
-const userProfileRepo = new UserProfileRepository();
 const experienceRepo = new ExperienceRepository();
 const storyService = new STARStoryService();
 
@@ -56,12 +54,7 @@ async function loadExperiences() {
   errorMessage.value = null;
 
   try {
-    const userProfile = await userProfileRepo.get(userId.value);
-    if (!userProfile) {
-      experiences.value = [];
-      return;
-    }
-    const result = await experienceRepo.list(userProfile);
+    const result = await experienceRepo.list(userId.value);
     experiences.value = result || [];
     await loadStoryCounts();
   } catch (error) {
@@ -73,18 +66,22 @@ async function loadExperiences() {
 }
 
 async function loadStoryCounts() {
-  // Load story counts for all experiences
-  // Note: Passing Experience objects directly to avoid refetching
-  storyCounts.value = {};
-  for (const experience of experiences.value) {
-    try {
-      const stories = await storyService.getStoriesByExperience(experience);
-      storyCounts.value[experience.id] = stories.length;
-    } catch (error) {
-      console.error(`[experiences] Error loading stories for ${experience.id}:`, error);
-      storyCounts.value[experience.id] = 0;
-    }
-  }
+  const counts = await Promise.all(
+    experiences.value.map(async (experience) => {
+      try {
+        const stories = await storyService.getStoriesByExperience(experience.id);
+        return { id: experience.id, count: stories.length };
+      } catch (error) {
+        console.error(`[experiences] Error loading stories for ${experience.id}:`, error);
+        return { id: experience.id, count: 0 };
+      }
+    })
+  );
+
+  storyCounts.value = counts.reduce<Record<string, number>>((acc, { id, count }) => {
+    acc[id] = count;
+    return acc;
+  }, {});
 }
 
 function handleEdit(id: string) {
