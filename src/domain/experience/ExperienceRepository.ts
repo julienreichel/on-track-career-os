@@ -70,13 +70,10 @@ export class ExperienceRepository {
 
     const selectionSet = ['id', 'experiences.*'];
 
-    const { data } = await this._userProfileModel.get(
-      { id: userId },
-      gqlOptions({ selectionSet })
-    );
+    const { data } = await this._userProfileModel.get({ id: userId }, gqlOptions({ selectionSet }));
 
     const profile = data as UserProfileWithExperiences | null;
-    const items = profile?.experiences ?? [];
+    const items = (profile?.experiences ?? []) as Experience[];
     return items.filter((item): item is Experience => Boolean(item));
   }
 

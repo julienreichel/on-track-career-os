@@ -89,7 +89,7 @@ export class STARStoryRepository {
       gqlOptions({ selectionSet })
     );
 
-    const stories = data?.stories ?? [];
+    const stories = (data?.stories ?? []) as STARStory[];
     return stories.filter((story): story is STARStory => Boolean(story));
   }
 
