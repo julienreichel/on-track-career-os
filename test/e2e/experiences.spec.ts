@@ -36,18 +36,16 @@ test.describe('Experience Management', () => {
       await expect(body).toBeVisible();
     });
 
-    test('should display experience cards or table if experiences exist', async ({ page }) => {
+    test('should display experience cards or empty state', async ({ page }) => {
       // Wait for any data to load
       await page.waitForTimeout(1500);
 
-      // Check for experience table (UTable component) OR empty state text
-      const hasTable = (await page.locator('table').count()) > 0;
-      const hasTableRows = (await page.locator('table tbody tr').count()) > 0;
+      const cardCount = await page.locator('[data-testid="experience-card"]').count();
       const hasEmpty =
         (await page.locator('text=/no experiences yet|upload.*cv|add.*manually/i').count()) > 0;
 
-      // Should have either table with rows OR empty state
-      expect(hasTable || hasTableRows || hasEmpty).toBe(true);
+      // Should have either cards or empty state
+      expect(cardCount > 0 || hasEmpty).toBe(true);
     });
 
     test('should have back to profile navigation', async ({ page }) => {
@@ -241,13 +239,15 @@ test.describe('Experience Management', () => {
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(2000);
 
-      // Check if there are any experience rows in the table
-      const tableRows = page.locator('table tbody tr');
-      await expect(tableRows.first()).toBeVisible();
+      // Locate the newly created experience card
+      const experienceCard = page
+        .locator('[data-testid="experience-card"]')
+        .filter({ hasText: jobTitle })
+        .first();
+      await expect(experienceCard).toBeVisible();
 
-      // Click the first "View Stories" button (document-text icon)
-      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
-      await viewStoriesButton.click();
+      // Click the "View Stories" button inside the card
+      await experienceCard.getByRole('button', { name: /View Stories/i }).click();
 
       // Should navigate to stories page for that experience
       await page.waitForLoadState('networkidle');

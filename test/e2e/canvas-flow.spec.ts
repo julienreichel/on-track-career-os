@@ -61,14 +61,14 @@ async function createExperience(
   await page.goto('/profile/experiences');
   await expect(page).toHaveURL(/\/profile\/experiences/);
   await expect(page.locator('h1', { hasText: 'Experiences' })).toBeVisible();
-  await expect(page.getByRole('row').nth(1)).toBeVisible();
 
-  // Find the row containing the experience title and click the edit button
-  const experienceRow = page
-    .getByRole('row')
-    .filter({ has: page.getByRole('cell', { name: title, exact: true }) });
+  const experienceCard = page
+    .locator('[data-testid="experience-card"]')
+    .filter({ hasText: title })
+    .first();
+  await expect(experienceCard).toBeVisible();
 
-  await experienceRow.getByLabel('Edit').click();
+  await experienceCard.getByRole('button', { name: /Edit/i }).click();
   await page.waitForLoadState('domcontentloaded');
 
   await expect(page).toHaveURL(/\/profile\/experiences\/[a-f0-9-]+$/);

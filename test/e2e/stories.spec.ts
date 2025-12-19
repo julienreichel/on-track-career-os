@@ -61,16 +61,15 @@ async function createExperience(
   await expect(page).toHaveURL(/\/profile\/experiences/);
   await expect(page.locator('h1', { hasText: 'Experiences' })).toBeVisible();
 
-  // Wait until the table actually has at least one row
-  await expect(page.getByRole('row').nth(1)).toBeVisible();
+  // Wait until the experience cards render and locate the one with our title
+  const experienceCard = page
+    .locator('[data-testid="experience-card"]')
+    .filter({ hasText: title })
+    .first();
+  await expect(experienceCard).toBeVisible();
 
-  // Find the row containing the experience title and click the edit button
-  const experienceRow = page
-    .getByRole('row')
-    .filter({ has: page.getByRole('cell', { name: title, exact: true }) });
-
-  await experienceRow.getByLabel('Edit').click();
-  await page.waitForLoadState('domcontentloaded'); // or drop completely if not needed
+  await experienceCard.getByRole('button', { name: /Edit/i }).click();
+  await page.waitForLoadState('domcontentloaded');
 
   await expect(page).toHaveURL(/\/profile\/experiences\/[a-f0-9-]+$/);
 
@@ -204,7 +203,7 @@ test.describe('Story Management', () => {
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1500);
 
-      const hasExperiences = (await page.locator('table tbody tr').count()) > 0;
+      const hasExperiences = (await page.locator('[data-testid="experience-card"]').count()) > 0;
 
       // Create experience if none exist
       if (!hasExperiences) {
@@ -220,7 +219,7 @@ test.describe('Story Management', () => {
 
     test('should display stories for specific experience', async ({ page }) => {
       // Find view stories button and click it
-      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      const viewStoriesButton = page.getByRole('button', { name: /View Stories/i }).first();
       await viewStoriesButton.click();
       await page.waitForLoadState('networkidle');
 
@@ -233,7 +232,7 @@ test.describe('Story Management', () => {
     });
 
     test('should have "New Story" button on experience stories page', async ({ page }) => {
-      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      const viewStoriesButton = page.getByRole('button', { name: /View Stories/i }).first();
       await viewStoriesButton.click();
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
@@ -247,7 +246,7 @@ test.describe('Story Management', () => {
     });
 
     test('should have auto-generate button on experience stories page', async ({ page }) => {
-      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      const viewStoriesButton = page.getByRole('button', { name: /View Stories/i }).first();
       await viewStoriesButton.click();
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(500);
@@ -263,7 +262,7 @@ test.describe('Story Management', () => {
     });
 
     test('should not display company names for experience-specific stories', async ({ page }) => {
-      const viewStoriesButton = page.locator('button[aria-label*="stories" i]').first();
+      const viewStoriesButton = page.getByRole('button', { name: /View Stories/i }).first();
       await viewStoriesButton.click();
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(1000);

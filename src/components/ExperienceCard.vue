@@ -1,0 +1,143 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import type { Experience } from '@/domain/experience/Experience';
+
+const props = defineProps<{
+  experience: Experience;
+  storyCount?: number;
+}>();
+
+const emit = defineEmits<{
+  viewStories: [experienceId: string];
+  edit: [experienceId: string];
+  delete: [experienceId: string];
+}>();
+
+const { t } = useI18n();
+const descriptionMaxLength = 180;
+
+const title = computed(() => props.experience.title || t('experiences.card.noTitle'));
+
+const subtitle = computed(() => props.experience.companyName || t('experiences.card.noCompany'));
+
+const dateRange = computed(() => {
+  const start = formatDate(props.experience.startDate);
+  const end = formatDate(props.experience.endDate);
+  return `${start} · ${end}`;
+});
+
+const description = computed(() => {
+  const summary =
+    getTextContent(props.experience.summary) ||
+    getTextContent(props.experience.responsibilities) ||
+    getTextContent(props.experience.tasks);
+
+  if (!summary) {
+    return t('experiences.card.noSummary');
+  }
+
+  const trimmed = summary.trim();
+  return trimmed.length > descriptionMaxLength
+    ? `${trimmed.slice(0, descriptionMaxLength)}…`
+    : trimmed;
+});
+
+const statusBadge = computed(() => {
+  const status = props.experience.status || 'draft';
+  return {
+    color: status === 'complete' ? 'success' : 'neutral',
+    label:
+      status === 'complete'
+        ? t('experiences.status.complete')
+        : t('experiences.status.draft'),
+  };
+});
+
+const hasStories = computed(() => (props.storyCount ?? 0) > 0);
+
+function formatDate(dateString: string | null | undefined): string {
+  if (!dateString) {
+    return t('experiences.present');
+  }
+
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return dateString;
+  }
+
+  return date.toLocaleDateString();
+}
+
+function handleViewStories() {
+  emit('viewStories', props.experience.id);
+}
+
+function handleEdit() {
+  emit('edit', props.experience.id);
+}
+
+function handleDelete() {
+  emit('delete', props.experience.id);
+}
+
+function getTextContent(input: string | string[] | null | undefined) {
+  if (!input) {
+    return '';
+  }
+
+  if (Array.isArray(input)) {
+    return input.filter(Boolean).join('. ');
+  }
+
+  return input;
+}
+</script>
+
+<template>
+  <div data-testid="experience-card">
+    <ItemCard :title="title" :subtitle="subtitle" @edit="handleEdit" @delete="handleDelete">
+      <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
+        <div class="font-medium text-gray-900 dark:text-gray-100">
+          {{ dateRange }}
+        </div>
+        <p class="line-clamp-4">
+          {{ description }}
+        </p>
+      </div>
+
+      <template #badges>
+        <UBadge color="primary" variant="subtle" size="xs">
+          <UIcon name="i-heroicons-briefcase" class="w-3 h-3 mr-1" />
+          {{ t(`experiences.types.${experience.experienceType || 'work'}`) }}
+        </UBadge>
+        <UBadge v-if="hasStories" color="primary" variant="subtle" size="xs">
+          <UIcon name="i-heroicons-document-text" class="w-3 h-3 mr-1" />
+          {{ storyCount }}
+        </UBadge>
+        <UBadge color="neutral" variant="soft" size="xs">
+          {{ statusBadge.label }}
+        </UBadge>
+      </template>
+
+      <template #actions>
+        <UButton
+          :label="t('experiences.list.viewStories')"
+          icon="i-heroicons-document-text"
+          size="xs"
+          color="neutral"
+          variant="soft"
+          @click.stop="handleViewStories"
+        />
+        <UButton
+          :label="t('common.edit')"
+          icon="i-heroicons-pencil"
+          size="xs"
+          color="primary"
+          variant="soft"
+          @click.stop="handleEdit"
+        />
+      </template>
+    </ItemCard>
+  </div>
+</template>

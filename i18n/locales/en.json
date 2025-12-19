@@ -119,6 +119,11 @@
       "viewStories": "View Stories",
       "newStory": "New Story"
     },
+    "card": {
+      "noTitle": "Untitled experience",
+      "noCompany": "Company not specified",
+      "noSummary": "Add responsibilities or a summary to describe this experience."
+    },
     "table": {
       "title": "Title",
       "company": "Company",

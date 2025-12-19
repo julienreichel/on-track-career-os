@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { ref, watch, computed, h, resolveComponent } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import type { TableColumn } from '@nuxt/ui';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { Experience } from '@/domain/experience/Experience';
 import { useAuthUser } from '@/composables/useAuthUser';
-
-const UButton = resolveComponent('UButton');
-const UBadge = resolveComponent('UBadge');
+import type { PageHeaderLink } from '@/types/ui';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -26,98 +23,16 @@ const errorMessage = ref<string | null>(null);
 const showDeleteModal = ref(false);
 const experienceToDelete = ref<string | null>(null);
 
-function formatDate(dateString: string | null | undefined): string {
-  if (!dateString) return t('experiences.present');
-  try {
-    return new Date(dateString).toLocaleDateString();
-  } catch {
-    return dateString;
-  }
-}
-
-function getStatusBadge(status: string | null | undefined) {
-  const statusValue = status || 'draft';
-  return {
-    draft: { color: 'neutral' as const, label: t('experiences.status.draft') },
-    complete: { color: 'success' as const, label: t('experiences.status.complete') },
-  }[statusValue];
-}
-
-// Table columns configuration using TanStack Table API
-const columns = computed<TableColumn<Experience>[]>(() => [
+const headerLinks = computed<PageHeaderLink[]>(() => [
   {
-    accessorKey: 'title',
-    header: t('experiences.table.title'),
+    label: t('cvUpload.title'),
+    icon: 'i-heroicons-arrow-up-tray',
+    to: '/profile/cv-upload',
   },
   {
-    accessorKey: 'companyName',
-    header: t('experiences.table.company'),
-  },
-  {
-    accessorKey: 'startDate',
-    header: t('experiences.table.startDate'),
-    cell: ({ row }) => formatDate(row.original.startDate),
-  },
-  {
-    accessorKey: 'endDate',
-    header: t('experiences.table.endDate'),
-    cell: ({ row }) => formatDate(row.original.endDate),
-  },
-  {
-    accessorKey: 'status',
-    header: t('experiences.table.status'),
-    cell: ({ row }) => {
-      const badge = getStatusBadge(row.original.status);
-      return h(UBadge, {
-        color: badge?.color,
-        label: badge?.label,
-        size: 'xs',
-      });
-    },
-  },
-  {
-    id: 'stories',
-    header: t('experiences.table.stories'),
-    cell: ({ row }) => {
-      const count = storyCounts.value?.[row.original.id] ?? 0;
-      return h(UBadge, {
-        color: count > 0 ? 'primary' : 'neutral',
-        label: `${count}`,
-        size: 'xs',
-      });
-    },
-  },
-  {
-    id: 'actions',
-    header: t('experiences.table.actions'),
-    cell: ({ row }) => {
-      return h('div', { class: 'flex gap-2' }, [
-        h(UButton, {
-          icon: 'i-heroicons-document-text',
-          size: 'xs',
-          color: 'primary',
-          variant: 'ghost',
-          'aria-label': t('experiences.list.viewStories'),
-          onClick: () => handleViewStories(row.original.id),
-        }),
-        h(UButton, {
-          icon: 'i-heroicons-pencil',
-          size: 'xs',
-          color: 'neutral',
-          variant: 'ghost',
-          'aria-label': t('experiences.list.edit'),
-          onClick: () => handleEdit(row.original.id),
-        }),
-        h(UButton, {
-          icon: 'i-heroicons-trash',
-          size: 'xs',
-          color: 'error',
-          variant: 'ghost',
-          'aria-label': t('experiences.list.delete'),
-          onClick: () => handleDelete(row.original.id),
-        }),
-      ]);
-    },
+    label: t('experiences.list.addNew'),
+    icon: 'i-heroicons-plus',
+    onClick: handleNewExperience,
   },
 ]);
 
@@ -127,7 +42,6 @@ watch(
   async (newUserId) => {
     if (newUserId) {
       await loadExperiences();
-      await loadStoryCounts();
     }
   },
   { immediate: true }
@@ -149,6 +63,7 @@ async function loadExperiences() {
     }
     const result = await experienceRepo.list(userProfile);
     experiences.value = result || [];
+    await loadStoryCounts();
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : 'Failed to load experiences';
     console.error('[experiences] Error loading experiences:', error);
@@ -160,6 +75,7 @@ async function loadExperiences() {
 async function loadStoryCounts() {
   // Load story counts for all experiences
   // Note: Passing Experience objects directly to avoid refetching
+  storyCounts.value = {};
   for (const experience of experiences.value) {
     try {
       const stories = await storyService.getStoriesByExperience(experience);
@@ -194,6 +110,7 @@ async function confirmDelete() {
   try {
     await experienceRepo.delete(experienceToDelete.value);
     experiences.value = experiences.value.filter((exp) => exp.id !== experienceToDelete.value);
+    await loadStoryCounts();
     showDeleteModal.value = false;
     experienceToDelete.value = null;
   } catch (error) {
@@ -218,18 +135,7 @@ function handleViewStories(id: string) {
       <UPageHeader
         :title="t('features.experiences.title')"
         :description="t('features.experiences.description')"
-        :links="[
-          {
-            label: t('cvUpload.title'),
-            icon: 'i-heroicons-arrow-up-tray',
-            to: '/profile/cv-upload',
-          },
-          {
-            label: t('experiences.list.addNew'),
-            icon: 'i-heroicons-plus',
-            onClick: handleNewExperience,
-          },
-        ]"
+        :links="headerLinks"
       />
 
       <UPageBody>
@@ -263,8 +169,18 @@ function handleViewStories(id: string) {
           </UEmpty>
         </UCard>
 
-        <!-- Experience Table -->
-        <UTable v-else :columns="columns" :data="experiences" :loading="loading" />
+        <!-- Experience Cards -->
+        <UPageGrid v-else>
+          <ExperienceCard
+            v-for="experience in experiences"
+            :key="experience.id"
+            :experience="experience"
+            :story-count="storyCounts[experience.id] ?? 0"
+            @view-stories="handleViewStories"
+            @edit="handleEdit"
+            @delete="handleDelete"
+          />
+        </UPageGrid>
       </UPageBody>
     </UPage>
 
