@@ -731,6 +731,9 @@ PERSONAL CANVAS:
 EXPERIENCE SUMMARY:
 {{experiences}}
 
+## TARGET JOB DESCRIPTION (if provided)
+{{jobDescription}}
+
 Return JSON with:
 - elevatorPitch (80 words max)
 - careerStory (160 words max)
@@ -744,7 +747,8 @@ Return JSON with:
   "profile": {},
   "experiences": [],
   "stories": [],
-  "canvas": {}
+  "canvas": {},
+  "jobDescription?": "string"
 }
 ```
 
