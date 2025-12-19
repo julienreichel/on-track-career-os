@@ -54,8 +54,10 @@ watch(
       task.value = newStory.task || '';
       action.value = newStory.action || '';
       result.value = newStory.result || '';
-      achievements.value = newStory.achievements || [];
-      kpiSuggestions.value = newStory.kpiSuggestions || [];
+      achievements.value =
+        newStory.achievements?.filter((entry): entry is string => typeof entry === 'string') || [];
+      kpiSuggestions.value =
+        newStory.kpiSuggestions?.filter((entry): entry is string => typeof entry === 'string') || [];
     }
   },
   { immediate: true }
