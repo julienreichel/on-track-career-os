@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { Experience, ExperienceCreateInput } from '@/domain/experience/Experience';
 
@@ -105,6 +105,13 @@ function handleSubmit() {
 function handleCancel() {
   emit('cancel');
 }
+
+const experienceTypeValue = computed<string>({
+  get: () => form.value.experienceType ?? 'work',
+  set: (value) => {
+    form.value.experienceType = value as ExperienceCreateInput['experienceType'];
+  },
+});
 </script>
 
 <template>
@@ -137,7 +144,7 @@ function handleCancel() {
       <!-- Experience Type -->
       <UFormField :label="t('experiences.form.type')">
         <USelect
-          v-model="form.experienceType"
+          v-model="experienceTypeValue"
           :items="[
             { value: 'work', label: t('experiences.types.work') },
             { value: 'education', label: t('experiences.types.education') },
