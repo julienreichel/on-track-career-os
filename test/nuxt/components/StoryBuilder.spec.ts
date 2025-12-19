@@ -95,7 +95,7 @@ describe('StoryBuilder', () => {
   });
 
   it('populates fields in edit mode', async () => {
-    const story: STARStory = {
+    const story = {
       id: 'story-1',
       situation: 'Test situation',
       task: 'Test task',
@@ -107,7 +107,7 @@ describe('StoryBuilder', () => {
       owner: 'user-1',
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
-    };
+    } as STARStory;
 
     const wrapper = mount(StoryBuilder, {
       global: {
@@ -406,7 +406,7 @@ describe('StoryBuilder', () => {
   });
 
   it('handles empty achievements array', async () => {
-    const story: STARStory = {
+    const story = {
       id: 'story-1',
       situation: 'Test',
       task: 'Test',
@@ -418,7 +418,7 @@ describe('StoryBuilder', () => {
       owner: 'user-1',
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
-    };
+    } as STARStory;
 
     const wrapper = mount(StoryBuilder, {
       global: {

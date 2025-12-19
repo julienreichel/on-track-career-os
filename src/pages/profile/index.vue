@@ -94,6 +94,7 @@ import { UserProfileRepository } from '@/domain/user-profile/UserProfileReposito
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
+import type { PageHeaderLink } from '@/types/ui';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -116,7 +117,7 @@ const goToFullProfile = (mode?: 'edit') => {
   });
 };
 
-const headerLinks = computed(() => [
+const headerLinks = computed<PageHeaderLink[]>(() => [
   {
     label: t('navigation.backToHome'),
     icon: 'i-heroicons-arrow-left',

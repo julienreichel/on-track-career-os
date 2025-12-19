@@ -71,6 +71,7 @@ import { isValidEmail, isValidPhone } from '@/domain/user-profile/contactValidat
 import type { UserProfile, UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 import type { ProfileForm } from '@/components/profile/types';
+import type { PageHeaderLink } from '@/types/ui';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -398,25 +399,8 @@ const handleSubmit = async () => {
   }
 };
 
-type HeaderLink = {
-  label: string;
-  icon?: string;
-  to?: string;
-  color?:
-    | 'error'
-    | 'primary'
-    | 'secondary'
-    | 'success'
-    | 'info'
-    | 'warning'
-    | 'neutral'
-    | undefined;
-  onClick?: () => void;
-  ariaLabel?: string;
-};
-
-const headerLinks = computed<HeaderLink[]>(() => {
-  const links: HeaderLink[] = [
+const headerLinks = computed<PageHeaderLink[]>(() => {
+  const links: PageHeaderLink[] = [
     {
       label: t('profile.links.backToSummary'),
       icon: 'i-heroicons-user',

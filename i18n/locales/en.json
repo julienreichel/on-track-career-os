@@ -359,8 +359,6 @@
       "kpisHint": "Press Enter to add each KPI",
       "kpisPlaceholder": "Add KPI",
       "loading": "Loading story...",
-      "generating": "Generating with AI...",
-      "saving": "Saving story...",
       "notFound": "Story Not Found",
       "notFoundDescription": "The story you're looking for doesn't exist or has been deleted."
     }

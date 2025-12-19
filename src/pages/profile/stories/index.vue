@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStoryList } from '@/composables/useStoryList';
 import type { STARStory } from '@/domain/starstory/STARStory';
+import type { PageHeaderLink } from '@/types/ui';
 
 definePageMeta({
   breadcrumbLabel: 'All Stories',
@@ -54,7 +55,7 @@ const handleBackToProfile = () => {
 };
 
 // Page header links
-const headerLinks = computed(() => [
+const headerLinks = computed<PageHeaderLink[]>(() => [
   {
     label: t('common.backToProfile'),
     icon: 'i-heroicons-arrow-left',
@@ -92,7 +93,7 @@ onMounted(async () => {
       <!-- Error Alert -->
       <UAlert
         v-if="error"
-        color="red"
+        color="error"
         icon="i-heroicons-exclamation-triangle"
         :title="t('common.error')"
         :description="error"
