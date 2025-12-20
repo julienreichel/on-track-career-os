@@ -126,7 +126,9 @@ async function createManualStory(
       return false;
     }
 
-    // Step 2: Fill all 4 STAR fields (required to enable Save button)
+    // Step 2: Fill required Story Title and STAR fields (required to enable Save button)
+    const storyTitle = `E2E Manual Story ${Date.now()}`;
+    await page.getByLabel(/Story Title/i).fill(storyTitle);
     // Parse content or use default values for STAR sections
     await page.getByLabel(/Situation/i).fill('System outages affecting production.');
     await page.getByLabel(/Task/i).fill('Implement monitoring and alerting solution.');
@@ -389,7 +391,8 @@ test.describe('Story Management', () => {
       await page.getByRole('heading', { name: /Manual Entry/i }).click();
       await page.waitForTimeout(300);
 
-      // Step 2 — Fill all required STAR fields
+      // Step 2 — Fill Story Title and all required STAR fields
+      await page.getByLabel(/Story Title/i).fill(`E2E Manual Story ${Date.now()}`);
       await page.getByLabel(/Situation/i).fill('System outages affecting production.');
       await page.getByLabel(/Task/i).fill('Implement monitoring solution.');
       await page.getByLabel(/Action/i).fill('Deployed comprehensive observability stack.');

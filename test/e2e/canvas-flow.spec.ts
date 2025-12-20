@@ -118,7 +118,9 @@ async function createManualStory(
       return false;
     }
 
-    // Step 2: Fill all 4 STAR fields (required to enable Save button)
+    // Step 2: Fill Story Title and all STAR fields (required to enable Save button)
+    const storyTitle = `E2E Canvas Story ${Date.now()}`;
+    await page.getByLabel(/Story Title/i).fill(storyTitle);
     await page.getByLabel(/Situation/i).fill('System performance degradation affecting users.');
     await page.getByLabel(/Task/i).fill('Improve system reliability and reduce response time.');
     await page
