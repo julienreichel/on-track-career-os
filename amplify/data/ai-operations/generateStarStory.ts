@@ -56,6 +56,14 @@ export interface GenerateStarStoryOutput {
   result: string;
 }
 
+const CODE_FENCE_LENGTH = 3;
+const MIN_TITLE_SENTENCE_LENGTH = 10;
+const MAX_TITLE_LENGTH = 80;
+const TITLE_TRUNCATION_LENGTH = 77;
+const TITLE_ELLIPSIS = '…';
+const INLINE_TITLE_REGEX =
+  /^##\s+(?!title:)(?!situation:)(?!task:)(?!action:)(?!result:)([^\n#]+)$/gim;
+
 export interface GenerateStarStoryInput {
   sourceText: string;
 }
@@ -72,7 +80,7 @@ function cleanSectionText(value: string): string {
 
   // Remove surrounding markdown fences/backticks/brackets/quotes if AI wrapped the content
   if (cleaned.startsWith('```') && cleaned.endsWith('```')) {
-    cleaned = cleaned.slice(3, -3).trim();
+    cleaned = cleaned.slice(CODE_FENCE_LENGTH, -CODE_FENCE_LENGTH).trim();
   }
 
   if (cleaned.startsWith('[') && cleaned.endsWith(']')) {
@@ -98,6 +106,10 @@ function extractSection(text: string, startMarker: string, endMarker?: string): 
   return cleanSectionText(match?.[1] ?? '');
 }
 
+function normalizeInlineTitleHeadings(input: string): string {
+  return input.replace(INLINE_TITLE_REGEX, (_, heading: string) => `## title: ${heading.trim()}`);
+}
+
 /**
  * Parse AI text response into structured STAR stories
  */
@@ -119,15 +131,18 @@ function inferTitleFromStory(story: GenerateStarStoryOutput): string {
     getFirstSentence(story.situation),
   ].filter((candidate) => candidate.length > 0);
 
-  const preferred = candidates.find((candidate) => candidate.length >= 10);
+  const preferred = candidates.find((candidate) => candidate.length >= MIN_TITLE_SENTENCE_LENGTH);
   const fallback = preferred || candidates[0] || 'Untitled STAR story';
 
-  return fallback.length > 80 ? `${fallback.slice(0, 77)}…` : fallback;
+  return fallback.length > MAX_TITLE_LENGTH
+    ? `${fallback.slice(0, TITLE_TRUNCATION_LENGTH)}${TITLE_ELLIPSIS}`
+    : fallback;
 }
 
 function parseStarStoriesFromText(aiText: string): GenerateStarStoryOutput[] {
+  const normalizedText = normalizeInlineTitleHeadings(aiText);
   const stories: GenerateStarStoryOutput[] = [];
-  const trimmedText = aiText.trim();
+  const trimmedText = normalizedText.trim();
   const hasTitleMarkers = /##\s*title:/i.test(trimmedText);
   const blockPattern = hasTitleMarkers ? /(?=##\s*title:)/i : /(?=##\s*situation:)/i;
 

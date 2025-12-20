@@ -207,6 +207,63 @@ Increased user engagement`;
       expect(story.result).toBeTruthy();
     });
 
+    it('should support inline heading titles without explicit markers', async () => {
+      const inlineHeadingResponse = `## Registration System Redesign Success
+**Boosted Enterprise Adoption**
+
+## situation:
+I was tasked with revamping our Registration System to improve its adoption rate and to secure more enterprise contracts.
+
+## task:
+I needed to redesign the Registration System to significantly increase its adoption rate and attract more enterprise clients.
+
+## action:
+I led the redesign focusing on user experience and collaborated closely with Product and Design.
+
+## result:
+I increased adoption from 5% to 60%, securing over $1M in enterprise contracts.
+
+---
+
+## Support Incident Volume Reduction
+**Streamlined Support Processes**
+
+## situation:
+I faced a challenge of high support incident volume, impacting customer satisfaction.
+
+## task:
+I had to reduce the incident volume by improving processes and the platform.
+
+## action:
+I streamlined workflows with QA and Operations and introduced a new incident platform.
+
+## result:
+I reduced incident volume by 40%, improving productivity and satisfaction.`;
+
+      mockSend.mockResolvedValueOnce({
+        body: Buffer.from(
+          JSON.stringify({
+            output: {
+              message: {
+                content: [{ text: inlineHeadingResponse }],
+              },
+            },
+          })
+        ),
+      });
+
+      const result = await handler({
+        arguments: { sourceText: mockExperienceText },
+      });
+
+      const parsed = JSON.parse(result);
+      expect(parsed).toHaveLength(2);
+      expect(parsed[0].title).toBe('Registration System Redesign Success');
+      expect(parsed[1].title).toBe('Support Incident Volume Reduction');
+      expect(parsed[0].situation).toContain('revamping our Registration System');
+      expect(parsed[1].result).toContain('reduced incident volume by 40%');
+    });
+
     it('should handle all fields as empty strings with fallbacks', async () => {
       const emptyText = `## title:
 
