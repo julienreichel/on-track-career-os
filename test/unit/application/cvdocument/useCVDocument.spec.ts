@@ -42,7 +42,7 @@ describe('useCVDocument', () => {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       owner: 'user-123::user-123',
-    } as CVDocument;
+    } as unknown as CVDocument;
 
     mockService.getFullCVDocument.mockResolvedValue(mockCVDocument);
 
@@ -94,13 +94,13 @@ describe('useCVDocument', () => {
     withMockedConsoleError(async () => {
       mockService.getFullCVDocument.mockRejectedValue(new Error('Service failed'));
 
-    const { item, loading, error, load } = useCVDocument('cvdocument-123');
+      const { item, loading, error, load } = useCVDocument('cvdocument-123');
 
-    await load();
+      await load();
 
-    expect(loading.value).toBe(false);
-    expect(error.value).toBe('Service failed');
-    expect(item.value).toBeNull();
+      expect(loading.value).toBe(false);
+      expect(error.value).toBe('Service failed');
+      expect(item.value).toBeNull();
     })
   );
 
@@ -109,13 +109,13 @@ describe('useCVDocument', () => {
     withMockedConsoleError(async () => {
       mockService.getFullCVDocument.mockRejectedValue(new Error('Network error'));
 
-    const { loading, error, item, load } = useCVDocument('cvdocument-123');
+      const { loading, error, item, load } = useCVDocument('cvdocument-123');
 
-    await load();
+      await load();
 
-    expect(loading.value).toBe(false);
-    expect(error.value).toBe('Network error');
-    expect(item.value).toBeNull();
+      expect(loading.value).toBe(false);
+      expect(error.value).toBe('Network error');
+      expect(item.value).toBeNull();
     })
   );
 
@@ -206,7 +206,7 @@ describe('useCVDocument', () => {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-15T00:00:00Z',
       owner: 'user-123::user-123',
-    } as CVDocument;
+    } as unknown as CVDocument;
 
     mockService.getFullCVDocument.mockResolvedValue(tailoredCV);
 
@@ -235,7 +235,7 @@ describe('useCVDocument', () => {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       owner: 'user-123::user-123',
-    } as CVDocument;
+    } as unknown as CVDocument;
 
     mockService.getFullCVDocument.mockResolvedValue(cvWithContent);
 
@@ -256,7 +256,7 @@ describe('useCVDocument', () => {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       owner: 'user-123::user-123',
-    } as CVDocument;
+    } as unknown as CVDocument;
 
     mockService.getFullCVDocument.mockResolvedValue(cvWithNullContent);
 

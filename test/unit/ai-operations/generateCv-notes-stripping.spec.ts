@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest';
  */
 function stripTrailingNotes(cvText: string): string {
   // Match separator line followed by note/notes (case insensitive)
-  const notePattern = /\n---+\s*\n.*?\b(note|notes)\b:?.*/is;
+  const notePattern = /\n---+\s*\n[\s\S]*?\b(note|notes)\b:?.*/i;
   const match = cvText.match(notePattern);
 
   if (match) {

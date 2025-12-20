@@ -3,11 +3,9 @@ import { mount } from '@vue/test-utils';
 import { createTestI18n } from '../../utils/createTestI18n';
 import ExperienceForm from '~/components/ExperienceForm.vue';
 import type { Experience } from '~/domain/experience/Experience';
-import en from '../../../i18n/locales/en.json';
 
 // Create i18n instance for tests
 const i18n = createTestI18n();
-
 
 // Stub Nuxt UI components
 const stubs = {

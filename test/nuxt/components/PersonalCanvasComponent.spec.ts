@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestI18n } from '../../utils/createTestI18n';
 import PersonalCanvasComponent from '~/components/PersonalCanvasComponent.vue';
-import en from '../../../i18n/locales/en.json';
 
 // Create i18n instance for tests
 const i18n = createTestI18n();

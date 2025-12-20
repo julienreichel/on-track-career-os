@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useStoryEngine } from '@/application/starstory/useStoryEngine';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
-import type { STARStory } from '@/domain/starstory/STARStory';
-import type { STARStory as AiSTARStory } from '@/domain/ai-operations/STARStory';
+import type { STARStory, STARStoryUpdateInput } from '@/domain/starstory/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 import type { Experience } from '@/domain/experience/Experience';
 import { withMockedConsoleError } from '../../../utils/withMockedConsole';
@@ -240,12 +239,12 @@ describe('useStoryEngine', () => {
 
   describe('runStarInterview', () => {
     it('should generate STAR from text', async () => {
-      const mockAiStory: AiSTARStory = {
+      const mockAiStory = {
         situation: 'Team struggled with deployments',
         task: 'Implement CI/CD',
         action: 'Set up GitHub Actions',
         result: 'Reduced deployment time by 70%',
-      };
+      } as STARStory;
 
       mockService.generateStar.mockResolvedValue([mockAiStory]);
       mockService.generateAchievements.mockResolvedValue({
@@ -268,12 +267,12 @@ describe('useStoryEngine', () => {
     });
 
     it('should update existing draft', async () => {
-      const mockAiStory: AiSTARStory = {
+      const mockAiStory = {
         situation: 'S',
         task: 'T',
         action: 'A',
         result: 'R',
-      };
+      } as STARStory;
 
       mockService.generateStar.mockResolvedValue([mockAiStory]);
       mockService.generateAchievements.mockResolvedValue({
@@ -446,14 +445,18 @@ describe('useStoryEngine', () => {
         { id: 'story-123', situation: 'Old', task: 'T', action: 'A', result: 'R' } as STARStory,
       ];
 
-      const result = await updateStory('story-123', { situation: 'Updated situation' });
+      const update = {
+        situation: 'Updated situation',
+      } as unknown as STARStoryUpdateInput;
+
+      const result = await updateStory('story-123', update);
 
       expect(result).toEqual(mockUpdatedStory);
       expect(stories.value[0]).toEqual(mockUpdatedStory);
     });
 
     it('should update selected story if it matches', async () => {
-      const mockUpdatedStory: STARStory = {
+      const mockUpdatedStory = {
         id: 'story-123',
         situation: 'Updated',
       } as STARStory;
@@ -464,7 +467,11 @@ describe('useStoryEngine', () => {
 
       selectedStory.value = { id: 'story-123' } as STARStory;
 
-      await updateStory('story-123', { situation: 'Updated' });
+      const update = {
+        situation: 'Updated situation',
+      } as unknown as STARStoryUpdateInput;
+
+      await updateStory('story-123', update);
 
       expect(selectedStory.value).toEqual(mockUpdatedStory);
     });

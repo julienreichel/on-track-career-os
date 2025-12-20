@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import { createTestI18n } from '../../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import StoriesPage from '@/pages/profile/stories/index.vue';
 import type { STARStory } from '@/domain/starstory/STARStory';
 import type { Experience } from '@/domain/experience/Experience';
+import type { ComponentPublicInstance, Ref } from 'vue';
 
 // Mock Nuxt composables
 vi.mock('#app', () => ({
@@ -52,7 +53,11 @@ vi.mock('@/application/experience/useExperience', () => ({
 }));
 
 const i18n = createTestI18n();
-
+type StoriesPageExposed = {
+  stories: Ref<STARStory[]>;
+  loading: Ref<boolean>;
+  error: Ref<string | null>;
+};
 
 describe('Profile Stories Page', () => {
   beforeEach(() => {
@@ -69,7 +74,7 @@ describe('Profile Stories Page', () => {
   });
 
   const createWrapper = () => {
-    return mount(StoriesPage, {
+    const wrapper = mount(StoriesPage, {
       global: {
         plugins: [i18n, router],
         stubs: {
@@ -106,6 +111,7 @@ describe('Profile Stories Page', () => {
         },
       },
     });
+    return wrapper as unknown as VueWrapper<ComponentPublicInstance<StoriesPageExposed>>;
   };
 
   it('should render page with title and description', () => {
@@ -155,7 +161,7 @@ describe('Profile Stories Page', () => {
   });
 
   it('should render stories table with data', async () => {
-    const mockStoriesData: STARStory[] = [
+    const mockStoriesData = [
       {
         id: 'story-1',
         situation: 'Led a team migration project',
@@ -169,7 +175,7 @@ describe('Profile Stories Page', () => {
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',
       },
-    ];
+    ] as STARStory[];
 
     mockStories.mockReturnValue(mockStoriesData);
     mockLoading.mockReturnValue(false);
@@ -192,7 +198,7 @@ describe('Profile Stories Page', () => {
   });
 
   it('should pass stories to StoryList component', async () => {
-    const mockStoriesData: STARStory[] = [
+    const mockStoriesData = [
       {
         id: 'story-1',
         situation: 'Test',
@@ -206,7 +212,7 @@ describe('Profile Stories Page', () => {
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',
       },
-    ];
+    ] as STARStory[];
 
     mockStories.mockReturnValue(mockStoriesData);
     mockLoading.mockReturnValue(false);
@@ -222,7 +228,7 @@ describe('Profile Stories Page', () => {
   });
 
   it('should pass KPI suggestions to StoryList component', async () => {
-    const mockStoriesData: STARStory[] = [
+    const mockStoriesData = [
       {
         id: 'story-1',
         situation: 'Test',
@@ -236,7 +242,7 @@ describe('Profile Stories Page', () => {
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',
       },
-    ];
+    ] as STARStory[];
 
     mockStories.mockReturnValue(mockStoriesData);
     mockLoading.mockReturnValue(false);
@@ -250,7 +256,7 @@ describe('Profile Stories Page', () => {
   });
 
   it('should handle stories with no achievements or KPIs', async () => {
-    const mockStoriesData: STARStory[] = [
+    const mockStoriesData = [
       {
         id: 'story-1',
         situation: 'Test',
@@ -264,7 +270,7 @@ describe('Profile Stories Page', () => {
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',
       },
-    ];
+    ] as STARStory[];
 
     mockStories.mockReturnValue(mockStoriesData);
     mockLoading.mockReturnValue(false);
@@ -279,7 +285,7 @@ describe('Profile Stories Page', () => {
   });
 
   it('should pass showCompanyNames prop to StoryList', async () => {
-    const mockStoriesData: STARStory[] = [
+    const mockStoriesData = [
       {
         id: 'story-1',
         situation: 'Test',
@@ -293,7 +299,7 @@ describe('Profile Stories Page', () => {
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',
       },
-    ];
+    ] as STARStory[];
 
     mockStories.mockReturnValue(mockStoriesData);
     mockLoading.mockReturnValue(false);

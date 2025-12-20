@@ -82,16 +82,19 @@ describe('useCvDocuments', () => {
       expect(items.value).toEqual(mockCVs);
     });
 
-    it('should handle errors during load', withMockedConsoleError(async () => {
-      mockRepository.list.mockRejectedValue(new Error('Load failed'));
+    it(
+      'should handle errors during load',
+      withMockedConsoleError(async () => {
+        mockRepository.list.mockRejectedValue(new Error('Load failed'));
 
-      const { items, error, loadAll } = useCvDocuments();
+        const { items, error, loadAll } = useCvDocuments();
 
-      await loadAll();
+        await loadAll();
 
-      expect(items.value).toEqual([]);
-      expect(error.value).toBe('Load failed');
-    }));
+        expect(items.value).toEqual([]);
+        expect(error.value).toBe('Load failed');
+      })
+    );
 
     it('should set loading state correctly', async () => {
       mockRepository.list.mockImplementation(
@@ -134,16 +137,19 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockCreated);
     });
 
-    it('should handle creation errors', withMockedConsoleError(async () => {
-      mockRepository.create.mockRejectedValue(new Error('Creation failed'));
+    it(
+      'should handle creation errors',
+      withMockedConsoleError(async () => {
+        mockRepository.create.mockRejectedValue(new Error('Creation failed'));
 
-      const { error, createDocument } = useCvDocuments();
+        const { error, createDocument } = useCvDocuments();
 
-      const result = await createDocument({ name: 'CV', userId: 'user-1' } as never);
+        const result = await createDocument({ name: 'CV', userId: 'user-1' } as never);
 
-      expect(result).toBeNull();
-      expect(error.value).toBe('Creation failed');
-    }));
+        expect(result).toBeNull();
+        expect(error.value).toBe('Creation failed');
+      })
+    );
 
     it('should not add to items if creation returns null', async () => {
       mockRepository.create.mockResolvedValue(null);
@@ -173,16 +179,19 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle update errors', withMockedConsoleError(async () => {
-      mockRepository.update.mockRejectedValue(new Error('Update failed'));
+    it(
+      'should handle update errors',
+      withMockedConsoleError(async () => {
+        mockRepository.update.mockRejectedValue(new Error('Update failed'));
 
-      const { error, updateDocument } = useCvDocuments();
+        const { error, updateDocument } = useCvDocuments();
 
-      const result = await updateDocument({ id: 'cv-1', name: 'New' } as never);
+        const result = await updateDocument({ id: 'cv-1', name: 'New' } as never);
 
-      expect(result).toBeNull();
-      expect(error.value).toBe('Update failed');
-    }));
+        expect(result).toBeNull();
+        expect(error.value).toBe('Update failed');
+      })
+    );
   });
 
   describe('deleteDocument', () => {
@@ -205,16 +214,19 @@ describe('useCvDocuments', () => {
       expect(items.value[0].id).toBe('cv-2');
     });
 
-    it('should handle deletion errors', withMockedConsoleError(async () => {
-      mockRepository.delete.mockRejectedValue(new Error('Deletion failed'));
+    it(
+      'should handle deletion errors',
+      withMockedConsoleError(async () => {
+        mockRepository.delete.mockRejectedValue(new Error('Deletion failed'));
 
-      const { error, deleteDocument } = useCvDocuments();
+        const { error, deleteDocument } = useCvDocuments();
 
-      const result = await deleteDocument('cv-1');
+        const result = await deleteDocument('cv-1');
 
-      expect(result).toBe(false);
-      expect(error.value).toBe('Deletion failed');
-    }));
+        expect(result).toBe(false);
+        expect(error.value).toBe('Deletion failed');
+      })
+    );
   });
 
   describe('addBlock', () => {
@@ -223,7 +235,7 @@ describe('useCvDocuments', () => {
         id: 'cv-1',
         name: 'My CV',
         contentJSON: { blocks: [] },
-      } as CVDocument;
+      } as unknown as CVDocument;
 
       const mockUpdated = {
         ...mockCV,
@@ -249,16 +261,19 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle addBlock errors', withMockedConsoleError(async () => {
-      mockService.addBlock.mockRejectedValue(new Error('Add block failed'));
+    it(
+      'should handle addBlock errors',
+      withMockedConsoleError(async () => {
+        mockService.addBlock.mockRejectedValue(new Error('Add block failed'));
 
-      const { error, addBlock } = useCvDocuments();
+        const { error, addBlock } = useCvDocuments();
 
-      const result = await addBlock('cv-1', { id: 'block-1', type: 'header', content: {} });
+        const result = await addBlock('cv-1', { id: 'block-1', type: 'header', content: {} });
 
-      expect(result).toBeNull();
-      expect(error.value).toBe('Add block failed');
-    }));
+        expect(result).toBeNull();
+        expect(error.value).toBe('Add block failed');
+      })
+    );
   });
 
   describe('updateBlock', () => {
@@ -269,7 +284,7 @@ describe('useCvDocuments', () => {
         contentJSON: {
           blocks: [{ id: 'block-1', type: 'header', content: { title: 'Old' }, order: 0 }],
         },
-      } as CVDocument;
+      } as unknown as CVDocument;
 
       const mockUpdated = {
         ...mockCV,
@@ -293,16 +308,19 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle updateBlock errors', withMockedConsoleError(async () => {
-      mockService.updateBlock.mockRejectedValue(new Error('Update block failed'));
+    it(
+      'should handle updateBlock errors',
+      withMockedConsoleError(async () => {
+        mockService.updateBlock.mockRejectedValue(new Error('Update block failed'));
 
-      const { error, updateBlock } = useCvDocuments();
+        const { error, updateBlock } = useCvDocuments();
 
-      const result = await updateBlock('cv-1', 'block-1', { content: {} });
+        const result = await updateBlock('cv-1', 'block-1', { content: {} });
 
-      expect(result).toBeNull();
-      expect(error.value).toBe('Update block failed');
-    }));
+        expect(result).toBeNull();
+        expect(error.value).toBe('Update block failed');
+      })
+    );
   });
 
   describe('removeBlock', () => {
@@ -316,7 +334,7 @@ describe('useCvDocuments', () => {
             { id: 'block-2', type: 'experience', content: {}, order: 1 },
           ],
         },
-      } as CVDocument;
+      } as unknown as CVDocument;
 
       const mockUpdated = {
         ...mockCV,
@@ -338,16 +356,19 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle removeBlock errors', withMockedConsoleError(async () => {
-      mockService.removeBlock.mockRejectedValue(new Error('Remove block failed'));
+    it(
+      'should handle removeBlock errors',
+      withMockedConsoleError(async () => {
+        mockService.removeBlock.mockRejectedValue(new Error('Remove block failed'));
 
-      const { error, removeBlock } = useCvDocuments();
+        const { error, removeBlock } = useCvDocuments();
 
-      const result = await removeBlock('cv-1', 'block-1');
+        const result = await removeBlock('cv-1', 'block-1');
 
-      expect(result).toBeNull();
-      expect(error.value).toBe('Remove block failed');
-    }));
+        expect(result).toBeNull();
+        expect(error.value).toBe('Remove block failed');
+      })
+    );
   });
 
   describe('reorderBlocks', () => {
@@ -361,7 +382,7 @@ describe('useCvDocuments', () => {
             { id: 'block-2', type: 'experience', content: {}, order: 1 },
           ],
         },
-      } as CVDocument;
+      } as unknown as CVDocument;
 
       const mockUpdated = {
         ...mockCV,
@@ -386,15 +407,18 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle reorderBlocks errors', withMockedConsoleError(async () => {
-      mockService.reorderBlocks.mockRejectedValue(new Error('Reorder failed'));
+    it(
+      'should handle reorderBlocks errors',
+      withMockedConsoleError(async () => {
+        mockService.reorderBlocks.mockRejectedValue(new Error('Reorder failed'));
 
-      const { error, reorderBlocks } = useCvDocuments();
+        const { error, reorderBlocks } = useCvDocuments();
 
-      const result = await reorderBlocks('cv-1', ['block-1', 'block-2']);
+        const result = await reorderBlocks('cv-1', ['block-1', 'block-2']);
 
-      expect(result).toBeNull();
-      expect(error.value).toBe('Reorder failed');
-    }));
+        expect(result).toBeNull();
+        expect(error.value).toBe('Reorder failed');
+      })
+    );
   });
 });

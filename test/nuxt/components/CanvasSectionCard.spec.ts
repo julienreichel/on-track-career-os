@@ -6,7 +6,6 @@ import CanvasSectionCard from '@/components/CanvasSectionCard.vue';
 // Create i18n instance for tests
 const i18n = createTestI18n();
 
-
 describe('CanvasSectionCard', () => {
   const defaultProps = {
     icon: 'i-heroicons-user-group',
@@ -329,7 +328,7 @@ describe('CanvasSectionCard', () => {
       const updateEvents = wrapper.emitted('update:items') as string[][];
       expect(updateEvents.length).toBeGreaterThanOrEqual(3);
       // Each event emission contains the full array of tags accumulated so far
-      const lastEmit = updateEvents[updateEvents.length - 1][0] as string[];
+      const lastEmit = updateEvents[updateEvents.length - 1][0];
       expect(lastEmit).toContain('Tag 1');
       expect(lastEmit).toContain('Tag 2');
       expect(lastEmit).toContain('Tag 3');

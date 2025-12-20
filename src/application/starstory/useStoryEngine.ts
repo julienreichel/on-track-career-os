@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue';
 import type { Ref } from 'vue';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
-import type { STARStory } from '@/domain/starstory/STARStory';
+import type { STARStory, STARStoryUpdateInput } from '@/domain/starstory/STARStory';
 import type { STARStory as AiSTARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 import type { Experience } from '@/domain/experience/Experience';
@@ -320,10 +320,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
   };
 
   // Update existing story
-  const updateStory = async (
-    storyId: string,
-    updates: Partial<Omit<STARStory, 'id' | 'experienceId' | 'owner' | 'createdAt' | 'updatedAt'>>
-  ) => {
+  const updateStory = async (storyId: string, updates: STARStoryUpdateInput) => {
     saving.value = true;
     error.value = null;
 
