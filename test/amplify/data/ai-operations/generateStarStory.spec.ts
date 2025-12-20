@@ -221,7 +221,7 @@ I needed to redesign the Registration System to significantly increase its adopt
 I led the redesign focusing on user experience and collaborated closely with Product and Design.
 
 ## result:
-I increased adoption from 5% to 60%, securing over $1M in enterprise contracts.
+**I increased** adoption from 5% to 60%, securing over $1M in enterprise contracts.
 
 ---
 
@@ -238,7 +238,7 @@ I had to reduce the incident volume by improving processes and the platform.
 I streamlined workflows with QA and Operations and introduced a new incident platform.
 
 ## result:
-I reduced incident volume by 40%, improving productivity and satisfaction.`;
+_I reduced_ incident volume by 40%, improving productivity and satisfaction.`;
 
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
@@ -262,6 +262,8 @@ I reduced incident volume by 40%, improving productivity and satisfaction.`;
       expect(parsed[1].title).toBe('Support Incident Volume Reduction');
       expect(parsed[0].situation).toContain('revamping our Registration System');
       expect(parsed[1].result).toContain('reduced incident volume by 40%');
+      expect(parsed[0].result).not.toContain('**');
+      expect(parsed[1].result).not.toContain('_');
     });
 
     it('should handle all fields as empty strings with fallbacks', async () => {

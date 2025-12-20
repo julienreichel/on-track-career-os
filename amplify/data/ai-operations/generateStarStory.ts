@@ -94,6 +94,12 @@ function cleanSectionText(value: string): string {
   // Remove trailing markdown separators like --- or ***
   cleaned = cleaned.replace(/(\n|\s)*[-*_]{3,}\s*$/g, '').trim();
 
+  // Normalize markdown emphasis markers (**bold**, *italic*, __bold__, _italic_)
+  cleaned = cleaned.replace(/\*\*(.*?)\*\*/g, '$1');
+  cleaned = cleaned.replace(/\*(.*?)\*/g, '$1');
+  cleaned = cleaned.replace(/__(.*?)__/g, '$1');
+  cleaned = cleaned.replace(/_(.*?)_/g, '$1');
+
   return cleaned;
 }
 
