@@ -24,7 +24,11 @@ const close = () => {
 </script>
 
 <template>
-  <UModal :open="open" :title="t('storyView.title')" @update:open="emit('update:open', $event)">
+  <UModal
+    :open="open"
+    :title="story.title || t('storyView.title')"
+    @update:open="emit('update:open', $event)"
+  >
     <template #body>
       <div class="space-y-6">
         <!-- Experience Name -->

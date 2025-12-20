@@ -94,6 +94,7 @@ const handleSubmitFreeText = async () => {
     if (aiStories && aiStories.length > 0) {
       const story = aiStories[0];
       // Populate form state with generated story
+      updateField('title', story?.title);
       updateField('situation', story?.situation);
       updateField('task', story?.task);
       updateField('action', story?.action);
@@ -117,6 +118,7 @@ const handleGenerateAchievements = async () => {
   showAchievementsPanel.value = true;
   // Create a story object from form state for generation
   const storyForGeneration = {
+    title: formState.value.title,
     situation: formState.value.situation,
     task: formState.value.task,
     action: formState.value.action,

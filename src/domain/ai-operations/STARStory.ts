@@ -17,6 +17,7 @@ export function isSTARStory(data: unknown): data is STARStory {
   const story = data as Record<string, unknown>;
 
   return (
+    typeof story.title === 'string' &&
     typeof story.situation === 'string' &&
     typeof story.task === 'string' &&
     typeof story.action === 'string' &&

@@ -19,7 +19,20 @@ const { t } = useI18n();
 
 const showDeleteConfirm = ref(false);
 
-const title = computed(() => props.companyName || props.experienceName || t('storyCard.noTitle'));
+const headerTitle = computed(
+  () =>
+    props.story.title?.trim() ||
+    props.experienceName ||
+    props.companyName ||
+    t('storyCard.noTitle')
+);
+
+const subtitle = computed(() => {
+  if (props.experienceName && props.companyName && props.experienceName !== props.companyName) {
+    return `${props.experienceName} · ${props.companyName}`;
+  }
+  return props.experienceName || props.companyName;
+});
 
 const preview = computed(() => {
   const maxLength = 120;
@@ -56,7 +69,7 @@ const cancelDelete = () => {
 </script>
 
 <template>
-  <ItemCard :title="title" @edit="handleEdit" @delete="handleDelete">
+  <ItemCard :title="headerTitle" :subtitle="subtitle" @edit="handleEdit" @delete="handleDelete">
     <!-- Preview Text Content -->
     <div class="text-sm text-gray-700 dark:text-gray-300 line-clamp-4">
       {{ preview }}

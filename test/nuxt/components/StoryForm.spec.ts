@@ -13,6 +13,12 @@ const stubs = {
       '<div class="form-field"><label>{{ label }}</label><div class="hint">{{ hint }}</div><slot /></div>',
     props: ['label', 'hint', 'required'],
   },
+  UInput: {
+    template:
+      '<input :value="modelValue" :placeholder="placeholder" :disabled="disabled" :readonly="readonly" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+    props: ['modelValue', 'placeholder', 'disabled', 'readonly'],
+    emits: ['update:modelValue'],
+  },
   UTextarea: {
     template:
       '<textarea :value="modelValue" :placeholder="placeholder" :disabled="disabled" :readonly="readonly" @input="$emit(\'update:modelValue\', $event.target.value)" />',
@@ -22,6 +28,7 @@ const stubs = {
 };
 
 const defaultFormState: StoryFormState = {
+  title: '',
   situation: '',
   task: '',
   action: '',
@@ -42,7 +49,9 @@ describe('StoryForm', () => {
       },
     });
 
+    const inputs = wrapper.findAll('input');
     const textareas = wrapper.findAll('textarea');
+    expect(inputs).toHaveLength(1);
     expect(textareas).toHaveLength(4);
   });
 
@@ -57,6 +66,7 @@ describe('StoryForm', () => {
       },
     });
 
+    expect(wrapper.text()).toContain('Story Title');
     expect(wrapper.text()).toContain('Situation');
     expect(wrapper.text()).toContain('Task');
     expect(wrapper.text()).toContain('Action');
@@ -65,6 +75,7 @@ describe('StoryForm', () => {
 
   it('populates fields with modelValue data', () => {
     const formState: StoryFormState = {
+      title: 'Cloud migration leader',
       situation: 'Test situation',
       task: 'Test task',
       action: 'Test action',
@@ -83,7 +94,9 @@ describe('StoryForm', () => {
       },
     });
 
+    const inputs = wrapper.findAll('input');
     const textareas = wrapper.findAll('textarea');
+    expect((inputs[0].element as HTMLInputElement).value).toBe('Cloud migration leader');
     expect((textareas[0].element as HTMLTextAreaElement).value).toBe('Test situation');
     expect((textareas[1].element as HTMLTextAreaElement).value).toBe('Test task');
     expect((textareas[2].element as HTMLTextAreaElement).value).toBe('Test action');
@@ -168,6 +181,7 @@ describe('StoryForm', () => {
 
   it('preserves other fields when updating one field', async () => {
     const formState: StoryFormState = {
+      title: 'Original title',
       situation: 'Original situation',
       task: 'Original task',
       action: 'Original action',
@@ -190,6 +204,7 @@ describe('StoryForm', () => {
     await textareas[0].setValue('Updated situation');
 
     const emittedValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as StoryFormState;
+    expect(emittedValue.title).toBe('Original title');
     expect(emittedValue.situation).toBe('Updated situation');
     expect(emittedValue.task).toBe('Original task');
     expect(emittedValue.action).toBe('Original action');
@@ -210,7 +225,11 @@ describe('StoryForm', () => {
       },
     });
 
+    const inputs = wrapper.findAll('input');
     const textareas = wrapper.findAll('textarea');
+    inputs.forEach((input) => {
+      expect(input.attributes('disabled')).toBeDefined();
+    });
     textareas.forEach((textarea) => {
       expect(textarea.attributes('disabled')).toBeDefined();
     });
@@ -228,7 +247,11 @@ describe('StoryForm', () => {
       },
     });
 
+    const inputs = wrapper.findAll('input');
     const textareas = wrapper.findAll('textarea');
+    inputs.forEach((input) => {
+      expect(input.attributes('readonly')).toBeDefined();
+    });
     textareas.forEach((textarea) => {
       expect(textarea.attributes('readonly')).toBeDefined();
     });
@@ -246,10 +269,11 @@ describe('StoryForm', () => {
     });
 
     const { t } = i18n.global;
-    expect(wrapper.text()).toContain(t('stories.builder.situationHint'));
-    expect(wrapper.text()).toContain(t('stories.builder.taskHint'));
-    expect(wrapper.text()).toContain(t('stories.builder.actionHint'));
-    expect(wrapper.text()).toContain(t('stories.builder.resultHint'));
+    expect(wrapper.text()).toContain(t('star.title.description'));
+    expect(wrapper.text()).toContain(t('star.situation.description'));
+    expect(wrapper.text()).toContain(t('star.task.description'));
+    expect(wrapper.text()).toContain(t('star.action.description'));
+    expect(wrapper.text()).toContain(t('star.result.description'));
   });
 
   it('marks all fields as required', () => {
@@ -264,7 +288,7 @@ describe('StoryForm', () => {
     });
 
     const formFields = wrapper.findAll('.form-field');
-    expect(formFields).toHaveLength(4);
+    expect(formFields).toHaveLength(5);
     // All 4 STAR fields should be rendered (testing structure)
     expect(wrapper.text()).toContain('Situation');
     expect(wrapper.text()).toContain('Task');
@@ -283,7 +307,9 @@ describe('StoryForm', () => {
       },
     });
 
+    const inputs = wrapper.findAll('input');
     const textareas = wrapper.findAll('textarea');
+    await inputs[0].setValue('');
     await textareas[0].setValue('');
 
     const emittedValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as StoryFormState;
@@ -301,7 +327,9 @@ describe('StoryForm', () => {
       },
     });
 
+    const inputs = wrapper.findAll('input');
     const textareas = wrapper.findAll('textarea');
+    expect(inputs).toHaveLength(1);
     expect(textareas).toHaveLength(4);
     // Testing that all textareas are rendered correctly
     textareas.forEach((textarea) => {
@@ -309,3 +337,21 @@ describe('StoryForm', () => {
     });
   });
 });
+  it('emits update:modelValue when title changes', async () => {
+    const wrapper = mount(StoryForm, {
+      global: {
+        plugins: [i18n],
+        stubs,
+      },
+      props: {
+        modelValue: defaultFormState,
+      },
+    });
+
+    const input = wrapper.find('input');
+    await input.setValue('New title');
+
+    expect(wrapper.emitted('update:modelValue')).toBeTruthy();
+    const emittedValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as StoryFormState;
+    expect(emittedValue.title).toBe('New title');
+  });

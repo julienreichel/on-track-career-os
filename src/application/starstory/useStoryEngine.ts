@@ -10,6 +10,7 @@ import type { Experience } from '@/domain/experience/Experience';
  * Story Engine Draft State
  */
 export interface StoryDraft {
+  title?: string;
   situation: string;
   task: string;
   action: string;
@@ -144,6 +145,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
       .join('\n');
 
     draftStory.value = {
+      title: '',
       situation: '',
       task: '',
       action: '',
@@ -186,6 +188,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
 
       if (draftStory.value) {
         Object.assign(draftStory.value, {
+          title: aiStory.title || '',
           situation: aiStory.situation,
           task: aiStory.task,
           action: aiStory.action,
@@ -193,6 +196,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
         });
       } else {
         draftStory.value = {
+          title: aiStory.title || '',
           situation: aiStory.situation,
           task: aiStory.task,
           action: aiStory.action,
@@ -205,6 +209,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
       // Automatically generate achievements and KPIs for the generated story
       try {
         const aiStoryForAchievements: AiSTARStory = {
+          title: aiStory.title || 'Untitled STAR story',
           situation: aiStory.situation,
           task: aiStory.task,
           action: aiStory.action,
@@ -245,6 +250,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
 
     try {
       const aiStory: AiSTARStory = {
+        title: sourceStory.title || 'Untitled STAR story',
         situation: sourceStory.situation,
         task: sourceStory.task,
         action: sourceStory.action,
@@ -287,6 +293,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
 
     try {
       const aiStory: AiSTARStory = {
+        title: draftStory.value.title || 'Untitled STAR story',
         situation: draftStory.value.situation,
         task: draftStory.value.task,
         action: draftStory.value.action,

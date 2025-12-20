@@ -18,7 +18,7 @@ import { truncateForLog, withAiOperationHandler } from './utils/common';
  */
 
 // System prompt - updated to generate multiple stories in text format
-const SYSTEM_PROMPT = `You extract STAR stories (Situation, Task, Action, Result) from experience descriptions.
+const SYSTEM_PROMPT = `You extract STAR stories (Title, Situation, Task, Action, Result) from experience descriptions.
 You may generate ONE OR MORE stories if the experience contains multiple achievements.
 You may complete missing information with reasonable inferences based on context.
 
@@ -28,6 +28,9 @@ IMPORTANT: Write all stories in FIRST PERSON perspective using "I" pronouns.
 - Keep the personal narrative voice throughout
 
 Format your response as plain text using this structure for EACH story:
+
+## title:
+[Give the story a short resume-friendly headline]
 
 ## situation:
 [Description of the context/challenge - use "I was", "I faced", etc.]
@@ -46,6 +49,7 @@ Be concise but specific. Use the user's words when available.`;
 
 // Type definitions matching AI Interaction Contract
 export interface GenerateStarStoryOutput {
+  title: string;
   situation: string;
   task: string;
   action: string;
@@ -71,19 +75,56 @@ function extractSection(text: string, startMarker: string, endMarker?: string): 
 /**
  * Parse AI text response into structured STAR stories
  */
+function inferTitleFromSituation(situation: string): string {
+  if (!situation) {
+    return 'Untitled STAR story';
+  }
+
+  const firstSentence = situation.split(/[\n.]/).find((segment) => segment.trim().length > 0);
+  if (firstSentence) {
+    const trimmed = firstSentence.trim();
+    return trimmed.length > 80 ? `${trimmed.slice(0, 77)}…` : trimmed;
+  }
+
+  return 'Untitled STAR story';
+}
+
 function parseStarStoriesFromText(aiText: string): GenerateStarStoryOutput[] {
   const stories: GenerateStarStoryOutput[] = [];
+  const trimmedText = aiText.trim();
+  const hasTitleMarkers = /##\s*title:/i.test(trimmedText);
+  const blockPattern = hasTitleMarkers ? /(?=##\s*title:)/i : /(?=##\s*situation:)/i;
 
-  // Split by ## situation: to find individual stories
-  const storyBlocks = aiText.split(/##\s*situation:/i).filter((block) => block.trim());
+  const storyBlocks = trimmedText
+    .split(blockPattern)
+    .map((block) => block.trim())
+    .filter((block) => block.length > 0);
 
   for (const block of storyBlocks) {
     const story: GenerateStarStoryOutput = {
-      situation: extractSection(block, '^', '##\\s*task:') || 'No situation provided',
-      task: extractSection(block, '##\\s*task:', '##\\s*action:') || 'No task provided',
-      action: extractSection(block, '##\\s*action:', '##\\s*result:') || 'No action provided',
-      result: extractSection(block, '##\\s*result:') || 'No result provided',
+      title: extractSection(block, '##\\s*title:', '##\\s*situation:'),
+      situation: extractSection(block, '##\\s*situation:', '##\\s*task:'),
+      task: extractSection(block, '##\\s*task:', '##\\s*action:'),
+      action: extractSection(block, '##\\s*action:', '##\\s*result:'),
+      result: extractSection(block, '##\\s*result:'),
     };
+
+    if (!story.title) {
+      story.title = inferTitleFromSituation(story.situation);
+    }
+
+    if (!story.situation) {
+      story.situation = 'No situation provided';
+    }
+    if (!story.task) {
+      story.task = 'No task provided';
+    }
+    if (!story.action) {
+      story.action = 'No action provided';
+    }
+    if (!story.result) {
+      story.result = 'No result provided';
+    }
 
     // Only add stories that have at least some content (not all fallbacks)
     const hasContent =
@@ -100,6 +141,7 @@ function parseStarStoriesFromText(aiText: string): GenerateStarStoryOutput[] {
   // Fallback: if no stories found, return single placeholder story
   if (stories.length === 0) {
     stories.push({
+      title: 'Untitled STAR story',
       situation: 'Unable to extract situation from text',
       task: 'Unable to extract task from text',
       action: 'Unable to extract action from text',
@@ -118,7 +160,7 @@ function buildUserPrompt(sourceText: string): string {
 
 ${sourceText}
 
-Remember to use the format with ## headers for each section, and create separate stories if there are multiple distinct achievements.`;
+Remember to use the format with ## headers for each section, include a concise ## title:, and create separate stories if there are multiple distinct achievements.`;
 }
 
 /**

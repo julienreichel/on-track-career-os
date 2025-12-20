@@ -17,6 +17,7 @@ export interface StoryBuilderProps {
 export interface StoryBuilderEmits {
   save: [
     story: {
+      title: string;
       situation: string;
       task: string;
       action: string;
@@ -38,6 +39,7 @@ const emit = defineEmits<StoryBuilderEmits>();
 const { t } = useI18n();
 
 // Form state
+const title = ref('');
 const situation = ref('');
 const task = ref('');
 const action = ref('');
@@ -50,6 +52,7 @@ watch(
   () => props.story,
   (newStory) => {
     if (newStory) {
+      title.value = newStory.title || '';
       situation.value = newStory.situation || '';
       task.value = newStory.task || '';
       action.value = newStory.action || '';
@@ -58,6 +61,14 @@ watch(
         newStory.achievements?.filter((entry): entry is string => typeof entry === 'string') || [];
       kpiSuggestions.value =
         newStory.kpiSuggestions?.filter((entry): entry is string => typeof entry === 'string') || [];
+    } else {
+      title.value = '';
+      situation.value = '';
+      task.value = '';
+      action.value = '';
+      result.value = '';
+      achievements.value = [];
+      kpiSuggestions.value = [];
     }
   },
   { immediate: true }
@@ -81,6 +92,7 @@ const handleGenerateAchievements = () => {
 
 const handleSave = () => {
   emit('save', {
+    title: title.value,
     situation: situation.value,
     task: task.value,
     action: action.value,
@@ -96,6 +108,7 @@ const handleCancel = () => {
 
 const isValid = () => {
   return (
+    title.value.trim() !== '' &&
     situation.value.trim() !== '' &&
     task.value.trim() !== '' &&
     action.value.trim() !== '' &&
@@ -108,6 +121,14 @@ const isValid = () => {
   <UCard>
     <!-- STAR Form Fields -->
     <div class="space-y-6">
+      <UFormField :label="t('stories.builder.title')" :hint="t('stories.builder.titleHint')" required>
+        <UInput
+          v-model="title"
+          :placeholder="t('stories.builder.titlePlaceholder')"
+          class="w-full"
+        />
+      </UFormField>
+
       <UFormField
         :label="t('stories.builder.situation')"
         :hint="t('stories.builder.situationHint')"

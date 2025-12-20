@@ -343,6 +343,9 @@
       "generate": "Generate STAR",
       "generating": "Generating your STAR story...",
       "saving": "Saving your story...",
+      "title": "Story Title",
+      "titleHint": "Give this story a clear headline for CVs and recruiters.",
+      "titlePlaceholder": "e.g. Led cloud migration reducing deployment time by 85%",
       "situation": "Situation",
       "situationHint": "Describe the context or challenge you faced",
       "situationPlaceholder": "What was the situation or challenge?",
@@ -398,6 +401,11 @@
     }
   },
   "star": {
+    "title": {
+      "label": "Story Title",
+      "description": "Provide a short headline that summarizes this achievement",
+      "placeholder": "e.g. Scaled data pipeline to support 5x user growth"
+    },
     "situation": {
       "label": "Situation",
       "description": "Describe the context or challenge you faced",

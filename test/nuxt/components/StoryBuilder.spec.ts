@@ -29,6 +29,18 @@ const stubs = {
       return { internalValue, handleInput };
     },
   },
+  UInput: {
+    template: '<input :value="modelValue" :placeholder="placeholder" @input="handleInput" />',
+    props: ['modelValue', 'placeholder', 'disabled', 'readonly'],
+    emits: ['update:modelValue'],
+    setup(props, { emit }) {
+      const internalValue = props.modelValue;
+      const handleInput = (event: Event) => {
+        emit('update:modelValue', (event.target as HTMLInputElement).value);
+      };
+      return { internalValue, handleInput };
+    },
+  },
   UButton: {
     template: '<button :disabled="disabled" @click="$attrs.onClick">{{ label }}<slot /></button>',
     props: ['label', 'icon', 'variant', 'size', 'color', 'disabled'],
@@ -63,6 +75,7 @@ describe('StoryBuilder', () => {
   it('populates fields in edit mode', async () => {
     const story = {
       id: 'story-1',
+      title: 'Cloud migration lead',
       situation: 'Test situation',
       task: 'Test task',
       action: 'Test action',
@@ -89,6 +102,7 @@ describe('StoryBuilder', () => {
 
     await wrapper.vm.$nextTick();
 
+    expect((wrapper.vm as any).title).toBe('Cloud migration lead');
     expect((wrapper.vm as any).situation).toBe('Test situation');
     expect((wrapper.vm as any).task).toBe('Test task');
     expect((wrapper.vm as any).action).toBe('Test action');
@@ -107,6 +121,7 @@ describe('StoryBuilder', () => {
       },
     });
 
+    expect(wrapper.text()).toContain('Story Title');
     expect(wrapper.text()).toContain('Situation');
     expect(wrapper.text()).toContain('Task');
     expect(wrapper.text()).toContain('Action');
@@ -175,6 +190,7 @@ describe('StoryBuilder', () => {
     });
 
     // Fill all fields
+    (wrapper.vm as any).title = 'Story title';
     (wrapper.vm as any).situation = 'Test situation';
     (wrapper.vm as any).task = 'Test task';
     (wrapper.vm as any).action = 'Test action';
@@ -199,6 +215,7 @@ describe('StoryBuilder', () => {
     });
 
     // Fill all fields to enable button
+    (wrapper.vm as any).title = 'Story title';
     (wrapper.vm as any).situation = 'Test situation';
     (wrapper.vm as any).task = 'Test task';
     (wrapper.vm as any).action = 'Test action';
@@ -241,6 +258,7 @@ describe('StoryBuilder', () => {
       },
     });
 
+    (wrapper.vm as any).title = 'Story title';
     (wrapper.vm as any).situation = 'Test situation';
     (wrapper.vm as any).task = 'Test task';
     (wrapper.vm as any).action = 'Test action';
@@ -264,6 +282,7 @@ describe('StoryBuilder', () => {
       },
     });
 
+    (wrapper.vm as any).title = 'Story title';
     (wrapper.vm as any).situation = 'Test situation';
     (wrapper.vm as any).task = 'Test task';
     (wrapper.vm as any).action = 'Test action';
@@ -279,6 +298,7 @@ describe('StoryBuilder', () => {
     expect(wrapper.emitted('save')).toBeTruthy();
     const emittedData = wrapper.emitted('save')?.[0]?.[0];
     expect(emittedData).toEqual({
+      title: 'Story title',
       situation: 'Test situation',
       task: 'Test task',
       action: 'Test action',
@@ -345,6 +365,7 @@ describe('StoryBuilder', () => {
     });
 
     // Only fill three fields
+    (wrapper.vm as any).title = 'Story title';
     (wrapper.vm as any).situation = 'Test situation';
     (wrapper.vm as any).task = 'Test task';
     (wrapper.vm as any).action = 'Test action';
@@ -374,6 +395,7 @@ describe('StoryBuilder', () => {
   it('handles empty achievements array', async () => {
     const story = {
       id: 'story-1',
+      title: 'Test story',
       situation: 'Test',
       task: 'Test',
       action: 'Test',

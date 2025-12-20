@@ -19,6 +19,7 @@ describe('useStoryEditor', () => {
 
   const mockStory: STARStory = {
     id: 'story-1',
+    title: 'Cloud Migration Success',
     situation: 'Led migration project',
     task: 'Migrate legacy system',
     action: 'Designed new architecture',
@@ -48,6 +49,7 @@ describe('useStoryEditor', () => {
         useStoryEditor();
 
       expect(story.value).toBeNull();
+      expect(formState.value.title).toBe('');
       expect(formState.value.situation).toBe('');
       expect(formState.value.task).toBe('');
       expect(formState.value.action).toBe('');
@@ -86,6 +88,7 @@ describe('useStoryEditor', () => {
       await loadPromise;
 
       expect(story.value).toEqual(mockStory);
+      expect(formState.value.title).toBe(mockStory.title);
       expect(formState.value.situation).toBe(mockStory.situation);
       expect(formState.value.task).toBe(mockStory.task);
       expect(formState.value.action).toBe(mockStory.action);
@@ -124,10 +127,12 @@ describe('useStoryEditor', () => {
       const { initializeNew, formState, isDirty } = useStoryEditor();
 
       initializeNew({
+        title: 'Initial title',
         situation: 'Initial situation',
         experienceId: 'exp-1',
       });
 
+      expect(formState.value.title).toBe('Initial title');
       expect(formState.value.situation).toBe('Initial situation');
       expect(formState.value.experienceId).toBe('exp-1');
       expect(isDirty.value).toBe(true);
@@ -161,6 +166,7 @@ describe('useStoryEditor', () => {
       const { initializeNew, updateField, save, story, saving, isDirty } = useStoryEditor();
 
       initializeNew({ experienceId: 'exp-1' });
+      updateField('title', 'Story Title');
       updateField('situation', 'Situation');
       updateField('task', 'Task');
       updateField('action', 'Action');
@@ -198,6 +204,7 @@ describe('useStoryEditor', () => {
     it('should not save invalid form', async () => {
       const { updateField, save, error } = useStoryEditor();
 
+      updateField('title', 'Incomplete Story');
       updateField('situation', 'Only situation');
       // Missing task, action, result
 
@@ -211,6 +218,7 @@ describe('useStoryEditor', () => {
     it('should not save without experience ID', async () => {
       const { updateField, save, error } = useStoryEditor();
 
+      updateField('title', 'Story Title');
       updateField('situation', 'Situation');
       updateField('task', 'Task');
       updateField('action', 'Action');
@@ -228,6 +236,7 @@ describe('useStoryEditor', () => {
       const { initializeNew, updateField, save } = useStoryEditor();
 
       initializeNew({ experienceId: 'exp-1' });
+      updateField('title', 'Story Title');
       updateField('situation', 'S');
       updateField('task', 'T');
       updateField('action', 'A');
@@ -249,6 +258,7 @@ describe('useStoryEditor', () => {
       const { initializeNew, updateField, save, error, saving } = useStoryEditor();
 
       initializeNew({ experienceId: 'exp-1' });
+      updateField('title', 'Story Title');
       updateField('situation', 'S');
       updateField('task', 'T');
       updateField('action', 'A');
@@ -416,6 +426,7 @@ describe('useStoryEditor', () => {
 
       expect(canSave.value).toBe(false);
 
+      updateField('title', 'Story Title');
       updateField('situation', 'S');
       updateField('task', 'T');
       updateField('action', 'A');
@@ -442,6 +453,7 @@ describe('useStoryEditor', () => {
 
       initializeNew({ experienceId: 'exp-1' });
 
+      updateField('title', 'Story Title');
       // Only situation
       updateField('situation', 'S');
       expect(canSave.value).toBe(false);
@@ -464,6 +476,7 @@ describe('useStoryEditor', () => {
 
       initializeNew({ experienceId: 'exp-1' });
 
+      updateField('title', 'Story Title');
       updateField('situation', '   ');
       updateField('task', 'T');
       updateField('action', 'A');

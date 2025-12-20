@@ -8,6 +8,7 @@ import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAnd
  * Story Editor Form State
  */
 export interface StoryFormState {
+  title: string;
   situation: string;
   task: string;
   action: string;
@@ -22,6 +23,7 @@ export interface StoryFormState {
  */
 function createEmptyFormState(): StoryFormState {
   return {
+    title: '',
     situation: '',
     task: '',
     action: '',
@@ -36,6 +38,7 @@ function createEmptyFormState(): StoryFormState {
  */
 function storyToFormState(story: STARStory): StoryFormState {
   return {
+    title: story.title || '',
     situation: story.situation,
     task: story.task,
     action: story.action,
@@ -51,6 +54,7 @@ function storyToFormState(story: STARStory): StoryFormState {
  */
 function isFormValid(form: StoryFormState): boolean {
   return (
+    form.title.trim().length > 0 &&
     form.situation.trim().length > 0 &&
     form.task.trim().length > 0 &&
     form.action.trim().length > 0 &&
@@ -63,6 +67,7 @@ function isFormValid(form: StoryFormState): boolean {
  */
 function formStateToAiStory(form: StoryFormState): AiSTARStory {
   return {
+    title: form.title,
     situation: form.situation,
     task: form.task,
     action: form.action,
@@ -85,6 +90,7 @@ function extractEnhancements(form: StoryFormState): AchievementsAndKpis {
  */
 function createStoryUpdates(form: StoryFormState): Partial<Omit<STARStoryUpdateInput, 'id'>> {
   return {
+    title: form.title,
     situation: form.situation,
     task: form.task,
     action: form.action,

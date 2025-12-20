@@ -171,6 +171,7 @@ describe('AiOperationsService', () => {
     it('should successfully generate STAR story from source text', async () => {
       // Arrange
       const mockStarStory: STARStory = {
+        title: 'Restructuring leadership',
         situation: 'Led a distributed team during company restructuring',
         task: 'Maintain team productivity and morale while adapting to new organizational structure',
         action: 'Implemented daily standups, 1-on-1s, and created team charter',
@@ -224,6 +225,7 @@ describe('AiOperationsService', () => {
     it('should successfully generate achievements and KPIs from STAR story', async () => {
       // Arrange
       const mockStarStory: STARStory = {
+        title: 'Restructuring leadership',
         situation: 'Led distributed team during restructuring',
         task: 'Maintain productivity and morale',
         action: 'Implemented daily standups and team charter',
@@ -251,6 +253,7 @@ describe('AiOperationsService', () => {
     it('should throw error for empty situation', async () => {
       // Arrange
       const invalidStory: STARStory = {
+        title: 'Missing situation',
         situation: '',
         task: 'Some task',
         action: 'Some action',
@@ -267,6 +270,7 @@ describe('AiOperationsService', () => {
     it('should throw error for empty task', async () => {
       // Arrange
       const invalidStory: STARStory = {
+        title: 'Missing task',
         situation: 'Some situation',
         task: '',
         action: 'Some action',
@@ -283,6 +287,7 @@ describe('AiOperationsService', () => {
     it('should throw error when repository fails', async () => {
       // Arrange
       const mockStarStory: STARStory = {
+        title: 'Valid story',
         situation: 'Led team',
         task: 'Maintain productivity',
         action: 'Implemented standups',
@@ -300,6 +305,7 @@ describe('AiOperationsService', () => {
     it('should throw error when result structure is invalid', async () => {
       // Arrange
       const mockStarStory: STARStory = {
+        title: 'Valid story',
         situation: 'Led team',
         task: 'Maintain productivity',
         action: 'Implemented standups',

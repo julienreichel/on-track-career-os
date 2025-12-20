@@ -37,6 +37,7 @@ describe('STARStoryService', () => {
     it('should fetch a complete STARStory by id', async () => {
       const mockSTARStory = {
         id: 'starstory-123',
+        title: 'Deployment Transformation',
         situation: 'The team was struggling with deployment bottlenecks',
         task: 'Improve deployment efficiency',
         action: 'Led migration to microservices architecture',
@@ -80,6 +81,7 @@ describe('STARStoryService', () => {
       const mockStories: STARStory[] = [
         {
           id: 'story-1',
+          title: 'Story One',
           situation: 'S1',
           task: 'T1',
           action: 'A1',
@@ -88,6 +90,7 @@ describe('STARStoryService', () => {
         },
         {
           id: 'story-2',
+          title: 'Story Two',
           situation: 'S2',
           task: 'T2',
           action: 'A2',
@@ -118,6 +121,7 @@ describe('STARStoryService', () => {
     it('should generate STAR story from source text', async () => {
       const sourceText = 'Led team migration to microservices...';
       const mockAiStory: AiSTARStory = {
+        title: 'Migration Breakthrough',
         situation: 'Team struggled with monolithic architecture',
         task: 'Migrate to microservices',
         action: 'Led the migration process',
@@ -145,6 +149,7 @@ describe('STARStoryService', () => {
   describe('generateAchievements', () => {
     it('should generate achievements and KPIs from STAR story', async () => {
       const aiStory: AiSTARStory = {
+        title: 'Performance Turnaround',
         situation: 'System performance issues',
         task: 'Optimize performance',
         action: 'Refactored codebase',
@@ -168,6 +173,7 @@ describe('STARStoryService', () => {
   describe('createAndLinkStory', () => {
     it('should create story and link to experience', async () => {
       const storyData: AiSTARStory = {
+        title: 'Query Optimization Win',
         situation: 'Performance bottleneck',
         task: 'Optimize query performance',
         action: 'Redesigned database indexes',
@@ -187,6 +193,7 @@ describe('STARStoryService', () => {
       const result = await service.createAndLinkStory(storyData, 'exp-123');
 
       expect(mockRepository.create).toHaveBeenCalledWith({
+        title: storyData.title,
         situation: storyData.situation,
         task: storyData.task,
         action: storyData.action,
@@ -200,6 +207,7 @@ describe('STARStoryService', () => {
 
     it('should include achievements when provided', async () => {
       const storyData: AiSTARStory = {
+        title: 'Achievement Story',
         situation: 'S',
         task: 'T',
         action: 'A',
@@ -228,6 +236,7 @@ describe('STARStoryService', () => {
     it('should update story with partial changes', async () => {
       const mockUpdatedStory: STARStory = {
         id: 'story-123',
+        title: 'Updated Story',
         situation: 'Updated situation',
         task: 'Original task',
         action: 'Original action',

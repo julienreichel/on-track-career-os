@@ -24,6 +24,18 @@ const updateField = (field: keyof StoryFormState, value: string) => {
 
 <template>
   <div class="space-y-6">
+    <!-- Title -->
+    <UFormField :label="t('star.title.label')" :hint="t('star.title.description')" required>
+      <UInput
+        :model-value="modelValue.title"
+        :placeholder="t('star.title.placeholder')"
+        :disabled="disabled"
+        :readonly="readonly"
+        class="w-full"
+        @update:model-value="updateField('title', $event)"
+      />
+    </UFormField>
+
     <!-- Situation -->
     <UFormField :label="t('star.situation.label')" :hint="t('star.situation.description')" required>
       <UTextarea

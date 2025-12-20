@@ -6,6 +6,7 @@ import type { STARStory } from '@/domain/starstory/STARStory';
 describe('StoryCard.vue', () => {
   const mockStory: STARStory = {
     id: 'story-1',
+    title: 'Cloud Migration Win',
     situation:
       'This is a long situation text that should be truncated when displayed in the card preview because it exceeds the maximum length of 150 characters that we allow for the preview text in the story card component',
     task: 'Test task',
@@ -64,15 +65,17 @@ describe('StoryCard.vue', () => {
     expect(wrapper.text()).toContain('1');
   });
 
-  it('should emit click event when clicked', async () => {
+  it('should emit view event when view button clicked', async () => {
     const wrapper = mount(StoryCard, {
       props: { story: mockStory },
     });
 
-    await wrapper.trigger('click');
+    const buttons = wrapper.findAll('button');
+    const viewButton = buttons.find((btn) => btn.text().includes('View'));
+    await viewButton?.trigger('click');
 
-    expect(wrapper.emitted('click')).toBeTruthy();
-    expect(wrapper.emitted('click')?.[0]).toEqual([mockStory]);
+    expect(wrapper.emitted('view')).toBeTruthy();
+    expect(wrapper.emitted('view')?.[0]).toEqual([mockStory]);
   });
 
   it('should not show badges when no achievements or KPIs', () => {

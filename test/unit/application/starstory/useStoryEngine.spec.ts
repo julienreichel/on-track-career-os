@@ -223,6 +223,7 @@ describe('useStoryEngine', () => {
 
       expect(hasDraft.value).toBe(true);
       expect(draftStory.value).toEqual({
+        title: '',
         situation: '',
         task: '',
         action: '',
@@ -240,6 +241,7 @@ describe('useStoryEngine', () => {
   describe('runStarInterview', () => {
     it('should generate STAR from text', async () => {
       const mockAiStory = {
+        title: 'CI/CD Transformation',
         situation: 'Team struggled with deployments',
         task: 'Implement CI/CD',
         action: 'Set up GitHub Actions',
@@ -268,6 +270,7 @@ describe('useStoryEngine', () => {
 
     it('should update existing draft', async () => {
       const mockAiStory = {
+        title: 'Updated Draft',
         situation: 'S',
         task: 'T',
         action: 'A',
@@ -284,6 +287,7 @@ describe('useStoryEngine', () => {
 
       // Create initial draft
       draftStory.value = {
+        title: '',
         situation: '',
         task: '',
         action: '',
@@ -345,6 +349,7 @@ describe('useStoryEngine', () => {
       await generateAchievements();
 
       expect(mockService.generateAchievements).toHaveBeenCalledWith({
+        title: 'Untitled STAR story',
         situation: 'S',
         task: 'T',
         action: 'A',

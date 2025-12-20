@@ -158,6 +158,7 @@ export const schema = a
 
     STARStory: a
       .model({
+        title: a.string(),
         situation: a.string().required(),
         task: a.string().required(),
         action: a.string().required(),

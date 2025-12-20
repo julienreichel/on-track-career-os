@@ -82,6 +82,7 @@ export class STARStoryService {
     achievements?: AchievementsAndKpis
   ): Promise<STARStory | null> {
     const input: STARStoryCreateInput = {
+      title: storyData.title?.trim() || 'Untitled STAR story',
       situation: storyData.situation,
       task: storyData.task,
       action: storyData.action,

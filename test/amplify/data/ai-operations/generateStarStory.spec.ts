@@ -54,7 +54,10 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
     // In a real scenario, the AI would analyze the text
     // For testing, we provide a structured text response
     if (sourceText.includes('TechCorp')) {
-      return `## situation:
+      return `## title:
+TechCorp Deployment Transformation
+
+## situation:
 The team was struggling with deployment bottlenecks and scaling issues in a monolithic application at TechCorp.
 
 ## task:
@@ -66,7 +69,10 @@ Led the migration to microservices architecture using Docker and Kubernetes, imp
 ## result:
 Reduced deployment time by 70% and improved system reliability to 99.9% uptime.`;
     }
-    return `## situation:
+    return `## title:
+General Achievement
+
+## situation:
 Context extracted from the provided experience
 
 ## task:
@@ -107,10 +113,12 @@ Outcome achieved from the experience`;
       expect(parsed.length).toBeGreaterThan(0);
 
       const story = parsed[0];
+      expect(story.title).toContain('TechCorp');
       expect(story.situation).toContain('TechCorp');
       expect(story.task).toContain('deployment efficiency');
       expect(story.action).toContain('microservices');
       expect(story.result).toContain('70%');
+      expect(typeof story.title).toBe('string');
       expect(typeof story.situation).toBe('string');
       expect(typeof story.task).toBe('string');
       expect(typeof story.action).toBe('string');
@@ -118,7 +126,10 @@ Outcome achieved from the experience`;
     });
 
     it('should apply fallbacks for missing fields', async () => {
-      const incompleteText = `## situation:
+      const incompleteText = `## title:
+Custom Story Title
+
+## situation:
 Working on a project
 
 ## task:
@@ -146,6 +157,7 @@ Working on a project
       const parsed = JSON.parse(result);
       expect(Array.isArray(parsed)).toBe(true);
       const story = parsed[0];
+      expect(story.title).toBe('Custom Story Title');
       expect(story.situation).toBe('Working on a project');
       expect(story.task).toBe('No task provided'); // Fallback for empty string
       expect(story.action).toBe('No action provided'); // Fallback for missing field
@@ -155,7 +167,10 @@ Working on a project
     it('should handle short experience text', async () => {
       const shortText = 'Implemented a new feature that increased user engagement.';
 
-      const shortTextResponse = `## situation:
+      const shortTextResponse = `## title:
+Engagement Booster
+
+## situation:
 Working on improving user engagement
 
 ## task:
@@ -193,7 +208,9 @@ Increased user engagement`;
     });
 
     it('should handle all fields as empty strings with fallbacks', async () => {
-      const emptyText = `## situation:
+      const emptyText = `## title:
+
+## situation:
 
 ## task:
 
@@ -229,7 +246,10 @@ Increased user engagement`;
     });
 
     it('should preserve non-empty fields while applying fallbacks to empty ones', async () => {
-      const mixedText = `## situation:
+      const mixedText = `## title:
+Customer Support Win
+
+## situation:
 Valid situation
 
 ## task:
@@ -258,6 +278,7 @@ Valid action
       const parsed = JSON.parse(result);
       expect(Array.isArray(parsed)).toBe(true);
       const story = parsed[0];
+      expect(story.title).toBe('Customer Support Win');
       expect(story.situation).toBe('Valid situation');
       expect(story.task).toBe('No task provided');
       expect(story.action).toBe('Valid action');
