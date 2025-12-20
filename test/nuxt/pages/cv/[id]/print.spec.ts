@@ -33,21 +33,6 @@ global.window.print = mockPrint;
 const mockClose = vi.fn();
 global.window.close = mockClose;
 
-// Mock composables
-vi.mock('vue-router', async () => {
-  const actual = await vi.importActual('vue-router');
-  return {
-    ...actual,
-    useRouter: () => ({
-      push: vi.fn(),
-    }),
-    useRoute: () => ({
-      params: { id: 'cv-print-123' },
-      query: {},
-    }),
-  };
-});
-
 // Mock marked for markdown rendering
 vi.mock('marked', () => ({
   marked: vi.fn((content: string) => `<div class="rendered">${content}</div>`),
@@ -63,6 +48,11 @@ const router = createRouter({
   routes: [
     { path: '/cv/:id/print', name: 'cv-id-print', component: { template: '<div>Print</div>' } },
   ],
+});
+
+beforeEach(async () => {
+  await router.push({ name: 'cv-id-print', params: { id: 'cv-print-123' } });
+  await router.isReady();
 });
 
 // Stub Nuxt UI components

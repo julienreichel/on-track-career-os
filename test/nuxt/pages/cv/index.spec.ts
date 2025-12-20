@@ -24,21 +24,6 @@ vi.mock('@/domain/cvdocument/CVDocumentService', () => ({
   })),
 }));
 
-// Mock composables
-vi.mock('vue-router', async () => {
-  const actual = await vi.importActual('vue-router');
-  return {
-    ...actual,
-    useRouter: () => ({
-      push: vi.fn(),
-    }),
-    useRoute: () => ({
-      params: {},
-      query: {},
-    }),
-  };
-});
-
 // Create i18n instance for tests
 const i18n = createTestI18n();
 

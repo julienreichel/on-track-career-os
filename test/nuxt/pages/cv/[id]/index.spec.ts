@@ -27,22 +27,6 @@ vi.mock('@/domain/cvdocument/CVDocumentService', () => ({
   })),
 }));
 
-// Mock composables
-vi.mock('vue-router', async () => {
-  const actual = await vi.importActual('vue-router');
-  return {
-    ...actual,
-    useRouter: () => ({
-      push: vi.fn(),
-      back: vi.fn(),
-    }),
-    useRoute: () => ({
-      params: { id: 'cv-123' },
-      query: {},
-    }),
-  };
-});
-
 // Mock marked for markdown rendering
 vi.mock('marked', () => ({
   marked: vi.fn((content: string) => `<div>${content}</div>`),
@@ -59,6 +43,11 @@ const router = createRouter({
     { path: '/cv', name: 'cv', component: { template: '<div>CV List</div>' } },
     { path: '/cv/:id', name: 'cv-id', component: { template: '<div>CV Detail</div>' } },
   ],
+});
+
+beforeEach(async () => {
+  await router.push({ name: 'cv-id', params: { id: 'cv-123' } });
+  await router.isReady();
 });
 
 // Stub Nuxt UI components

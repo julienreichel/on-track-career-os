@@ -42,6 +42,7 @@ export default defineConfig({
           name: 'amplify',
           include: ['test/amplify/**/*.spec.ts'],
           environment: 'node',
+          setupFiles: ['test/amplify/setup/silenceConsole.ts'],
           coverage: {
             provider: 'v8',
             include: ['amplify/**/*.ts'],
@@ -66,6 +67,7 @@ export default defineConfig({
           name: 'nuxt',
           include: ['test/nuxt/**/*.spec.ts'],
           environment: 'nuxt',
+          setupFiles: [resolve(__dirname, './test/nuxt/setup/global-stubs.ts')],
           environmentOptions: {
             nuxt: {
               domEnvironment: 'happy-dom',
