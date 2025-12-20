@@ -106,8 +106,34 @@ function extractSection(text: string, startMarker: string, endMarker?: string): 
   return cleanSectionText(match?.[1] ?? '');
 }
 
+function cleanTitleSection(value: string): string {
+  const cleaned = cleanSectionText(value);
+  if (!cleaned) return cleaned;
+
+  const subtitleRegex = /(\n|\s)*\*\*/;
+  const subtitleMatchIndex = cleaned.search(subtitleRegex);
+  if (subtitleMatchIndex >= 0) {
+    return cleaned.slice(0, subtitleMatchIndex).trim();
+  }
+
+  const newlineIndex = cleaned.indexOf('\n');
+  if (newlineIndex >= 0) {
+    return cleaned.slice(0, newlineIndex).trim();
+  }
+
+  return cleaned;
+}
+
 function normalizeInlineTitleHeadings(input: string): string {
-  return input.replace(INLINE_TITLE_REGEX, (_, heading: string) => `## title: ${heading.trim()}`);
+  return input.replace(INLINE_TITLE_REGEX, (_, heading: string) => {
+    const trimmedHeading = heading.trim();
+
+    const lineBreakIndex = trimmedHeading.search(/\s*\*\*/);
+    const cleanHeading =
+      lineBreakIndex >= 0 ? trimmedHeading.slice(0, lineBreakIndex).trim() : trimmedHeading;
+
+    return `## title: ${cleanHeading}`;
+  });
 }
 
 /**
@@ -153,14 +179,12 @@ function parseStarStoriesFromText(aiText: string): GenerateStarStoryOutput[] {
 
   for (const block of storyBlocks) {
     const story: GenerateStarStoryOutput = {
-      title: extractSection(block, '##\\s*title:', '##\\s*situation:'),
+      title: cleanTitleSection(extractSection(block, '##\\s*title:', '##\\s*situation:')),
       situation: extractSection(block, '##\\s*situation:', '##\\s*task:'),
       task: extractSection(block, '##\\s*task:', '##\\s*action:'),
       action: extractSection(block, '##\\s*action:', '##\\s*result:'),
       result: extractSection(block, '##\\s*result:'),
     };
-
-    story.title = cleanSectionText(story.title);
 
     if (!story.situation) {
       story.situation = 'No situation provided';

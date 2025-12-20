@@ -226,7 +226,7 @@ I increased adoption from 5% to 60%, securing over $1M in enterprise contracts.
 ---
 
 ## Support Incident Volume Reduction
-**Streamlined Support Processes**
+Streamlined Support Processes
 
 ## situation:
 I faced a challenge of high support incident volume, impacting customer satisfaction.
