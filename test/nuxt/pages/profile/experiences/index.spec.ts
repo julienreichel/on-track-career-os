@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestI18n } from '../../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
@@ -35,6 +35,13 @@ const router = createRouter({
       component: { template: '<div>New</div>' },
     },
   ],
+});
+
+beforeAll(async () => {
+  if (router.currentRoute.value.path !== '/profile/experiences') {
+    await router.push('/profile/experiences');
+  }
+  await router.isReady();
 });
 
 // Stub Nuxt UI components
