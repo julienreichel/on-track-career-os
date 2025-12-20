@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../../utils/createTestI18n';
 import CanvasIndexPage from '~/pages/profile/canvas/index.vue';
 import type { PersonalCanvas } from '~/domain/personal-canvas/PersonalCanvas';
 import { ref } from 'vue';
@@ -34,29 +34,8 @@ vi.mock('~/composables/useAuthUser', () => ({
 }));
 
 // Create i18n instance
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      canvas: {
-        page: {
-          title: 'Personal Canvas',
-          description: 'Your career strategy canvas',
-        },
-        messages: {
-          error: 'Error',
-          generated: 'Canvas generated successfully',
-          regenerated: 'Canvas regenerated successfully',
-          saved: 'Changes saved successfully',
-        },
-      },
-      errors: {
-        unknown: 'An unknown error occurred',
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 describe('Canvas Index Page', () => {
   beforeEach(() => {

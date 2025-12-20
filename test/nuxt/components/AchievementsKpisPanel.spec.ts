@@ -1,30 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../utils/createTestI18n';
 import AchievementsKpisPanel from '../../../src/components/AchievementsKpisPanel.vue';
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      enhancer: {
-        title: 'Achievements & KPIs',
-        regenerate: 'Regenerate',
-      },
-      stories: {
-        builder: {
-          achievementsList: 'Achievements List',
-          achievementsHint: 'Achievements hint',
-          achievementsPlaceholder: 'Add achievement',
-          kpisList: 'KPIs List',
-          kpisHint: 'KPIs hint',
-          kpisPlaceholder: 'Add KPI',
-        },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 const stubs = {
   UButton: {

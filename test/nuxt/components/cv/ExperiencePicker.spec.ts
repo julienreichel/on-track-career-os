@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../utils/createTestI18n';
 import CvExperiencePicker from '@/components/cv/ExperiencePicker.vue';
 import type { Experience } from '@/domain/experience/Experience';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
@@ -12,24 +12,8 @@ vi.mock('@/domain/experience/ExperienceRepository', () => ({
   },
 }));
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      cvExperiencePicker: {
-        title: 'Select Experiences',
-        description: 'Choose the experiences to include in your CV',
-        selectAll: 'Select All',
-        deselectAll: 'Deselect All',
-        noExperiences: 'No experiences found',
-        addExperience: 'Add your first experience',
-        loading: 'Loading experiences...',
-        current: 'Current',
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 const stubs = {
   UCard: {

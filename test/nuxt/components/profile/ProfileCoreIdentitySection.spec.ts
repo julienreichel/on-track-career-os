@@ -1,38 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../utils/createTestI18n';
 import { ref } from 'vue';
 import ProfileSectionCoreIdentity from '@/components/profile/section/CoreIdentity.vue';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 import type { ProfileForm } from '@/components/profile/types';
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  missingWarn: false,
-  fallbackWarn: false,
-  messages: {
-    en: {
-      profile: {
-        sections: {
-          coreIdentity: 'Core Identity',
-        },
-        fields: {
-          fullName: 'Full name',
-          headline: 'Headline',
-          location: 'Location',
-          seniorityLevel: 'Seniority',
-        },
-        photo: {
-          empty: 'Add photo',
-          help: 'Helper',
-          upload: 'Upload',
-          remove: 'Remove',
-        },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 const stubs = {
   UCard: {

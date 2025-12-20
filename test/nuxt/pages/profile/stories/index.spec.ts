@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import StoriesPage from '@/pages/profile/stories/index.vue';
 import type { STARStory } from '@/domain/starstory/STARStory';
@@ -51,50 +51,8 @@ vi.mock('@/application/experience/useExperience', () => ({
   })),
 }));
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      stories: {
-        global: {
-          title: 'All STAR Stories',
-          description: 'Browse all your achievement stories across all experiences',
-          empty: 'No stories yet',
-          emptyDescription:
-            'Create STAR stories from your experiences to document your achievements.',
-          goToExperiences: 'Go to Experiences',
-          experience: 'Experience',
-          status: 'Status',
-          achievements: 'Achievements',
-          kpis: 'KPIs',
-          goToExperience: 'Go to Experience',
-          unknownExperience: 'Unknown Experience',
-        },
-        table: {
-          preview: 'Preview',
-          actions: 'Actions',
-        },
-        list: {
-          edit: 'Edit',
-        },
-        status: {
-          draft: 'Draft',
-        },
-      },
-      common: {
-        error: 'Error',
-        backToProfile: 'Back to Profile',
-        search: 'Search',
-      },
-      storyList: {
-        emptyTitle: 'No stories yet',
-        emptyDescription: 'Create your first story',
-        createFirst: 'Create First Story',
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 describe('Profile Stories Page', () => {
   beforeEach(() => {

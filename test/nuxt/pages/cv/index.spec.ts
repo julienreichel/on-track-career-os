@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import CvIndexPage from '@/pages/cv/index.vue';
 
@@ -40,32 +40,8 @@ vi.mock('vue-router', async () => {
 });
 
 // Create i18n instance for tests
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      cvList: {
-        title: 'CV Documents',
-        description: 'Manage your CV documents',
-        addNew: 'New CV',
-        empty: 'No CVs yet',
-        emptyDescription: 'Create your first CV',
-        actions: {
-          edit: 'Edit',
-          delete: 'Delete',
-          print: 'Print',
-        },
-      },
-      common: {
-        loading: 'Loading...',
-        delete: 'Delete',
-        cancel: 'Cancel',
-        confirm: 'Confirm',
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 // Create router for tests
 const router = createRouter({

@@ -1,24 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../utils/createTestI18n';
 import UnsavedChangesModal from '../../../src/components/UnsavedChangesModal.vue';
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      storyEditor: {
-        unsavedChanges: 'You have unsaved changes',
-        unsavedChangesDescription: 'Are you sure you want to discard your changes?',
-      },
-      common: {
-        goBack: 'Go back',
-        discard: 'Discard',
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 const stubs = {
   UModal: {

@@ -1,36 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../utils/createTestI18n';
 import ProfilePreview from '~/components/cv/ProfilePreview.vue';
 import type { ParseCvTextOutput } from '@amplify/data/ai-operations/parseCvText';
 
 // Create i18n instance for tests
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      cvUpload: {
-        sections: {
-          profile: 'Profile Information',
-        },
-        profile: {
-          fullName: 'Full Name',
-          headline: 'Headline',
-          location: 'Location',
-          seniorityLevel: 'Seniority Level',
-          goals: 'Goals',
-          aspirations: 'Aspirations',
-          personalValues: 'Personal Values',
-          strengths: 'Strengths',
-          interests: 'Interests',
-          languages: 'Languages',
-          removeItem: 'Remove',
-        },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 // Stub child components
 const stubs = {

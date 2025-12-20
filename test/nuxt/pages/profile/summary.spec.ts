@@ -1,24 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../utils/createTestI18n';
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      profile: {
-        title: 'Profile',
-        description: 'Manage profile',
-        summary: {
-          viewFullProfile: 'View full profile',
-          fullProfileDescription: 'See details',
-          editFromSummary: 'Edit profile',
-        },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
 
 const stubs = {
   UPage: {
@@ -68,8 +52,8 @@ describe('Profile summary header', () => {
       }
     );
 
-    expect(wrapper.text()).toContain('Profile');
-    expect(wrapper.text()).toContain('Manage profile');
+    expect(wrapper.text()).toContain(i18n.global.t('profile.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('profile.description'));
   });
 
   it('renders CTA for full profile', () => {
@@ -99,7 +83,7 @@ describe('Profile summary header', () => {
       }
     );
 
-    expect(wrapper.text()).toContain('View full profile');
-    expect(wrapper.text()).toContain('Edit profile');
+    expect(wrapper.text()).toContain(i18n.global.t('profile.summary.viewFullProfile'));
+    expect(wrapper.text()).toContain(i18n.global.t('profile.summary.editFromSummary'));
   });
 });

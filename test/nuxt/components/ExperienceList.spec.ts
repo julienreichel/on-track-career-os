@@ -1,41 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../utils/createTestI18n';
 import ExperienceList from '~/components/ExperienceList.vue';
 import type { Experience } from '~/domain/experience/Experience';
 
 // Create i18n instance for tests
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      experiences: {
-        present: 'Present',
-        list: {
-          title: 'Your Experiences',
-          addNew: 'Add Experience',
-          edit: 'Edit',
-          delete: 'Delete',
-          empty: 'No experiences yet. Upload a CV or add one manually.',
-        },
-        table: {
-          title: 'Title',
-          company: 'Company',
-          startDate: 'Start Date',
-          endDate: 'End Date',
-          status: 'Status',
-          stories: 'Stories',
-          actions: 'Actions',
-        },
-        status: {
-          draft: 'Draft',
-          complete: 'Complete',
-        },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 // Stub Nuxt UI components
 const stubs = {

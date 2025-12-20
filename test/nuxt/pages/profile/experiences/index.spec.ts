@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
 
 /**
@@ -17,23 +17,7 @@ import { createRouter, createMemoryHistory } from 'vue-router';
  */
 
 // Create i18n instance for tests
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      experiences: {
-        title: 'Experiences',
-        new: 'New Experience',
-        empty: {
-          title: 'No experiences yet',
-          description: 'Upload your CV or add manually',
-        },
-        backToProfile: 'Back to Profile',
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
 
 // Create router for tests
 const router = createRouter({
@@ -90,7 +74,7 @@ describe('Experiences Page Component', () => {
         {
           template: `
             <UPageHeader>
-              <template #title>{{ t('experiences.title') }}</template>
+              <template #title>{{ t('features.experiences.title') }}</template>
             </UPageHeader>
           `,
           setup() {
@@ -107,7 +91,7 @@ describe('Experiences Page Component', () => {
       );
 
       expect(wrapper.find('.u-page-header').exists()).toBe(true);
-      expect(wrapper.text()).toContain('Experiences');
+      expect(wrapper.text()).toContain(i18n.global.t('features.experiences.title'));
     });
 
     it('should render new experience button', () => {
@@ -116,7 +100,9 @@ describe('Experiences Page Component', () => {
           template: `
             <UPageHeader>
               <template #links>
-                <UButton to="/profile/experiences/new">{{ t('experiences.new') }}</UButton>
+                <UButton to="/profile/experiences/new">
+                  {{ t('experiences.list.addNew') }}
+                </UButton>
               </template>
             </UPageHeader>
           `,
@@ -135,16 +121,16 @@ describe('Experiences Page Component', () => {
 
       const button = wrapper.find('.u-button');
       expect(button.exists()).toBe(true);
-      expect(button.text()).toContain('New Experience');
+      expect(button.text()).toContain(i18n.global.t('experiences.list.addNew'));
     });
 
-    it('should render back to profile link', () => {
+    it('should render CV upload link', () => {
       const wrapper = mount(
         {
           template: `
             <UPageHeader>
               <template #links>
-                <NuxtLink to="/profile">{{ t('experiences.backToProfile') }}</NuxtLink>
+                <NuxtLink to="/profile/cv-upload">{{ t('cvUpload.title') }}</NuxtLink>
               </template>
             </UPageHeader>
           `,
@@ -161,9 +147,9 @@ describe('Experiences Page Component', () => {
         }
       );
 
-      const link = wrapper.find('a[href="/profile"]');
+      const link = wrapper.find('a[href="/profile/cv-upload"]');
       expect(link.exists()).toBe(true);
-      expect(link.text()).toContain('Back to Profile');
+      expect(link.text()).toContain(i18n.global.t('cvUpload.title'));
     });
   });
 
@@ -173,8 +159,8 @@ describe('Experiences Page Component', () => {
         {
           template: `
             <UEmpty
-              :title="t('experiences.empty.title')"
-              :description="t('experiences.empty.description')"
+              :title="t('experiences.list.empty')"
+              :description="t('experiences.list.empty')"
             />
           `,
           setup() {
@@ -191,8 +177,8 @@ describe('Experiences Page Component', () => {
       );
 
       expect(wrapper.find('.u-empty').exists()).toBe(true);
-      expect(wrapper.text()).toContain('No experiences yet');
-      expect(wrapper.text()).toContain('Upload your CV or add manually');
+      const emptyText = i18n.global.t('experiences.list.empty');
+      expect(wrapper.text()).toContain(emptyText);
     });
 
     it('should render empty state with icon', () => {

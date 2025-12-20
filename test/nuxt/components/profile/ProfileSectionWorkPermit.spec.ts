@@ -1,31 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../utils/createTestI18n';
 import { ref } from 'vue';
 import ProfileSectionWorkPermit from '@/components/profile/section/WorkPermit.vue';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 import type { ProfileForm } from '@/components/profile/types';
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  missingWarn: false,
-  fallbackWarn: false,
-  messages: {
-    en: {
-      profile: {
-        sections: {
-          workPermit: 'Work Authorization',
-        },
-        fields: {
-          workPermitInfo: 'Work Permit',
-          workPermitPlaceholder: 'Add details',
-          workPermitEmpty: 'Work permit information not provided',
-        },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 const stubs = {
   UCard: {

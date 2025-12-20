@@ -1,44 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../utils/createTestI18n';
 import ExperienceForm from '~/components/ExperienceForm.vue';
 import type { Experience } from '~/domain/experience/Experience';
+import en from '../../../i18n/locales/en.json';
 
 // Create i18n instance for tests
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      experiences: {
-        form: {
-          createTitle: 'Add Experience',
-          editTitle: 'Edit Experience',
-          title: 'Job Title',
-          titlePlaceholder: 'e.g., Senior Software Engineer',
-          company: 'Company Name',
-          companyPlaceholder: 'e.g., Acme Corporation',
-          startDate: 'Start Date',
-          endDate: 'End Date',
-          endDateHint: 'Leave empty if this is your current position',
-          responsibilities: 'Responsibilities',
-          responsibilitiesPlaceholder: 'Enter each responsibility on a new line',
-          responsibilitiesHint: 'One responsibility per line',
-          tasks: 'Tasks & Achievements',
-          tasksPlaceholder: 'Enter each task or achievement on a new line',
-          tasksHint: 'One task per line',
-          status: 'Status',
-          save: 'Save Experience',
-          cancel: 'Cancel',
-        },
-        status: {
-          draft: 'Draft',
-          complete: 'Complete',
-        },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 // Stub Nuxt UI components
 const stubs = {

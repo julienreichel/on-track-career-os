@@ -1,32 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../utils/createTestI18n';
 import { ref } from 'vue';
 import ProfileSectionSocialLinks from '@/components/profile/section/SocialLinks.vue';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 import type { ProfileForm } from '@/components/profile/types';
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  missingWarn: false,
-  fallbackWarn: false,
-  messages: {
-    en: {
-      profile: {
-        sections: {
-          socialLinks: 'Social Links',
-        },
-        fields: {
-          socialLinks: 'Social Links',
-          socialLinksEmpty: 'No social links added yet',
-          socialLinksHint: 'Hint',
-          socialUrlPlaceholder: 'https://example.com',
-        },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 const stubs = {
   UCard: {

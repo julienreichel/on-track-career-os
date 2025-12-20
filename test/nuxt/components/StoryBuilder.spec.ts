@@ -1,45 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../utils/createTestI18n';
 import StoryBuilder from '../../../src/components/StoryBuilder.vue';
 import type { STARStory } from '../../../src/domain/starstory/STARStory';
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      stories: {
-        builder: {
-          situation: 'Situation',
-          situationHint: 'Situation hint',
-          situationPlaceholder: 'Enter situation',
-          task: 'Task',
-          taskHint: 'Task hint',
-          taskPlaceholder: 'Enter task',
-          action: 'Action',
-          actionHint: 'Action hint',
-          actionPlaceholder: 'Enter action',
-          result: 'Result',
-          resultHint: 'Result hint',
-          resultPlaceholder: 'Enter result',
-          achievements: 'Achievements',
-          generateAchievements: 'Generate Achievements',
-          achievementsList: 'Achievements List',
-          achievementsHint: 'Achievements hint',
-          achievementsPlaceholder: 'Add achievement',
-          kpisList: 'KPIs List',
-          kpisHint: 'KPIs hint',
-          kpisPlaceholder: 'Add KPI',
-        },
-      },
-      common: {
-        cancel: 'Cancel',
-        save: 'Save',
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 const stubs = {
   UCard: {

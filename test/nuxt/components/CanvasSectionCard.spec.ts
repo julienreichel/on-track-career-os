@@ -1,24 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../utils/createTestI18n';
 import CanvasSectionCard from '@/components/CanvasSectionCard.vue';
 
 // Create i18n instance for tests
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      canvas: {
-        aria: {
-          editSection: 'Edit section',
-          saveSection: 'Save section',
-          cancelEdit: 'Cancel edit',
-        },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 describe('CanvasSectionCard', () => {
   const defaultProps = {

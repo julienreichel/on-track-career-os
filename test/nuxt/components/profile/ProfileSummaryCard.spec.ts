@@ -1,29 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../utils/createTestI18n';
 import ProfileSummaryCard from '@/components/profile/SummaryCard.vue';
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  missingWarn: false,
-  fallbackWarn: false,
-  messages: {
-    en: {
-      profile: {
-        fields: {
-          fullName: 'Full Name',
-        },
-        summary: {
-          emptyName: 'Complete your profile',
-          emptyHeadline: 'Add headline',
-          careerDirection: 'Career direction',
-          careerDirectionEmpty: 'Add goals',
-        },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
 
 const stubs = {
   UCard: {
@@ -75,8 +55,8 @@ describe('ProfileSummaryCard', () => {
       },
     });
 
-    expect(wrapper.text()).toContain('Complete your profile');
-    expect(wrapper.text()).toContain('Add headline');
+    expect(wrapper.text()).toContain(i18n.global.t('profile.summary.emptyName'));
+    expect(wrapper.text()).toContain(i18n.global.t('profile.summary.emptyHeadline'));
   });
 
   it('shows up to three career direction items', () => {

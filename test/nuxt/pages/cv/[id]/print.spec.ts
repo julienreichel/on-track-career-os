@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import CvPrintPage from '@/pages/cv/[id]/print.vue';
 
@@ -54,24 +54,8 @@ vi.mock('marked', () => ({
 }));
 
 // Create i18n instance for tests
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      cvDisplay: {
-        loading: 'Loading CV...',
-        actions: {
-          print: 'Print',
-          retry: 'Retry',
-        },
-      },
-      common: {
-        close: 'Close',
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 // Create router for tests
 const router = createRouter({

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
 
 /**
@@ -16,25 +16,7 @@ import { createRouter, createMemoryHistory } from 'vue-router';
  */
 
 // Create i18n instance for tests
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      app: {
-        title: 'AI Career OS',
-        description: 'Your AI-powered career development platform',
-      },
-      home: {
-        welcome: 'Welcome',
-        profile: 'Profile',
-        jobs: 'Jobs',
-        applications: 'Applications',
-        interview: 'Interview Prep',
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
 
 // Create router for tests
 const router = createRouter({
@@ -108,7 +90,7 @@ describe('Index Page Component', () => {
           template: `
             <div>
               <UPageHeader>
-                <template #description>{{ t('app.description') }}</template>
+                <template #description>{{ t('home.description') }}</template>
               </UPageHeader>
             </div>
           `,
@@ -125,7 +107,7 @@ describe('Index Page Component', () => {
         }
       );
 
-      expect(wrapper.text()).toContain('AI-powered career development');
+      expect(wrapper.text()).toContain(i18n.global.t('home.description'));
     });
   });
 
@@ -134,7 +116,7 @@ describe('Index Page Component', () => {
       const wrapper = mount(
         {
           template: `
-            <UPageCard to="/profile" :title="t('home.profile')" />
+            <UPageCard to="/profile" :title="t('features.profile.title')" />
           `,
           setup() {
             const { t } = i18n.global;
@@ -150,14 +132,14 @@ describe('Index Page Component', () => {
       );
 
       expect(wrapper.find('.u-page-card').exists()).toBe(true);
-      expect(wrapper.text()).toContain('Profile');
+      expect(wrapper.text()).toContain(i18n.global.t('features.profile.title'));
     });
 
     it('should render jobs feature card', () => {
       const wrapper = mount(
         {
           template: `
-            <UPageCard :title="t('home.jobs')" />
+            <UPageCard :title="t('features.jobs.title')" />
           `,
           setup() {
             const { t } = i18n.global;
@@ -172,14 +154,14 @@ describe('Index Page Component', () => {
         }
       );
 
-      expect(wrapper.text()).toContain('Jobs');
+      expect(wrapper.text()).toContain(i18n.global.t('features.jobs.title'));
     });
 
     it('should render applications feature card', () => {
       const wrapper = mount(
         {
           template: `
-            <UPageCard :title="t('home.applications')" />
+            <UPageCard :title="t('features.applications.title')" />
           `,
           setup() {
             const { t } = i18n.global;
@@ -194,14 +176,14 @@ describe('Index Page Component', () => {
         }
       );
 
-      expect(wrapper.text()).toContain('Applications');
+      expect(wrapper.text()).toContain(i18n.global.t('features.applications.title'));
     });
 
     it('should render interview prep feature card', () => {
       const wrapper = mount(
         {
           template: `
-            <UPageCard :title="t('home.interview')" />
+            <UPageCard :title="t('features.interview.title')" />
           `,
           setup() {
             const { t } = i18n.global;
@@ -216,7 +198,7 @@ describe('Index Page Component', () => {
         }
       );
 
-      expect(wrapper.text()).toContain('Interview Prep');
+      expect(wrapper.text()).toContain(i18n.global.t('features.interview.title'));
     });
   });
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../utils/createTestI18n';
 import { nextTick, ref } from 'vue';
 import ProfileFullForm from '@/components/profile/FullForm.vue';
 
@@ -66,35 +66,8 @@ vi.mock('@/domain/user-profile/ProfilePhotoService', () => ({
   })),
 }));
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  missingWarn: false,
-  fallbackWarn: false,
-  messages: {
-    en: {
-      profile: {
-        title: 'Profile',
-        description: 'Manage profile',
-        actions: {
-          cancel: 'Cancel',
-          save: 'Save Profile',
-          saving: 'Saving...',
-        },
-        sections: {
-          coreIdentity: 'Core identity',
-        },
-        messages: {
-          saveSuccess: 'Saved',
-          saveError: 'Error',
-        },
-      },
-      navigation: {
-        backToHome: 'Home',
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 const baseStubs = {
   UPage: {

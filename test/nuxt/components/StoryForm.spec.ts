@@ -1,27 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../utils/createTestI18n';
 import StoryForm from '../../../src/components/StoryForm.vue';
 import type { StoryFormState } from '../../../src/composables/useStoryEditor';
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      star: {
-        situation: {
-          label: 'Situation',
-          description: 'Situation hint',
-          placeholder: 'Enter situation',
-        },
-        task: { label: 'Task', description: 'Task hint', placeholder: 'Enter task' },
-        action: { label: 'Action', description: 'Action hint', placeholder: 'Enter action' },
-        result: { label: 'Result', description: 'Result hint', placeholder: 'Enter result' },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 const stubs = {
   UFormField: {
@@ -261,10 +245,11 @@ describe('StoryForm', () => {
       },
     });
 
-    expect(wrapper.text()).toContain('Situation hint');
-    expect(wrapper.text()).toContain('Task hint');
-    expect(wrapper.text()).toContain('Action hint');
-    expect(wrapper.text()).toContain('Result hint');
+    const { t } = i18n.global;
+    expect(wrapper.text()).toContain(t('stories.builder.situationHint'));
+    expect(wrapper.text()).toContain(t('stories.builder.taskHint'));
+    expect(wrapper.text()).toContain(t('stories.builder.actionHint'));
+    expect(wrapper.text()).toContain(t('stories.builder.resultHint'));
   });
 
   it('marks all fields as required', () => {

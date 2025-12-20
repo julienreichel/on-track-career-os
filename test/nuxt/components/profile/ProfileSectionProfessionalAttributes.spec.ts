@@ -1,37 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../../utils/createTestI18n';
 import { ref } from 'vue';
 import ProfileSectionProfessionalAttributes from '@/components/profile/section/ProfessionalAttributes.vue';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 import type { ProfileForm } from '@/components/profile/types';
 
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  missingWarn: false,
-  fallbackWarn: false,
-  messages: {
-    en: {
-      profile: {
-        sections: {
-          professionalAttributes: 'Professional Attributes',
-        },
-        fields: {
-          skills: 'Skills',
-          certifications: 'Certifications',
-          languages: 'Languages',
-          skillsPlaceholder: 'Add skill',
-          certificationsPlaceholder: 'Add certification',
-          languagesPlaceholder: 'Add language',
-          skillsHint: 'Hint',
-          certificationsHint: 'Hint',
-          languagesHint: 'Hint',
-        },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
 
 const stubs = {
   UCard: {

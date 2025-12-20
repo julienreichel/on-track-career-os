@@ -1,36 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createI18n } from 'vue-i18n';
+import { createTestI18n } from '../../utils/createTestI18n';
 import PersonalCanvasComponent from '~/components/PersonalCanvasComponent.vue';
+import en from '../../../i18n/locales/en.json';
 
 // Create i18n instance for tests
-const i18n = createI18n({
-  legacy: false,
-  locale: 'en',
-  messages: {
-    en: {
-      canvas: {
-        title: 'Personal Business Model Canvas',
-        description: 'Your career strategy at a glance',
-        empty: {
-          title: 'No canvas yet',
-          description: 'Generate your first canvas from your profile',
-        },
-        sections: {
-          customerSegments: 'Customer Segments',
-          valueProposition: 'Value Proposition',
-          channels: 'Channels',
-          customerRelationships: 'Customer Relationships',
-          keyActivities: 'Key Activities',
-          keyResources: 'Key Resources',
-          keyPartners: 'Key Partners',
-          costStructure: 'Cost Structure',
-          revenueStreams: 'Revenue Streams',
-        },
-      },
-    },
-  },
-});
+const i18n = createTestI18n();
+
+const translate = (key: string) => i18n.global.t(key);
 
 describe('PersonalCanvasComponent', () => {
   const mockCanvas = {
@@ -70,7 +47,7 @@ describe('PersonalCanvasComponent', () => {
     });
 
     expect(wrapper.find('.u-card').exists()).toBe(true);
-    expect(wrapper.text()).toContain('No canvas yet');
+    expect(wrapper.text()).toContain(translate('canvas.empty.title'));
   });
 
   it('renders loading state', () => {
@@ -154,7 +131,7 @@ describe('PersonalCanvasComponent', () => {
 
     // Find edit button and click it
     const buttons = wrapper.findAllComponents({ name: 'UButton' });
-    const editButton = buttons.find((b) => b.text().includes('canvas.actions.edit'));
+    const editButton = buttons.find((b) => b.text().includes(translate('canvas.actions.edit')));
 
     if (editButton) {
       await editButton.trigger('click');
@@ -189,7 +166,7 @@ describe('PersonalCanvasComponent', () => {
 
     // Enter edit mode
     const buttons = wrapper.findAllComponents({ name: 'UButton' });
-    const editButton = buttons.find((b) => b.text().includes('canvas.actions.edit'));
+    const editButton = buttons.find((b) => b.text().includes(translate('canvas.actions.edit')));
 
     if (editButton) {
       await editButton.trigger('click');
@@ -198,7 +175,7 @@ describe('PersonalCanvasComponent', () => {
       // Click save button
       const saveButton = wrapper
         .findAllComponents({ name: 'UButton' })
-        .find((b) => b.text().includes('canvas.actions.save'));
+        .find((b) => b.text().includes(translate('canvas.actions.save')));
       if (saveButton) {
         await saveButton.trigger('click');
         expect(wrapper.emitted('save')).toBeTruthy();
@@ -227,6 +204,6 @@ describe('PersonalCanvasComponent', () => {
     });
 
     expect(wrapper.find('.badge').exists()).toBe(true);
-    expect(wrapper.text()).toContain('canvas.needsUpdate');
+    expect(wrapper.text()).toContain(translate('canvas.needsUpdate'));
   });
 });
