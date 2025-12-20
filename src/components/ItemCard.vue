@@ -31,7 +31,13 @@ const handleDelete = (event: Event) => {
 </script>
 
 <template>
-  <UCard class="h-full flex flex-col">
+  <UCard
+    class="h-full flex flex-col"
+    :ui="{
+      body: 'flex flex-col flex-1',
+      footer: 'mt-auto',
+    }"
+  >
     <template #header>
       <div class="space-y-2">
         <!-- Title -->
@@ -46,7 +52,7 @@ const handleDelete = (event: Event) => {
     </template>
 
     <!-- Content Area - grows to fill space -->
-    <div class="flex-grow">
+    <div class="flex flex-col flex-1">
       <slot />
     </div>
 
