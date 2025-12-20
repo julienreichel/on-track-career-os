@@ -402,6 +402,7 @@ export const schema = a
       .query()
       .arguments({
         starStory: a.customType({
+          title: a.string(),
           situation: a.string().required(),
           task: a.string().required(),
           action: a.string().required(),

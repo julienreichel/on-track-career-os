@@ -59,6 +59,7 @@ const OUTPUT_SCHEMA = `{
 // Input types
 export interface GenerateAchievementsAndKpisInput {
   starStory: {
+    title?: string;
     situation: string;
     task: string;
     action: string;
@@ -77,6 +78,8 @@ export interface GenerateAchievementsAndKpisOutput {
  */
 function buildUserPrompt(starStory: GenerateAchievementsAndKpisInput['starStory']): string {
   return `Generate achievements and KPIs based on this STAR story:
+
+TITLE: ${starStory.title ?? 'Untitled STAR story'}
 
 SITUATION: ${starStory.situation}
 
