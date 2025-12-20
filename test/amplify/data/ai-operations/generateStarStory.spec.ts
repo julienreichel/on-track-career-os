@@ -55,7 +55,7 @@ which reduced deployment time by 70% and improved system reliability to 99.9% up
     // For testing, we provide a structured text response
     if (sourceText.includes('TechCorp')) {
       return `## title:
-TechCorp Deployment Transformation
+TechCorp Deployment Win
 
 ## situation:
 The team was struggling with deployment bottlenecks and scaling issues in a monolithic application at TechCorp.
@@ -113,7 +113,7 @@ Outcome achieved from the experience`;
       expect(parsed.length).toBeGreaterThan(0);
 
       const story = parsed[0];
-      expect(story.title).toContain('TechCorp');
+      expect(story.title).toBe('TechCorp Deployment Win');
       expect(story.situation).toContain('TechCorp');
       expect(story.task).toContain('deployment efficiency');
       expect(story.action).toContain('microservices');

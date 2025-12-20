@@ -30,7 +30,7 @@ IMPORTANT: Write all stories in FIRST PERSON perspective using "I" pronouns.
 Format your response as plain text using this structure for EACH story:
 
 ## title:
-[Give the story a short resume-friendly headline]
+[Give the story a resume-friendly headline in 3-5 words. Use active verbs and summarize the impact (e.g., "Cut MTTR 60%", "Led Cloud Migration"). Never exceed 6 words.]
 
 ## situation:
 [Description of the context/challenge - use "I was", "I faced", etc.]
@@ -63,30 +63,66 @@ export interface GenerateStarStoryInput {
 /**
  * Extract text between markers
  */
+function cleanSectionText(value: string): string {
+  if (!value) {
+    return '';
+  }
+
+  let cleaned = value.trim();
+
+  // Remove surrounding markdown fences/backticks/brackets/quotes if AI wrapped the content
+  if (cleaned.startsWith('```') && cleaned.endsWith('```')) {
+    cleaned = cleaned.slice(3, -3).trim();
+  }
+
+  if (cleaned.startsWith('[') && cleaned.endsWith(']')) {
+    cleaned = cleaned.slice(1, -1).trim();
+  }
+
+  cleaned = cleaned.replace(/^`+/, '').replace(/`+$/, '');
+  cleaned = cleaned.replace(/^"+/, '').replace(/"+$/, '');
+  cleaned = cleaned.replace(/^'+/, '').replace(/'+$/, '');
+
+  // Remove trailing markdown separators like --- or ***
+  cleaned = cleaned.replace(/(\n|\s)*[-*_]{3,}\s*$/g, '').trim();
+
+  return cleaned;
+}
+
 function extractSection(text: string, startMarker: string, endMarker?: string): string {
   const regex = endMarker
     ? new RegExp(`${startMarker}\\s*(.*?)${endMarker}`, 'is')
     : new RegExp(`${startMarker}\\s*(.*?)(?:##|$)`, 'is');
 
   const match = text.match(regex);
-  return match?.[1]?.trim() || '';
+  return cleanSectionText(match?.[1] ?? '');
 }
 
 /**
  * Parse AI text response into structured STAR stories
  */
-function inferTitleFromSituation(situation: string): string {
-  if (!situation) {
-    return 'Untitled STAR story';
+function getFirstSentence(text: string): string {
+  if (!text) return '';
+
+  const sentenceMatch = text.match(/(.+?[.?!])(\s|$)/s);
+  if (sentenceMatch && sentenceMatch[1]) {
+    return sentenceMatch[1].trim();
   }
 
-  const firstSentence = situation.split(/[\n.]/).find((segment) => segment.trim().length > 0);
-  if (firstSentence) {
-    const trimmed = firstSentence.trim();
-    return trimmed.length > 80 ? `${trimmed.slice(0, 77)}…` : trimmed;
-  }
+  return text.trim();
+}
 
-  return 'Untitled STAR story';
+function inferTitleFromStory(story: GenerateStarStoryOutput): string {
+  const candidates = [
+    getFirstSentence(story.result),
+    getFirstSentence(story.action),
+    getFirstSentence(story.situation),
+  ].filter((candidate) => candidate.length > 0);
+
+  const preferred = candidates.find((candidate) => candidate.length >= 10);
+  const fallback = preferred || candidates[0] || 'Untitled STAR story';
+
+  return fallback.length > 80 ? `${fallback.slice(0, 77)}…` : fallback;
 }
 
 function parseStarStoriesFromText(aiText: string): GenerateStarStoryOutput[] {
@@ -109,9 +145,7 @@ function parseStarStoriesFromText(aiText: string): GenerateStarStoryOutput[] {
       result: extractSection(block, '##\\s*result:'),
     };
 
-    if (!story.title) {
-      story.title = inferTitleFromSituation(story.situation);
-    }
+    story.title = cleanSectionText(story.title);
 
     if (!story.situation) {
       story.situation = 'No situation provided';
@@ -134,6 +168,10 @@ function parseStarStoriesFromText(aiText: string): GenerateStarStoryOutput[] {
       story.result !== 'No result provided';
 
     if (hasContent) {
+      if (!story.title) {
+        story.title = inferTitleFromStory(story);
+      }
+
       stories.push(story);
     }
   }
