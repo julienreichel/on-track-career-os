@@ -7,6 +7,7 @@ import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { Experience } from '@/domain/experience/Experience';
 import type { STARStory } from '@/domain/starstory/STARStory';
+import { withMockedConsoleError } from '../../utils/withMockedConsole';
 
 // Mock dependencies
 vi.mock('@/domain/ai-operations/AiOperationsService');
@@ -106,17 +107,6 @@ describe('useCvGenerator', () => {
       updatedAt: '2024-01-01',
     },
   ] as unknown as STARStory[];
-
-  const withSilencedConsoleError = (testFn: () => Promise<void> | void) => {
-    return async () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      try {
-        await testFn();
-      } finally {
-        consoleSpy.mockRestore();
-      }
-    };
-  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -250,7 +240,7 @@ describe('useCvGenerator', () => {
 
     it(
       'should handle profile not found',
-      withSilencedConsoleError(async () => {
+      withMockedConsoleError(async () => {
         mockUserProfileRepo.get.mockResolvedValue(null);
 
         const { generateCv, error } = useCvGenerator();
@@ -264,7 +254,7 @@ describe('useCvGenerator', () => {
 
     it(
       'should handle AI service errors',
-      withSilencedConsoleError(async () => {
+      withMockedConsoleError(async () => {
         mockAiService.generateCv.mockRejectedValue(new Error('AI service failed'));
 
         const { generateCv, error, generating } = useCvGenerator();
@@ -278,7 +268,7 @@ describe('useCvGenerator', () => {
 
     it(
       'should handle repository errors during input building',
-      withSilencedConsoleError(async () => {
+      withMockedConsoleError(async () => {
         mockExperienceRepo.list.mockRejectedValue(new Error('Database error'));
 
         const { generateCv, error } = useCvGenerator();
@@ -291,7 +281,7 @@ describe('useCvGenerator', () => {
 
     it(
       'should handle story loading errors gracefully',
-      withSilencedConsoleError(async () => {
+      withMockedConsoleError(async () => {
         mockStoryService.getStoriesByExperience.mockRejectedValue(new Error('Story load failed'));
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -312,7 +302,7 @@ describe('useCvGenerator', () => {
 
     it(
       'should reset error state on new generation',
-      withSilencedConsoleError(async () => {
+      withMockedConsoleError(async () => {
         const { generateCv, error } = useCvGenerator();
 
         // First call fails
@@ -452,7 +442,7 @@ describe('useCvGenerator', () => {
 
     it(
       'should return null when profile not found',
-      withSilencedConsoleError(async () => {
+      withMockedConsoleError(async () => {
         mockUserProfileRepo.get.mockResolvedValue(null);
 
         const { buildGenerationInput, error } = useCvGenerator();
@@ -465,7 +455,7 @@ describe('useCvGenerator', () => {
 
     it(
       'should handle errors during input building',
-      withSilencedConsoleError(async () => {
+      withMockedConsoleError(async () => {
         mockExperienceRepo.list.mockRejectedValue(new Error('List failed'));
 
         const { buildGenerationInput, error } = useCvGenerator();
@@ -501,7 +491,7 @@ describe('useCvGenerator', () => {
 
     it(
       'should handle unknown error types',
-      withSilencedConsoleError(async () => {
+      withMockedConsoleError(async () => {
         mockAiService.generateCv.mockRejectedValue('String error');
 
         const { generateCv, error } = useCvGenerator();

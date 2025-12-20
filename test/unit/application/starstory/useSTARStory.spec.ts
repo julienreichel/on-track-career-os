@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useSTARStory } from '@/application/starstory/useSTARStory';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { STARStory } from '@/domain/starstory/STARStory';
+import { withMockedConsoleError } from '../../../utils/withMockedConsole';
 
 // Mock the STARStoryService
 vi.mock('@/domain/starstory/STARStoryService');
@@ -86,8 +87,10 @@ describe('useSTARStory', () => {
     expect(mockService.getFullSTARStory).toHaveBeenCalledWith('non-existent-id');
   });
 
-  it('should handle errors and set error state', async () => {
-    mockService.getFullSTARStory.mockRejectedValue(new Error('Service failed'));
+  it(
+    'should handle errors and set error state',
+    withMockedConsoleError(async () => {
+      mockService.getFullSTARStory.mockRejectedValue(new Error('Service failed'));
 
     const { item, loading, error, load } = useSTARStory('starstory-123');
 
@@ -96,17 +99,21 @@ describe('useSTARStory', () => {
     expect(loading.value).toBe(false);
     expect(error.value).toBe('Service failed');
     expect(item.value).toBeNull();
-  });
+    })
+  );
 
-  it('should handle unknown errors', async () => {
-    mockService.getFullSTARStory.mockRejectedValue('Unknown error');
+  it(
+    'should handle unknown errors',
+    withMockedConsoleError(async () => {
+      mockService.getFullSTARStory.mockRejectedValue('Unknown error');
 
     const { error, load } = useSTARStory('starstory-123');
 
     await load();
 
     expect(error.value).toBe('Unknown error occurred');
-  });
+    })
+  );
 
   it('should reset error state on successful reload', async () => {
     const mockSTARStory = {
@@ -127,7 +134,9 @@ describe('useSTARStory', () => {
     mockService.getFullSTARStory.mockRejectedValueOnce(new Error('Network error'));
     const { error, load } = useSTARStory('starstory-123');
 
-    await load();
+    await withMockedConsoleError(async () => {
+      await load();
+    })();
     expect(error.value).toBe('Network error');
 
     // Second call succeeds

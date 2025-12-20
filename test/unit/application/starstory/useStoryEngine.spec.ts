@@ -5,6 +5,7 @@ import type { STARStory } from '@/domain/starstory/STARStory';
 import type { STARStory as AiSTARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 import type { Experience } from '@/domain/experience/Experience';
+import { withMockedConsoleError } from '../../../utils/withMockedConsole';
 
 // Mock the services
 vi.mock('@/domain/starstory/STARStoryService');
@@ -98,15 +99,18 @@ describe('useStoryEngine', () => {
       expect(loading.value).toBe(false);
     });
 
-    it('should handle errors when loading stories', async () => {
-      mockService.getStoriesByExperience.mockRejectedValue(new Error('Database error'));
+    it(
+      'should handle errors when loading stories',
+      withMockedConsoleError(async () => {
+        mockService.getStoriesByExperience.mockRejectedValue(new Error('Database error'));
 
-      const { error, loadStoriesByExperienceId } = useStoryEngine();
+        const { error, loadStoriesByExperienceId } = useStoryEngine();
 
-      await loadStoriesByExperienceId('exp-123');
+        await loadStoriesByExperienceId('exp-123');
 
-      expect(error.value).toBe('Database error');
-    });
+        expect(error.value).toBe('Database error');
+      })
+    );
 
     it('should require experience ID', async () => {
       const { error, loadStoriesByExperienceId } = useStoryEngine();
@@ -147,21 +151,24 @@ describe('useStoryEngine', () => {
       expect(hasStories.value).toBe(true);
     });
 
-    it('should handle errors', async () => {
-      const mockExperience = {
-        id: 'exp-123',
-        title: 'Test Experience',
-      } as Experience;
+    it(
+      'should handle errors',
+      withMockedConsoleError(async () => {
+        const mockExperience = {
+          id: 'exp-123',
+          title: 'Test Experience',
+        } as Experience;
 
-      mockService.getStoriesByExperience.mockRejectedValue(new Error('Database error'));
+        mockService.getStoriesByExperience.mockRejectedValue(new Error('Database error'));
 
-      const { error, loadStoriesForExperience } = useStoryEngine();
+        const { error, loadStoriesForExperience } = useStoryEngine();
 
-      await loadStoriesForExperience(mockExperience);
+        await loadStoriesForExperience(mockExperience);
 
-      expect(error.value).toBe('Database error');
-      expect(mockService.getStoriesByExperience).toHaveBeenCalledWith('exp-123');
-    });
+        expect(error.value).toBe('Database error');
+        expect(mockService.getStoriesByExperience).toHaveBeenCalledWith('exp-123');
+      })
+    );
   });
 
   describe('loadStory', () => {
@@ -185,15 +192,18 @@ describe('useStoryEngine', () => {
       expect(selectedStory.value).toEqual(mockStory);
     });
 
-    it('should handle errors when loading story', async () => {
-      mockService.getFullSTARStory.mockRejectedValue(new Error('Not found'));
+    it(
+      'should handle errors when loading story',
+      withMockedConsoleError(async () => {
+        mockService.getFullSTARStory.mockRejectedValue(new Error('Not found'));
 
-      const { error, loadStory } = useStoryEngine();
+        const { error, loadStory } = useStoryEngine();
 
-      await loadStory('story-123');
+        await loadStory('story-123');
 
-      expect(error.value).toBe('Not found');
-    });
+        expect(error.value).toBe('Not found');
+      })
+    );
   });
 
   describe('createStoryDraft', () => {
@@ -238,6 +248,10 @@ describe('useStoryEngine', () => {
       };
 
       mockService.generateStar.mockResolvedValue([mockAiStory]);
+      mockService.generateAchievements.mockResolvedValue({
+        achievements: [],
+        kpiSuggestions: [],
+      });
 
       const { draftStory, runStarInterview, isGenerating } = useStoryEngine();
 
@@ -262,6 +276,10 @@ describe('useStoryEngine', () => {
       };
 
       mockService.generateStar.mockResolvedValue([mockAiStory]);
+      mockService.generateAchievements.mockResolvedValue({
+        achievements: ['Existing achievement'],
+        kpiSuggestions: ['Existing KPI'],
+      });
 
       const { draftStory, runStarInterview } = useStoryEngine();
 
@@ -292,14 +310,17 @@ describe('useStoryEngine', () => {
       expect(mockService.generateStar).not.toHaveBeenCalled();
     });
 
-    it('should handle AI generation errors', async () => {
-      mockService.generateStar.mockRejectedValue(new Error('AI service error'));
+    it(
+      'should handle AI generation errors',
+      withMockedConsoleError(async () => {
+        mockService.generateStar.mockRejectedValue(new Error('AI service error'));
 
-      const { error, runStarInterview } = useStoryEngine();
+        const { error, runStarInterview } = useStoryEngine();
 
-      await expect(runStarInterview('Test text')).rejects.toThrow('AI service error');
-      expect(error.value).toBe('AI service error');
-    });
+        await expect(runStarInterview('Test text')).rejects.toThrow('AI service error');
+        expect(error.value).toBe('AI service error');
+      })
+    );
   });
 
   describe('generateAchievements', () => {

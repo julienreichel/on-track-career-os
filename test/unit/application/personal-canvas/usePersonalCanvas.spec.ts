@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { usePersonalCanvas } from '@/application/personal-canvas/usePersonalCanvas';
 import { PersonalCanvasService } from '@/domain/personal-canvas/PersonalCanvasService';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
+import { withMockedConsoleError } from '../../../utils/withMockedConsole';
 
 // Mock the PersonalCanvasService
 vi.mock('@/domain/personal-canvas/PersonalCanvasService');
@@ -91,8 +92,10 @@ describe('usePersonalCanvas', () => {
     expect(mockService.getFullPersonalCanvas).toHaveBeenCalledWith('non-existent-id');
   });
 
-  it('should handle errors and set error state', async () => {
-    mockService.getFullPersonalCanvas.mockRejectedValue(new Error('Service failed'));
+  it(
+    'should handle errors and set error state',
+    withMockedConsoleError(async () => {
+      mockService.getFullPersonalCanvas.mockRejectedValue(new Error('Service failed'));
 
     const { item, loading, error, load } = usePersonalCanvas('personalcanvas-123');
 
@@ -101,10 +104,13 @@ describe('usePersonalCanvas', () => {
     expect(loading.value).toBe(false);
     expect(error.value).toBe('Service failed');
     expect(item.value).toBeNull();
-  });
+    })
+  );
 
-  it('should handle network errors', async () => {
-    mockService.getFullPersonalCanvas.mockRejectedValue(new Error('Network error'));
+  it(
+    'should handle network errors',
+    withMockedConsoleError(async () => {
+      mockService.getFullPersonalCanvas.mockRejectedValue(new Error('Network error'));
 
     const { loading, error, item, load } = usePersonalCanvas('personalcanvas-123');
 
@@ -113,7 +119,8 @@ describe('usePersonalCanvas', () => {
     expect(loading.value).toBe(false);
     expect(error.value).toBe('Network error');
     expect(item.value).toBeNull();
-  });
+    })
+  );
 
   it('should allow multiple load calls', async () => {
     const mockCanvas1 = {

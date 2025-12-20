@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useCVDocument } from '@/application/cvdocument/useCVDocument';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
+import { withMockedConsoleError } from '../../../utils/withMockedConsole';
 
 // Mock the CVDocumentService
 vi.mock('@/domain/cvdocument/CVDocumentService');
@@ -88,8 +89,10 @@ describe('useCVDocument', () => {
     expect(mockService.getFullCVDocument).toHaveBeenCalledWith('non-existent-id');
   });
 
-  it('should handle errors and set error state', async () => {
-    mockService.getFullCVDocument.mockRejectedValue(new Error('Service failed'));
+  it(
+    'should handle errors and set error state',
+    withMockedConsoleError(async () => {
+      mockService.getFullCVDocument.mockRejectedValue(new Error('Service failed'));
 
     const { item, loading, error, load } = useCVDocument('cvdocument-123');
 
@@ -98,10 +101,13 @@ describe('useCVDocument', () => {
     expect(loading.value).toBe(false);
     expect(error.value).toBe('Service failed');
     expect(item.value).toBeNull();
-  });
+    })
+  );
 
-  it('should handle network errors', async () => {
-    mockService.getFullCVDocument.mockRejectedValue(new Error('Network error'));
+  it(
+    'should handle network errors',
+    withMockedConsoleError(async () => {
+      mockService.getFullCVDocument.mockRejectedValue(new Error('Network error'));
 
     const { loading, error, item, load } = useCVDocument('cvdocument-123');
 
@@ -110,7 +116,8 @@ describe('useCVDocument', () => {
     expect(loading.value).toBe(false);
     expect(error.value).toBe('Network error');
     expect(item.value).toBeNull();
-  });
+    })
+  );
 
   it('should allow multiple load calls', async () => {
     const mockCV1 = {

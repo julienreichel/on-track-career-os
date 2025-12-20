@@ -3,6 +3,7 @@ import { useCvDocuments } from '@/composables/useCvDocuments';
 import { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
+import { withMockedConsoleError } from '../../../utils/withMockedConsole';
 
 // Mock dependencies
 vi.mock('@/domain/cvdocument/CVDocumentRepository');
@@ -22,17 +23,6 @@ describe('useCvDocuments', () => {
     updateBlock: ReturnType<typeof vi.fn>;
     removeBlock: ReturnType<typeof vi.fn>;
     reorderBlocks: ReturnType<typeof vi.fn>;
-  };
-
-  const withSilencedConsoleError = (fn: () => Promise<void> | void) => {
-    return async () => {
-      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      try {
-        await fn();
-      } finally {
-        spy.mockRestore();
-      }
-    };
   };
 
   beforeEach(() => {
@@ -92,7 +82,7 @@ describe('useCvDocuments', () => {
       expect(items.value).toEqual(mockCVs);
     });
 
-    it('should handle errors during load', withSilencedConsoleError(async () => {
+    it('should handle errors during load', withMockedConsoleError(async () => {
       mockRepository.list.mockRejectedValue(new Error('Load failed'));
 
       const { items, error, loadAll } = useCvDocuments();
@@ -144,7 +134,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockCreated);
     });
 
-    it('should handle creation errors', withSilencedConsoleError(async () => {
+    it('should handle creation errors', withMockedConsoleError(async () => {
       mockRepository.create.mockRejectedValue(new Error('Creation failed'));
 
       const { error, createDocument } = useCvDocuments();
@@ -183,7 +173,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle update errors', withSilencedConsoleError(async () => {
+    it('should handle update errors', withMockedConsoleError(async () => {
       mockRepository.update.mockRejectedValue(new Error('Update failed'));
 
       const { error, updateDocument } = useCvDocuments();
@@ -215,7 +205,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0].id).toBe('cv-2');
     });
 
-    it('should handle deletion errors', withSilencedConsoleError(async () => {
+    it('should handle deletion errors', withMockedConsoleError(async () => {
       mockRepository.delete.mockRejectedValue(new Error('Deletion failed'));
 
       const { error, deleteDocument } = useCvDocuments();
@@ -259,7 +249,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle addBlock errors', withSilencedConsoleError(async () => {
+    it('should handle addBlock errors', withMockedConsoleError(async () => {
       mockService.addBlock.mockRejectedValue(new Error('Add block failed'));
 
       const { error, addBlock } = useCvDocuments();
@@ -303,7 +293,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle updateBlock errors', withSilencedConsoleError(async () => {
+    it('should handle updateBlock errors', withMockedConsoleError(async () => {
       mockService.updateBlock.mockRejectedValue(new Error('Update block failed'));
 
       const { error, updateBlock } = useCvDocuments();
@@ -348,7 +338,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle removeBlock errors', withSilencedConsoleError(async () => {
+    it('should handle removeBlock errors', withMockedConsoleError(async () => {
       mockService.removeBlock.mockRejectedValue(new Error('Remove block failed'));
 
       const { error, removeBlock } = useCvDocuments();
@@ -396,7 +386,7 @@ describe('useCvDocuments', () => {
       expect(items.value[0]).toEqual(mockUpdated);
     });
 
-    it('should handle reorderBlocks errors', withSilencedConsoleError(async () => {
+    it('should handle reorderBlocks errors', withMockedConsoleError(async () => {
       mockService.reorderBlocks.mockRejectedValue(new Error('Reorder failed'));
 
       const { error, reorderBlocks } = useCvDocuments();

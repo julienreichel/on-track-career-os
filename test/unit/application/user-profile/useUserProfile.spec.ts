@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useUserProfile } from '@/application/user-profile/useUserProfile';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
+import { withMockedConsoleError } from '../../../utils/withMockedConsole';
 
 // Mock the UserProfileService
 vi.mock('@/domain/user-profile/UserProfileService');
@@ -54,8 +55,10 @@ describe('useUserProfile', () => {
     expect(mockService.getFullUserProfile).toHaveBeenCalledWith('user-123');
   });
 
-  it('should handle errors and set error state', async () => {
-    mockService.getFullUserProfile.mockRejectedValue(new Error('Service failed'));
+  it(
+    'should handle errors and set error state',
+    withMockedConsoleError(async () => {
+      mockService.getFullUserProfile.mockRejectedValue(new Error('Service failed'));
 
     const { item, loading, error, load } = useUserProfile('user-123');
 
@@ -64,7 +67,8 @@ describe('useUserProfile', () => {
     expect(loading.value).toBe(false);
     expect(error.value).toBe('Service failed');
     expect(item.value).toBeNull();
-  });
+    })
+  );
 
   it('should handle loading state correctly', async () => {
     mockService.getFullUserProfile.mockImplementation(
@@ -93,8 +97,10 @@ describe('useUserProfile', () => {
     expect(mockService.getFullUserProfile).toHaveBeenCalledWith('non-existent-id');
   });
 
-  it('should handle errors and set error state', async () => {
-    mockService.getFullUserProfile.mockRejectedValue(new Error('Network error'));
+  it(
+    'should handle errors and set error state',
+    withMockedConsoleError(async () => {
+      mockService.getFullUserProfile.mockRejectedValue(new Error('Network error'));
 
     const { loading, error, item, load } = useUserProfile('user-123');
 
@@ -103,7 +109,8 @@ describe('useUserProfile', () => {
     expect(loading.value).toBe(false);
     expect(error.value).toBe('Network error');
     expect(item.value).toBeNull();
-  });
+    })
+  );
 
   it('should allow multiple load calls', async () => {
     const mockProfile1 = {
