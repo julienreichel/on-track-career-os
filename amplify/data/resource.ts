@@ -89,7 +89,6 @@ export const schema = a
         cvs: a.hasMany('CVDocument', 'userId'),
         coverLetters: a.hasMany('CoverLetter', 'userId'),
         speechBlocks: a.hasMany('SpeechBlock', 'userId'),
-        interviewSessions: a.hasMany('InterviewSession', 'userId'),
         matchingSummaries: a.hasMany('MatchingSummary', 'userId'),
       })
       .authorization((allow) => [allow.owner()]),
@@ -197,8 +196,6 @@ export const schema = a
         cvs: a.hasMany('CVDocument', 'jobId'),
         speechBlocks: a.hasMany('SpeechBlock', 'jobId'),
         kpiSets: a.hasMany('KPISet', 'jobId'),
-        interviewQuestions: a.hasOne('InterviewQuestionSet', 'jobId'),
-        interviewSessions: a.hasMany('InterviewSession', 'jobId'),
         matchingSummaries: a.hasMany('MatchingSummary', 'jobId'),
       })
       .authorization((allow) => [allow.owner()]),
@@ -340,36 +337,6 @@ export const schema = a
         story: a.belongsTo('STARStory', 'storyId'),
 
         materialId: a.string().required(),
-      })
-      .authorization((allow) => [allow.owner()]),
-
-    // =====================================================
-    // 5. INTERVIEW DOMAIN
-    // =====================================================
-
-    InterviewQuestionSet: a
-      .model({
-        behavioralQuestions: a.string().array(),
-        technicalQuestions: a.string().array(),
-        culturalQuestions: a.string().array(),
-        painBasedQuestions: a.string().array(),
-
-        jobId: a.id().required(),
-        job: a.belongsTo('JobDescription', 'jobId'),
-      })
-      .authorization((allow) => [allow.owner()]),
-
-    InterviewSession: a
-      .model({
-        transcript: a.string(),
-        scores: a.json(),
-        feedback: a.string(),
-
-        userId: a.id().required(),
-        user: a.belongsTo('UserProfile', 'userId'),
-
-        jobId: a.id().required(),
-        job: a.belongsTo('JobDescription', 'jobId'),
       })
       .authorization((allow) => [allow.owner()]),
 
