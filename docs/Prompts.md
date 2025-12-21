@@ -204,3 +204,215 @@ same `/applications/speech`
 NO export, NO PDF
 
 ---
+
+# PROMPT 5A-1 — Job Description Intake → Save Raw JD Text
+
+### Context & Purpose
+
+User pastes a job description into `/jobs/new`.
+We must parse it into JobDescription.rawText and trigger AI parsing.
+
+### Component/Composables
+
+Used:
+
+- `useJobAnalysis()` composable
+  Components:
+- Job Intake Component (page 2.2)
+
+### Pages Impacted
+
+- `/jobs/new` → create JD entry
+- `/jobs/:id` → view results later
+
+### Implementation Instructions
+
+- Save raw text string into JobDescription entity.
+- Validate non-empty text.
+- Trigger `ai.parseJobDescription` with `{ jobText }`.
+- Store AI output into JobDescription fields.
+
+### Acceptance Criteria
+
+- Raw JD saved to DB.
+- AI call fired successfully.
+- Responsibilities / skills / behaviours stored.
+- Job list displays job title extracted by AI.
+
+---
+
+---
+
+# PROMPT 5A-2 — AI Parsing of Job Description
+
+### Context & Purpose
+
+Convert job posting into structured data.
+
+### Components / Composables
+
+- `useJobAnalysis().parseJobDescription()`
+
+### Page
+
+- `/jobs/new`
+
+### Implementation
+
+- Call `ai.parseJobDescription` updated schema.
+- Write mapping function:
+  raw → mapped fields:
+  responsibilities, skills, behaviours, successCriteria, pains, seniority, title.
+- Save output to JobDescription entry.
+
+### Acceptance Criteria
+
+- AI output validated via schema.
+- Seniority always present (even “unknown”).
+- Title extracted in 90% of cases.
+- Responsibilites length ≥ 3 if present in text.
+
+---
+
+---
+
+# PROMPT 5A-3 — Build JobRoleCard Generator
+
+### Context & Purpose
+
+Turn parsed data into a user-facing Job Role Card.
+
+### Components
+
+- Job Role Card Component (Page 2.3)
+
+### Pages
+
+- `/jobs/:id`
+
+### Implementation
+
+- Create `ai.generateJobRoleCard` call.
+- Summarise job into structured fields.
+- Add AI confidence score.
+- Store under JobRoleCard entity.
+
+### Acceptance Criteria
+
+- Summary produced ≤ 120 words.
+- All fields must map 1-to-1 to CDM node names.
+- Card visible on page with tabs.
+
+---
+
+---
+
+# PROMPT 5A-4 — Manual Editing UI
+
+### Context & Purpose
+
+Users must edit extracted fields.
+
+### Components
+
+- `<UTabs>` based editor
+- Job Role Card Component
+
+### Pages
+
+- `/jobs/:id`
+
+### Implementation
+
+- Editable lists for:
+  responsibilities, skills, behaviours, success criteria, pains
+- Versioning not required.
+- Tag input for array fields.
+
+### Acceptance Criteria
+
+- User can add/remove items.
+- Autosave at field level.
+- UI validation handles empty entries.
+
+---
+
+---
+
+# PROMPT 5A-5 — Connect Job → Company (optional field stub)
+
+### Context & Purpose
+
+EPIC 5C will require relational linking.
+
+### Components/Composables
+
+- useJobAnalysis
+- useCanvasEngine (later)
+
+### Pages
+
+- `/jobs/:id`
+
+### Implementation
+
+- Add dropdown for company selection (optional)
+- Save companyId FK onto JobDescription
+
+### Acceptance Criteria
+
+- No AI required yet.
+- Relationship persists.
+
+---
+
+---
+
+# PROMPT 5A-6 — Data Refresh Logic
+
+### Context
+
+User may update JD text after first parsing.
+
+### Components
+
+- `useJobAnalysis()`
+
+### Pages
+
+- `/jobs/:id`
+
+### Implementation
+
+- Add "Reanalyse" button
+- Re-run AI pipeline overwriting existing fields
+
+### Acceptance Tests
+
+- Output regenerates fully
+- Confirm overwrite warning shown
+- UI refresh without page reload
+
+---
+
+---
+
+# PROMPT 5A-7 — Business Rules Validation
+
+### Purpose
+
+Prevent bad data downstream.
+
+### Implementation
+
+Validation rules:
+
+- minimum JD words: 80
+- responsibilities count ≥ 3 OR flag warnings
+- success criteria must be non-empty OR propagate “not provided”
+
+### Acceptance Criteria
+
+- Warning banners visible
+- Stored data remains valid JSON
+- No frontend crashes

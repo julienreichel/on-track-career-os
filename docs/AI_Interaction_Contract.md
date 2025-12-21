@@ -409,62 +409,59 @@ Stories:
 
 ## AI OPERATION 6 — `ai.parseJobDescription`
 
-### Purpose
-
-Extract structured fields from a job description.
-
-### System Prompt
-
-```
-Analyze the job description and extract responsibilities, skills,
-behaviours, success criteria, and explicit pains.
-No hallucinations. Return JSON only.
-```
-
-### User Prompt
-
-```
-Parse this job description:
-{{jobText}}
-```
-
-### Input
-
-```json
-{ "jobText": "string" }
-```
-
-### Output
+### Output JSON
 
 ```json
 {
+  "jobTitle": "string",
+  "seniorityLevel": "string",
   "responsibilities": ["string"],
   "requiredSkills": ["string"],
   "behaviours": ["string"],
   "successCriteria": ["string"],
-  "explicitPains": ["string"]
+  "explicitPains": ["string"],
+  "confidence": "number"
 }
+```
+
+### Additional rules
+
+```
+- Extract job title using original text clues:
+  H1 title, first line title, or repeated role reference.
+- Seniority must always be classified using explicit vocabulary found
+  (entry / mid / senior / lead / director / VP).
+- Never infer missing fields: leave empty arrays if not present.
+- Return confidence score (0–1).
 ```
 
 ---
 
-## AI OPERATION 7 — `ai.generateJobRoleCard`
+## AI OPERATION 7 — `ai.generateJobRoleCard` **(updated)**
 
-### Purpose
-
-Refine job analysis into a structured Role Card.
-
-### Output
+### Output JSON (updated)
 
 ```json
 {
   "roleSummary": "string",
+  "jobTitle": "string",
+  "seniorityLevel": "string",
   "responsibilities": ["string"],
   "skills": ["string"],
   "behaviours": ["string"],
   "successCriteria": ["string"],
-  "jobPains": ["string"]
+  "jobPains": ["string"],
+  "aiConfidenceScore": "number"
 }
+```
+
+### Additional rules
+
+```
+- Accept the structured output from ai.parseJobDescription.
+- Preserve original field names from CDM.
+- Do not create new skills or responsibilities.
+- Must produce a short 3–6 line summary of the role purpose.
 ```
 
 ---
@@ -768,46 +765,6 @@ Return JSON with:
 - shorten if over length
 - ban job/company targeting
 - no opinionated emotional tone
-
----
-
-## AI OPERATION 15 — `ai.generateInterviewQuestions`
-
-### Output
-
-```json
-{
-  "behavioral": ["string"],
-  "technical": ["string"],
-  "cultural": ["string"],
-  "painBased": ["string"]
-}
-```
-
----
-
-## AI OPERATIONS 16–17 — Interview Simulation
-
-### `ai.simulateInterviewTurn`
-
-```json
-{
-  "question": "string"
-}
-```
-
-### `ai.evaluateInterviewAnswer`
-
-```json
-{
-  "score": {
-    "clarity": "number",
-    "structure": "number",
-    "relevance": "number"
-  },
-  "feedback": ["string"]
-}
-```
 
 ---
 
