@@ -209,14 +209,20 @@ NO export, NO PDF
 
 ### Context & Purpose
 
-User pastes a job description into `/jobs/new`.
+User updage a pdf job description into `/jobs/new`.
 We must parse it into JobDescription.rawText and trigger AI parsing.
+
+Similar as the work done for uploading a CV, parsing it and saving it, see
+
+- useCvParsing
+- useCvUploadWorkflow
+- src/pages/profile/cv-upload.vue
 
 ### Component/Composables
 
 Used:
 
-- `useJobAnalysis()` composable
+- `useJobDescription()` composable
   Components:
 - Job Intake Component (page 2.2)
 
@@ -238,8 +244,6 @@ Used:
 - AI call fired successfully.
 - Responsibilities / skills / behaviours stored.
 - Job list displays job title extracted by AI.
-
----
 
 ---
 
