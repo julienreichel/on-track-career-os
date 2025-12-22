@@ -181,6 +181,7 @@ export const schema = a
         rawText: a.string(),
         title: a.string().required(),
         seniorityLevel: a.string(),
+        roleSummary: a.string(), // short narrative
         responsibilities: a.string().array(),
         requiredSkills: a.string().array(),
         behaviours: a.string().array(),
@@ -191,26 +192,11 @@ export const schema = a
         companyId: a.id(),
         company: a.belongsTo('Company', 'companyId'),
 
-        roleCard: a.hasOne('JobRoleCard', 'jobId'),
         coverLetters: a.hasMany('CoverLetter', 'jobId'),
         cvs: a.hasMany('CVDocument', 'jobId'),
         speechBlocks: a.hasMany('SpeechBlock', 'jobId'),
         kpiSets: a.hasMany('KPISet', 'jobId'),
         matchingSummaries: a.hasMany('MatchingSummary', 'jobId'),
-      })
-      .authorization((allow) => [allow.owner()]),
-
-    JobRoleCard: a
-      .model({
-        responsibilityList: a.string().array(),
-        skillsList: a.string().array(),
-        behaviourList: a.string().array(),
-        successCriteriaList: a.string().array(),
-        jobPains: a.string().array(),
-        aiConfidenceScore: a.float(),
-
-        jobId: a.id().required(),
-        job: a.belongsTo('JobDescription', 'jobId'),
       })
       .authorization((allow) => [allow.owner()]),
 

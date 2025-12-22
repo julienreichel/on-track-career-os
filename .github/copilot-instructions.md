@@ -8,7 +8,7 @@
 
 1. User Identity: `UserProfile`, `PersonalCanvas`, `Experience`
 2. Stories: `STARStory` (STAR methodology)
-3. Job/Company: `JobDescription`, `JobRoleCard`, `Company`, `CompanyCanvas`
+3. Job/Company: `JobDescription`, `Company`, `CompanyCanvas`
 4. Materials: `CVDocument`, `CoverLetter`, `SpeechBlock`, `KPISet`
 5. Interview: `InterviewQuestionSet`, `InterviewSession`
 

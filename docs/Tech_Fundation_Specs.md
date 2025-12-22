@@ -115,7 +115,6 @@ const schema = a.schema({
   - Experience
   - STARStory
   - JobDescription
-  - JobRoleCard
   - Company
   - CompanyCanvas
   - MatchingSummary
@@ -360,8 +359,7 @@ project-root/
 │   │   │   ├── PersonalCanvasBoard.vue
 │   │   │   └── CompanyCanvasBoard.vue
 │   │   ├── jobs/
-│   │   │   ├── JobForm.vue
-│   │   │   └── JobRoleCardView.vue
+│   │   │   └── JobForm.vue
 │   │   ├── companies/
 │   │   │   └── CompanyForm.vue
 │   │   ├── matching/

@@ -278,39 +278,6 @@ Convert job posting into structured data.
 
 ---
 
----
-
-# PROMPT 5A-3 — Build JobRoleCard Generator
-
-### Context & Purpose
-
-Turn parsed data into a user-facing Job Role Card.
-
-### Components
-
-- Job Role Card Component (Page 2.3)
-
-### Pages
-
-- `/jobs/:id`
-
-### Implementation
-
-- Create `ai.generateJobRoleCard` call.
-- Summarise job into structured fields.
-- Add AI confidence score.
-- Store under JobRoleCard entity.
-
-### Acceptance Criteria
-
-- Summary produced ≤ 120 words.
-- All fields must map 1-to-1 to CDM node names.
-- Card visible on page with tabs.
-
----
-
----
-
 # PROMPT 5A-4 — Manual Editing UI
 
 ### Context & Purpose

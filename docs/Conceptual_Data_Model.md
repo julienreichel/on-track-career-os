@@ -167,28 +167,7 @@ _(EPIC 5A)_
 
 **Relationships:**
 
-- 1 JobDescription → 1 JobRoleCard
 - 1 Company → \* Jobs (optional)
-
----
-
-## **ENTITY: JobRoleCard**
-
-_(EPIC 5A)_
-
-**Attributes:**
-
-- roleCardId
-- responsibilityList
-- skillsList
-- behaviourList
-- successCriteriaList
-- jobPains
-- aiConfidenceScore
-
-**Relationships:**
-
-- 1 JobRoleCard → 1 JobDescription
 
 ---
 
@@ -390,9 +369,6 @@ UserProfile ↔ PersonalCanvas
 1 ↔ 1
 
 UserProfile ↔ CommunicationProfile
-1 ↔ 1
-
-JobDescription ↔ JobRoleCard
 1 ↔ 1
 
 Company ↔ CompanyCanvas

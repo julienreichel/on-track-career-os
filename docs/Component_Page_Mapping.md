@@ -320,31 +320,6 @@ Each page includes:
 
 ---
 
-## **3.3 Job Role Card**
-
-### UI
-
-- `<UTabs>`
-- `<UCard>`
-
-### Components
-
-- Job Role Card Component
-
-### Composables
-
-- `useJobAnalysis()`
-
-### CDM
-
-- JobRoleCard
-
-### AI Ops
-
-- `ai.generateJobRoleCard`
-
----
-
 ## **3.4 Company List**
 
 ### UI
@@ -683,7 +658,6 @@ STAR Builder        Story Builder          useStoryEngine            STARStory  
                                                                                             generateAchievements
 Personal Canvas     Canvas Component       useCanvasEngine           PersonalCanvas        generatePersonalCanvas
 Add Job             Job Intake             useJobAnalysis            JobDescription        parseJobDescription
-Job Role Card       Job Role Card          useJobAnalysis            JobRoleCard           generateJobRoleCard
 Add Company         Company Intake         useCanvasEngine           Company               analyzeCompanyInfo
 Company Canvas      Company Canvas         useCanvasEngine           CompanyCanvas         generateCompanyCanvas
 Matching            Matching Engine        useMatchingEngine         MatchingSummary       generateMatchingSummary

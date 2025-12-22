@@ -264,12 +264,10 @@ The project has established a **strong backend and domain foundation** with comp
 **Implemented:**
 
 - ✅ JobDescription GraphQL model
-- ✅ JobRoleCard GraphQL model
 
 **Missing:**
 
 - ❌ `ai.parseJobDescription` Lambda
-- ❌ `ai.generateJobRoleCard` Lambda
 - ❌ Job repository/service/composable
 - ❌ Job intake page (paste JD)
 - ❌ Job role card view/edit page
@@ -277,11 +275,10 @@ The project has established a **strong backend and domain foundation** with comp
 **Next Steps:**
 
 1. Implement `ai.parseJobDescription` Lambda
-2. Implement `ai.generateJobRoleCard` Lambda
-3. Create job domain layer
-4. Create `/jobs` page (list)
-5. Create `/jobs/new` page (paste JD)
-6. Create `/jobs/:id` page (view/edit role card)
+2. Create job domain layer
+3. Create `/jobs` page (list)
+4. Create `/jobs/new` page (paste JD)
+5. Create `/jobs/:id` page (view/edit role card)
 
 ---
 
@@ -417,7 +414,6 @@ The project has established a **strong backend and domain foundation** with comp
 **Job & Company Analysis (4 missing):**
 
 - ❌ `ai.parseJobDescription`
-- ❌ `ai.generateJobRoleCard`
 - ❌ `ai.analyzeCompanyInfo`
 - ❌ `ai.generateCompanyCanvas`
 
@@ -456,7 +452,6 @@ The project has established a **strong backend and domain foundation** with comp
 ### Missing Domain Layers (10 models exist in schema but no domain layer)
 
 - ❌ JobDescription
-- ❌ JobRoleCard
 - ❌ Company
 - ❌ CompanyCanvas
 - ❌ MatchingSummary
@@ -671,7 +666,6 @@ The project has established a **strong backend and domain foundation** with comp
 
 1. Implement 5 missing AI operations:
    - `ai.parseJobDescription`
-   - `ai.generateJobRoleCard`
    - `ai.analyzeCompanyInfo`
    - `ai.generateCompanyCanvas`
    - `ai.generateMatchingSummary`

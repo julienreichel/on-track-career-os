@@ -50,9 +50,8 @@ Each operation must conform to:
 ### Job & Company (EPIC 5A / 5B)
 
 6. `ai.parseJobDescription`
-7. `ai.generateJobRoleCard`
-8. `ai.analyzeCompanyInfo`
-9. `ai.generateCompanyCanvas`
+7. `ai.analyzeCompanyInfo`
+8. `ai.generateCompanyCanvas`
 
 ### Matching Engine (EPIC 5C)
 
@@ -433,35 +432,6 @@ Stories:
   (entry / mid / senior / lead / director / VP).
 - Never infer missing fields: leave empty arrays if not present.
 - Return confidence score (0–1).
-```
-
----
-
-## AI OPERATION 7 — `ai.generateJobRoleCard` **(updated)**
-
-### Output JSON (updated)
-
-```json
-{
-  "roleSummary": "string",
-  "jobTitle": "string",
-  "seniorityLevel": "string",
-  "responsibilities": ["string"],
-  "skills": ["string"],
-  "behaviours": ["string"],
-  "successCriteria": ["string"],
-  "jobPains": ["string"],
-  "aiConfidenceScore": "number"
-}
-```
-
-### Additional rules
-
-```
-- Accept the structured output from ai.parseJobDescription.
-- Preserve original field names from CDM.
-- Do not create new skills or responsibilities.
-- Must produce a short 3–6 line summary of the role purpose.
 ```
 
 ---

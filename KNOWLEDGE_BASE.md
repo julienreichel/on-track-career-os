@@ -88,7 +88,6 @@ _(Condensed from full CDM; only key-developer-relevant models.)_
 ### 3.3 Job & Company Domain
 
 - **JobDescription**
-- **JobRoleCard**
 - **Company**
 - **CompanyCanvas**
 - **MatchingSummary**
@@ -210,9 +209,8 @@ _(From AI Interaction Contract) _
 ### Jobs & Companies
 
 6. `ai.parseJobDescription`
-7. `ai.generateJobRoleCard`
-8. `ai.analyzeCompanyInfo`
-9. `ai.generateCompanyCanvas`
+7. `ai.analyzeCompanyInfo`
+8. `ai.generateCompanyCanvas`
 
 ### Matching
 
