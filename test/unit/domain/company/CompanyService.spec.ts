@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CompanyService } from '@/domain/company/CompanyService';
-import { CompanyRepository } from '@/domain/company/CompanyRepository';
+import type { CompanyRepository } from '@/domain/company/CompanyRepository';
 import type { Company } from '@/domain/company/Company';
 
 // Mock the repository
