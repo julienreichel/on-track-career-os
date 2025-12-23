@@ -10,6 +10,8 @@ import { isAchievementsAndKpis } from './AchievementsAndKpis';
 import type { PersonalCanvas, PersonalCanvasInput } from './PersonalCanvas';
 import { isPersonalCanvas } from './PersonalCanvas';
 import type { GenerateCvInput, GenerateCvResult } from './types/generateCv';
+import type { ParsedJobDescription } from './ParsedJobDescription';
+import { isParsedJobDescription } from './ParsedJobDescription';
 
 /**
  * Service for AI-powered CV and experience operations
@@ -45,6 +47,32 @@ export class AiOperationsService {
       // Re-throw with more context
       throw new Error(
         `Failed to parse CV text: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Parse job description text into structured data
+   * @param jobText - Raw job description text
+   * @returns Structured JobDescription data aligned with domain model
+   * @throws Error when validation fails
+   */
+  async parseJobDescription(jobText: string): Promise<ParsedJobDescription> {
+    if (!jobText || jobText.trim().length === 0) {
+      throw new Error('Job description text cannot be empty');
+    }
+
+    try {
+      const result = await this.repo.parseJobDescription(jobText);
+
+      if (!isParsedJobDescription(result)) {
+        throw new Error('Invalid job description parsing result structure');
+      }
+
+      return result;
+    } catch (error) {
+      throw new Error(
+        `Failed to parse job description: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
   }

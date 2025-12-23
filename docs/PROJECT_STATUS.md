@@ -264,21 +264,20 @@ The project has established a **strong backend and domain foundation** with comp
 **Implemented:**
 
 - ✅ JobDescription GraphQL model
+- ✅ `ai.parseJobDescription` Lambda + domain wiring
 
 **Missing:**
 
-- ❌ `ai.parseJobDescription` Lambda
-- ❌ Job repository/service/composable
+- ❌ Job repository/service/composable (JD CRUD + AI trigger)
 - ❌ Job intake page (paste JD)
 - ❌ Job role card view/edit page
 
 **Next Steps:**
 
-1. Implement `ai.parseJobDescription` Lambda
-2. Create job domain layer
-3. Create `/jobs` page (list)
-4. Create `/jobs/new` page (paste JD)
-5. Create `/jobs/:id` page (view/edit role card)
+1. Create job domain layer wired to `ai.parseJobDescription`
+2. Create `/jobs` page (list)
+3. Create `/jobs/new` page (paste JD)
+4. Create `/jobs/:id` page (view/edit role card)
 
 ---
 
@@ -402,8 +401,9 @@ The project has established a **strong backend and domain foundation** with comp
 | `ai.generateStarStory`           | ✅     | 7 passing | ✅     | Production ready |
 | `ai.generateAchievementsAndKpis` | ✅     | 7 passing | ✅     | Production ready |
 | `ai.generatePersonalCanvas`      | ✅     | 7 passing | ✅     | Production ready |
+| `ai.parseJobDescription`         | ✅     | 3 passing | ✅     | Production ready |
 
-**Total: 5/17 (29%)**
+**Total: 6/17 (35%)**
 
 ### Missing Operations ❌
 
@@ -411,9 +411,8 @@ The project has established a **strong backend and domain foundation** with comp
 
 **User Canvas (0 remaining):** All complete ✅
 
-**Job & Company Analysis (4 missing):**
+**Job & Company Analysis (3 missing):**
 
-- ❌ `ai.parseJobDescription`
 - ❌ `ai.analyzeCompanyInfo`
 - ❌ `ai.generateCompanyCanvas`
 
@@ -664,8 +663,8 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Tasks:**
 
-1. Implement 5 missing AI operations:
-   - `ai.parseJobDescription`
+1. Implement remaining AI operations:
+   - ✅ `ai.parseJobDescription`
    - `ai.analyzeCompanyInfo`
    - `ai.generateCompanyCanvas`
    - `ai.generateMatchingSummary`

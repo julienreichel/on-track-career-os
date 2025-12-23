@@ -5,6 +5,7 @@ import type { STARStory } from './STARStory';
 import type { AchievementsAndKpis } from './AchievementsAndKpis';
 import type { PersonalCanvas, PersonalCanvasInput } from './PersonalCanvas';
 import type { GenerateCvInput, GenerateCvResult } from './types/generateCv';
+import type { ParsedJobDescription } from './ParsedJobDescription';
 
 /**
  * Repository interface for AI operations
@@ -54,6 +55,13 @@ export interface IAiOperationsRepository {
    * @returns Complete CV as Markdown text
    */
   generateCv(input: GenerateCvInput): Promise<GenerateCvResult>;
+
+  /**
+   * Parse job description text into structured fields
+   * @param jobText - Raw job description text
+   * @returns Structured job description aligned with domain model
+   */
+  parseJobDescription(jobText: string): Promise<ParsedJobDescription>;
 }
 
 /**
@@ -97,19 +105,10 @@ export type AmplifyAiOperations = {
     options?: Record<string, unknown>
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 
-  generateCv: (
-    input: {
-      userProfile: string;
-      selectedExperiences: string;
-      stories?: string;
-      skills?: string[];
-      languages?: string[];
-      certifications?: string[];
-      interests?: string[];
-      jobDescription?: string;
-    },
+  parseJobDescription: (
+    input: { jobText: string },
     options?: Record<string, unknown>
-  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
+  ) => Promise<{ data: string | null; errors?: unknown[] }>;
 
   generateCv: (
     input: {
@@ -278,5 +277,19 @@ export class AiOperationsRepository implements IAiOperationsRepository {
 
     // GraphQL schema returns a.string() - plain Markdown text
     return data as string;
+  }
+
+  async parseJobDescription(jobText: string): Promise<ParsedJobDescription> {
+    const { data, errors } = await this.client.parseJobDescription({ jobText }, gqlOptions());
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    return JSON.parse(data) as ParsedJobDescription;
   }
 }

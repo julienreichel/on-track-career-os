@@ -24,7 +24,7 @@ This directory contains AWS Lambda functions implementing the 17 AI operations d
 
 ### Job & Company (EPIC 5A / 5B)
 
-- ⏳ `ai.parseJobDescription` - Extract job requirements
+- ✅ `ai.parseJobDescription` - Extract job requirements
 - ⏳ `ai.analyzeCompanyInfo` - Analyze company data
 - ⏳ `ai.generateCompanyCanvas` - Generate Company Canvas
 

@@ -18,6 +18,7 @@ describe('AiOperationsRepository', () => {
   let repository: AiOperationsRepository;
   let mockClient: {
     parseCvText: ReturnType<typeof vi.fn>;
+    parseJobDescription: ReturnType<typeof vi.fn>;
     extractExperienceBlocks: ReturnType<typeof vi.fn>;
     generateStarStory: ReturnType<typeof vi.fn>;
     generateAchievementsAndKpis: ReturnType<typeof vi.fn>;
@@ -28,6 +29,7 @@ describe('AiOperationsRepository', () => {
     // Create fresh mocks for each test
     mockClient = {
       parseCvText: vi.fn(),
+      parseJobDescription: vi.fn(),
       extractExperienceBlocks: vi.fn(),
       generateStarStory: vi.fn(),
       generateAchievementsAndKpis: vi.fn(),
@@ -36,6 +38,56 @@ describe('AiOperationsRepository', () => {
 
     // Inject the mocks via constructor (dependency injection)
     repository = new AiOperationsRepository(mockClient as AmplifyAiOperations);
+  });
+
+  describe('parseJobDescription', () => {
+    it('should parse job description text and return structured data', async () => {
+      const mockJobText = 'We are hiring a Senior Product Manager...';
+      const mockParsedJob = {
+        title: 'Senior Product Manager',
+        seniorityLevel: 'Senior',
+        roleSummary: 'Owns analytics roadmap',
+        responsibilities: ['Own roadmap'],
+        requiredSkills: ['Stakeholder management'],
+        behaviours: ['Ownership'],
+        successCriteria: ['Adoption'],
+        explicitPains: ['Fragmentation'],
+        aiConfidenceScore: 0.9,
+      };
+
+      mockClient.parseJobDescription.mockResolvedValue({
+        data: JSON.stringify(mockParsedJob),
+        errors: undefined,
+      });
+
+      const result = await repository.parseJobDescription(mockJobText);
+
+      expect(mockClient.parseJobDescription).toHaveBeenCalledWith(
+        { jobText: mockJobText },
+        expect.objectContaining({ authMode: 'userPool' })
+      );
+      expect(result).toEqual(mockParsedJob);
+    });
+
+    it('should throw when operation returns errors', async () => {
+      mockClient.parseJobDescription.mockResolvedValue({
+        data: null,
+        errors: [{ message: 'AI failure' }],
+      });
+
+      await expect(repository.parseJobDescription('Broken')).rejects.toThrow('AI operation failed');
+    });
+
+    it('should throw when no data returned', async () => {
+      mockClient.parseJobDescription.mockResolvedValue({
+        data: null,
+        errors: undefined,
+      });
+
+      await expect(repository.parseJobDescription('Missing data')).rejects.toThrow(
+        'AI operation returned no data'
+      );
+    });
   });
 
   describe('parseCvText', () => {

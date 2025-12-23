@@ -6,6 +6,7 @@ import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
 import type { STARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 import type { PersonalCanvas, PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas';
+import type { ParsedJobDescription } from '@/domain/ai-operations/ParsedJobDescription';
 
 /**
  * Helper function to handle async operations with loading and error states
@@ -31,7 +32,7 @@ async function handleAsyncOperation<T>(
 
 /**
  * Composable for AI operations
- * Provides reactive state management for CV parsing, experience extraction, STAR story generation, achievements/KPIs, and Personal Canvas
+ * Provides reactive state management for CV parsing, job parsing, experience extraction, STAR story generation, achievements/KPIs, and Personal Canvas
  *
  * Supports six workflows:
  * - parseCv: Parse CV text only
@@ -42,6 +43,7 @@ async function handleAsyncOperation<T>(
  */
 export function useAiOperations() {
   const parsedCv = ref<ParsedCV | null>(null);
+  const parsedJobDescription = ref<ParsedJobDescription | null>(null);
   const experiences = ref<ExperiencesResult | null>(null);
   const starStories = ref<STARStory[] | null>(null); // Changed to array
   const achievementsAndKpis = ref<AchievementsAndKpis | null>(null);
@@ -52,6 +54,14 @@ export function useAiOperations() {
 
   const parseCv = (cvText: string) =>
     handleAsyncOperation(() => service.parseCvText(cvText), loading, error, parsedCv);
+
+  const parseJobDescription = (jobText: string) =>
+    handleAsyncOperation(
+      () => service.parseJobDescription(jobText),
+      loading,
+      error,
+      parsedJobDescription
+    );
 
   const extractExperiences = (experienceTextBlocks: string[]) =>
     handleAsyncOperation(
@@ -82,6 +92,7 @@ export function useAiOperations() {
 
   const reset = () => {
     parsedCv.value = null;
+    parsedJobDescription.value = null;
     experiences.value = null;
     starStories.value = null;
     achievementsAndKpis.value = null;
@@ -92,6 +103,7 @@ export function useAiOperations() {
 
   return {
     parsedCv,
+    parsedJobDescription,
     experiences,
     starStories,
     achievementsAndKpis,
@@ -99,6 +111,7 @@ export function useAiOperations() {
     loading,
     error,
     parseCv,
+    parseJobDescription,
     extractExperiences,
     generateStarStory,
     generateAchievementsAndKpis,

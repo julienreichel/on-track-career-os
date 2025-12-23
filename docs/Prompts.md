@@ -205,185 +205,325 @@ NO export, NO PDF
 
 ---
 
-# PROMPT 5A-1 — Job Description Intake → Save Raw JD Text
+## MASTER PROMPT 5A.1 — Implement `ai.parseJobDescription`
 
 ### Context & Purpose
 
-User updage a pdf job description into `/jobs/new`.
-We must parse it into JobDescription.rawText and trigger AI parsing.
+Implement the **single AI operation responsible for job understanding**.
 
-Similar as the work done for uploading a CV, parsing it and saving it, see
+`ai.parseJobDescription` takes **raw job description text** and returns a fully structured representation of the role, directly matching the `JobDescription` model.
 
-- useCvParsing
-- useCvUploadWorkflow
-- src/pages/profile/cv-upload.vue
-
-### Component/Composables
-
-Used:
-
-- `useJobDescription()` composable
-  Components:
-- Job Intake Component (page 2.2)
-
-### Pages Impacted
-
-- `/jobs/new` → create JD entry
-- `/jobs/:id` → view results later
-
-### Implementation Instructions
-
-- Save raw text string into JobDescription entity.
-- Validate non-empty text.
-- Trigger `ai.parseJobDescription` with `{ jobText }`.
-- Store AI output into JobDescription fields.
-
-### Acceptance Criteria
-
-- Raw JD saved to DB.
-- AI call fired successfully.
-- Responsibilities / skills / behaviours stored.
-- Job list displays job title extracted by AI.
-
----
-
-# PROMPT 5A-2 — AI Parsing of Job Description
-
-### Context & Purpose
-
-Convert job posting into structured data.
+This is the **only AI operation** for EPIC 5A.
+Its output is stored directly on the `JobDescription` entity.
 
 ### Components / Composables
 
-- `useJobAnalysis().parseJobDescription()`
+- AI operations layer (Lambda)
+- AI operations repository/service
+- Types shared between Lambda and frontend/domain
 
-### Page
+### Pages
 
-- `/jobs/new`
+None (backend / AI only).
 
-### Implementation
+### What to Implement
 
-- Call `ai.parseJobDescription` updated schema.
-- Write mapping function:
-  raw → mapped fields:
-  responsibilities, skills, behaviours, successCriteria, pains, seniority, title.
-- Save output to JobDescription entry.
+- Create or update the Lambda implementing `ai.parseJobDescription`.
+- The AI must:
+  - Extract **only what is explicitly present** in the job description.
+  - Populate the following fields:
+    - `title`
+    - `seniorityLevel`
+    - `roleSummary` (short synthesized description of the role)
+    - `responsibilities`
+    - `requiredSkills`
+    - `behaviours`
+    - `successCriteria`
+    - `explicitPains`
+    - `aiConfidenceScore`
+
+- Output must be **structured JSON only**, validated and normalized.
+- Missing fields must result in empty arrays or empty strings, never hallucinated content.
+- Confidence score reflects extraction quality (not user fit).
 
 ### Acceptance Criteria
 
-- AI output validated via schema.
-- Seniority always present (even “unknown”).
-- Title extracted in 90% of cases.
-- Responsibilites length ≥ 3 if present in text.
+- AI output maps **1-to-1** to `JobDescription` fields.
+- Lambda applies defaults for missing values.
+- Operation is exposed through Amplify / GraphQL.
+- Unit tests cover:
+  - Full JD
+  - Partial JD
+  - Poorly structured JD
+
+- No other AI operation is required for EPIC 5A.
 
 ---
 
-# PROMPT 5A-4 — Manual Editing UI
+## MASTER PROMPT 5A.2 — Implement Job Domain Layer (`JobDescription`)
 
 ### Context & Purpose
 
-Users must edit extracted fields.
+Implement the **Job domain layer** around the simplified `JobDescription` model.
 
-### Components
+This layer is responsible for:
 
-- `<UTabs>` based editor
-- Job Role Card Component
+- Persisting raw job descriptions
+- Storing AI-parsed job structure
+- Managing job lifecycle (`draft → analyzed → complete`)
+
+### Components / Composables
+
+To create or complete:
+
+- `JobDescriptionRepository`
+- `JobService`
+- `useJobAnalysis` composable
+
+Reuse patterns from:
+
+- Experience domain
+- PersonalCanvas domain
 
 ### Pages
 
-- `/jobs/:id`
+None yet (domain only).
 
-### Implementation
+### What to Implement
 
-- Editable lists for:
-  responsibilities, skills, behaviours, success criteria, pains
-- Versioning not required.
-- Tag input for array fields.
+- Repository:
+  - CRUD operations on `JobDescription`
+
+- Service:
+  - Create job from raw text
+  - Attach parsed AI data to job
+  - Update job fields after user edits
+  - Re-run AI parsing on existing `rawText`
+
+- Composable (`useJobAnalysis`):
+  - Reactive state: jobs list, selected job, loading/error
+  - Methods:
+    - `createJobFromRawText(rawText)`
+    - `loadJob(jobId)`
+    - `listJobs()`
+    - `updateJob(jobId, patch)`
+    - `reanalyseJob(jobId)`
 
 ### Acceptance Criteria
 
-- User can add/remove items.
-- Autosave at field level.
-- UI validation handles empty entries.
+- A job can exist with `rawText` only (`draft`).
+- After AI parsing, job status becomes `analyzed`.
+- All job fields persist correctly.
+- Domain layer matches patterns used elsewhere in the app.
 
 ---
 
----
-
-# PROMPT 5A-5 — Connect Job → Company (optional field stub)
+## MASTER PROMPT 5A.3 — Implement `/jobs/new` (Add Job Description)
 
 ### Context & Purpose
 
-EPIC 5C will require relational linking.
+Create the **entry point for EPIC 5A**.
 
-### Components/Composables
+Users paste a job description and trigger AI analysis.
+On success, they are redirected to the job detail page.
 
-- useJobAnalysis
-- useCanvasEngine (later)
+### Components / Composables
+
+- Nuxt UI form components
+- `useJobAnalysis` composable
 
 ### Pages
 
-- `/jobs/:id`
+- Create: `/jobs/new`
 
-### Implementation
+### What to Implement
 
-- Add dropdown for company selection (optional)
-- Save companyId FK onto JobDescription
+- UI:
+  - Large textarea for job description
+  - Primary CTA: “Analyze job”
+  - Loading and error states
+
+- Logic:
+  - Validate minimal input length
+  - Create `JobDescription` with `rawText`
+  - Call `ai.parseJobDescription`
+  - Store parsed fields on job
+  - Redirect to `/jobs/:id`
+
+- UX:
+  - Disable submit while processing
+  - Clear error feedback on failure
 
 ### Acceptance Criteria
 
-- No AI required yet.
-- Relationship persists.
+- User can paste a JD and trigger analysis.
+- Job is persisted with parsed fields.
+- Redirect happens only after successful parsing.
+- Invalid or too-short input does not call AI.
 
 ---
 
+## MASTER PROMPT 5A.4 — Implement `/jobs` Job List Page
+
+### Context & Purpose
+
+Provide users with an overview of all jobs they’ve added and analyzed.
+
+This page is the navigation hub for job-related workflows.
+
+### Components / Composables
+
+- List or table UI component
+- `useJobAnalysis` composable
+
+### Pages
+
+- Create: `/jobs`
+
+### What to Implement
+
+- Display a list of jobs showing:
+  - Title
+  - Seniority
+  - Status (`draft`, `analyzed`, `complete`)
+
+- Actions:
+  - Add job → `/jobs/new`
+  - Open job → `/jobs/:id`
+  - Delete job (with confirmation)
+
+- Empty state with CTA to add first job.
+
+### Acceptance Criteria
+
+- All jobs load correctly for the user.
+- Navigation works without full page reload.
+- Deleting a job removes it from the list immediately.
+- UI remains consistent with other list pages (experiences, CVs).
+
 ---
 
-# PROMPT 5A-6 — Data Refresh Logic
+## MASTER PROMPT 5A.5 — Implement `/jobs/:id` Job Detail & Role Card View
 
-### Context
+### Context & Purpose
 
-User may update JD text after first parsing.
+This page is the **Job Role Card UI**, backed directly by `JobDescription`.
+
+Users can:
+
+- Review AI-parsed job structure
+- Edit any extracted field
+- Re-run AI analysis from original JD
+
+### Components / Composables
+
+- Nuxt UI:
+  - Tabs
+  - Tag/list editors
+  - Inputs / textareas
+
+- `useJobAnalysis` composable
+
+### Pages
+
+- Create: `/jobs/[id]`
+
+### What to Implement
+
+- Header:
+  - Job title (editable)
+  - Seniority level
+  - Role summary (editable)
+
+- Tabbed sections:
+  - Responsibilities
+  - Required skills
+  - Behaviours
+  - Success criteria
+  - Explicit pains
+
+- Editing:
+  - User can add/remove/edit list items
+  - Changes persist to backend
+
+- Reanalyse:
+  - Button “Reanalyse from original JD”
+  - Confirms overwrite
+  - Calls `ai.parseJobDescription` again using `rawText`
+
+### Acceptance Criteria
+
+- Page loads job data correctly.
+- All fields are editable and persist.
+- Reanalyse overwrites AI-generated fields only.
+- No secondary entity (JobRoleCard) is used anywhere.
+
+---
+
+## MASTER PROMPT 5A.6 — Validation & Guardrails
+
+### Context & Purpose
+
+Ensure job data is **safe and usable** for downstream EPICs (5C, 6, 7).
+
+### Components / Composables
+
+- `useJobAnalysis`
+- Job service validation helpers
+
+### Pages
+
+Applies to `/jobs/new` and `/jobs/:id`.
+
+### What to Implement
+
+- Validation rules:
+  - Minimum JD length before AI call
+  - Title must not be empty after analysis
+  - Empty arrays allowed, but flagged in UI
+
+- Status management:
+  - `draft`: rawText only
+  - `analyzed`: AI fields populated
+  - `complete`: user has reviewed/edited (manual toggle or implicit)
+
+### Acceptance Criteria
+
+- Invalid data never breaks later workflows.
+- Warnings are visible but non-blocking.
+- Job always remains in a consistent state.
+
+---
+
+## MASTER PROMPT 5A.7 — Documentation & Contract Alignment
+
+### Context & Purpose
+
+Ensure all docs and contracts reflect the simplified architecture.
 
 ### Components
 
-- `useJobAnalysis()`
+- Documentation files
+- AI Interaction Contract
 
 ### Pages
 
-- `/jobs/:id`
+None.
 
-### Implementation
+### What to Implement
 
-- Add "Reanalyse" button
-- Re-run AI pipeline overwriting existing fields
+- Update AI Interaction Contract:
+  - Remove `ai.generateJobRoleCard`
+  - Ensure `ai.parseJobDescription` fully documents all job fields
 
-### Acceptance Tests
+- Update diagrams and EPIC descriptions:
+  - “Job Role Card” = UI view, not entity
 
-- Output regenerates fully
-- Confirm overwrite warning shown
-- UI refresh without page reload
-
----
-
----
-
-# PROMPT 5A-7 — Business Rules Validation
-
-### Purpose
-
-Prevent bad data downstream.
-
-### Implementation
-
-Validation rules:
-
-- minimum JD words: 80
-- responsibilities count ≥ 3 OR flag warnings
-- success criteria must be non-empty OR propagate “not provided”
+- Ensure naming consistency across docs:
+  - No reference to JobRoleCard entity remains
 
 ### Acceptance Criteria
 
-- Warning banners visible
-- Stored data remains valid JSON
-- No frontend crashes
+- Documentation matches code and schema.
+- No dangling references to removed AI ops or models.
+- EPIC 5A reads coherently end-to-end.

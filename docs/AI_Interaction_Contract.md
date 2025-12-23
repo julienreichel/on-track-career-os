@@ -412,26 +412,27 @@ Stories:
 
 ```json
 {
-  "jobTitle": "string",
+  "title": "string",
   "seniorityLevel": "string",
+  "roleSummary": "string",
   "responsibilities": ["string"],
   "requiredSkills": ["string"],
   "behaviours": ["string"],
   "successCriteria": ["string"],
   "explicitPains": ["string"],
-  "confidence": "number"
+  "aiConfidenceScore": "number"
 }
 ```
 
 ### Additional rules
 
 ```
-- Extract job title using original text clues:
-  H1 title, first line title, or repeated role reference.
-- Seniority must always be classified using explicit vocabulary found
-  (entry / mid / senior / lead / director / VP).
-- Never infer missing fields: leave empty arrays if not present.
-- Return confidence score (0–1).
+- Title = exact role mentioned in the job.
+- Seniority must use explicit wording (entry / mid / senior / lead / director / VP).
+- roleSummary = short synthesized description of the role scope using only explicit info.
+- Each collection must only include items explicitly present.
+- Missing information must result in "" or [] (never hallucinated content).
+- aiConfidenceScore reflects extraction quality between 0 and 1.
 ```
 
 ---

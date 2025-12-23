@@ -5,6 +5,7 @@ import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
 import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
 import type { STARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
+import type { ParsedJobDescription } from '@/domain/ai-operations/ParsedJobDescription';
 
 // Mock the repository
 vi.mock('@/domain/ai-operations/AiOperationsRepository');
@@ -13,6 +14,7 @@ describe('AiOperationsService', () => {
   let service: AiOperationsService;
   let mockRepo: {
     parseCvText: ReturnType<typeof vi.fn>;
+    parseJobDescription: ReturnType<typeof vi.fn>;
     extractExperienceBlocks: ReturnType<typeof vi.fn>;
     generateStarStory: ReturnType<typeof vi.fn>;
     generateAchievementsAndKpis: ReturnType<typeof vi.fn>;
@@ -22,6 +24,7 @@ describe('AiOperationsService', () => {
     // Create mock repository
     mockRepo = {
       parseCvText: vi.fn(),
+      parseJobDescription: vi.fn(),
       extractExperienceBlocks: vi.fn(),
       generateStarStory: vi.fn(),
       generateAchievementsAndKpis: vi.fn(),
@@ -96,6 +99,54 @@ describe('AiOperationsService', () => {
       // Act & Assert
       await expect(service.parseCvText('Sample CV text')).rejects.toThrow(
         'Invalid CV parsing result structure'
+      );
+    });
+  });
+
+  describe('parseJobDescription', () => {
+    it('should successfully parse job description text', async () => {
+      const mockParsedJob: ParsedJobDescription = {
+        title: 'Senior Product Manager',
+        seniorityLevel: 'Senior',
+        roleSummary: 'Leads analytics roadmap.',
+        responsibilities: ['Own roadmap'],
+        requiredSkills: ['SaaS'],
+        behaviours: ['Ownership'],
+        successCriteria: ['Adoption'],
+        explicitPains: ['Fragmented tooling'],
+        aiConfidenceScore: 0.8,
+      };
+
+      mockRepo.parseJobDescription.mockResolvedValue(mockParsedJob);
+
+      const result = await service.parseJobDescription('We are hiring a Senior Product Manager...');
+
+      expect(result).toEqual(mockParsedJob);
+      expect(mockRepo.parseJobDescription).toHaveBeenCalledWith(
+        'We are hiring a Senior Product Manager...'
+      );
+    });
+
+    it('should throw when job text is empty', async () => {
+      await expect(service.parseJobDescription('')).rejects.toThrow(
+        'Job description text cannot be empty'
+      );
+      expect(mockRepo.parseJobDescription).not.toHaveBeenCalled();
+    });
+
+    it('should throw when repository fails', async () => {
+      mockRepo.parseJobDescription.mockRejectedValue(new Error('AI failure'));
+
+      await expect(service.parseJobDescription('Valid text')).rejects.toThrow(
+        'Failed to parse job description: AI failure'
+      );
+    });
+
+    it('should throw when structure invalid', async () => {
+      mockRepo.parseJobDescription.mockResolvedValue({ invalid: true });
+
+      await expect(service.parseJobDescription('Valid text')).rejects.toThrow(
+        'Invalid job description parsing result structure'
       );
     });
   });

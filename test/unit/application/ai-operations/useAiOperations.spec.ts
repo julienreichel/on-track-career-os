@@ -5,6 +5,7 @@ import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
 import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
 import type { STARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
+import type { ParsedJobDescription } from '@/domain/ai-operations/ParsedJobDescription';
 
 // Mock the service
 vi.mock('@/domain/ai-operations/AiOperationsService');
@@ -12,6 +13,7 @@ vi.mock('@/domain/ai-operations/AiOperationsService');
 describe('useAiOperations', () => {
   let mockService: {
     parseCvText: ReturnType<typeof vi.fn>;
+    parseJobDescription: ReturnType<typeof vi.fn>;
     extractExperienceBlocks: ReturnType<typeof vi.fn>;
     generateStarStory: ReturnType<typeof vi.fn>;
     generateAchievementsAndKpis: ReturnType<typeof vi.fn>;
@@ -21,6 +23,7 @@ describe('useAiOperations', () => {
     // Create mock service
     mockService = {
       parseCvText: vi.fn(),
+      parseJobDescription: vi.fn(),
       extractExperienceBlocks: vi.fn(),
       generateStarStory: vi.fn(),
       generateAchievementsAndKpis: vi.fn(),
@@ -34,11 +37,20 @@ describe('useAiOperations', () => {
 
   it('should initialize with default state', () => {
     // Act
-    const { parsedCv, experiences, starStories, achievementsAndKpis, loading, error } =
+    const {
+      parsedCv,
+      parsedJobDescription,
+      experiences,
+      starStories,
+      achievementsAndKpis,
+      loading,
+      error,
+    } =
       useAiOperations();
 
     // Assert
     expect(parsedCv.value).toBeNull();
+    expect(parsedJobDescription.value).toBeNull();
     expect(experiences.value).toBeNull();
     expect(starStories.value).toBeNull();
     expect(achievementsAndKpis.value).toBeNull();
@@ -68,6 +80,40 @@ describe('useAiOperations', () => {
     expect(loading.value).toBe(false);
     expect(error.value).toBeNull();
     expect(parsedCv.value).toEqual(mockParsedCv);
+  });
+
+  it('should successfully parse job description text', async () => {
+    const mockParsedJob: ParsedJobDescription = {
+      title: 'Senior Product Manager',
+      seniorityLevel: 'Senior',
+      roleSummary: 'Drives the roadmap for enterprise analytics.',
+      responsibilities: ['Own the analytics roadmap'],
+      requiredSkills: ['Stakeholder management'],
+      behaviours: ['Bias for action'],
+      successCriteria: ['Increased adoption'],
+      explicitPains: ['Fragmented data'],
+      aiConfidenceScore: 0.82,
+    };
+
+    mockService.parseJobDescription.mockResolvedValue(mockParsedJob);
+
+    const { parsedJobDescription, loading, error, parseJobDescription } = useAiOperations();
+    await parseJobDescription('We are hiring a Senior Product Manager...');
+
+    expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
+    expect(parsedJobDescription.value).toEqual(mockParsedJob);
+  });
+
+  it('should handle errors when parsing job descriptions', async () => {
+    mockService.parseJobDescription.mockRejectedValue(new Error('Job parsing failed'));
+
+    const { parsedJobDescription, loading, error, parseJobDescription } = useAiOperations();
+    await parseJobDescription('Broken job posting');
+
+    expect(loading.value).toBe(false);
+    expect(error.value).toBe('Job parsing failed');
+    expect(parsedJobDescription.value).toBeNull();
   });
 
   it('should successfully extract experiences', async () => {
@@ -176,7 +222,16 @@ describe('useAiOperations', () => {
 
   it('should reset state', () => {
     // Arrange
-    const { parsedCv, experiences, starStories, achievementsAndKpis, loading, error, reset } =
+    const {
+      parsedCv,
+      parsedJobDescription,
+      experiences,
+      starStories,
+      achievementsAndKpis,
+      loading,
+      error,
+      reset,
+    } =
       useAiOperations();
     parsedCv.value = {
       sections: {
@@ -188,6 +243,17 @@ describe('useAiOperations', () => {
       },
       confidence: 0.9,
     } as ParsedCV;
+    parsedJobDescription.value = {
+      title: 'Example',
+      seniorityLevel: 'Lead',
+      roleSummary: 'Example summary',
+      responsibilities: [],
+      requiredSkills: [],
+      behaviours: [],
+      successCriteria: [],
+      explicitPains: [],
+      aiConfidenceScore: 0.5,
+    };
     experiences.value = { experiences: [] };
     starStories.value = [
       {
@@ -209,6 +275,7 @@ describe('useAiOperations', () => {
 
     // Assert
     expect(parsedCv.value).toBeNull();
+    expect(parsedJobDescription.value).toBeNull();
     expect(experiences.value).toBeNull();
     expect(starStories.value).toBeNull();
     expect(achievementsAndKpis.value).toBeNull();

@@ -54,6 +54,14 @@ export const generateCvFunction = defineFunction({
   timeoutSeconds: 90, // Longer timeout for full CV generation
 });
 
+export const parseJobDescriptionFunction = defineFunction({
+  entry: './ai-operations/parseJobDescription.ts',
+  environment: {
+    MODEL_ID,
+  },
+  timeoutSeconds: 60,
+});
+
 export const schema = a
   .schema({
     // =====================================================
@@ -392,6 +400,13 @@ export const schema = a
       .returns(a.string())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateCvFunction)),
+
+    parseJobDescription: a
+      .query()
+      .arguments({ jobText: a.string().required() })
+      .returns(a.string())
+      .authorization((allow) => [allow.authenticated()])
+      .handler(a.handler.function(parseJobDescriptionFunction)),
 
     // =====================================================
     // UTILITY FUNCTIONS (Custom Queries)
