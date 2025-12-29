@@ -36,7 +36,8 @@ Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer
 - ✅ EPIC 2 (Experience Builder - STAR Stories) — 95% complete
 - ✅ EPIC 3 (Generic CV Generator) — 100% complete
 - ✅ EPIC 3B (CV Header & Contact Information) — 100% complete
-- ⚠️ Remaining EPICs 4-7 still in early implementation stages
+- ✅ EPIC 5A (Job Description Analysis) — 95% complete
+- ⚠️ Remaining EPICs 4, 5B, 5C, 6, 7 still in early implementation stages
 
 ### 2.1 Frontend (Nuxt 3)
 
@@ -87,10 +88,10 @@ _(Condensed from full CDM; only key-developer-relevant models.)_
 
 ### 3.3 Job & Company Domain
 
-- **JobDescription**
-- **Company**
-- **CompanyCanvas**
-- **MatchingSummary**
+- **JobDescription**: rawText, title, seniorityLevel, roleSummary, responsibilities, requiredSkills, behaviours, successCriteria, explicitPains, status (draft/analyzed/complete), companyId
+- **Company**: name, industry, size, description
+- **CompanyCanvas**: 9 sections mirroring Business Model Canvas
+- **MatchingSummary**: fitScore, competitiveAdvantages, contributions, risks
 
 ### 3.4 Application Materials
 
@@ -131,23 +132,48 @@ _(From Component Model + Component→Page Mapping) _
 
 ### 4.2 Composables
 
-- `useUserProfile()`
-- `useExperienceStore()`
-- `useStoryEngine()`
-- `useCanvasEngine()`
-- `useJobAnalysis()`
-- `useMatchingEngine()`
-- `useTailoringEngine()`
-- `useInterviewEngine()`
-- `useAiClient()`
-- `useCvDocuments()`
-- `useCvGenerator()`
+- `useUserProfile()` - User profile CRUD with photo upload
+- `useExperienceStore()` - Experience management
+- `useStoryEngine()` - STAR story creation/editing
+- `useCanvasEngine()` - Personal Canvas generation/editing
+- `useJobAnalysis()` - Job CRUD, list, parse, reanalyse, delete
+- `useJobUpload()` - File upload, text extraction, validation
+- `useMatchingEngine()` - User-Job-Company matching (not implemented)
+- `useTailoringEngine()` - Tailored materials (not implemented)
+- `useInterviewEngine()` - Interview prep (not implemented)
+- `useAiOperations()` - AI operations orchestration
+- `useCvDocuments()` - CV document management
+- `useCvGenerator()` - CV generation from user data
 
 ---
 
 ## 5. Pages & Their Interactions
 
 _(Structured per navigation zones)_
+
+### Profile Zone
+
+- `/profile` - View/edit user profile with all identity fields
+- `/profile/canvas` - Personal Canvas with 9-section BMC layout
+- `/profile/experiences` - Experience list with create/edit/delete
+- `/profile/experiences/:id/edit` - Experience form
+- `/profile/experiences/:id/stories` - Per-experience story list
+- `/profile/experiences/:id/stories/:storyId` - Story editor (STAR)
+- `/profile/stories` - Global story library
+- `/cv-upload` - CV upload → AI parsing → import workflow
+
+### Jobs & Companies Zone
+
+- `/jobs` - Job list with search, status badges, delete modal
+- `/jobs/new` - Upload job description (PDF/TXT) → AI parsing
+- `/jobs/:id` - View/edit job details with 5 tabbed sections, reanalyse
+
+### Applications Zone
+
+- `/cv` - CV document list
+- `/cv/new` - CV creation wizard (experience picker, options)
+- `/cv/:id` - CV Markdown editor with preview
+- `/cv/:id/print` - A4 print layout with auto-print
 (From Navigation Structure & Component Mapping )
 
 ### 5.1 My Profile
