@@ -125,6 +125,7 @@ describe('useAiOperations', () => {
           endDate: '2023-12',
           responsibilities: [],
           tasks: [],
+          experienceType: 'work',
         },
       ],
     };
@@ -143,6 +144,7 @@ describe('useAiOperations', () => {
   it('should successfully generate STAR story', async () => {
     // Arrange
     const mockStarStory: STARStory = {
+      title: 'Distributed team',
       situation: 'Led a distributed team during company restructuring',
       task: 'Maintain team productivity and morale',
       action: 'Implemented daily standups and 1-on-1s',
@@ -177,6 +179,7 @@ describe('useAiOperations', () => {
   it('should successfully generate achievements and KPIs', async () => {
     // Arrange
     const mockStarStory: STARStory = {
+      title: 'Distributed team',
       situation: 'Led distributed team',
       task: 'Maintain productivity',
       action: 'Implemented standups',
@@ -201,6 +204,7 @@ describe('useAiOperations', () => {
   it('should handle errors in generateAchievementsAndKpis', async () => {
     // Arrange
     const mockStarStory: STARStory = {
+      title: 'Distributed team',
       situation: 'Led team',
       task: 'Maintain productivity',
       action: 'Implemented standups',
@@ -253,6 +257,7 @@ describe('useAiOperations', () => {
     experiences.value = { experiences: [] };
     starStories.value = [
       {
+        title: 'Test',
         situation: 'Test',
         task: 'Test',
         action: 'Test',

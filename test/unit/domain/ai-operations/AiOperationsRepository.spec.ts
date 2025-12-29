@@ -37,7 +37,7 @@ describe('AiOperationsRepository', () => {
     };
 
     // Inject the mocks via constructor (dependency injection)
-    repository = new AiOperationsRepository(mockClient as AmplifyAiOperations);
+    repository = new AiOperationsRepository(mockClient as unknown as AmplifyAiOperations);
   });
 
   describe('parseJobDescription', () => {
@@ -193,6 +193,7 @@ describe('AiOperationsRepository', () => {
     it('should generate STAR story from source text', async () => {
       const mockSourceText = 'Led migration project that improved performance by 40%';
       const mockStarStory: STARStory = {
+        title: 'Distributed team',
         situation: 'System had performance issues',
         task: 'Migrate to new architecture',
         action: 'Designed and implemented new system',
@@ -200,7 +201,7 @@ describe('AiOperationsRepository', () => {
       };
 
       mockClient.generateStarStory.mockResolvedValue({
-        data: JSON.stringify(mockStarStory),
+        data: JSON.stringify([mockStarStory]),
         errors: undefined,
       });
 
@@ -210,17 +211,18 @@ describe('AiOperationsRepository', () => {
         { sourceText: mockSourceText },
         expect.objectContaining({ authMode: 'userPool' })
       );
-      expect(result).toEqual(mockStarStory);
-      expect(result.situation).toBeDefined();
-      expect(result.task).toBeDefined();
-      expect(result.action).toBeDefined();
-      expect(result.result).toBeDefined();
+      expect(result[0]).toEqual(mockStarStory);
+      expect(result[0].situation).toBeDefined();
+      expect(result[0].task).toBeDefined();
+      expect(result[0].action).toBeDefined();
+      expect(result[0].result).toBeDefined();
     });
   });
 
   describe('generateAchievementsAndKpis', () => {
     it('should generate achievements and KPIs from STAR story', async () => {
       const mockStarStory: STARStory = {
+        title: 'Distributed team',
         situation: 'System had performance issues',
         task: 'Migrate to new architecture',
         action: 'Designed and implemented new system',
@@ -303,7 +305,6 @@ describe('AiOperationsRepository', () => {
       );
       expect(result).toEqual(mockPersonalCanvas);
       expect(result.valueProposition).toBeDefined();
-      expect(result.targetRoles).toBeDefined();
     });
 
     it('should throw error when canvas generation fails', async () => {
