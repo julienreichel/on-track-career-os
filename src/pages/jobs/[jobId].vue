@@ -133,6 +133,7 @@ watch(
   (value) => {
     if (value) {
       hydrateForm(value);
+      updateBreadcrumb(value.title);
     }
   },
   { immediate: true }
@@ -237,6 +238,10 @@ function closeReanalyseModal() {
 
 function updateListField(field: ListField, value: string[]) {
   form[field] = [...value];
+}
+
+function updateBreadcrumb(title?: string | null) {
+  route.meta.breadcrumbLabel = title?.trim() || t('jobList.card.noTitle');
 }
 
 function buildUpdatePayload(): Partial<JobDescriptionUpdateInput> {
