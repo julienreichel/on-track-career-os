@@ -45,8 +45,7 @@ describe('useAiOperations', () => {
       achievementsAndKpis,
       loading,
       error,
-    } =
-      useAiOperations();
+    } = useAiOperations();
 
     // Assert
     expect(parsedCv.value).toBeNull();
@@ -92,7 +91,6 @@ describe('useAiOperations', () => {
       behaviours: ['Bias for action'],
       successCriteria: ['Increased adoption'],
       explicitPains: ['Fragmented data'],
-      aiConfidenceScore: 0.82,
     };
 
     mockService.parseJobDescription.mockResolvedValue(mockParsedJob);
@@ -231,8 +229,7 @@ describe('useAiOperations', () => {
       loading,
       error,
       reset,
-    } =
-      useAiOperations();
+    } = useAiOperations();
     parsedCv.value = {
       sections: {
         experiences: [],
@@ -252,7 +249,6 @@ describe('useAiOperations', () => {
       behaviours: [],
       successCriteria: [],
       explicitPains: [],
-      aiConfidenceScore: 0.5,
     };
     experiences.value = { experiences: [] };
     starStories.value = [

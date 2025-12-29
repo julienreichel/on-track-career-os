@@ -29,7 +29,6 @@ export function isParsedJobDescription(data: unknown): data is ParsedJobDescript
     typeof job.title === 'string' &&
     typeof job.seniorityLevel === 'string' &&
     typeof job.roleSummary === 'string' &&
-    typeof job.aiConfidenceScore === 'number' &&
     arrayFields.every((field) => Array.isArray(job[field]))
   );
 }

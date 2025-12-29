@@ -286,7 +286,6 @@ export const schema = a
       .model({
         tone: a.string(),
         content: a.string(),
-        aiConfidenceScore: a.float(),
 
         userId: a.id().required(),
         user: a.belongsTo('UserProfile', 'userId'),

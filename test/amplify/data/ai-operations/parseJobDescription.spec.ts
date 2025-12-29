@@ -53,7 +53,6 @@ describe('ai.parseJobDescription', () => {
       behaviours: ['Bias for action'],
       successCriteria: ['Adoption increases 20%'],
       explicitPains: ['Fragmented analytics tooling'],
-      aiConfidenceScore: 0.92,
     };
 
     mockSend.mockResolvedValue(buildBedrockResponse(mockOutput));
@@ -66,7 +65,6 @@ describe('ai.parseJobDescription', () => {
     expect(parsed.title).toBe('Senior Product Manager');
     expect(parsed.responsibilities).toEqual(mockOutput.responsibilities);
     expect(parsed.requiredSkills).toEqual(mockOutput.requiredSkills);
-    expect(parsed.aiConfidenceScore).toBeCloseTo(0.92);
   });
 
   it('should apply defaults for partial job descriptions', async () => {
@@ -89,7 +87,6 @@ describe('ai.parseJobDescription', () => {
     expect(parsed.behaviours).toEqual([]);
     expect(parsed.successCriteria).toEqual([]);
     expect(parsed.explicitPains).toEqual([]);
-    expect(parsed.aiConfidenceScore).toBeCloseTo(0.6, 1);
   });
 
   it('should sanitize poorly structured outputs', async () => {
@@ -102,7 +99,6 @@ describe('ai.parseJobDescription', () => {
       behaviours: {},
       successCriteria: null,
       explicitPains: null,
-      aiConfidenceScore: 2,
     };
 
     mockSend.mockResolvedValue(buildBedrockResponse(malformedOutput));
@@ -120,6 +116,5 @@ describe('ai.parseJobDescription', () => {
     expect(parsed.behaviours).toEqual([]);
     expect(parsed.successCriteria).toEqual([]);
     expect(parsed.explicitPains).toEqual([]);
-    expect(parsed.aiConfidenceScore).toBeLessThanOrEqual(0.25);
   });
 });

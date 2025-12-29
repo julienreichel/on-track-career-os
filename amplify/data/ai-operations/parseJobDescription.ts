@@ -31,7 +31,6 @@ MANDATORY FIELDS:
 - behaviours (string[])
 - successCriteria (string[])
 - explicitPains (string[])
-- aiConfidenceScore (number between 0 and 1)
 
 RULES:
 - Extract ONLY information explicitly present in the job description.
@@ -53,8 +52,7 @@ const OUTPUT_SCHEMA = `{
   "requiredSkills": ["string"],
   "behaviours": ["string"],
   "successCriteria": ["string"],
-  "explicitPains": ["string"],
-  "aiConfidenceScore": 0.85
+  "explicitPains": ["string"]
 }`;
 
 export interface ParseJobDescriptionInput {
@@ -70,7 +68,6 @@ export interface ParseJobDescriptionOutput {
   behaviours: string[];
   successCriteria: string[];
   explicitPains: string[];
-  aiConfidenceScore: number;
 }
 
 function sanitizeString(value: unknown): string {
@@ -87,24 +84,6 @@ function sanitizeStringArray(value: unknown): string[] {
     .filter((item) => item.length > 0);
 }
 
-function clampConfidence(value: unknown): number {
-  if (typeof value !== 'number' || Number.isNaN(value)) {
-    return DEFAULT_CONFIDENCE;
-  }
-
-  if (value < 0) return 0;
-  if (value > 1) return 1;
-  return value;
-}
-
-function applyConfidenceFallback(
-  parsed: Partial<ParseJobDescriptionOutput>,
-  hasContent: boolean
-): number {
-  const confidence = clampConfidence(parsed.aiConfidenceScore);
-  return hasContent ? confidence : Math.min(confidence, LOW_CONFIDENCE_THRESHOLD);
-}
-
 function validateOutput(parsed: Partial<ParseJobDescriptionOutput>): ParseJobDescriptionOutput {
   const title = sanitizeString(parsed.title);
   const seniorityLevel = sanitizeString(parsed.seniorityLevel);
@@ -115,16 +94,6 @@ function validateOutput(parsed: Partial<ParseJobDescriptionOutput>): ParseJobDes
   const successCriteria = sanitizeStringArray(parsed.successCriteria);
   const explicitPains = sanitizeStringArray(parsed.explicitPains);
 
-  const hasContent =
-    Boolean(title || seniorityLevel || roleSummary) ||
-    responsibilities.length > 0 ||
-    requiredSkills.length > 0 ||
-    behaviours.length > 0 ||
-    successCriteria.length > 0 ||
-    explicitPains.length > 0;
-
-  const aiConfidenceScore = applyConfidenceFallback(parsed, hasContent);
-
   return {
     title,
     seniorityLevel,
@@ -134,7 +103,6 @@ function validateOutput(parsed: Partial<ParseJobDescriptionOutput>): ParseJobDes
     behaviours,
     successCriteria,
     explicitPains,
-    aiConfidenceScore,
   };
 }
 

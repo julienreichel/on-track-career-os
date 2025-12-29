@@ -101,7 +101,6 @@ export class JobDescriptionService {
       behaviours: parsed.behaviours,
       successCriteria: parsed.successCriteria,
       explicitPains: parsed.explicitPains,
-      aiConfidenceScore: parsed.aiConfidenceScore,
       status: 'analyzed',
     };
   }

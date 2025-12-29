@@ -147,7 +147,6 @@ describe('JobDescriptionService', () => {
         behaviours: ['Ownership'],
         successCriteria: ['Goal'],
         explicitPains: ['Pain'],
-        aiConfidenceScore: 0.8,
       } as ParsedJobDescription;
 
       const mockUpdated = { id: 'job-1', ...parsed, status: 'analyzed' } as JobDescription;
@@ -193,7 +192,6 @@ describe('JobDescriptionService', () => {
         behaviours: [],
         successCriteria: [],
         explicitPains: [],
-        aiConfidenceScore: 0.9,
       } as ParsedJobDescription;
       const updatedJob = { ...job, title: 'Parsed' } as JobDescription;
 

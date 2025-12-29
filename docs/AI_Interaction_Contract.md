@@ -419,8 +419,7 @@ Stories:
   "requiredSkills": ["string"],
   "behaviours": ["string"],
   "successCriteria": ["string"],
-  "explicitPains": ["string"],
-  "aiConfidenceScore": "number"
+  "explicitPains": ["string"]
 }
 ```
 
@@ -432,7 +431,6 @@ Stories:
 - roleSummary = short synthesized description of the role scope using only explicit info.
 - Each collection must only include items explicitly present.
 - Missing information must result in "" or [] (never hallucinated content).
-- aiConfidenceScore reflects extraction quality between 0 and 1.
 ```
 
 ---

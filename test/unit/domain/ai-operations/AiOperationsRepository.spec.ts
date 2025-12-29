@@ -52,7 +52,6 @@ describe('AiOperationsRepository', () => {
         behaviours: ['Ownership'],
         successCriteria: ['Adoption'],
         explicitPains: ['Fragmentation'],
-        aiConfidenceScore: 0.9,
       };
 
       mockClient.parseJobDescription.mockResolvedValue({

@@ -240,7 +240,6 @@ None (backend / AI only).
     - `behaviours`
     - `successCriteria`
     - `explicitPains`
-    - `aiConfidenceScore`
 
 - Output must be **structured JSON only**, validated and normalized.
 - Missing fields must result in empty arrays or empty strings, never hallucinated content.

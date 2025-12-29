@@ -272,7 +272,6 @@ _(EPIC 6)_
 - letterId
 - tone
 - content
-- aiConfidenceScore
 
 **Relationships:**
 

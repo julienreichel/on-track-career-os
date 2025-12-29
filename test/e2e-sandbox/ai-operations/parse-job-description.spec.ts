@@ -96,7 +96,6 @@ The team currently struggles with fragmented messaging and lack of unified posit
     expect(Array.isArray(parsed.behaviours)).toBe(true);
     expect(Array.isArray(parsed.successCriteria)).toBe(true);
     expect(Array.isArray(parsed.explicitPains)).toBe(true);
-    expect(typeof parsed.aiConfidenceScore).toBe('number');
 
     expect(parsed.title).toContain('Product');
     expect(parsed.responsibilities.length).toBeGreaterThan(0);
