@@ -812,5 +812,33 @@
       "tooShort": "The job description is too short. Please upload a complete document.",
       "generic": "Unable to analyze this job description."
     }
+  },
+  "jobList": {
+    "actions": {
+      "add": "Add Job",
+      "view": "View job",
+      "open": "Open job"
+    },
+    "empty": {
+      "title": "No jobs yet",
+      "description": "Start by analyzing your first job description.",
+      "cta": "Analyze a job"
+    },
+    "delete": {
+      "title": "Delete job",
+      "message": "Are you sure you want to delete this job? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "status": {
+      "draft": "Draft",
+      "analyzed": "Analyzed",
+      "complete": "Complete"
+    },
+    "card": {
+      "created": "Created {date}",
+      "noSeniority": "Seniority unknown",
+      "noTitle": "Untitled job"
+    }
   }
 }

@@ -12,6 +12,7 @@ describe('useJobAnalysis', () => {
     createJobFromRawText: ReturnType<typeof vi.fn>;
     updateJob: ReturnType<typeof vi.fn>;
     reanalyseJob: ReturnType<typeof vi.fn>;
+    deleteJob: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -21,6 +22,7 @@ describe('useJobAnalysis', () => {
       createJobFromRawText: vi.fn(),
       updateJob: vi.fn(),
       reanalyseJob: vi.fn(),
+      deleteJob: vi.fn(),
     };
 
     vi.mocked(JobDescriptionService).mockImplementation(
@@ -97,5 +99,20 @@ describe('useJobAnalysis', () => {
     await expect(listJobs()).rejects.toThrow('Failure');
     expect(loading.value).toBe(false);
     expect(error.value).toBe('Failure');
+  });
+
+  it('should delete job and update list', async () => {
+    const { jobs, deleteJob } = useJobAnalysis();
+    jobs.value = [
+      { id: 'job-1', title: 'Draft' } as JobDescription,
+      { id: 'job-2', title: 'Other' } as JobDescription,
+    ];
+    mockService.deleteJob.mockResolvedValue(undefined);
+
+    await deleteJob('job-1');
+
+    expect(mockService.deleteJob).toHaveBeenCalledWith('job-1');
+    expect(jobs.value).toHaveLength(1);
+    expect(jobs.value[0].id).toBe('job-2');
   });
 });

@@ -206,4 +206,14 @@ describe('JobDescriptionService', () => {
       expect(result).toEqual(updatedJob);
     });
   });
+
+  describe('deleteJob', () => {
+    it('should call repository delete', async () => {
+      mockRepository.delete.mockResolvedValue(undefined);
+
+      await service.deleteJob('job-1');
+
+      expect(mockRepository.delete).toHaveBeenCalledWith('job-1');
+    });
+  });
 });

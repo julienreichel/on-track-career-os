@@ -62,6 +62,14 @@ export function useJobAnalysis() {
     return updated;
   };
 
+  const deleteJob = async (jobId: string) => {
+    await handle(() => service.deleteJob(jobId));
+    jobs.value = jobs.value.filter((job) => job.id !== jobId);
+    if (selectedJob.value?.id === jobId) {
+      selectedJob.value = null;
+    }
+  };
+
   const resetState = () => {
     jobs.value = [];
     selectedJob.value = null;
@@ -79,6 +87,7 @@ export function useJobAnalysis() {
     createJobFromRawText,
     updateJob,
     reanalyseJob,
+    deleteJob,
     resetState,
   };
 }

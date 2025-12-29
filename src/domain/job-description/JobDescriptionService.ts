@@ -89,6 +89,10 @@ export class JobDescriptionService {
     return this.attachParsedJobDescription(jobId, parsed);
   }
 
+  async deleteJob(jobId: string): Promise<void> {
+    await this.repo.delete(jobId);
+  }
+
   private buildParsedUpdatePayload(
     parsed: ParsedJobDescription
   ): Partial<JobDescriptionUpdateInput> {
