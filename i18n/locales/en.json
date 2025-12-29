@@ -506,7 +506,8 @@
     "stay": "Stay",
     "leave": "Leave",
     "discard": "Discard",
-    "goBack": "Go back"
+    "goBack": "Go back",
+    "backToList": "Back to list"
   },
   "canvas": {
     "title": "Personal Business Model Canvas",
@@ -843,6 +844,64 @@
       "created": "Created {date}",
       "noSeniority": "Seniority unknown",
       "noTitle": "Untitled job"
+    }
+  },
+  "jobDetail": {
+    "title": "Job role card",
+    "description": "Review and refine the AI parsed job details.",
+    "actions": {
+      "reanalyse": "Reanalyse from original JD"
+    },
+    "fields": {
+      "title": "Job title",
+      "seniorityLevel": "Seniority level",
+      "roleSummary": "Role summary"
+    },
+    "placeholders": {
+      "title": "Enter or edit the job title",
+      "seniorityLevel": "Enter seniority (e.g., Senior, Director)",
+      "roleSummary": "Summarize the core responsibilities and mission for this role",
+      "responsibilities": "Add a responsibility and press Enter",
+      "requiredSkills": "Add a required skill and press Enter",
+      "behaviours": "Add a behaviour and press Enter",
+      "successCriteria": "Add success criteria and press Enter",
+      "explicitPains": "Add explicit pain points and press Enter"
+    },
+    "hints": {
+      "responsibilities": "Key responsibilities highlighted in the job description",
+      "requiredSkills": "Skills and capabilities explicitly mentioned",
+      "behaviours": "Behavioural traits and expectations",
+      "successCriteria": "How success is measured for the role",
+      "explicitPains": "Challenges or pain points the employer wants to solve"
+    },
+    "tabs": {
+      "responsibilities": "Responsibilities",
+      "requiredSkills": "Required skills",
+      "behaviours": "Behaviours",
+      "successCriteria": "Success criteria",
+      "explicitPains": "Explicit pains"
+    },
+    "sections": {
+      "parsedData": "AI parsed details",
+      "description": "Edit or extend the structured job data before preparing your application."
+    },
+    "meta": {
+      "status": "Status",
+      "createdAt": "Created at",
+      "updatedAt": "Updated at",
+      "companyId": "Company",
+      "notAvailable": "Not available"
+    },
+    "reanalyse": {
+      "title": "Reanalyse from original JD",
+      "message": "This will overwrite the AI generated fields with a new analysis of the original job description.",
+      "cancel": "Cancel",
+      "confirm": "Reanalyse now"
+    },
+    "errors": {
+      "title": "Job details",
+      "generic": "Unable to update the job. Please try again.",
+      "notFound": "Job description not found"
     }
   }
 }
