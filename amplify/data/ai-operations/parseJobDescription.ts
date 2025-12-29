@@ -16,9 +16,6 @@ import { truncateForLog, withAiOperationHandler } from './utils/common';
  * @see docs/AI_Interaction_Contract.md - Operation 6
  */
 
-const DEFAULT_CONFIDENCE = 0.6;
-const LOW_CONFIDENCE_THRESHOLD = 0.25;
-
 const SYSTEM_PROMPT = `You are a hiring analyst that extracts structured job description data.
 Return ONLY JSON matching the contract for the JobDescription model.
 
