@@ -1,0 +1,19 @@
+Head of Engineering
+
+About the Role:
+We are searching for a Head of Engineering who can connect product strategy with reliable execution. The person in this role will coach a team of senior engineers, define an architecture roadmap, and ensure that the entire delivery pipeline—from ideation to release—is resilient, observable, and fast.
+
+Key Responsibilities:
+- Partner with Product to translate business goals into technical plans with measurable milestones.
+- Establish engineering excellence practices that prioritize quality, automation, and continuous learning.
+- Grow, mentor, and retain a diverse engineering organization that values feedback and accountability.
+- Implement security-minded development workflows and ensure compliance with regional data privacy requirements.
+- Advocate for the engineering team within the broader company and communicate progress to executive leadership.
+
+Required Experience:
+- 8+ years leading cross-functional engineering teams in high-growth environments.
+- Proven experience managing multimillion-dollar budgets and complex vendor ecosystems.
+- Expertise with distributed systems, event-driven architectures, and performance optimization.
+- Demonstrated ability to modernize legacy platforms while shipping new customer-facing features.
+
+Success in this role looks like clear delivery cadences, happy engineers, predictable releases, and a platform that scales with our customer base. Continuous improvement, transparency, and collaboration with peers in Design, Research, and Operations are essential. continuous values include resilience, learning, openness, and deep empathy for both teammates and customers.

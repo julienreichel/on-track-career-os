@@ -60,7 +60,13 @@ function handleDelete() {
 </script>
 
 <template>
-  <ItemCard :title="title" :subtitle="subtitle" @edit="handleOpen" @delete="handleDelete">
+  <ItemCard
+    data-testid="job-card"
+    :title="title"
+    :subtitle="subtitle"
+    @edit="handleOpen"
+    @delete="handleDelete"
+  >
     <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
       <p v-if="createdAt" class="font-medium text-gray-900 dark:text-gray-100">
         {{ t('jobList.card.created', { date: createdAt }) }}
