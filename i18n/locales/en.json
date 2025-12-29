@@ -819,6 +819,10 @@
       "view": "View job",
       "open": "Open job"
     },
+    "search": {
+      "placeholder": "Search jobs...",
+      "noResults": "No jobs match your search."
+    },
     "empty": {
       "title": "No jobs yet",
       "description": "Start by analyzing your first job description.",

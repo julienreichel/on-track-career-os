@@ -13,6 +13,7 @@ const loading = ref(true);
 const errorMessage = ref<string | null>(null);
 const showDeleteModal = ref(false);
 const jobToDelete = ref<string | null>(null);
+const searchQuery = ref('');
 
 const headerLinks = computed(() => [
   {
@@ -23,6 +24,17 @@ const headerLinks = computed(() => [
 ]);
 
 const jobs = jobAnalysis.jobs;
+const filteredJobs = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) {
+    return jobs.value;
+  }
+
+  return jobs.value.filter((job) => {
+    const fields = [job.title, job.seniorityLevel, job.roleSummary, job.status];
+    return fields.some((field) => field?.toLowerCase().includes(query));
+  });
+});
 
 async function loadJobs() {
   loading.value = true;
@@ -76,6 +88,15 @@ function cancelDelete() {
       />
 
       <UPageBody>
+        <div v-if="!loading && jobs.length > 0" class="mb-6">
+          <UInput
+            v-model="searchQuery"
+            icon="i-heroicons-magnifying-glass"
+            :placeholder="t('jobList.search.placeholder')"
+            size="lg"
+          />
+        </div>
+
         <UAlert
           v-if="errorMessage"
           icon="i-heroicons-exclamation-triangle"
@@ -105,9 +126,17 @@ function cancelDelete() {
           </UEmpty>
         </UCard>
 
+        <UCard v-else-if="filteredJobs.length === 0">
+          <UEmpty :title="t('jobList.search.noResults')" icon="i-heroicons-magnifying-glass">
+            <p class="text-sm text-gray-500">
+              {{ t('jobList.search.placeholder') }}
+            </p>
+          </UEmpty>
+        </UCard>
+
         <UPageGrid v-else>
           <JobCard
-            v-for="job in jobs"
+            v-for="job in filteredJobs"
             :key="job.id"
             :job="job"
             @open="handleOpen"
