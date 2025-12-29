@@ -795,5 +795,22 @@
       "regenerationFailed": "Failed to regenerate block",
       "noSectionGenerated": "No content was generated"
     }
+  },
+  "jobUpload": {
+    "title": "Analyze a New Job",
+    "description": "Upload a job description and let AI structure the role automatically.",
+    "dropzone": {
+      "label": "Drop the job description here or click to upload",
+      "description": "Accepted formats: PDF (.pdf) or plain text (.txt)"
+    },
+    "fileUploaded": "Uploaded {fileName}",
+    "status": {
+      "extracting": "Extracting job description from the uploaded file\u2026",
+      "analyzing": "Analyzing job description with AI\u2026"
+    },
+    "errors": {
+      "tooShort": "The job description is too short. Please upload a complete document.",
+      "generic": "Unable to analyze this job description."
+    }
   }
 }
