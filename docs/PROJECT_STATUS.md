@@ -771,6 +771,7 @@ The project has established a **strong backend and domain foundation** with comp
 9. ✅ 25+ job-related tests passing
 
 **Remaining for Phase 4:**
+
 - ❌ EPIC 5B: Company Analysis (`ai.analyzeCompanyInfo`, `ai.generateCompanyCanvas`)
 - ❌ EPIC 5C: Matching (`ai.generateMatchingSummary`)
 - ❌ Company pages: `/companies`, `/companies/:id`

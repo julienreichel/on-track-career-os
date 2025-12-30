@@ -1,20 +1,44 @@
 # COMPONENT → PAGE MAPPING (MVP → V1)
 
+**Last Updated:** 2025-12-30  
+**Status:** Reflects actual implementation as of EPIC 5A completion
+
 **Complete mapping of:**
 
-- UI Pages
-- Frontend Components
-- Composables
-- CDM Entities
-- AI Operations
+- UI Pages (actual routes)
+- Frontend Components (implemented)
+- Composables (state + logic)
+- CDM Entities (GraphQL models)
+- AI Operations (Lambda functions)
 
 Each page includes:
 
 - UI Components (Nuxt UI)
-- Frontend Components
+- Frontend Components (custom components)
 - Composables (state + logic)
 - CDM Entities created/updated
 - AI Operations triggered on that page
+
+---
+
+## 📋 DOCUMENT STATUS
+
+**✅ Implemented (6 EPICs - 60% Complete):**
+
+- EPIC 1A: User Data Intake & Identity
+- EPIC 1B: Personal Canvas Generation
+- EPIC 2: Experience Builder (STAR Stories)
+- EPIC 3: Generic CV Generator
+- EPIC 3B: CV Header & Contact Info
+- EPIC 5A: Job Description Analysis
+
+**❌ Not Implemented (4 EPICs - 40% Remaining):**
+
+- EPIC 4: User Speech Builder
+- EPIC 5B: Company Analysis
+- EPIC 5C: User-Job-Company Matching
+- EPIC 6: Tailored Application Materials
+- EPIC 7: Interview Prep
 
 ---
 
@@ -22,248 +46,521 @@ Each page includes:
 
 ---
 
-## **0.1 Login / Signup Page**
+## **0.1 Login / Signup Page** ✅
+
+**Route:** `/login`
 
 ### UI
 
 - `<UCard>`
+- Amplify Authenticator Component
 
 ### Components
 
-- Auth UI component
+- None (Amplify UI)
 
 ### Composables
 
-- None
+- `useAuthUser()` - wraps Amplify auth
 
 ### CDM Entities
 
-- **UserProfile** (created empty)
+- **UserProfile** (created empty on first login)
 
 ### AI Ops
 
 - None
 
+**Status:** ✅ Implemented
+
 ---
 
-## **0.2 First-Time Onboarding Wizard**
+## **0.2 Home / Dashboard Page** ✅
+
+**Route:** `/`
 
 ### UI
 
-- `<USteps>`
-- `<UCard>`
-- `<UForm>`
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UPageGrid>`, `<UPageCard>`
 
 ### Components
 
-- User Profile Manager (initialization)
+- None (uses Nuxt UI layout components)
 
 ### Composables
 
-- `useUserProfile()`
-
-### CDM
-
-- UserProfile (goals, values)
-- Experience (later in onboarding)
-
-### AI
-
-- Optional: `ai.parseCvText`
-
----
-
-# 1. DASHBOARD
-
----
-
-## **1.1 Dashboard Page**
-
-### UI
-
-- `<UGrid>`
-- `<UCard>`
-
-### Components
-
-- Dashboard Overview Component
-
-### Composables
-
-- `useUserProfile()`
-- `useExperienceStore()`
-- `useJobAnalysis()`
-- `useTailoringEngine()`
+- `useAuthUser()` - check user state
+- Conditional CV upload visibility
 
 ### CDM Entities
 
-- UserProfile
-- Experiences
-- JobDescription
-- CVDocument (drafts)
-
-### AI Ops
-
-- None (display-only)
-
----
-
-# 2. MY PROFILE
-
----
-
-## **2.1 Profile Overview**
-
-### UI
-
-- `<UCard>`
-- `<UFormGroup>`
-
-### Components
-
-- User Profile Manager
-
-### Composables
-
-- `useUserProfile()`
-
-### CDM
-
-- UserProfile
+- None (navigation only)
 
 ### AI Ops
 
 - None
 
+**Status:** ✅ Implemented (simple navigation hub)
+
+**Note:** Original "First-Time Onboarding Wizard" not implemented - users start with CV upload or manual data entry
+
 ---
 
-## **2.2 Experience List**
+# 1. MY PROFILE & IDENTITY (EPIC 1A + 1B)
+
+---
+
+## **1.1 Profile Summary Page** ✅
+
+**Route:** `/profile`
 
 ### UI
 
-- `<UTable>`
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UPageGrid>`, `<UPageCard>`
+- `<USkeleton>`, `<UAlert>`
 
 ### Components
 
-- Experience List Component
+- `ProfileSummaryCard` - displays profile overview with photo
 
 ### Composables
 
-- `useExperienceStore()`
+- `useUserProfile()` - profile CRUD
+- `useAuthUser()` - get userId
+- `ProfilePhotoService` - photo upload/retrieval
 
-### CDM
+### CDM Entities
 
-- Experience[]
+- **UserProfile** (read)
 
-### AI
+### AI Ops
 
 - None
 
+**Status:** ✅ Implemented  
+**Pattern:** Hub page with navigation cards to related features
+
 ---
 
-## **2.3 Experience Editor**
+## **1.2 Full Profile Form** ✅
+
+**Route:** `/profile/full`
 
 ### UI
 
-- `<UForm>`
-- `<UTextarea>`
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UForm>`, `<UFormGroup>`
+- `<UInput>`, `<UTextarea>`, `<UButton>`
+- `<UFileUpload>` (profile photo)
+
+### Components
+
+- `ProfileFullForm` - complete profile editor organized in sections
+  - Core Identity Section
+  - Career Direction Section
+  - Identity & Values Section
+  - Professional Attributes Section
+  - Contact Information Section
+
+### Composables
+
+- `useUserProfile()` - profile CRUD
+- `ProfilePhotoService` - photo management
+
+### CDM Entities
+
+- **UserProfile** (full CRUD)
+
+### AI Ops
+
+- None
+
+**Status:** ✅ Implemented  
+**Pattern:** Large form with section-based organization, edit/view modes
+
+---
+
+## **1.3 CV Upload & Import** ✅
+
+**Route:** `/profile/cv-upload`
+
+### UI
+
+- `<UPage>`, `<UPageBody>`
+- Step-based wizard UI
+
+### Components
+
+- `CvUploadStep` - file upload
+- `CvParsingStep` - AI parsing indicator
+- `ProfilePreview` - extracted profile data
+- `ExperiencesPreview` - extracted experiences
+- `CvImportSuccess` - completion message
+
+### Composables
+
+- `useCvUploadWorkflow()` - orchestrates multi-step flow
+- `useCvParsing()` - AI parsing logic
+- `useExperienceImport()` - import extracted data
+- `useProfileMerge()` - merge with existing profile
+
+### CDM Entities
+
+- **UserProfile** (merge/update)
+- **Experience** (bulk create)
+
+### AI Ops
+
+- `ai.parseCvText` - extract profile data
+- `ai.extractExperienceBlocks` - extract experiences
+
+**Status:** ✅ Implemented  
+**Pattern:** Multi-step wizard with AI processing, preview, and import
+
+---
+
+## **1.4 Experience List** ✅
+
+**Route:** `/profile/experiences`
+
+### UI
+
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UPageGrid>`, `<UCard>`, `<UEmpty>`
+- `<UModal>` (delete confirmation)
+
+### Components
+
+- `ExperienceCard` - displays experience with story count
+- `ExperienceList` - table view (legacy component, not used in current page)
+
+### Composables
+
+- `ExperienceRepository` - data access
+- `STARStoryService` - story counts
+
+### CDM Entities
+
+- **Experience[]** (list, delete)
+- **STARStory** (count relationship)
+
+### AI Ops
+
+- None
+
+**Status:** ✅ Implemented  
+**Pattern:** Card grid layout with empty state and delete modal
+
+---
+
+## **1.5 Experience Editor** ✅
+
+**Route:** `/profile/experiences/:id` (and `/profile/experiences/new`)
+
+### UI
+
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UAlert>`, `<USkeleton>`
+
+### Components
+
+- `ExperienceForm` - full CRUD form for experience
+  - Title, Company, Type, Dates
+  - Location, Description
+  - Responsibilities, Tasks
+  - Status
+
+### Composables
+
+- `ExperienceRepository` - CRUD operations
+
+### CDM Entities
+
+- **Experience** (create, read, update)
+
+### AI Ops
+
+- None (manual entry only)
+
+**Status:** ✅ Implemented  
+**Pattern:** Single reusable form component for create/edit modes
+
+**Note:** Original spec mentioned `ai.extractExperienceBlocks` and `ai.generateAchievementsAndKpis` button triggers - not implemented here (experiences come from CV upload instead)
+
+---
+
+## **1.6 Global Story Library** ✅
+
+**Route:** `/profile/stories`
+
+### UI
+
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UEmpty>`, `<UAlert>`
+
+### Components
+
+- `StoryList` - displays stories with experience context
+- `StoryViewModal` - full STAR story display
+
+### Composables
+
+- `useStoryList()` - fetch all user stories
+
+### CDM Entities
+
+- **STARStory[]** (read, with Experience relationship)
+
+### AI Ops
+
+- None (display only)
+
+**Status:** ✅ Implemented  
+**Pattern:** Read-only list view with modal for full story details
+
+---
+
+## **1.7 Per-Experience Story List** ✅
+
+**Route:** `/profile/experiences/:experienceId/stories`
+
+### UI
+
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UButton>`, `<UAlert>`
+
+### Components
+
+- `StoryList` - story cards with actions
+- `StoryViewModal` - full story view
+
+### Composables
+
+- `useStoryList()` - fetch stories for experience
+- `useStoryEngine()` - auto-generate stories
+
+### CDM Entities
+
+- **STARStory[]** (list, delete)
+- **Experience** (context)
+
+### AI Ops
+
+- `ai.generateStarStory` - auto-generate from experience
+
+**Status:** ✅ Implemented  
+**Pattern:** Scoped list with auto-generate button
+
+---
+
+## **1.8 STAR Story Editor** ✅
+
+**Route:** `/profile/experiences/:experienceId/stories/:storyId`
+
+### UI
+
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UTabs>`
+
+### Components
+
+- `StoryBuilder` - guided STAR interview (3 modes)
+  - Free text → AI generation
+  - Auto-generate from experience
+  - Manual entry
+- `StoryForm` - manual STAR field entry
+- `AchievementsKpisPanel` - tag-based editing
+
+### Composables
+
+- `useStoryEditor()` - CRUD operations
+- `useStarInterview()` - guided interview flow
+- `useStoryEnhancer()` - AI generation
+
+### CDM Entities
+
+- **STARStory** (create, read, update)
+- **Experience** (relationship)
+
+### AI Ops
+
+- `ai.generateStarStory` - generate from text
+- `ai.generateAchievementsAndKpis` - generate KPIs
+
+**Status:** ✅ Implemented  
+**Pattern:** Multi-mode editor with AI assistance
+
+---
+
+## **1.9 Personal Business Model Canvas** ✅
+
+**Route:** `/profile/canvas`
+
+### UI
+
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UAlert>`, `<UToast>`
+
+### Components
+
+- `PersonalCanvasComponent` - 9-section BMC layout
+- `CanvasSectionCard` - per-section tag editor
+
+### Composables
+
+- `useCanvasEngine()` - CRUD and AI operations
+
+### CDM Entities
+
+- **PersonalCanvas** (create, read, update)
+
+### AI Ops
+
+- `ai.generatePersonalCanvas` - generate from profile/experiences/stories
+
+**Status:** ✅ Implemented  
+**Pattern:** Single-page canvas with per-section editing and regeneration
+
+---
+
+# 2. CV DOCUMENTS (EPIC 3 + 3B)
+
+---
+
+## **2.1 CV List** ✅
+
+**Route:** `/cv`
+
+### UI
+
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UPageGrid>`, `<UEmpty>`
 - `<UButton>`
 
 ### Components
 
-- Experience Intake Component
+- None (inline cards)
 
 ### Composables
 
-- `useExperienceStore()`
+- `useCvDocuments()` - CRUD operations
 
-### CDM
+### CDM Entities
 
-- Experience
+- **CVDocument[]** (list, delete)
 
 ### AI Ops
 
-- `ai.extractExperienceBlocks` (if imported)
-- `ai.generateAchievementsAndKpis` (button-triggered)
+- None
+
+**Status:** ✅ Implemented  
+**Pattern:** Card grid with delete and print shortcuts
 
 ---
 
-## **2.4 STAR Story Builder**
+## **2.2 CV Generator Wizard** ✅
+
+**Route:** `/cv/new`
 
 ### UI
 
-- Custom `<UChat>`
-- `<UModal>` (suggestions)
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UFormField>`, `<UInput>`
+- `<UCheckbox>` (optional sections)
+- Step indicator (custom)
 
 ### Components
 
-- Story Builder Component
+- `CvExperiencePicker` - select experiences for CV
+- `CvGeneratingStep` - AI generation loading state
 
 ### Composables
 
-- `useStoryEngine()`
+- `useCvGenerator()` - build AI payload
+- `useCvDocuments()` - save generated CV
 
-### CDM
+### CDM Entities
 
-- STARStory
-- Achievements
-- KPI Suggestions
+- **CVDocument** (create)
+- **UserProfile** (read)
+- **Experience** (read, select)
+- **STARStory** (read)
 
 ### AI Ops
 
-- `ai.generateStarStory`
-- `ai.generateAchievementsAndKpis`
+- `ai.generateCv` - generate markdown CV from profile/experiences/stories
+
+**Status:** ✅ Implemented  
+**Pattern:** 2-step wizard (select experiences → configure options → generate)
 
 ---
 
-## **2.5 Personal Business Model Canvas**
+## **2.3 CV Editor** ✅
+
+**Route:** `/cv/:id`
 
 ### UI
 
-- `<UDraggable>`
-- `<UCard>`
-- `<UContainer>`
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UTextarea>` (markdown editor)
+- `<UCard>` (rendered preview)
+- `<UToggle>` (profile photo)
 
 ### Components
 
-- Personal Canvas Component
+- None (inline editor + preview)
 
 ### Composables
 
-- `useCanvasEngine()`
-- `useUserProfile()`
+- `useCvDocuments()` - read, update
+- `ProfilePhotoService` - photo URL for preview
 
-### CDM
+### CDM Entities
 
-- PersonalCanvas
+- **CVDocument** (read, update)
+- **UserProfile** (photo, contact info)
 
 ### AI Ops
 
-- `ai.generatePersonalCanvas`
+- None (manual editing)
+
+**Status:** ✅ Implemented  
+**Pattern:** Split-view editor with live markdown preview
 
 ---
 
-## **2.6 Strengths & Communication Profile (V1)**
+## **2.4 CV Print View** ✅
+
+**Route:** `/cv/:id/print`
 
 ### UI
 
-- `<UCard>`
+- A4-sized layout
+- Auto-print on load
+- CSS optimized for 2-page output
 
 ### Components
 
-- Communication Profile Module
+- None (render markdown with styling)
 
 ### Composables
 
-- `useUserProfile()`
+- `useCvDocuments()` - read CV
+- `ProfilePhotoService()` - photo for header
 
-### CDM
+### CDM Entities
 
-- CommunicationProfile
+- **CVDocument** (read)
+- **UserProfile** (photo, contact)
 
 ### AI Ops
 
-- Future (tone, psychology inference)
+- None
+
+**Status:** ✅ Implemented  
+**Pattern:** Print-optimized view with auto-trigger
 
 ---
 
@@ -271,80 +568,142 @@ Each page includes:
 
 ---
 
-## **3.1 Job List**
+## **3.1 Job List** ✅
+
+**Route:** `/jobs`
 
 ### UI
 
-- `<UTable>`
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UInput>` (search)
+- `<UPageGrid>`, `<UCard>`, `<UEmpty>`
+- `<UModal>` (delete confirmation)
+- `<UAlert>`
 
 ### Components
 
-- Job List Component
+- `JobCard` - displays job with status badge
 
 ### Composables
 
-- `useJobAnalysis()`
+- `useJobAnalysis()` - CRUD operations
 
-### CDM
+### CDM Entities
 
-- JobDescription[]
-
-### AI
-
-- None
-
----
-
-## **3.2 Add Job Description**
-
-### UI
-
-- `<UTextarea>`
-- `<UButton>`
-
-### Components
-
-- Job Intake Component
-
-### Composables
-
-- `useJobAnalysis()`
-
-### CDM
-
-- JobDescription (raw text)
+- **JobDescription[]** (list, delete)
 
 ### AI Ops
 
-- `ai.parseJobDescription`
+- None
+
+**Status:** ✅ Implemented  
+**Pattern:** Searchable card grid with delete modal
 
 ---
 
-## **3.4 Company List**
+## **3.2 Job Upload** ✅
+
+**Route:** `/jobs/new`
 
 ### UI
 
-- `<UTable>`
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UAlert>`
 
 ### Components
 
-- Company List Component
+- `JobUploadStep` - file upload (PDF/TXT) with status feedback
 
 ### Composables
 
-- `useCanvasEngine()`
+- `useJobUpload()` - file handling and validation
+- `useJobAnalysis()` - create job and trigger AI
 
-### CDM
+### CDM Entities
 
-- Company[]
+- **JobDescription** (create with rawText)
 
-### AI
+### AI Ops
 
-- None
+- `ai.parseJobDescription` - extract job fields from raw text
+
+**Status:** ✅ Implemented  
+**Pattern:** Single-step upload with AI parsing and redirect
 
 ---
 
-## **3.5 Add Company Info**
+## **3.3 Job Detail & Editor** ✅
+
+**Route:** `/jobs/[jobId]`
+
+### UI
+
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UFormGroup>`, `<UInput>`
+- `<UTabs>` (5 sections)
+- `<UModal>` (reanalyse confirmation)
+- `<UButton>` (save, cancel, reanalyse)
+
+### Components
+
+- `TagInput` - list field editing (responsibilities, skills, behaviours, etc.)
+
+### Composables
+
+- `useJobAnalysis()` - CRUD and reanalysis
+- `useBreadcrumbMapping()` - dynamic breadcrumb
+
+### CDM Entities
+
+- **JobDescription** (read, update, reanalyse)
+
+### AI Ops
+
+- `ai.parseJobDescription` - reanalyse from rawText
+
+**Status:** ✅ Implemented  
+**Pattern:** Tabbed editor with dirty tracking, save/cancel, and reanalyse modal
+
+**Fields:**
+
+- Scalar: title, seniorityLevel, roleSummary
+- Lists: responsibilities, requiredSkills, behaviours, successCriteria, explicitPains
+
+---
+
+## **3.4 Company List** ❌
+
+**Route:** `/companies` (planned)
+
+### UI
+
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UTable>` or `<UPageGrid>`
+
+### Components
+
+- Company Card Component (planned)
+
+### Composables
+
+- `useCompany()` (exists but not used)
+
+### CDM Entities
+
+- **Company[]** (list)
+
+### AI Ops
+
+- None
+
+**Status:** ❌ Not Implemented  
+**Blocking:** EPIC 5B not started
+
+---
+
+## **3.5 Company Info Editor** ❌
+
+**Route:** `/companies/new`, `/companies/[id]` (planned)
 
 ### UI
 
@@ -353,23 +712,28 @@ Each page includes:
 
 ### Components
 
-- Company Intake Component
+- Company Intake Component (planned)
 
 ### Composables
 
-- `useCanvasEngine()`
+- `useCompany()` (exists)
 
-### CDM
+### CDM Entities
 
-- Company
+- **Company** (create/update)
 
 ### AI Ops
 
-- `ai.analyzeCompanyInfo`
+- `ai.analyzeCompanyInfo` (not implemented)
+
+**Status:** ❌ Not Implemented  
+**Blocking:** EPIC 5B - AI operation missing
 
 ---
 
-## **3.6 Company Business Model Canvas**
+## **3.6 Company Business Model Canvas** ❌
+
+**Route:** `/companies/[id]/canvas` (planned)
 
 ### UI
 
@@ -378,61 +742,77 @@ Each page includes:
 
 ### Components
 
-- Company Canvas Component
+- Company Canvas Component (planned - could reuse PersonalCanvasComponent pattern)
 
 ### Composables
 
-- `useCanvasEngine()`
+- `useCanvasEngine()` (could be extended for company canvas)
 
-### CDM
+### CDM Entities
 
-- CompanyCanvas
+- **CompanyCanvas** (CRUD)
 
 ### AI Ops
 
-- `ai.generateCompanyCanvas`
+- `ai.generateCompanyCanvas` (not implemented)
+
+**Status:** ❌ Not Implemented  
+**Blocking:** EPIC 5B - AI operation and UI missing
 
 ---
 
-# 4. MATCHING
+# 4. MATCHING (EPIC 5C)
 
 ---
 
-## **4.1 Matching Summary (User ↔ Job ↔ Company)**
+## **4.1 Matching Summary** ❌
+
+**Route:** `/jobs/[jobId]/match` (planned)
 
 ### UI
 
 - `<UCard>`
 - `<UAlert>`
 - `<UBadge>`
+- `<UProgress>` (fit score)
 
 ### Components
 
-- Matching Engine Component
+- Matching Summary Component (planned)
+- Fit Score Visualization (planned)
 
 ### Composables
 
-- `useMatchingEngine()`
-- `useUserProfile()`
-- `useExperienceStore()`
-- `useCanvasEngine()`
-- `useJobAnalysis()`
+- `useMatchingEngine()` (not implemented)
+- `useUserProfile()` ✅
+- `useJobAnalysis()` ✅
+- `useCanvasEngine()` ✅
 
-### CDM
+### CDM Entities
 
-- MatchingSummary
+- **MatchingSummary** (create/read)
+- **UserProfile** (read)
+- **PersonalCanvas** (read)
+- **JobDescription** (read)
+- **CompanyCanvas** (read - depends on 5B)
 
 ### AI Ops
 
-- `ai.generateMatchingSummary`
+- `ai.generateMatchingSummary` (not implemented)
+
+**Status:** ❌ Not Implemented  
+**Blocking:** EPIC 5C - AI operation, composable, and UI missing  
+**Dependencies:** EPIC 5B (Company Canvas) recommended but not required
 
 ---
 
-# 5. APPLICATION MATERIALS
+# 5. TAILORED APPLICATION MATERIALS (EPIC 6)
 
 ---
 
-## **5.1 CV Builder**
+## **5.1 Tailored CV Generator** ❌
+
+**Route:** `/applications/[jobId]/cv` (planned)
 
 ### UI
 
@@ -442,230 +822,857 @@ Each page includes:
 
 ### Components
 
-- CV Builder Component
+- Tailored CV Builder Component (planned)
 
 ### Composables
 
-- `useTailoringEngine()`
-- `useUserProfile()`
-- `useExperienceStore()`
+- `useTailoringEngine()` (not implemented)
+- `useCvGenerator()` ✅ (could be extended)
 
-### CDM
+### CDM Entities
 
-- CVDocument
+- **CVDocument** (create tailored version)
+- **JobDescription** (read)
+- **MatchingSummary** (read)
 
 ### AI Ops
 
-- `ai.generateTailoredCvBlocks` (tailored mode)
+- `ai.generateTailoredCvBlocks` (not implemented)
+
+**Status:** ❌ Not Implemented  
+**Blocking:** EPIC 6 - AI operation and tailoring engine missing
+
+**Note:** Current `ai.generateCv` generates generic CVs. Tailored version requires job-specific optimization.
 
 ---
 
-## **5.2 Cover Letter Builder**
+## **5.2 Cover Letter Builder** ❌
+
+**Route:** `/applications/[jobId]/cover-letter` (planned)
 
 ### UI
 
-- `<URadioGroup>`
+- `<URadioGroup>` (tone selection)
 - `<UEditor>`
 
 ### Components
 
-- Cover Letter Generator Component
+- Cover Letter Generator Component (planned)
 
 ### Composables
 
-- `useTailoringEngine()`
-- `useStoryEngine()`
-- `useCanvasEngine()`
-- `useJobAnalysis()`
+- `useTailoringEngine()` (not implemented)
+- `useStoryEngine()` ✅
+- `useCanvasEngine()` ✅
+- `useJobAnalysis()` ✅
 
-### CDM
+### CDM Entities
 
-- CoverLetter
+- **CoverLetter** (create/update)
+- **JobDescription** (read)
+- **MatchingSummary** (read)
+- **PersonalCanvas** (read)
 
 ### AI Ops
 
-- `ai.generateCoverLetter`
+- `ai.generateCoverLetter` (not implemented)
+
+**Status:** ❌ Not Implemented  
+**Blocking:** EPIC 6 - AI operation missing
 
 ---
 
-## **5.3 Speech Builder**
+## **5.3 Speech Builder** ❌
+
+**Route:** `/speech` or `/applications/[jobId]/speech` (planned)
 
 ### UI
 
 - `<UTextarea>`
-- `<USteps>`
+- `<USteps>` (multi-section)
+- `<UTabs>` (generic vs tailored)
 
 ### Components
 
-- Speech Builder Component
+- Speech Builder Component (planned)
 
 ### Composables
 
-- `useTailoringEngine()`
+- `useTailoringEngine()` (not implemented)
+- `useUserProfile()` ✅
+- `useCanvasEngine()` ✅
 
-### CDM
+### CDM Entities
 
-- SpeechBlock
+- **SpeechBlock** (create/update)
 
 ### AI Ops
 
-- `ai.generateTailoredSpeech`
+- `ai.generateSpeech` (not implemented - EPIC 4)
+- `ai.generateTailoredSpeech` (not implemented - EPIC 6)
+
+**Status:** ❌ Not Implemented  
+**Blocking:** EPIC 4 (generic) + EPIC 6 (tailored) - AI operations missing
 
 ---
 
-## **5.4 KPI Generator**
+## **5.4 KPI Generator** ❌
+
+**Route:** `/applications/[jobId]/kpis` (planned)
 
 ### UI
 
 - `<UCard>`
 - `<UBadge>`
+- `<UButton>` (generate)
 
 ### Components
 
-- KPI Proposition Component
+- KPI Proposition Component (planned)
 
 ### Composables
 
-- `useTailoringEngine()`
+- `useTailoringEngine()` (not implemented)
+- `useStoryEngine()` ✅
 
-### CDM
+### CDM Entities
 
-- KPISet
+- **KPISet** (create/update)
+- **STARStory** (read - for KPI extraction)
 
 ### AI Ops
 
-- `ai.generateTailoredKpis`
+- `ai.generateTailoredKpis` (not implemented)
+
+**Status:** ❌ Not Implemented  
+**Blocking:** EPIC 6 - AI operation missing
+
+**Note:** Current `ai.generateAchievementsAndKpis` generates story-level KPIs. This needs job-tailored aggregation.
 
 ---
 
-# 6. INTERVIEW PREP
+# 6. INTERVIEW PREP (EPIC 7)
 
 ---
 
-## **6.1 Interview Questions Generator**
+## **6.1 Interview Questions Generator** ❌
+
+**Route:** `/interviews/[jobId]/prep` (planned)
 
 ### UI
 
 - `<UAccordion>`
 - `<UCard>`
+- `<UButton>` (generate, practice)
 
 ### Components
 
-- Interview Questions Component
+- Interview Questions Component (planned)
 
 ### Composables
 
-- `useInterviewEngine()`
-- `useStoryEngine()`
+- `useInterviewEngine()` (not implemented)
+- `useStoryEngine()` ✅
 
-### CDM
+### CDM Entities
 
-- InterviewQuestionSet
+- **InterviewQuestionSet** (create/read)
+- **JobDescription** (read)
+- **STARStory** (read - for answer preparation)
 
 ### AI Ops
 
-- `ai.generateInterviewQuestions`
+- `ai.generateInterviewQuestions` (not implemented)
+
+**Status:** ❌ Not Implemented  
+**Blocking:** EPIC 7 - AI operation and interview engine missing
 
 ---
 
-## **6.2 Interview Simulator (Text) — V1**
+## **6.2 Interview Simulator** ❌
+
+**Route:** `/interviews/[jobId]/simulate` (planned)
 
 ### UI
 
-- Custom `<ChatPane>`
-- `<UProgress>`
+- Custom `<ChatPane>` or `<UChat>`
+- `<UProgress>` (session progress)
+- `<UBadge>` (performance feedback)
 
 ### Components
 
-- Interview Simulation Component
+- Interview Simulation Component (planned)
+- Feedback Panel Component (planned)
 
 ### Composables
 
-- `useInterviewEngine()`
+- `useInterviewEngine()` (not implemented)
 
-### CDM
+### CDM Entities
 
-- InterviewSession
+- **InterviewSession** (create/update)
+- **InterviewQuestionSet** (read)
 
 ### AI Ops
 
-- `ai.simulateInterviewTurn`
-- `ai.evaluateInterviewAnswer`
+- `ai.simulateInterviewTurn` (not implemented)
+- `ai.evaluateInterviewAnswer` (not implemented)
+
+**Status:** ❌ Not Implemented  
+**Blocking:** EPIC 7 - AI operations and real-time engine missing
 
 ---
 
-# 7. SYSTEM UTILITY PAGES
+# 7. SYSTEM PAGES
 
 ---
 
-## **7.1 Template Library**
+## **7.1 Settings** ❌
 
-### UI
-
-- `<UCard>`
-
-### Components
-
-- Template Library Component
-
-### Composables
-
-- `useTailoringEngine()`
-
-### CDM
-
-- None (static)
-
-### AI
-
-- None
-
----
-
-## **7.2 Settings**
+**Route:** `/settings` (planned)
 
 ### UI
 
 - `<UForm>`
+- `<UCard>`
 
 ### Components
 
-- Settings Component
+- Settings Component (planned)
 
 ### Composables
 
-- `useUserProfile()`
+- `useUserProfile()` ✅
 
-### CDM
+### CDM Entities
 
-- UserProfile (updates)
+- **UserProfile** (update preferences)
 
 ### AI Ops
 
 - None
 
+**Status:** ❌ Not Implemented (low priority)
+
 ---
 
-# 8. COMPONENT → PAGE SUMMARY TABLE
+# 8. IMPLEMENTATION SUMMARY
 
-```
-Page                Component(s)           Composables               CDM Entity            AI Ops
----------------------------------------------------------------------------------------------------------
-Profile Overview    User Profile Manager   useUserProfile            UserProfile           -
-Experience Editor   Experience Intake      useExperienceStore        Experience            extractExperienceBlocks,
-                                                                                            generateAchievements
-STAR Builder        Story Builder          useStoryEngine            STARStory             generateStarStory,
-                                                                                            generateAchievements
-Personal Canvas     Canvas Component       useCanvasEngine           PersonalCanvas        generatePersonalCanvas
-Add Job             Job Intake             useJobAnalysis            JobDescription        parseJobDescription
-Add Company         Company Intake         useCanvasEngine           Company               analyzeCompanyInfo
-Company Canvas      Company Canvas         useCanvasEngine           CompanyCanvas         generateCompanyCanvas
-Matching            Matching Engine        useMatchingEngine         MatchingSummary       generateMatchingSummary
-CV Builder          CV Builder             useTailoringEngine        CVDocument            generateTailoredCvBlocks
-Letter Builder      Letter Generator       useTailoringEngine        CoverLetter           generateCoverLetter
-Speech Builder      Speech Generator       useTailoringEngine        SpeechBlock           generateTailoredSpeech
-KPI Generator       KPI Component          useTailoringEngine        KPISet                generateTailoredKpis
-Q&A Generator       Interview Q Generator  useInterviewEngine        InterviewQuestionSet  generateInterviewQuestions
-Interview Sim       Interview Simulator    useInterviewEngine        InterviewSession      simulateInterviewTurn,
-                                                                                            evaluateInterviewAnswer
-```
+## 8.1 Implemented Pages (18 Routes)
+
+| Page                   | Route                                                 | Status | EPIC |
+| ---------------------- | ----------------------------------------------------- | ------ | ---- |
+| Home                   | `/`                                                   | ✅     | -    |
+| Login                  | `/login`                                              | ✅     | -    |
+| Profile Summary        | `/profile`                                            | ✅     | 1A   |
+| Profile Full Form      | `/profile/full`                                       | ✅     | 1A   |
+| CV Upload              | `/profile/cv-upload`                                  | ✅     | 1A   |
+| Experience List        | `/profile/experiences`                                | ✅     | 1A   |
+| Experience Editor      | `/profile/experiences/:id`                            | ✅     | 1A   |
+| Global Story Library   | `/profile/stories`                                    | ✅     | 2    |
+| Per-Experience Stories | `/profile/experiences/:experienceId/stories`          | ✅     | 2    |
+| Story Editor           | `/profile/experiences/:experienceId/stories/:storyId` | ✅     | 2    |
+| Personal Canvas        | `/profile/canvas`                                     | ✅     | 1B   |
+| CV List                | `/cv`                                                 | ✅     | 3    |
+| CV Generator           | `/cv/new`                                             | ✅     | 3    |
+| CV Editor              | `/cv/:id`                                             | ✅     | 3    |
+| CV Print               | `/cv/:id/print`                                       | ✅     | 3B   |
+| Job List               | `/jobs`                                               | ✅     | 5A   |
+| Job Upload             | `/jobs/new`                                           | ✅     | 5A   |
+| Job Detail             | `/jobs/[jobId]`                                       | ✅     | 5A   |
+
+## 8.2 Planned Pages (12 Routes)
+
+| Page                | Route                               | Status | EPIC | Blocker               |
+| ------------------- | ----------------------------------- | ------ | ---- | --------------------- |
+| Company List        | `/companies`                        | ❌     | 5B   | AI operation missing  |
+| Company Editor      | `/companies/:id`                    | ❌     | 5B   | AI operation missing  |
+| Company Canvas      | `/companies/:id/canvas`             | ❌     | 5B   | AI operation missing  |
+| Matching Summary    | `/jobs/:jobId/match`                | ❌     | 5C   | AI operation missing  |
+| Tailored CV         | `/applications/:jobId/cv`           | ❌     | 6    | AI operation missing  |
+| Cover Letter        | `/applications/:jobId/cover-letter` | ❌     | 6    | AI operation missing  |
+| Speech Builder      | `/speech`                           | ❌     | 4    | AI operation missing  |
+| Tailored Speech     | `/applications/:jobId/speech`       | ❌     | 6    | AI operation missing  |
+| KPI Generator       | `/applications/:jobId/kpis`         | ❌     | 6    | AI operation missing  |
+| Interview Prep      | `/interviews/:jobId/prep`           | ❌     | 7    | AI operation missing  |
+| Interview Simulator | `/interviews/:jobId/simulate`       | ❌     | 7    | AI operations missing |
+| Settings            | `/settings`                         | ❌     | -    | Low priority          |
+
+## 8.3 Implemented Components (13 Core + 9 CV + 2 Job)
+
+**Core Components (Domain):**
+
+- `ExperienceForm` - CRUD form for experiences
+- `ExperienceCard` - experience display card
+- `ExperienceList` - table view (legacy)
+- `StoryBuilder` - guided STAR interview (3 modes)
+- `StoryForm` - manual STAR entry
+- `StoryList` - story cards with actions
+- `StoryCard` - individual story card
+- `StoryViewModal` - full story display
+- `AchievementsKpisPanel` - tag-based KPI editing
+- `PersonalCanvasComponent` - 9-section BMC layout
+- `CanvasSectionCard` - per-section tag editor
+- `TagInput` - reusable tag management
+- `ItemCard` - reusable card pattern
+
+**CV Components:**
+
+- `ExperiencePicker` - select experiences for CV
+- `ExperiencesPreview` - preview extracted experiences
+- `ProfilePreview` - preview extracted profile
+- `UploadStep` - file upload UI
+- `ParsingStep` - AI parsing indicator
+- `GeneratingStep` - CV generation indicator
+- `ImportSuccess` - import completion
+- `BadgeList` - list of badges
+- `SingleBadge` - individual badge
+
+**Job Components:**
+
+- `JobCard` - job display with status badge
+- `JobUploadStep` - file upload with status
+
+**Profile Components:**
+
+- `ProfileFullForm` - complete profile editor
+- `ProfileSummaryCard` - profile overview
+
+## 8.4 Implemented Composables (20+)
+
+**Application Layer (`src/application/`):**
+
+- `useUserProfile(id)` - single profile CRUD
+- `useExperience(id)` - single experience CRUD
+- `useSTARStory(id)` - single story CRUD
+- `usePersonalCanvas(id)` - single canvas CRUD
+- `useCVDocument(id)` - single CV CRUD
+- `useJobDescription(id)` - single job CRUD
+- `useCompany(id)` - single company CRUD (exists, unused)
+- `useStoryEngine(experienceId)` - story operations
+- `useCanvasEngine()` - canvas operations with AI
+- `useAiOperations()` - AI operation execution
+
+**Workflow Layer (`src/composables/`):**
+
+- `useAuthUser()` - auth state wrapper
+- `useCvUploadWorkflow()` - CV upload orchestration
+- `useCvParsing()` - CV parsing logic
+- `useExperienceImport()` - import extracted experiences
+- `useProfileMerge()` - merge profile data
+- `useJobAnalysis()` - job CRUD + AI operations
+- `useJobUpload()` - job file upload
+- `useCvGenerator()` - CV generation logic
+- `useCvDocuments()` - CV list operations
+- `useStoryList()` - story list operations
+- `useStoryEditor(storyId)` - story CRUD workflow
+- `useStarInterview(sourceText)` - guided STAR interview
+- `useStoryEnhancer()` - AI story generation
+- `useBreadcrumbMapping()` - dynamic breadcrumbs
+
+## 8.5 AI Operations Status (6/17 Implemented)
+
+**✅ Implemented:**
+
+1. `ai.parseCvText` - extract profile from CV
+2. `ai.extractExperienceBlocks` - extract experiences from CV
+3. `ai.generatePersonalCanvas` - generate personal BMC
+4. `ai.generateStarStory` - generate STAR stories
+5. `ai.generateAchievementsAndKpis` - generate KPIs from story
+6. `ai.generateCv` - generate markdown CV
+7. `ai.parseJobDescription` - extract job fields from text
+
+**❌ Missing (11 operations):**
+
+1. `ai.generateSpeech` - EPIC 4
+2. `ai.analyzeCompanyInfo` - EPIC 5B
+3. `ai.generateCompanyCanvas` - EPIC 5B
+4. `ai.generateMatchingSummary` - EPIC 5C
+5. `ai.generateTailoredCvBlocks` - EPIC 6
+6. `ai.generateCoverLetter` - EPIC 6
+7. `ai.generateTailoredSpeech` - EPIC 6
+8. `ai.generateTailoredKpis` - EPIC 6
+9. `ai.generateInterviewQuestions` - EPIC 7
+10. `ai.simulateInterviewTurn` - EPIC 7
+11. `ai.evaluateInterviewAnswer` - EPIC 7
+
+---
+
+# 9. ARCHITECTURE AUDIT & ANALYSIS
+
+## 9.1 What's Working Well ✅
+
+### 1. Component Architecture
+
+**Pattern:** Pages → Components → Composables → Services → Repositories → GraphQL
+
+**Strengths:**
+
+- ✅ Clean separation of concerns
+- ✅ Consistent file organization (`src/pages/`, `src/components/`, `src/composables/`)
+- ✅ Reusable components (`TagInput`, `ItemCard`, `CanvasSectionCard`)
+- ✅ Domain-specific components (`ExperienceForm`, `StoryBuilder`, `JobCard`)
+
+### 2. Composable Pattern
+
+**Pattern:** Workflow composables wrap application-layer composables
+
+**Strengths:**
+
+- ✅ Clear distinction between single-entity (`use*` in `application/`) and workflow orchestration (`use*Workflow`, `use*Engine`)
+- ✅ State management stays close to data (no global Pinia store needed)
+- ✅ Testable units with mocked dependencies
+- ✅ Good examples: `useCvUploadWorkflow()`, `useCanvasEngine()`, `useStoryEditor()`
+
+### 3. Nuxt UI Integration
+
+**Pattern:** Heavy reliance on Nuxt UI components + semantic HTML
+
+**Strengths:**
+
+- ✅ Consistent design system
+- ✅ Built-in accessibility
+- ✅ Rapid development (no custom UI primitives needed)
+- ✅ Good coverage: `UPage`, `UPageHeader`, `UPageBody`, `UCard`, `UForm`, `UInput`, `UButton`, etc.
+
+### 4. Page Patterns
+
+**Established Patterns:**
+
+1. **Hub Page**: `/profile` - navigation cards to features
+2. **List Page**: `/jobs`, `/cv` - searchable card grid + empty state + delete modal
+3. **Form Page**: `/profile/full`, `/jobs/[jobId]` - edit/view modes, dirty tracking, save/cancel
+4. **Wizard Page**: `/cv/new`, `/profile/cv-upload` - multi-step with progress indicator
+5. **Detail Page**: `/jobs/[jobId]` - tabbed sections with TagInput
+
+**Consistency:** ✅ Patterns are emerging and reusable
+
+### 5. Test Coverage
+
+**Coverage:** 975 unit/integration + 31 sandbox + 3 E2E flows
+
+**Strengths:**
+
+- ✅ Comprehensive domain/service/composable tests
+- ✅ Component tests with Nuxt UI stubs
+- ✅ E2E tests for critical flows (canvas, stories, jobs)
+- ✅ Sandbox tests for AI operations
+
+### 6. i18n Implementation
+
+**Pattern:** All text via `t('key.path')` with JSON locale files
+
+**Strengths:**
+
+- ✅ No hard-coded strings
+- ✅ Organized by feature (`jobUpload`, `jobList`, `jobDetail`)
+- ✅ Reusable keys (`errors`, `actions`, `features`)
+
+## 9.2 Areas for Improvement ⚠️
+
+### 1. Component Reuse & Organization
+
+**Issue:** Some duplication between pages
+
+- `ExperienceCard` is good, but `ExperienceList` (table component) is unused
+- Job list uses inline cards instead of a reusable `JobList` component
+- CV list uses inline cards instead of a reusable `CvList` component
+
+**Impact:** Moderate - increases page complexity
+
+**Recommendation:**
+
+- Extract list patterns into reusable components (`JobList`, `CvList`)
+- Deprecate unused `ExperienceList` table component
+- Create `ListPage` layout component for common list page pattern
+
+### 2. Form Abstraction
+
+**Issue:** Form state management is inconsistent
+
+- `ExperienceForm` is a complete self-contained component
+- Jobs detail page has inline form logic (304 lines)
+- CV generator has inline form logic (256 lines)
+
+**Impact:** Moderate - harder to maintain, test, and reuse
+
+**Recommendation:**
+
+- Extract `JobForm` component from `/jobs/[jobId].vue`
+- Extract `CvGeneratorForm` component from `/cv/new.vue`
+- Create `FormCard` wrapper component for common form+card pattern
+
+### 3. Wizard Pattern
+
+**Issue:** Wizard implementation is ad-hoc
+
+- CV upload has custom step tracking
+- CV generator has custom step tracking
+- No reusable wizard component
+
+**Impact:** Low - works but duplicates logic
+
+**Recommendation:**
+
+- Create `WizardContainer` component with slot-based steps
+- Standardize step indicator UI
+- Centralize step navigation logic
+
+### 4. Modal Usage
+
+**Issue:** Delete modals are repeated in multiple pages
+
+- `/profile/experiences` - delete experience modal
+- `/jobs` - delete job modal
+- Custom implementation each time
+
+**Impact:** Low - but creates duplication
+
+**Recommendation:**
+
+- Create `ConfirmModal` component (already exists at `src/components/ConfirmModal.vue` - use it!)
+- Standardize delete confirmation pattern
+
+### 5. Breadcrumb Management
+
+**Issue:** Dynamic breadcrumbs require `useBreadcrumbMapping()` and `definePageMeta`
+
+- Jobs detail page updates breadcrumb with job title
+- Experience stories page updates with company name
+- Requires two mechanisms (`definePageMeta` + `useBreadcrumbMapping`)
+
+**Impact:** Low - works but complex
+
+**Recommendation:**
+
+- Document breadcrumb pattern in style guide
+- Consider Nuxt UI `<UBreadcrumb>` if it provides dynamic support
+
+### 6. Loading & Error States
+
+**Issue:** Loading and error handling is inconsistent
+
+- Some pages use `<USkeleton>`
+- Some pages use custom loading indicators
+- Error messages use different patterns (`<UAlert>`, `errorMessage` strings)
+
+**Impact:** Moderate - UX inconsistency
+
+**Recommendation:**
+
+- Create `LoadingCard` component for skeleton states
+- Standardize error toast vs alert usage
+- Create `ErrorBoundary` component for page-level errors
+
+### 7. Empty States
+
+**Issue:** Empty states are well-implemented but could be extracted
+
+- Each page implements `<UEmpty>` with custom actions
+- Pattern is consistent but repeated
+
+**Impact:** Low - minor duplication
+
+**Recommendation:**
+
+- Create `EmptyState` wrapper with common patterns (icon, title, description, primary action)
+
+### 8. Page Size
+
+**Issue:** Some pages are very large
+
+- `/jobs/[jobId].vue` - 485 lines
+- `/cv/new.vue` - 256 lines
+- `/profile/experiences/[experienceId]/stories/[storyId].vue` - complex logic
+
+**Impact:** Moderate - harder to maintain and test
+
+**Recommendation:**
+
+- Extract form logic into components
+- Extract wizard steps into separate components
+- Target max 200 lines per page (excluding types)
+
+### 9. Type Definitions
+
+**Issue:** Type definitions are sometimes inline
+
+- Form state types defined in page files
+- Some interfaces duplicated across files
+
+**Impact:** Low - but reduces type reuse
+
+**Recommendation:**
+
+- Extract form state types to `types/forms.ts`
+- Extract UI types to `types/ui.ts`
+- Use domain types directly when possible
+
+### 10. Composable Organization
+
+**Issue:** Unclear distinction between workflow composables
+
+- Some are in `src/composables/` (workflow level)
+- Some are in `src/application/` (entity level)
+- Naming could be clearer (`useJobAnalysis` vs `useJobDescription`)
+
+**Impact:** Low - but affects developer experience
+
+**Recommendation:**
+
+- Keep `src/application/` for single-entity CRUD (`useUserProfile`, `useJobDescription`)
+- Keep `src/composables/` for workflows (`useCvUploadWorkflow`, `useJobAnalysisWorkflow`)
+- Rename for clarity where needed
+
+## 9.3 Missing Patterns for Future EPICs
+
+### 1. Tailoring Engine Pattern
+
+**Needed for:** EPIC 6
+
+**Requirements:**
+
+- Context aggregation (profile + canvas + job + company + matching)
+- Multi-step generation workflow
+- Comparison UI (generic vs tailored)
+
+**Recommendation:**
+
+- Create `useTailoringEngine()` composable
+- Design `TailoringContext` type
+- Create `ComparisonView` component
+
+### 2. Real-Time Chat Pattern
+
+**Needed for:** EPIC 7 (Interview Simulator)
+
+**Requirements:**
+
+- Streaming AI responses
+- Turn-based conversation
+- Performance feedback
+- Session persistence
+
+**Recommendation:**
+
+- Research Nuxt UI `<UChat>` component
+- Design `ChatMessage` and `ChatSession` types
+- Create `InterviewSimulator` component
+
+### 3. Matching Visualization
+
+**Needed for:** EPIC 5C
+
+**Requirements:**
+
+- Fit score display (0-100%)
+- Impact areas (radar chart?)
+- Strengths/gaps lists
+- Recommendations
+
+**Recommendation:**
+
+- Create `FitScoreGauge` component
+- Create `ImpactAreasChart` component (consider Chart.js)
+- Design `MatchingResults` layout
+
+---
+
+# 10. REFACTORING PLAN
+
+## Phase 1: Component Extraction (1-2 weeks)
+
+**Priority:** High  
+**Impact:** Reduces duplication, improves maintainability
+
+### Tasks:
+
+1. **Extract List Components**
+   - [ ] Create `JobList.vue` from `/jobs/index.vue` inline logic
+   - [ ] Create `CvList.vue` from `/cv/index.vue` inline logic
+   - [ ] Deprecate `ExperienceList.vue` table component (card pattern is better)
+
+2. **Extract Form Components**
+   - [ ] Create `JobForm.vue` from `/jobs/[jobId].vue`
+   - [ ] Create `CvGeneratorForm.vue` from `/cv/new.vue`
+   - [ ] Extract common form patterns into `FormCard.vue`
+
+3. **Standardize Modals**
+   - [ ] Replace all delete modals with existing `ConfirmModal.vue`
+   - [ ] Add `type` prop to `ConfirmModal` (delete, warning, info)
+   - [ ] Update 3 pages: `/profile/experiences`, `/jobs`, `/profile/experiences/[experienceId]/stories`
+
+4. **Extract Empty States**
+   - [ ] Create `EmptyState.vue` wrapper component
+   - [ ] Update 5+ pages to use `EmptyState`
+
+**Estimated Effort:** 10-15 hours  
+**Files Affected:** ~10 pages, +5 new components
+
+---
+
+## Phase 2: Page Refactoring (1-2 weeks)
+
+**Priority:** Medium  
+**Impact:** Improves readability and testability
+
+### Tasks:
+
+1. **Reduce Page Complexity**
+   - [ ] `/jobs/[jobId].vue` - extract `JobForm` component (485 → 150 lines)
+   - [ ] `/cv/new.vue` - extract wizard steps (256 → 100 lines)
+   - [ ] `/profile/experiences/[experienceId]/stories/[storyId].vue` - extract mode selection logic
+
+2. **Wizard Standardization**
+   - [ ] Create `WizardContainer.vue` component
+   - [ ] Create `WizardStep.vue` component
+   - [ ] Update `/cv/new.vue` to use wizard components
+   - [ ] Update `/profile/cv-upload.vue` to use wizard components
+
+3. **Loading & Error Standardization**
+   - [ ] Create `LoadingCard.vue` component (skeleton wrapper)
+   - [ ] Create `ErrorAlert.vue` component (standardized error display)
+   - [ ] Update 10+ pages to use standardized components
+
+**Estimated Effort:** 15-20 hours  
+**Files Affected:** ~15 pages, +4 new components
+
+---
+
+## Phase 3: Type System Cleanup (3-5 days)
+
+**Priority:** Low  
+**Impact:** Improves type reuse and discoverability
+
+### Tasks:
+
+1. **Extract Form Types**
+   - [ ] Create `src/types/forms.ts`
+   - [ ] Move form state types from page files
+   - [ ] Create generic `FormState<T>` type
+
+2. **Extract UI Types**
+   - [ ] Consolidate `PageHeaderLink`, `TableColumn`, etc. in `src/types/ui.ts`
+   - [ ] Remove duplicated type definitions
+
+3. **Document Type Patterns**
+   - [ ] Add JSDoc comments to key types
+   - [ ] Create type usage guide in docs
+
+**Estimated Effort:** 5-8 hours  
+**Files Affected:** ~20 files, +2 type files
+
+---
+
+## Phase 4: Composable Reorganization (3-5 days)
+
+**Priority:** Low  
+**Impact:** Improves developer experience
+
+### Tasks:
+
+1. **Clarify Naming**
+   - [ ] Rename `useJobAnalysis()` → `useJobWorkflow()` (or keep if preferred)
+   - [ ] Ensure all workflow composables have clear names
+
+2. **Document Composable Patterns**
+   - [ ] Create composable style guide
+   - [ ] Document when to use `application/` vs `composables/`
+
+3. **Audit Unused Composables**
+   - [ ] Verify all composables are used
+   - [ ] Remove or mark deprecated composables
+
+**Estimated Effort:** 5-8 hours  
+**Files Affected:** ~10 composables
+
+---
+
+## Phase 5: Future EPIC Preparation (2-3 weeks)
+
+**Priority:** Medium (before starting EPICs 4, 5B, 5C, 6, 7)  
+**Impact:** Enables faster EPIC implementation
+
+### Tasks:
+
+1. **Tailoring Engine Foundation (EPIC 6)**
+   - [ ] Design `TailoringContext` type
+   - [ ] Create `useTailoringEngine()` composable skeleton
+   - [ ] Create `ComparisonView.vue` component
+   - [ ] Create `TailoredContentEditor.vue` base component
+
+2. **Matching Engine Foundation (EPIC 5C)**
+   - [ ] Design `MatchingResult` type
+   - [ ] Create `FitScoreGauge.vue` component
+   - [ ] Create `ImpactAreasChart.vue` component (research charting library)
+   - [ ] Create `MatchingResults.vue` layout
+
+3. **Interview Engine Foundation (EPIC 7)**
+   - [ ] Design `InterviewMessage`, `InterviewSession` types
+   - [ ] Research streaming AI implementation
+   - [ ] Create `InterviewChat.vue` component skeleton
+   - [ ] Create `PerformanceFeedback.vue` component
+
+4. **Company Canvas (EPIC 5B)**
+   - [ ] Verify `PersonalCanvasComponent` can be reused for company canvas
+   - [ ] Create `CompanyCanvasComponent.vue` (extend personal canvas pattern)
+   - [ ] Create `CompanyForm.vue` component
+
+**Estimated Effort:** 20-30 hours (parallel with EPIC development)  
+**Files Affected:** +10 new components, +3 new composables
+
+---
+
+## Refactoring Success Metrics
+
+### Code Quality
+
+- [ ] Max page size: 200 lines (excluding types)
+- [ ] Max component complexity: 16 (ESLint)
+- [ ] Component reuse: 80%+ (pages use shared components)
+- [ ] Type coverage: 100% (no `any` types)
+
+### Developer Experience
+
+- [ ] New page creation: < 100 lines (use shared patterns)
+- [ ] Component discoverability: documented in style guide
+- [ ] Composable clarity: clear naming + JSDoc
+
+### Maintainability
+
+- [ ] Reduced duplication: -30% code in pages
+- [ ] Standardized patterns: wizard, list, form, modal
+- [ ] Consistent error handling: unified approach
+
+---
+
+# 11. NEXT IMMEDIATE ACTIONS
+
+## Before Starting EPIC 4/5B/5C/6/7
+
+1. **Complete Phase 1 Refactoring** (Component Extraction)
+   - Extract `JobForm`, `CvList`, `JobList` components
+   - Standardize delete modals with `ConfirmModal`
+   - Create `EmptyState` wrapper
+
+2. **Document Component Library**
+   - Create `docs/Component_Library.md`
+   - Document when to use each component
+   - Add usage examples
+
+3. **Create Component Templates**
+   - `ComponentList.vue.template` - for list pages
+   - `ComponentForm.vue.template` - for form pages
+   - `ComponentWizard.vue.template` - for wizard pages
+
+4. **Establish Page Guidelines**
+   - Max 200 lines per page
+   - Required sections: script setup, template, types
+   - Composable usage patterns
+
+---
+
+**END OF DOCUMENT**
+
+**Last Updated:** 2025-12-30  
+**Next Review:** After EPIC 5B completion
