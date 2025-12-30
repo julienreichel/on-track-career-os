@@ -73,7 +73,6 @@ describe('AI Operations - Generate Company Canvas (E2E Sandbox)', () => {
     expect(canvas.companyName).toContain('Atlas');
     expect(Array.isArray(canvas.valuePropositions)).toBe(true);
     expect(Array.isArray(canvas.customerSegments)).toBe(true);
-    expect(typeof canvas.analysisSummary).toBe('string');
     expect(typeof canvas.confidence).toBe('number');
   });
 });

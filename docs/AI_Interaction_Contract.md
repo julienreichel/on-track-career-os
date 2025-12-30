@@ -591,7 +591,6 @@ Additional Notes:
 
 ### Fallback Strategy
 
-- If every block is empty, set `confidence` to `0.3` and explain the lack of data in `analysisSummary`.
 - Deduplicate entries across blocks before returning.
 - Cap each list at 8 bullets to keep UI readable.
 

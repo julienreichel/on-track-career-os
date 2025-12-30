@@ -504,7 +504,6 @@ describe('AiOperationsService', () => {
       keyActivities: [],
       keyPartners: [],
       costStructure: [],
-      analysisSummary: 'Summary',
       confidence: 0.65,
     };
 
@@ -533,7 +532,6 @@ describe('AiOperationsService', () => {
         keyActivities: [],
         keyPartners: [],
         costStructure: [],
-        analysisSummary: 'Summary',
         confidence: 0.5,
       } as GeneratedCompanyCanvas);
 

@@ -1,18 +1,18 @@
 import { computed, ref } from 'vue';
 import type { CompanyCanvas } from '@/domain/company-canvas/CompanyCanvas';
 import { CompanyCanvasService } from '@/domain/company-canvas/CompanyCanvasService';
-import { COMPANY_CANVAS_BLOCKS, type CompanyCanvasBlockKey } from '@/domain/company-canvas/canvasBlocks';
+import {
+  COMPANY_CANVAS_BLOCKS,
+  type CompanyCanvasBlockKey,
+} from '@/domain/company-canvas/canvasBlocks';
 
 type BlockDraft = Record<CompanyCanvasBlockKey, string[]>;
 
 function createEmptyDraft(): BlockDraft {
-  return COMPANY_CANVAS_BLOCKS.reduce<BlockDraft>(
-    (acc, key) => {
-      acc[key] = [];
-      return acc;
-    },
-    {} as BlockDraft
-  );
+  return COMPANY_CANVAS_BLOCKS.reduce<BlockDraft>((acc, key) => {
+    acc[key] = [];
+    return acc;
+  }, {} as BlockDraft);
 }
 
 export function useCompanyCanvas(companyId: string) {
@@ -50,15 +50,9 @@ export function useCompanyCanvas(companyId: string) {
     dirty.value = true;
   };
 
-  const updateSummary = (summary: string) => {
-    draftSummary.value = summary;
-    dirty.value = true;
-  };
-
   const save = async () => {
     const payload = {
       ...draftBlocks.value,
-      analysisSummary: draftSummary.value,
     };
     const updated = await run(() => service.saveDraft(companyId, payload));
     canvas.value = updated;
@@ -75,7 +69,9 @@ export function useCompanyCanvas(companyId: string) {
     return regenerated;
   };
 
-  const isEmpty = computed(() => COMPANY_CANVAS_BLOCKS.every((key) => draftBlocks.value[key].length === 0));
+  const isEmpty = computed(() =>
+    COMPANY_CANVAS_BLOCKS.every((key) => draftBlocks.value[key].length === 0)
+  );
 
   function hydrateDraft(data: CompanyCanvas | null) {
     if (!data) {
@@ -88,7 +84,6 @@ export function useCompanyCanvas(companyId: string) {
       next[key] = (data[key] as string[]) ?? [];
     });
     draftBlocks.value = next;
-    draftSummary.value = data.analysisSummary ?? '';
   }
 
   return {
@@ -101,7 +96,6 @@ export function useCompanyCanvas(companyId: string) {
     error,
     load,
     updateBlock,
-    updateSummary,
     save,
     regenerate,
   };

@@ -86,7 +86,6 @@ describe('CompanyCanvasService', () => {
       keyActivities: [],
       keyPartners: [],
       costStructure: [],
-      analysisSummary: 'Test',
       confidence: 0.9,
     });
     canvasRepo.update.mockResolvedValue({
@@ -101,7 +100,6 @@ describe('CompanyCanvasService', () => {
     expect(canvasRepo.update).toHaveBeenCalledWith(
       expect.objectContaining({
         needsUpdate: false,
-        analysisSummary: 'Test',
       })
     );
     expect(regenerated.customerSegments).toEqual(['Startups']);
@@ -127,13 +125,11 @@ describe('CompanyCanvasService', () => {
       id: 'canvas-1',
       companyId: 'company-1',
       customerSegments: ['Fintech'],
-      analysisSummary: 'Summary',
       needsUpdate: true,
     } as CompanyCanvas);
 
-    const result = await service.saveDraft('company-1', {
+    await service.saveDraft('company-1', {
       customerSegments: ['Fintech'],
-      analysisSummary: ' Summary ',
     });
 
     expect(canvasRepo.create).toHaveBeenCalledWith(
@@ -142,12 +138,6 @@ describe('CompanyCanvasService', () => {
         needsUpdate: true,
       })
     );
-    expect(canvasRepo.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        analysisSummary: 'Summary',
-      })
-    );
-    expect(result.analysisSummary).toBe('Summary');
   });
 
   it('throws when regenerating canvas for unknown company', async () => {
@@ -186,7 +176,6 @@ describe('CompanyCanvasService', () => {
       keyActivities: [],
       keyPartners: [],
       costStructure: [],
-      analysisSummary: '',
       confidence: 0.7,
     });
     canvasRepo.update.mockResolvedValue(canvas);

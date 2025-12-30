@@ -254,7 +254,7 @@ export const schema = a
         keyActivities: a.string().array(),
         keyPartners: a.string().array(),
         costStructure: a.string().array(),
-        lastGeneratedAt: a.date(),
+        lastGeneratedAt: a.datetime(),
         needsUpdate: a.boolean().default(false),
 
         companyId: a.id().required(),

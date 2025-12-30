@@ -137,6 +137,7 @@
       },
       "lastUpdated": "Last updated {date}",
       "actions": {
+        "back": "Back to Companies",
         "reset": "Reset changes",
         "analyze": "Analyze company info",
         "save": "Save company"
@@ -157,11 +158,6 @@
       },
       "lastGeneratedAt": "Last generated {date}",
       "lastGeneratedUnknown": "Unknown",
-      "summary": {
-        "label": "Analysis summary",
-        "hint": "Short narrative describing how the company creates and captures value.",
-        "placeholder": "Add a concise summary of the business model..."
-      },
       "actions": {
         "generate": "Generate canvas",
         "save": "Save canvas"

@@ -453,7 +453,6 @@ describe('AiOperationsRepository', () => {
       keyActivities: [],
       keyPartners: [],
       costStructure: [],
-      analysisSummary: 'Summary',
       confidence: 0.7,
     };
 
@@ -473,7 +472,6 @@ describe('AiOperationsRepository', () => {
         }),
         expect.objectContaining({ authMode: 'userPool' })
       );
-      expect(result.analysisSummary).toBe('Summary');
     });
 
     it('throws when AI returns errors', async () => {

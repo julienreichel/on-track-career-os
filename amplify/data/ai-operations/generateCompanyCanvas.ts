@@ -17,7 +17,6 @@ const OUTPUT_SCHEMA = `{
   "keyActivities": ["string"],
   "keyPartners": ["string"],
   "costStructure": ["string"],
-  "analysisSummary": "string",
   "confidence": 0.8
 }`;
 
@@ -37,7 +36,6 @@ export interface GenerateCompanyCanvasOutput {
   keyActivities: string[];
   keyPartners: string[];
   costStructure: string[];
-  analysisSummary: string;
   confidence: number;
 }
 
@@ -93,7 +91,6 @@ function validateOutput(raw: Record<string, unknown>): GenerateCompanyCanvasOutp
   return {
     companyName: sanitizeString(raw.companyName),
     ...(normalized as Record<BlockKey, string[]>),
-    analysisSummary: sanitizeString(raw.analysisSummary),
     confidence: clampConfidence(raw.confidence),
   };
 }

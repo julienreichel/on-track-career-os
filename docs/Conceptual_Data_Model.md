@@ -215,7 +215,6 @@ _(EPIC 5B)_
 - keyActivities (list)
 - keyPartners (list)
 - costStructure (list)
-- analysisSummary
 - sourceOperation
 - lastGeneratedAt
 - needsUpdate (boolean)

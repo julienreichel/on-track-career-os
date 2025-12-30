@@ -19,7 +19,6 @@ const ARRAY_FIELDS: (keyof CompanyInput)[] = [
   'productsServices',
   'targetMarkets',
   'customerSegments',
-  'researchSources',
 ];
 
 export class CompanyService {

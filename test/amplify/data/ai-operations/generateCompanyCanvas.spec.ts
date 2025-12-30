@@ -28,7 +28,6 @@ describe('ai.generateCompanyCanvas', () => {
     keyActivities: string[];
     keyPartners: string[];
     costStructure: string[];
-    analysisSummary: string;
     confidence: number;
   }>;
 
@@ -74,7 +73,6 @@ describe('ai.generateCompanyCanvas', () => {
       keyActivities: ['Product dev'],
       keyPartners: ['Cloud vendor'],
       costStructure: ['R&D'],
-      analysisSummary: 'Focused on SMB automation.',
       confidence: 0.8,
     };
 
@@ -90,7 +88,6 @@ describe('ai.generateCompanyCanvas', () => {
     expect(response.companyName).toBe('Acme');
     expect(response.customerSegments).toEqual(['SMBs']);
     expect(response.valuePropositions).toEqual(['Automated ops']);
-    expect(response.analysisSummary).toContain('automation');
   });
 
   it('applies defaults and clamps array sizes', async () => {
@@ -106,7 +103,6 @@ describe('ai.generateCompanyCanvas', () => {
       keyActivities: [],
       keyPartners: [],
       costStructure: [],
-      analysisSummary: 123,
       confidence: undefined,
     };
 
@@ -121,7 +117,6 @@ describe('ai.generateCompanyCanvas', () => {
     expect(response.customerSegments.length).toBe(8);
     expect(response.valuePropositions).toEqual(['Value']);
     expect(response.channels).toEqual([]);
-    expect(response.analysisSummary).toBe('');
     expect(response.confidence).toBeGreaterThan(0);
   });
 });

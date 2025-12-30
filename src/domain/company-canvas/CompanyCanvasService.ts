@@ -71,7 +71,6 @@ export class CompanyCanvasService {
       keyActivities: generated.keyActivities,
       keyPartners: generated.keyPartners,
       costStructure: generated.costStructure,
-      analysisSummary: generated.analysisSummary,
       lastGeneratedAt: new Date().toISOString(),
       needsUpdate: false,
     };
@@ -119,9 +118,6 @@ export class CompanyCanvasService {
         normalized[key] = normalizeStringArray(normalized[key] as string[]);
       }
     });
-    if (typeof normalized.analysisSummary === 'string') {
-      normalized.analysisSummary = normalized.analysisSummary.trim();
-    }
     return normalized;
   }
 }

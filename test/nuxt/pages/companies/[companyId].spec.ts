@@ -51,14 +51,12 @@ const canvasMock = {
     keyPartners: [],
     costStructure: [],
   }),
-  draftSummary: ref(''),
   dirty: ref(false),
   isEmpty: ref(true),
   loading: ref(false),
   error: ref(null),
   load: vi.fn().mockResolvedValue(null),
   updateBlock: vi.fn(),
-  updateSummary: vi.fn(),
   save: vi.fn().mockResolvedValue(null),
   regenerate: vi.fn().mockResolvedValue(null),
 };
@@ -92,7 +90,8 @@ const stubs = {
   UButton: {
     props: ['label', 'disabled', 'loading'],
     emits: ['click'],
-    template: '<button class="u-button" type="button" :disabled="disabled" @click="$emit(\'click\')">{{ label }}</button>',
+    template:
+      '<button class="u-button" type="button" :disabled="disabled" @click="$emit(\'click\')">{{ label }}</button>',
   },
   CompanyForm: {
     props: ['modelValue'],
@@ -157,9 +156,7 @@ describe('Company Detail Page', () => {
     await wrapper.vm.$nextTick();
     await flushPromises();
     const saveButton =
-      wrapper
-        .findAll('.u-button')
-        .find((button) => button.text().includes('Save company')) ??
+      wrapper.findAll('.u-button').find((button) => button.text().includes('Save company')) ??
       wrapper.findAll('.u-button').at(-1);
     expect(saveButton).toBeTruthy();
     await saveButton!.trigger('click');

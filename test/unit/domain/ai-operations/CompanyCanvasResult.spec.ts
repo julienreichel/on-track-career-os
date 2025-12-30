@@ -14,7 +14,6 @@ describe('CompanyCanvasResult type guard', () => {
       keyActivities: [],
       keyPartners: [],
       costStructure: [],
-      analysisSummary: 'Summary',
       confidence: 0.6,
     };
 
@@ -27,7 +26,6 @@ describe('CompanyCanvasResult type guard', () => {
       isGeneratedCompanyCanvas({
         companyName: 'Acme',
         customerSegments: {},
-        analysisSummary: null,
         confidence: 'high',
       })
     ).toBe(false);

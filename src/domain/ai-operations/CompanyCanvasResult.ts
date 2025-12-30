@@ -20,7 +20,6 @@ export function isGeneratedCompanyCanvas(value: unknown): value is GeneratedComp
   return (
     typeof candidate.companyName === 'string' &&
     Array.isArray(candidate.customerSegments) &&
-    typeof candidate.analysisSummary === 'string' &&
     typeof candidate.confidence === 'number'
   );
 }

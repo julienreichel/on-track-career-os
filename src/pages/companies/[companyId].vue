@@ -35,7 +35,6 @@ const form = reactive<CompanyFormState>({
 const rawNotes = ref('');
 
 const company = companyStore.company;
-const canvas = canvasStore.canvas;
 
 const headerLinks = computed(() => [
   {
@@ -105,13 +104,10 @@ watch(
   { immediate: true }
 );
 
-watch(
-  companyId,
-  async () => {
-    await loadCompany();
-    await canvasStore.load();
-  }
-);
+watch(companyId, async () => {
+  await loadCompany();
+  await canvasStore.load();
+});
 
 onMounted(async () => {
   await loadCompany();
@@ -212,8 +208,7 @@ async function saveCanvas() {
   try {
     await canvasStore.save();
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('companies.canvas.errors.save');
+    errorMessage.value = error instanceof Error ? error.message : t('companies.canvas.errors.save');
   } finally {
     canvasSaving.value = false;
   }
@@ -309,15 +304,13 @@ async function regenerateCanvas() {
           </UCard>
 
           <CompanyCanvasEditor
-            :blocks="canvasStore.draftBlocks"
-            :summary="canvasStore.draftSummary"
-            :needs-update="canvas.value?.needsUpdate ?? true"
-            :last-generated-at="canvas.value?.lastGeneratedAt ?? null"
+            :blocks="canvasStore.draftBlocks.value"
+            :needs-update="canvasStore.canvas.value?.needsUpdate ?? true"
+            :last-generated-at="canvasStore.canvas.value?.lastGeneratedAt ?? null"
             :saving="canvasSaving"
             :regenerating="canvasRegenerating"
-            :disabled="canvasStore.loading"
+            :disabled="canvasStore.loading.value"
             @update:block="canvasStore.updateBlock"
-            @update:summary="canvasStore.updateSummary"
             @save="saveCanvas"
             @regenerate="regenerateCanvas"
           />

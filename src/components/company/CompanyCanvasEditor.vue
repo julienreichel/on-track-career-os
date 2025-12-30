@@ -7,7 +7,6 @@ import type { CompanyCanvasBlockKey } from '@/domain/company-canvas/canvasBlocks
 
 interface Props {
   blocks: Record<CompanyCanvasBlockKey, string[]>;
-  summary: string;
   needsUpdate?: boolean;
   lastGeneratedAt?: string | null;
   saving?: boolean;
@@ -25,7 +24,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'update:block': [CompanyCanvasBlockKey, string[]];
-  'update:summary': [string];
   save: [];
   regenerate: [];
 }>();
@@ -56,15 +54,6 @@ const formattedLastGeneratedAt = computed(() => {
     minute: 'numeric',
   }).format(date);
 });
-
-const summaryPlaceholder = computed(() =>
-  t('companies.canvas.summary.placeholder')
-);
-
-const handleSummaryUpdate = (event: Event) => {
-  const value = (event.target as HTMLTextAreaElement).value;
-  emit('update:summary', value);
-};
 </script>
 
 <template>
@@ -103,19 +92,6 @@ const handleSummaryUpdate = (event: Event) => {
         @update:model-value="(value) => emit('update:block', block.key, value)"
       />
     </div>
-
-    <UFormField
-      :label="t('companies.canvas.summary.label')"
-      :hint="t('companies.canvas.summary.hint')"
-    >
-      <UTextarea
-        :value="summary"
-        :placeholder="summaryPlaceholder"
-        :disabled="disabled || saving || regenerating"
-        class="w-full"
-        @input="handleSummaryUpdate"
-      />
-    </UFormField>
 
     <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
       <UButton
