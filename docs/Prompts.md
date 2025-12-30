@@ -234,7 +234,122 @@ Acceptance criteria
 - User can navigate from the job to the linked company page.
 - User can clear the link cleanly.
 
-## MASTER PROMPT 6 — EPIC 5B End-to-End Playwright E2E + Key Vitest Coverage
+## MASTER PROMPT 6 — EPIC 5A ⇄ EPIC 5B Bridge: Company Extraction from Job Description Upload
+
+Intro (context + why)
+When a user uploads or pastes a Job Description (EPIC 5A), the text often implicitly or explicitly contains company information (name, industry, products, market). EPIC 5B introduces Company as a first-class entity. This prompt defines the automatic, non-intrusive bridge between EPIC 5A and EPIC 5B: extract and normalize company info at job upload time, link the job to an existing or newly created Company, without generating a CompanyCanvas yet.
+
+This step ensures:
+
+- No duplicated companies
+- Early company context availability
+- Clean separation of concerns (analysis vs. canvas generation)
+
+Feature scope
+
+- On Job Description upload / parsing:
+  - Extract company-related information from the job description text
+  - Call `ai.analyzeCompanyInfo` using job content as input
+  - Link the job to a Company entity (existing or newly created)
+- CompanyCanvas is NOT generated here (manual action only from Company page)
+  Out of scope
+- No automatic CompanyCanvas generation
+- No UI canvas rendering
+- No aggressive company deduplication heuristics beyond name-based matching
+
+Trigger point (explicit)
+
+- This logic runs AFTER:
+  - Job description text is parsed and stored
+  - JobDescription entity exists
+- This logic runs BEFORE:
+  - Job detail page is shown as “fully initialized”
+
+AI operations usage
+
+- Call `ai.analyzeCompanyInfo`
+  Inputs:
+  - rawText: full job description text
+  - jobTitle (if available)
+  - optional jobContext metadata (location, seniority)
+    Output:
+  - companyProfile object (companyName, industry, productsServices, targetMarkets, summary, etc.)
+    Must follow the AI Interaction Contract strictly (JSON only, validated output).
+
+Company deduplication rules (important)
+
+- Use companyName as the primary matching key
+- Normalization rules (single shared helper):
+  - trim whitespace
+  - case-insensitive comparison
+  - ignore common suffixes (e.g. “SA”, “AG”, “Ltd”, “Inc”) if such helper already exists; otherwise keep comparison simple and explicit
+- If a Company with the same normalized name exists:
+  - Reuse it
+  - Do NOT overwrite existing Company fields blindly
+  - Merge only missing or empty fields (same merge rules as manual analyzeCompanyInfo)
+- If no Company exists:
+  - Create a new Company entity
+  - Populate only fields returned by analyzeCompanyInfo
+  - Mark CompanyCanvas.needsUpdate = true (canvas not generated yet)
+
+Domain / services / composables to implement or extend
+
+- Services:
+  - Extend JobDescriptionService orchestration:
+    - parseJobDescription
+    - → analyzeCompanyInfo
+    - → findOrCreateCompany
+    - → link JobDescription.companyId
+- Repositories:
+  - CompanyRepository:
+    - findByNormalizedName(name)
+    - create()
+    - updatePartial()
+- Shared helpers:
+  - normalizeCompanyName(name)
+  - mergeCompanyFields(existingCompany, analyzedCompanyProfile)
+
+Frontend composables impact
+
+- Extend `useJobDescription(jobId)`:
+  - expose linked company (if any)
+  - expose status flags (companyDetected, companyCreated, companyLinked)
+- No new UI required for this step (UI can display linked company badge if already designed)
+
+Implementation instructions (CLEAN + DRY)
+
+- Keep AI calls and dedup logic in the service layer, NOT in pages or composables.
+- Reuse the same merge logic used in EPIC 5B manual “Analyze Company Info” action.
+- Ensure idempotency:
+  - Re-running job analysis should not create duplicate companies.
+- Fail-safe behavior:
+  - If AI analysis fails or returns invalid data, job upload still succeeds without company linkage.
+
+Testing requirements
+
+- Vitest:
+  - Unit tests for normalizeCompanyName
+  - Service tests:
+    - job upload → company extracted → existing company reused
+    - job upload → company extracted → new company created
+    - job upload → AI failure → job created without company
+  - Merge behavior tests (existing data preserved)
+- Playwright:
+  - Covered implicitly by EPIC 5B E2E:
+    - Upload job with recognizable company name
+    - Verify job shows linked company
+    - Navigate to company page
+    - Verify no canvas exists yet and “Generate Canvas” is available
+
+Acceptance criteria
+
+- Uploading a job description with company info automatically links a Company.
+- Duplicate companies are not created when uploading multiple jobs for the same company.
+- CompanyCanvas is NOT generated automatically in this flow.
+- Job upload remains robust even if company analysis fails.
+- Logic is reusable and shared with EPIC 5B manual company analysis.
+
+## MASTER PROMPT 7 — EPIC 5B End-to-End Playwright E2E + Key Vitest Coverage
 
 Intro (context + why)
 EPIC 5B adds a multi-step workflow (create company → analyze → generate canvas → edit/save → link from job). We need one reliable E2E happy path + targeted unit/component tests to prevent regressions.
