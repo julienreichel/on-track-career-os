@@ -24,7 +24,11 @@ export default withNuxt(
             '[...slug]',
             // Components in cv/render subfolder
             'Block',
+            'Card',
+            'Form',
+            'List',
             'Editor',
+            'Selector',
           ],
         },
       ],
