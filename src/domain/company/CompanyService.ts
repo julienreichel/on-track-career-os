@@ -1,8 +1,9 @@
 import type { CompanyCreateInput, CompanyUpdateInput } from './Company';
 import { CompanyRepository } from './CompanyRepository';
-import { applyArrayNormalization, normalizeStringArray } from './companyUtils';
+import { applyArrayNormalization } from './companyUtils';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { AnalyzeCompanyInfoInput } from '@/domain/ai-operations/CompanyAnalysis';
+import { mergeCompanyProfile } from './companyMatching';
 
 type CompanyInput = Partial<Omit<CompanyCreateInput, 'owner'>> & { companyName: string };
 type CompanyUpdatePayload = Partial<Omit<CompanyUpdateInput, 'owner'>>;
@@ -95,16 +96,10 @@ export class CompanyService {
 
     const analysis = await this.aiService.analyzeCompanyInfo(input);
 
+    const merged = mergeCompanyProfile(company, analysis.companyProfile);
     const updatePayload: CompanyUpdateInput = {
       id: company.id,
-      companyName: analysis.companyProfile.companyName || company.companyName,
-      industry: analysis.companyProfile.industry || company.industry,
-      sizeRange: analysis.companyProfile.sizeRange || company.sizeRange,
-      website: analysis.companyProfile.website || company.website,
-      productsServices: normalizeStringArray(analysis.companyProfile.productsServices),
-      targetMarkets: normalizeStringArray(analysis.companyProfile.targetMarkets),
-      customerSegments: normalizeStringArray(analysis.companyProfile.customerSegments),
-      description: analysis.companyProfile.description || company.description,
+      ...merged,
       rawNotes: company.rawNotes,
     };
 

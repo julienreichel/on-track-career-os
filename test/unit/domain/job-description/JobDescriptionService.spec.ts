@@ -7,15 +7,22 @@ import type {
 } from '@/domain/job-description/JobDescription';
 import type { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { ParsedJobDescription } from '@/domain/ai-operations/ParsedJobDescription';
+import type { CompanyRepository } from '@/domain/company/CompanyRepository';
+import type { CompanyCanvasRepository } from '@/domain/company-canvas/CompanyCanvasRepository';
+import type { Company } from '@/domain/company/Company';
 
 // Mock the repository
 vi.mock('@/domain/job-description/JobDescriptionRepository');
 vi.mock('@/domain/ai-operations/AiOperationsService');
+vi.mock('@/domain/company/CompanyRepository');
+vi.mock('@/domain/company-canvas/CompanyCanvasRepository');
 
 describe('JobDescriptionService', () => {
   let service: JobDescriptionService;
   let mockRepository: ReturnType<typeof vi.mocked<JobDescriptionRepository>>;
   let mockAiService: ReturnType<typeof vi.mocked<AiOperationsService>>;
+  let mockCompanyRepo: ReturnType<typeof vi.mocked<CompanyRepository>>;
+  let mockCanvasRepo: ReturnType<typeof vi.mocked<CompanyCanvasRepository>>;
 
   beforeEach(() => {
     mockRepository = {
@@ -27,9 +34,27 @@ describe('JobDescriptionService', () => {
     } as unknown as ReturnType<typeof vi.mocked<JobDescriptionRepository>>;
     mockAiService = {
       parseJobDescription: vi.fn(),
+      analyzeCompanyInfo: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<AiOperationsService>>;
 
-    service = new JobDescriptionService(mockRepository, mockAiService);
+    mockCompanyRepo = {
+      findByNormalizedName: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+    } as unknown as ReturnType<typeof vi.mocked<CompanyRepository>>;
+
+    mockCanvasRepo = {
+      create: vi.fn(),
+    } as unknown as ReturnType<typeof vi.mocked<CompanyCanvasRepository>>;
+
+    service = new JobDescriptionService(
+      mockRepository,
+      mockAiService,
+      mockCompanyRepo,
+      mockCanvasRepo
+    );
+
+    mockAiService.analyzeCompanyInfo.mockRejectedValue(new Error('AI disabled'));
   });
 
   describe('getFullJobDescription', () => {
@@ -202,8 +227,139 @@ describe('JobDescriptionService', () => {
       const result = await service.reanalyseJob('job-1');
 
       expect(mockAiService.parseJobDescription).toHaveBeenCalledWith('Job text');
-      expect(mockRepository.update).toHaveBeenCalled();
+      expect(mockRepository.update).toHaveBeenCalledTimes(1);
       expect(result).toEqual(updatedJob);
+    });
+
+    it('links to existing company when analysis succeeds', async () => {
+      const job = { id: 'job-1', rawText: 'Job text', title: 'Engineer' } as JobDescription;
+      const parsed = {
+        title: 'Parsed',
+        seniorityLevel: '',
+        roleSummary: '',
+        responsibilities: [],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
+      } as ParsedJobDescription;
+      const updatedJob = { ...job, title: 'Parsed' } as JobDescription;
+      const jobWithCompany = { ...updatedJob, companyId: 'company-123' } as JobDescription;
+
+      mockRepository.get.mockResolvedValue(job);
+      mockAiService.parseJobDescription.mockResolvedValue(parsed);
+      mockRepository.update
+        .mockResolvedValueOnce(updatedJob)
+        .mockResolvedValueOnce(jobWithCompany);
+      mockAiService.analyzeCompanyInfo.mockResolvedValue({
+        companyProfile: {
+          companyName: 'Acme Inc.',
+          industry: 'Software',
+          sizeRange: '',
+          website: '',
+          productsServices: ['Automation'],
+          targetMarkets: [],
+          customerSegments: [],
+          description: '',
+        },
+        confidence: 0.9,
+      });
+      mockCompanyRepo.findByNormalizedName.mockResolvedValue({
+        id: 'company-123',
+        companyName: 'Acme Inc.',
+        productsServices: [],
+        targetMarkets: [],
+        customerSegments: [],
+      } as Company);
+      mockCompanyRepo.update.mockResolvedValue({
+        id: 'company-123',
+        companyName: 'Acme Inc.',
+      } as Company);
+
+      const result = await service.reanalyseJob('job-1');
+
+      expect(mockRepository.update).toHaveBeenCalledTimes(2);
+      expect(mockCompanyRepo.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'company-123',
+        })
+      );
+      expect(result.companyId).toBe('company-123');
+    });
+
+    it('creates company and canvas when none exists', async () => {
+      const job = { id: 'job-1', rawText: 'Job text', title: 'Engineer' } as JobDescription;
+      const parsed = {
+        title: 'Parsed',
+        seniorityLevel: '',
+        roleSummary: '',
+        responsibilities: [],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
+      } as ParsedJobDescription;
+      const updatedJob = { ...job, title: 'Parsed' } as JobDescription;
+      const jobWithCompany = { ...updatedJob, companyId: 'company-999' } as JobDescription;
+
+      mockRepository.get.mockResolvedValue(job);
+      mockAiService.parseJobDescription.mockResolvedValue(parsed);
+      mockRepository.update
+        .mockResolvedValueOnce(updatedJob)
+        .mockResolvedValueOnce(jobWithCompany);
+      mockAiService.analyzeCompanyInfo.mockResolvedValue({
+        companyProfile: {
+          companyName: 'NewCo',
+          industry: '',
+          sizeRange: '',
+          website: '',
+          productsServices: [],
+          targetMarkets: [],
+          customerSegments: [],
+          description: '',
+        },
+        confidence: 0.7,
+      });
+      mockCompanyRepo.findByNormalizedName.mockResolvedValue(null);
+      mockCompanyRepo.create.mockResolvedValue({
+        id: 'company-999',
+        companyName: 'NewCo',
+      } as Company);
+
+      const result = await service.reanalyseJob('job-1');
+
+      expect(mockCompanyRepo.create).toHaveBeenCalled();
+      expect(mockCanvasRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          companyId: 'company-999',
+          needsUpdate: true,
+        })
+      );
+      expect(result.companyId).toBe('company-999');
+    });
+
+    it('continues when company analysis fails', async () => {
+      const job = { id: 'job-1', rawText: 'Job text' } as JobDescription;
+      const parsed = {
+        title: 'Parsed',
+        seniorityLevel: '',
+        roleSummary: '',
+        responsibilities: [],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
+      } as ParsedJobDescription;
+      const updatedJob = { ...job, title: 'Parsed' } as JobDescription;
+
+      mockRepository.get.mockResolvedValue(job);
+      mockAiService.parseJobDescription.mockResolvedValue(parsed);
+      mockRepository.update.mockResolvedValue(updatedJob);
+      mockAiService.analyzeCompanyInfo.mockRejectedValue(new Error('AI failed'));
+
+      const result = await service.reanalyseJob('job-1');
+
+      expect(result.companyId).toBeUndefined();
     });
   });
 

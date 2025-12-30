@@ -1,5 +1,6 @@
 import { gqlOptions } from '@/data/graphql/options';
 import type { CompanyCreateInput, CompanyUpdateInput, Company } from './Company';
+import { normalizeCompanyName } from './companyMatching';
 
 export type AmplifyCompanyModel = {
   get: (
@@ -64,5 +65,18 @@ export class CompanyRepository {
 
   async delete(id: string) {
     await this.model.delete({ id }, gqlOptions());
+  }
+
+  async findByNormalizedName(name: string) {
+    const normalized = normalizeCompanyName(name);
+    if (!normalized) {
+      return null;
+    }
+    const companies = await this.list();
+    return (
+      companies.find(
+        (company) => normalizeCompanyName(company.companyName) === normalized
+      ) ?? null
+    );
   }
 }

@@ -1,10 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { CompanyRepository, type AmplifyCompanyModel } from '@/domain/company/CompanyRepository';
-import type {
-  Company,
-  CompanyCreateInput,
-  CompanyUpdateInput,
-} from '@/domain/company/Company';
+import type { Company, CompanyCreateInput, CompanyUpdateInput } from '@/domain/company/Company';
 
 const { gqlOptionsMock } = vi.hoisted(() => ({
   gqlOptionsMock: vi.fn((custom?: Record<string, unknown>) => ({
@@ -143,6 +139,25 @@ describe('CompanyRepository', () => {
         expect.objectContaining({ authMode: 'userPool' })
       );
       expect(gqlOptionsMock).toHaveBeenCalledWith();
+    });
+  });
+
+  describe('findByNormalizedName', () => {
+    it('returns company matching normalized name', async () => {
+      const companies = [
+        { id: '1', companyName: 'Acme Inc.' },
+        { id: '2', companyName: 'Global Freight' },
+      ] as Company[];
+      mockModel.list.mockResolvedValue({ data: companies });
+
+      const result = await repository.findByNormalizedName('  acme  ');
+
+      expect(result).toEqual(companies[0]);
+    });
+
+    it('returns null when name missing', async () => {
+      const result = await repository.findByNormalizedName('');
+      expect(result).toBeNull();
     });
   });
 });
