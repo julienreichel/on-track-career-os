@@ -17,6 +17,12 @@ const searchQuery = ref('');
 
 const headerLinks = computed(() => [
   {
+    label: t('jobList.actions.viewCompanies'),
+    icon: 'i-heroicons-building-office-2',
+    to: '/companies',
+    variant: 'ghost',
+  },
+  {
     label: t('jobList.actions.add'),
     icon: 'i-heroicons-plus',
     to: '/jobs/new',
@@ -135,8 +141,8 @@ function cancelDelete() {
         </UCard>
 
         <UPageGrid v-else>
-          <JobCard
-            v-for="job in filteredJobs"
+        <JobCard
+          v-for="job in filteredJobs"
             :key="job.id"
             :job="job"
             @open="handleOpen"

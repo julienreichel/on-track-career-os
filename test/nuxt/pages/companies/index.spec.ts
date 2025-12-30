@@ -30,6 +30,7 @@ const router = createRouter({
   routes: [
     { path: '/companies', component: CompaniesPage },
     { path: '/companies/new', component: { template: '<div>New Company</div>' } },
+    { path: '/jobs', component: { template: '<div>Jobs</div>' } },
   ],
 });
 
@@ -118,6 +119,8 @@ describe('Companies List Page', () => {
     const wrapper = await mountPage();
     expect(mockListCompanies).toHaveBeenCalled();
     expect(wrapper.find('.u-page-header').text()).toContain(i18n.global.t('companies.list.title'));
+    const jobsLink = wrapper.find('a[href="/jobs"]');
+    expect(jobsLink.exists()).toBe(true);
   });
 
   it('shows empty state when no companies exist', async () => {

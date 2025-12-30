@@ -16,6 +16,12 @@ const companyToDelete = ref<string | null>(null);
 
 const headerLinks = computed(() => [
   {
+    label: t('companies.list.actions.viewJobs'),
+    icon: 'i-heroicons-briefcase',
+    to: '/jobs',
+    variant: 'ghost',
+  },
+  {
     label: t('companies.list.actions.add'),
     icon: 'i-heroicons-plus',
     to: '/companies/new',

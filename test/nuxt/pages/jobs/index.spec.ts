@@ -34,6 +34,7 @@ const router = createRouter({
     { path: '/', component: { template: '<div>Home</div>' } },
     { path: '/jobs', component: JobsPage },
     { path: '/jobs/new', component: { template: '<div>New Job</div>' } },
+    { path: '/companies', component: { template: '<div>Companies</div>' } },
   ],
 });
 
@@ -125,7 +126,7 @@ describe('Jobs List Page', () => {
     jobsRef.value = [];
   });
 
-  it('renders page header with add job link', async () => {
+  it('renders page header with navigation links', async () => {
     const wrapper = await mountPage();
 
     expect(mockListJobs).toHaveBeenCalled();
@@ -133,6 +134,8 @@ describe('Jobs List Page', () => {
     expect(header.text()).toContain(i18n.global.t('features.jobs.title'));
     const addLink = header.find('a[href="/jobs/new"]');
     expect(addLink.exists()).toBe(true);
+    const companiesLink = header.find('a[href="/companies"]');
+    expect(companiesLink.exists()).toBe(true);
   });
 
   it('shows empty state when there are no jobs', async () => {

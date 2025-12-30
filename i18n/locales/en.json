@@ -7,7 +7,7 @@
     "profile": "Profile",
     "cvUpload": "Upload CV",
     "experiences": "Experiences",
-    "jobs": "Jobs & Companies",
+    "jobs": "Jobs",
     "companies": "Companies",
     "applications": "Applications",
     "interview": "Interview Prep",
@@ -37,7 +37,7 @@
       "description": "Document your work experiences and achievements"
     },
     "jobs": {
-      "title": "Jobs & Companies",
+      "title": "Jobs",
       "description": "Research and analyze job opportunities"
     },
     "applications": {
@@ -55,7 +55,8 @@
       "description": "Track the organizations you are researching and their business models.",
       "actions": {
         "add": "Add company",
-        "back": "Back to Companies"
+        "back": "Back to Companies",
+        "viewJobs": "View jobs"
       },
       "search": {
         "placeholder": "Search by name, industry, or market",
@@ -993,7 +994,8 @@
     "actions": {
       "add": "Add Job",
       "view": "View job",
-      "open": "Open job"
+      "open": "Open job",
+      "viewCompanies": "View companies"
     },
     "search": {
       "placeholder": "Search jobs...",
