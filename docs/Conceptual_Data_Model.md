@@ -187,6 +187,11 @@ _(EPIC 5B)_
 - customerSegments (list)
 - description
 - rawNotes (long text from uploads)
+- marketChallenges (list)
+- internalPains (list)
+- partnerships (list)
+- hiringFocus (list)
+- strategicNotes (list)
 - createdAt / updatedAt
 
 **Relationships:**
@@ -205,6 +210,7 @@ _(EPIC 5B)_
 
 - canvasId
 - companyId (FK)
+- companyName
 - customerSegments (list)
 - valuePropositions (list)
 - channels (list)
@@ -214,6 +220,9 @@ _(EPIC 5B)_
 - keyActivities (list)
 - keyPartners (list)
 - costStructure (list)
+- analysisSummary
+- sourceOperation
+- aiConfidence
 - lastGeneratedAt
 - needsUpdate (boolean)
 

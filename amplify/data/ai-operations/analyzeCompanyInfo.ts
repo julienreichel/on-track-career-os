@@ -1,0 +1,165 @@
+import { invokeAiWithRetry } from './utils/bedrock';
+import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
+
+const SYSTEM_PROMPT = `You are a market intelligence analyst. Extract only explicit facts about the company.
+Return JSON describing the company profile (identity + offerings) and key signals (challenges, partnerships, hiring focus, strategy notes).
+Never invent data. Leave strings empty and arrays [] when not present.`;
+
+const OUTPUT_SCHEMA = `{
+  "companyProfile": {
+    "companyName": "string",
+    "alternateNames": ["string"],
+    "industry": "string",
+    "sizeRange": "string",
+    "headquarters": "string",
+    "website": "string",
+    "productsServices": ["string"],
+    "targetMarkets": ["string"],
+    "customerSegments": ["string"],
+    "summary": "string"
+  },
+  "signals": {
+    "marketChallenges": ["string"],
+    "internalPains": ["string"],
+    "partnerships": ["string"],
+    "hiringFocus": ["string"],
+    "strategicNotes": ["string"]
+  },
+  "confidence": 0.8
+}`;
+
+export interface AnalyzeCompanyInfoInput {
+  companyName: string;
+  industry?: string;
+  size?: string;
+  rawText: string;
+  jobContext?: {
+    title?: string;
+    summary?: string;
+  };
+}
+
+export interface AnalyzeCompanyInfoOutput {
+  companyProfile: {
+    companyName: string;
+    alternateNames: string[];
+    industry: string;
+    sizeRange: string;
+    headquarters: string;
+    website: string;
+    productsServices: string[];
+    targetMarkets: string[];
+    customerSegments: string[];
+    summary: string;
+  };
+  signals: {
+    marketChallenges: string[];
+    internalPains: string[];
+    partnerships: string[];
+    hiringFocus: string[];
+    strategicNotes: string[];
+  };
+  confidence: number;
+}
+
+const CONFIDENCE_FALLBACK = 0.55;
+
+function sanitizeString(value: unknown) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function sanitizeArray(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  const list: string[] = [];
+  for (const entry of value) {
+    const text = sanitizeString(entry);
+    if (text && !seen.has(text)) {
+      seen.add(text);
+      list.push(text);
+    }
+  }
+  return list;
+}
+
+function clampConfidence(value: unknown) {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return CONFIDENCE_FALLBACK;
+  }
+  return Math.max(0, Math.min(1, value));
+}
+
+function validateOutput(raw: Record<string, unknown>): AnalyzeCompanyInfoOutput {
+  const profile = (raw.companyProfile ?? {}) as Record<string, unknown>;
+  const signals = (raw.signals ?? {}) as Record<string, unknown>;
+
+  return {
+    companyProfile: {
+      companyName: sanitizeString(profile.companyName),
+      alternateNames: sanitizeArray(profile.alternateNames),
+      industry: sanitizeString(profile.industry),
+      sizeRange: sanitizeString(profile.sizeRange),
+      headquarters: sanitizeString(profile.headquarters),
+      website: sanitizeString(profile.website),
+      productsServices: sanitizeArray(profile.productsServices),
+      targetMarkets: sanitizeArray(profile.targetMarkets),
+      customerSegments: sanitizeArray(profile.customerSegments),
+      summary: sanitizeString(profile.summary),
+    },
+    signals: {
+      marketChallenges: sanitizeArray(signals.marketChallenges),
+      internalPains: sanitizeArray(signals.internalPains),
+      partnerships: sanitizeArray(signals.partnerships),
+      hiringFocus: sanitizeArray(signals.hiringFocus),
+      strategicNotes: sanitizeArray(signals.strategicNotes),
+    },
+    confidence: clampConfidence(raw.confidence),
+  };
+}
+
+function buildUserPrompt(args: AnalyzeCompanyInfoInput) {
+  const jobSection = args.jobContext
+    ? `Job Context:
+Title: ${args.jobContext.title ?? ''}
+Summary: ${args.jobContext.summary ?? ''}`
+    : '';
+
+  return `Analyze the following company information. Extract only explicitly stated facts.
+
+Company Name: ${args.companyName}
+Industry: ${args.industry ?? ''}
+Size: ${args.size ?? ''}
+${jobSection}
+
+Source:
+"""
+${args.rawText}
+"""
+
+Return JSON matching:
+${OUTPUT_SCHEMA}`;
+}
+
+export const handler = async (event: { arguments: AnalyzeCompanyInfoInput }) => {
+  return withAiOperationHandlerObject(
+    'analyzeCompanyInfo',
+    event,
+    (args) => {
+      if (!args.rawText?.trim()) {
+        throw new Error('rawText is required');
+      }
+      const userPrompt = buildUserPrompt(args);
+      return invokeAiWithRetry({
+        systemPrompt: SYSTEM_PROMPT,
+        userPrompt,
+        outputSchema: OUTPUT_SCHEMA,
+        validate: validateOutput,
+        operationName: 'analyzeCompanyInfo',
+      });
+    },
+    (args) => ({
+      companyName: args.companyName,
+      preview: truncateForLog(args.rawText),
+    })
+  );
+};

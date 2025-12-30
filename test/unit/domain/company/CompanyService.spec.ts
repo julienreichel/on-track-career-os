@@ -1,54 +1,246 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { CompanyService } from '@/domain/company/CompanyService';
 import type { CompanyRepository } from '@/domain/company/CompanyRepository';
+import type { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { Company } from '@/domain/company/Company';
 
-// Mock the repository
 vi.mock('@/domain/company/CompanyRepository');
+vi.mock('@/domain/ai-operations/AiOperationsService');
 
 describe('CompanyService', () => {
+  let repo: vi.Mocked<CompanyRepository>;
+  let ai: vi.Mocked<AiOperationsService>;
   let service: CompanyService;
-  let mockRepository: ReturnType<typeof vi.mocked<CompanyRepository>>;
 
   beforeEach(() => {
-    mockRepository = {
+    repo = {
       get: vi.fn(),
       list: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-    } as unknown as ReturnType<typeof vi.mocked<CompanyRepository>>;
+    } as unknown as vi.Mocked<CompanyRepository>;
 
-    service = new CompanyService(mockRepository);
+    ai = {
+      analyzeCompanyInfo: vi.fn(),
+      generateCompanyCanvas: vi.fn(),
+    } as unknown as vi.Mocked<AiOperationsService>;
+
+    service = new CompanyService(repo, ai);
   });
 
-  describe('getFullCompany', () => {
-    it('should fetch a complete Company by id', async () => {
-      const mockCompany = {
-        id: 'company-123',
-        // TODO: Add model-specific fields
-        createdAt: '2025-01-01T00:00:00Z',
-        updatedAt: '2025-01-15T00:00:00Z',
-        owner: 'user-123::user-123',
-      } as Company;
+  it('creates companies with normalized arrays', async () => {
+    repo.create.mockResolvedValue({
+      id: 'c1',
+      companyName: 'Acme',
+      productsServices: ['API'],
+    } as Company);
 
-      mockRepository.get.mockResolvedValue(mockCompany);
-
-      const result = await service.getFullCompany('company-123');
-
-      expect(mockRepository.get).toHaveBeenCalledWith('company-123');
-      expect(result).toEqual(mockCompany);
+    const result = await service.createCompany({
+      companyName: ' Acme ',
+      productsServices: [' Platform ', 'platform'],
     });
 
-    it('should return null when Company does not exist', async () => {
-      mockRepository.get.mockResolvedValue(null);
+    expect(repo.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        companyName: 'Acme',
+        productsServices: ['Platform'],
+      })
+    );
+    expect(result?.id).toBe('c1');
+  });
 
-      const result = await service.getFullCompany('non-existent-id');
+  it('updates companies partially', async () => {
+    repo.update.mockResolvedValue({
+      id: 'c1',
+      companyName: 'New',
+    } as Company);
 
-      expect(mockRepository.get).toHaveBeenCalledWith('non-existent-id');
-      expect(result).toBeNull();
+    const updated = await service.updateCompany('c1', {
+      companyName: ' New ',
+      targetMarkets: ['  EU '],
     });
 
-    // TODO: Add more tests for lazy loading and relations
+    expect(repo.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'c1',
+        companyName: 'New',
+        targetMarkets: ['EU'],
+      })
+    );
+    expect(updated?.companyName).toBe('New');
+  });
+
+  it('analyzes company info via AI and updates record', async () => {
+    repo.get.mockResolvedValue({
+      id: 'c1',
+      companyName: 'Acme',
+      rawNotes: 'Sample text',
+    } as Company);
+    ai.analyzeCompanyInfo.mockResolvedValue({
+      companyProfile: {
+        companyName: 'Acme Labs',
+        alternateNames: ['Acme'],
+        industry: 'AI',
+        sizeRange: '51-200',
+        headquarters: 'Paris',
+        website: 'https://acme.test',
+        productsServices: ['API'],
+        targetMarkets: ['EU'],
+        customerSegments: ['Startups'],
+        summary: 'Test',
+      },
+      signals: {
+        marketChallenges: ['Competition'],
+        internalPains: [],
+        partnerships: [],
+        hiringFocus: [],
+        strategicNotes: [],
+      },
+      confidence: 0.82,
+    });
+    repo.update.mockResolvedValue({
+      id: 'c1',
+      companyName: 'Acme Labs',
+    } as Company);
+
+    const result = await service.analyzeCompany('c1');
+
+    expect(ai.analyzeCompanyInfo).toHaveBeenCalledWith(
+      expect.objectContaining({
+        companyName: 'Acme',
+        rawText: 'Sample text',
+      })
+    );
+    expect(repo.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'c1',
+        companyName: 'Acme Labs',
+        marketChallenges: ['Competition'],
+        aiConfidence: 0.82,
+      })
+    );
+    expect(result?.companyName).toBe('Acme Labs');
+  });
+
+  it('throws when analyzing without research text', async () => {
+    repo.get.mockResolvedValue({
+      id: 'c1',
+      companyName: 'Acme',
+      rawNotes: '',
+    } as Company);
+
+    await expect(service.analyzeCompany('c1')).rejects.toThrow('No company research text');
+  });
+
+  it('lists companies using repository filter', async () => {
+    repo.list.mockResolvedValue([{ id: 'c1' } as Company]);
+
+    const result = await service.listCompanies({ industry: 'AI' });
+
+    expect(repo.list).toHaveBeenCalledWith({ industry: 'AI' });
+    expect(result).toHaveLength(1);
+  });
+
+  it('gets and deletes companies via repository', async () => {
+    repo.get.mockResolvedValue({ id: 'c1' } as Company);
+
+    const company = await service.getCompany('c1');
+    await service.deleteCompany('c1');
+
+    expect(repo.get).toHaveBeenCalledWith('c1');
+    expect(repo.delete).toHaveBeenCalledWith('c1');
+    expect(company?.id).toBe('c1');
+  });
+
+  it('triggers analyze step when requested during creation', async () => {
+    repo.create.mockResolvedValue({
+      id: 'c1',
+      companyName: 'Acme',
+      rawNotes: 'Stored research',
+    } as Company);
+    const analyzeSpy = vi.spyOn(service, 'analyzeCompany').mockResolvedValue({
+      id: 'c1',
+      companyName: 'Analyzed',
+    } as Company);
+
+    const result = await service.createCompany(
+      { companyName: 'Acme' },
+      { analyze: true, jobContext: { title: 'CTO' } }
+    );
+
+    expect(analyzeSpy).toHaveBeenCalledWith('c1', {
+      rawText: 'Stored research',
+      jobContext: { title: 'CTO' },
+    });
+    expect(result?.companyName).toBe('Analyzed');
+
+    analyzeSpy.mockRestore();
+  });
+
+  it('drops empty strings during update normalization', async () => {
+    repo.update.mockResolvedValue({ id: 'c1' } as Company);
+
+    await service.updateCompany('c1', {
+      companyName: '   ',
+      rawNotes: ' ',
+      aiConfidence: 2,
+    });
+
+    expect(repo.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'c1',
+        aiConfidence: 1,
+      })
+    );
+  });
+
+  it('throws when analyzing a non-existent company', async () => {
+    repo.get.mockResolvedValue(null);
+
+    await expect(service.analyzeCompany('missing')).rejects.toThrow('Company not found');
+  });
+
+  it('uses provided raw text and job context for analysis', async () => {
+    repo.get.mockResolvedValue({
+      id: 'c1',
+      companyName: 'Acme',
+      rawNotes: 'Stored',
+    } as Company);
+    ai.analyzeCompanyInfo.mockResolvedValue({
+      companyProfile: {
+        companyName: 'Acme',
+        alternateNames: [],
+        industry: '',
+        sizeRange: '',
+        headquarters: '',
+        website: '',
+        productsServices: [],
+        targetMarkets: [],
+        customerSegments: [],
+        summary: '',
+      },
+      signals: {
+        marketChallenges: [],
+        internalPains: [],
+        partnerships: [],
+        hiringFocus: [],
+        strategicNotes: [],
+      },
+      confidence: 0.5,
+    });
+    repo.update.mockResolvedValue({ id: 'c1' } as Company);
+
+    await service.analyzeCompany('c1', {
+      rawText: 'Provided',
+      jobContext: { title: 'CTO', summary: 'Lead' },
+    });
+
+    expect(ai.analyzeCompanyInfo).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rawText: 'Provided',
+        jobContext: { title: 'CTO', summary: 'Lead' },
+      })
+    );
   });
 });

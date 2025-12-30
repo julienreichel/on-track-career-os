@@ -6,6 +6,14 @@ import type { AchievementsAndKpis } from './AchievementsAndKpis';
 import type { PersonalCanvas, PersonalCanvasInput } from './PersonalCanvas';
 import type { GenerateCvInput, GenerateCvResult } from './types/generateCv';
 import type { ParsedJobDescription } from './ParsedJobDescription';
+import type {
+  AnalyzeCompanyInfoInput,
+  CompanyAnalysisResult,
+} from './CompanyAnalysis';
+import type {
+  GeneratedCompanyCanvas,
+  GeneratedCompanyCanvasInput,
+} from './CompanyCanvasResult';
 
 /**
  * Repository interface for AI operations
@@ -62,6 +70,18 @@ export interface IAiOperationsRepository {
    * @returns Structured job description aligned with domain model
    */
   parseJobDescription(jobText: string): Promise<ParsedJobDescription>;
+
+  /**
+   * Analyze company research text into structured profile/signals
+   */
+  analyzeCompanyInfo(input: AnalyzeCompanyInfoInput): Promise<CompanyAnalysisResult>;
+
+  /**
+   * Generate full company canvas from structured profile + signals
+   */
+  generateCompanyCanvas(
+    input: GeneratedCompanyCanvasInput
+  ): Promise<GeneratedCompanyCanvas>;
 }
 
 /**
@@ -109,6 +129,29 @@ export type AmplifyAiOperations = {
     input: { jobText: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: string | null; errors?: unknown[] }>;
+
+  analyzeCompanyInfo: (
+    input: {
+      companyName: string;
+      industry?: string;
+      size?: string;
+      rawText: string;
+      jobContext?: {
+        title?: string;
+        summary?: string;
+      };
+    },
+    options?: Record<string, unknown>
+  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
+
+  generateCompanyCanvas: (
+    input: {
+      companyProfile: Record<string, unknown>;
+      signals: Record<string, unknown>;
+      additionalNotes?: string[];
+    },
+    options?: Record<string, unknown>
+  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 
   generateCv: (
     input: {
@@ -291,5 +334,51 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     }
 
     return JSON.parse(data) as ParsedJobDescription;
+  }
+
+  async analyzeCompanyInfo(input: AnalyzeCompanyInfoInput): Promise<CompanyAnalysisResult> {
+    const { data, errors } = await this.client.analyzeCompanyInfo(
+      {
+        companyName: input.companyName,
+        industry: input.industry,
+        size: input.size,
+        rawText: input.rawText,
+        jobContext: input.jobContext,
+      },
+      gqlOptions()
+    );
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    return data as CompanyAnalysisResult;
+  }
+
+  async generateCompanyCanvas(
+    input: GeneratedCompanyCanvasInput
+  ): Promise<GeneratedCompanyCanvas> {
+    const { data, errors } = await this.client.generateCompanyCanvas(
+      {
+        companyProfile: input.companyProfile,
+        signals: input.signals,
+        additionalNotes: input.additionalNotes,
+      },
+      gqlOptions()
+    );
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    return data as GeneratedCompanyCanvas;
   }
 }

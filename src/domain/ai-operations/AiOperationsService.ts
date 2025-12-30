@@ -12,6 +12,16 @@ import { isPersonalCanvas } from './PersonalCanvas';
 import type { GenerateCvInput, GenerateCvResult } from './types/generateCv';
 import type { ParsedJobDescription } from './ParsedJobDescription';
 import { isParsedJobDescription } from './ParsedJobDescription';
+import type {
+  AnalyzeCompanyInfoInput,
+  CompanyAnalysisResult,
+} from './CompanyAnalysis';
+import { isCompanyAnalysisResult } from './CompanyAnalysis';
+import type {
+  GeneratedCompanyCanvas,
+  GeneratedCompanyCanvasInput,
+} from './CompanyCanvasResult';
+import { isGeneratedCompanyCanvas } from './CompanyCanvasResult';
 
 /**
  * Service for AI-powered CV and experience operations
@@ -288,5 +298,27 @@ export class AiOperationsService {
         `Failed to generate CV: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
+  }
+
+  async analyzeCompanyInfo(input: AnalyzeCompanyInfoInput): Promise<CompanyAnalysisResult> {
+    if (!input.rawText?.trim()) {
+      throw new Error('Company research text cannot be empty');
+    }
+
+    const result = await this.repo.analyzeCompanyInfo(input);
+    if (!isCompanyAnalysisResult(result)) {
+      throw new Error('Invalid company analysis structure');
+    }
+    return result;
+  }
+
+  async generateCompanyCanvas(
+    input: GeneratedCompanyCanvasInput
+  ): Promise<GeneratedCompanyCanvas> {
+    const result = await this.repo.generateCompanyCanvas(input);
+    if (!isGeneratedCompanyCanvas(result)) {
+      throw new Error('Invalid company canvas result');
+    }
+    return result;
   }
 }

@@ -1,26 +1,50 @@
-import { ref } from 'vue'
-import { CompanyService } from '@/domain/company/CompanyService'
+import { ref } from 'vue';
 import type { Company } from '@/domain/company/Company';
+import { CompanyService } from '@/domain/company/CompanyService';
 
-export function useCompany(id: string) {
-  const item = ref<Company | null>(null);
-  const loading = ref(false)
-  const error = ref<string | null>(null)
-  const service = new CompanyService()
+export function useCompany(companyId: string) {
+  const company = ref<Company | null>(null);
+  const loading = ref(false);
+  const error = ref<string | null>(null);
+  const service = new CompanyService();
+
+  const run = async <T>(cb: () => Promise<T>): Promise<T> => {
+    loading.value = true;
+    error.value = null;
+    try {
+      return await cb();
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error';
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
 
   const load = async () => {
-    loading.value = true
-    error.value = null
-    
-    try {
-      item.value = await service.getFullCompany(id)
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
-      console.error('[useCompany] Error loading company:', err)
-    } finally {
-      loading.value = false
-    }
-  }
+    const result = await run(() => service.getCompany(companyId));
+    company.value = result;
+    return result;
+  };
 
-  return { item, loading, error, load }
+  const save = async (patch: Record<string, unknown>) => {
+    const updated = await run(() => service.updateCompany(companyId, patch));
+    company.value = updated;
+    return updated;
+  };
+
+  const analyze = async (options?: { rawText?: string }) => {
+    const updated = await run(() => service.analyzeCompany(companyId, options));
+    company.value = updated;
+    return updated;
+  };
+
+  return {
+    company,
+    loading,
+    error,
+    load,
+    save,
+    analyze,
+  };
 }
