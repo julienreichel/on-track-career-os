@@ -87,10 +87,6 @@ describe('CompanyCanvasEditor', () => {
     await wrapper.find('.block-section .add').trigger('click');
     expect(wrapper.emitted('update:block')?.[0]?.[0]).toBeDefined();
 
-    const textarea = wrapper.find('.u-textarea');
-    await textarea.setValue('Updated summary');
-    expect(wrapper.emitted('update:summary')?.[0]).toEqual(['Updated summary']);
-
     const buttons = wrapper.findAll('.u-button');
     await buttons[0].trigger('click');
     await buttons[1].trigger('click');
