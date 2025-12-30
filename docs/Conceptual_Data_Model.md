@@ -180,15 +180,20 @@ _(EPIC 5B)_
 - companyId
 - companyName
 - industry
-- size
-- productsServices
-- marketPosition
-- rawText (optional pasted description)
+- sizeRange
+- website
+- productsServices (list)
+- targetMarkets (list)
+- customerSegments (list)
+- description
+- rawNotes (long text from uploads)
+- createdAt / updatedAt
 
 **Relationships:**
 
 - 1 Company → 1 CompanyCanvas
 - 1 Company → \* Jobs
+- 1 Company ← `ai.analyzeCompanyInfo` result populates/update fields
 
 ---
 
@@ -199,20 +204,23 @@ _(EPIC 5B)_
 **Attributes:**
 
 - canvasId
-- valueProposition
-- keyActivities
-- strengthsAdvantage
-- targetRoles
-- channels
-- resources
-- marketChallenges
-- internalPains
-- customerPains
-- strategicPriorities
+- companyId (FK)
+- customerSegments (list)
+- valuePropositions (list)
+- channels (list)
+- customerRelationships (list)
+- revenueStreams (list)
+- keyResources (list)
+- keyActivities (list)
+- keyPartners (list)
+- costStructure (list)
+- lastGeneratedAt
+- needsUpdate (boolean)
 
 **Relationships:**
 
 - 1 CompanyCanvas → 1 Company
+- 1 CompanyCanvas is produced/refreshed by `ai.generateCompanyCanvas`
 
 ---
 

@@ -435,22 +435,165 @@ Stories:
 
 ---
 
-## AI OPERATION 8 — `ai.analyzeCompanyInfo` / `ai.generateCompanyCanvas`
+## AI OPERATION 7 — `ai.analyzeCompanyInfo`
 
 ### Purpose
 
-Generate the Company Canvas from job & company inputs.
+Normalize raw company notes (press releases, job briefs, investor decks) into a structured profile that seeds the `Company` entity and downstream canvases.
 
-### Output
+### System Prompt
+
+```
+You are a market intelligence analyst.
+Extract only explicitly stated facts about the company and return JSON.
+Capture:
+- Company identity (name, industry, size range, HQ, website)
+- Products/services and target markets
+- Explicit customer segments
+
+Rules:
+- Never invent data. Leave fields empty or [] when missing.
+- Bullet points must be < 20 words and fact-based.
+- Do not duplicate sentences across arrays.
+- Output valid JSON only.
+```
+
+### User Prompt
+
+```
+Analyze the following company information and optional job context.
+
+Company Name: {{companyName}}
+Industry: {{industry}}
+Size: {{size}}
+Job Context (optional): {{jobContext}}
+
+Source Text:
+"""
+{{rawText}}
+"""
+
+Return JSON with companyProfile + signals per the schema.
+```
+
+### Input Schema
 
 ```json
 {
-  "marketChallenges": ["string"],
-  "internalPains": ["string"],
-  "customerPains": ["string"],
-  "strategicPriorities": ["string"]
+  "companyName": "string",
+  "industry": "string",
+  "size": "string",
+  "rawText": "string",
+  "jobContext": {
+    "title": "string",
+    "summary": "string"
+  }
 }
 ```
+
+### Output Schema
+
+```json
+{
+  "companyProfile": {
+    "companyName": "string",
+    "industry": "string",
+    "sizeRange": "string",
+    "website": "string",
+    "productsServices": ["string"],
+    "targetMarkets": ["string"],
+    "customerSegments": ["string"],
+    "summary": "string"
+  }
+}
+```
+
+### Fallback Strategy
+
+- Strings default to `""`, arrays default to `[]`.
+- If `confidence` missing, set to `0.55`.
+- Truncate bullet entries to < 160 characters.
+
+---
+
+## AI OPERATION 8 — `ai.generateCompanyCanvas`
+
+### Purpose
+
+Produce the 9 canonical Business Model Canvas blocks for a company using structured inputs from `ai.analyzeCompanyInfo` plus curator notes. Feeds the `CompanyCanvas` entity for EPIC 5B.
+
+### System Prompt
+
+```
+You are a strategy consultant building a Business Model Canvas.
+Use ONLY the provided company profile + signals + notes.
+Return concise bullets for each block:
+1. customerSegments
+2. valuePropositions
+3. channels
+4. customerRelationships
+5. revenueStreams
+6. keyResources
+7. keyActivities
+8. keyPartners
+9. costStructure
+
+Rules:
+- Never invent monetization models or partnerships not present in the inputs.
+- Each bullet must reflect an explicit fact; if missing, leave the block empty.
+- Output valid JSON only.
+```
+
+### User Prompt
+
+```
+Build the Business Model Canvas for this company.
+
+Company Profile:
+{{companyProfileJson}}
+
+Additional Notes:
+{{additionalNotes}}
+```
+
+### Input Schema
+
+```json
+{
+  "companyProfile": {
+    "companyName": "string",
+    "industry": "string",
+    "sizeRange": "string",
+    "productsServices": ["string"],
+    "targetMarkets": ["string"],
+    "customerSegments": ["string"]
+  },
+  "additionalNotes": ["string"]
+}
+```
+
+### Output Schema
+
+```json
+{
+  "companyName": "string",
+  "customerSegments": ["string"],
+  "valuePropositions": ["string"],
+  "channels": ["string"],
+  "customerRelationships": ["string"],
+  "revenueStreams": ["string"],
+  "keyResources": ["string"],
+  "keyActivities": ["string"],
+  "keyPartners": ["string"],
+  "costStructure": ["string"]
+}
+```
+
+### Fallback Strategy
+
+- If every block is empty, set `confidence` to `0.3` and explain the lack of data in `analysisSummary`.
+- Deduplicate entries across blocks before returning.
+- Cap each list at 8 bullets to keep UI readable.
 
 ---
 
