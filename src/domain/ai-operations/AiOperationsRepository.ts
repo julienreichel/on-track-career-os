@@ -146,8 +146,8 @@ export type AmplifyAiOperations = {
 
   generateCompanyCanvas: (
     input: {
-      companyProfile: Record<string, unknown>;
-      signals: Record<string, unknown>;
+      companyProfile: string;
+      signals: string;
       additionalNotes?: string[];
     },
     options?: Record<string, unknown>
@@ -356,7 +356,8 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return data as CompanyAnalysisResult;
+    const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+    return parsed as CompanyAnalysisResult;
   }
 
   async generateCompanyCanvas(
@@ -364,8 +365,8 @@ export class AiOperationsRepository implements IAiOperationsRepository {
   ): Promise<GeneratedCompanyCanvas> {
     const { data, errors } = await this.client.generateCompanyCanvas(
       {
-        companyProfile: input.companyProfile,
-        signals: input.signals,
+        companyProfile: JSON.stringify(input.companyProfile),
+        signals: JSON.stringify(input.signals),
         additionalNotes: input.additionalNotes,
       },
       gqlOptions()
@@ -379,6 +380,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return data as GeneratedCompanyCanvas;
+    const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+    return parsed as GeneratedCompanyCanvas;
   }
 }

@@ -10,6 +10,8 @@ import {
   generatePersonalCanvasFunction,
   generateCvFunction,
   parseJobDescriptionFunction,
+  analyzeCompanyInfoFunction,
+  generateCompanyCanvasFunction,
 } from './data/resource';
 import { deleteUserProfile } from './data/delete-user-profile/resource';
 import { storage } from './storage/resource';
@@ -28,6 +30,8 @@ const backend = defineBackend({
   generatePersonalCanvasFunction,
   generateCvFunction,
   parseJobDescriptionFunction,
+  analyzeCompanyInfoFunction,
+  generateCompanyCanvasFunction,
   deleteUserProfile,
 });
 
@@ -82,6 +86,22 @@ backend.generateCvFunction.resources.lambda.addToRolePolicy(
 );
 
 backend.parseJobDescriptionFunction.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['bedrock:InvokeModel'],
+    resources: ['arn:aws:bedrock:*::foundation-model/*', 'arn:aws:bedrock:*:*:inference-profile/*'],
+  })
+);
+
+backend.analyzeCompanyInfoFunction.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['bedrock:InvokeModel'],
+    resources: ['arn:aws:bedrock:*::foundation-model/*', 'arn:aws:bedrock:*:*:inference-profile/*'],
+  })
+);
+
+backend.generateCompanyCanvasFunction.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     effect: Effect.ALLOW,
     actions: ['bedrock:InvokeModel'],

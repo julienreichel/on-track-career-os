@@ -62,6 +62,22 @@ export const parseJobDescriptionFunction = defineFunction({
   timeoutSeconds: 60,
 });
 
+export const analyzeCompanyInfoFunction = defineFunction({
+  entry: './ai-operations/analyzeCompanyInfo.ts',
+  environment: {
+    MODEL_ID,
+  },
+  timeoutSeconds: 60,
+});
+
+export const generateCompanyCanvasFunction = defineFunction({
+  entry: './ai-operations/generateCompanyCanvas.ts',
+  environment: {
+    MODEL_ID,
+  },
+  timeoutSeconds: 60,
+});
+
 export const schema = a
   .schema({
     // =====================================================
@@ -412,6 +428,33 @@ export const schema = a
       .returns(a.string())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(parseJobDescriptionFunction)),
+
+    analyzeCompanyInfo: a
+      .query()
+      .arguments({
+        companyName: a.string().required(),
+        industry: a.string(),
+        size: a.string(),
+        rawText: a.string().required(),
+        jobContext: a.customType({
+          title: a.string(),
+          summary: a.string(),
+        }),
+      })
+      .returns(a.json())
+      .authorization((allow) => [allow.authenticated()])
+      .handler(a.handler.function(analyzeCompanyInfoFunction)),
+
+    generateCompanyCanvas: a
+      .query()
+      .arguments({
+        companyProfile: a.json().required(),
+        signals: a.json().required(),
+        additionalNotes: a.string().array(),
+      })
+      .returns(a.json())
+      .authorization((allow) => [allow.authenticated()])
+      .handler(a.handler.function(generateCompanyCanvasFunction)),
 
     // =====================================================
     // UTILITY FUNCTIONS (Custom Queries)

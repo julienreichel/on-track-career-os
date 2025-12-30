@@ -5,6 +5,9 @@ import {
 } from '@/domain/ai-operations/AiOperationsRepository';
 import type { STARStory } from '@/domain/ai-operations/STARStory';
 import type { PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas';
+import type { GenerateCvInput } from '@/domain/ai-operations/types/generateCv';
+import type { CompanyAnalysisResult } from '@/domain/ai-operations/CompanyAnalysis';
+import type { GeneratedCompanyCanvas } from '@/domain/ai-operations/CompanyCanvasResult';
 
 // Mock gqlOptions
 vi.mock('@/data/graphql/options', () => ({
@@ -23,6 +26,9 @@ describe('AiOperationsRepository', () => {
     generateStarStory: ReturnType<typeof vi.fn>;
     generateAchievementsAndKpis: ReturnType<typeof vi.fn>;
     generatePersonalCanvas: ReturnType<typeof vi.fn>;
+    generateCv: ReturnType<typeof vi.fn>;
+    analyzeCompanyInfo: ReturnType<typeof vi.fn>;
+    generateCompanyCanvas: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -34,6 +40,9 @@ describe('AiOperationsRepository', () => {
       generateStarStory: vi.fn(),
       generateAchievementsAndKpis: vi.fn(),
       generatePersonalCanvas: vi.fn(),
+      generateCv: vi.fn(),
+      analyzeCompanyInfo: vi.fn(),
+      generateCompanyCanvas: vi.fn(),
     };
 
     // Inject the mocks via constructor (dependency injection)
@@ -322,6 +331,188 @@ describe('AiOperationsRepository', () => {
       await expect(repository.generatePersonalCanvas(mockInput)).rejects.toThrow(
         'AI operation failed'
       );
+    });
+  });
+
+  describe('generateCv', () => {
+    const baseInput: GenerateCvInput = {
+      userProfile: { fullName: 'Jane Doe' },
+      selectedExperiences: [
+        {
+          id: 'exp-1',
+          title: 'Engineer',
+          company: 'Acme',
+          startDate: '2020-01-01',
+        },
+      ],
+    };
+
+    it('returns markdown string when successful', async () => {
+      mockClient.generateCv.mockResolvedValue({
+        data: '# CV Markdown',
+        errors: undefined,
+      });
+
+      const result = await repository.generateCv(baseInput);
+
+      expect(mockClient.generateCv).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userProfile: JSON.stringify(baseInput.userProfile),
+        }),
+        expect.objectContaining({ authMode: 'userPool' })
+      );
+      expect(result).toBe('# CV Markdown');
+    });
+
+    it('throws when AI reports errors', async () => {
+      mockClient.generateCv.mockResolvedValue({
+        data: null,
+        errors: [{ message: 'oops' }],
+      });
+
+      await expect(repository.generateCv(baseInput)).rejects.toThrow('AI operation failed');
+    });
+
+    it('throws when no data returned', async () => {
+      mockClient.generateCv.mockResolvedValue({
+        data: null,
+        errors: undefined,
+      });
+
+      await expect(repository.generateCv(baseInput)).rejects.toThrow(
+        'AI operation returned no data'
+      );
+    });
+  });
+
+  describe('analyzeCompanyInfo', () => {
+    const analysisResponse: CompanyAnalysisResult = {
+      companyProfile: {
+        companyName: 'Acme',
+        alternateNames: [],
+        industry: '',
+        sizeRange: '',
+        headquarters: '',
+        website: '',
+        productsServices: [],
+        targetMarkets: [],
+        customerSegments: [],
+        summary: '',
+      },
+      signals: {
+        marketChallenges: [],
+        internalPains: [],
+        partnerships: [],
+        hiringFocus: [],
+        strategicNotes: [],
+      },
+      confidence: 0.8,
+    };
+
+    it('returns structured analysis data', async () => {
+      mockClient.analyzeCompanyInfo.mockResolvedValue({
+        data: JSON.stringify(analysisResponse),
+        errors: undefined,
+      });
+
+      const result = await repository.analyzeCompanyInfo({
+        companyName: 'Acme',
+        rawText: 'Some notes',
+      });
+
+      expect(mockClient.analyzeCompanyInfo).toHaveBeenCalledWith(
+        expect.objectContaining({ companyName: 'Acme', rawText: 'Some notes' }),
+        expect.objectContaining({ authMode: 'userPool' })
+      );
+      expect(result.companyProfile.companyName).toBe('Acme');
+    });
+
+    it('throws when AI returns errors', async () => {
+      mockClient.analyzeCompanyInfo.mockResolvedValue({
+        data: null,
+        errors: [{ message: 'failure' }],
+      });
+
+      await expect(
+        repository.analyzeCompanyInfo({ companyName: 'Acme', rawText: 'X' })
+      ).rejects.toThrow('AI operation failed');
+    });
+
+    it('throws when no data returned', async () => {
+      mockClient.analyzeCompanyInfo.mockResolvedValue({
+        data: null,
+        errors: undefined,
+      });
+
+      await expect(
+        repository.analyzeCompanyInfo({ companyName: 'Acme', rawText: 'X' })
+      ).rejects.toThrow('AI operation returned no data');
+    });
+  });
+
+  describe('generateCompanyCanvas', () => {
+    const canvasResponse: GeneratedCompanyCanvas = {
+      companyName: 'Acme',
+      customerSegments: ['SMB'],
+      valuePropositions: ['Automation'],
+      channels: [],
+      customerRelationships: [],
+      revenueStreams: [],
+      keyResources: [],
+      keyActivities: [],
+      keyPartners: [],
+      costStructure: [],
+      analysisSummary: 'Summary',
+      confidence: 0.7,
+    };
+
+    it('returns generated canvas', async () => {
+      mockClient.generateCompanyCanvas.mockResolvedValue({
+        data: JSON.stringify(canvasResponse),
+        errors: undefined,
+      });
+
+      const result = await repository.generateCompanyCanvas({
+        companyProfile: { companyName: 'Acme' },
+        signals: {},
+      });
+
+      expect(mockClient.generateCompanyCanvas).toHaveBeenCalledWith(
+        expect.objectContaining({
+          companyProfile: JSON.stringify({ companyName: 'Acme' }),
+          signals: JSON.stringify({}),
+        }),
+        expect.objectContaining({ authMode: 'userPool' })
+      );
+      expect(result.analysisSummary).toBe('Summary');
+    });
+
+    it('throws when AI returns errors', async () => {
+      mockClient.generateCompanyCanvas.mockResolvedValue({
+        data: null,
+        errors: [{ message: 'broken' }],
+      });
+
+      await expect(
+        repository.generateCompanyCanvas({
+          companyProfile: { companyName: 'Acme' },
+          signals: {},
+        })
+      ).rejects.toThrow('AI operation failed');
+    });
+
+    it('throws when no data returned', async () => {
+      mockClient.generateCompanyCanvas.mockResolvedValue({
+        data: null,
+        errors: undefined,
+      });
+
+      await expect(
+        repository.generateCompanyCanvas({
+          companyProfile: { companyName: 'Acme' },
+          signals: {},
+        })
+      ).rejects.toThrow('AI operation returned no data');
     });
   });
 });

@@ -6,6 +6,9 @@ import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
 import type { STARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 import type { ParsedJobDescription } from '@/domain/ai-operations/ParsedJobDescription';
+import type { GenerateCvInput } from '@/domain/ai-operations/types/generateCv';
+import type { CompanyAnalysisResult } from '@/domain/ai-operations/CompanyAnalysis';
+import type { GeneratedCompanyCanvas } from '@/domain/ai-operations/CompanyCanvasResult';
 
 // Mock the repository
 vi.mock('@/domain/ai-operations/AiOperationsRepository');
@@ -18,6 +21,9 @@ describe('AiOperationsService', () => {
     extractExperienceBlocks: ReturnType<typeof vi.fn>;
     generateStarStory: ReturnType<typeof vi.fn>;
     generateAchievementsAndKpis: ReturnType<typeof vi.fn>;
+    generateCv: ReturnType<typeof vi.fn>;
+    analyzeCompanyInfo: ReturnType<typeof vi.fn>;
+    generateCompanyCanvas: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -28,6 +34,9 @@ describe('AiOperationsService', () => {
       extractExperienceBlocks: vi.fn(),
       generateStarStory: vi.fn(),
       generateAchievementsAndKpis: vi.fn(),
+      generateCv: vi.fn(),
+      analyzeCompanyInfo: vi.fn(),
+      generateCompanyCanvas: vi.fn(),
     };
 
     // Create service with mocked repo
@@ -368,6 +377,184 @@ describe('AiOperationsService', () => {
       await expect(service.generateAchievementsAndKpis(mockStarStory)).rejects.toThrow(
         'Invalid achievements and KPIs result structure'
       );
+    });
+  });
+
+  describe('generateCv', () => {
+    const baseInput: GenerateCvInput = {
+      userProfile: { fullName: 'Jane Doe' },
+      selectedExperiences: [
+        {
+          id: 'exp-1',
+          title: 'Engineer',
+          company: 'Acme',
+          startDate: '2020-01-01',
+        },
+      ],
+    };
+
+    it('returns markdown when repo succeeds', async () => {
+      mockRepo.generateCv.mockResolvedValue('## CV');
+
+      const result = await service.generateCv(baseInput);
+
+      expect(mockRepo.generateCv).toHaveBeenCalledWith(baseInput);
+      expect(result).toBe('## CV');
+    });
+
+    it('rejects when no experiences provided', async () => {
+      await expect(
+        service.generateCv({ ...baseInput, selectedExperiences: [] })
+      ).rejects.toThrow('At least one experience must be selected');
+      expect(mockRepo.generateCv).not.toHaveBeenCalled();
+    });
+
+    it('rejects when experience missing required fields', async () => {
+      await expect(
+        service.generateCv({
+          ...baseInput,
+          selectedExperiences: [{ id: 'exp', title: '', company: '', startDate: '2020-01-01' }],
+        })
+      ).rejects.toThrow('Each experience must have id, title, and company');
+    });
+
+    it('rejects when repo returns non-string payload', async () => {
+      mockRepo.generateCv.mockResolvedValue({} as unknown as string);
+
+      await expect(service.generateCv(baseInput)).rejects.toThrow(
+        'Invalid CV result: expected string'
+      );
+    });
+
+    it('rejects when repo returns empty markdown', async () => {
+      mockRepo.generateCv.mockResolvedValue('   ');
+
+      await expect(service.generateCv(baseInput)).rejects.toThrow(
+        'CV generation produced empty markdown'
+      );
+    });
+
+    it('wraps repository errors with context', async () => {
+      mockRepo.generateCv.mockRejectedValue(new Error('Network down'));
+
+      await expect(service.generateCv(baseInput)).rejects.toThrow(
+        'Failed to generate CV: Network down'
+      );
+    });
+  });
+
+  describe('analyzeCompanyInfo', () => {
+    const analysisResult: CompanyAnalysisResult = {
+      companyProfile: {
+        companyName: 'Acme',
+        alternateNames: [],
+        industry: '',
+        sizeRange: '',
+        headquarters: '',
+        website: '',
+        productsServices: [],
+        targetMarkets: [],
+        customerSegments: [],
+        summary: '',
+      },
+      signals: {
+        marketChallenges: [],
+        internalPains: [],
+        partnerships: [],
+        hiringFocus: [],
+        strategicNotes: [],
+      },
+      confidence: 0.7,
+    };
+
+    it('returns validated analysis result', async () => {
+      mockRepo.analyzeCompanyInfo.mockResolvedValue(analysisResult);
+
+      const result = await service.analyzeCompanyInfo({
+        companyName: 'Acme',
+        rawText: 'Research text',
+      });
+
+      expect(mockRepo.analyzeCompanyInfo).toHaveBeenCalledWith({
+        companyName: 'Acme',
+        rawText: 'Research text',
+      });
+      expect(result.confidence).toBe(0.7);
+    });
+
+    it('rejects empty research text', async () => {
+      await expect(
+        service.analyzeCompanyInfo({ companyName: 'Acme', rawText: '   ' })
+      ).rejects.toThrow('Company research text cannot be empty');
+      expect(mockRepo.analyzeCompanyInfo).not.toHaveBeenCalled();
+    });
+
+    it('rejects invalid structures', async () => {
+      mockRepo.analyzeCompanyInfo.mockResolvedValue({
+        companyProfile: {},
+        signals: {},
+        confidence: 0.5,
+      } as CompanyAnalysisResult);
+
+      await expect(
+        service.analyzeCompanyInfo({ companyName: 'Acme', rawText: 'data' })
+      ).rejects.toThrow('Invalid company analysis structure');
+    });
+  });
+
+  describe('generateCompanyCanvas', () => {
+    const canvasResult: GeneratedCompanyCanvas = {
+      companyName: 'Acme',
+      customerSegments: ['SMBs'],
+      valuePropositions: ['Automation'],
+      channels: [],
+      customerRelationships: [],
+      revenueStreams: [],
+      keyResources: [],
+      keyActivities: [],
+      keyPartners: [],
+      costStructure: [],
+      analysisSummary: 'Summary',
+      confidence: 0.65,
+    };
+
+    it('returns generated canvas when repo succeeds', async () => {
+      mockRepo.generateCompanyCanvas.mockResolvedValue(canvasResult);
+
+      const result = await service.generateCompanyCanvas({
+        companyProfile: { companyName: 'Acme' },
+        signals: {},
+      });
+
+      expect(mockRepo.generateCompanyCanvas).toHaveBeenCalledWith({
+        companyProfile: { companyName: 'Acme' },
+        signals: {},
+      });
+      expect(result.companyName).toBe('Acme');
+    });
+
+    it('throws when validation fails', async () => {
+      mockRepo.generateCompanyCanvas.mockResolvedValue({
+        companyName: 'Acme',
+        customerSegments: 'invalid' as unknown as string[],
+        valuePropositions: [],
+        channels: [],
+        customerRelationships: [],
+        revenueStreams: [],
+        keyResources: [],
+        keyActivities: [],
+        keyPartners: [],
+        costStructure: [],
+        analysisSummary: 'Summary',
+        confidence: 0.5,
+      } as GeneratedCompanyCanvas);
+
+      await expect(
+        service.generateCompanyCanvas({
+          companyProfile: { companyName: 'Acme' },
+          signals: {},
+        })
+      ).rejects.toThrow('Invalid company canvas result');
     });
   });
 });

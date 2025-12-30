@@ -97,7 +97,7 @@ Acceptance criteria
 ## MASTER PROMPT 3 — AI Ops Integration for EPIC 5B (analyzeCompanyInfo + generateCompanyCanvas)
 
 Intro (context + why)
-EPIC 5B requires two AI operations with strict JSON I/O and validation. Implement integration so the UI triggers AI safely and results map cleanly into Company and CompanyCanvas. :contentReference[oaicite:7]{index=7} :contentReference[oaicite:8]{index=8}
+EPIC 5B requires two AI operations with strict JSON I/O and validation. Implement integration so the UI triggers AI safely and results map cleanly into Company and CompanyCanvas.
 
 Feature scope
 
@@ -116,8 +116,8 @@ AI operations impact (must follow contract)
   - Output: `companyProfile` object with normalized fields (website, productsServices, targetMarkets, customerSegments, summary, etc.) :contentReference[oaicite:10]{index=10}
   - Mapping: update Company entity fields (do not overwrite user edits blindly—define merge rules).
 - `ai.generateCompanyCanvas`:
-  - Inputs: companyProfile + additionalNotes[] :contentReference[oaicite:11]{index=11}
-  - Output: 9-block BMC fields + companyName :contentReference[oaicite:12]{index=12}
+  - Inputs: companyProfile + additionalNotes[] {index=11}
+  - Output: 9-block BMC fields + companyName {index=12}
   - Mapping: write to CompanyCanvas entity (blocks are arrays of strings)
 
 Implementation instructions (clean + DRY)
@@ -140,14 +140,14 @@ Testing requirements
 Acceptance criteria
 
 - Both AI ops can be executed from the app with strict JSON validation (no free text leakage).
-- Invalid AI responses trigger fallback strategy and still return a safe object shape per contract. :contentReference[oaicite:13]{index=13}
+- Invalid AI responses trigger fallback strategy and still return a safe object shape per contract.
 - Company fields update is predictable (no surprising overwrites).
-- CompanyCanvas generated data matches the 9-block CDM structure. :contentReference[oaicite:14]{index=14}
+- CompanyCanvas generated data matches the 9-block CDM structure.
 
 ## MASTER PROMPT 4 — UI Pages for EPIC 5B (Nuxt UI): /companies, /companies/new, /companies/[id]
 
 Intro (context + why)
-EPIC 5B requires a user-facing flow to create a company, optionally analyze pasted notes, and generate/edit a 9-block CompanyCanvas. UI must be consistent with existing Nuxt UI patterns and keep code DRY by reusing canvas editing components. :contentReference[oaicite:15]{index=15}
+EPIC 5B requires a user-facing flow to create a company, optionally analyze pasted notes, and generate/edit a 9-block CompanyCanvas. UI must be consistent with existing Nuxt UI patterns and keep code DRY by reusing canvas editing components.
 
 Feature scope
 
@@ -195,7 +195,7 @@ Acceptance criteria
 ## MASTER PROMPT 5 — Connect EPIC 5A Job Flow to Companies (Select/Create + Persist companyId)
 
 Intro (context + why)
-JobDescription supports linking to a Company (CDM indicates Company ↔ Jobs relationship). EPIC 5B must provide minimal UX to associate a job with a company to enable later matching and context-aware generation. :contentReference[oaicite:17]{index=17}
+JobDescription supports linking to a Company (CDM indicates Company ↔ Jobs relationship). EPIC 5B must provide minimal UX to associate a job with a company to enable later matching and context-aware generation.
 
 Feature scope
 
@@ -263,10 +263,10 @@ Implementation instructions (Playwright best practices)
 
 Vitest coverage checklist
 
-- AI schema validation/fallback tests for both company ops :contentReference[oaicite:18]{index=18}
+- AI schema validation/fallback tests for both company ops
 - Merge strategy tests for analyzeCompanyInfo → Company
 - Canvas keys config test (ensures exactly 9 blocks, correct order and labels)
-- Repository/service tests for save/load of CompanyCanvas :contentReference[oaicite:19]{index=19}
+- Repository/service tests for save/load of CompanyCanvas
 
 Acceptance criteria
 
