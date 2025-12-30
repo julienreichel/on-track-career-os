@@ -1,16 +1,31 @@
 <script setup lang="ts">
-import { useSlots } from 'vue';
+import { useSlots, useAttrs } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-defineProps<{
-  /**
-   * Main title displayed in the card header
-   */
-  title: string;
-  /**
-   * Optional subtitle displayed below the title in header
-   */
-  subtitle?: string;
-}>();
+defineOptions({ inheritAttrs: false });
+
+const props = withDefaults(
+  defineProps<{
+    /**
+     * Main title displayed in the card header
+     */
+    title: string;
+    /**
+     * Optional subtitle displayed below the title in header
+     */
+    subtitle?: string;
+
+    /**
+     * Controls whether the default delete action is rendered.
+     * Enabled by default.
+     */
+    showDelete?: boolean;
+  }>(),
+  {
+    subtitle: '',
+    showDelete: true,
+  }
+);
 
 const emit = defineEmits<{
   edit: [];
@@ -18,6 +33,8 @@ const emit = defineEmits<{
 }>();
 
 const slots = useSlots();
+const attrs = useAttrs();
+const { t } = useI18n();
 
 const handleEdit = (event: Event) => {
   event.stopPropagation();
@@ -32,6 +49,7 @@ const handleDelete = (event: Event) => {
 
 <template>
   <UCard
+    v-bind="attrs"
     class="h-full flex flex-col"
     :ui="{
       body: 'flex flex-col flex-1',
@@ -84,10 +102,12 @@ const handleDelete = (event: Event) => {
 
           <!-- Right Side - Delete Button -->
           <UButton
+            v-if="props.showDelete !== false"
             icon="i-heroicons-trash"
             size="xs"
             color="error"
             variant="ghost"
+            :aria-label="t('common.delete')"
             @click="handleDelete"
           />
         </div>

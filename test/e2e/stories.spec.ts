@@ -715,7 +715,7 @@ test.describe('Story Management', () => {
       test.skip(hasEmpty, 'No stories to delete');
 
       // Delete button is directly visible with trash icon
-      const deleteButton = page.locator('button span.i-heroicons\\:trash').first();
+      const deleteButton = page.getByRole('button', { name: /delete/i }).first();
 
       await deleteButton.click();
       await page.waitForTimeout(500);

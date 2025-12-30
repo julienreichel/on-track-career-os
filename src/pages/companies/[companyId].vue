@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import { reactive, ref, computed, watch, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import CompanyForm, { type CompanyFormState } from '@/components/company/CompanyForm.vue';
 import CompanyNotesInput from '@/components/company/CompanyNotesInput.vue';
 import CompanyCanvasEditor from '@/components/company/CompanyCanvasEditor.vue';
+import JobCard from '@/components/job/JobCard.vue';
 import { useCompany } from '@/application/company/useCompany';
 import { useCompanyCanvas } from '@/application/company/useCompanyCanvas';
+import { useCompanyJobs } from '@/application/company/useCompanyJobs';
 import type { Company } from '@/domain/company/Company';
 
 const route = useRoute();
+const router = useRouter();
 const { t } = useI18n();
 
 const companyId = computed(() => route.params.companyId as string);
 const companyStore = useCompany(companyId.value);
 const canvasStore = useCompanyCanvas(companyId.value);
+const jobsStore = useCompanyJobs(companyId.value);
 
 const loading = ref(true);
 const errorMessage = ref<string | null>(null);
@@ -34,6 +38,9 @@ const form = reactive<CompanyFormState>({
 const rawNotes = ref('');
 
 const company = companyStore.company;
+const relatedJobs = jobsStore.jobs;
+const jobsLoading = jobsStore.loading;
+const jobsError = jobsStore.error;
 
 const toStringArray = (values?: (string | null)[] | null) =>
   (values ?? []).filter((entry): entry is string => typeof entry === 'string');
@@ -109,11 +116,13 @@ watch(
 watch(companyId, async () => {
   await loadCompany();
   await canvasStore.load();
+  await jobsStore.load();
 });
 
 onMounted(async () => {
   await loadCompany();
   await canvasStore.load();
+  await jobsStore.load();
 });
 
 async function loadCompany() {
@@ -208,6 +217,14 @@ async function regenerateCanvas() {
     canvasRegenerating.value = false;
   }
 }
+
+function openJob(jobId: string) {
+  router.push(`/jobs/${jobId}`);
+}
+
+function clearJobsError() {
+  jobsError.value = null;
+}
 </script>
 
 <template>
@@ -289,6 +306,59 @@ async function regenerateCanvas() {
             @save="saveCanvas"
             @regenerate="regenerateCanvas"
           />
+
+          <UCard>
+            <div class="mb-6">
+              <h2 class="text-xl font-semibold">
+                {{ t('companies.detail.sections.linkedJobs') }}
+              </h2>
+              <p class="text-sm text-gray-500">
+                {{ t('companies.detail.sections.linkedJobsDescription') }}
+              </p>
+            </div>
+
+            <UAlert
+              v-if="jobsError"
+              icon="i-heroicons-exclamation-triangle"
+              color="error"
+              variant="soft"
+              :title="t('companies.detail.errors.title')"
+              :description="jobsError"
+              class="mb-4"
+              :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+              @close="clearJobsError"
+            />
+
+            <div v-if="jobsLoading" class="grid gap-4 md:grid-cols-2">
+              <USkeleton class="h-32 w-full" />
+              <USkeleton class="h-32 w-full" />
+            </div>
+            <div
+              v-else-if="relatedJobs.length === 0"
+              class="rounded-lg border border-dashed border-gray-200 p-6 text-center dark:border-gray-800"
+            >
+              <p class="text-sm text-gray-500">
+                {{ t('companies.detail.sections.linkedJobsEmpty') }}
+              </p>
+              <UButton
+                class="mt-4"
+                color="primary"
+                variant="ghost"
+                :label="t('companies.list.actions.viewJobs')"
+                icon="i-heroicons-arrow-top-right-on-square"
+                to="/jobs"
+              />
+            </div>
+            <div v-else class="grid gap-4 md:grid-cols-2">
+              <JobCard
+                v-for="job in relatedJobs"
+                :key="job.id"
+                :job="job"
+                :show-delete="false"
+                @open="openJob"
+              />
+            </div>
+          </UCard>
         </div>
       </UPageBody>
     </UPage>

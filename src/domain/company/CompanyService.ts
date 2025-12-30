@@ -97,9 +97,11 @@ export class CompanyService {
     const analysis = await this.aiService.analyzeCompanyInfo(input);
 
     const merged = mergeCompanyProfile(company, analysis.companyProfile);
+    const analyzedName = analysis.companyProfile.companyName?.trim();
     const updatePayload: CompanyUpdateInput = {
       id: company.id,
       ...merged,
+      companyName: analyzedName || company.companyName,
       rawNotes: company.rawNotes,
     };
 

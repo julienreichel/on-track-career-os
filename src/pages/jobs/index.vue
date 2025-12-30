@@ -141,10 +141,11 @@ function cancelDelete() {
         </UCard>
 
         <UPageGrid v-else>
-        <JobCard
-          v-for="job in filteredJobs"
+          <JobCard
+            v-for="job in filteredJobs"
             :key="job.id"
             :job="job"
+            :show-delete="true"
             @open="handleOpen"
             @delete="requestDelete"
           />

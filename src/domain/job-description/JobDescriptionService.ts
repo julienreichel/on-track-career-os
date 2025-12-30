@@ -31,6 +31,17 @@ export class JobDescriptionService {
     return this.repo.list();
   }
 
+  async listJobsByCompany(companyId: string): Promise<JobDescription[]> {
+    if (!companyId) {
+      return [];
+    }
+    return this.repo.list({
+      filter: {
+        companyId: { eq: companyId },
+      },
+    });
+  }
+
   async createJobFromRawText(rawText: string): Promise<JobDescription> {
     const sanitized = rawText?.trim();
     if (!sanitized) {

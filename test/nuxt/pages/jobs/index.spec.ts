@@ -94,7 +94,7 @@ const stubs = {
     template: '<div v-if="open" class="u-modal"><slot name="body" /><slot name="footer" /></div>',
   },
   JobCard: {
-    props: ['job'],
+    props: ['job', 'showDelete'],
     emits: ['open', 'delete'],
     template: `
       <div class="job-card-stub">

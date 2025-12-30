@@ -102,6 +102,28 @@ describe('JobDescriptionService', () => {
     });
   });
 
+  describe('listJobsByCompany', () => {
+    it('returns empty array when companyId missing', async () => {
+      const result = await service.listJobsByCompany('');
+      expect(result).toEqual([]);
+      expect(mockRepository.list).not.toHaveBeenCalled();
+    });
+
+    it('fetches jobs filtered by companyId', async () => {
+      const mockJobs = [{ id: 'job-1' }] as JobDescription[];
+      mockRepository.list.mockResolvedValue(mockJobs);
+
+      const result = await service.listJobsByCompany('company-1');
+
+      expect(mockRepository.list).toHaveBeenCalledWith({
+        filter: {
+          companyId: { eq: 'company-1' },
+        },
+      });
+      expect(result).toEqual(mockJobs);
+    });
+  });
+
   describe('createJobFromRawText', () => {
     it('should create a draft job from raw text', async () => {
       const mockCreated = {

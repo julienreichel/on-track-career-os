@@ -2,11 +2,12 @@ import { ref } from 'vue';
 import type { JobDescription, JobDescriptionUpdateInput } from '@/domain/job-description/JobDescription';
 import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
 
+const jobs = ref<JobDescription[]>([]);
+const selectedJob = ref<JobDescription | null>(null);
+const loading = ref(false);
+const error = ref<string | null>(null);
+
 export function useJobAnalysis() {
-  const jobs = ref<JobDescription[]>([]);
-  const selectedJob = ref<JobDescription | null>(null);
-  const loading = ref(false);
-  const error = ref<string | null>(null);
   const service = new JobDescriptionService();
 
   const run = async <T>(operation: () => Promise<T>): Promise<T> => {

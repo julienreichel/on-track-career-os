@@ -5,6 +5,7 @@ import { ref, reactive } from 'vue';
 import CompanyDetailPage from '@/pages/companies/[companyId].vue';
 import { createTestI18n } from '../../../utils/createTestI18n';
 import type { Company } from '@/domain/company/Company';
+import type { JobDescription } from '@/domain/job-description/JobDescription';
 
 const companyRef = ref<Company | null>({
   id: 'company-1',
@@ -25,6 +26,10 @@ const companyRef = ref<Company | null>({
 const mockLoad = vi.fn().mockResolvedValue(companyRef.value);
 const mockSave = vi.fn().mockResolvedValue(companyRef.value);
 const mockAnalyze = vi.fn().mockResolvedValue(companyRef.value);
+const jobsRef = ref<JobDescription[]>([]);
+const jobsLoading = ref(false);
+const jobsError = ref<string | null>(null);
+const mockLoadJobs = vi.fn().mockResolvedValue([]);
 
 vi.mock('@/application/company/useCompany', () => ({
   useCompany: () => ({
@@ -63,6 +68,15 @@ const canvasMock = {
 
 vi.mock('@/application/company/useCompanyCanvas', () => ({
   useCompanyCanvas: () => canvasMock,
+}));
+
+vi.mock('@/application/company/useCompanyJobs', () => ({
+  useCompanyJobs: () => ({
+    jobs: jobsRef,
+    loading: jobsLoading,
+    error: jobsError,
+    load: mockLoadJobs,
+  }),
 }));
 
 const router = createRouter({
@@ -133,6 +147,16 @@ const stubs = {
       </div>
     `,
   },
+  JobCard: {
+    props: ['job'],
+    emits: ['open'],
+    template: `
+      <div class="job-card-stub">
+        <span class="job-title">{{ job.title }}</span>
+        <button class="open-job" type="button" @click="$emit('open', job.id)">Open</button>
+      </div>
+    `,
+  },
 };
 
 async function mountPage() {
@@ -149,12 +173,16 @@ async function mountPage() {
 describe('Company Detail Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    jobsRef.value = [];
+    jobsLoading.value = false;
+    jobsError.value = null;
   });
 
   it('loads company details on mount', async () => {
     await mountPage();
     await flushPromises();
     expect(mockLoad).toHaveBeenCalled();
+    expect(mockLoadJobs).toHaveBeenCalled();
   });
 
   it('saves company changes', async () => {
@@ -176,5 +204,31 @@ describe('Company Detail Page', () => {
     await wrapper.find('.company-canvas-editor .regenerate-canvas').trigger('click');
     expect(canvasMock.save).toHaveBeenCalled();
     expect(canvasMock.regenerate).toHaveBeenCalled();
+  });
+
+  it('renders linked jobs when available', async () => {
+    jobsRef.value = [
+      {
+        id: 'job-1',
+        title: 'Head of Ops',
+        seniorityLevel: 'Director',
+        status: 'draft',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+        owner: 'user-1',
+        rawText: 'text',
+        companyId: 'company-1',
+        responsibilities: [],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
+      },
+    ];
+    const wrapper = await mountPage();
+    await flushPromises();
+
+    expect(wrapper.findAll('.job-card-stub')).toHaveLength(1);
+    expect(wrapper.text()).toContain('Head of Ops');
   });
 });

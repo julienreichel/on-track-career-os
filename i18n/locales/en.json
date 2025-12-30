@@ -133,7 +133,10 @@
       "description": "Update the company profile, run AI analysis, and manage the Business Model Canvas.",
       "sections": {
         "companyInfo": "Company information",
-        "companyInfoDescription": "Edit the high-level profile before running AI analysis."
+        "companyInfoDescription": "Edit the high-level profile before running AI analysis.",
+        "linkedJobs": "Linked jobs",
+        "linkedJobsDescription": "Jobs currently associated with this company.",
+        "linkedJobsEmpty": "No jobs are linked to this company yet."
       },
       "lastUpdated": "Last updated {date}",
       "actions": {

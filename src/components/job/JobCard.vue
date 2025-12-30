@@ -6,6 +6,7 @@ import type { JobDescription } from '@/domain/job-description/JobDescription';
 
 const props = defineProps<{
   job: JobDescription;
+  showDelete?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -64,6 +65,7 @@ function handleDelete() {
     data-testid="job-card"
     :title="title"
     :subtitle="subtitle"
+    :show-delete="props.showDelete !== false"
     @edit="handleOpen"
     @delete="handleDelete"
   >

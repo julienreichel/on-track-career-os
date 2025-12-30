@@ -8,7 +8,7 @@ const i18n = createTestI18n();
 const stubs = {
   ItemCard: {
     name: 'ItemCard',
-    props: ['title', 'subtitle'],
+    props: ['title', 'subtitle', 'showDelete'],
     emits: ['edit', 'delete'],
     template: `
       <div class="item-card">
@@ -16,7 +16,7 @@ const stubs = {
         <slot name="badges" />
         <slot name="actions" />
         <button class="edit" @click="$emit('edit')">edit</button>
-        <button class="delete" @click="$emit('delete')">delete</button>
+        <button v-if="showDelete !== false" class="delete" @click="$emit('delete')">delete</button>
       </div>
     `,
   },
@@ -70,11 +70,17 @@ describe('JobCard', () => {
     expect(wrapper.emitted('open')?.[0]).toEqual(['job-1']);
   });
 
-  it('emits delete event when delete button clicked', async () => {
+  it('emits delete event when delete action triggered', async () => {
     const wrapper = createWrapper();
-    await wrapper.find('.delete').trigger('click');
+    const itemCard = wrapper.findComponent(stubs.ItemCard as any);
+    await itemCard.vm.$emit('delete');
 
     expect(wrapper.emitted('delete')).toBeTruthy();
     expect(wrapper.emitted('delete')?.[0]).toEqual(['job-1']);
+  });
+
+  it('hides delete button when showDelete is false', () => {
+    const wrapper = createWrapper({ showDelete: false });
+    expect(wrapper.find('.delete').exists()).toBe(false);
   });
 });
