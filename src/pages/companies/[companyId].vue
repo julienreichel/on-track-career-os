@@ -19,7 +19,6 @@ const canvasStore = useCompanyCanvas(companyId.value);
 const loading = ref(true);
 const errorMessage = ref<string | null>(null);
 const savingCompany = ref(false);
-const analyzing = ref(false);
 
 const form = reactive<CompanyFormState>({
   companyName: '',
@@ -91,7 +90,7 @@ const isDirty = computed(
   () => !!company.value && (hasScalarChanges() || hasListChanges() || hasNotesChange())
 );
 
-const disableActions = computed(() => savingCompany.value || analyzing.value);
+const disableActions = computed(() => savingCompany.value);
 const canSaveCompany = computed(() => isDirty.value && !disableActions.value);
 
 const canvasSaving = ref(false);
@@ -184,27 +183,6 @@ function resetCompanyForm() {
   }
 }
 
-async function analyzeCompany() {
-  if (!company.value) return;
-  if (!rawNotes.value.trim()) {
-    errorMessage.value = t('companies.detail.errors.missingNotes');
-    return;
-  }
-  analyzing.value = true;
-  errorMessage.value = null;
-  try {
-    const updated = await companyStore.analyze({ rawText: rawNotes.value });
-    if (updated) {
-      hydrateCompany(updated);
-    }
-  } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('companies.detail.errors.generic');
-  } finally {
-    analyzing.value = false;
-  }
-}
-
 async function saveCanvas() {
   canvasSaving.value = true;
   errorMessage.value = null;
@@ -261,33 +239,31 @@ async function regenerateCanvas() {
 
         <div v-else class="space-y-8">
           <UCard>
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <h2 class="text-xl font-semibold">
-                  {{ t('companies.detail.sections.companyInfo') }}
-                </h2>
-                <p class="text-sm text-gray-500">
-                  {{ t('companies.detail.sections.companyInfoDescription') }}
-                </p>
-                <p v-if="formattedMeta" class="mt-2 text-xs text-gray-400">
-                  {{ t('companies.detail.lastUpdated', { date: formattedMeta }) }}
-                </p>
-              </div>
-              <div class="flex flex-col gap-2 sm:flex-row">
+            <div class="mb-6">
+              <h2 class="text-xl font-semibold">
+                {{ t('companies.detail.sections.companyInfo') }}
+              </h2>
+              <p class="text-sm text-gray-500">
+                {{ t('companies.detail.sections.companyInfoDescription') }}
+              </p>
+              <p v-if="formattedMeta" class="mt-2 text-xs text-gray-400">
+                {{ t('companies.detail.lastUpdated', { date: formattedMeta }) }}
+              </p>
+            </div>
+
+            <div class="space-y-6">
+              <CompanyForm v-model="form" :disabled="disableActions" />
+              <CompanyNotesInput v-model="rawNotes" :disabled="disableActions" />
+            </div>
+
+            <template #footer>
+              <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                 <UButton
                   color="neutral"
                   variant="ghost"
                   :label="t('companies.detail.actions.reset')"
                   :disabled="!isDirty || disableActions"
                   @click="resetCompanyForm"
-                />
-                <UButton
-                  color="secondary"
-                  icon="i-heroicons-sparkles"
-                  :label="t('companies.detail.actions.analyze')"
-                  :loading="analyzing"
-                  :disabled="disableActions"
-                  @click="analyzeCompany"
                 />
                 <UButton
                   color="primary"
@@ -298,22 +274,19 @@ async function regenerateCanvas() {
                   @click="saveCompany"
                 />
               </div>
-            </div>
-
-            <div class="mt-6 space-y-6">
-              <CompanyForm v-model="form" :disabled="disableActions" />
-              <CompanyNotesInput v-model="rawNotes" :disabled="disableActions" />
-            </div>
+            </template>
           </UCard>
 
           <CompanyCanvasEditor
             :blocks="canvasStore.draftBlocks.value"
+            :summary="canvasStore.draftSummary.value"
             :needs-update="canvasStore.canvas.value?.needsUpdate ?? true"
             :last-generated-at="canvasStore.canvas.value?.lastGeneratedAt ?? null"
             :saving="canvasSaving"
             :regenerating="canvasRegenerating"
             :disabled="canvasStore.loading.value"
             @update:block="canvasStore.updateBlock"
+            @update:summary="canvasStore.updateSummary"
             @save="saveCanvas"
             @regenerate="regenerateCanvas"
           />

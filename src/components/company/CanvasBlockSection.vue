@@ -29,7 +29,6 @@ const handleUpdate = (value: string[]) => {
   <UCard variant="soft" class="w-full">
     <TagInput
       :label="label"
-      :hint="hint"
       :placeholder="placeholder"
       :model-value="modelValue"
       :disabled="disabled"
