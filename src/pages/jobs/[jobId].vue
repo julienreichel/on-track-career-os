@@ -3,7 +3,9 @@ import { computed, reactive, ref, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import TagInput from '@/components/TagInput.vue';
+import LinkedCompanyBadge from '@/components/company/LinkedCompanyBadge.vue';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
+import { useCompanies } from '@/composables/useCompanies';
 import type {
   JobDescription,
   JobDescriptionUpdateInput,
@@ -37,6 +39,7 @@ const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const jobAnalysis = useJobAnalysis();
+const companyStore = useCompanies();
 
 const jobId = computed(() => route.params.jobId as string | undefined);
 const job = jobAnalysis.selectedJob;
@@ -46,6 +49,8 @@ const errorMessage = ref<string | null>(null);
 const showReanalyseModal = ref(false);
 const reanalysing = ref(false);
 const saving = ref(false);
+const selectedCompanyId = ref<string | null>(null);
+const linkingCompany = ref(false);
 
 const form = reactive<JobFormState>({
   title: '',
@@ -143,10 +148,11 @@ watch(jobId, () => {
   loadJob();
 });
 
-onMounted(() => {
+onMounted(async () => {
   if (!job.value) {
-    loadJob();
+    await loadJob();
   }
+  await loadCompanies();
 });
 
 const isDirty = computed(() => {
@@ -172,6 +178,14 @@ const isDirty = computed(() => {
 const disableActions = computed(() => saving.value || reanalysing.value);
 const canSave = computed(() => isDirty.value && !disableActions.value);
 const canCancel = computed(() => isDirty.value && !disableActions.value);
+const companySelectorDisabled = computed(
+  () => loading.value || companyStore.loading.value || linkingCompany.value
+);
+const availableCompanies = computed(() => companyStore.rawCompanies.value);
+const linkedCompany = computed(
+  () =>
+    availableCompanies.value.find((company) => company.id === (job.value?.companyId ?? '')) ?? null
+);
 
 function hydrateForm(data: JobDescription) {
   form.title = data.title ?? '';
@@ -182,6 +196,7 @@ function hydrateForm(data: JobDescription) {
   form.behaviours = toStringList(data.behaviours);
   form.successCriteria = toStringList(data.successCriteria);
   form.explicitPains = toStringList(data.explicitPains);
+  selectedCompanyId.value = data.companyId ?? null;
 }
 
 async function loadJob() {
@@ -203,6 +218,18 @@ async function loadJob() {
     errorMessage.value = error instanceof Error ? error.message : t('jobDetail.errors.generic');
   } finally {
     loading.value = false;
+  }
+}
+
+async function loadCompanies() {
+  try {
+    await companyStore.listCompanies();
+  } catch (error) {
+    console.error('[jobDetail] Failed to load companies', error);
+    if (!errorMessage.value) {
+      errorMessage.value =
+        error instanceof Error ? error.message : t('companies.list.errors.generic');
+    }
   }
 }
 
@@ -283,6 +310,44 @@ function handleCancel() {
   }
 }
 
+async function handleCompanyLinkChange(nextCompanyId: string | null) {
+  if (!job.value?.id) {
+    selectedCompanyId.value = null;
+    return;
+  }
+
+  const previousCompanyId = job.value.companyId ?? null;
+  if (nextCompanyId === previousCompanyId) {
+    selectedCompanyId.value = previousCompanyId;
+    return;
+  }
+
+  selectedCompanyId.value = nextCompanyId;
+  linkingCompany.value = true;
+  errorMessage.value = null;
+
+  try {
+    const updated = await jobAnalysis.updateJob(job.value.id, { companyId: nextCompanyId });
+    hydrateForm(updated);
+  } catch (error) {
+    selectedCompanyId.value = previousCompanyId;
+    errorMessage.value = error instanceof Error ? error.message : t('jobDetail.errors.generic');
+  } finally {
+    linkingCompany.value = false;
+  }
+}
+
+function handleCompanyLinkClear() {
+  handleCompanyLinkChange(null);
+}
+
+function redirectToCompanyCreate() {
+  router.push({
+    path: '/companies/new',
+    query: { returnTo: route.fullPath },
+  });
+}
+
 async function confirmReanalyse() {
   const id = jobId.value;
   if (!id) {
@@ -336,7 +401,7 @@ async function confirmReanalyse() {
           <UCard class="mb-6">
             <div class="flex flex-col gap-6">
               <div class="grid gap-4 md:grid-cols-2">
-                <UFormGroup :label="t('jobDetail.fields.title')">
+                <UFormField :label="t('jobDetail.fields.title')">
                   <UInput
                     v-model="form.title"
                     :placeholder="t('jobDetail.placeholders.title')"
@@ -344,19 +409,19 @@ async function confirmReanalyse() {
                     class="w-full"
                     data-testid="job-title-input"
                   />
-                </UFormGroup>
+                </UFormField>
 
-                <UFormGroup :label="t('jobDetail.fields.seniorityLevel')">
+                <UFormField :label="t('jobDetail.fields.seniorityLevel')">
                   <UInput
                     v-model="form.seniorityLevel"
                     :placeholder="t('jobDetail.placeholders.seniorityLevel')"
                     :disabled="disableActions"
                     data-testid="job-seniority-input"
                   />
-                </UFormGroup>
+                </UFormField>
               </div>
 
-              <UFormGroup :label="t('jobDetail.fields.roleSummary')">
+              <UFormField :label="t('jobDetail.fields.roleSummary')">
                 <UTextarea
                   v-model="form.roleSummary"
                   :placeholder="t('jobDetail.placeholders.roleSummary')"
@@ -365,7 +430,7 @@ async function confirmReanalyse() {
                   class="w-full"
                   data-testid="job-summary-input"
                 />
-              </UFormGroup>
+              </UFormField>
 
               <div class="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -392,15 +457,39 @@ async function confirmReanalyse() {
                     {{ formattedCreatedAt || t('jobDetail.meta.notAvailable') }}
                   </p>
                 </div>
-                <div>
+                <div v-if="linkedCompany">
                   <p class="text-sm text-gray-500">
                     {{ t('jobDetail.meta.companyId') }}
                   </p>
-                  <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">
-                    {{ job.companyId || t('jobDetail.meta.notAvailable') }}
-                  </p>
+                  <div class="mt-1 flex items-center gap-2">
+                    <LinkedCompanyBadge :company="linkedCompany" />
+                    <UButton
+                      size="xs"
+                      variant="ghost"
+                      color="neutral"
+                      icon="i-heroicons-x-mark-20-solid"
+                      :aria-label="t('jobDetail.companyLink.clear')"
+                      data-testid="job-company-clear"
+                      :disabled="linkingCompany"
+                      @click="handleCompanyLinkClear"
+                    />
+                  </div>
                 </div>
               </div>
+
+          <div v-if="!selectedCompanyId || !linkedCompany" class="mt-6">
+            <div class="mt-3">
+              <CompanySelector
+                :model-value="selectedCompanyId"
+                :companies="availableCompanies"
+                :loading="companyStore.loading.value || linkingCompany"
+                :disabled="companySelectorDisabled"
+                @update:model-value="handleCompanyLinkChange"
+                @clear="handleCompanyLinkClear"
+                @create="redirectToCompanyCreate"
+              />
+            </div>
+          </div>
             </div>
           </UCard>
 

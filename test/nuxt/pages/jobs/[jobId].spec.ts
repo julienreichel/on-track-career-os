@@ -46,6 +46,25 @@ vi.mock('@/composables/useJobAnalysis', () => ({
   useJobAnalysis: () => jobAnalysisMock,
 }));
 
+const companyStoreMock = {
+  companies: ref([]),
+  rawCompanies: ref([
+    { id: 'company-1', companyName: 'Acme Corp' },
+    { id: 'company-2', companyName: 'Global Freight' },
+  ]),
+  loading: ref(false),
+  error: ref(null),
+  searchQuery: ref(''),
+  listCompanies: vi.fn().mockResolvedValue([]),
+  createCompany: vi.fn(),
+  updateCompany: vi.fn(),
+  deleteCompany: vi.fn(),
+};
+
+vi.mock('@/composables/useCompanies', () => ({
+  useCompanies: () => companyStoreMock,
+}));
+
 const i18n = createTestI18n();
 
 const router = createRouter({
@@ -86,7 +105,7 @@ const stubs = {
   UCard: {
     template: '<div class="u-card"><slot name="header" /><slot /></div>',
   },
-  UFormGroup: {
+  UFormField: {
     props: ['label'],
     template: '<label class="u-form-group"><slot /></label>',
   },
@@ -169,6 +188,30 @@ const stubs = {
       </div>
     `,
   },
+  CompanySelector: {
+    props: ['modelValue'],
+    emits: ['update:modelValue', 'create', 'clear'],
+    template: `
+      <div class="company-selector-stub">
+        <button
+          v-if="!modelValue"
+          class="select-company"
+          type="button"
+          @click="$emit('update:modelValue', 'company-2')"
+        >
+          Select Company 2
+        </button>
+        <button
+          v-if="!modelValue"
+          class="clear-company"
+          type="button"
+          @click="$emit('update:modelValue', null)"
+        >
+          Clear
+        </button>
+      </div>
+    `,
+  },
 };
 
 async function mountPage() {
@@ -177,18 +220,26 @@ async function mountPage() {
   }
   await router.isReady();
 
-  return mount(JobDetailPage, {
+  const wrapper = mount(JobDetailPage, {
     global: {
       plugins: [i18n, router],
       stubs,
     },
   });
+
+  await Promise.resolve();
+  return wrapper;
 }
 
 describe('Job Detail Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     selectedJob.value = { ...baseJob };
+    companyStoreMock.rawCompanies.value = [
+      { id: 'company-1', companyName: 'Acme Corp' },
+      { id: 'company-2', companyName: 'Global Freight' },
+    ];
+    companyStoreMock.listCompanies.mockResolvedValue(companyStoreMock.rawCompanies.value);
   });
 
   it('renders job details', async () => {
@@ -277,5 +328,33 @@ describe('Job Detail Page', () => {
     await confirm.trigger('click');
 
     expect(mockReanalyseJob).toHaveBeenCalledWith('job-1');
+  });
+
+  it('links a company when selector emits an update', async () => {
+    mockUpdateJob.mockResolvedValue({
+      ...selectedJob.value,
+      companyId: 'company-2',
+    });
+
+    selectedJob.value = { ...baseJob, companyId: null };
+
+    const wrapper = await mountPage();
+    const linkButton = wrapper.find('.select-company');
+    await linkButton.trigger('click');
+
+    expect(mockUpdateJob).toHaveBeenCalledWith('job-1', { companyId: 'company-2' });
+  });
+
+  it('clears the company link', async () => {
+    mockUpdateJob.mockResolvedValue({
+      ...selectedJob.value,
+      companyId: null,
+    });
+
+    const wrapper = await mountPage();
+    const clearButton = wrapper.find('[data-testid="job-company-clear"]');
+    await clearButton.trigger('click');
+
+    expect(mockUpdateJob).toHaveBeenCalledWith('job-1', { companyId: null });
   });
 });

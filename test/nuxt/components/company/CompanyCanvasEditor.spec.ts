@@ -17,7 +17,13 @@ const stubs = {
     `,
   },
   UCard: {
-    template: '<div class="u-card"><slot /></div>',
+    template: `
+      <div class="u-card">
+        <div class="u-card-header"><slot name="header" /></div>
+        <div class="u-card-body"><slot /></div>
+        <div class="u-card-footer"><slot name="footer" /></div>
+      </div>
+    `,
   },
   UBadge: {
     template: '<span class="u-badge"><slot /></span>',

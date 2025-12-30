@@ -1067,6 +1067,16 @@
       "companyId": "Company",
       "notAvailable": "Not available"
     },
+    "companyLink": {
+      "description": "Link this job to an existing company profile to unlock AI analysis later.",
+      "selectPlaceholder": "Search companies by name, industry, or market...",
+      "create": "Create company",
+      "clear": "Clear link",
+      "view": "View company",
+      "none": "No company linked",
+      "empty": "No companies found. Try another search or create one.",
+      "selected": "Linked to {name}"
+    },
     "reanalyse": {
       "title": "Reanalyse from original JD",
       "message": "This will overwrite the AI generated fields with a new analysis of the original job description.",

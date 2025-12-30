@@ -81,7 +81,15 @@ const stubs = {
     template: '<header class="u-page-header">{{ title }}<slot /></header>',
   },
   UPageBody: { template: '<div class="u-page-body"><slot /></div>' },
-  UCard: { template: '<div class="u-card"><slot /></div>' },
+  UCard: {
+    template: `
+      <div class="u-card">
+        <div class="u-card-header"><slot name="header" /></div>
+        <div class="u-card-body"><slot /></div>
+        <div class="u-card-footer"><slot name="footer" /></div>
+      </div>
+    `,
+  },
   UAlert: {
     props: ['title', 'description'],
     template: '<div class="u-alert">{{ title }} {{ description }}</div>',
@@ -155,11 +163,9 @@ describe('Company Detail Page', () => {
     (wrapper.vm as any).form.companyName = 'Updated';
     await wrapper.vm.$nextTick();
     await flushPromises();
-    const saveButton =
-      wrapper.findAll('.u-button').find((button) => button.text().includes('Save company')) ??
-      wrapper.findAll('.u-button').at(-1);
-    expect(saveButton).toBeTruthy();
-    await saveButton!.trigger('click');
+    const saveButton = wrapper.find('[data-testid="company-save-button"]');
+    expect(saveButton.exists()).toBe(true);
+    await saveButton.trigger('click');
     expect(mockSave).toHaveBeenCalled();
   });
 

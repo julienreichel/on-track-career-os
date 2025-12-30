@@ -12,6 +12,7 @@ describe('useJobDescription', () => {
   beforeEach(() => {
     mockService = {
       getFullJobDescription: vi.fn(),
+      updateJob: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<JobDescriptionService>>;
 
     // Mock the constructor to return our mock service
@@ -92,5 +93,49 @@ describe('useJobDescription', () => {
     expect(item.value).toBeNull();
   });
 
-  // TODO: Add more tests for error handling and edge cases
+  it('links a company to the job description', async () => {
+    const updatedJob = {
+      id: 'jobdescription-123',
+      companyId: 'company-321',
+    } as JobDescription;
+    mockService.updateJob.mockResolvedValue(updatedJob);
+
+    const { linkCompany, linking, item } = useJobDescription('jobdescription-123');
+
+    const promise = linkCompany('company-321');
+    expect(linking.value).toBe(true);
+
+    await promise;
+
+    expect(mockService.updateJob).toHaveBeenCalledWith('jobdescription-123', {
+      companyId: 'company-321',
+    });
+    expect(item.value).toEqual(updatedJob);
+    expect(linking.value).toBe(false);
+  });
+
+  it('clears the company link', async () => {
+    const updatedJob = {
+      id: 'jobdescription-123',
+      companyId: null,
+    } as JobDescription;
+    mockService.updateJob.mockResolvedValue(updatedJob);
+
+    const { clearCompanyLink, item } = useJobDescription('jobdescription-123');
+    await clearCompanyLink();
+
+    expect(mockService.updateJob).toHaveBeenCalledWith('jobdescription-123', {
+      companyId: null,
+    });
+    expect(item.value).toEqual(updatedJob);
+  });
+
+  it('surfaces errors when linking fails', async () => {
+    mockService.updateJob.mockRejectedValue(new Error('Link failed'));
+    const { linkCompany, error, linking } = useJobDescription('jobdescription-123');
+
+    await expect(linkCompany('company-321')).rejects.toThrow('Link failed');
+    expect(error.value).toBe('Link failed');
+    expect(linking.value).toBe(false);
+  });
 });

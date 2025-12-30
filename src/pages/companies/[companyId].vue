@@ -271,6 +271,7 @@ async function regenerateCanvas() {
                   :label="t('companies.detail.actions.save')"
                   :loading="savingCompany"
                   :disabled="!canSaveCompany"
+                  data-testid="company-save-button"
                   @click="saveCompany"
                 />
               </div>
@@ -279,14 +280,12 @@ async function regenerateCanvas() {
 
           <CompanyCanvasEditor
             :blocks="canvasStore.draftBlocks.value"
-            :summary="canvasStore.draftSummary.value"
             :needs-update="canvasStore.canvas.value?.needsUpdate ?? true"
             :last-generated-at="canvasStore.canvas.value?.lastGeneratedAt ?? null"
             :saving="canvasSaving"
             :regenerating="canvasRegenerating"
             :disabled="canvasStore.loading.value"
             @update:block="canvasStore.updateBlock"
-            @update:summary="canvasStore.updateSummary"
             @save="saveCanvas"
             @regenerate="regenerateCanvas"
           />

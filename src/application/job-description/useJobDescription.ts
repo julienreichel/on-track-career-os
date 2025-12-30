@@ -6,6 +6,7 @@ export function useJobDescription(id: string) {
   const item = ref<JobDescription | null>(null);
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const linking = ref(false)
   const service = new JobDescriptionService()
 
   const load = async () => {
@@ -22,5 +23,23 @@ export function useJobDescription(id: string) {
     }
   }
 
-  return { item, loading, error, load }
+  const updateCompanyLink = async (companyId: string | null) => {
+    linking.value = true
+    error.value = null
+    try {
+      const updated = await service.updateJob(id, { companyId })
+      item.value = updated
+      return updated
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error occurred'
+      throw err
+    } finally {
+      linking.value = false
+    }
+  }
+
+  const linkCompany = (companyId: string) => updateCompanyLink(companyId)
+  const clearCompanyLink = () => updateCompanyLink(null)
+
+  return { item, loading, error, linking, load, linkCompany, clearCompanyLink }
 }
