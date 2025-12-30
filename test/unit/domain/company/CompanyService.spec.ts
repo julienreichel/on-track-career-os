@@ -80,22 +80,13 @@ describe('CompanyService', () => {
     ai.analyzeCompanyInfo.mockResolvedValue({
       companyProfile: {
         companyName: 'Acme Labs',
-        alternateNames: ['Acme'],
         industry: 'AI',
         sizeRange: '51-200',
-        headquarters: 'Paris',
         website: 'https://acme.test',
         productsServices: ['API'],
         targetMarkets: ['EU'],
         customerSegments: ['Startups'],
-        summary: 'Test',
-      },
-      signals: {
-        marketChallenges: ['Competition'],
-        internalPains: [],
-        partnerships: [],
-        hiringFocus: [],
-        strategicNotes: [],
+        description: 'Test',
       },
       confidence: 0.82,
     });
@@ -116,8 +107,6 @@ describe('CompanyService', () => {
       expect.objectContaining({
         id: 'c1',
         companyName: 'Acme Labs',
-        marketChallenges: ['Competition'],
-        aiConfidence: 0.82,
       })
     );
     expect(result?.companyName).toBe('Acme Labs');
@@ -184,13 +173,11 @@ describe('CompanyService', () => {
     await service.updateCompany('c1', {
       companyName: '   ',
       rawNotes: ' ',
-      aiConfidence: 2,
     });
 
     expect(repo.update).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'c1',
-        aiConfidence: 1,
       })
     );
   });
@@ -210,22 +197,13 @@ describe('CompanyService', () => {
     ai.analyzeCompanyInfo.mockResolvedValue({
       companyProfile: {
         companyName: 'Acme',
-        alternateNames: [],
         industry: '',
         sizeRange: '',
-        headquarters: '',
         website: '',
         productsServices: [],
         targetMarkets: [],
         customerSegments: [],
-        summary: '',
-      },
-      signals: {
-        marketChallenges: [],
-        internalPains: [],
-        partnerships: [],
-        hiringFocus: [],
-        strategicNotes: [],
+        description: '',
       },
       confidence: 0.5,
     });

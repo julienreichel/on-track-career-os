@@ -2,28 +2,19 @@ import { invokeAiWithRetry } from './utils/bedrock';
 import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 const SYSTEM_PROMPT = `You are a market intelligence analyst. Extract only explicit facts about the company.
-Return JSON describing the company profile (identity + offerings) and key signals (challenges, partnerships, hiring focus, strategy notes).
+Return JSON describing the company profile (identity + offerings).
 Never invent data. Leave strings empty and arrays [] when not present.`;
 
 const OUTPUT_SCHEMA = `{
   "companyProfile": {
     "companyName": "string",
-    "alternateNames": ["string"],
     "industry": "string",
     "sizeRange": "string",
-    "headquarters": "string",
     "website": "string",
     "productsServices": ["string"],
     "targetMarkets": ["string"],
     "customerSegments": ["string"],
-    "summary": "string"
-  },
-  "signals": {
-    "marketChallenges": ["string"],
-    "internalPains": ["string"],
-    "partnerships": ["string"],
-    "hiringFocus": ["string"],
-    "strategicNotes": ["string"]
+    "description": "string"
   },
   "confidence": 0.8
 }`;
@@ -42,22 +33,13 @@ export interface AnalyzeCompanyInfoInput {
 export interface AnalyzeCompanyInfoOutput {
   companyProfile: {
     companyName: string;
-    alternateNames: string[];
     industry: string;
     sizeRange: string;
-    headquarters: string;
     website: string;
     productsServices: string[];
     targetMarkets: string[];
     customerSegments: string[];
-    summary: string;
-  };
-  signals: {
-    marketChallenges: string[];
-    internalPains: string[];
-    partnerships: string[];
-    hiringFocus: string[];
-    strategicNotes: string[];
+    description: string;
   };
   confidence: number;
 }
@@ -91,27 +73,17 @@ function clampConfidence(value: unknown) {
 
 function validateOutput(raw: Record<string, unknown>): AnalyzeCompanyInfoOutput {
   const profile = (raw.companyProfile ?? {}) as Record<string, unknown>;
-  const signals = (raw.signals ?? {}) as Record<string, unknown>;
 
   return {
     companyProfile: {
       companyName: sanitizeString(profile.companyName),
-      alternateNames: sanitizeArray(profile.alternateNames),
       industry: sanitizeString(profile.industry),
       sizeRange: sanitizeString(profile.sizeRange),
-      headquarters: sanitizeString(profile.headquarters),
       website: sanitizeString(profile.website),
       productsServices: sanitizeArray(profile.productsServices),
       targetMarkets: sanitizeArray(profile.targetMarkets),
       customerSegments: sanitizeArray(profile.customerSegments),
-      summary: sanitizeString(profile.summary),
-    },
-    signals: {
-      marketChallenges: sanitizeArray(signals.marketChallenges),
-      internalPains: sanitizeArray(signals.internalPains),
-      partnerships: sanitizeArray(signals.partnerships),
-      hiringFocus: sanitizeArray(signals.hiringFocus),
-      strategicNotes: sanitizeArray(signals.strategicNotes),
+      description: sanitizeString(profile.description),
     },
     confidence: clampConfidence(raw.confidence),
   };

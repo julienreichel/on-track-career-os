@@ -187,11 +187,6 @@ _(EPIC 5B)_
 - customerSegments (list)
 - description
 - rawNotes (long text from uploads)
-- marketChallenges (list)
-- internalPains (list)
-- partnerships (list)
-- hiringFocus (list)
-- strategicNotes (list)
 - createdAt / updatedAt
 
 **Relationships:**
@@ -222,7 +217,6 @@ _(EPIC 5B)_
 - costStructure (list)
 - analysisSummary
 - sourceOperation
-- aiConfidence
 - lastGeneratedAt
 - needsUpdate (boolean)
 

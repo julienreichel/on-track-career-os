@@ -72,12 +72,12 @@ export interface IAiOperationsRepository {
   parseJobDescription(jobText: string): Promise<ParsedJobDescription>;
 
   /**
-   * Analyze company research text into structured profile/signals
+   * Analyze company research text into structured company profile
    */
   analyzeCompanyInfo(input: AnalyzeCompanyInfoInput): Promise<CompanyAnalysisResult>;
 
   /**
-   * Generate full company canvas from structured profile + signals
+   * Generate full company canvas from structured profile
    */
   generateCompanyCanvas(
     input: GeneratedCompanyCanvasInput
@@ -147,7 +147,6 @@ export type AmplifyAiOperations = {
   generateCompanyCanvas: (
     input: {
       companyProfile: string;
-      signals: string;
       additionalNotes?: string[];
     },
     options?: Record<string, unknown>
@@ -366,7 +365,6 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     const { data, errors } = await this.client.generateCompanyCanvas(
       {
         companyProfile: JSON.stringify(input.companyProfile),
-        signals: JSON.stringify(input.signals),
         additionalNotes: input.additionalNotes,
       },
       gqlOptions()

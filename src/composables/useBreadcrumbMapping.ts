@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
+import { CompanyService } from '@/domain/company/CompanyService';
 
 /**
  * Composable for managing breadcrumb ID to name mappings
@@ -14,6 +15,7 @@ interface BreadcrumbMapping {
 const mappingCache = ref<BreadcrumbMapping>({});
 let experienceService: ExperienceService | null = null;
 let cvDocumentService: CVDocumentService | null = null;
+let companyService: CompanyService | null = null;
 
 export function useBreadcrumbMapping() {
   /**
@@ -106,6 +108,10 @@ export function useBreadcrumbMapping() {
       return await getCVDocumentName(segment);
     }
 
+    if (previousSegment === 'companies') {
+      return await getCompanyName(segment);
+    }
+
     // Add more mappings here as needed for other entity types
     // For example: companies, jobs, stories, etc.
 
@@ -125,3 +131,29 @@ export function useBreadcrumbMapping() {
     clearCache,
   };
 }
+
+  /**
+   * Get display name for a company ID
+   */
+  const getCompanyName = async (companyId: string): Promise<string> => {
+    if (!companyService) {
+      companyService = new CompanyService();
+    }
+
+    if (mappingCache.value[companyId]) {
+      return mappingCache.value[companyId];
+    }
+
+    try {
+      const company = await companyService!.getCompany(companyId);
+      const name = company?.companyName;
+      if (name) {
+        mappingCache.value[companyId] = name;
+        return name;
+      }
+    } catch (err) {
+      console.error('[useBreadcrumbMapping] Error fetching company:', err);
+    }
+
+    return companyId;
+  };

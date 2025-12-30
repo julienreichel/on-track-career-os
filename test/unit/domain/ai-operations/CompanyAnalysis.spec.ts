@@ -6,22 +6,13 @@ describe('CompanyAnalysis type guards', () => {
     const valid = {
       companyProfile: {
         companyName: 'Acme',
-        alternateNames: [],
         industry: '',
         sizeRange: '',
-        headquarters: '',
         website: '',
         productsServices: [],
         targetMarkets: [],
         customerSegments: [],
-        summary: '',
-      },
-      signals: {
-        marketChallenges: [],
-        internalPains: [],
-        partnerships: [],
-        hiringFocus: [],
-        strategicNotes: [],
+        description: '',
       },
       confidence: 0.8,
     };
@@ -35,7 +26,6 @@ describe('CompanyAnalysis type guards', () => {
     expect(
       isCompanyAnalysisResult({
         companyProfile: { companyName: 123, productsServices: [] },
-        signals: { marketChallenges: [] },
         confidence: 'high',
       })
     ).toBe(false);

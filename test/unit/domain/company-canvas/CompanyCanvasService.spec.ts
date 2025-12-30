@@ -74,11 +74,6 @@ describe('CompanyCanvasService', () => {
       productsServices: ['API'],
       targetMarkets: [],
       customerSegments: [],
-      marketChallenges: [],
-      internalPains: [],
-      partnerships: [],
-      hiringFocus: [],
-      strategicNotes: [],
     } as Company);
     ai.generateCompanyCanvas.mockResolvedValue({
       companyName: 'Acme',
@@ -107,7 +102,6 @@ describe('CompanyCanvasService', () => {
       expect.objectContaining({
         needsUpdate: false,
         analysisSummary: 'Test',
-        aiConfidence: 0.9,
       })
     );
     expect(regenerated.customerSegments).toEqual(['Startups']);
@@ -180,11 +174,6 @@ describe('CompanyCanvasService', () => {
       productsServices: [],
       targetMarkets: [],
       customerSegments: [],
-      marketChallenges: [],
-      internalPains: [],
-      partnerships: [],
-      hiringFocus: [],
-      strategicNotes: [],
     } as Company);
     ai.generateCompanyCanvas.mockResolvedValue({
       companyName: 'Acme',

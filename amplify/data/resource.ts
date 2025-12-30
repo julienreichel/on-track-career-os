@@ -234,7 +234,6 @@ export const schema = a
         targetMarkets: a.string().array(),
         customerSegments: a.string().array(),
         description: a.string(),
-        researchSources: a.string().array(),
         rawNotes: a.string(),
 
         canvas: a.hasOne('CompanyCanvas', 'companyId'),
@@ -449,7 +448,6 @@ export const schema = a
       .query()
       .arguments({
         companyProfile: a.json().required(),
-        signals: a.json().required(),
         additionalNotes: a.string().array(),
       })
       .returns(a.json())

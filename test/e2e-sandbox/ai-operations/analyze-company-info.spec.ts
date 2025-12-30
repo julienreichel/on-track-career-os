@@ -77,7 +77,6 @@ They are hiring platform engineers focused on data ingestion.
 
     expect(typeof analysis.companyProfile.companyName).toBe('string');
     expect(Array.isArray(analysis.companyProfile.productsServices)).toBe(true);
-    expect(Array.isArray(analysis.signals.marketChallenges)).toBe(true);
     expect(typeof analysis.confidence).toBe('number');
   });
 });

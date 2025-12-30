@@ -403,9 +403,9 @@ describe('AiOperationsService', () => {
     });
 
     it('rejects when no experiences provided', async () => {
-      await expect(
-        service.generateCv({ ...baseInput, selectedExperiences: [] })
-      ).rejects.toThrow('At least one experience must be selected');
+      await expect(service.generateCv({ ...baseInput, selectedExperiences: [] })).rejects.toThrow(
+        'At least one experience must be selected'
+      );
       expect(mockRepo.generateCv).not.toHaveBeenCalled();
     });
 
@@ -447,22 +447,13 @@ describe('AiOperationsService', () => {
     const analysisResult: CompanyAnalysisResult = {
       companyProfile: {
         companyName: 'Acme',
-        alternateNames: [],
         industry: '',
         sizeRange: '',
-        headquarters: '',
         website: '',
         productsServices: [],
         targetMarkets: [],
         customerSegments: [],
-        summary: '',
-      },
-      signals: {
-        marketChallenges: [],
-        internalPains: [],
-        partnerships: [],
-        hiringFocus: [],
-        strategicNotes: [],
+        description: '',
       },
       confidence: 0.7,
     };
@@ -492,7 +483,6 @@ describe('AiOperationsService', () => {
     it('rejects invalid structures', async () => {
       mockRepo.analyzeCompanyInfo.mockResolvedValue({
         companyProfile: {},
-        signals: {},
         confidence: 0.5,
       } as CompanyAnalysisResult);
 
@@ -523,12 +513,10 @@ describe('AiOperationsService', () => {
 
       const result = await service.generateCompanyCanvas({
         companyProfile: { companyName: 'Acme' },
-        signals: {},
       });
 
       expect(mockRepo.generateCompanyCanvas).toHaveBeenCalledWith({
         companyProfile: { companyName: 'Acme' },
-        signals: {},
       });
       expect(result.companyName).toBe('Acme');
     });
@@ -552,7 +540,6 @@ describe('AiOperationsService', () => {
       await expect(
         service.generateCompanyCanvas({
           companyProfile: { companyName: 'Acme' },
-          signals: {},
         })
       ).rejects.toThrow('Invalid company canvas result');
     });

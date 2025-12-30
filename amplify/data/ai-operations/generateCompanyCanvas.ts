@@ -2,7 +2,7 @@ import { invokeAiWithRetry } from './utils/bedrock';
 import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 const SYSTEM_PROMPT = `You are a strategy consultant building a Business Model Canvas.
-Use only the provided company profile, signals, and notes.
+Use only the provided company profile and notes.
 Return concise bullet points (<= 20 words) for each of the 9 canonical blocks.
 Leave blocks empty when the source contains no data.`;
 
@@ -23,7 +23,6 @@ const OUTPUT_SCHEMA = `{
 
 export interface GenerateCompanyCanvasInput {
   companyProfile: Record<string, unknown>;
-  signals: Record<string, unknown>;
   additionalNotes?: string[];
 }
 
@@ -108,9 +107,6 @@ export const handler = async (event: { arguments: GenerateCompanyCanvasInput }) 
 
 Company Profile:
 ${JSON.stringify(args.companyProfile, null, JSON_INDENT_SPACES)}
-
-Signals:
-${JSON.stringify(args.signals, null, JSON_INDENT_SPACES)}
 
 Additional Notes:
 ${JSON.stringify(args.additionalNotes ?? [], null, JSON_INDENT_SPACES)}

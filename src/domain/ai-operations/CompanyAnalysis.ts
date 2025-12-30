@@ -20,7 +20,6 @@ export function isCompanyAnalysisResult(value: unknown): value is CompanyAnalysi
   return (
     typeof candidate.companyProfile?.companyName === 'string' &&
     Array.isArray(candidate.companyProfile?.productsServices) &&
-    Array.isArray(candidate.signals?.marketChallenges) &&
     typeof candidate.confidence === 'number'
   );
 }

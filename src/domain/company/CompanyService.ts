@@ -16,16 +16,10 @@ type AnalyzeOptions = {
 };
 
 const ARRAY_FIELDS: (keyof CompanyInput)[] = [
-  'alternateNames',
   'productsServices',
   'targetMarkets',
   'customerSegments',
   'researchSources',
-  'marketChallenges',
-  'internalPains',
-  'partnerships',
-  'hiringFocus',
-  'strategicNotes',
 ];
 
 export class CompanyService {
@@ -105,22 +99,14 @@ export class CompanyService {
     const updatePayload: CompanyUpdateInput = {
       id: company.id,
       companyName: analysis.companyProfile.companyName || company.companyName,
-      alternateNames: normalizeStringArray(analysis.companyProfile.alternateNames),
       industry: analysis.companyProfile.industry || company.industry,
       sizeRange: analysis.companyProfile.sizeRange || company.sizeRange,
-      headquarters: analysis.companyProfile.headquarters || company.headquarters,
       website: analysis.companyProfile.website || company.website,
       productsServices: normalizeStringArray(analysis.companyProfile.productsServices),
       targetMarkets: normalizeStringArray(analysis.companyProfile.targetMarkets),
       customerSegments: normalizeStringArray(analysis.companyProfile.customerSegments),
-      description: analysis.companyProfile.summary || company.description,
+      description: analysis.companyProfile.description || company.description,
       rawNotes: company.rawNotes,
-      aiConfidence: analysis.confidence,
-      marketChallenges: normalizeStringArray(analysis.signals.marketChallenges),
-      internalPains: normalizeStringArray(analysis.signals.internalPains),
-      partnerships: normalizeStringArray(analysis.signals.partnerships),
-      hiringFocus: normalizeStringArray(analysis.signals.hiringFocus),
-      strategicNotes: normalizeStringArray(analysis.signals.strategicNotes),
     };
 
     return this.repo.update(updatePayload);
@@ -135,7 +121,7 @@ export class CompanyService {
     if (typeof next.description === 'string') {
       next.description = next.description.trim();
     }
-    return this.normalizeConfidence(next);
+    return next;
   }
 
   private normalizeUpdateInput(input: CompanyUpdatePayload): CompanyUpdatePayload {
@@ -158,13 +144,6 @@ export class CompanyService {
         delete next.description;
       }
     }
-    return this.normalizeConfidence(next);
-  }
-
-  private normalizeConfidence<T extends { aiConfidence?: number }>(payload: T): T {
-    if (typeof payload.aiConfidence === 'number' && !Number.isNaN(payload.aiConfidence)) {
-      payload.aiConfidence = Number(Math.max(0, Math.min(1, payload.aiConfidence)));
-    }
-    return payload;
+    return next;
   }
 }

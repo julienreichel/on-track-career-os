@@ -447,7 +447,7 @@ Normalize raw company notes (press releases, job briefs, investor decks) into a 
 You are a market intelligence analyst.
 Extract only explicitly stated facts about the company and return JSON.
 Capture:
-- Company identity (name, industry, size range, HQ, website)
+- Company identity (name, industry, size range, website)
 - Products/services and target markets
 - Explicit customer segments
 
@@ -473,7 +473,7 @@ Source Text:
 {{rawText}}
 """
 
-Return JSON with companyProfile + signals per the schema.
+Return JSON with companyProfile per the schema.
 ```
 
 ### Input Schema
@@ -503,7 +503,7 @@ Return JSON with companyProfile + signals per the schema.
     "productsServices": ["string"],
     "targetMarkets": ["string"],
     "customerSegments": ["string"],
-    "summary": "string"
+    "description": "string"
   }
 }
 ```
@@ -526,7 +526,7 @@ Produce the 9 canonical Business Model Canvas blocks for a company using structu
 
 ```
 You are a strategy consultant building a Business Model Canvas.
-Use ONLY the provided company profile + signals + notes.
+Use ONLY the provided company profile + notes.
 Return concise bullets for each block:
 1. customerSegments
 2. valuePropositions

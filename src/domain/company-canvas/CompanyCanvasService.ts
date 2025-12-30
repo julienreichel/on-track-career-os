@@ -53,13 +53,6 @@ export class CompanyCanvasService {
         targetMarkets: company.targetMarkets ?? [],
         customerSegments: company.customerSegments ?? [],
       },
-      signals: {
-        marketChallenges: company.marketChallenges ?? [],
-        internalPains: company.internalPains ?? [],
-        partnerships: company.partnerships ?? [],
-        hiringFocus: company.hiringFocus ?? [],
-        strategicNotes: company.strategicNotes ?? [],
-      },
       additionalNotes,
     };
 
@@ -81,7 +74,6 @@ export class CompanyCanvasService {
       analysisSummary: generated.analysisSummary,
       lastGeneratedAt: new Date().toISOString(),
       needsUpdate: false,
-      aiConfidence: generated.confidence,
     };
 
     return this.canvasRepo.update(payload);

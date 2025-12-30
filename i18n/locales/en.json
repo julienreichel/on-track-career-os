@@ -49,6 +49,186 @@
       "description": "Prepare for interviews with AI assistance"
     }
   },
+  "companies": {
+    "list": {
+      "title": "Companies",
+      "description": "Track the organizations you are researching and their business models.",
+      "actions": {
+        "add": "Add company",
+        "back": "Back to Companies"
+      },
+      "search": {
+        "placeholder": "Search by name, industry, or market",
+        "noResults": "No companies match your search yet"
+      },
+      "errors": {
+        "title": "Unable to load companies",
+        "generic": "Something went wrong while loading your companies."
+      },
+      "empty": {
+        "title": "No companies yet",
+        "description": "Start by adding a company you'd like to research."
+      },
+      "delete": {
+        "title": "Delete company",
+        "message": "Are you sure you want to delete this company? This action cannot be undone.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      }
+    },
+    "card": {
+      "noName": "Untitled company",
+      "noIndustry": "Industry not specified",
+      "emptyDescription": "Add a short description or list of products to describe this company.",
+      "createdAt": "Created {date}",
+      "updatedAt": "Updated {date}",
+      "products": "{count} products/services",
+      "markets": "{count} markets",
+      "view": "View company"
+    },
+    "form": {
+      "title": "Add Company",
+      "description": "Capture the core profile of a company and paste any research notes you'd like to analyze.",
+      "companyName": "Company name",
+      "companyNameHint": "Required",
+      "companyNamePlaceholder": "e.g., Atlas Robotics",
+      "industry": "Industry",
+      "industryHint": "What category does this company operate in?",
+      "industryPlaceholder": "e.g., Energy analytics",
+      "sizeRange": "Size range",
+      "sizeRangeHint": "Approximate employee count or stage",
+      "sizeRangePlaceholder": "e.g., 201-500",
+      "website": "Website",
+      "websitePlaceholder": "https://example.com",
+      "productsServices": "Products & services",
+      "productsServicesHint": "List key offerings as tags",
+      "productsServicesPlaceholder": "Add a product or service and press Enter",
+      "targetMarkets": "Target markets",
+      "targetMarketsHint": "Regions or verticals served",
+      "targetMarketsPlaceholder": "Add a market and press Enter",
+      "customerSegments": "Customer segments",
+      "customerSegmentsHint": "Key buyer personas or accounts",
+      "customerSegmentsPlaceholder": "Add a segment and press Enter",
+      "description": "Company summary",
+      "descriptionHint": "Optional short description for your context",
+      "descriptionPlaceholder": "Describe what this company does...",
+      "errors": {
+        "title": "Unable to save company",
+        "generic": "Something went wrong while saving this company.",
+        "missingName": "Add a company name before saving.",
+        "missingNotes": "Add research notes before running AI analysis."
+      },
+      "actions": {
+        "save": "Save company",
+        "analyze": "Save & analyze"
+      }
+    },
+    "notes": {
+      "label": "Research notes",
+      "hint": "Paste any call notes, press articles, or observations. These will be used for AI analysis.",
+      "placeholder": "Paste raw research notes..."
+    },
+    "detail": {
+      "untitled": "Untitled company",
+      "description": "Update the company profile, run AI analysis, and manage the Business Model Canvas.",
+      "sections": {
+        "companyInfo": "Company information",
+        "companyInfoDescription": "Edit the high-level profile before running AI analysis."
+      },
+      "lastUpdated": "Last updated {date}",
+      "actions": {
+        "reset": "Reset changes",
+        "analyze": "Analyze company info",
+        "save": "Save company"
+      },
+      "errors": {
+        "title": "Company error",
+        "generic": "Something went wrong while processing this company.",
+        "notFound": "This company could not be found.",
+        "missingNotes": "Add research notes before running analysis."
+      }
+    },
+    "canvas": {
+      "title": "Company Canvas",
+      "description": "Map the nine Business Model Canvas blocks to understand how this company operates.",
+      "status": {
+        "needsUpdate": "Needs update",
+        "upToDate": "Up to date"
+      },
+      "lastGeneratedAt": "Last generated {date}",
+      "lastGeneratedUnknown": "Unknown",
+      "summary": {
+        "label": "Analysis summary",
+        "hint": "Short narrative describing how the company creates and captures value.",
+        "placeholder": "Add a concise summary of the business model..."
+      },
+      "actions": {
+        "generate": "Generate canvas",
+        "save": "Save canvas"
+      },
+      "errors": {
+        "save": "Failed to save the canvas.",
+        "generate": "Failed to generate a new canvas."
+      },
+      "blocks": {
+        "customerSegments": {
+          "label": "Customer Segments",
+          "hint": "Primary customer groups the company targets."
+        },
+        "valuePropositions": {
+          "label": "Value Propositions",
+          "hint": "Key benefits or outcomes promised to customers."
+        },
+        "channels": {
+          "label": "Channels",
+          "hint": "How the company delivers products/services."
+        },
+        "customerRelationships": {
+          "label": "Customer Relationships",
+          "hint": "How the company acquires and supports customers."
+        },
+        "revenueStreams": {
+          "label": "Revenue Streams",
+          "hint": "Ways the company earns money."
+        },
+        "keyResources": {
+          "label": "Key Resources",
+          "hint": "Critical assets required to operate."
+        },
+        "keyActivities": {
+          "label": "Key Activities",
+          "hint": "Core activities the company must execute."
+        },
+        "keyPartners": {
+          "label": "Key Partnerships",
+          "hint": "External partners that enable the business."
+        },
+        "costStructure": {
+          "label": "Cost Structure",
+          "hint": "Major cost drivers or investments."
+        }
+      }
+    },
+    "upload": {
+      "helper": "Have a PDF or text file about the company? Drop it below and we’ll extract the details automatically.",
+      "dropzone": {
+        "label": "Drop company brief or click to browse",
+        "description": "Supports PDF and TXT files (max 5MB)"
+      },
+      "status": {
+        "extracting": "Extracting text from the document…",
+        "analyzing": "Analyzing company information…"
+      },
+      "errors": {
+        "title": "Upload error",
+        "tooShort": "We could not extract enough content from this file. Try another document.",
+        "generic": "Something went wrong while analyzing this file."
+      },
+      "fileUploaded": "File uploaded: {fileName}",
+      "orManual": "Or fill the form manually",
+      "defaultName": "New Company"
+    }
+  },
   "cvUpload": {
     "title": "Upload Your CV",
     "description": "Upload your CV to extract your professional experience automatically.",

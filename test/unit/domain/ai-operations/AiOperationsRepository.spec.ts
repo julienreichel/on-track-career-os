@@ -389,22 +389,13 @@ describe('AiOperationsRepository', () => {
     const analysisResponse: CompanyAnalysisResult = {
       companyProfile: {
         companyName: 'Acme',
-        alternateNames: [],
         industry: '',
         sizeRange: '',
-        headquarters: '',
         website: '',
         productsServices: [],
         targetMarkets: [],
         customerSegments: [],
-        summary: '',
-      },
-      signals: {
-        marketChallenges: [],
-        internalPains: [],
-        partnerships: [],
-        hiringFocus: [],
-        strategicNotes: [],
+        description: '',
       },
       confidence: 0.8,
     };
@@ -474,13 +465,11 @@ describe('AiOperationsRepository', () => {
 
       const result = await repository.generateCompanyCanvas({
         companyProfile: { companyName: 'Acme' },
-        signals: {},
       });
 
       expect(mockClient.generateCompanyCanvas).toHaveBeenCalledWith(
         expect.objectContaining({
           companyProfile: JSON.stringify({ companyName: 'Acme' }),
-          signals: JSON.stringify({}),
         }),
         expect.objectContaining({ authMode: 'userPool' })
       );
@@ -496,7 +485,6 @@ describe('AiOperationsRepository', () => {
       await expect(
         repository.generateCompanyCanvas({
           companyProfile: { companyName: 'Acme' },
-          signals: {},
         })
       ).rejects.toThrow('AI operation failed');
     });
@@ -510,7 +498,6 @@ describe('AiOperationsRepository', () => {
       await expect(
         repository.generateCompanyCanvas({
           companyProfile: { companyName: 'Acme' },
-          signals: {},
         })
       ).rejects.toThrow('AI operation returned no data');
     });

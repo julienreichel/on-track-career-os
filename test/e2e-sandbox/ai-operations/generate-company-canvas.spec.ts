@@ -65,17 +65,8 @@ describe('AI Operations - Generate Company Canvas (E2E Sandbox)', () => {
       customerSegments: ['Grid operators'],
     };
 
-    const signals = {
-      marketChallenges: ['Aging infrastructure'],
-      internalPains: ['Manual inspections'],
-      partnerships: ['Drone hardware OEMs'],
-      hiringFocus: ['Field engineers'],
-      strategicNotes: ['Expanding into LATAM'],
-    };
-
     const canvas = await repository.generateCompanyCanvas({
       companyProfile,
-      signals,
       additionalNotes: ['Prioritize safety compliance'],
     });
 

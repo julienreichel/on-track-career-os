@@ -15,7 +15,6 @@ describe('ai.generateCompanyCanvas', () => {
   type Handler = (event: {
     arguments: {
       companyProfile: Record<string, unknown>;
-      signals: Record<string, unknown>;
       additionalNotes?: string[];
     };
   }) => Promise<{
@@ -84,7 +83,6 @@ describe('ai.generateCompanyCanvas', () => {
     const response = await handler({
       arguments: {
         companyProfile: { companyName: 'Acme' },
-        signals: {},
         additionalNotes: [],
       },
     });
@@ -117,7 +115,6 @@ describe('ai.generateCompanyCanvas', () => {
     const response = await handler({
       arguments: {
         companyProfile: { companyName: 'Placeholder' },
-        signals: {},
       },
     });
 

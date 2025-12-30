@@ -113,7 +113,7 @@ AI operations impact (must follow contract)
 
 - `ai.analyzeCompanyInfo`:
   - Inputs: companyName, industry, size, rawText, optional jobContext :contentReference[oaicite:9]{index=9}
-  - Output: `companyProfile` object with normalized fields (website, productsServices, targetMarkets, customerSegments, summary, etc.) :contentReference[oaicite:10]{index=10}
+  - Output: `companyProfile` object with normalized fields (website, productsServices, targetMarkets, customerSegments, description, etc.) :contentReference[oaicite:10]{index=10}
   - Mapping: update Company entity fields (do not overwrite user edits blindly—define merge rules).
 - `ai.generateCompanyCanvas`:
   - Inputs: companyProfile + additionalNotes[] {index=11}
@@ -273,7 +273,7 @@ AI operations usage
   - jobTitle (if available)
   - optional jobContext metadata (location, seniority)
     Output:
-  - companyProfile object (companyName, industry, productsServices, targetMarkets, summary, etc.)
+  - companyProfile object (companyName, industry, productsServices, targetMarkets, description, etc.)
     Must follow the AI Interaction Contract strictly (JSON only, validated output).
 
 Company deduplication rules (important)
