@@ -22,6 +22,7 @@
             :title="t('features.jobs.title')"
             :description="t('features.jobs.description')"
             icon="i-heroicons-building-office"
+            :to="{ name: 'jobs' }"
           />
           <UPageCard
             :title="t('features.applications.title')"
