@@ -36,6 +36,9 @@ const rawNotes = ref('');
 
 const company = companyStore.company;
 
+const toStringArray = (values?: (string | null)[] | null) =>
+  (values ?? []).filter((entry): entry is string => typeof entry === 'string');
+
 const headerLinks = computed(() => [
   {
     label: t('companies.detail.actions.back'),
@@ -73,9 +76,9 @@ const hasScalarChanges = () => {
 const hasListChanges = () => {
   if (!company.value) return false;
   return (
-    !arraysEqual(form.productsServices, company.value.productsServices ?? []) ||
-    !arraysEqual(form.targetMarkets, company.value.targetMarkets ?? []) ||
-    !arraysEqual(form.customerSegments, company.value.customerSegments ?? [])
+    !arraysEqual(form.productsServices, toStringArray(company.value.productsServices)) ||
+    !arraysEqual(form.targetMarkets, toStringArray(company.value.targetMarkets)) ||
+    !arraysEqual(form.customerSegments, toStringArray(company.value.customerSegments))
   );
 };
 
@@ -136,9 +139,9 @@ function hydrateCompany(value: Company) {
   form.sizeRange = value.sizeRange ?? '';
   form.website = value.website ?? '';
   form.description = value.description ?? '';
-  form.productsServices = [...(value.productsServices ?? [])];
-  form.targetMarkets = [...(value.targetMarkets ?? [])];
-  form.customerSegments = [...(value.customerSegments ?? [])];
+  form.productsServices = toStringArray(value.productsServices);
+  form.targetMarkets = toStringArray(value.targetMarkets);
+  form.customerSegments = toStringArray(value.customerSegments);
   rawNotes.value = value.rawNotes ?? '';
 }
 

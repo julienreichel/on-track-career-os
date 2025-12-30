@@ -462,10 +462,6 @@ describe('AiOperationsRepository', () => {
         errors: undefined,
       });
 
-      const result = await repository.generateCompanyCanvas({
-        companyProfile: { companyName: 'Acme' },
-      });
-
       expect(mockClient.generateCompanyCanvas).toHaveBeenCalledWith(
         expect.objectContaining({
           companyProfile: JSON.stringify({ companyName: 'Acme' }),

@@ -32,7 +32,11 @@ export class CompanyCanvasService {
       needsUpdate: true,
     };
 
-    return this.canvasRepo.update(payload);
+    const updated = await this.canvasRepo.update(payload);
+    if (!updated) {
+      throw new Error('Failed to update company canvas');
+    }
+    return updated;
   }
 
   async regenerateCanvas(
@@ -75,7 +79,11 @@ export class CompanyCanvasService {
       needsUpdate: false,
     };
 
-    return this.canvasRepo.update(payload);
+    const updated = await this.canvasRepo.update(payload);
+    if (!updated) {
+      throw new Error('Failed to update company canvas');
+    }
+    return updated;
   }
 
   private async validateOrCreateCanvas(companyId: string) {
