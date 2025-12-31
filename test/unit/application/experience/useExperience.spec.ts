@@ -93,13 +93,13 @@ describe('useExperience', () => {
     withMockedConsoleError(async () => {
       mockService.getFullExperience.mockRejectedValue(new Error('Service error'));
 
-    const { item, loading, error, load } = useExperience('experience-123');
+      const { item, loading, error, load } = useExperience('experience-123');
 
-    await load();
+      await load();
 
-    expect(loading.value).toBe(false);
-    expect(error.value).toBe('Service error');
-    expect(item.value).toBeNull();
+      expect(loading.value).toBe(false);
+      expect(error.value).toBe('Service error');
+      expect(item.value).toBeNull();
     })
   );
 

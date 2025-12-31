@@ -57,7 +57,9 @@ test.describe('Full Profile Page - Edit Mode', () => {
   });
 
   test('should show save/cancel buttons in edit mode', async ({ page }) => {
-    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit")').first();
+    const editButton = page
+      .locator('button:has-text("Edit Profile"), button:has-text("Edit")')
+      .first();
     await editButton.click();
     await page.waitForTimeout(500);
 
@@ -69,7 +71,9 @@ test.describe('Full Profile Page - Edit Mode', () => {
   });
 
   test('should exit edit mode when cancel clicked', async ({ page }) => {
-    const editButton = page.locator('button:has-text("Edit Profile"), button:has-text("Edit")').first();
+    const editButton = page
+      .locator('button:has-text("Edit Profile"), button:has-text("Edit")')
+      .first();
     await editButton.click();
     await page.waitForTimeout(500);
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));

@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
-import type { JobDescription, JobDescriptionUpdateInput } from '@/domain/job-description/JobDescription';
+import type {
+  JobDescription,
+  JobDescriptionUpdateInput,
+} from '@/domain/job-description/JobDescription';
 
 vi.mock('@/domain/job-description/JobDescriptionService');
 

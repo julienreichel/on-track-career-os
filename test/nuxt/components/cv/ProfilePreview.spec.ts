@@ -7,7 +7,6 @@ import type { ParseCvTextOutput } from '@amplify/data/ai-operations/parseCvText'
 // Create i18n instance for tests
 const i18n = createTestI18n();
 
-
 // Stub child components
 const stubs = {
   UCard: {

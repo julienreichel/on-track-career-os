@@ -5,7 +5,6 @@ import AchievementsKpisPanel from '../../../src/components/AchievementsKpisPanel
 
 const i18n = createTestI18n();
 
-
 const stubs = {
   UButton: {
     template: '<button :disabled="loading" @click="$attrs.onClick"><slot /></button>',

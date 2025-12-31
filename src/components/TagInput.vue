@@ -64,11 +64,7 @@ const handleRemove = (index: number) => {
         @keydown="handleKeydown"
       />
     </UFormField>
-    <div
-      v-if="modelValue.length > 0"
-      class="flex flex-wrap gap-2"
-      :data-testid="tagsTestId"
-    >
+    <div v-if="modelValue.length > 0" class="flex flex-wrap gap-2" :data-testid="tagsTestId">
       <UBadge v-for="(item, index) in modelValue" :key="index" :color="color" variant="subtle">
         {{ item }}
         <UButton

@@ -21,10 +21,7 @@ const showDeleteConfirm = ref(false);
 
 const headerTitle = computed(
   () =>
-    props.story.title?.trim() ||
-    props.experienceName ||
-    props.companyName ||
-    t('storyCard.noTitle')
+    props.story.title?.trim() || props.experienceName || props.companyName || t('storyCard.noTitle')
 );
 
 const subtitle = computed(() => {

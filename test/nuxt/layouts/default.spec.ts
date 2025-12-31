@@ -6,7 +6,6 @@ import DefaultLayout from '@/layouts/default.vue';
 // Create i18n instance for tests
 const i18n = createTestI18n();
 
-
 // Mock Nuxt composables
 vi.mock('#app', () => ({
   useNuxtApp: () => ({

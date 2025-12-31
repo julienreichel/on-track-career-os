@@ -36,7 +36,6 @@ vi.mock('~/composables/useAuthUser', () => ({
 // Create i18n instance
 const i18n = createTestI18n();
 
-
 describe('Canvas Index Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();

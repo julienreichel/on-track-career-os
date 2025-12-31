@@ -73,7 +73,8 @@ const stubs = {
   UButton: {
     props: ['label', 'icon', 'to'],
     emits: ['click'],
-    template: '<button class="u-button" type="button" @click="$emit(\'click\')">{{ label }}</button>',
+    template:
+      '<button class="u-button" type="button" @click="$emit(\'click\')">{{ label }}</button>',
   },
   UInput: {
     props: ['modelValue'],

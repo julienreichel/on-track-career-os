@@ -24,10 +24,7 @@ export function normalizeStringArray(values: Array<string | null | undefined> | 
 export function applyArrayNormalization<
   T extends Record<string, unknown>,
   K extends keyof T = keyof T,
->(
-  payload: T,
-  keys: K[]
-): T {
+>(payload: T, keys: K[]): T {
   const clone = { ...payload };
   for (const key of keys) {
     const current = clone[key];

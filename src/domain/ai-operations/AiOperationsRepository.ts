@@ -6,14 +6,8 @@ import type { AchievementsAndKpis } from './AchievementsAndKpis';
 import type { PersonalCanvas, PersonalCanvasInput } from './PersonalCanvas';
 import type { GenerateCvInput, GenerateCvResult } from './types/generateCv';
 import type { ParsedJobDescription } from './ParsedJobDescription';
-import type {
-  AnalyzeCompanyInfoInput,
-  CompanyAnalysisResult,
-} from './CompanyAnalysis';
-import type {
-  GeneratedCompanyCanvas,
-  GeneratedCompanyCanvasInput,
-} from './CompanyCanvasResult';
+import type { AnalyzeCompanyInfoInput, CompanyAnalysisResult } from './CompanyAnalysis';
+import type { GeneratedCompanyCanvas, GeneratedCompanyCanvasInput } from './CompanyCanvasResult';
 
 /**
  * Repository interface for AI operations
@@ -79,9 +73,7 @@ export interface IAiOperationsRepository {
   /**
    * Generate full company canvas from structured profile
    */
-  generateCompanyCanvas(
-    input: GeneratedCompanyCanvasInput
-  ): Promise<GeneratedCompanyCanvas>;
+  generateCompanyCanvas(input: GeneratedCompanyCanvasInput): Promise<GeneratedCompanyCanvas>;
 }
 
 /**
@@ -359,9 +351,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     return parsed as CompanyAnalysisResult;
   }
 
-  async generateCompanyCanvas(
-    input: GeneratedCompanyCanvasInput
-  ): Promise<GeneratedCompanyCanvas> {
+  async generateCompanyCanvas(input: GeneratedCompanyCanvasInput): Promise<GeneratedCompanyCanvas> {
     const { data, errors } = await this.client.generateCompanyCanvas(
       {
         companyProfile: JSON.stringify(input.companyProfile),

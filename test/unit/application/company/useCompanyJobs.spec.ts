@@ -39,4 +39,3 @@ describe('useCompanyJobs', () => {
     expect(jobsRef.value).toEqual([]);
   });
 });
-

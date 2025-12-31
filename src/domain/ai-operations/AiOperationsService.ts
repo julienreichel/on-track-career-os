@@ -12,15 +12,9 @@ import { isPersonalCanvas } from './PersonalCanvas';
 import type { GenerateCvInput, GenerateCvResult } from './types/generateCv';
 import type { ParsedJobDescription } from './ParsedJobDescription';
 import { isParsedJobDescription } from './ParsedJobDescription';
-import type {
-  AnalyzeCompanyInfoInput,
-  CompanyAnalysisResult,
-} from './CompanyAnalysis';
+import type { AnalyzeCompanyInfoInput, CompanyAnalysisResult } from './CompanyAnalysis';
 import { isCompanyAnalysisResult } from './CompanyAnalysis';
-import type {
-  GeneratedCompanyCanvas,
-  GeneratedCompanyCanvasInput,
-} from './CompanyCanvasResult';
+import type { GeneratedCompanyCanvas, GeneratedCompanyCanvasInput } from './CompanyCanvasResult';
 import { isGeneratedCompanyCanvas } from './CompanyCanvasResult';
 
 type AnalyzeCompanyMock =
@@ -58,10 +52,7 @@ function resolveAiMock(
     return null;
   }
 
-  const result =
-    typeof handler === 'function'
-      ? handler(input as never)
-      : handler;
+  const result = typeof handler === 'function' ? handler(input as never) : handler;
   return cloneResult(result);
 }
 
@@ -359,9 +350,7 @@ export class AiOperationsService {
     return result;
   }
 
-  async generateCompanyCanvas(
-    input: GeneratedCompanyCanvasInput
-  ): Promise<GeneratedCompanyCanvas> {
+  async generateCompanyCanvas(input: GeneratedCompanyCanvasInput): Promise<GeneratedCompanyCanvas> {
     const mock = resolveAiMock('generateCompanyCanvas', input);
     if (mock) {
       return mock;

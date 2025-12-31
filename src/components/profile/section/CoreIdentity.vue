@@ -58,7 +58,7 @@
       class="hidden"
       accept="image/png,image/jpeg,image/webp"
       @change="handlePhotoSelected"
-    >
+    />
 
     <div v-if="!isEditing" class="space-y-4">
       <div v-if="form.fullName">

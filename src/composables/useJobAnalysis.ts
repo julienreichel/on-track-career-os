@@ -1,5 +1,8 @@
 import { ref } from 'vue';
-import type { JobDescription, JobDescriptionUpdateInput } from '@/domain/job-description/JobDescription';
+import type {
+  JobDescription,
+  JobDescriptionUpdateInput,
+} from '@/domain/job-description/JobDescription';
 import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
 
 const jobs = ref<JobDescription[]>([]);

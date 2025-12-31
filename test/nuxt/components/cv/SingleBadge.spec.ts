@@ -6,7 +6,6 @@ import SingleBadge from '~/components/cv/SingleBadge.vue';
 // Create i18n instance for tests
 const i18n = createTestI18n();
 
-
 // Stub Nuxt UI components
 const stubs = {
   UBadge: {

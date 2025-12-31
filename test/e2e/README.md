@@ -51,10 +51,11 @@ npx playwright show-report
 ### Current Status
 
 **32 out of 36 tests passing** - Excellent coverage for main pages!
-  - **Status**: Backend deployed, authentication working, but pages need fixes
-  - **Next Steps**: Debug page rendering errors before activating tests
-  - Tests use `networkidle` wait strategy and authenticated state
-  - To activate: Fix page issues, then rename to `.spec.ts`
+
+- **Status**: Backend deployed, authentication working, but pages need fixes
+- **Next Steps**: Debug page rendering errors before activating tests
+- Tests use `networkidle` wait strategy and authenticated state
+- To activate: Fix page issues, then rename to `.spec.ts`
 
 ## Test Organization
 

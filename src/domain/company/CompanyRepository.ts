@@ -74,9 +74,7 @@ export class CompanyRepository {
     }
     const companies = await this.list();
     return (
-      companies.find(
-        (company) => normalizeCompanyName(company.companyName) === normalized
-      ) ?? null
+      companies.find((company) => normalizeCompanyName(company.companyName) === normalized) ?? null
     );
   }
 }

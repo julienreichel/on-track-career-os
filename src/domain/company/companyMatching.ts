@@ -2,7 +2,18 @@ import type { Company, CompanyUpdateInput } from './Company';
 import { normalizeStringArray } from './companyUtils';
 import type { CompanyAnalysisResult } from '@/domain/ai-operations/CompanyAnalysis';
 
-const COMPANY_SUFFIXES = ['inc', 'inc.', 'llc', 'ltd', 'ltda', 'co', 'corp', 'corporation', 'sa', 'ag'];
+const COMPANY_SUFFIXES = [
+  'inc',
+  'inc.',
+  'llc',
+  'ltd',
+  'ltda',
+  'co',
+  'corp',
+  'corporation',
+  'sa',
+  'ag',
+];
 
 export function normalizeCompanyName(name?: string | null) {
   if (!name) {
@@ -48,7 +59,10 @@ export function mergeCompanyProfile(
   ) => {
     const merged = normalizeStringArray([...(existingValues ?? []), ...(incoming ?? [])]);
     const current = normalizeStringArray(existingValues ?? []);
-    if (merged.length !== current.length || merged.some((value, index) => value !== current[index])) {
+    if (
+      merged.length !== current.length ||
+      merged.some((value, index) => value !== current[index])
+    ) {
       (update as Record<string, unknown>)[key] = merged;
     }
   };

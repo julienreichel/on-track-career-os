@@ -60,7 +60,9 @@ export function useCompanyUpload() {
     status.value = 'extracting';
 
     const rawText =
-      file.type === 'application/pdf' ? await extractPdfText(file) : await extractTextFromFile(file);
+      file.type === 'application/pdf'
+        ? await extractPdfText(file)
+        : await extractTextFromFile(file);
     const sanitized = rawText?.trim();
 
     if (!sanitized || sanitized.length < MIN_TEXT_LENGTH) {
@@ -97,9 +99,7 @@ export function useCompanyUpload() {
     }
   }
 
-  async function handleFileSelected(
-    file: File | null | undefined
-  ): Promise<Company | null> {
+  async function handleFileSelected(file: File | null | undefined): Promise<Company | null> {
     if (!file) {
       return null;
     }

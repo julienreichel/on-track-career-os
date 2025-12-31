@@ -48,8 +48,7 @@ async function loadJobs() {
   try {
     await jobAnalysis.listJobs();
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('jobUpload.errors.generic');
+    errorMessage.value = error instanceof Error ? error.message : t('jobUpload.errors.generic');
   } finally {
     loading.value = false;
   }
@@ -73,8 +72,7 @@ async function confirmDelete() {
     showDeleteModal.value = false;
     jobToDelete.value = null;
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('jobUpload.errors.generic');
+    errorMessage.value = error instanceof Error ? error.message : t('jobUpload.errors.generic');
   }
 }
 
@@ -158,7 +156,12 @@ function cancelDelete() {
         <p>{{ t('jobList.delete.message') }}</p>
       </template>
       <template #footer>
-        <UButton color="neutral" variant="ghost" :label="t('jobList.delete.cancel')" @click="cancelDelete" />
+        <UButton
+          color="neutral"
+          variant="ghost"
+          :label="t('jobList.delete.cancel')"
+          @click="cancelDelete"
+        />
         <UButton color="error" :label="t('jobList.delete.confirm')" @click="confirmDelete" />
       </template>
     </UModal>

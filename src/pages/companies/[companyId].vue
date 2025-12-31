@@ -361,7 +361,11 @@ function clearJobsError() {
               :title="t('companies.detail.errors.title')"
               :description="jobsError"
               class="mb-4"
-              :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+              :close-button="{
+                icon: 'i-heroicons-x-mark-20-solid',
+                color: 'error',
+                variant: 'link',
+              }"
               @close="clearJobsError"
             />
 

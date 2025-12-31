@@ -6,7 +6,6 @@ import type { StoryFormState } from '../../../src/composables/useStoryEditor';
 
 const i18n = createTestI18n();
 
-
 const stubs = {
   UFormField: {
     template:
@@ -337,21 +336,21 @@ describe('StoryForm', () => {
     });
   });
 });
-  it('emits update:modelValue when title changes', async () => {
-    const wrapper = mount(StoryForm, {
-      global: {
-        plugins: [i18n],
-        stubs,
-      },
-      props: {
-        modelValue: defaultFormState,
-      },
-    });
-
-    const input = wrapper.find('input');
-    await input.setValue('New title');
-
-    expect(wrapper.emitted('update:modelValue')).toBeTruthy();
-    const emittedValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as StoryFormState;
-    expect(emittedValue.title).toBe('New title');
+it('emits update:modelValue when title changes', async () => {
+  const wrapper = mount(StoryForm, {
+    global: {
+      plugins: [i18n],
+      stubs,
+    },
+    props: {
+      modelValue: defaultFormState,
+    },
   });
+
+  const input = wrapper.find('input');
+  await input.setValue('New title');
+
+  expect(wrapper.emitted('update:modelValue')).toBeTruthy();
+  const emittedValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as StoryFormState;
+  expect(emittedValue.title).toBe('New title');
+});

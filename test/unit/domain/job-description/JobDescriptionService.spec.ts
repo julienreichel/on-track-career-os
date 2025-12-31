@@ -270,9 +270,7 @@ describe('JobDescriptionService', () => {
 
       mockRepository.get.mockResolvedValue(job);
       mockAiService.parseJobDescription.mockResolvedValue(parsed);
-      mockRepository.update
-        .mockResolvedValueOnce(updatedJob)
-        .mockResolvedValueOnce(jobWithCompany);
+      mockRepository.update.mockResolvedValueOnce(updatedJob).mockResolvedValueOnce(jobWithCompany);
       mockAiService.analyzeCompanyInfo.mockResolvedValue({
         companyProfile: {
           companyName: 'Acme Inc.',
@@ -326,9 +324,7 @@ describe('JobDescriptionService', () => {
 
       mockRepository.get.mockResolvedValue(job);
       mockAiService.parseJobDescription.mockResolvedValue(parsed);
-      mockRepository.update
-        .mockResolvedValueOnce(updatedJob)
-        .mockResolvedValueOnce(jobWithCompany);
+      mockRepository.update.mockResolvedValueOnce(updatedJob).mockResolvedValueOnce(jobWithCompany);
       mockAiService.analyzeCompanyInfo.mockResolvedValue({
         companyProfile: {
           companyName: 'NewCo',

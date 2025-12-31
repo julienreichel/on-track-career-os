@@ -6,7 +6,6 @@ import ImportSuccess from '~/components/cv/ImportSuccess.vue';
 // Create i18n instance for tests
 const i18n = createTestI18n();
 
-
 // Stub Nuxt UI components
 const stubs = {
   UCard: {

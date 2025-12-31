@@ -132,28 +132,28 @@ export function useBreadcrumbMapping() {
   };
 }
 
-  /**
-   * Get display name for a company ID
-   */
-  const getCompanyName = async (companyId: string): Promise<string> => {
-    if (!companyService) {
-      companyService = new CompanyService();
-    }
+/**
+ * Get display name for a company ID
+ */
+const getCompanyName = async (companyId: string): Promise<string> => {
+  if (!companyService) {
+    companyService = new CompanyService();
+  }
 
-    if (mappingCache.value[companyId]) {
-      return mappingCache.value[companyId];
-    }
+  if (mappingCache.value[companyId]) {
+    return mappingCache.value[companyId];
+  }
 
-    try {
-      const company = await companyService!.getCompany(companyId);
-      const name = company?.companyName;
-      if (name) {
-        mappingCache.value[companyId] = name;
-        return name;
-      }
-    } catch (err) {
-      console.error('[useBreadcrumbMapping] Error fetching company:', err);
+  try {
+    const company = await companyService!.getCompany(companyId);
+    const name = company?.companyName;
+    if (name) {
+      mappingCache.value[companyId] = name;
+      return name;
     }
+  } catch (err) {
+    console.error('[useBreadcrumbMapping] Error fetching company:', err);
+  }
 
-    return companyId;
-  };
+  return companyId;
+};

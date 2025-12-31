@@ -47,10 +47,7 @@ const statusBadge = computed(() => {
   const status = props.experience.status || 'draft';
   return {
     color: status === 'complete' ? 'success' : 'neutral',
-    label:
-      status === 'complete'
-        ? t('experiences.status.complete')
-        : t('experiences.status.draft'),
+    label: status === 'complete' ? t('experiences.status.complete') : t('experiences.status.draft'),
   };
 });
 

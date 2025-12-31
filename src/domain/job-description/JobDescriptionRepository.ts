@@ -1,5 +1,9 @@
 import { gqlOptions } from '@/data/graphql/options';
-import type { JobDescriptionCreateInput, JobDescriptionUpdateInput, JobDescription } from './JobDescription';
+import type {
+  JobDescriptionCreateInput,
+  JobDescriptionUpdateInput,
+  JobDescription,
+} from './JobDescription';
 
 export type AmplifyJobDescriptionModel = {
   get: (

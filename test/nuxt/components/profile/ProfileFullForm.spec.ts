@@ -68,7 +68,6 @@ vi.mock('@/domain/user-profile/ProfilePhotoService', () => ({
 
 const i18n = createTestI18n();
 
-
 const baseStubs = {
   UPage: {
     template: '<div class="u-page"><slot /></div>',

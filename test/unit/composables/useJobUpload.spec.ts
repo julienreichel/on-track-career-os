@@ -48,8 +48,7 @@ describe('useJobUpload', () => {
     mockDestroy.mockReset();
   });
 
-  const createPdfFile = () =>
-    new File(['dummy'], 'job.pdf', { type: 'application/pdf' });
+  const createPdfFile = () => new File(['dummy'], 'job.pdf', { type: 'application/pdf' });
 
   const createTextFile = (content: string) =>
     new File([content], 'job.txt', { type: 'text/plain' });
@@ -75,9 +74,7 @@ describe('useJobUpload', () => {
     mockReanalyseJob.mockResolvedValueOnce(analyzedJob);
 
     const jobUpload = useJobUpload();
-    const job = await jobUpload.handleFileSelected(
-      createTextFile('B'.repeat(500))
-    );
+    const job = await jobUpload.handleFileSelected(createTextFile('B'.repeat(500)));
 
     expect(job).toEqual(analyzedJob);
     expect(mockGetText).not.toHaveBeenCalled();

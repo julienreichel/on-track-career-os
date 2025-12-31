@@ -27,7 +27,6 @@ vi.mock('@/domain/cvdocument/CVDocumentService', () => ({
 // Create i18n instance for tests
 const i18n = createTestI18n();
 
-
 // Create router for tests
 const router = createRouter({
   history: createMemoryHistory(),

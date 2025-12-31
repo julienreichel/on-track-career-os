@@ -12,7 +12,12 @@
           {{ t('profile.fields.skills') }}
         </label>
         <div class="flex flex-wrap gap-2">
-          <UBadge v-for="(skill, index) in form.skills" :key="index" color="success" variant="subtle">
+          <UBadge
+            v-for="(skill, index) in form.skills"
+            :key="index"
+            color="success"
+            variant="subtle"
+          >
             {{ skill }}
           </UBadge>
         </div>

@@ -8,7 +8,6 @@ import type { ProfileForm } from '@/components/profile/types';
 
 const i18n = createTestI18n();
 
-
 const stubs = {
   UCard: {
     template: '<div class="u-card"><slot name="header" /><slot /></div>',

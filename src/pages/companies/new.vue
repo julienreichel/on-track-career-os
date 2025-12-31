@@ -93,8 +93,7 @@ async function handleSave(analyze = false) {
 
     await router.push(`/companies/${result.id}`);
   } catch (error) {
-    formError.value =
-      error instanceof Error ? error.message : t('companies.form.errors.generic');
+    formError.value = error instanceof Error ? error.message : t('companies.form.errors.generic');
   } finally {
     saving.value = false;
     analyzing.value = false;

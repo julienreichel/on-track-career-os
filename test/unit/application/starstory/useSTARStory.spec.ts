@@ -92,13 +92,13 @@ describe('useSTARStory', () => {
     withMockedConsoleError(async () => {
       mockService.getFullSTARStory.mockRejectedValue(new Error('Service failed'));
 
-    const { item, loading, error, load } = useSTARStory('starstory-123');
+      const { item, loading, error, load } = useSTARStory('starstory-123');
 
-    await load();
+      await load();
 
-    expect(loading.value).toBe(false);
-    expect(error.value).toBe('Service failed');
-    expect(item.value).toBeNull();
+      expect(loading.value).toBe(false);
+      expect(error.value).toBe('Service failed');
+      expect(item.value).toBeNull();
     })
   );
 
@@ -107,11 +107,11 @@ describe('useSTARStory', () => {
     withMockedConsoleError(async () => {
       mockService.getFullSTARStory.mockRejectedValue('Unknown error');
 
-    const { error, load } = useSTARStory('starstory-123');
+      const { error, load } = useSTARStory('starstory-123');
 
-    await load();
+      await load();
 
-    expect(error.value).toBe('Unknown error occurred');
+      expect(error.value).toBe('Unknown error occurred');
     })
   );
 

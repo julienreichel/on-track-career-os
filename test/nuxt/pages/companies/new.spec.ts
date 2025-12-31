@@ -127,9 +127,7 @@ describe('New Company Page', () => {
     await wrapper.vm.$nextTick();
     await flushPromises();
     const saveButton =
-      wrapper
-        .findAll('.u-button')
-        .find((button) => button.text().includes('Save company')) ??
+      wrapper.findAll('.u-button').find((button) => button.text().includes('Save company')) ??
       wrapper.findAll('.u-button')[1];
     await saveButton.trigger('click');
     expect(mockCreateCompany).toHaveBeenCalled();
@@ -142,9 +140,7 @@ describe('New Company Page', () => {
     await wrapper.vm.$nextTick();
     await flushPromises();
     const analyzeButton =
-      wrapper
-        .findAll('.u-button')
-        .find((button) => button.text().includes('Save & analyze')) ??
+      wrapper.findAll('.u-button').find((button) => button.text().includes('Save & analyze')) ??
       wrapper.findAll('.u-button')[0];
     await analyzeButton.trigger('click');
     expect(mockAnalyzeCreate).toHaveBeenCalled();

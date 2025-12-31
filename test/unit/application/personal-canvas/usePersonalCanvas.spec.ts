@@ -97,13 +97,13 @@ describe('usePersonalCanvas', () => {
     withMockedConsoleError(async () => {
       mockService.getFullPersonalCanvas.mockRejectedValue(new Error('Service failed'));
 
-    const { item, loading, error, load } = usePersonalCanvas('personalcanvas-123');
+      const { item, loading, error, load } = usePersonalCanvas('personalcanvas-123');
 
-    await load();
+      await load();
 
-    expect(loading.value).toBe(false);
-    expect(error.value).toBe('Service failed');
-    expect(item.value).toBeNull();
+      expect(loading.value).toBe(false);
+      expect(error.value).toBe('Service failed');
+      expect(item.value).toBeNull();
     })
   );
 
@@ -112,13 +112,13 @@ describe('usePersonalCanvas', () => {
     withMockedConsoleError(async () => {
       mockService.getFullPersonalCanvas.mockRejectedValue(new Error('Network error'));
 
-    const { loading, error, item, load } = usePersonalCanvas('personalcanvas-123');
+      const { loading, error, item, load } = usePersonalCanvas('personalcanvas-123');
 
-    await load();
+      await load();
 
-    expect(loading.value).toBe(false);
-    expect(error.value).toBe('Network error');
-    expect(item.value).toBeNull();
+      expect(loading.value).toBe(false);
+      expect(error.value).toBe('Network error');
+      expect(item.value).toBeNull();
     })
   );
 

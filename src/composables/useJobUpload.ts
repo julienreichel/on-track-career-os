@@ -50,15 +50,17 @@ export function useJobUpload() {
     status.value = 'extracting';
 
     const rawText =
-      file.type === 'application/pdf' ? await extractPdfText(file) : await extractTextFromFile(file);
+      file.type === 'application/pdf'
+        ? await extractPdfText(file)
+        : await extractTextFromFile(file);
 
-  const sanitized = rawText?.trim();
-  if (!sanitized || sanitized.length < MIN_TEXT_LENGTH) {
-    status.value = 'idle';
-    errorMessage.value = t('jobUpload.errors.tooShort');
-    selectedFile.value = null;
-    throw new Error(t('jobUpload.errors.tooShort'));
-  }
+    const sanitized = rawText?.trim();
+    if (!sanitized || sanitized.length < MIN_TEXT_LENGTH) {
+      status.value = 'idle';
+      errorMessage.value = t('jobUpload.errors.tooShort');
+      selectedFile.value = null;
+      throw new Error(t('jobUpload.errors.tooShort'));
+    }
 
     status.value = 'analyzing';
     try {
@@ -66,8 +68,7 @@ export function useJobUpload() {
       const analyzed = await jobAnalysis.reanalyseJob(draft.id);
       return analyzed;
     } catch (error) {
-      errorMessage.value =
-        error instanceof Error ? error.message : t('jobUpload.errors.generic');
+      errorMessage.value = error instanceof Error ? error.message : t('jobUpload.errors.generic');
       selectedFile.value = null;
       throw error;
     } finally {
@@ -83,11 +84,10 @@ export function useJobUpload() {
     try {
       const job = await processFile(file);
       return job;
-  } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('jobUpload.errors.generic');
-    return null;
-  }
+    } catch (error) {
+      errorMessage.value = error instanceof Error ? error.message : t('jobUpload.errors.generic');
+      return null;
+    }
   }
 
   function reset() {

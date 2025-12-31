@@ -24,10 +24,7 @@ const value = computed({
 </script>
 
 <template>
-  <UFormField
-    :label="t('companies.notes.label')"
-    :hint="t('companies.notes.hint')"
-  >
+  <UFormField :label="t('companies.notes.label')" :hint="t('companies.notes.hint')">
     <UTextarea
       v-model="value"
       :placeholder="t('companies.notes.placeholder')"

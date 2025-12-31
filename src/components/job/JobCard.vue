@@ -17,9 +17,7 @@ const emit = defineEmits<{
 const { t } = useI18n();
 
 const title = computed(() => props.job.title || t('jobList.card.noTitle'));
-const subtitle = computed(
-  () => props.job.seniorityLevel || t('jobList.card.noSeniority')
-);
+const subtitle = computed(() => props.job.seniorityLevel || t('jobList.card.noSeniority'));
 
 const createdAt = computed(() => {
   if (!props.job.createdAt) {
@@ -39,12 +37,7 @@ const createdAt = computed(() => {
 
 const statusBadge = computed(() => {
   const status = props.job.status || 'draft';
-  const color =
-    status === 'complete'
-      ? 'success'
-      : status === 'analyzed'
-        ? 'primary'
-        : 'neutral';
+  const color = status === 'complete' ? 'success' : status === 'analyzed' ? 'primary' : 'neutral';
   return {
     color,
     label: t(`jobList.status.${status}`),

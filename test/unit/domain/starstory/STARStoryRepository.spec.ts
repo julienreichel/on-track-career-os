@@ -204,9 +204,7 @@ describe('STARStoryRepository', () => {
       expect(mockExperienceModel.get).toHaveBeenCalledWith(
         { id: 'exp-123' },
         expect.objectContaining({
-          selectionSet: expect.arrayContaining([
-            expect.stringContaining('stories'),
-          ]),
+          selectionSet: expect.arrayContaining([expect.stringContaining('stories')]),
         })
       );
       expect(result).toEqual(mockStories);

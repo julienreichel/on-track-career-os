@@ -477,19 +477,19 @@ async function confirmReanalyse() {
                 </div>
               </div>
 
-          <div v-if="!selectedCompanyId || !linkedCompany" class="mt-6">
-            <div class="mt-3">
-              <CompanySelector
-                :model-value="selectedCompanyId"
-                :companies="availableCompanies"
-                :loading="companyStore.loading.value || linkingCompany"
-                :disabled="companySelectorDisabled"
-                @update:model-value="handleCompanyLinkChange"
-                @clear="handleCompanyLinkClear"
-                @create="redirectToCompanyCreate"
-              />
-            </div>
-          </div>
+              <div v-if="!selectedCompanyId || !linkedCompany" class="mt-6">
+                <div class="mt-3">
+                  <CompanySelector
+                    :model-value="selectedCompanyId"
+                    :companies="availableCompanies"
+                    :loading="companyStore.loading.value || linkingCompany"
+                    :disabled="companySelectorDisabled"
+                    @update:model-value="handleCompanyLinkChange"
+                    @clear="handleCompanyLinkClear"
+                    @create="redirectToCompanyCreate"
+                  />
+                </div>
+              </div>
             </div>
           </UCard>
 

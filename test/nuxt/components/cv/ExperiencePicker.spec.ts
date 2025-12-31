@@ -14,7 +14,6 @@ vi.mock('@/domain/experience/ExperienceRepository', () => ({
 
 const i18n = createTestI18n();
 
-
 const stubs = {
   UCard: {
     template:

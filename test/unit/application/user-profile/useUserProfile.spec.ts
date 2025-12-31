@@ -60,13 +60,13 @@ describe('useUserProfile', () => {
     withMockedConsoleError(async () => {
       mockService.getFullUserProfile.mockRejectedValue(new Error('Service failed'));
 
-    const { item, loading, error, load } = useUserProfile('user-123');
+      const { item, loading, error, load } = useUserProfile('user-123');
 
-    await load();
+      await load();
 
-    expect(loading.value).toBe(false);
-    expect(error.value).toBe('Service failed');
-    expect(item.value).toBeNull();
+      expect(loading.value).toBe(false);
+      expect(error.value).toBe('Service failed');
+      expect(item.value).toBeNull();
     })
   );
 
@@ -102,13 +102,13 @@ describe('useUserProfile', () => {
     withMockedConsoleError(async () => {
       mockService.getFullUserProfile.mockRejectedValue(new Error('Network error'));
 
-    const { loading, error, item, load } = useUserProfile('user-123');
+      const { loading, error, item, load } = useUserProfile('user-123');
 
-    await load();
+      await load();
 
-    expect(loading.value).toBe(false);
-    expect(error.value).toBe('Network error');
-    expect(item.value).toBeNull();
+      expect(loading.value).toBe(false);
+      expect(error.value).toBe('Network error');
+      expect(item.value).toBeNull();
     })
   );
 

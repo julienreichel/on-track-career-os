@@ -6,7 +6,6 @@ import type { STARStory } from '../../../src/domain/starstory/STARStory';
 
 const i18n = createTestI18n();
 
-
 const stubs = {
   UCard: {
     template: '<div class="card"><slot /><div class="footer"><slot name="footer" /></div></div>',

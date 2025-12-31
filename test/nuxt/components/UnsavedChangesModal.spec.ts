@@ -5,7 +5,6 @@ import UnsavedChangesModal from '../../../src/components/UnsavedChangesModal.vue
 
 const i18n = createTestI18n();
 
-
 const stubs = {
   UModal: {
     template: `

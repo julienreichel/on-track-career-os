@@ -143,33 +143,39 @@ describe('useCanvasEngine', () => {
       expect(loading.value).toBe(false);
     });
 
-    it('should handle errors when loading canvas', withMockedConsoleError(async () => {
-      const errorMessage = 'Failed to load canvas';
-      mockService.getFullPersonalCanvas.mockRejectedValue(new Error(errorMessage));
+    it(
+      'should handle errors when loading canvas',
+      withMockedConsoleError(async () => {
+        const errorMessage = 'Failed to load canvas';
+        mockService.getFullPersonalCanvas.mockRejectedValue(new Error(errorMessage));
 
-      const { canvas, loading, error, loadCanvas } = useCanvasEngine();
+        const { canvas, loading, error, loadCanvas } = useCanvasEngine();
 
-      await loadCanvas('canvas-123');
+        await loadCanvas('canvas-123');
 
-      expect(canvas.value).toBeNull();
-      expect(loading.value).toBe(false);
-      expect(error.value).toBe(errorMessage);
-    }));
+        expect(canvas.value).toBeNull();
+        expect(loading.value).toBe(false);
+        expect(error.value).toBe(errorMessage);
+      })
+    );
 
-    it('should clear previous error on new load', withMockedConsoleError(async () => {
-      // First call fails
-      mockService.getFullPersonalCanvas.mockRejectedValueOnce(new Error('First error'));
-      const { error, loadCanvas } = useCanvasEngine();
+    it(
+      'should clear previous error on new load',
+      withMockedConsoleError(async () => {
+        // First call fails
+        mockService.getFullPersonalCanvas.mockRejectedValueOnce(new Error('First error'));
+        const { error, loadCanvas } = useCanvasEngine();
 
-      await loadCanvas('canvas-123');
-      expect(error.value).toBe('First error');
+        await loadCanvas('canvas-123');
+        expect(error.value).toBe('First error');
 
-      // Second call succeeds
-      mockService.getFullPersonalCanvas.mockResolvedValueOnce(mockPersonalCanvas);
-      await loadCanvas('canvas-123');
+        // Second call succeeds
+        mockService.getFullPersonalCanvas.mockResolvedValueOnce(mockPersonalCanvas);
+        await loadCanvas('canvas-123');
 
-      expect(error.value).toBeNull();
-    }));
+        expect(error.value).toBeNull();
+      })
+    );
   });
 
   describe('saveCanvas', () => {
@@ -251,31 +257,34 @@ describe('useCanvasEngine', () => {
       expect(canvas.value).toEqual(updatedCanvas);
     });
 
-    it('should handle save errors', withMockedConsoleError(async () => {
-      const canvasData = {
-        userId: 'user-123',
-        customerSegments: [],
-        valueProposition: ['Value'],
-        channels: [],
-        customerRelationships: [],
-        keyActivities: [],
-        keyResources: [],
-        keyPartners: [],
-        costStructure: [],
-        revenueStreams: [],
-        lastGeneratedAt: '2025-01-15T00:00:00Z',
-        needsUpdate: false,
-        owner: 'user-123::user-123',
-      };
+    it(
+      'should handle save errors',
+      withMockedConsoleError(async () => {
+        const canvasData = {
+          userId: 'user-123',
+          customerSegments: [],
+          valueProposition: ['Value'],
+          channels: [],
+          customerRelationships: [],
+          keyActivities: [],
+          keyResources: [],
+          keyPartners: [],
+          costStructure: [],
+          revenueStreams: [],
+          lastGeneratedAt: '2025-01-15T00:00:00Z',
+          needsUpdate: false,
+          owner: 'user-123::user-123',
+        };
 
-      mockRepository.create.mockRejectedValue(new Error('Save failed'));
+        mockRepository.create.mockRejectedValue(new Error('Save failed'));
 
-      const { error, saveCanvas } = useCanvasEngine();
+        const { error, saveCanvas } = useCanvasEngine();
 
-      await saveCanvas(canvasData as any);
+        await saveCanvas(canvasData as any);
 
-      expect(error.value).toBe('Save failed');
-    }));
+        expect(error.value).toBe('Save failed');
+      })
+    );
 
     it('should handle loading state during save', async () => {
       const canvasData = {
@@ -374,23 +383,26 @@ describe('useCanvasEngine', () => {
       expect(error.value).toBeNull();
     });
 
-    it('should handle regeneration errors', withMockedConsoleError(async () => {
-      const mockInput: PersonalCanvasInput = {
-        profile: { fullName: 'John Doe', headline: 'Engineer', summary: '5 years' },
-        experiences: [],
-        stories: [],
-      };
+    it(
+      'should handle regeneration errors',
+      withMockedConsoleError(async () => {
+        const mockInput: PersonalCanvasInput = {
+          profile: { fullName: 'John Doe', headline: 'Engineer', summary: '5 years' },
+          experiences: [],
+          stories: [],
+        };
 
-      mockService.regenerateCanvas.mockRejectedValue(new Error('AI service error'));
+        mockService.regenerateCanvas.mockRejectedValue(new Error('AI service error'));
 
-      const { canvas, error, regenerateCanvas } = useCanvasEngine();
+        const { canvas, error, regenerateCanvas } = useCanvasEngine();
 
-      const result = await regenerateCanvas(mockInput);
+        const result = await regenerateCanvas(mockInput);
 
-      expect(result).toBeNull();
-      expect(canvas.value).toBeNull();
-      expect(error.value).toBe('AI service error');
-    }));
+        expect(result).toBeNull();
+        expect(canvas.value).toBeNull();
+        expect(error.value).toBe('AI service error');
+      })
+    );
 
     it('should not manage loading state during regeneration (caller manages it)', async () => {
       const input: PersonalCanvasInput = {
@@ -547,20 +559,23 @@ describe('useCanvasEngine', () => {
       expect(success).toBe(false);
     });
 
-    it('should handle generation errors', withMockedConsoleError(async () => {
-      mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
-      mockExperienceRepo.list.mockResolvedValue([]);
-      mockStoryService.getStoriesByExperience.mockResolvedValue([]);
-      mockService.regenerateCanvas.mockRejectedValue(new Error('AI service error'));
+    it(
+      'should handle generation errors',
+      withMockedConsoleError(async () => {
+        mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
+        mockExperienceRepo.list.mockResolvedValue([]);
+        mockStoryService.getStoriesByExperience.mockResolvedValue([]);
+        mockService.regenerateCanvas.mockRejectedValue(new Error('AI service error'));
 
-      const { error, generateAndSave, initializeForUser } = useCanvasEngine();
+        const { error, generateAndSave, initializeForUser } = useCanvasEngine();
 
-      await initializeForUser('user-123');
-      const success = await generateAndSave();
+        await initializeForUser('user-123');
+        const success = await generateAndSave();
 
-      expect(success).toBe(false);
-      expect(error.value).toBe('AI service error');
-    }));
+        expect(success).toBe(false);
+        expect(error.value).toBe('AI service error');
+      })
+    );
   });
 
   describe('regenerateAndSave', () => {

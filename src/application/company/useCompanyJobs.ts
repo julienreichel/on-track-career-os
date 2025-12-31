@@ -35,4 +35,3 @@ export function useCompanyJobs(companyId: string) {
     load,
   };
 }
-

@@ -116,7 +116,10 @@ const updateField = <K extends keyof CompanyFormState>(key: K, value: CompanyFor
       @update:model-value="updateField('customerSegments', $event)"
     />
 
-    <UFormField :label="t('companies.form.description')" :hint="t('companies.form.descriptionHint')">
+    <UFormField
+      :label="t('companies.form.description')"
+      :hint="t('companies.form.descriptionHint')"
+    >
       <UTextarea
         :value="form.description"
         :placeholder="t('companies.form.descriptionPlaceholder')"

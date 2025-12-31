@@ -67,12 +67,14 @@ const stubs = {
   UButton: {
     props: ['label'],
     emits: ['click'],
-    template: '<button class="u-button" type="button" @click="$emit(\'click\')">{{ label }}</button>',
+    template:
+      '<button class="u-button" type="button" @click="$emit(\'click\')">{{ label }}</button>',
   },
   UInput: {
     props: ['modelValue'],
     emits: ['update:modelValue'],
-    template: '<input class="u-input" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+    template:
+      '<input class="u-input" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
   },
   UPageGrid: { template: '<div class="u-page-grid"><slot /></div>' },
   USkeleton: { template: '<div class="u-skeleton"></div>' },

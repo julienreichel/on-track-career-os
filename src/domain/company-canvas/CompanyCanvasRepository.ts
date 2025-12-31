@@ -1,5 +1,9 @@
 import { gqlOptions } from '@/data/graphql/options';
-import type { CompanyCanvasCreateInput, CompanyCanvasUpdateInput, CompanyCanvas } from './CompanyCanvas';
+import type {
+  CompanyCanvasCreateInput,
+  CompanyCanvasUpdateInput,
+  CompanyCanvas,
+} from './CompanyCanvas';
 
 export type AmplifyCompanyCanvasModel = {
   get: (

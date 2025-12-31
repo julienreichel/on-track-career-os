@@ -60,7 +60,8 @@ watch(
       achievements.value =
         newStory.achievements?.filter((entry): entry is string => typeof entry === 'string') || [];
       kpiSuggestions.value =
-        newStory.kpiSuggestions?.filter((entry): entry is string => typeof entry === 'string') || [];
+        newStory.kpiSuggestions?.filter((entry): entry is string => typeof entry === 'string') ||
+        [];
     } else {
       title.value = '';
       situation.value = '';
@@ -121,7 +122,11 @@ const isValid = () => {
   <UCard>
     <!-- STAR Form Fields -->
     <div class="space-y-6">
-      <UFormField :label="t('stories.builder.title')" :hint="t('stories.builder.titleHint')" required>
+      <UFormField
+        :label="t('stories.builder.title')"
+        :hint="t('stories.builder.titleHint')"
+        required
+      >
         <UInput
           v-model="title"
           :placeholder="t('stories.builder.titlePlaceholder')"

@@ -328,9 +328,7 @@ Must have 5+ years of experience and strong communication skills.
     const headerCount = (markdown.match(/^#+\s+/gm) || []).length;
     const hasKeySections =
       headerCount >= 3 ||
-      (/(summary|profile)/i.test(result) &&
-        /experience/i.test(result) &&
-        /skill/i.test(result));
+      (/(summary|profile)/i.test(result) && /experience/i.test(result) && /skill/i.test(result));
     expect(hasKeySections).toBe(true);
 
     // Log for inspection

@@ -153,11 +153,7 @@ function cancelDelete() {
           :label="t('companies.list.delete.cancel')"
           @click="cancelDelete"
         />
-        <UButton
-          color="error"
-          :label="t('companies.list.delete.confirm')"
-          @click="confirmDelete"
-        />
+        <UButton color="error" :label="t('companies.list.delete.confirm')" @click="confirmDelete" />
       </template>
     </UModal>
   </UContainer>

@@ -8,7 +8,6 @@ import type { ProfileForm } from '@/components/profile/types';
 
 const i18n = createTestI18n();
 
-
 const stubs = {
   UCard: {
     template: '<div class="u-card"><slot name="header" /><slot /></div>',
@@ -21,8 +20,7 @@ const stubs = {
     template: '<button class="u-button" @click="$emit(\'click\')"><slot /></button>',
   },
   UFormField: {
-    template:
-      '<label class="u-form-field">{{ label }}<slot /></label>',
+    template: '<label class="u-form-field">{{ label }}<slot /></label>',
     props: ['label', 'required'],
   },
   UInput: {
