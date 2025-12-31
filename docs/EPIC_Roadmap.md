@@ -297,6 +297,15 @@ Completes the full application workflow.
 
 ---
 
+# ✔ MVP Completion
+
+At this point the user can:
+**→ understand themselves → analyze a job → generate application materials**
+
+---
+
+# V1 — Enhance Quality & Personalization
+
 ## EPIC 7 — Generic Interview Question Generator
 
 **Goal:** Prepare users for interviews immediately.
@@ -313,20 +322,11 @@ Completes the full application workflow.
 
 Plug-and-play interview preparation.
 
-### Reason in MVP
+### Reason in V1
 
 Completes the “prepare → apply → interview” cycle.
 
 ---
-
-# ✔ MVP Completion
-
-At this point the user can:
-**→ understand themselves → analyze a job → generate application materials**
-
----
-
-# V1 — Enhance Quality & Personalization
 
 ## EPIC 8 — Expanded Personal Profile (Communication & Psychological)
 

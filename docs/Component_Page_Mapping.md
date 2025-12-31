@@ -1,7 +1,7 @@
 # COMPONENT → PAGE MAPPING (MVP → V1)
 
-**Last Updated:** 2025-12-30  
-**Status:** Reflects actual implementation as of EPIC 5A completion
+**Last Updated:** 2025-12-31  
+**Status:** Reflects actual implementation as of EPIC 5B completion
 
 **Complete mapping of:**
 
@@ -23,7 +23,7 @@ Each page includes:
 
 ## 📋 DOCUMENT STATUS
 
-**✅ Implemented (6 EPICs - 60% Complete):**
+**✅ Implemented (7 EPICs - 70% Complete):**
 
 - EPIC 1A: User Data Intake & Identity
 - EPIC 1B: Personal Canvas Generation
@@ -31,11 +31,11 @@ Each page includes:
 - EPIC 3: Generic CV Generator
 - EPIC 3B: CV Header & Contact Info
 - EPIC 5A: Job Description Analysis
+- EPIC 5B: Company Analysis & Canvas
 
-**❌ Not Implemented (4 EPICs - 40% Remaining):**
+**❌ Not Implemented (3 EPICs - 30% Remaining):**
 
 - EPIC 4: User Speech Builder
-- EPIC 5B: Company Analysis
 - EPIC 5C: User-Job-Company Matching
 - EPIC 6: Tailored Application Materials
 - EPIC 7: Interview Prep
@@ -647,22 +647,27 @@ Each page includes:
 ### Components
 
 - `TagInput` - list field editing (responsibilities, skills, behaviours, etc.)
+- `CompanySelector` - dropdown for job-company linking
+- `LinkedCompanyBadge` - display linked company with navigation
 
 ### Composables
 
 - `useJobAnalysis()` - CRUD and reanalysis
+- `useCompany()` - fetch companies for linking
 - `useBreadcrumbMapping()` - dynamic breadcrumb
 
 ### CDM Entities
 
 - **JobDescription** (read, update, reanalyse)
+- **Company** (read for linking)
 
 ### AI Ops
 
 - `ai.parseJobDescription` - reanalyse from rawText
+- `ai.analyzeCompanyInfo` - automatic extraction on job upload
 
 **Status:** ✅ Implemented  
-**Pattern:** Tabbed editor with dirty tracking, save/cancel, and reanalyse modal
+**Pattern:** Tabbed editor with dirty tracking, save/cancel, reanalyse modal, and company linking
 
 **Fields:**
 
@@ -671,22 +676,25 @@ Each page includes:
 
 ---
 
-## **3.4 Company List** ❌
+## **3.4 Company List** ✅
 
-**Route:** `/companies` (planned)
+**Route:** `/companies`
 
 ### UI
 
 - `<UPage>`, `<UPageHeader>`, `<UPageBody>`
-- `<UTable>` or `<UPageGrid>`
+- `<UPageGrid>`, `<UCard>`
+- `<UInput>` (search)
+- `<UModal>` (delete confirmation)
 
 ### Components
 
-- Company Card Component (planned)
+- `CompanyCard` - company display with ItemCard pattern
 
 ### Composables
 
-- `useCompany()` (exists but not used)
+- `useCompany()` - company CRUD, search
+- `useAuthUser()` - get userId
 
 ### CDM Entities
 
@@ -696,68 +704,79 @@ Each page includes:
 
 - None
 
-**Status:** ❌ Not Implemented  
-**Blocking:** EPIC 5B not started
+**Status:** ✅ Implemented  
+**Pattern:** Grid layout with search, empty state, delete confirmation modal
 
 ---
 
-## **3.5 Company Info Editor** ❌
+## **3.5 Company Info & Canvas Editor** ✅
 
-**Route:** `/companies/new`, `/companies/[id]` (planned)
+**Route:** `/companies/new`, `/companies/[companyId]`
 
 ### UI
 
-- `<UForm>`
-- `<UTextarea>`
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UForm>`, `<UFormGroup>`
+- `<UInput>`, `<UTextarea>`, `<UButton>`
+- `<UBadge>` (status indicators)
+- Grid layout for Business Model Canvas (9 blocks)
 
 ### Components
 
-- Company Intake Component (planned)
+- `CompanyForm` - company info form (name, industry, size, website, etc.)
+- `CompanyNotesInput` - research notes textarea
+- `CompanyCanvasEditor` - Business Model Canvas grid layout
+- `CanvasBlockSection` - individual BMC block editor with tag input
+- Related Jobs grid (on detail page)
 
 ### Composables
 
-- `useCompany()` (exists)
+- `useCompany()` - company CRUD, AI analysis
+- `useCompanyCanvas()` - canvas generation/editing
+- `useCompanyJobs()` - fetch linked jobs
+- `useAuthUser()` - get userId
 
 ### CDM Entities
 
 - **Company** (create/update)
+- **CompanyCanvas** (create/read/update)
+- **JobDescription[]** (read linked jobs)
 
 ### AI Ops
 
-- `ai.analyzeCompanyInfo` (not implemented)
+- `ai.analyzeCompanyInfo` ✅
+- `ai.generateCompanyCanvas` ✅
 
-**Status:** ❌ Not Implemented  
-**Blocking:** EPIC 5B - AI operation missing
+**Status:** ✅ Implemented  
+**Pattern:** Combined page with company form, Business Model Canvas editor, and related jobs section
 
----
+**Features:**
 
-## **3.6 Company Business Model Canvas** ❌
+- Create company with optional AI analysis
+- Edit company info fields (name, industry, sizeRange, website, productsServices, targetMarkets, customerSegments, description, additionalNotes)
+- AI-powered analysis from research notes (only shown for new/unanalyzed companies)
+- Generate Business Model Canvas from company profile (only shown when no canvas exists)
+- Edit canvas blocks with tag-based input:
+  - 9 BMC blocks: keyPartners, keyActivities, keyResources, valuePropositions, customerRelationships, channels, customerSegments, costStructure, revenueStreams
+  - Summary field
+- View all jobs linked to this company
+- Dynamic breadcrumb with company name
+- Automatic company extraction from job descriptions
+- Smart company deduplication with name normalization
 
-**Route:** `/companies/[id]/canvas` (planned)
+**Canvas Layout:**
 
-### UI
-
-- `<UDraggable>`
-- `<UCard>`
-
-### Components
-
-- Company Canvas Component (planned - could reuse PersonalCanvasComponent pattern)
-
-### Composables
-
-- `useCanvasEngine()` (could be extended for company canvas)
-
-### CDM Entities
-
-- **CompanyCanvas** (CRUD)
-
-### AI Ops
-
-- `ai.generateCompanyCanvas` (not implemented)
-
-**Status:** ❌ Not Implemented  
-**Blocking:** EPIC 5B - AI operation and UI missing
+- 5-column top section:
+  - Col 1: Key Partners
+  - Col 2: Key Activities (top), Key Resources (bottom)
+  - Col 3: Value Propositions
+  - Col 4: Customer Relationships (top), Channels (bottom)
+  - Col 5: Customer Segments
+- 2-column bottom section:
+  - Col 1: Cost Structure
+  - Col 2: Revenue Streams
+- Summary field below canvas
+- Save canvas button in card footer
 
 ---
 
@@ -1058,7 +1077,7 @@ Each page includes:
 
 # 8. IMPLEMENTATION SUMMARY
 
-## 8.1 Implemented Pages (18 Routes)
+## 8.1 Implemented Pages (21 Routes)
 
 | Page                   | Route                                                 | Status | EPIC |
 | ---------------------- | ----------------------------------------------------- | ------ | ---- |
@@ -1080,14 +1099,14 @@ Each page includes:
 | Job List               | `/jobs`                                               | ✅     | 5A   |
 | Job Upload             | `/jobs/new`                                           | ✅     | 5A   |
 | Job Detail             | `/jobs/[jobId]`                                       | ✅     | 5A   |
+| Company List           | `/companies`                                          | ✅     | 5B   |
+| Company New            | `/companies/new`                                      | ✅     | 5B   |
+| Company Detail         | `/companies/[companyId]`                              | ✅     | 5B   |
 
-## 8.2 Planned Pages (12 Routes)
+## 8.2 Planned Pages (9 Routes)
 
 | Page                | Route                               | Status | EPIC | Blocker               |
 | ------------------- | ----------------------------------- | ------ | ---- | --------------------- |
-| Company List        | `/companies`                        | ❌     | 5B   | AI operation missing  |
-| Company Editor      | `/companies/:id`                    | ❌     | 5B   | AI operation missing  |
-| Company Canvas      | `/companies/:id/canvas`             | ❌     | 5B   | AI operation missing  |
 | Matching Summary    | `/jobs/:jobId/match`                | ❌     | 5C   | AI operation missing  |
 | Tailored CV         | `/applications/:jobId/cv`           | ❌     | 6    | AI operation missing  |
 | Cover Letter        | `/applications/:jobId/cover-letter` | ❌     | 6    | AI operation missing  |
@@ -1098,7 +1117,7 @@ Each page includes:
 | Interview Simulator | `/interviews/:jobId/simulate`       | ❌     | 7    | AI operations missing |
 | Settings            | `/settings`                         | ❌     | -    | Low priority          |
 
-## 8.3 Implemented Components (13 Core + 9 CV + 2 Job)
+## 8.3 Implemented Components (20 Core + 7 Company + 9 CV + 2 Job)
 
 **Core Components (Domain):**
 

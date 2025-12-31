@@ -205,7 +205,6 @@ _(EPIC 5B)_
 
 - canvasId
 - companyId (FK)
-- companyName
 - customerSegments (list)
 - valuePropositions (list)
 - channels (list)
@@ -215,14 +214,15 @@ _(EPIC 5B)_
 - keyActivities (list)
 - keyPartners (list)
 - costStructure (list)
-- sourceOperation
-- lastGeneratedAt
-- needsUpdate (boolean)
+- summary
+- lastUpdatedAt
 
 **Relationships:**
 
 - 1 CompanyCanvas → 1 Company
 - 1 CompanyCanvas is produced/refreshed by `ai.generateCompanyCanvas`
+
+**Note:** Follows Business Model Canvas structure with 9 canonical blocks
 
 ---
 

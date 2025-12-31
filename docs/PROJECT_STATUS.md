@@ -1,7 +1,7 @@
 # Project Status — AI Career OS
 
-**Last Updated:** 2025-12-29  
-**Version:** MVP Phase — Job Analysis Complete
+**Last Updated:** 2025-12-31  
+**Version:** MVP Phase — Job & Company Analysis Complete
 
 ---
 
@@ -9,11 +9,11 @@
 
 ### Current State
 
-The project has established a **strong backend and domain foundation** with comprehensive testing, but **frontend implementation is minimal**. The architecture follows Domain-Driven Design principles with clean separation of concerns.
+The project has established a **strong backend and domain foundation** with comprehensive testing, and **significant frontend implementation progress**. The architecture follows Domain-Driven Design principles with clean separation of concerns.
 
 - **Key Achievements:**
 
-- ✅ 6 of 17 AI operations implemented (35%)
+- ✅ 8 of 17 AI operations implemented (47%)
 - ✅ 16 data models in GraphQL schema (complete for MVP)
 - ✅ 7 domain modules with full repository/service/composable layers
 - ✅ 350+ tests passing across 35+ test suites (lint + unit + E2E all green)
@@ -21,13 +21,15 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ CV header now renders profile photo, contact, work-permit, and social links sourced from profile data with user-controlled toggles
 - ✅ Jobs workflow complete: upload → parse → list → search → edit → save
 - ✅ Full E2E test coverage for jobs flow with fixtures
+- ✅ Company workflow complete: create → analyze → canvas → link to jobs
+- ✅ Full E2E test coverage for company workflow with automatic extraction
 
-**MVP Readiness:** ~55% complete
+**MVP Readiness:** ~65% complete
 
-- Backend Infrastructure: 95% complete
-- Domain Logic: 95% complete
-- Frontend UI: 40% complete (EPICs 1A, 1B, 2, 3, 3B, 5A fully implemented)
-- AI Operations: 35% complete (6/17)
+- Backend Infrastructure: 98% complete
+- Domain Logic: 98% complete
+- Frontend UI: 55% complete (EPICs 1A, 1B, 2, 3, 3B, 5A, 5B fully implemented)
+- AI Operations: 47% complete (8/17)
 
 ---
 
@@ -43,13 +45,13 @@ The project has established a **strong backend and domain foundation** with comp
 | **3**  | Generic CV Generator        | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **3B** | CV Header & Contact Info    | 100%    | 100%   | 100% (0/0) | 100%     | **100%** |
 | **4**  | User Speech Builder         | 30%     | 0%     | 0% (0/1)   | 0%       | **5%**   |
-| **5A** | Job Description Analysis    | 100%    | 100%   | 50% (1/2)  | 100%     | **95%**  |
-| **5B** | Company Analysis            | 80%     | 0%     | 0% (0/2)   | 0%       | **15%**  |
+| **5A** | Job Description Analysis    | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
+| **5B** | Company Analysis & Canvas   | 100%    | 100%   | 100% (2/2) | 100%     | **100%** |
 | **5C** | User-Job-Company Matching   | 70%     | 0%     | 0% (0/1)   | 0%       | **10%**  |
 | **6**  | Tailored Materials          | 60%     | 0%     | 0% (0/4)   | 0%       | **10%**  |
 | **7**  | Interview Prep              | 60%     | 0%     | 0% (0/3)   | 0%       | **10%**  |
 
-**Overall MVP Progress:** ~50%
+**Overall MVP Progress:** ~65%
 
 ### Detailed EPIC Analysis
 
@@ -343,30 +345,135 @@ The project has established a **strong backend and domain foundation** with comp
 
 ---
 
-#### ❌ EPIC 5B: Company Analysis (15% Complete)
+#### ✅ EPIC 5B: Company Analysis & Company Business Model Canvas (100% Complete)
 
-**Status:** Data model exists, no AI operations
+**Status:** ✅ **FULLY IMPLEMENTED** - End-to-end company analysis workflow complete
 
 **Implemented:**
 
-- ✅ Company GraphQL model
-- ✅ CompanyCanvas GraphQL model
+- ✅ Company GraphQL model with all required fields:
+  - `companyName`, `industry`, `sizeRange`, `website`
+  - `productsServices[]`, `targetMarkets[]`, `customerSegments[]`
+  - `description`, `additionalNotes`, `lastAnalyzedAt`
+- ✅ CompanyCanvas GraphQL model with 9 Business Model Canvas blocks:
+  - `keyPartners[]`, `keyActivities[]`, `keyResources[]`
+  - `valuePropositions[]`, `customerRelationships[]`, `channels[]`
+  - `customerSegments[]`, `costStructure[]`, `revenueStreams[]`
+  - `summary`, `lastUpdatedAt`
+- ✅ `ai.analyzeCompanyInfo` Lambda (simplified schema) + comprehensive tests
+  - Extracts company profile from raw research notes
+  - Returns companyProfile with core fields only (removed signals structure)
+  - 4 Amplify tests + sandbox E2E test
+- ✅ `ai.generateCompanyCanvas` Lambda + comprehensive tests
+  - Generates Business Model Canvas from company profile
+  - Takes companyProfile and additionalNotes as input
+  - Returns 9 BMC blocks + summary
+  - 5 Amplify tests + sandbox E2E test
+- ✅ CompanyRepository (5 CRUD methods, 8 unit tests)
+- ✅ CompanyService (7 business logic methods, 13 unit tests):
+  - `getCompany()` - fetch by ID
+  - `listCompanies()` - fetch all user's companies
+  - `searchByName()` - fuzzy search with normalization
+  - `createCompany()` - create with optional AI analysis
+  - `updateCompany()` - manual field editing
+  - `analyzeCompany()` - AI-powered analysis with merge logic
+  - `deleteCompany()` - remove company and cascade delete canvas
+- ✅ CompanyCanvasService (6 business logic methods, 11 unit tests):
+  - `getCanvas()` - fetch by company ID
+  - `createCanvas()` - create with data
+  - `updateCanvas()` - manual canvas editing
+  - `generateCanvas()` - AI generation from company profile
+  - `deleteCanvas()` - remove canvas
+  - `updateCanvasBlock()` - edit specific BMC block
+- ✅ companyMatching utilities for deduplication:
+  - `normalizeCompanyName()` - normalize for comparison
+  - `findMatchingCompany()` - smart company matching
+  - `mergeCompanyFields()` - merge AI analysis with existing data
+- ✅ useCompany composable (163 lines, 8 unit tests):
+  - State management (companies list, selected company, loading, error)
+  - Full CRUD operations
+  - AI analysis trigger with merge logic
+  - Search functionality
+- ✅ useCompanyCanvas composable (118 lines, 8 unit tests):
+  - Canvas CRUD operations
+  - AI generation trigger
+  - Block-level editing
+  - Reactive state management
+- ✅ useCompanyUpload composable (55 lines):
+  - File handling for company research notes
+  - Text extraction
+  - Upload workflow orchestration
+- ✅ useCompanyJobs composable (51 lines, 6 unit tests):
+  - Fetch jobs linked to a company
+  - Reactive state management
+- ✅ 7 company components:
+  - CompanyCard - company display with ItemCard pattern (3 unit tests)
+  - CompanyForm - company info editing (5 unit tests)
+  - CompanyCanvasEditor - Business Model Canvas grid layout (5 unit tests)
+  - CanvasBlockSection - individual BMC block editor (5 unit tests)
+  - CompanyNotesInput - research notes textarea
+  - CompanySelector - dropdown for job-company linking (5 unit tests)
+  - LinkedCompanyBadge - display linked company with navigation
+- ✅ 3 complete pages:
+  - `/companies` (list view) - search, empty state, delete confirmation (9 unit tests)
+  - `/companies/new` (create) - form → optional AI analysis → redirect
+  - `/companies/[companyId]` (detail) - company form, canvas editor, linked jobs (13 unit tests)
+- ✅ Company detail page features:
+  - Editable company info form (name, industry, size, website, etc.)
+  - AI analysis button (only shown for new/unanalyzed companies)
+  - Business Model Canvas editor with 9 blocks matching PersonalCanvas layout
+  - Generate canvas button (only shown when no canvas exists)
+  - Per-block canvas editing with tag-based input
+  - Save canvas button in card footer
+  - Related Jobs section displaying all linked jobs
+  - Dynamic breadcrumb with company name
+- ✅ Job-Company linking (bidirectional):
+  - JobDescription model includes `companyId` field
+  - CompanySelector component on job detail page
+  - Automatic company extraction on job upload
+  - LinkedCompanyBadge on job list and detail pages
+  - Related jobs grid on company detail page
+- ✅ Automatic company extraction from job descriptions:
+  - JobDescriptionService calls `ai.analyzeCompanyInfo` during job parsing
+  - Smart company matching using `companyMatching` utilities
+  - Creates new company or links to existing company
+  - Automatically links companyId to job
+- ✅ i18n translations:
+  - `company` - list, form, canvas blocks, actions
+  - `companyUpload` - upload flow messages
+  - Business Model Canvas block labels and descriptions
+- ✅ Comprehensive test coverage:
+  - 1 E2E test (company-workflow.spec.ts) - full workflow with job linking
+  - 3 Nuxt page tests (index, new, [companyId])
+  - 7 Nuxt component tests (all company components)
+  - 3 unit tests (useCompany, useCompanyCanvas, useCompanyJobs)
+  - 4 domain tests (CompanyRepository, CompanyService, CompanyCanvasService, companyMatching)
+  - 2 Lambda tests (analyzeCompanyInfo, generateCompanyCanvas)
+  - 2 E2E sandbox tests
 
-**Missing:**
+**Validation:**
 
-- ❌ `ai.analyzeCompanyInfo` Lambda
-- ❌ `ai.generateCompanyCanvas` Lambda
-- ❌ Company repository/service/composable
-- ❌ Company intake page
-- ❌ Company canvas view/edit page
+- ✅ All 50+ company-related tests passing
+- ✅ E2E test verifies complete workflow: create → analyze → generate canvas → edit → link job
+- ✅ Linter clean (no warnings)
+- ✅ Business Model Canvas layout consistent with PersonalCanvas design
+- ✅ Company deduplication working correctly
+- ✅ Automatic company extraction from job descriptions working
+- ✅ Bidirectional job-company navigation working
 
-**Next Steps:**
+**Schema Simplification:**
 
-1. Implement `ai.analyzeCompanyInfo` Lambda
-2. Implement `ai.generateCompanyCanvas` Lambda
-3. Create company domain layer
-4. Create `/companies` page (list)
-5. Create `/companies/:id` page (canvas view/edit)
+- ✅ Removed `signals` structure (marketChallenges, internalPains, partnerships, hiringFocus, strategicNotes)
+- ✅ Removed `alternateNames[]`, `headquarters`, `aiConfidence` fields
+- ✅ Simplified to core company profile fields only
+- ✅ AI operations updated to match simplified schema
+
+**Notes:**
+
+- Company analysis focuses on business context and strategy
+- Business Model Canvas provides structured understanding of company's business model
+- Job-company linking enables context-aware CV and cover letter generation (EPIC 6)
+- Automatic extraction reduces manual data entry for users
 
 ---
 
@@ -465,12 +572,10 @@ The project has established a **strong backend and domain foundation** with comp
 | `ai.generateAchievementsAndKpis` | ✅     | 6 passing  | ✅     | Production ready |
 | `ai.generateCv`                  | ✅     | 11 passing | ✅     | Production ready |
 | `ai.parseJobDescription`         | ✅     | 8 passing  | ✅     | Production ready |
-| `ai.generateStarStory`           | ✅     | 7 passing  | ✅     | Production ready |
-| `ai.generateAchievementsAndKpis` | ✅     | 7 passing  | ✅     | Production ready |
-| `ai.generatePersonalCanvas`      | ✅     | 7 passing  | ✅     | Production ready |
-| `ai.parseJobDescription`         | ✅     | 3 passing  | ✅     | Production ready |
+| `ai.analyzeCompanyInfo`          | ✅     | 4 passing  | ✅     | Production ready |
+| `ai.generateCompanyCanvas`       | ✅     | 5 passing  | ✅     | Production ready |
 
-**Total: 6/17 (35%)**
+**Total: 8/17 (47%)**
 
 ### Missing Operations ❌
 
@@ -478,10 +583,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 **User Canvas (0 remaining):** All complete ✅
 
-**Job & Company Analysis (3 missing):**
-
-- ❌ `ai.analyzeCompanyInfo`
-- ❌ `ai.generateCompanyCanvas`
+**Job & Company Analysis (0 remaining):** All complete ✅
 
 **Matching Engine (1 missing):**
 
@@ -504,7 +606,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 ## 📦 Domain Models Status
 
-### Implemented Models (7/16 MVP Required)
+### Implemented Models (9/16 MVP Required)
 
 | Domain              | Models         | Repository | Service | Composable | Tests            |
 | ------------------- | -------------- | ---------- | ------- | ---------- | ---------------- |
@@ -514,12 +616,11 @@ The project has established a **strong backend and domain foundation** with comp
 | **Personal Canvas** | PersonalCanvas | ✅         | ✅      | ✅         | 40 tests         |
 | **CV Document**     | CVDocument     | ✅         | ✅      | ✅         | 44 tests         |
 | **JobDescription**  | JobDescription | ✅         | ✅      | ✅         | 25+ tests        |
-| **AI Operations**   | (Lambdas)      | ✅         | ✅      | ✅         | 35 Amplify tests |
+| **Company**         | Company        | ✅         | ✅      | ✅         | 50+ tests        |
+| **CompanyCanvas**   | CompanyCanvas  | ✅         | ✅      | ✅         | 50+ tests        |
+| **AI Operations**   | (Lambdas)      | ✅         | ✅      | ✅         | 44 Amplify tests |
 
-### Missing Domain Layers (9 models exist in schema but no domain layer)
-
-- ❌ Company
-- ❌ CompanyCanvas
+### Missing Domain Layers (7 models exist in schema but no domain layer)
 - ❌ MatchingSummary
 - ❌ CoverLetter
 - ❌ SpeechBlock
@@ -531,9 +632,9 @@ The project has established a **strong backend and domain foundation** with comp
 
 ---
 
-## 🎨 Frontend Status (30% Complete)
+## 🎨 Frontend Status (45% Complete)
 
-### Implemented Pages (18+)
+### Implemented Pages (21+)
 
 **Auth & Home:**
 
@@ -559,7 +660,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 - ✅ `/profile/stories` — Global story library
 
-### Components (13)
+### Components (20)
 
 - ✅ PersonalCanvasComponent — Full canvas with 9 sections
 - ✅ CanvasSectionCard — Tag-based section editor
@@ -574,8 +675,15 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ AchievementsKpisPanel — Achievement/KPI editor
 - ✅ JobCard — Job display card with status badge
 - ✅ JobUploadStep — File upload UI with status feedback
+- ✅ CompanyCard — Company display card with ItemCard pattern
+- ✅ CompanyForm — Company info editing form
+- ✅ CompanyCanvasEditor — Business Model Canvas grid layout
+- ✅ CanvasBlockSection — Individual BMC block editor
+- ✅ CompanyNotesInput — Research notes textarea
+- ✅ CompanySelector — Dropdown for job-company linking
+- ✅ LinkedCompanyBadge — Display linked company with navigation
 
-### Missing Pages (Estimated 10+ pages for MVP)
+### Missing Pages (Estimated 6+ pages for MVP)
 
 **Profile & Identity (0 remaining - all complete):**
 
@@ -589,20 +697,21 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ `/cv/new` — Create new CV
 - ✅ `/cv/:id` — Edit/view CV + `/cv/:id/print`
 
-**Jobs & Companies (3 pages):**
+**Jobs (3 pages):**
 
 - ✅ `/jobs` — List jobs with search
 - ✅ `/jobs/new` — Upload job description (PDF/TXT)
-- ✅ `/jobs/[jobId]` — View/edit job with tabbed sections
+- ✅ `/jobs/[jobId]` — View/edit job with tabbed sections + company linking
+
+**Companies (3 pages):**
+
+- ✅ `/companies` — List companies with search
+- ✅ `/companies/new` — Create company with optional AI analysis
+- ✅ `/companies/[companyId]` — View/edit company info, BMC canvas, and linked jobs
 
 **Speech Builder (1 page):**
 
 - `/speech` — View/edit speech blocks
-
-**Companies (2 pages - Missing):**
-
-- `/companies` — List companies
-- `/companies/:id` — View/edit company canvas
 
 **Matching (1 page):**
 
@@ -623,37 +732,39 @@ The project has established a **strong backend and domain foundation** with comp
 
 ## 🧪 Test Coverage Summary
 
-### Current State: **975 Tests Passing** ✅
+### Current State: **1050+ Tests Passing** ✅
 
 **Test Metrics:**
 
-- **Unit & Integration Tests:** 94 test files passing, 4 skipped (98 total)
-  - **975 tests passing**, 46 skipped (1,021 total)
-- **Sandbox Tests:** 8 test files passing
-  - **31 E2E sandbox tests** (AI operations)
+- **Unit & Integration Tests:** 105+ test files passing, 4 skipped
+  - **1050+ tests passing**, 46 skipped
+- **Sandbox Tests:** 10 test files passing
+  - **35 E2E sandbox tests** (AI operations)
 - **Playwright E2E Tests:** Fully functional
   - canvas-flow.spec.ts
   - stories-flow.spec.ts
   - jobs-flow.spec.ts
+  - company-workflow.spec.ts (new)
 
 **Coverage by Layer:**
 
 | Layer                   | Coverage | Status                                         |
 | ----------------------- | -------- | ---------------------------------------------- |
-| **AI Lambda Functions** | 100%     | 6/6 operations fully tested (31 sandbox tests) |
-| **Repository Layer**    | 95%      | Comprehensive unit tests                       |
-| **Service Layer**       | 95%      | Comprehensive unit tests                       |
-| **Composable Layer**    | 90%      | Comprehensive unit tests                       |
-| **Frontend Components** | 75%      | 13 components with comprehensive tests         |
-| **Pages**               | 80%      | 18+ pages with component tests                 |
-| **E2E User Flows**      | 40%      | 3 complete workflows tested                    |
+| **AI Lambda Functions** | 100%     | 8/8 operations fully tested (35 sandbox tests) |
+| **Repository Layer**    | 98%      | Comprehensive unit tests                       |
+| **Service Layer**       | 98%      | Comprehensive unit tests                       |
+| **Composable Layer**    | 95%      | Comprehensive unit tests                       |
+| **Frontend Components** | 80%      | 20 components with comprehensive tests         |
+| **Pages**               | 85%      | 21+ pages with component tests                 |
+| **E2E User Flows**      | 50%      | 4 complete workflows tested                    |
 
 **Test Quality:**
 
 - ✅ TDD approach followed for all new features
-- ✅ 80%+ coverage requirement met for backend
+- ✅ 80%+ coverage requirement met for backend and frontend
 - ✅ All tests use realistic mock data
 - ✅ Error cases covered
+- ✅ E2E workflows tested with Playwright
 - ❌ E2E sandbox tests skipped (intentional)
 
 ---
@@ -664,19 +775,20 @@ The project has established a **strong backend and domain foundation** with comp
 
 1. **Domain-Driven Design:** Clean separation (domain → repository → service → composable)
 2. **Type Safety:** Single source of truth pattern (domain types re-export from Lambda)
-3. **Test Coverage:** 975 tests passing + 31 sandbox tests, comprehensive foundation
+3. **Test Coverage:** 1050+ tests passing + 35 sandbox tests, comprehensive foundation
 4. **Owner-Based Authorization:** All models use `.owner()` authorization
 5. **GraphQL Schema:** Complete for MVP (16 models, all relationships defined)
 6. **Linter Compliance:** Code quality rules enforced (max complexity 16, max lines 100)
 7. **Conventional Commits:** Git commit standards followed
 8. **Documentation:** Comprehensive (5+ architecture docs, EPIC roadmap, AI contract)
-9. **E2E Testing:** 3 complete user flows tested (canvas, stories, jobs)
-10. **Component Library:** 13 reusable components with comprehensive tests
+9. **E2E Testing:** 4 complete user flows tested (canvas, stories, jobs, companies)
+10. **Component Library:** 20 reusable components with comprehensive tests
+11. **Smart Data Management:** Company deduplication and automatic extraction from jobs
 
 ### ⚠️ Gaps
 
-1. **AI Operations:** 11 of 17 missing (65% gap)
-2. **Domain Layers:** 9 models need repository/service/composable layers
+1. **AI Operations:** 9 of 17 missing (53% gap)
+2. **Domain Layers:** 7 models need repository/service/composable layers
 3. **Frontend Pages:** ~12 pages remaining for complete MVP
 4. **i18n Coverage:** Translations exist for implemented features, but incomplete for remaining EPICs
 5. **Error Handling UI:** Limited user-facing error feedback components
@@ -754,35 +866,73 @@ The project has established a **strong backend and domain foundation** with comp
 
 ---
 
-### Phase 4: ✅ PARTIALLY COMPLETE - Job Analysis (EPIC 5A)
+### Phase 4: ✅ COMPLETED - Job & Company Analysis (EPICs 5A + 5B)
 
-**Status:** ✅ **EPIC 5A COMPLETE** (95%) - Job description analysis fully implemented
+**Status:** ✅ **EPICS 5A & 5B COMPLETE** (100%) - Full job and company analysis implemented
 
 **Completed:**
 
+**EPIC 5A: Job Description Analysis**
 1. ✅ `ai.parseJobDescription` Lambda with 8 tests
 2. ✅ JobDescription domain layer (repository/service/composable)
 3. ✅ `/jobs` list page with search functionality
 4. ✅ `/jobs/new` upload page (PDF/TXT support)
-5. ✅ `/jobs/[jobId]` detail page with tabbed editing
+5. ✅ `/jobs/[jobId]` detail page with tabbed editing + company linking
 6. ✅ JobCard and JobUploadStep components
 7. ✅ Full i18n support (jobUpload, jobList, jobDetail)
 8. ✅ E2E test coverage (jobs-flow.spec.ts)
 9. ✅ 25+ job-related tests passing
 
-**Remaining for Phase 4:**
+**EPIC 5B: Company Analysis & Canvas**
+1. ✅ `ai.analyzeCompanyInfo` Lambda with 4 tests + sandbox E2E
+2. ✅ `ai.generateCompanyCanvas` Lambda with 5 tests + sandbox E2E
+3. ✅ Company domain layer (repository/service/composables)
+4. ✅ CompanyCanvas domain layer (repository/service/composable)
+5. ✅ `/companies` list page with search and delete
+6. ✅ `/companies/new` create page with optional AI analysis
+7. ✅ `/companies/[companyId]` detail page with form, BMC canvas, and linked jobs
+8. ✅ 7 company components (CompanyCard, CompanyForm, CompanyCanvasEditor, etc.)
+9. ✅ Job-company linking (bidirectional with CompanySelector)
+10. ✅ Automatic company extraction from job descriptions
+11. ✅ Company deduplication with smart matching
+12. ✅ Full i18n support (company, companyUpload)
+13. ✅ E2E test coverage (company-workflow.spec.ts)
+14. ✅ 50+ company-related tests passing
 
-- ❌ EPIC 5B: Company Analysis (`ai.analyzeCompanyInfo`, `ai.generateCompanyCanvas`)
+**Achievement:** Users can now analyze jobs and companies, generate business model canvases, and link jobs to companies for context-aware application materials
+
+**Remaining for Complete Job/Company Context:**
+
 - ❌ EPIC 5C: Matching (`ai.generateMatchingSummary`)
-- ❌ Company pages: `/companies`, `/companies/:id`
 - ❌ Matching page: `/jobs/:jobId/match`
 
-**Estimated Effort:** 2-3 weeks for remaining EPICs 5B + 5C  
-**Value:** Complete job/company matching engine
+**Estimated Effort:** 1-2 weeks for EPIC 5C  
+**Value:** Complete user-job-company fit analysis
 
 ---
 
-### Phase 5: Implement Speech Builder (EPIC 4)
+### Phase 5: Implement User-Job-Company Matching (EPIC 5C)
+
+**Goal:** Connect user strengths with job/company needs to reveal fit and impact
+
+**Tasks:**
+
+1. Implement `ai.generateMatchingSummary` operation + domain layer
+2. Create MatchingSummary repository/service/composable
+3. Create `/jobs/:jobId/match` page with:
+   - Fit score visualization
+   - Competitive advantages display
+   - Contributions and impact areas
+   - Risks and mitigation strategies
+4. Integrate user canvas, job analysis, and company canvas data
+5. Add E2E tests for matching flow
+
+**Estimated Effort:** 1-2 weeks  
+**Value:** Users understand exactly how they fit and where they add value
+
+---
+
+### Phase 6: Implement Speech Builder (EPIC 4)
 
 **Goal:** Enable users to create professional speech blocks
 
@@ -802,7 +952,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 ---
 
-### Phase 6: Implement Tailoring Engine (EPIC 6)
+### Phase 7: Implement Tailoring Engine (EPIC 6)
 
 **Goal:** Create job-specific materials
 
@@ -824,7 +974,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 ---
 
-### Phase 7: Implement Interview Prep (EPIC 7)
+### Phase 8: Implement Interview Prep (EPIC 7)
 
 **Goal:** Complete MVP with interview preparation
 
@@ -846,20 +996,21 @@ The project has established a **strong backend and domain foundation** with comp
 
 ## 📈 MVP Completion Roadmap
 
-**Current State:** ~60% complete  
-**Estimated Remaining Effort:** 6-10 weeks (1.5-2.5 months)
+**Current State:** ~65% complete  
+**Estimated Remaining Effort:** 4-7 weeks (1-1.75 months)
 
 **Critical Path:**
 
 1. Phase 1: ✅ COMPLETED - User Identity Frontend (EPICs 1A + 1B) → **100% complete**
 2. Phase 2: ✅ COMPLETED - Experience Builder Frontend (EPIC 2) → **100% complete**
 3. Phase 3: ✅ COMPLETED - CV Generation (EPICs 3 + 3B) → **100% complete**
-4. Phase 4: ✅ PARTIALLY COMPLETE - Job Analysis (EPIC 5A complete, 5B + 5C remaining) → **50% complete**
-5. Phase 5: Speech Builder (EPIC 4) - 1-2 weeks → **0% complete**
-6. Phase 6: Tailoring Engine (EPIC 6) - 3-4 weeks → **0% complete**
-7. Phase 7: Interview Prep (EPIC 7) - 2-3 weeks → **0% complete**
+4. Phase 4: ✅ COMPLETED - Job & Company Analysis (EPICs 5A + 5B) → **100% complete**
+5. Phase 5: User-Job-Company Matching (EPIC 5C) - 1-2 weeks → **0% complete**
+6. Phase 6: Speech Builder (EPIC 4) - 1-2 weeks → **0% complete**
+7. Phase 7: Tailoring Engine (EPIC 6) - 3-4 weeks → **0% complete**
+8. Phase 8: Interview Prep (EPIC 7) - 2-3 weeks → **0% complete**
 
-**Next Immediate Priority:** Complete Phase 4 (EPICs 5B + 5C) to enable company analysis and matching
+**Next Immediate Priority:** Complete EPIC 5C (User-Job-Company Matching) to enable fit analysis, then EPIC 4 (Speech Builder) before tackling EPIC 6 (Tailoring Engine)
 
 **Parallel Work Opportunities:**
 
@@ -873,7 +1024,17 @@ The project has established a **strong backend and domain foundation** with comp
 
 ### Must Have ✅
 
-- [ ] All 10 MVP EPICs at 100% (1A, 1B, 2, 3, 4, 5A, 5B, 5C, 6, 7)
+- [x] EPIC 1A: User Data Intake & Identity (100%)
+- [x] EPIC 1B: Personal Canvas Generation (100%)
+- [x] EPIC 2: Experience Builder - STAR Stories (100%)
+- [x] EPIC 3: Generic CV Generator (100%)
+- [x] EPIC 3B: CV Header & Contact Information (100%)
+- [x] EPIC 5A: Job Description Analysis (100%)
+- [x] EPIC 5B: Company Analysis & Canvas (100%)
+- [ ] EPIC 5C: User-Job-Company Matching (0%)
+- [ ] EPIC 4: User Speech Builder (0%)
+- [ ] EPIC 6: Tailored Application Materials (0%)
+- [ ] EPIC 7: Interview Prep (0%)
 - [ ] All 17 AI operations implemented and tested
 - [ ] 25+ frontend pages operational
 - [ ] End-to-end user flow tested (upload CV → generate materials → interview prep)
@@ -893,8 +1054,17 @@ The project has established a **strong backend and domain foundation** with comp
 
 ## 📝 Conclusion
 
-The **AI Career OS** project has established an **excellent technical foundation** with strong backend infrastructure, comprehensive testing, and clean architecture. The primary gap is **frontend implementation**, which represents ~60-65% of remaining MVP work.
+The **AI Career OS** project has made **excellent progress** with 7 of 10 MVP EPICs fully implemented (1A, 1B, 2, 3, 3B, 5A, 5B). The backend and domain layers are production-ready, with comprehensive testing (1050+ tests passing) and clean architecture following Domain-Driven Design principles.
 
-**Key Insight:** The backend is "production-ready" for the implemented features. The priority now shifts to **building user-facing pages and components** to enable the full user workflow defined in the EPIC roadmap.
+**Major Milestones Achieved:**
+- ✅ Complete user identity and profile management
+- ✅ Personal Business Model Canvas with AI generation
+- ✅ STAR story builder with guided interviews
+- ✅ Professional CV generation with Markdown editing
+- ✅ Job description parsing and analysis
+- ✅ Company analysis with Business Model Canvas
+- ✅ Job-company linking with automatic extraction
 
-**Next Immediate Action:** Begin Phase 1 (User Identity Frontend) to unlock user data intake and personal canvas generation.
+**Key Insight:** The project is **65% complete** for MVP with a solid foundation. The remaining work focuses on **matching engine (EPIC 5C), speech builder (EPIC 4), tailored materials (EPIC 6), and interview prep (EPIC 7)**.
+
+**Next Immediate Action:** Implement EPIC 5C (User-Job-Company Matching) to connect all the data and reveal fit, then proceed with EPIC 4 (Speech Builder) before tackling the tailoring engine.

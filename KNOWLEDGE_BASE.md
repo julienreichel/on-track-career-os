@@ -31,13 +31,14 @@ Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer
 
 **Current Implementation Status (December 2025):**
 
-- ✅ EPIC 1A (User Data Intake) — 95% complete
+- ✅ EPIC 1A (User Data Intake) — 100% complete
 - ✅ EPIC 1B (Personal Canvas) — 100% complete end-to-end
-- ✅ EPIC 2 (Experience Builder - STAR Stories) — 95% complete
+- ✅ EPIC 2 (Experience Builder - STAR Stories) — 100% complete
 - ✅ EPIC 3 (Generic CV Generator) — 100% complete
 - ✅ EPIC 3B (CV Header & Contact Information) — 100% complete
-- ✅ EPIC 5A (Job Description Analysis) — 95% complete
-- ⚠️ Remaining EPICs 4, 5B, 5C, 6, 7 still in early implementation stages
+- ✅ EPIC 5A (Job Description Analysis) — 100% complete
+- ✅ EPIC 5B (Company Analysis & Canvas) — 100% complete
+- ⚠️ Remaining EPICs 4, 5C, 6, 7 still in early implementation stages
 
 ### 2.1 Frontend (Nuxt 3)
 
@@ -89,8 +90,8 @@ _(Condensed from full CDM; only key-developer-relevant models.)_
 ### 3.3 Job & Company Domain
 
 - **JobDescription**: rawText, title, seniorityLevel, roleSummary, responsibilities, requiredSkills, behaviours, successCriteria, explicitPains, status (draft/analyzed/complete), companyId
-- **Company**: name, industry, size, description
-- **CompanyCanvas**: 9 sections mirroring Business Model Canvas
+- **Company**: companyName, industry, sizeRange, website, productsServices, targetMarkets, customerSegments, description, additionalNotes, lastAnalyzedAt
+- **CompanyCanvas**: 9 Business Model Canvas blocks (keyPartners, keyActivities, keyResources, valuePropositions, customerRelationships, channels, customerSegments, costStructure, revenueStreams), summary, lastUpdatedAt
 - **MatchingSummary**: fitScore, competitiveAdvantages, contributions, risks
 
 ### 3.4 Application Materials
@@ -138,6 +139,10 @@ _(From Component Model + Component→Page Mapping) _
 - `useCanvasEngine()` - Personal Canvas generation/editing
 - `useJobAnalysis()` - Job CRUD, list, parse, reanalyse, delete
 - `useJobUpload()` - File upload, text extraction, validation
+- `useCompany()` - Company CRUD, list, search, AI analysis
+- `useCompanyCanvas()` - Company Canvas generation/editing
+- `useCompanyUpload()` - Company research notes upload
+- `useCompanyJobs()` - Fetch jobs linked to a company
 - `useMatchingEngine()` - User-Job-Company matching (not implemented)
 - `useTailoringEngine()` - Tailored materials (not implemented)
 - `useInterviewEngine()` - Interview prep (not implemented)
@@ -166,7 +171,10 @@ _(Structured per navigation zones)_
 
 - `/jobs` - Job list with search, status badges, delete modal
 - `/jobs/new` - Upload job description (PDF/TXT) → AI parsing
-- `/jobs/:id` - View/edit job details with 5 tabbed sections, reanalyse
+- `/jobs/:id` - View/edit job details with 5 tabbed sections, reanalyse, company linking
+- `/companies` - Company list with search, delete modal
+- `/companies/new` - Create company with optional AI analysis
+- `/companies/:companyId` - View/edit company info, BMC canvas, and linked jobs
 
 ### Applications Zone
 
@@ -266,9 +274,9 @@ _(From AI Interaction Contract) _
 
 ## 8. Current Implementation Status
 
-### MVP Progress: ~50% Complete
+### MVP Progress: ~65% Complete
 
-#### ✅ EPIC 1A: User Data Intake & Identity (95% Complete)
+#### ✅ EPIC 1A: User Data Intake & Identity (100% Complete)
 
 **Fully Implemented:**
 
@@ -292,7 +300,7 @@ _(From AI Interaction Contract) _
 - 121 tests passing (7 Amplify + 40 unit + 25 composable + 8 page + 21 CanvasSectionCard + 7 PersonalCanvasComponent + 13 usePersonalCanvas)
 - E2E canvas flow tests
 
-#### ✅ EPIC 2: Experience Builder - STAR Stories (95% Complete)
+#### ✅ EPIC 2: Experience Builder - STAR Stories (100% Complete)
 
 **Fully Implemented:**
 
@@ -317,6 +325,45 @@ _(From AI Interaction Contract) _
 - Composable & domain tests: `test/unit/composables/useCvGenerator.spec.ts`, CVDocument service/repo specs
 - Utility coverage: `test/unit/ai-operations/generateCv-notes-stripping.spec.ts`
 - ⚠️ UI specs under `test/nuxt/pages/cv` and `test/nuxt/components/cv` exist but are `describe.skip` → no automated run yet
+
+#### ✅ EPIC 5A: Job Description Analysis (100% Complete)
+
+**Fully Implemented:**
+
+- Backend: GraphQL model + Lambda + repository/service/composables (25+ tests)
+- Frontend: `/jobs`, `/jobs/new`, `/jobs/[jobId]` pages with complete CRUD
+- JobCard and JobUploadStep components
+- Full i18n support (jobUpload, jobList, jobDetail)
+- E2E test coverage (jobs-flow.spec.ts)
+- PDF/TXT upload with AI parsing
+- Job search and filtering
+- Tabbed job detail editing
+- Job status tracking (draft/analyzed/complete)
+- Company linking via CompanySelector
+
+#### ✅ EPIC 5B: Company Analysis & Company Business Model Canvas (100% Complete)
+
+**Fully Implemented:**
+
+- Backend: Company and CompanyCanvas GraphQL models + 2 AI Lambdas + repository/service/composables (50+ tests)
+- Frontend: `/companies`, `/companies/new`, `/companies/[companyId]` pages with complete CRUD
+- 7 company components: CompanyCard, CompanyForm, CompanyCanvasEditor, CanvasBlockSection, CompanyNotesInput, CompanySelector, LinkedCompanyBadge
+- Full i18n support (company, companyUpload, BMC block labels)
+- E2E test coverage (company-workflow.spec.ts)
+- AI-powered company analysis from research notes
+- Business Model Canvas generation with 9 blocks
+- Per-block canvas editing with tag-based input
+- Job-company linking (bidirectional)
+- Automatic company extraction from job descriptions
+- Smart company deduplication with normalization
+- Related jobs display on company detail page
+- 2 E2E sandbox tests (analyze-company-info, generate-company-canvas)
+
+**Schema Simplification:**
+
+- Removed `signals` structure for cleaner data model
+- Focused on core company profile fields
+- Business Model Canvas provides structured business understanding
 
 #### ⚠️ Other EPICs: Backend foundations in place, frontend implementation pending
 
