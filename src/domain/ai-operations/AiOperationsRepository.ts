@@ -8,6 +8,7 @@ import type { GenerateCvInput, GenerateCvResult } from './types/generateCv';
 import type { ParsedJobDescription } from './ParsedJobDescription';
 import type { AnalyzeCompanyInfoInput, CompanyAnalysisResult } from './CompanyAnalysis';
 import type { GeneratedCompanyCanvas, GeneratedCompanyCanvasInput } from './CompanyCanvasResult';
+import type { MatchingSummaryInput, MatchingSummaryResult } from './MatchingSummaryResult';
 
 /**
  * Repository interface for AI operations
@@ -74,6 +75,11 @@ export interface IAiOperationsRepository {
    * Generate full company canvas from structured profile
    */
   generateCompanyCanvas(input: GeneratedCompanyCanvasInput): Promise<GeneratedCompanyCanvas>;
+
+  /**
+   * Generate a structured matching summary between user and job
+   */
+  generateMatchingSummary(input: MatchingSummaryInput): Promise<MatchingSummaryResult>;
 }
 
 /**
@@ -140,6 +146,13 @@ export type AmplifyAiOperations = {
     input: {
       companyProfile: string;
       additionalNotes?: string[];
+    },
+    options?: Record<string, unknown>
+  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
+
+  generateMatchingSummary: (
+    input: {
+      payload: string;
     },
     options?: Record<string, unknown>
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
@@ -370,5 +383,25 @@ export class AiOperationsRepository implements IAiOperationsRepository {
 
     const parsed = typeof data === 'string' ? JSON.parse(data) : data;
     return parsed as GeneratedCompanyCanvas;
+  }
+
+  async generateMatchingSummary(input: MatchingSummaryInput): Promise<MatchingSummaryResult> {
+    const { data, errors } = await this.client.generateMatchingSummary(
+      {
+        payload: JSON.stringify(input),
+      },
+      gqlOptions()
+    );
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+    return parsed as MatchingSummaryResult;
   }
 }

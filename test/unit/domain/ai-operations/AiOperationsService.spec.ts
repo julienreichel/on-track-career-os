@@ -9,6 +9,7 @@ import type { ParsedJobDescription } from '@/domain/ai-operations/ParsedJobDescr
 import type { GenerateCvInput } from '@/domain/ai-operations/types/generateCv';
 import type { CompanyAnalysisResult } from '@/domain/ai-operations/CompanyAnalysis';
 import type { GeneratedCompanyCanvas } from '@/domain/ai-operations/CompanyCanvasResult';
+import type { MatchingSummaryResult } from '@/domain/ai-operations/MatchingSummaryResult';
 
 // Mock the repository
 vi.mock('@/domain/ai-operations/AiOperationsRepository');
@@ -24,6 +25,7 @@ describe('AiOperationsService', () => {
     generateCv: ReturnType<typeof vi.fn>;
     analyzeCompanyInfo: ReturnType<typeof vi.fn>;
     generateCompanyCanvas: ReturnType<typeof vi.fn>;
+    generateMatchingSummary: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -37,6 +39,7 @@ describe('AiOperationsService', () => {
       generateCv: vi.fn(),
       analyzeCompanyInfo: vi.fn(),
       generateCompanyCanvas: vi.fn(),
+      generateMatchingSummary: vi.fn(),
     };
 
     // Create service with mocked repo
@@ -615,6 +618,65 @@ describe('AiOperationsService', () => {
 
       expect(result).toEqual(mockedCanvas);
       expect(mockRepo.generateCompanyCanvas).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('generateMatchingSummary', () => {
+    const validInput = {
+      user: {
+        profile: {
+          fullName: 'Casey Candidate',
+          strengths: ['Leadership'],
+        },
+      },
+      job: {
+        title: 'Head of Engineering',
+        responsibilities: ['Lead org'],
+      },
+    };
+
+    const summaryResult: MatchingSummaryResult = {
+      summaryParagraph: 'Casey can align engineering strategy with the job requirements.',
+      impactAreas: ['Accelerate delivery'],
+      contributionMap: ['Scaling agile teams'],
+      riskMitigationPoints: ['Needs deeper knowledge of healthcare compliance'],
+      generatedAt: '2025-01-01T00:00:00.000Z',
+      needsUpdate: false,
+      userFitScore: 82,
+    };
+
+    it('returns a normalized matching summary from the repository', async () => {
+      mockRepo.generateMatchingSummary.mockResolvedValue(summaryResult);
+
+      const result = await service.generateMatchingSummary(validInput as never);
+
+      expect(result).toEqual(summaryResult);
+      expect(mockRepo.generateMatchingSummary).toHaveBeenCalledWith(validInput);
+    });
+
+    it('throws when user profile is missing', async () => {
+      await expect(
+        service.generateMatchingSummary({ user: {} as never, job: { title: 'x' } } as never)
+      ).rejects.toThrow('User profile with fullName is required');
+      expect(mockRepo.generateMatchingSummary).not.toHaveBeenCalled();
+    });
+
+    it('throws when job title missing', async () => {
+      await expect(
+        service.generateMatchingSummary({
+          user: { profile: { fullName: 'Casey' } },
+          job: { title: '' },
+        } as never)
+      ).rejects.toThrow('Job title is required to generate a matching summary');
+      expect(mockRepo.generateMatchingSummary).not.toHaveBeenCalled();
+    });
+
+    it('throws when repo returns invalid structure', async () => {
+      mockRepo.generateMatchingSummary.mockResolvedValue({ invalid: true });
+
+      await expect(service.generateMatchingSummary(validInput as never)).rejects.toThrow(
+        'Invalid matching summary result'
+      );
     });
   });
 });

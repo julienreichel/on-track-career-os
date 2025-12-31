@@ -29,6 +29,7 @@ describe('AiOperationsRepository', () => {
     generateCv: ReturnType<typeof vi.fn>;
     analyzeCompanyInfo: ReturnType<typeof vi.fn>;
     generateCompanyCanvas: ReturnType<typeof vi.fn>;
+    generateMatchingSummary: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -43,6 +44,7 @@ describe('AiOperationsRepository', () => {
       generateCv: vi.fn(),
       analyzeCompanyInfo: vi.fn(),
       generateCompanyCanvas: vi.fn(),
+      generateMatchingSummary: vi.fn(),
     };
 
     // Inject the mocks via constructor (dependency injection)
@@ -499,6 +501,62 @@ describe('AiOperationsRepository', () => {
           companyProfile: { companyName: 'Acme' },
         })
       ).rejects.toThrow('AI operation returned no data');
+    });
+  });
+
+  describe('generateMatchingSummary', () => {
+    const matchingInput = {
+      user: { profile: { fullName: 'Casey Candidate' } },
+      job: { title: 'Product Lead' },
+    };
+
+    const summaryResponse = {
+      summaryParagraph: 'Casey has relevant leadership history.',
+      impactAreas: ['Scale delivery'],
+      contributionMap: ['Mentor engineering managers'],
+      riskMitigationPoints: ['Limited hardware exposure'],
+      generatedAt: '2025-01-01T00:00:00.000Z',
+      needsUpdate: false,
+      userFitScore: 75,
+    };
+
+    it('returns parsed matching summary', async () => {
+      mockClient.generateMatchingSummary.mockResolvedValue({
+        data: JSON.stringify(summaryResponse),
+        errors: undefined,
+      });
+
+      const result = await repository.generateMatchingSummary(matchingInput as never);
+
+      expect(result).toEqual(summaryResponse);
+      expect(mockClient.generateMatchingSummary).toHaveBeenCalledWith(
+        {
+          payload: JSON.stringify(matchingInput),
+        },
+        expect.objectContaining({ authMode: 'userPool' })
+      );
+    });
+
+    it('throws when AI returns errors', async () => {
+      mockClient.generateMatchingSummary.mockResolvedValue({
+        data: null,
+        errors: [{ message: 'bad' }],
+      });
+
+      await expect(repository.generateMatchingSummary(matchingInput as never)).rejects.toThrow(
+        'AI operation failed'
+      );
+    });
+
+    it('throws when no data returned', async () => {
+      mockClient.generateMatchingSummary.mockResolvedValue({
+        data: null,
+        errors: undefined,
+      });
+
+      await expect(repository.generateMatchingSummary(matchingInput as never)).rejects.toThrow(
+        'AI operation returned no data'
+      );
     });
   });
 });

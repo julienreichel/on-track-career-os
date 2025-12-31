@@ -62,7 +62,6 @@ EPIC 5C is blocked primarily by the missing AI operation that produces the **mat
 
 **Out of scope:**
 
-- Any “fit score” (the data model mentions score as V2; treat it as optional/not produced by AI in MVP)
 - Any new frameworks or UI work (handled in other prompts)
 
 ### 4) Composables / services / repositories / domain modules
@@ -90,8 +89,6 @@ Return JSON containing these fields (names should match app expectations; allow 
 - `contributionMap: string[]`
 - `risks: string[]`
 
-(Also note the CDM expects “riskMitigationPoints” and “summaryParagraph” for the stored entity; the agent must decide how to map/rename consistently across AI output vs entity fields—keep it DRY and explicit.)
-
 **Input schema (define explicitly):**
 Use structured inputs only—no raw free-text. Input should be a JSON object that can be composed from existing models:
 
@@ -105,7 +102,6 @@ Follow the contract’s global rules:
 
 - If output is not valid JSON → attempt substring parse → retry once with “Return ONLY VALID JSON matching schema”
 - Missing strings → `""`; missing arrays → `[]`; missing objects → `{}`
-- If hallucinated content detected by validator heuristics (e.g., mentions facts not in inputs) → strip, keep only input-grounded items (best-effort)
 - Log fallback steps used + store input/output payloads for traceability
 
 **Where it is called from (later prompts implement caller):**
@@ -121,7 +117,7 @@ Add tests at the same rigor level as existing AI ops:
   - Output missing fields → fallback fills defaults
   - Output invalid JSON → retry path exercised (mock AI response)
 
-- Sandbox E2E AI tests (if your repo uses these for ops): one happy path, one fallback path
+- Sandbox E2E AI tests: one happy path, one fallback path
 
 ### 9) Acceptance criteria (checklist)
 

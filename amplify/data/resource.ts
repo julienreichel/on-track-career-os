@@ -78,6 +78,14 @@ export const generateCompanyCanvasFunction = defineFunction({
   timeoutSeconds: 60,
 });
 
+export const generateMatchingSummaryFunction = defineFunction({
+  entry: './ai-operations/generateMatchingSummary.ts',
+  environment: {
+    MODEL_ID,
+  },
+  timeoutSeconds: 60,
+});
+
 export const schema = a
   .schema({
     // =====================================================
@@ -461,6 +469,15 @@ export const schema = a
       .returns(a.json())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateCompanyCanvasFunction)),
+
+    generateMatchingSummary: a
+      .query()
+      .arguments({
+        payload: a.json().required(),
+      })
+      .returns(a.json())
+      .authorization((allow) => [allow.authenticated()])
+      .handler(a.handler.function(generateMatchingSummaryFunction)),
 
     // =====================================================
     // UTILITY FUNCTIONS (Custom Queries)

@@ -16,6 +16,8 @@ import type { AnalyzeCompanyInfoInput, CompanyAnalysisResult } from './CompanyAn
 import { isCompanyAnalysisResult } from './CompanyAnalysis';
 import type { GeneratedCompanyCanvas, GeneratedCompanyCanvasInput } from './CompanyCanvasResult';
 import { isGeneratedCompanyCanvas } from './CompanyCanvasResult';
+import type { MatchingSummaryInput, MatchingSummaryResult } from './MatchingSummaryResult';
+import { isMatchingSummaryResult } from './MatchingSummaryResult';
 
 type AnalyzeCompanyMock =
   | CompanyAnalysisResult
@@ -23,6 +25,9 @@ type AnalyzeCompanyMock =
 type CanvasMock =
   | GeneratedCompanyCanvas
   | ((input: GeneratedCompanyCanvasInput) => GeneratedCompanyCanvas);
+type MatchingSummaryMock =
+  | MatchingSummaryResult
+  | ((input: MatchingSummaryInput) => MatchingSummaryResult);
 
 function cloneResult<T>(value: T): T {
   if (typeof structuredClone === 'function') {
@@ -40,8 +45,12 @@ function resolveAiMock(
   input: GeneratedCompanyCanvasInput
 ): GeneratedCompanyCanvas | null;
 function resolveAiMock(
-  key: 'analyzeCompanyInfo' | 'generateCompanyCanvas',
-  input: AnalyzeCompanyInfoInput | GeneratedCompanyCanvasInput
+  key: 'generateMatchingSummary',
+  input: MatchingSummaryInput
+): MatchingSummaryResult | null;
+function resolveAiMock(
+  key: 'analyzeCompanyInfo' | 'generateCompanyCanvas' | 'generateMatchingSummary',
+  input: AnalyzeCompanyInfoInput | GeneratedCompanyCanvasInput | MatchingSummaryInput
 ) {
   if (typeof window === 'undefined' || !window.__AI_OPERATION_MOCKS__) {
     return null;
@@ -362,6 +371,27 @@ export class AiOperationsService {
     }
     return result;
   }
+
+  async generateMatchingSummary(input: MatchingSummaryInput): Promise<MatchingSummaryResult> {
+    if (!input?.user?.profile?.fullName) {
+      throw new Error('User profile with fullName is required');
+    }
+    if (!input?.job?.title) {
+      throw new Error('Job title is required to generate a matching summary');
+    }
+
+    const mocked = resolveAiMock('generateMatchingSummary', input);
+    if (mocked) {
+      return mocked;
+    }
+
+    const result = await this.repo.generateMatchingSummary(input);
+
+    if (!isMatchingSummaryResult(result)) {
+      throw new Error('Invalid matching summary result');
+    }
+    return result;
+  }
 }
 
 declare global {
@@ -369,6 +399,7 @@ declare global {
     __AI_OPERATION_MOCKS__?: {
       analyzeCompanyInfo?: AnalyzeCompanyMock;
       generateCompanyCanvas?: CanvasMock;
+      generateMatchingSummary?: MatchingSummaryMock;
     };
   }
 }

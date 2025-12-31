@@ -487,7 +487,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Missing:**
 
-- ❌ `ai.generateMatchingSummary` Lambda
+- ✅ `ai.generateMatchingSummary` Lambda
 - ❌ Matching repository/service/composable
 - ❌ Matching summary page
 - ❌ Fit score visualization
@@ -495,7 +495,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Next Steps:**
 
-1. Implement `ai.generateMatchingSummary` Lambda
+1. Implement `ai.generateMatchingSummary` Lambda ✅
 2. Create matching domain layer
 3. Create `/jobs/:jobId/match` page
 4. Add fit score visualization
@@ -587,7 +587,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Matching Engine (1 missing):**
 
-- ❌ `ai.generateMatchingSummary`
+- ✅ `ai.generateMatchingSummary`
 
 **Application Materials (4 missing):**
 
@@ -906,7 +906,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Remaining for Complete Job/Company Context:**
 
-- ❌ EPIC 5C: Matching (`ai.generateMatchingSummary`)
+- ⚠️ EPIC 5C: Matching (AI op ready – Awaiting domain + UI layers)
 - ❌ Matching page: `/jobs/:jobId/match`
 
 **Estimated Effort:** 1-2 weeks for EPIC 5C  
@@ -920,7 +920,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Tasks:**
 
-1. Implement `ai.generateMatchingSummary` operation + domain layer
+1. Implement `ai.generateMatchingSummary` operation + domain layer (AI operation ✅, domain layer pending)
 2. Create MatchingSummary repository/service/composable
 3. Create `/jobs/:jobId/match` page with:
    - Fit score visualization
