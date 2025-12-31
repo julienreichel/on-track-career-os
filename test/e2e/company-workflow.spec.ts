@@ -45,7 +45,9 @@ test.describe('Company workflow', () => {
     await page.getByRole('button', { name: /save company/i }).click();
     await expect(page).toHaveURL(/\/companies\/[0-9a-f-]+$/i, { timeout: 60000 });
     await page.waitForLoadState('networkidle');
-    await expect(page.getByTestId('company-analyze-button')).toBeVisible({ timeout: 60000 });
+    await expect(page.getByRole('button', { name: /analyze company info/i })).toBeVisible({
+      timeout: 60000,
+    });
     companyDetailUrl = page.url();
   });
 
@@ -54,9 +56,9 @@ test.describe('Company workflow', () => {
     await page.goto(companyDetailUrl!);
     await page.waitForLoadState('networkidle');
 
-    await page.getByTestId('company-analyze-button').click();
-    await expect(page.getByTestId('company-productsServices-tags')).toBeVisible();
-    await expect(page.getByPlaceholder('https://example.com')).not.toHaveValue('');
+    await page.getByRole('button', { name: /analyze company info/i }).click();
+    await expect(page.getByText(/Orchestrator platform/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByLabel('Website')).not.toHaveValue('');
 
     const analyzedNameInput = page.getByPlaceholder('e.g., Atlas Robotics');
     companySearchName = (await analyzedNameInput.inputValue()) || COMPANY_NAME;
@@ -77,7 +79,7 @@ test.describe('Company workflow', () => {
     await page.goto(companyDetailUrl!);
     await page.waitForLoadState('networkidle');
 
-    const valuePropInput = page.getByTestId('canvas-valuePropositions-input');
+    const valuePropInput = page.getByLabel('Value Propositions');
     await valuePropInput.fill(CUSTOM_VALUE_PROP);
     await valuePropInput.press('Enter');
     await expect(page.getByTestId('canvas-valuePropositions-tags')).toContainText(
@@ -105,9 +107,9 @@ test.describe('Company workflow', () => {
     await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 60000 });
     jobDetailUrl = page.url();
 
-    const jobTitleInput = page.getByTestId('job-title-input');
+    const jobTitleInput = page.getByLabel('Job title');
     await jobTitleInput.fill(JOB_TITLE);
-    const saveJobButton = page.getByTestId('job-save-button');
+    const saveJobButton = page.getByRole('button', { name: /^Save$/i }).last();
     await saveJobButton.click();
     await expect(saveJobButton).toBeDisabled({ timeout: 10000 });
   });
@@ -119,29 +121,29 @@ test.describe('Company workflow', () => {
     await page.goto(jobDetailUrl!);
     await page.waitForLoadState('networkidle');
 
-    const clearLinkButton = page.getByTestId('job-company-clear');
+    const clearLinkButton = page.getByRole('button', { name: /clear link/i });
     if (await clearLinkButton.isVisible()) {
       await clearLinkButton.click();
       await expect(clearLinkButton).toBeHidden({ timeout: 10000 });
     }
 
-    const selectorSearch = page.getByTestId('company-selector-search');
+    const selectorSearch = page.getByPlaceholder(
+      'Search companies by name, industry, or market...'
+    );
     await expect(selectorSearch).toBeEnabled({ timeout: 10000 });
     await selectorSearch.fill(companySearchName);
-    await page
-      .getByTestId('company-selector-option')
-      .filter({ hasText: companySearchName })
-      .first()
-      .click();
+    await page.getByRole('button', { name: new RegExp(companySearchName, 'i') }).click();
 
-    await expect(page.getByTestId('job-company-clear')).toBeVisible({ timeout: 10000 });
-    await expect(page.getByRole('link', { name: 'View company' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /clear link/i })).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(page.getByRole('link', { name: /view company/i })).toBeVisible();
 
     await page.reload();
     await page.waitForLoadState('networkidle');
-    await expect(page.getByRole('link', { name: 'View company' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /view company/i })).toBeVisible();
 
-    await page.getByRole('link', { name: 'View company' }).click();
+    await page.getByRole('link', { name: /view company/i }).click();
     await expect(page).toHaveURL(companyDetailUrl!);
   });
 });
