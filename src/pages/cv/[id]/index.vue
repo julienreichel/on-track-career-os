@@ -98,7 +98,7 @@
                     :src="profilePhotoUrl"
                     :alt="$t('cvDisplay.photoAlt')"
                     class="h-16 w-16 rounded-full object-cover border border-gray-200 dark:border-gray-700"
-                  />
+                  >
                   <p class="text-xs text-gray-500 dark:text-gray-400">
                     {{ $t('cvDisplay.photoPreviewHelp') }}
                   </p>
@@ -115,7 +115,7 @@
                   :src="profilePhotoUrl!"
                   :alt="$t('cvDisplay.photoAlt')"
                   class="cv-photo-image"
-                />
+                >
               </div>
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div class="prose prose-gray max-w-none" v-html="renderedHtml" />
