@@ -1,9 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import {
-  createExperience,
-  createFullExperience,
-  createManualStory,
-} from './utils/storyHelpers';
+import { createFullExperience, createManualStory } from './utils/storyHelpers';
 
 /**
  * E2E Tests for Personal Canvas (EPIC 1B)
