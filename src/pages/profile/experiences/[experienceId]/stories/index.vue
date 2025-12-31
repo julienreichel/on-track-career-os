@@ -133,14 +133,10 @@ const handleAutoGenerate = async () => {
         // Continue without achievements - story can still be saved
       }
 
-      // Create complete story with achievements and KPIs
-      const completeStory = {
-        ...story,
+      await storyService.createAndLinkStory(story, experienceId.value, {
         achievements,
         kpiSuggestions,
-      };
-
-      await storyService.createAndLinkStory(completeStory, experienceId.value);
+      });
     }
 
     // 5. Reload stories list using cached experience

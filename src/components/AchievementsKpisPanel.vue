@@ -41,6 +41,7 @@ const { t } = useI18n();
       :placeholder="t('stories.builder.achievementsPlaceholder')"
       :disabled="readonly"
       color="primary"
+      test-id="achievements"
       @update:model-value="emit('update:achievements', $event)"
     />
 
@@ -52,6 +53,7 @@ const { t } = useI18n();
       :placeholder="t('stories.builder.kpisPlaceholder')"
       :disabled="readonly"
       color="success"
+      test-id="kpis"
       @update:model-value="emit('update:kpis', $event)"
     />
   </div>

@@ -81,6 +81,13 @@ export class STARStoryService {
     experienceId: string,
     achievements?: AchievementsAndKpis
   ): Promise<STARStory | null> {
+    const fallbackAchievements = Array.isArray((storyData as STARStory).achievements)
+      ? (storyData as STARStory).achievements
+      : [];
+    const fallbackKpis = Array.isArray((storyData as STARStory).kpiSuggestions)
+      ? (storyData as STARStory).kpiSuggestions
+      : [];
+
     const input: STARStoryCreateInput = {
       title: storyData.title?.trim() || 'Untitled STAR story',
       situation: storyData.situation,
@@ -88,8 +95,8 @@ export class STARStoryService {
       action: storyData.action,
       result: storyData.result,
       experienceId,
-      achievements: achievements?.achievements || [],
-      kpiSuggestions: achievements?.kpiSuggestions || [],
+      achievements: achievements?.achievements ?? fallbackAchievements,
+      kpiSuggestions: achievements?.kpiSuggestions ?? fallbackKpis,
     };
 
     return await this.repo.create(input);

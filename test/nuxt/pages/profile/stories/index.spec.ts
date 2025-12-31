@@ -8,9 +8,10 @@ import type { Experience } from '@/domain/experience/Experience';
 import type { ComponentPublicInstance, Ref } from 'vue';
 
 // Mock Nuxt composables
+const pushMock = vi.fn();
 vi.mock('#app', () => ({
   useRouter: vi.fn(() => ({
-    push: vi.fn(),
+    push: pushMock,
   })),
   useRoute: vi.fn(() => ({
     params: {},
@@ -62,6 +63,7 @@ type StoriesPageExposed = {
 describe('Profile Stories Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    pushMock.mockReset();
   });
 
   // Create a real router instance for testing
@@ -80,7 +82,20 @@ describe('Profile Stories Page', () => {
         stubs: {
           UPage: { template: '<div class="u-page"><slot /></div>' },
           UPageHeader: {
-            template: '<div class="u-page-header"><slot /></div>',
+            template: `
+              <div class="u-page-header">
+                <slot />
+                <button
+                  v-for="(link, index) in links"
+                  :key="index"
+                  class="header-link"
+                  type="button"
+                  @click="link?.onClick && link.onClick()"
+                >
+                  {{ link?.label || ('Link ' + index) }}
+                </button>
+              </div>
+            `,
             props: ['title', 'description', 'links'],
           },
           UPageBody: { template: '<div class="u-page-body"><slot /></div>' },
@@ -103,9 +118,15 @@ describe('Profile Stories Page', () => {
             props: ['title', 'description', 'color'],
           },
           UIcon: { template: '<i class="u-icon" />', props: ['name'] },
+          UInput: {
+            template:
+              '<input class="u-input" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value); $emit(\'input\', $event.target.value)" />',
+            props: ['modelValue', 'placeholder', 'icon', 'size'],
+          },
           // Stub StoryList to avoid router injection issues and prop type warnings
           StoryList: {
-            template: '<div class="story-list"><slot /></div>',
+            template:
+              '<div class="story-list" :data-count="stories?.length || 0"><slot /></div>',
             props: ['stories', 'loading', 'showCompanyNames'],
           },
         },
@@ -331,5 +352,43 @@ describe('Profile Stories Page', () => {
 
     const pageHeader = wrapper.find('.u-page-header');
     expect(pageHeader.exists()).toBe(true);
+  });
+
+  it('should search stories when typing in search input', async () => {
+    const searchSpy = vi.fn(() => []);
+    mockSearch.mockImplementation(searchSpy);
+    mockStories.mockReturnValue([]);
+
+    const wrapper = createWrapper();
+    await wrapper.vm.$nextTick();
+
+    const input = wrapper.find('input.u-input');
+    expect(input.exists()).toBe(true);
+
+    await input.setValue('AI');
+    expect(searchSpy).toHaveBeenCalledWith('AI');
+  });
+
+  it('should navigate back to profile from header link', async () => {
+    const pushSpy = vi.spyOn(router, 'push');
+    const wrapper = createWrapper();
+    await wrapper.vm.$nextTick();
+
+    const linkButton = wrapper.find('.header-link');
+    expect(linkButton.exists()).toBe(true);
+
+    await linkButton.trigger('click');
+    expect(pushSpy).toHaveBeenCalledWith('/profile');
+    pushSpy.mockRestore();
+  });
+
+  it('should render error alert text when error exists', async () => {
+    mockError.mockReturnValue('Something went wrong');
+    const wrapper = createWrapper();
+    await wrapper.vm.$nextTick();
+
+    const alert = wrapper.find('.u-alert');
+    expect(alert.exists()).toBe(true);
+    expect(alert.text()).toContain('Something went wrong');
   });
 });
