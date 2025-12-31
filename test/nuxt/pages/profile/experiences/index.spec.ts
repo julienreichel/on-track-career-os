@@ -1,7 +1,10 @@
-import { describe, it, expect, beforeAll } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
+import { mount, flushPromises } from '@vue/test-utils';
+import { ref } from 'vue';
 import { createTestI18n } from '../../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
+import ExperiencesPage from '@/pages/profile/experiences/index.vue';
+import type { Experience } from '@/domain/experience/Experience';
 
 /**
  * Nuxt Component Tests: Experiences List Page
@@ -37,6 +40,29 @@ const router = createRouter({
   ],
 });
 
+const mockExperienceList = vi.fn<[], Promise<Experience[]>>(() => Promise.resolve([]));
+const mockDeleteExperience = vi.fn();
+const mockStoryCount = vi.fn(() => Promise.resolve([]));
+
+vi.mock('@/domain/experience/ExperienceRepository', () => ({
+  ExperienceRepository: vi.fn(() => ({
+    list: mockExperienceList,
+    delete: mockDeleteExperience,
+  })),
+}));
+
+vi.mock('@/domain/starstory/STARStoryService', () => ({
+  STARStoryService: vi.fn(() => ({
+    getStoriesByExperience: mockStoryCount,
+  })),
+}));
+
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => ({
+    userId: ref('test-user-id'),
+  }),
+}));
+
 beforeAll(async () => {
   if (router.currentRoute.value.path !== '/profile/experiences') {
     await router.push('/profile/experiences');
@@ -71,6 +97,36 @@ const stubs = {
   NuxtLink: {
     template: '<a :href="to" class="nuxt-link"><slot /></a>',
     props: ['to'],
+  },
+};
+
+const pageComponentStubs = {
+  ...stubs,
+  UContainer: {
+    template: '<div class="u-container"><slot /></div>',
+  },
+  UPageGrid: {
+    template: '<div class="u-page-grid"><slot /></div>',
+  },
+  UAlert: {
+    template: '<div class="u-alert"><slot /></div>',
+    props: ['title', 'description'],
+  },
+  UCard: {
+    template: '<div class="u-card"><slot /></div>',
+  },
+  USkeleton: {
+    template: '<div class="u-skeleton" />',
+  },
+  UButton: stubs.UButton,
+  UEmpty: stubs.UEmpty,
+  UModal: {
+    template: '<div class="u-modal"><slot /></div>',
+    props: ['title'],
+  },
+  ExperienceCard: {
+    props: ['experience', 'storyCount'],
+    template: '<div class="experience-card-stub">{{ experience.title }}<slot /></div>',
   },
 };
 
@@ -300,5 +356,58 @@ describe('Experiences Page Component', () => {
       expect(wrapper.find('.u-page-header').exists()).toBe(true);
       expect(wrapper.find('.u-page-body').exists()).toBe(true);
     });
+  });
+});
+
+describe('Experiences Page Integration', () => {
+  beforeEach(() => {
+    mockExperienceList.mockReset();
+    mockStoryCount.mockReset();
+  });
+
+  const mountExperiencesPage = async () => {
+    const wrapper = mount(ExperiencesPage, {
+      global: {
+        plugins: [i18n, router],
+        stubs: pageComponentStubs,
+      },
+    });
+
+    await flushPromises();
+    return wrapper;
+  };
+
+  it('renders empty state when repository returns no experiences', async () => {
+    mockExperienceList.mockResolvedValueOnce([]);
+    mockStoryCount.mockResolvedValue([]);
+
+    const wrapper = await mountExperiencesPage();
+    expect(wrapper.text()).toContain(i18n.global.t('experiences.list.empty'));
+  });
+
+  it('renders experience cards when repository returns data', async () => {
+    mockExperienceList.mockResolvedValueOnce([
+      {
+        id: 'exp-1',
+        title: 'Platform Lead',
+        companyName: 'Acme Labs',
+        experienceType: 'work',
+        startDate: '2024-01-01',
+        endDate: null,
+        responsibilities: [],
+        tasks: [],
+        status: 'draft',
+        userId: 'user-1',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+        owner: 'user-1',
+        rawText: '',
+      } as Experience,
+    ]);
+    mockStoryCount.mockResolvedValue([]);
+
+    const wrapper = await mountExperiencesPage();
+    expect(wrapper.findAll('.experience-card-stub')).toHaveLength(1);
+    expect(wrapper.text()).toContain('Platform Lead');
   });
 });

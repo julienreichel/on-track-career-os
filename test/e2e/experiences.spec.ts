@@ -1,257 +1,94 @@
 import { test, expect } from '@playwright/test';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { createExperience } from './utils/storyHelpers';
 
-/**
- * E2E Tests for Experience Management (EPIC 2)
- *
- * Tests experience CRUD workflows and navigation.
- *
- * Component/UI tests moved to:
- * - test/nuxt/pages/profile/experiences/index.spec.ts (listing page)
- * - test/nuxt/components/ExperienceForm.spec.ts (form component)
- *
- * These E2E tests focus on:
- * - Complete CRUD workflows (create → save → list → edit → delete)
- * - Form submission and data persistence
- * - Navigation between experiences and stories
- * - Backend integration
- */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-test.describe('Experience Management', () => {
-  test.describe('Experience Listing', () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto('/profile/experiences');
-      await page.waitForLoadState('networkidle');
-      // Wait for any initial data loading
-      await page.waitForTimeout(2000);
-    });
+const CV_FIXTURE = join(__dirname, 'fixtures', 'test-cv.txt');
+const MANUAL_EXPERIENCE_TITLE = `E2E Manual Experience ${Date.now()}`;
 
-    test('should display experiences page', async ({ page }) => {
-      // Auth state should now persist correctly
+test.describe('Experience workflow', () => {
+  test.describe.configure({ mode: 'serial' });
 
-      // Verify we're on the experiences page
-      await expect(page).toHaveURL(/.*\/profile\/experiences/);
+  let manualExperienceId: string | null = null;
+  let updatedCompanyName: string | null = null;
 
-      // Page should be visible
-      const body = page.locator('body');
-      await expect(body).toBeVisible();
-    });
+  test('imports experiences via CV upload flow from the listing page', async ({ page }) => {
+    await page.goto('/profile/experiences');
+    await page.waitForLoadState('networkidle');
 
-    test('should display experience cards or empty state', async ({ page }) => {
-      // Wait for any data to load
-      await page.waitForTimeout(1500);
+    await page.getByRole('link', { name: /Upload Your CV/i }).click();
+    await expect(page).toHaveURL(/\/profile\/cv-upload$/);
 
-      const cardCount = await page.locator('[data-testid="experience-card"]').count();
-      const hasEmpty =
-        (await page.locator('text=/no experiences yet|upload.*cv|add.*manually/i').count()) > 0;
+    const fileInput = page.locator('input[type="file"]').first();
+    await fileInput.setInputFiles(CV_FIXTURE);
 
-      // Should have either cards or empty state
-      expect(cardCount > 0 || hasEmpty).toBe(true);
-    });
+    const importButton = page.getByRole('button', { name: /Import All/i });
+    await expect(importButton).toBeVisible({ timeout: 30000 });
+    await importButton.click();
 
-    test('should have back to profile navigation', async ({ page }) => {
-      // Look for back button
-      const backButton = page
-        .locator(
-          'button:has-text("Profile"), a:has-text("Profile"), a:has-text("Back"), button:has-text("Back")'
-        )
-        .first();
+    await expect(page.getByText(/Successfully imported/i)).toBeVisible({ timeout: 20000 });
+    await page.getByRole('button', { name: /View Experiences/i }).click();
 
-      await expect(backButton).toBeVisible();
-    });
+    await expect(page).toHaveURL(/\/profile\/experiences$/);
+    await expect(
+      page.locator('[data-testid="experience-card"]').filter({ hasText: /Senior Software Engineer/i })
+    ).toBeVisible({ timeout: 20000 });
   });
 
-  test.describe('Experience Creation', () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto('/profile/experiences');
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000);
-    });
+  test('creates an experience manually', async ({ page }) => {
+    manualExperienceId = await createExperience(page, MANUAL_EXPERIENCE_TITLE);
+    await page.goto('/profile/experiences');
+    await page.waitForLoadState('networkidle');
 
-    test('should navigate to new experience form', async ({ page }) => {
-      // Look for the link to /new in page header (UPageHeader)
-      const newLink = page.locator('a[href="/profile/experiences/new"]').first();
-
-      const count = await newLink.count();
-
-      if (count > 0) {
-        await newLink.click();
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(1000);
-
-        // Should navigate to new experience page
-        await expect(page).toHaveURL(/.*\/experiences\/new/);
-      }
-    });
-
-    test('should display experience creation form', async ({ page }) => {
-      await page.goto('/profile/experiences/new');
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000);
-
-      // Look for UInput fields (Nuxt UI)
-      const hasInputs = (await page.locator('input').count()) > 0;
-
-      // Should have input elements
-      expect(hasInputs).toBe(true);
-    });
-
-    test('should have required form fields', async ({ page }) => {
-      await page.goto('/profile/experiences/new');
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000);
-
-      // Check for text inputs (title, company, etc.) - Nuxt UI uses regular inputs
-      const textInputs = page.locator('input[type="text"]');
-      const dateInputs = page.locator('input[type="date"]');
-
-      const hasTextInputs = (await textInputs.count()) > 0;
-      const hasDateInputs = (await dateInputs.count()) > 0;
-
-      // Should have both text and date inputs
-      expect(hasTextInputs && hasDateInputs).toBe(true);
-    });
-
-    test('should have save and cancel buttons', async ({ page }) => {
-      await page.goto('/profile/experiences/new');
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(500);
-
-      // Look for save button
-      const saveButton = page
-        .locator('button:has-text("Save"), button:has-text("Create"), button[type="submit"]')
-        .first();
-
-      // Look for cancel button
-      const cancelButton = page
-        .locator('button:has-text("Cancel"), a:has-text("Cancel"), a:has-text("Back")')
-        .first();
-
-      await expect(saveButton).toBeVisible();
-      await expect(cancelButton).toBeVisible();
-    });
-
-    test('should show validation errors for empty required fields', async ({ page }) => {
-      await page.goto('/profile/experiences/new');
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000);
-
-      // Check that Save button is disabled for empty form
-      const saveButton = page.locator('button:has-text("Save")').first();
-
-      // Button should be disabled when required fields are empty
-      await expect(saveButton).toBeDisabled();
-
-      // Verify we're still on the new experience page
-      const currentUrl = page.url();
-      expect(currentUrl).toContain('/new');
-    });
-
-    test('should successfully create experience with valid data', async ({ page }) => {
-      await page.goto('/profile/experiences/new');
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000);
-
-      // Fill in the form with test data
-      const timestamp = Date.now();
-      const jobTitle = `E2E Test Engineer ${timestamp}`;
-      const companyName = `E2E Test Company ${timestamp}`;
-
-      // Get all text inputs in order (title, company)
-      const textInputs = page.locator('input[type="text"]');
-      const textInputCount = await textInputs.count();
-
-      if (textInputCount >= 1) {
-        await textInputs.nth(0).fill(jobTitle); // Title field
-      }
-      if (textInputCount >= 2) {
-        await textInputs.nth(1).fill(companyName); // Company field
-      }
-
-      // Fill start date (first date input)
-      const dateInputs = page.locator('input[type="date"]');
-      await dateInputs.first().fill('2024-01-01');
-
-      // Submit form
-      const saveButton = page.locator('button:has-text("Save")').first();
-
-      await saveButton.click();
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(2000);
-
-      // Should redirect back to experiences list
-      await expect(page).toHaveURL(/.*\/profile\/experiences$/);
-    });
-
-    test('should allow canceling experience creation', async ({ page }) => {
-      await page.goto('/profile/experiences/new');
-      await page.waitForLoadState('networkidle');
-
-      // Click cancel button
-      const cancelButton = page
-        .locator('button:has-text("Cancel"), a:has-text("Cancel"), a:has-text("Back")')
-        .first();
-
-      await cancelButton.click();
-      await page.waitForLoadState('networkidle');
-
-      // Should navigate back to experiences list
-      await expect(page).toHaveURL(/.*\/experiences$/);
-    });
+    await expect(
+      page.locator('[data-testid="experience-card"]').filter({ hasText: MANUAL_EXPERIENCE_TITLE })
+    ).toBeVisible({ timeout: 20000 });
   });
 
-  test.describe('Experience Navigation - With Data', () => {
-    test.beforeEach(async ({ page }) => {
-      await page.goto('/profile/experiences');
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1500);
-    });
+  test('edits the manual experience and saves the changes', async ({ page }) => {
+    expect(manualExperienceId).toBeTruthy();
+    updatedCompanyName = `Updated Company ${Date.now()}`;
 
-    test('should navigate to story list when clicking view stories button', async ({ page }) => {
-      // create an experience
-      await page.goto('/profile/experiences/new');
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1500);
+    await page.goto(`/profile/experiences/${manualExperienceId}`);
+    await page.waitForLoadState('networkidle');
 
-      // Fill in the form with test data
-      const timestamp = Date.now();
-      const jobTitle = `E2E Test Engineer ${timestamp}`;
-      const companyName = `E2E Test Company ${timestamp}`;
+    await page.getByLabel(/Company Name/i).fill(updatedCompanyName);
+    await page
+      .getByLabel(/Responsibilities/i)
+      .fill('Drove platform reliability improvements and automation.');
+    await page
+      .getByLabel(/Tasks/i)
+      .fill('Led automation rollout and coordinated cross-team delivery.');
 
-      // Get all text inputs in order (title, company)
-      const textInputs = page.locator('input[type="text"]');
-      const textInputCount = await textInputs.count();
+    await page.getByRole('button', { name: /Save Experience/i }).click();
+    await page.waitForLoadState('networkidle');
 
-      if (textInputCount >= 1) {
-        await textInputs.nth(0).fill(jobTitle); // Title field
-      }
-      if (textInputCount >= 2) {
-        await textInputs.nth(1).fill(companyName); // Company field
-      }
+    await expect(page).toHaveURL(/\/profile\/experiences$/);
+    await expect(
+      page.locator('[data-testid="experience-card"]').filter({ hasText: updatedCompanyName })
+    ).toBeVisible({ timeout: 20000 });
+  });
 
-      // Fill start date (first date input)
-      const dateInputs = page.locator('input[type="date"]');
-      await dateInputs.first().fill('2024-01-01');
+  test('opens the stories page for the manual experience and sees empty state', async ({ page }) => {
+    expect(manualExperienceId).toBeTruthy();
 
-      // Submit form
-      const saveButton = page.locator('button:has-text("Save")').first();
+    await page.goto('/profile/experiences');
+    await page.waitForLoadState('networkidle');
 
-      await saveButton.click();
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(2000);
+    const manualCard = page
+      .locator('[data-testid="experience-card"]')
+      .filter({ hasText: MANUAL_EXPERIENCE_TITLE })
+      .first();
 
-      // Locate the newly created experience card
-      const experienceCard = page
-        .locator('[data-testid="experience-card"]')
-        .filter({ hasText: jobTitle })
-        .first();
-      await expect(experienceCard).toBeVisible();
+    await manualCard.getByRole('button', { name: /View Stories/i }).click();
+    await page.waitForLoadState('networkidle');
 
-      // Click the "View Stories" button inside the card
-      await experienceCard.getByRole('button', { name: /View Stories/i }).click();
-
-      // Should navigate to stories page for that experience
-      await page.waitForLoadState('networkidle');
-      await expect(page).toHaveURL(/.*\/experiences\/[^/]+\/stories/);
+    await expect(page).toHaveURL(new RegExp(`/profile/experiences/${manualExperienceId}/stories`));
+    await expect(page.getByText(/No stories yet for this experience/i)).toBeVisible({
+      timeout: 10000,
     });
   });
 });
