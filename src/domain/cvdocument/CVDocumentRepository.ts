@@ -1,4 +1,5 @@
 import { gqlOptions } from '@/data/graphql/options';
+import { fetchAllListItems } from '@/data/graphql/pagination';
 import type { CVDocumentCreateInput, CVDocumentUpdateInput, CVDocument } from './CVDocument';
 
 export type AmplifyCVDocumentModel = {
@@ -6,7 +7,9 @@ export type AmplifyCVDocumentModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: CVDocument | null }>;
-  list: (options?: Record<string, unknown>) => Promise<{ data: CVDocument[] }>;
+  list: (
+    options?: Record<string, unknown>
+  ) => Promise<{ data: CVDocument[]; nextToken?: string | null }>;
   create: (
     input: CVDocumentCreateInput,
     options?: Record<string, unknown>
@@ -48,8 +51,7 @@ export class CVDocumentRepository {
   }
 
   async list(filter: Record<string, unknown> = {}) {
-    const { data } = await this.model.list(gqlOptions(filter));
-    return data;
+    return fetchAllListItems<CVDocument>(this.model.list.bind(this.model), filter);
   }
 
   async create(input: CVDocumentCreateInput) {

@@ -1,4 +1,5 @@
 import { gqlOptions } from '@/data/graphql/options';
+import { fetchAllListItems } from '@/data/graphql/pagination';
 import type { UserProfileUpdateInput, UserProfile } from './UserProfile';
 
 export type AmplifyUserProfileModel = {
@@ -6,7 +7,9 @@ export type AmplifyUserProfileModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: UserProfile | null }>;
-  list: (options?: Record<string, unknown>) => Promise<{ data: UserProfile[] }>;
+  list: (
+    options?: Record<string, unknown>
+  ) => Promise<{ data: UserProfile[]; nextToken?: string | null }>;
   update: (
     input: UserProfileUpdateInput,
     options?: Record<string, unknown>
@@ -53,8 +56,7 @@ export class UserProfileRepository {
   }
 
   async list(filter: Record<string, unknown> = {}) {
-    const { data } = await this.model.list(gqlOptions(filter));
-    return data;
+    return fetchAllListItems<UserProfile>(this.model.list.bind(this.model), filter);
   }
 
   async update(input: UserProfileUpdateInput) {

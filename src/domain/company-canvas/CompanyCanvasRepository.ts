@@ -1,4 +1,5 @@
 import { gqlOptions } from '@/data/graphql/options';
+import { fetchAllListItems } from '@/data/graphql/pagination';
 import type {
   CompanyCanvasCreateInput,
   CompanyCanvasUpdateInput,
@@ -10,7 +11,9 @@ export type AmplifyCompanyCanvasModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: CompanyCanvas | null }>;
-  list: (options?: Record<string, unknown>) => Promise<{ data: CompanyCanvas[] }>;
+  list: (
+    options?: Record<string, unknown>
+  ) => Promise<{ data: CompanyCanvas[]; nextToken?: string | null }>;
   create: (
     input: CompanyCanvasCreateInput,
     options?: Record<string, unknown>
@@ -52,8 +55,7 @@ export class CompanyCanvasRepository {
   }
 
   async list(filter: Record<string, unknown> = {}) {
-    const { data } = await this.model.list(gqlOptions(filter));
-    return data;
+    return fetchAllListItems<CompanyCanvas>(this.model.list.bind(this.model), filter);
   }
 
   async create(input: CompanyCanvasCreateInput) {

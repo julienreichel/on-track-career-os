@@ -1,4 +1,5 @@
 import { gqlOptions } from '@/data/graphql/options';
+import { fetchAllListItems } from '@/data/graphql/pagination';
 import type { CompanyCreateInput, CompanyUpdateInput, Company } from './Company';
 import { normalizeCompanyName } from './companyMatching';
 
@@ -7,7 +8,9 @@ export type AmplifyCompanyModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: Company | null }>;
-  list: (options?: Record<string, unknown>) => Promise<{ data: Company[] }>;
+  list: (
+    options?: Record<string, unknown>
+  ) => Promise<{ data: Company[]; nextToken?: string | null }>;
   create: (
     input: CompanyCreateInput,
     options?: Record<string, unknown>
@@ -49,8 +52,7 @@ export class CompanyRepository {
   }
 
   async list(filter: Record<string, unknown> = {}) {
-    const { data } = await this.model.list(gqlOptions(filter));
-    return data;
+    return fetchAllListItems<Company>(this.model.list.bind(this.model), filter);
   }
 
   async create(input: CompanyCreateInput) {

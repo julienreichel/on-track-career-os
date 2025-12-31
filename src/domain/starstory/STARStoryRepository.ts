@@ -1,4 +1,5 @@
 import { gqlOptions } from '@/data/graphql/options';
+import { fetchAllListItems } from '@/data/graphql/pagination';
 import type { AmplifyExperienceModel } from '@/domain/experience/ExperienceRepository';
 import type { STARStoryCreateInput, STARStoryUpdateInput, STARStory } from './STARStory';
 
@@ -7,7 +8,9 @@ export type AmplifySTARStoryModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: STARStory | null }>;
-  list: (options?: Record<string, unknown>) => Promise<{ data: STARStory[] }>;
+  list: (
+    options?: Record<string, unknown>
+  ) => Promise<{ data: STARStory[]; nextToken?: string | null }>;
   create: (
     input: STARStoryCreateInput,
     options?: Record<string, unknown>
@@ -67,8 +70,7 @@ export class STARStoryRepository {
    * @returns Array of stories
    */
   async list(filter: Record<string, unknown> = {}): Promise<STARStory[]> {
-    const { data } = await this.model.list(gqlOptions(filter));
-    return data;
+    return fetchAllListItems<STARStory>(this.model.list.bind(this.model), filter);
   }
 
   /**

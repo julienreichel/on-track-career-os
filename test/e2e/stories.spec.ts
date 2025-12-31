@@ -41,7 +41,10 @@ test.describe('Story workflow', () => {
       dialog.getByRole('heading', { name: /Key Performance Indicators/i })
     ).toBeVisible();
 
-    await dialog.getByRole('button', { name: /^Close$/i }).last().click();
+    await dialog
+      .getByRole('button', { name: /^Close$/i })
+      .last()
+      .click();
   });
 
   test('generates a story from free text with AI achievements and KPIs', async ({ page }) => {
@@ -49,7 +52,10 @@ test.describe('Story workflow', () => {
     await page.goto(`/profile/experiences/${experienceId}/stories/new`);
     await page.waitForLoadState('networkidle');
 
-    await page.getByRole('heading', { name: /Generate from Free Text/i }).first().click();
+    await page
+      .getByRole('heading', { name: /Generate from Free Text/i })
+      .first()
+      .click();
 
     const freeTextTextarea = page.getByLabel(/Your Achievement Description/i);
     await freeTextTextarea.fill(FREE_TEXT_INPUT);
@@ -63,7 +69,10 @@ test.describe('Story workflow', () => {
     await expect(kpiTags).toBeVisible({ timeout: 60000 });
     await expect(kpiTags).toContainText(/\S/, { timeout: 60000 });
 
-    await page.getByRole('button', { name: /^Save$/i }).last().click();
+    await page
+      .getByRole('button', { name: /^Save$/i })
+      .last()
+      .click();
     await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(new RegExp(`/profile/experiences/${experienceId}/stories$`));
     await expect(page.getByText(freeTextStoryTitle!)).toBeVisible({ timeout: 10000 });
@@ -99,18 +108,22 @@ test.describe('Story workflow', () => {
     await expect(achievementsTags).toContainText(/\S/, { timeout: 60000 });
     await expect(manualKpiTags).toContainText(/\S/, { timeout: 60000 });
 
-    await page.getByRole('button', { name: /^Save$/i }).last().click();
+    await page
+      .getByRole('button', { name: /^Save$/i })
+      .last()
+      .click();
     await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(new RegExp(`/profile/experiences/${experienceId}/stories$`));
     await expect(page.getByText(MANUAL_STORY_TITLE)).toBeVisible({ timeout: 10000 });
 
     await page.goto('/profile/stories');
+    await page.waitForTimeout(500);
     await page.waitForLoadState('networkidle');
-    await expect(
-      page
-        .locator('[data-testid="story-card"]')
-        .filter({ hasText: MANUAL_STORY_TITLE })
-        .first()
-    ).toBeVisible({ timeout: 60000 });
+    const storiesSearch = page.getByPlaceholder(/Search stories/i);
+    await storiesSearch.fill(MANUAL_STORY_TITLE);
+    await page.waitForTimeout(500);
+    await expect(page.getByRole('heading', { level: 3, name: MANUAL_STORY_TITLE })).toBeVisible({
+      timeout: 20000,
+    });
   });
 });

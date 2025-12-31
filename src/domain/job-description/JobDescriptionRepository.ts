@@ -1,4 +1,5 @@
 import { gqlOptions } from '@/data/graphql/options';
+import { fetchAllListItems } from '@/data/graphql/pagination';
 import type {
   JobDescriptionCreateInput,
   JobDescriptionUpdateInput,
@@ -10,7 +11,9 @@ export type AmplifyJobDescriptionModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: JobDescription | null }>;
-  list: (options?: Record<string, unknown>) => Promise<{ data: JobDescription[] }>;
+  list: (
+    options?: Record<string, unknown>
+  ) => Promise<{ data: JobDescription[]; nextToken?: string | null }>;
   create: (
     input: JobDescriptionCreateInput,
     options?: Record<string, unknown>
@@ -52,8 +55,7 @@ export class JobDescriptionRepository {
   }
 
   async list(filter: Record<string, unknown> = {}) {
-    const { data } = await this.model.list(gqlOptions(filter));
-    return data;
+    return fetchAllListItems<JobDescription>(this.model.list.bind(this.model), filter);
   }
 
   async create(input: JobDescriptionCreateInput) {
