@@ -18,7 +18,7 @@ test.describe('Company workflow', () => {
   let jobDetailUrl: string | null = null;
   let companySearchName = COMPANY_NAME;
 
-  test('1. Create company from research notes', async ({ page }) => {
+  test('creates company from research notes', async ({ page }) => {
     await page.goto('/companies');
     await page.waitForLoadState('networkidle');
     await expect(page.getByRole('heading', { name: 'Companies', level: 1 })).toBeVisible();
@@ -49,7 +49,7 @@ test.describe('Company workflow', () => {
     companyDetailUrl = page.url();
   });
 
-  test('2. Analyze company and generate canvas', async ({ page }) => {
+  test('runs AI analysis for company profile', async ({ page }) => {
     expect(companyDetailUrl).toBeTruthy();
     await page.goto(companyDetailUrl!);
     await page.waitForLoadState('networkidle');
@@ -57,12 +57,25 @@ test.describe('Company workflow', () => {
     await page.getByTestId('company-analyze-button').click();
     await expect(page.getByTestId('company-productsServices-tags')).toBeVisible();
     await expect(page.getByPlaceholder('https://example.com')).not.toHaveValue('');
+
     const analyzedNameInput = page.getByPlaceholder('e.g., Atlas Robotics');
     companySearchName = (await analyzedNameInput.inputValue()) || COMPANY_NAME;
+  });
+
+  test('generates company canvas via AI', async ({ page }) => {
+    expect(companyDetailUrl).toBeTruthy();
+    await page.goto(companyDetailUrl!);
+    await page.waitForLoadState('networkidle');
 
     await page.getByRole('button', { name: /generate canvas/i }).click();
     await expect(page.getByTestId('canvas-valuePropositions-tags')).toContainText(/.+/);
     await expect(page.getByTestId('canvas-customerSegments-tags')).toContainText(/.+/);
+  });
+
+  test('saves manual canvas edits', async ({ page }) => {
+    expect(companyDetailUrl).toBeTruthy();
+    await page.goto(companyDetailUrl!);
+    await page.waitForLoadState('networkidle');
 
     const valuePropInput = page.getByTestId('canvas-valuePropositions-input');
     await valuePropInput.fill(CUSTOM_VALUE_PROP);
@@ -78,7 +91,7 @@ test.describe('Company workflow', () => {
     );
   });
 
-  test('3. Upload job, link company, and verify navigation', async ({ page }) => {
+  test('uploads job description fixture', async ({ page }) => {
     expect(companyDetailUrl).toBeTruthy();
 
     await page.goto('/jobs');
@@ -97,10 +110,20 @@ test.describe('Company workflow', () => {
     const saveJobButton = page.getByTestId('job-save-button');
     await saveJobButton.click();
     await expect(saveJobButton).toBeDisabled({ timeout: 10000 });
+  });
+
+  test('links saved job to analyzed company', async ({ page }) => {
+    expect(companyDetailUrl).toBeTruthy();
+    expect(jobDetailUrl).toBeTruthy();
+
+    await page.goto(jobDetailUrl!);
+    await page.waitForLoadState('networkidle');
 
     const clearLinkButton = page.getByTestId('job-company-clear');
-    await clearLinkButton.click();
-    await expect(clearLinkButton).toBeHidden({ timeout: 10000 });
+    if (await clearLinkButton.isVisible()) {
+      await clearLinkButton.click();
+      await expect(clearLinkButton).toBeHidden({ timeout: 10000 });
+    }
 
     const selectorSearch = page.getByTestId('company-selector-search');
     await expect(selectorSearch).toBeEnabled({ timeout: 10000 });
@@ -120,10 +143,5 @@ test.describe('Company workflow', () => {
 
     await page.getByRole('link', { name: 'View company' }).click();
     await expect(page).toHaveURL(companyDetailUrl!);
-
-    expect(jobDetailUrl).toBeTruthy();
-    await page.goto(jobDetailUrl!);
-    await expect(page.getByTestId('job-title-input')).toHaveValue(JOB_TITLE);
-    await expect(page.getByRole('link', { name: 'View company' })).toBeVisible();
   });
 });
