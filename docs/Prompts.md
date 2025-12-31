@@ -41,350 +41,396 @@ Output:
 
 ---
 
-## MASTER PROMPT 2 — Domain Layer: Company + CompanyCanvas (Repository/Service/Composables)
-
-Intro (context + why)
-EPIC 5B introduces Company and CompanyCanvas as first-class entities in the Job & Company domain. We need a clean domain layer that matches the Conceptual Data Model (CDM) and supports later EPICs (5C matching).
-
-Feature scope
-
-- Implement domain/repository/services/composables for:
-  - Company CRUD
-  - CompanyCanvas read/update
-  - “needsUpdate” and “lastGeneratedAt” semantics
-- Integrate with Amplify Gen2 GraphQL models already present in the backend schema.
-  Out of scope
-- No matching engine logic (EPIC 5C)
-- No advanced dedupe/matching across companies
-
-Composables / services / repositories to create or update
-
-- Domain types:
-  - `Company`
-  - `CompanyCanvas` with 9 canonical blocks per CDM :contentReference[oaicite:6]{index=6}
-- Repositories:
-  - `CompanyRepository` (list/get/create/update/delete)
-  - `CompanyCanvasRepository` (getByCompanyId, update, setNeedsUpdate, setLastGeneratedAt)
-- Services:
-  - `CompanyService` (orchestrate create + optional analyze step; keep orchestration here, not UI)
-  - `CompanyCanvasService` (generate/regenerate orchestration; merges AI result into persisted canvas)
-- Frontend composables (Nuxt):
-  - `useCompanies()` (list/search/create/delete)
-  - `useCompany(companyId)` (load/update)
-  - `useCompanyCanvas(companyId)` (load/edit/save/regenerate; exposes “dirty” state)
-
-Implementation instructions (clean + DRY)
-
-- Reuse existing project conventions for repositories/composables (same patterns as JobDescription flows).
-- Single source of truth for canvas block keys (shared constant/enum) to avoid typos and duplicated UI mapping.
-- Ensure updates are partial/patch-like where appropriate; avoid replacing the entire entity when editing one block.
-- Normalize array entries (trim, dedupe, remove empty strings) at a single layer (service), not scattered in UI.
-
-Testing requirements
-
-- Vitest:
-  - Unit tests for normalization/dedupe helpers
-  - Repository/service tests with mocked API client
-  - Composable tests for state transitions (loading, saving, error, dirty flags)
-
-Acceptance criteria
-
-- Create, read, update, delete company works end-to-end via domain layer.
-- CompanyCanvas can be loaded, edited, and saved without AI.
-- `needsUpdate` and `lastGeneratedAt` are updated consistently (generation sets lastGeneratedAt and clears needsUpdate).
-- No duplicated “canvas keys” logic across UI/components.
-
-## MASTER PROMPT 3 — AI Ops Integration for EPIC 5B (analyzeCompanyInfo + generateCompanyCanvas)
-
-Intro (context + why)
-EPIC 5B requires two AI operations with strict JSON I/O and validation. Implement integration so the UI triggers AI safely and results map cleanly into Company and CompanyCanvas.
-
-Feature scope
-
-- Add/extend AI operation registry + client calls:
-  - `ai.analyzeCompanyInfo`
-  - `ai.generateCompanyCanvas`
-- Enforce strict input/output schema validation + fallback handling as per AI contract.
-  Out of scope
-- No “web research” or external enrichment beyond user-provided text.
-- No free-form text returned to the app.
-
-AI operations impact (must follow contract)
-
-- `ai.analyzeCompanyInfo`:
-  - Inputs: companyName, industry, size, rawText, optional jobContext :contentReference[oaicite:9]{index=9}
-  - Output: `companyProfile` object with normalized fields (website, productsServices, targetMarkets, customerSegments, description, etc.) :contentReference[oaicite:10]{index=10}
-  - Mapping: update Company entity fields (do not overwrite user edits blindly—define merge rules).
-- `ai.generateCompanyCanvas`:
-  - Inputs: companyProfile + additionalNotes[] {index=11}
-  - Output: 9-block BMC fields + companyName {index=12}
-  - Mapping: write to CompanyCanvas entity (blocks are arrays of strings)
-
-Implementation instructions (clean + DRY)
-
-- AI calls should be orchestrated in a service layer (not in page components).
-- Define deterministic merge strategy:
-  - analyzeCompanyInfo: fill empty fields, append to lists with dedupe, never erase non-empty user-provided data unless explicitly “Replace with AI result” is chosen.
-  - generateCompanyCanvas: replace the 9 blocks by default (canvas is a generated artifact), but preserve user edits if you support “regenerate only empty blocks” as an enhancement (optional).
-- Add operation-level logging hooks (inputs/outputs/fallback steps) consistent with project patterns.
-
-Testing requirements
-
-- Vitest:
-  - Schema validation tests for both ops (valid, missing fields, wrong types)
-  - Service orchestration tests: analyze → persist Company; generate → persist Canvas
-  - Merge strategy tests (user field wins, dedupe behavior)
-- Playwright:
-  - Covered in the final E2E master prompt
+## Master Prompt 1 — Implement `ai.generateMatchingSummary` AI Operation (Lambda + schemas + tests)
 
-Acceptance criteria
-
-- Both AI ops can be executed from the app with strict JSON validation (no free text leakage).
-- Invalid AI responses trigger fallback strategy and still return a safe object shape per contract.
-- Company fields update is predictable (no surprising overwrites).
-- CompanyCanvas generated data matches the 9-block CDM structure.
+### 1) Title
 
-## MASTER PROMPT 4 — UI Pages for EPIC 5B (Nuxt UI): /companies, /companies/new, /companies/[id]
+EPIC 5C — Add AI Operation `ai.generateMatchingSummary` (strict JSON, deterministic, validated)
 
-Intro (context + why)
-EPIC 5B requires a user-facing flow to create a company, optionally analyze pasted notes, and generate/edit a 9-block CompanyCanvas. UI must be consistent with existing Nuxt UI patterns and keep code DRY by reusing canvas editing components.
+### 2) Intro (context + why)
 
-Feature scope
+EPIC 5C is blocked primarily by the missing AI operation that produces the **matching summary** used by the UI and downstream EPIC 6 tailoring. The project uses a deterministic **AI operations registry** where **the app never receives free-form text**—only JSON validated by strict schemas + fallback rules. `ai.generateMatchingSummary` is explicitly planned and currently missing.
 
-- Implement pages:
-  - `/companies` list/search/create/delete
-  - `/companies/new` intake form (companyName, industry, sizeRange, website optional, products/services, markets, segments, raw notes paste)
-  - `/companies/[companyId]` company detail + canvas view/edit + regenerate actions
-    Out of scope
-- No multi-user sharing, permissions, or collaboration
-- No file upload parsing (only text paste for now, unless upload infra already exists)
+### 3) Feature scope
 
-Components to create/update (Nuxt UI)
+**Implement:**
 
-- Reusable components:
-  - `CompanyCard` (list item)
-  - `CompanyForm` (create/edit basic fields)
-  - `CompanyNotesInput` (raw notes textarea + helper text)
-  - `CompanyCanvasEditor` (maps 9 blocks to editable sections; uses TagInput-style editing)
-  - `CanvasBlockSection` (generic, blockKey + label + list editor)
-- UI behaviors:
-  - Clear CTA separation: “Save Company”, “Analyze Company Info (AI)”, “Generate Canvas (AI)”, “Save Canvas”
-  - Show lastGeneratedAt and needsUpdate (CDM fields) :contentReference[oaicite:16]{index=16}
-  - Loading + error states per action
+- A new Lambda-backed AI operation: `ai.generateMatchingSummary`
+- Strict input/output schema validation (pre-call + post-call)
+- Fallback strategy consistent with the AI Interaction Contract “ERROR FALLBACK RULES”
+- Unit/sandbox tests for schema validation + fallback behavior
 
-Implementation instructions (clean + DRY)
+**Out of scope:**
 
-- Use a single canonical “blocks config” array (key/label/help) to render the 9 sections.
-- Keep page components thin: they call composables/services; no direct GraphQL or AI calls inside UI.
-- Avoid duplicating list editing logic—centralize in one list-editor component.
+- Any “fit score” (the data model mentions score as V2; treat it as optional/not produced by AI in MVP)
+- Any new frameworks or UI work (handled in other prompts)
 
-Testing requirements
+### 4) Composables / services / repositories / domain modules
 
-- Vitest:
-  - Component tests for `CompanyForm`, `CompanyCanvasEditor`, and `CanvasBlockSection`
-  - Page tests for basic rendering + route param handling
-- Basic accessibility checks (labels, button names, headings)
+- Add operation definition to the AI operations registry (same pattern as existing ops like `ai.parseJobDescription`, `ai.analyzeCompanyInfo`)
+- Add shared schema types exported in the same “single source of truth” style used elsewhere (Lambda → types re-exported to frontend)
 
-Acceptance criteria
-
-- User can create a company with minimal data and lands on company detail page.
-- User can edit and save company fields.
-- User can view and edit the 9 canvas blocks and save them.
-- UI remains consistent with Nuxt UI design system and existing app conventions.
-
-## MASTER PROMPT 5 — Connect EPIC 5A Job Flow to Companies (Select/Create + Persist companyId)
-
-Intro (context + why)
-JobDescription supports linking to a Company (CDM indicates Company ↔ Jobs relationship). EPIC 5B must provide minimal UX to associate a job with a company to enable later matching and context-aware generation.
-
-Feature scope
-
-- From Job detail page (EPIC 5A):
-  - Allow selecting an existing Company
-  - Allow creating a new Company quickly (inline modal or redirect to /companies/new with return path)
-  - Persist linkage into JobDescription.companyId (or equivalent field in current backend)
-    Out of scope
-- No automatic company detection from job text (future enhancement)
-- No multi-company per job
-
-Composables/components/pages to update
-
-- Composables:
-  - Extend `useJobDescription(jobId)` to support setting/clearing company link
-  - Reuse `useCompanies()` for search/select
-- Components:
-  - `CompanySelector` (searchable select + “Create new” action)
-  - `LinkedCompanyBadge` (quick navigation to /companies/[id])
-
-Implementation instructions
-
-- Keep the link operation explicit and undoable (clear link).
-- Don’t block job editing on company data completeness.
-
-Testing requirements
-
-- Vitest:
-  - Company linking composable/service tests
-  - Component test for selector (select existing, clear)
-- Include in Playwright E2E (next prompt)
-
-Acceptance criteria
-
-- A job can be linked to a company and the link persists after reload.
-- User can navigate from the job to the linked company page.
-- User can clear the link cleanly.
-
-## MASTER PROMPT 6 — EPIC 5A ⇄ EPIC 5B Bridge: Company Extraction from Job Description Upload
-
-Intro (context + why)
-When a user uploads or pastes a Job Description (EPIC 5A), the text often implicitly or explicitly contains company information (name, industry, products, market). EPIC 5B introduces Company as a first-class entity. This prompt defines the automatic, non-intrusive bridge between EPIC 5A and EPIC 5B: extract and normalize company info at job upload time, link the job to an existing or newly created Company, without generating a CompanyCanvas yet.
-
-This step ensures:
-
-- No duplicated companies
-- Early company context availability
-- Clean separation of concerns (analysis vs. canvas generation)
-
-Feature scope
-
-- On Job Description upload / parsing:
-  - Extract company-related information from the job description text
-  - Call `ai.analyzeCompanyInfo` using job content as input
-  - Link the job to a Company entity (existing or newly created)
-- CompanyCanvas is NOT generated here (manual action only from Company page)
-  Out of scope
-- No automatic CompanyCanvas generation
-- No UI canvas rendering
-- No aggressive company deduplication heuristics beyond name-based matching
-
-Trigger point (explicit)
-
-- This logic runs AFTER:
-  - Job description text is parsed and stored
-  - JobDescription entity exists
-- This logic runs BEFORE:
-  - Job detail page is shown as “fully initialized”
-
-AI operations usage
-
-- Call `ai.analyzeCompanyInfo`
-  Inputs:
-  - rawText: full job description text
-  - jobTitle (if available)
-  - optional jobContext metadata (location, seniority)
-    Output:
-  - companyProfile object (companyName, industry, productsServices, targetMarkets, description, etc.)
-    Must follow the AI Interaction Contract strictly (JSON only, validated output).
-
-Company deduplication rules (important)
-
-- Use companyName as the primary matching key
-- Normalization rules (single shared helper):
-  - trim whitespace
-  - case-insensitive comparison
-  - ignore common suffixes (e.g. “SA”, “AG”, “Ltd”, “Inc”) if such helper already exists; otherwise keep comparison simple and explicit
-- If a Company with the same normalized name exists:
-  - Reuse it
-  - Do NOT overwrite existing Company fields blindly
-  - Merge only missing or empty fields (same merge rules as manual analyzeCompanyInfo)
-- If no Company exists:
-  - Create a new Company entity
-  - Populate only fields returned by analyzeCompanyInfo
-  - Mark CompanyCanvas.needsUpdate = true (canvas not generated yet)
-
-Domain / services / composables to implement or extend
-
-- Services:
-  - Extend JobDescriptionService orchestration:
-    - parseJobDescription
-    - → analyzeCompanyInfo
-    - → findOrCreateCompany
-    - → link JobDescription.companyId
-- Repositories:
-  - CompanyRepository:
-    - findByNormalizedName(name)
-    - create()
-    - updatePartial()
-- Shared helpers:
-  - normalizeCompanyName(name)
-  - mergeCompanyFields(existingCompany, analyzedCompanyProfile)
-
-Frontend composables impact
-
-- Extend `useJobDescription(jobId)`:
-  - expose linked company (if any)
-  - expose status flags (companyDetected, companyCreated, companyLinked)
-- No new UI required for this step (UI can display linked company badge if already designed)
-
-Implementation instructions (CLEAN + DRY)
-
-- Keep AI calls and dedup logic in the service layer, NOT in pages or composables.
-- Reuse the same merge logic used in EPIC 5B manual “Analyze Company Info” action.
-- Ensure idempotency:
-  - Re-running job analysis should not create duplicate companies.
-- Fail-safe behavior:
-  - If AI analysis fails or returns invalid data, job upload still succeeds without company linkage.
-
-Testing requirements
-
-- Vitest:
-  - Unit tests for normalizeCompanyName
-  - Service tests:
-    - job upload → company extracted → existing company reused
-    - job upload → company extracted → new company created
-    - job upload → AI failure → job created without company
-  - Merge behavior tests (existing data preserved)
-- Playwright:
-  - Covered implicitly by EPIC 5B E2E:
-    - Upload job with recognizable company name
-    - Verify job shows linked company
-    - Navigate to company page
-    - Verify no canvas exists yet and “Generate Canvas” is available
-
-Acceptance criteria
-
-- Uploading a job description with company info automatically links a Company.
-- Duplicate companies are not created when uploading multiple jobs for the same company.
-- CompanyCanvas is NOT generated automatically in this flow.
-- Job upload remains robust even if company analysis fails.
-- Logic is reusable and shared with EPIC 5B manual company analysis.
-
-## MASTER PROMPT 7 — EPIC 5B End-to-End Playwright E2E + Key Vitest Coverage
-
-Intro (context + why)
-EPIC 5B adds a multi-step workflow (create company → analyze → generate canvas → edit/save → link from job). We need one reliable E2E happy path + targeted unit/component tests to prevent regressions.
-
-Feature scope
-
-- Add a single Playwright E2E spec covering the core EPIC 5B path.
-- Ensure Vitest coverage exists for critical logic (merge + validation + canvas keys config).
-
-E2E happy path (Playwright)
-Scenario:
-
-1. Go to /companies
-2. Create new company (minimal required fields + paste notes)
-3. Run “Analyze Company Info (AI)” and assert company fields populate (at least one list field updates)
-4. Run “Generate Canvas (AI)” and assert at least 2 blocks have items
-5. Edit one canvas block (add/remove item) and save
-6. Go to a job detail page and link that job to the created company
-7. Assert the link persists (reload) and job can navigate back to the company
-
-Implementation instructions (Playwright best practices)
-
-- Use role-based locators, stable labels, and avoid strict-mode text collisions.
-- Prefer `getByRole` / `getByLabel` with exact accessible names.
-- Mock AI calls if the project has a test double approach; otherwise seed deterministic AI responses via test fixtures.
-
-Vitest coverage checklist
-
-- AI schema validation/fallback tests for both company ops
-- Merge strategy tests for analyzeCompanyInfo → Company
-- Canvas keys config test (ensures exactly 9 blocks, correct order and labels)
-- Repository/service tests for save/load of CompanyCanvas
-
-Acceptance criteria
-
-- Playwright spec passes reliably in CI (no flaky selectors, no timing hacks).
-- Critical business rules are covered in Vitest (validation, merge, dedupe, canvas keys).
-- EPIC 5B workflow is protected against regressions with minimal but meaningful tests.
+### 5) Components
+
+- None
+
+### 6) Pages/routes
+
+- None
+
+### 7) AI operations impact (names, inputs/outputs, validation + fallback, call sites)
+
+**Operation name:** `ai.generateMatchingSummary`
+
+**Output schema (MVP):**
+Return JSON containing these fields (names should match app expectations; allow snake_case → normalize to camelCase if your Lambda infra already supports that):
+
+- `fitSummary: string`
+- `impactAreas: string[]`
+- `contributionMap: string[]`
+- `risks: string[]`
+
+(Also note the CDM expects “riskMitigationPoints” and “summaryParagraph” for the stored entity; the agent must decide how to map/rename consistently across AI output vs entity fields—keep it DRY and explicit.)
+
+**Input schema (define explicitly):**
+Use structured inputs only—no raw free-text. Input should be a JSON object that can be composed from existing models:
+
+- `userProfile: {…}` (the profile fields used by other operations)
+- `personalCanvas?: {…}` (optional but recommended; if missing, AI must still produce stable output)
+- `jobDescription: {…}` (the analyzed job fields, not the raw posting)
+- `company?: { companyProfile?: {…}, companyCanvas?: {…} }` (optional, because job may not have a linked company/canvas)
+
+**Fallback rules (must implement):**
+Follow the contract’s global rules:
+
+- If output is not valid JSON → attempt substring parse → retry once with “Return ONLY VALID JSON matching schema”
+- Missing strings → `""`; missing arrays → `[]`; missing objects → `{}`
+- If hallucinated content detected by validator heuristics (e.g., mentions facts not in inputs) → strip, keep only input-grounded items (best-effort)
+- Log fallback steps used + store input/output payloads for traceability
+
+**Where it is called from (later prompts implement caller):**
+
+- Called by `useMatchingEngine()` (workflow composable) when user requests/opens the match page, and persisted to `MatchingSummary`
+
+### 8) Testing requirements
+
+Add tests at the same rigor level as existing AI ops:
+
+- Lambda unit tests:
+  - Valid input → valid output schema passes
+  - Output missing fields → fallback fills defaults
+  - Output invalid JSON → retry path exercised (mock AI response)
+
+- Sandbox E2E AI tests (if your repo uses these for ops): one happy path, one fallback path
+
+### 9) Acceptance criteria (checklist)
+
+- [ ] `ai.generateMatchingSummary` exists in the AI ops registry and can be invoked with strict schemas
+- [ ] Output JSON is always normalized + schema-valid (never free text reaches app)
+- [ ] Fallback behavior matches contract rules (retry + defaults)
+- [ ] Comprehensive tests pass (unit + sandbox), consistent with existing AI op quality gates
+- [ ] No new dependencies/frameworks introduced
+
+---
+
+## Master Prompt 2 — Add MatchingSummary Domain Layer (Repository + Service + Application Composable)
+
+### 1) Title
+
+EPIC 5C — Implement MatchingSummary domain layer (Amplify Gen2 GraphQL + type-safe repo/service)
+
+### 2) Intro (context + why)
+
+The CDM already includes `MatchingSummary`, but EPIC 5C is missing the domain layer: repository/service/composables. The app follows a clean split: repositories in `src/data/repositories`, domain services, and entity CRUD composables in `src/application`, plus workflow composables in `src/composables`.
+
+### 3) Feature scope
+
+**Implement:**
+
+- Repository for `MatchingSummary` CRUD using Amplify GraphQL patterns
+- Service encapsulating “upsert for (userId, jobId, companyId?)” semantics
+- Application-layer composable `useMatchingSummary(matchId | byJobId)` consistent with other entities
+
+**Out of scope:**
+
+- Workflow orchestration or AI calls (covered in Prompt 3)
+- UI rendering (Prompt 4)
+
+### 4) Composables / services / repositories / domain modules to create or update
+
+Create/update:
+
+- `src/data/repositories/matchingSummaryRepository.ts`
+- `src/domain/services/MatchingSummaryService.ts` (or existing naming conventions used in the repo)
+- `src/application/useMatchingSummary(...)` (entity-level CRUD composable)
+
+Key domain decisions to enforce (DRY):
+
+- Support “get existing summary for user+job(+company)” and update it instead of creating duplicates
+- Persist fields aligned with CDM:
+  - `impactAreas`
+  - `contributionMap`
+  - `riskMitigationPoints` (or alias mapping from AI `risks`)
+  - `summaryParagraph` (or alias mapping from AI `fitSummary`)
+
+### 5) Components
+
+- None
+
+### 6) Pages/routes
+
+- None
+
+### 7) AI operations impact
+
+- None directly (domain layer should be AI-agnostic; workflow comp will call AI then persist via service)
+
+### 8) Testing requirements
+
+Vitest tests:
+
+- Repository tests:
+  - create/read/update
+  - list/query patterns used by the workflow
+
+- Service tests:
+  - “upsert-by-job” behavior (no duplicates)
+  - mapping logic between AI output DTO and persisted entity fields (explicit mapping function)
+
+### 9) Acceptance criteria
+
+- [ ] `MatchingSummary` has a full repo/service/application composable consistent with other entities
+- [ ] Upsert behavior prevents duplicates for the same job context
+- [ ] Field mapping is centralized (single mapping function) and unit tested
+- [ ] All tests pass; lint clean; no new patterns introduced
+
+---
+
+## Master Prompt 3 — Build `useMatchingEngine()` Workflow Composable (data gathering + AI call + persistence)
+
+### 1) Title
+
+EPIC 5C — Implement workflow composable `useMatchingEngine()` (User × Job × Company)
+
+### 2) Intro (context + why)
+
+The matching page needs a single orchestration layer that gathers all required structured inputs (user profile, personal canvas, job description, optional company+canvas), invokes `ai.generateMatchingSummary`, applies fallback rules, and persists the result into `MatchingSummary`. The mapping doc explicitly calls for a `useMatchingEngine()` composable and reuse of existing patterns like `useJobAnalysis()` and `useCanvasEngine()`.
+
+### 3) Feature scope
+
+**Implement:**
+
+- `useMatchingEngine(jobId)` (or similar signature matching your conventions)
+- A single “generate or refresh matching” method:
+  - load required models
+  - validate prerequisites
+  - call AI operation
+  - persist summary
+  - expose UI-ready computed state (loading/error/empty)
+
+**Out of scope:**
+
+- Any new global store
+- Any background regeneration strategy (no polling); keep it user-triggered or page-entry-triggered
+
+### 4) Composables / services / repositories / domain modules to create or update
+
+Create:
+
+- `src/composables/useMatchingEngine.ts`
+
+Reuse:
+
+- `useUserProfile()` for current user data
+- `useCanvasEngine()` / `usePersonalCanvas()` for personal canvas access
+- `useJobAnalysis()` / job composables for `JobDescription`
+- Company composables from EPIC 5B for `Company` and `CompanyCanvas` (optional)
+
+### 5) Components
+
+- None (but shape the returned data so components can stay “dumb”)
+
+### 6) Pages/routes
+
+- None
+
+### 7) AI operations impact (where called from + fallback)
+
+- Call `ai.generateMatchingSummary` only with structured JSON input (no raw text)
+- Enforce “optional company context”:
+  - If job has no company or company has no canvas, still produce stable output
+
+- Apply the same strict schema validation and fallback approach used across AI ops (but don’t duplicate the Lambda validator—use shared client-side type guards if present, or rely on the fact Lambda already returns validated JSON)
+
+### 8) Testing requirements
+
+Vitest:
+
+- Workflow composable tests:
+  - happy path: all inputs exist → AI called → persisted → state updated
+  - missing company/canvas path: still calls AI with reduced input
+  - missing personal canvas path: either block with a clear error state or proceed with reduced input (choose one behavior and test it)
+  - error path: AI op fails → composable exposes stable error + no partial writes
+
+### 9) Acceptance criteria
+
+- [ ] `useMatchingEngine` composes existing composables (no duplication of canvas/job/company logic)
+- [ ] Works with or without linked company/canvas
+- [ ] Exposes clear states: `isLoading`, `error`, `matchingSummary`, and `regenerate()`
+- [ ] Tests cover all major branches; lint clean; strict TS passes
+
+---
+
+## Master Prompt 4 — Implement Matching Summary UI (components + `/jobs/[jobId]/match` page + navigation)
+
+### 1) Title
+
+EPIC 5C — Create `/jobs/[jobId]/match` page + MatchingSummary components (Nuxt UI scaffold)
+
+### 2) Intro (context + why)
+
+EPIC 5C’s planned UI route is `/jobs/[jobId]/match`. The mapping doc defines the UI primitives (UCard/UAlert/UBadge/UProgress) and required data (MatchingSummary + Job + Canvas context). The UI must follow the standard scaffold: `UContainer → UPage → UPageHeader/UPageBody`, reuse card patterns, and integrate breadcrumbs/navigation consistent with the Jobs & Companies section.
+
+### 3) Feature scope
+
+**Implement:**
+
+- New page: `/jobs/[jobId]/match`
+- Page header:
+  - breadcrumb: Jobs & Companies → Job (title) → Match
+  - optional action button: “Generate / Refresh match”
+
+- Page body:
+  - A primary “Matching Summary” card rendering:
+    - `summaryParagraph` / `fitSummary`
+    - impact areas
+    - contribution map
+    - risks + mitigation points (depending on final field naming)
+
+- Optional “Fit score visualization” UI element:
+  - If no score exists (MVP), render a placeholder or hide component (do not invent score)
+
+**Out of scope:**
+
+- Any tailoring pages (EPIC 6)
+- Any new charting library/framework
+
+### 4) Composables / services / repositories / domain modules
+
+Use:
+
+- `useMatchingEngine()` for orchestration
+- Existing job composable to show job title & linked company badge in header area (reuse `LinkedCompanyBadge` if appropriate)
+
+### 5) Components to create or update (Nuxt UI)
+
+Create components (keep them presentational; data comes from composable):
+
+- `MatchingSummaryCard` (renders summary + lists)
+- `FitScoreVisualization` (optional; should accept nullable/optional score; hide when undefined)
+- Consider reusing existing “Card pattern” components used in other pages (do not fork patterns)
+
+### 6) Pages/routes to create or update (navigation/breadcrumb behavior)
+
+Create:
+
+- `pages/jobs/[jobId]/match.vue`
+
+Update:
+
+- `pages/jobs/[jobId].vue` to include a visible navigation entry/button/link to “View Match” (only enabled when job is analyzed; optionally warn if prerequisites missing)
+
+Breadcrumb expectations:
+
+- Must include dynamic job title
+- Must be consistent with existing job detail breadcrumb pattern
+
+### 7) AI operations impact
+
+- The page should call `useMatchingEngine().regenerate()` on user action and/or on initial mount (choose one consistent behavior; avoid double calls)
+- Must never handle free-form text; render only validated fields already persisted/returned by the workflow
+
+### 8) Testing requirements
+
+Vitest:
+
+- Page test for `/jobs/[jobId]/match`:
+  - renders loading state
+  - renders empty/error state
+  - renders match data state (with mocked composable)
+
+- Component tests:
+  - `MatchingSummaryCard` renders lists robustly for empty arrays
+  - `FitScoreVisualization` hides safely when score missing
+
+Playwright is covered in Prompt 5.
+
+### 9) Acceptance criteria
+
+- [ ] `/jobs/[jobId]/match` exists with standard Nuxt UI scaffold
+- [ ] Uses `useMatchingEngine` and does not duplicate orchestration logic
+- [ ] Presents summary + 3 sections (impact, contribution, risks) with good empty states
+- [ ] Navigation from job detail → match works and breadcrumb is correct
+- [ ] All Vitest component/page tests pass; strict TS; lint clean
+
+---
+
+## Master Prompt 5 — Add the Single Playwright E2E Happy Path for EPIC 5C
+
+### 1) Title
+
+EPIC 5C — Playwright E2E: job → match generation → persistence → refresh
+
+### 2) Intro (context + why)
+
+The repo maintains robust E2E “happy path” coverage per EPIC (e.g., jobs-flow, company-workflow). EPIC 5C requires exactly one E2E spec validating that a user can open a job and generate/view a matching summary using strict JSON AI output and persisted `MatchingSummary`.
+
+### 3) Feature scope
+
+**Test must cover:**
+
+- Navigate to an existing analyzed job (or create one if your E2E pattern does that)
+- Go to `/jobs/[jobId]/match`
+- Trigger matching generation (button or auto-generate)
+- Verify key UI elements render (summary + at least one list section)
+- Refresh/reload page and verify it loads from persisted `MatchingSummary` (no re-generation required unless user triggers it)
+
+**Out of scope:**
+
+- Negative cases (AI failure), separate tests
+- Visual regression
+
+### 4) Composables/services/repositories
+
+- None directly; but the test assumes the full stack is wired (workflow composable, AI op, persistence)
+
+### 5) Components
+
+- Use stable locators:
+  - Prefer `getByRole()` / `getByTestId()` patterns consistent with your existing suite
+  - Avoid ambiguous `getByText()` strict mode pitfalls (scope locators to region/cards)
+
+### 6) Pages/routes (navigation expectations)
+
+- Start from `/jobs` list → open job detail
+- Use explicit link/button to match page OR direct navigation to `/jobs/${jobId}/match`
+- Validate breadcrumb shows job title and “Match”
+
+### 7) AI operations impact
+
+- The E2E should use the real AI operation in the environment if that’s the standard for your other E2Es; otherwise, follow the same mock/sandbox approach used in existing workflows
+- Must validate the UI receives JSON-shaped content (implicitly, by presence of rendered structured sections)
+
+### 8) Testing requirements
+
+Add **one** Playwright spec file, similar style to `jobs-flow.spec.ts` / `company-workflow.spec.ts`:
+
+- Setup: authenticated user
+- Steps: open job → open match → generate → assert → reload → assert
+
+### 9) Acceptance criteria
+
+- [ ] One Playwright test exists for EPIC 5C and passes reliably
+- [ ] Uses stable locators and avoids strict mode collisions
+- [ ] Demonstrates persistence (reload shows same match without manual re-entry)
+- [ ] Leaves the environment clean (if tests create data, they should delete it per your existing conventions)

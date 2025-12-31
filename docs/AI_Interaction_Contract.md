@@ -596,22 +596,196 @@ Additional Notes:
 
 ---
 
-## AI OPERATION 10 — `ai.generateMatchingSummary`
+### `ai.generateMatchingSummary`
 
-### Purpose
+#### Purpose
 
-Produce the User × Job × Company Fit Summary.
+Generate a **structured, deterministic matching analysis** between:
 
-### Output
+- a **User** (UserProfile + PersonalCanvas + selected Experience signals),
+- a **JobDescription** (analyzed job),
+- an **optional Company** (lightweight Company “basic info” only).
 
-```json
+The output is **strict JSON only**, validated against a schema, and is persisted into `MatchingSummary`.
+
+- produce a clear “fit narrative” + actionable matching artifacts
+- remain **grounded in provided inputs**
+- avoid overwhelming the model with excessive company context
+
+---
+
+## Input Schema (JSON)
+
+> Guiding principle: **maximize user signal**, keep company signal **minimal**.
+
+```ts
 {
-  "impactAreas": ["string"],
-  "contributionMap": ["string"],
-  "risks": ["string"],
-  "fitSummary": "string"
+  user: {
+    profile: {
+      fullName: string
+      headline?: string
+      location?: string
+      seniorityLevel?: string
+      workPermitInfo?: string
+
+      goals?: string[]
+      aspirations?: string[]
+      personalValues?: string[]
+      strengths?: string[]
+      interests?: string[]
+      skills?: string[]
+      certifications?: string[]
+      languages?: string[]
+    }
+
+    personalCanvas?: {
+      // PersonalCanvas (Business Model Canvas style)
+      customerSegments?: string[]
+      valueProposition?: string[]
+      channels?: string[]
+      customerRelationships?: string[]
+      keyActivities?: string[]
+      keyResources?: string[]
+      keyPartners?: string[]
+      costStructure?: string[]
+      revenueStreams?: string[]
+    }
+
+    experienceSignals?: {
+      // Lightweight, high-signal subset of Experience + STARStory,
+      // meant to improve matching without sending full stories.
+      experiences: Array<{
+        title: string
+        companyName?: string
+        startDate?: string // ISO date
+        endDate?: string   // ISO date or undefined
+        responsibilities?: string[]
+        tasks?: string[]
+        achievements?: string[]        // from STARStory.achievements (if available)
+        kpiSuggestions?: string[]      // from STARStory.kpiSuggestions (if available)
+      }>
+    }
+  }
+
+  job: {
+    // JobDescription (analyzed)
+    title: string
+    seniorityLevel?: string
+    roleSummary?: string
+    responsibilities?: string[]
+    requiredSkills?: string[]
+    behaviours?: string[]
+    successCriteria?: string[]
+    explicitPains?: string[]
+  }
+
+  company?: {
+    // MINIMAL company context (avoid overwhelming the AI)
+    companyName: string
+    industry?: string
+    sizeRange?: string
+    website?: string
+    description?: string
+  }
 }
 ```
+
+### Input Rules
+
+- Inputs must be **structured JSON only**.
+- No raw CV text, no raw job posting text, no free-form notes blobs.
+- `company` is optional (because `MatchingSummary.companyId` is optional in DB).
+- `experienceSignals.experiences` should include the **most relevant experiences** for the job (selection happens outside this operation).
+- If `experienceSignals` is missing, the operation must still return valid output, but quality may degrade (still deterministic + safe).
+
+---
+
+## Output Schema (JSON) — Matches `MatchingSummary`
+
+```ts
+{
+  // Optional in V1, maps to MatchingSummary.userFitScore
+  userFitScore?: number
+
+  // Core structured outputs
+  impactAreas: string[]
+  contributionMap: string[]
+  riskMitigationPoints: string[]
+  summaryParagraph: string
+
+  // Metadata
+  generatedAt: string // ISO datetime
+  needsUpdate: boolean
+}
+```
+
+### Output Semantics
+
+- `summaryParagraph`: concise narrative of fit (neutral tone, grounded in inputs)
+- `impactAreas`: where the user can create value quickly (3–7 items recommended)
+- `contributionMap`: explicit mappings from user signals → job needs (3–8 items recommended)
+- `riskMitigationPoints`: risks/gaps + mitigation actions (3–8 items recommended)
+- `userFitScore` (optional): only if the operation can compute it deterministically from inputs; must be `0..100`
+- `generatedAt`: timestamp set at generation time (UTC ISO string)
+- `needsUpdate`: set to `false` on successful generation (true only for fallback/partial cases)
+
+---
+
+## Validation Rules
+
+- Response must be valid JSON and match schema exactly (no extra keys).
+- Arrays are arrays of strings only (no objects).
+- If `userFitScore` exists: finite number, `0 <= score <= 100`.
+- `generatedAt` must be ISO datetime string.
+- Content must be input-grounded (no invented employers, achievements, company facts).
+
+---
+
+## Determinism & Grounding Requirements
+
+- Use only provided input fields.
+- Prefer explicit references to:
+  - user skills/strengths/values
+  - experience responsibilities/tasks/achievements/KPIs
+  - job requiredSkills/responsibilities/behaviours/explicitPains
+- Company input is intentionally minimal; do not infer culture, values, or strategy beyond `description/industry/sizeRange`.
+
+---
+
+## Fallback Strategy (Contract-Compatible)
+
+If validation fails:
+
+1. Retry once with a stricter instruction:
+   - “Return ONLY valid JSON matching schema. No extra keys. Strings/arrays only.”
+
+2. If still invalid, return fallback JSON:
+
+   ```ts
+   {
+     impactAreas: [],
+     contributionMap: [],
+     riskMitigationPoints: [],
+     summaryParagraph: "",
+     generatedAt: "<now-iso>",
+     needsUpdate: true
+   }
+   ```
+
+   (omit `userFitScore`)
+
+Additionally:
+
+- Log input snapshot + raw output snippet + fallback reason.
+- Persist fallback output (so UI remains stable and user can retry).
+
+---
+
+## Invocation Constraints
+
+- Called only from workflow/orchestration layer (e.g. `useMatchingEngine`).
+- Must be idempotent for unchanged inputs (workflow may enforce this via input hash; operation must remain stable for same input).
+- UI components must never call the AI op directly.
 
 ---
 

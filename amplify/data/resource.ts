@@ -265,18 +265,26 @@ export const schema = a
     MatchingSummary: a
       .model({
         userFitScore: a.float(),
+
+        // Core structured outputs
         impactAreas: a.string().array(),
-        contributionMap: a.string(),
+        contributionMap: a.string().array(),
         riskMitigationPoints: a.string().array(),
         summaryParagraph: a.string(),
 
+        // Metadata for traceability + refresh logic
+        generatedAt: a.datetime(),
+        needsUpdate: a.boolean().default(false),
+
+        // Relationships
         userId: a.id().required(),
         user: a.belongsTo('UserProfile', 'userId'),
 
         jobId: a.id().required(),
         job: a.belongsTo('JobDescription', 'jobId'),
 
-        companyId: a.id().required(),
+        // Company should be optional in MVP (job may not have one)
+        companyId: a.id(),
         company: a.belongsTo('Company', 'companyId'),
 
         kpis: a.hasMany('KPISet', 'matchingSummaryId'),
