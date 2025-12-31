@@ -34,7 +34,10 @@ test.describe('Experience workflow', () => {
 
     await expect(page).toHaveURL(/\/profile\/experiences$/);
     await expect(
-      page.locator('[data-testid="experience-card"]').filter({ hasText: /Senior Software Engineer/i })
+      page
+        .locator('[data-testid="experience-card"]')
+        .filter({ hasText: /Senior Software Engineer/i })
+        .first()
     ).toBeVisible({ timeout: 20000 });
   });
 

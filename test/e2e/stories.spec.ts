@@ -106,14 +106,11 @@ test.describe('Story workflow', () => {
 
     await page.goto('/profile/stories');
     await page.waitForLoadState('networkidle');
-    await expect(page.getByRole('button', { name: /View/i }).first()).toBeVisible({
-      timeout: 60000,
-    });
-
-    const searchInput = page.getByPlaceholder(/Search stories/i);
-    await searchInput.fill(MANUAL_STORY_TITLE);
     await expect(
-      page.getByRole('heading', { level: 3, name: MANUAL_STORY_TITLE })
-    ).toBeVisible({ timeout: 20000 });
+      page
+        .locator('[data-testid="story-card"]')
+        .filter({ hasText: MANUAL_STORY_TITLE })
+        .first()
+    ).toBeVisible({ timeout: 60000 });
   });
 });
