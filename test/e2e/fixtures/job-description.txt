@@ -1,7 +1,7 @@
-Head of Engineering
+Head of Engineering at Acme Systems
 
 About the Role:
-We are searching for a Head of Engineering who can connect product strategy with reliable execution. The person in this role will coach a team of senior engineers, define an architecture roadmap, and ensure that the entire delivery pipeline—from ideation to release—is resilient, observable, and fast.
+We are searching for a Head of Engineering who can connect product strategy with reliable execution for Acme Systems, an AI workflow platform focused on logistics and ecommerce brands. The company operates primarily in North America and Europe, offers the Orchestrator automation suite and Insight Dashboard, and recently opened a new operations center in Seattle. Customers such as FastShip Labs and ParcelFlow rely on the Acme Systems platform (see https://acme-systems.example) to reduce fulfillment costs.
 
 Key Responsibilities:
 - Partner with Product to translate business goals into technical plans with measurable milestones.

@@ -23,6 +23,7 @@ const jobsStore = useCompanyJobs(companyId.value);
 const loading = ref(true);
 const errorMessage = ref<string | null>(null);
 const savingCompany = ref(false);
+const analyzingCompany = ref(false);
 
 const form = reactive<CompanyFormState>({
   companyName: '',
@@ -97,7 +98,7 @@ const isDirty = computed(
   () => !!company.value && (hasScalarChanges() || hasListChanges() || hasNotesChange())
 );
 
-const disableActions = computed(() => savingCompany.value);
+const disableActions = computed(() => savingCompany.value || analyzingCompany.value);
 const canSaveCompany = computed(() => isDirty.value && !disableActions.value);
 
 const canvasSaving = ref(false);
@@ -183,6 +184,32 @@ async function saveCompany() {
       error instanceof Error ? error.message : t('companies.detail.errors.generic');
   } finally {
     savingCompany.value = false;
+  }
+}
+
+async function analyzeCompanyInfo() {
+  if (!company.value) {
+    return;
+  }
+
+  const researchText = rawNotes.value.trim() || company.value.rawNotes?.trim() || '';
+  if (!researchText) {
+    errorMessage.value = t('companies.detail.errors.missingNotes');
+    return;
+  }
+
+  analyzingCompany.value = true;
+  errorMessage.value = null;
+  try {
+    const updated = await companyStore.analyze({ rawText: researchText });
+    if (updated) {
+      hydrateCompany(updated);
+    }
+  } catch (error) {
+    errorMessage.value =
+      error instanceof Error ? error.message : t('companies.detail.errors.generic');
+  } finally {
+    analyzingCompany.value = false;
   }
 }
 
@@ -281,6 +308,15 @@ function clearJobsError() {
                   :label="t('companies.detail.actions.reset')"
                   :disabled="!isDirty || disableActions"
                   @click="resetCompanyForm"
+                />
+                <UButton
+                  color="secondary"
+                  icon="i-heroicons-sparkles"
+                  :label="t('companies.detail.actions.analyze')"
+                  :loading="analyzingCompany"
+                  :disabled="disableActions"
+                  data-testid="company-analyze-button"
+                  @click="analyzeCompanyInfo"
                 />
                 <UButton
                   color="primary"

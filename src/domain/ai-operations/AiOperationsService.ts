@@ -23,6 +23,48 @@ import type {
 } from './CompanyCanvasResult';
 import { isGeneratedCompanyCanvas } from './CompanyCanvasResult';
 
+type AnalyzeCompanyMock =
+  | CompanyAnalysisResult
+  | ((input: AnalyzeCompanyInfoInput) => CompanyAnalysisResult);
+type CanvasMock =
+  | GeneratedCompanyCanvas
+  | ((input: GeneratedCompanyCanvasInput) => GeneratedCompanyCanvas);
+
+function cloneResult<T>(value: T): T {
+  if (typeof structuredClone === 'function') {
+    return structuredClone(value);
+  }
+  return JSON.parse(JSON.stringify(value));
+}
+
+function resolveAiMock(
+  key: 'analyzeCompanyInfo',
+  input: AnalyzeCompanyInfoInput
+): CompanyAnalysisResult | null;
+function resolveAiMock(
+  key: 'generateCompanyCanvas',
+  input: GeneratedCompanyCanvasInput
+): GeneratedCompanyCanvas | null;
+function resolveAiMock(
+  key: 'analyzeCompanyInfo' | 'generateCompanyCanvas',
+  input: AnalyzeCompanyInfoInput | GeneratedCompanyCanvasInput
+) {
+  if (typeof window === 'undefined' || !window.__AI_OPERATION_MOCKS__) {
+    return null;
+  }
+
+  const handler = window.__AI_OPERATION_MOCKS__[key];
+  if (!handler) {
+    return null;
+  }
+
+  const result =
+    typeof handler === 'function'
+      ? handler(input as never)
+      : handler;
+  return cloneResult(result);
+}
+
 /**
  * Service for AI-powered CV and experience operations
  *
@@ -305,6 +347,11 @@ export class AiOperationsService {
       throw new Error('Company research text cannot be empty');
     }
 
+    const mock = resolveAiMock('analyzeCompanyInfo', input);
+    if (mock) {
+      return mock;
+    }
+
     const result = await this.repo.analyzeCompanyInfo(input);
     if (!isCompanyAnalysisResult(result)) {
       throw new Error('Invalid company analysis structure');
@@ -315,10 +362,24 @@ export class AiOperationsService {
   async generateCompanyCanvas(
     input: GeneratedCompanyCanvasInput
   ): Promise<GeneratedCompanyCanvas> {
+    const mock = resolveAiMock('generateCompanyCanvas', input);
+    if (mock) {
+      return mock;
+    }
+
     const result = await this.repo.generateCompanyCanvas(input);
     if (!isGeneratedCompanyCanvas(result)) {
       throw new Error('Invalid company canvas result');
     }
     return result;
+  }
+}
+
+declare global {
+  interface Window {
+    __AI_OPERATION_MOCKS__?: {
+      analyzeCompanyInfo?: AnalyzeCompanyMock;
+      generateCompanyCanvas?: CanvasMock;
+    };
   }
 }

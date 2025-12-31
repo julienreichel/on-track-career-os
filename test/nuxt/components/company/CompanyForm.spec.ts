@@ -37,7 +37,7 @@ const stubs = {
     `,
   },
   TagInput: {
-    props: ['modelValue', 'label'],
+    props: ['modelValue', 'label', 'testId'],
     emits: ['update:modelValue'],
     template: `
       <div class="tag-input">

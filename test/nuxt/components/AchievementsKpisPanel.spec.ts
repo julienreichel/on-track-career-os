@@ -13,7 +13,7 @@ const stubs = {
   },
   TagInput: {
     template: '<div class="tag-input"><slot /></div>',
-    props: ['modelValue', 'label', 'hint', 'placeholder', 'disabled', 'color'],
+    props: ['modelValue', 'label', 'hint', 'placeholder', 'disabled', 'color', 'testId'],
     emits: ['update:modelValue'],
   },
 };

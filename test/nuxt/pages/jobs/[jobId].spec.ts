@@ -168,7 +168,7 @@ const stubs = {
   },
   TagInput: {
     name: 'TagInput',
-    props: ['modelValue'],
+    props: ['modelValue', 'testId'],
     emits: ['update:modelValue'],
     template: '<div class="tag-input" v-bind="$attrs"></div>',
   },

@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import TagInput from '@/components/TagInput.vue';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     modelValue: string[];
     label: string;
     hint?: string;
     placeholder?: string;
     disabled?: boolean;
+    testId?: string;
   }>(),
   {
     hint: '',
     placeholder: '',
     disabled: false,
+    testId: undefined,
   }
 );
 
@@ -32,6 +34,7 @@ const handleUpdate = (value: string[]) => {
       :placeholder="placeholder"
       :model-value="modelValue"
       :disabled="disabled"
+      :test-id="props.testId"
       color="primary"
       @update:model-value="handleUpdate"
     />

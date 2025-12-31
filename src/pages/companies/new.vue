@@ -60,6 +60,10 @@ const payload = () => ({
   rawNotes: rawNotes.value.trim() || undefined,
 });
 
+function updateForm(value: CompanyFormState) {
+  Object.assign(form, value);
+}
+
 async function handleSave(analyze = false) {
   if (!form.companyName.trim()) {
     formError.value = t('companies.form.errors.missingName');
@@ -165,7 +169,11 @@ async function handleUploadSelected(file: File | null | undefined) {
             />
 
             <UCard>
-              <CompanyForm v-model="form" :disabled="disableActions" />
+              <CompanyForm
+                :model-value="form"
+                :disabled="disableActions"
+                @update:model-value="updateForm"
+              />
               <div class="mt-6">
                 <CompanyNotesInput v-model="rawNotes" :disabled="disableActions" />
               </div>

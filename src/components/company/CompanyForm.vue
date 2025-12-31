@@ -91,6 +91,7 @@ const updateField = <K extends keyof CompanyFormState>(key: K, value: CompanyFor
         :placeholder="t('companies.form.productsServicesPlaceholder')"
         :model-value="form.productsServices"
         :disabled="disabled"
+        test-id="company-productsServices"
         @update:model-value="updateField('productsServices', $event)"
       />
 
@@ -100,6 +101,7 @@ const updateField = <K extends keyof CompanyFormState>(key: K, value: CompanyFor
         :placeholder="t('companies.form.targetMarketsPlaceholder')"
         :model-value="form.targetMarkets"
         :disabled="disabled"
+        test-id="company-targetMarkets"
         @update:model-value="updateField('targetMarkets', $event)"
       />
     </div>
@@ -110,6 +112,7 @@ const updateField = <K extends keyof CompanyFormState>(key: K, value: CompanyFor
       :placeholder="t('companies.form.customerSegmentsPlaceholder')"
       :model-value="form.customerSegments"
       :disabled="disabled"
+      test-id="company-customerSegments"
       @update:model-value="updateField('customerSegments', $event)"
     />
 

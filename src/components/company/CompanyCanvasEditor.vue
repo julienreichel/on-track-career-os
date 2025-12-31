@@ -79,6 +79,7 @@ const formattedLastGeneratedAt = computed(() => {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Key Partners (1 col) -->
         <CanvasBlockSection
+          test-id="canvas-keyPartners"
           :label="t('companies.canvas.blocks.keyPartners.label')"
           :hint="t('companies.canvas.blocks.keyPartners.hint')"
           :model-value="blocks.keyPartners ?? []"
@@ -89,6 +90,7 @@ const formattedLastGeneratedAt = computed(() => {
         <!-- Key Activities & Key Resources (1 col, stacked) -->
         <div class="flex flex-col space-y-4">
           <CanvasBlockSection
+            test-id="canvas-keyActivities"
             :label="t('companies.canvas.blocks.keyActivities.label')"
             :hint="t('companies.canvas.blocks.keyActivities.hint')"
             :model-value="blocks.keyActivities ?? []"
@@ -96,6 +98,7 @@ const formattedLastGeneratedAt = computed(() => {
             @update:model-value="(value) => emit('update:block', 'keyActivities', value)"
           />
           <CanvasBlockSection
+            test-id="canvas-keyResources"
             :label="t('companies.canvas.blocks.keyResources.label')"
             :hint="t('companies.canvas.blocks.keyResources.hint')"
             :model-value="blocks.keyResources ?? []"
@@ -106,6 +109,7 @@ const formattedLastGeneratedAt = computed(() => {
 
         <!-- Value Propositions (1 col, center) -->
         <CanvasBlockSection
+          test-id="canvas-valuePropositions"
           :label="t('companies.canvas.blocks.valuePropositions.label')"
           :hint="t('companies.canvas.blocks.valuePropositions.hint')"
           :model-value="blocks.valuePropositions ?? []"
@@ -116,6 +120,7 @@ const formattedLastGeneratedAt = computed(() => {
         <!-- Customer Relationships & Channels (1 col, stacked) -->
         <div class="flex flex-col space-y-4">
           <CanvasBlockSection
+            test-id="canvas-customerRelationships"
             :label="t('companies.canvas.blocks.customerRelationships.label')"
             :hint="t('companies.canvas.blocks.customerRelationships.hint')"
             :model-value="blocks.customerRelationships ?? []"
@@ -123,6 +128,7 @@ const formattedLastGeneratedAt = computed(() => {
             @update:model-value="(value) => emit('update:block', 'customerRelationships', value)"
           />
           <CanvasBlockSection
+            test-id="canvas-channels"
             :label="t('companies.canvas.blocks.channels.label')"
             :hint="t('companies.canvas.blocks.channels.hint')"
             :model-value="blocks.channels ?? []"
@@ -133,6 +139,7 @@ const formattedLastGeneratedAt = computed(() => {
 
         <!-- Customer Segments (1 col) -->
         <CanvasBlockSection
+          test-id="canvas-customerSegments"
           :label="t('companies.canvas.blocks.customerSegments.label')"
           :hint="t('companies.canvas.blocks.customerSegments.hint')"
           :model-value="blocks.customerSegments ?? []"
@@ -144,6 +151,7 @@ const formattedLastGeneratedAt = computed(() => {
       <!-- Bottom Section: Cost Structure & Revenue Streams -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <CanvasBlockSection
+          test-id="canvas-costStructure"
           :label="t('companies.canvas.blocks.costStructure.label')"
           :hint="t('companies.canvas.blocks.costStructure.hint')"
           :model-value="blocks.costStructure ?? []"
@@ -151,6 +159,7 @@ const formattedLastGeneratedAt = computed(() => {
           @update:model-value="(value) => emit('update:block', 'costStructure', value)"
         />
         <CanvasBlockSection
+          test-id="canvas-revenueStreams"
           :label="t('companies.canvas.blocks.revenueStreams.label')"
           :hint="t('companies.canvas.blocks.revenueStreams.hint')"
           :model-value="blocks.revenueStreams ?? []"

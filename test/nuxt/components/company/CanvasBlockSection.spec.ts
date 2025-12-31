@@ -7,7 +7,7 @@ const stubs = {
     template: '<div class="u-card"><slot /></div>',
   },
   TagInput: {
-    props: ['modelValue', 'label'],
+    props: ['modelValue', 'label', 'testId'],
     emits: ['update:modelValue'],
     template: `
       <div class="tag-input">

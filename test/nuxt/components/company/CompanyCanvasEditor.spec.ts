@@ -5,7 +5,7 @@ import { createTestI18n } from '../../../utils/createTestI18n';
 
 const stubs = {
   CanvasBlockSection: {
-    props: ['modelValue', 'label'],
+    props: ['modelValue', 'label', 'testId'],
     emits: ['update:modelValue'],
     template: `
       <div class="block-section">

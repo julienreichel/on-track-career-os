@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { AiOperationsRepository } from '@/domain/ai-operations/AiOperationsRepository';
 import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
@@ -540,6 +540,81 @@ describe('AiOperationsService', () => {
           companyProfile: { companyName: 'Acme' },
         })
       ).rejects.toThrow('Invalid company canvas result');
+    });
+  });
+
+  describe('AI mock overrides', () => {
+    let originalWindow: typeof window | undefined;
+
+    beforeEach(() => {
+      originalWindow = (globalThis as unknown as { window?: typeof window }).window;
+    });
+
+    afterEach(() => {
+      if (originalWindow === undefined) {
+        delete (globalThis as unknown as { window?: typeof window }).window;
+      } else {
+        (globalThis as unknown as { window?: typeof window }).window = originalWindow;
+      }
+    });
+
+    it('uses analyzeCompanyInfo mock when provided', async () => {
+      const mockedResult: CompanyAnalysisResult = {
+        companyProfile: {
+          companyName: 'Mocked Inc.',
+          industry: 'AI',
+          sizeRange: '11-50',
+          website: 'https://mocked.example',
+          productsServices: ['Mock'],
+          targetMarkets: [],
+          customerSegments: [],
+          description: 'Test',
+        },
+        confidence: 0.99,
+      };
+
+      (globalThis as any).window = {
+        __AI_OPERATION_MOCKS__: {
+          analyzeCompanyInfo: () => mockedResult,
+        },
+      };
+
+      const result = await service.analyzeCompanyInfo({
+        companyName: 'Ignored',
+        rawText: 'notes',
+      });
+
+      expect(result).toEqual(mockedResult);
+      expect(mockRepo.analyzeCompanyInfo).not.toHaveBeenCalled();
+    });
+
+    it('uses generateCompanyCanvas mock when provided', async () => {
+      const mockedCanvas: GeneratedCompanyCanvas = {
+        companyName: 'Mocked Inc.',
+        customerSegments: ['Segment'],
+        valuePropositions: ['Mock Value'],
+        channels: [],
+        customerRelationships: [],
+        revenueStreams: [],
+        keyResources: [],
+        keyActivities: [],
+        keyPartners: [],
+        costStructure: [],
+        confidence: 0.87,
+      };
+
+      (globalThis as any).window = {
+        __AI_OPERATION_MOCKS__: {
+          generateCompanyCanvas: () => mockedCanvas,
+        },
+      };
+
+      const result = await service.generateCompanyCanvas({
+        companyProfile: { companyName: 'Ignored' },
+      });
+
+      expect(result).toEqual(mockedCanvas);
+      expect(mockRepo.generateCompanyCanvas).not.toHaveBeenCalled();
     });
   });
 });
