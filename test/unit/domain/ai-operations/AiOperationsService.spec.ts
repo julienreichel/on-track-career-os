@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { AiOperationsRepository } from '@/domain/ai-operations/AiOperationsRepository';

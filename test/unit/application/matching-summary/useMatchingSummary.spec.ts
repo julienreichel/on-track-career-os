@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref } from 'vue';
 import { useMatchingSummary } from '@/application/matching-summary/useMatchingSummary';
 import { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';

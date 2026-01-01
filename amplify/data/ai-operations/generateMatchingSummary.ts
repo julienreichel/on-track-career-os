@@ -16,6 +16,9 @@ const OUTPUT_SCHEMA = `{
 }`;
 
 const MAX_LIST_ITEMS = 8;
+const SCORE_MIN = 0;
+const SCORE_MAX = 100;
+const PROMPT_INDENT_SPACES = 2;
 
 export interface MatchingExperienceSignal {
   title: string;
@@ -133,7 +136,7 @@ function sanitizeScore(value: unknown) {
   if (typeof value !== 'number' || Number.isNaN(value)) {
     return undefined;
   }
-  return Math.max(0, Math.min(100, value));
+  return Math.max(SCORE_MIN, Math.min(SCORE_MAX, value));
 }
 
 function finalizeOutput(raw: ModelResponse, { fallback }: { fallback: boolean }): GenerateMatchingSummaryOutput {
@@ -178,7 +181,7 @@ Use only the provided values. Highlight fit, contributions, and risks.
 Each list item should be a short bullet (<=20 words). Never invent context.
 
 INPUT:
-${JSON.stringify(args, null, 2)}
+${JSON.stringify(args, null, PROMPT_INDENT_SPACES)}
 
 Return ONLY JSON matching this schema:
 ${OUTPUT_SCHEMA}`;

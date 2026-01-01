@@ -1,10 +1,13 @@
-import type { MatchingSummary } from './MatchingSummary';
 import type {
+  MatchingSummary,
   MatchingSummaryCreateInput,
   MatchingSummaryUpdateInput,
 } from './MatchingSummary';
 import { MatchingSummaryRepository } from './MatchingSummaryRepository';
 import type { MatchingSummaryResult } from '@/domain/ai-operations/MatchingSummaryResult';
+
+const SCORE_MIN = 0;
+const SCORE_MAX = 100;
 
 export interface MatchingSummaryContext {
   userId: string;
@@ -34,7 +37,7 @@ function clampScore(value: unknown) {
   if (typeof value !== 'number' || Number.isNaN(value)) {
     return undefined;
   }
-  return Math.max(0, Math.min(100, value));
+  return Math.max(SCORE_MIN, Math.min(SCORE_MAX, value));
 }
 
 export function mapMatchingSummaryResult(
