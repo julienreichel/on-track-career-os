@@ -111,6 +111,9 @@ const tabItems = computed(() =>
   }))
 );
 
+const canViewMatch = computed(() => job.value?.status === 'analyzed');
+const matchLink = computed(() => (jobId.value ? `/jobs/${jobId.value}/match` : undefined));
+
 const headerLinks = computed<PageHeaderLink[]>(() => [
   {
     label: t('common.backToList'),
@@ -122,6 +125,13 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     icon: 'i-heroicons-arrow-path',
     onClick: () => (showReanalyseModal.value = true),
     disabled: loading.value || reanalysing.value,
+  },
+  {
+    label: t('jobDetail.match.view'),
+    icon: 'i-heroicons-sparkles',
+    to: matchLink.value,
+    disabled: !canViewMatch.value,
+    ariaLabel: !canViewMatch.value ? t('jobDetail.match.disabledTooltip') : undefined,
   },
 ]);
 

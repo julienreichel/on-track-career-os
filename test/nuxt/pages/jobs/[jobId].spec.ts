@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref, h } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
-import JobDetailPage from '@/pages/jobs/[jobId].vue';
+import JobDetailPage from '@/pages/jobs/[jobId]/index.vue';
 import { createTestI18n } from '../../../utils/createTestI18n';
 
 const mockLoadJob = vi.fn();

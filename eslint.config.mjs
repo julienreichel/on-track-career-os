@@ -17,6 +17,7 @@ export default withNuxt(
             'empty',
             'error',
             'index',
+            'match',
             'login',
             'new',
             'print',

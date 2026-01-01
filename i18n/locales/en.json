@@ -1088,10 +1088,52 @@
       "cancel": "Cancel",
       "confirm": "Reanalyse now"
     },
+    "match": {
+      "view": "View match",
+      "disabledTooltip": "Analyze the job first to unlock the matching summary."
+    },
     "errors": {
       "title": "Job details",
       "generic": "Unable to update the job. Please try again.",
       "notFound": "Job description not found"
+    }
+  },
+  "matching": {
+    "page": {
+      "title": "Matching analysis",
+      "description": "Compare your profile, experiences, and linked company context with this role.",
+      "breadcrumb": {
+        "match": "Match"
+      },
+      "actions": {
+        "generate": "Generate match",
+        "generating": "Generating match..."
+      },
+      "states": {
+        "loading": "Preparing your matching summary...",
+        "emptyTitle": "No matching summary yet",
+        "emptyDescription": "Generate a matching summary to understand how you align with this job.",
+        "errorTitle": "Unable to generate match",
+        "errorDescription": "Something went wrong while generating the matching summary. Try again."
+      }
+    },
+    "summaryCard": {
+      "title": "Matching Summary",
+      "summaryHeading": "Fit narrative",
+      "emptySummary": "No narrative available yet.",
+      "impactAreas": "Impact areas",
+      "contributionMap": "Contribution map",
+      "risks": "Risks & mitigation",
+      "emptyImpactAreas": "No impact areas identified",
+      "emptyContributionMap": "No contributions mapped yet",
+      "emptyRisks": "No risks documented"
+    },
+    "score": {
+      "title": "Fit score",
+      "subtitle": "Overall alignment",
+      "badge": "AI generated",
+      "outOf": "Out of 100",
+      "description": "Use this score as a directional signal. Refresh whenever your profile, job, or company data changes."
     }
   }
 }

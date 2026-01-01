@@ -2,6 +2,7 @@ import { ref } from 'vue';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
 import { CompanyService } from '@/domain/company/CompanyService';
+import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
 
 /**
  * Composable for managing breadcrumb ID to name mappings
@@ -16,6 +17,7 @@ const mappingCache = ref<BreadcrumbMapping>({});
 let experienceService: ExperienceService | null = null;
 let cvDocumentService: CVDocumentService | null = null;
 let companyService: CompanyService | null = null;
+let jobService: JobDescriptionService | null = null;
 
 export function useBreadcrumbMapping() {
   /**
@@ -112,6 +114,10 @@ export function useBreadcrumbMapping() {
       return await getCompanyName(segment);
     }
 
+    if (previousSegment === 'jobs') {
+      return await getJobName(segment);
+    }
+
     // Add more mappings here as needed for other entity types
     // For example: companies, jobs, stories, etc.
 
@@ -156,4 +162,27 @@ const getCompanyName = async (companyId: string): Promise<string> => {
   }
 
   return companyId;
+};
+
+const getJobName = async (jobId: string): Promise<string> => {
+  if (!jobService) {
+    jobService = new JobDescriptionService();
+  }
+
+  if (mappingCache.value[jobId]) {
+    return mappingCache.value[jobId];
+  }
+
+  try {
+    const job = await jobService!.getFullJobDescription(jobId);
+    const title = job?.title;
+    if (title) {
+      mappingCache.value[jobId] = title;
+      return title;
+    }
+  } catch (err) {
+    console.error('[useBreadcrumbMapping] Error fetching job:', err);
+  }
+
+  return jobId;
 };
