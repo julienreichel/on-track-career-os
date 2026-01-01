@@ -22,8 +22,18 @@ const stubs = {
   },
   UButton: {
     name: 'UButton',
-    props: ['label'],
-    template: '<button class="u-button" @click="$emit(\'click\')">{{ label }}</button>',
+    props: ['label', 'to', 'disabled'],
+    template: `
+      <button
+        class="u-button"
+        v-bind="$attrs"
+        :data-to="to"
+        :disabled="disabled"
+        @click="$emit('click')"
+      >
+        {{ label }}
+      </button>
+    `,
   },
   UBadge: {
     name: 'UBadge',
@@ -82,5 +92,19 @@ describe('JobCard', () => {
   it('hides delete button when showDelete is false', () => {
     const wrapper = createWrapper({ showDelete: false });
     expect(wrapper.find('.delete').exists()).toBe(false);
+  });
+
+  it('links to match page and disables button when job not analyzed', () => {
+    const wrapper = createWrapper({
+      job: { ...mockJob, status: 'draft' },
+    });
+    const button = wrapper.find('[data-testid="job-card-match"]');
+    expect(button.attributes('data-to')).toBe(`/jobs/${mockJob.id}/match`);
+    expect(button.attributes()).toHaveProperty('disabled');
+
+    const enabledWrapper = createWrapper();
+    const enabledButton = enabledWrapper.find('[data-testid="job-card-match"]');
+    expect(enabledButton.attributes('data-to')).toBe(`/jobs/${mockJob.id}/match`);
+    expect(enabledButton.attributes()).not.toHaveProperty('disabled');
   });
 });

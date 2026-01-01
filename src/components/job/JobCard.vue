@@ -44,6 +44,9 @@ const statusBadge = computed(() => {
   };
 });
 
+const canViewMatch = computed(() => props.job.status === 'analyzed');
+const matchLink = computed(() => `/jobs/${props.job.id}/match`);
+
 function handleOpen() {
   emit('open', props.job.id);
 }
@@ -88,6 +91,16 @@ function handleDelete() {
         color="primary"
         variant="soft"
         @click.stop="handleOpen"
+      />
+      <UButton
+        :label="t('jobList.actions.match')"
+        icon="i-heroicons-sparkles"
+        size="xs"
+        color="secondary"
+        variant="soft"
+        data-testid="job-card-match"
+        :to="canViewMatch ? matchLink : undefined"
+        :disabled="!canViewMatch"
       />
     </template>
   </ItemCard>

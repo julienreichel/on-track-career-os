@@ -998,7 +998,8 @@
       "add": "Add Job",
       "view": "View job",
       "open": "Open job",
-      "viewCompanies": "View companies"
+      "viewCompanies": "View companies",
+      "match": "View match"
     },
     "search": {
       "placeholder": "Search jobs...",
