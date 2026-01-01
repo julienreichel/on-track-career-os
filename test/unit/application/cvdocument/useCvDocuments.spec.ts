@@ -1,13 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useCvDocuments } from '@/composables/useCvDocuments';
 import { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
-import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 import { withMockedConsoleError } from '../../../utils/withMockedConsole';
 
 // Mock dependencies
 vi.mock('@/domain/cvdocument/CVDocumentRepository');
-vi.mock('@/domain/cvdocument/CVDocumentService');
 
 describe('useCvDocuments', () => {
   let mockRepository: {
@@ -16,13 +14,6 @@ describe('useCvDocuments', () => {
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
     get: ReturnType<typeof vi.fn>;
-  };
-
-  let mockService: {
-    addBlock: ReturnType<typeof vi.fn>;
-    updateBlock: ReturnType<typeof vi.fn>;
-    removeBlock: ReturnType<typeof vi.fn>;
-    reorderBlocks: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -36,15 +27,7 @@ describe('useCvDocuments', () => {
       get: vi.fn(),
     };
 
-    mockService = {
-      addBlock: vi.fn(),
-      updateBlock: vi.fn(),
-      removeBlock: vi.fn(),
-      reorderBlocks: vi.fn(),
-    };
-
     vi.mocked(CVDocumentRepository).mockImplementation(() => mockRepository as never);
-    vi.mocked(CVDocumentService).mockImplementation(() => mockService as never);
   });
 
   describe('loadAll', () => {
@@ -225,199 +208,6 @@ describe('useCvDocuments', () => {
 
         expect(result).toBe(false);
         expect(error.value).toBe('Deletion failed');
-      })
-    );
-  });
-
-  describe('addBlock', () => {
-    it('should add a block to CV document', async () => {
-      const mockCV = {
-        id: 'cv-1',
-        name: 'My CV',
-        contentJSON: { blocks: [] },
-      } as unknown as CVDocument;
-
-      const mockUpdated = {
-        ...mockCV,
-        contentJSON: {
-          blocks: [{ id: 'block-1', type: 'header', content: {}, order: 0 }],
-        },
-      };
-
-      mockRepository.list.mockResolvedValue([mockCV]);
-      mockService.addBlock.mockResolvedValue(mockUpdated);
-
-      const { items, loadAll, addBlock } = useCvDocuments();
-
-      await loadAll();
-      const result = await addBlock('cv-1', { id: 'block-1', type: 'header', content: {} });
-
-      expect(mockService.addBlock).toHaveBeenCalledWith('cv-1', {
-        id: 'block-1',
-        type: 'header',
-        content: {},
-      });
-      expect(result).toEqual(mockUpdated);
-      expect(items.value[0]).toEqual(mockUpdated);
-    });
-
-    it(
-      'should handle addBlock errors',
-      withMockedConsoleError(async () => {
-        mockService.addBlock.mockRejectedValue(new Error('Add block failed'));
-
-        const { error, addBlock } = useCvDocuments();
-
-        const result = await addBlock('cv-1', { id: 'block-1', type: 'header', content: {} });
-
-        expect(result).toBeNull();
-        expect(error.value).toBe('Add block failed');
-      })
-    );
-  });
-
-  describe('updateBlock', () => {
-    it('should update a block in CV document', async () => {
-      const mockCV = {
-        id: 'cv-1',
-        name: 'My CV',
-        contentJSON: {
-          blocks: [{ id: 'block-1', type: 'header', content: { title: 'Old' }, order: 0 }],
-        },
-      } as unknown as CVDocument;
-
-      const mockUpdated = {
-        ...mockCV,
-        contentJSON: {
-          blocks: [{ id: 'block-1', type: 'header', content: { title: 'New' }, order: 0 }],
-        },
-      };
-
-      mockRepository.list.mockResolvedValue([mockCV]);
-      mockService.updateBlock.mockResolvedValue(mockUpdated);
-
-      const { items, loadAll, updateBlock } = useCvDocuments();
-
-      await loadAll();
-      const result = await updateBlock('cv-1', 'block-1', { content: { title: 'New' } });
-
-      expect(mockService.updateBlock).toHaveBeenCalledWith('cv-1', 'block-1', {
-        content: { title: 'New' },
-      });
-      expect(result).toEqual(mockUpdated);
-      expect(items.value[0]).toEqual(mockUpdated);
-    });
-
-    it(
-      'should handle updateBlock errors',
-      withMockedConsoleError(async () => {
-        mockService.updateBlock.mockRejectedValue(new Error('Update block failed'));
-
-        const { error, updateBlock } = useCvDocuments();
-
-        const result = await updateBlock('cv-1', 'block-1', { content: {} });
-
-        expect(result).toBeNull();
-        expect(error.value).toBe('Update block failed');
-      })
-    );
-  });
-
-  describe('removeBlock', () => {
-    it('should remove a block from CV document', async () => {
-      const mockCV = {
-        id: 'cv-1',
-        name: 'My CV',
-        contentJSON: {
-          blocks: [
-            { id: 'block-1', type: 'header', content: {}, order: 0 },
-            { id: 'block-2', type: 'experience', content: {}, order: 1 },
-          ],
-        },
-      } as unknown as CVDocument;
-
-      const mockUpdated = {
-        ...mockCV,
-        contentJSON: {
-          blocks: [{ id: 'block-1', type: 'header', content: {}, order: 0 }],
-        },
-      };
-
-      mockRepository.list.mockResolvedValue([mockCV]);
-      mockService.removeBlock.mockResolvedValue(mockUpdated);
-
-      const { items, loadAll, removeBlock } = useCvDocuments();
-
-      await loadAll();
-      const result = await removeBlock('cv-1', 'block-2');
-
-      expect(mockService.removeBlock).toHaveBeenCalledWith('cv-1', 'block-2');
-      expect(result).toEqual(mockUpdated);
-      expect(items.value[0]).toEqual(mockUpdated);
-    });
-
-    it(
-      'should handle removeBlock errors',
-      withMockedConsoleError(async () => {
-        mockService.removeBlock.mockRejectedValue(new Error('Remove block failed'));
-
-        const { error, removeBlock } = useCvDocuments();
-
-        const result = await removeBlock('cv-1', 'block-1');
-
-        expect(result).toBeNull();
-        expect(error.value).toBe('Remove block failed');
-      })
-    );
-  });
-
-  describe('reorderBlocks', () => {
-    it('should reorder blocks in CV document', async () => {
-      const mockCV = {
-        id: 'cv-1',
-        name: 'My CV',
-        contentJSON: {
-          blocks: [
-            { id: 'block-1', type: 'header', content: {}, order: 0 },
-            { id: 'block-2', type: 'experience', content: {}, order: 1 },
-          ],
-        },
-      } as unknown as CVDocument;
-
-      const mockUpdated = {
-        ...mockCV,
-        contentJSON: {
-          blocks: [
-            { id: 'block-2', type: 'experience', content: {}, order: 0 },
-            { id: 'block-1', type: 'header', content: {}, order: 1 },
-          ],
-        },
-      };
-
-      mockRepository.list.mockResolvedValue([mockCV]);
-      mockService.reorderBlocks.mockResolvedValue(mockUpdated);
-
-      const { items, loadAll, reorderBlocks } = useCvDocuments();
-
-      await loadAll();
-      const result = await reorderBlocks('cv-1', ['block-2', 'block-1']);
-
-      expect(mockService.reorderBlocks).toHaveBeenCalledWith('cv-1', ['block-2', 'block-1']);
-      expect(result).toEqual(mockUpdated);
-      expect(items.value[0]).toEqual(mockUpdated);
-    });
-
-    it(
-      'should handle reorderBlocks errors',
-      withMockedConsoleError(async () => {
-        mockService.reorderBlocks.mockRejectedValue(new Error('Reorder failed'));
-
-        const { error, reorderBlocks } = useCvDocuments();
-
-        const result = await reorderBlocks('cv-1', ['block-1', 'block-2']);
-
-        expect(result).toBeNull();
-        expect(error.value).toBe('Reorder failed');
       })
     );
   });

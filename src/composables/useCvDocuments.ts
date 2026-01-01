@@ -1,6 +1,5 @@
 import { ref } from 'vue';
 import { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
-import { CVDocumentService, type CVBlock } from '@/domain/cvdocument/CVDocumentService';
 import type {
   CVDocument,
   CVDocumentCreateInput,
@@ -21,13 +20,12 @@ function updateItemInArray(items: CVDocument[], updated: CVDocument | null | und
 /**
  * Composable for managing CV documents list and block operations
  */
-// eslint-disable-next-line max-lines-per-function
+
 export function useCvDocuments() {
   const items = ref<CVDocument[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
   const repository = new CVDocumentRepository();
-  const service = new CVDocumentService();
 
   /**
    * Load all CV documents with optional filters
@@ -108,87 +106,6 @@ export function useCvDocuments() {
     }
   };
 
-  /**
-   * Add a new block to a CV document
-   */
-  const addBlock = async (
-    cvId: string,
-    block: Omit<CVBlock, 'order'>
-  ): Promise<CVDocument | null> => {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const updated = await service.addBlock(cvId, block);
-      updateItemInArray(items.value, updated);
-      return updated;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to add block';
-      console.error('[useCvDocuments] Error adding block:', err);
-      return null;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  const updateBlock = async (
-    cvId: string,
-    blockId: string,
-    updates: Partial<Omit<CVBlock, 'id'>>
-  ): Promise<CVDocument | null> => {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const updated = await service.updateBlock(cvId, blockId, updates);
-      updateItemInArray(items.value, updated);
-      return updated;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to update block';
-      console.error('[useCvDocuments] Error updating block:', err);
-      return null;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  const removeBlock = async (cvId: string, blockId: string): Promise<CVDocument | null> => {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const updated = await service.removeBlock(cvId, blockId);
-      updateItemInArray(items.value, updated);
-      return updated;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to remove block';
-      console.error('[useCvDocuments] Error removing block:', err);
-      return null;
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  /**
-   * Reorder blocks in a CV document
-   */
-  const reorderBlocks = async (cvId: string, blockIds: string[]): Promise<CVDocument | null> => {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const updated = await service.reorderBlocks(cvId, blockIds);
-      updateItemInArray(items.value, updated);
-      return updated;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to reorder blocks';
-      console.error('[useCvDocuments] Error reordering blocks:', err);
-      return null;
-    } finally {
-      loading.value = false;
-    }
-  };
-
   return {
     items,
     loading,
@@ -197,9 +114,5 @@ export function useCvDocuments() {
     createDocument,
     updateDocument,
     deleteDocument,
-    addBlock,
-    updateBlock,
-    removeBlock,
-    reorderBlocks,
   };
 }
