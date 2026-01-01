@@ -99,7 +99,7 @@ function handleDelete() {
         color="secondary"
         variant="soft"
         data-testid="job-card-match"
-        :to="canViewMatch ? matchLink : undefined"
+        :to="matchLink"
         :disabled="!canViewMatch"
       />
     </template>
