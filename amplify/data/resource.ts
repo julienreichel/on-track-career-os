@@ -272,13 +272,18 @@ export const schema = a
 
     MatchingSummary: a
       .model({
-        userFitScore: a.float(),
+        // New simplified scoring structure
+        overallScore: a.integer().required(),
+        scoreBreakdown: a.json().required(), // { skillFit, experienceFit, interestFit, edge }
+        recommendation: a.string().required(), // "apply" | "maybe" | "skip"
 
-        // Core structured outputs
-        impactAreas: a.string().array(),
-        contributionMap: a.string().array(),
-        riskMitigationPoints: a.string().array(),
-        summaryParagraph: a.string(),
+        // Structured actionable outputs
+        reasoningHighlights: a.string().array(),
+        strengthsForThisRole: a.string().array(),
+        skillMatch: a.string().array(), // [MATCH], [PARTIAL], [MISSING], [OVER] tagged items
+        riskyPoints: a.string().array(), // "Risk: ... Mitigation: ..." format
+        impactOpportunities: a.string().array(),
+        tailoringTips: a.string().array(),
 
         // Metadata for traceability + refresh logic
         generatedAt: a.datetime(),
@@ -545,11 +550,20 @@ export const schema = a
       })
       .returns(
         a.customType({
-          userFitScore: a.integer(),
-          impactAreas: a.string().array().required(),
-          contributionMap: a.string().array().required(),
-          riskMitigationPoints: a.string().array().required(),
-          summaryParagraph: a.string().required(),
+          overallScore: a.integer().required(),
+          scoreBreakdown: a.customType({
+            skillFit: a.integer().required(),
+            experienceFit: a.integer().required(),
+            interestFit: a.integer().required(),
+            edge: a.integer().required(),
+          }).required(),
+          recommendation: a.string().required(),
+          reasoningHighlights: a.string().array().required(),
+          strengthsForThisRole: a.string().array().required(),
+          skillMatch: a.string().array().required(),
+          riskyPoints: a.string().array().required(),
+          impactOpportunities: a.string().array().required(),
+          tailoringTips: a.string().array().required(),
           generatedAt: a.string().required(),
           needsUpdate: a.boolean().required(),
         })

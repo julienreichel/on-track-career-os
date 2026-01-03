@@ -3,7 +3,6 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import MatchingSummaryCard from '@/components/matching/MatchingSummaryCard.vue';
-import FitScoreVisualization from '@/components/matching/FitScoreVisualization.vue';
 import LinkedCompanyBadge from '@/components/company/LinkedCompanyBadge.vue';
 import { useMatchingEngine } from '@/composables/useMatchingEngine';
 import { useCompanies } from '@/composables/useCompanies';
@@ -61,13 +60,21 @@ const isLoading = computed(() => engine.isLoading.value);
 const isGenerating = computed(() => engine.isGenerating.value);
 const hasSummary = computed(() => engine.hasSummary.value);
 const errorMessage = engine.error;
-const score = computed(() => summary.value?.userFitScore ?? null);
 
 const summaryProps = computed(() => ({
-  summaryParagraph: (summary.value?.summaryParagraph ?? '') as string,
-  impactAreas: (summary.value?.impactAreas ?? []) as string[],
-  contributionMap: (summary.value?.contributionMap ?? []) as string[],
-  riskMitigationPoints: (summary.value?.riskMitigationPoints ?? []) as string[],
+  overallScore: summary.value?.overallScore ?? 0,
+  scoreBreakdown: summary.value?.scoreBreakdown
+    ? (typeof summary.value.scoreBreakdown === 'string'
+        ? JSON.parse(summary.value.scoreBreakdown)
+        : summary.value.scoreBreakdown)
+    : { skillFit: 0, experienceFit: 0, interestFit: 0, edge: 0 },
+  recommendation: (summary.value?.recommendation as 'apply' | 'maybe' | 'skip') ?? 'maybe',
+  reasoningHighlights: (summary.value?.reasoningHighlights ?? []) as string[],
+  strengthsForThisRole: (summary.value?.strengthsForThisRole ?? []) as string[],
+  skillMatch: (summary.value?.skillMatch ?? []) as string[],
+  riskyPoints: (summary.value?.riskyPoints ?? []) as string[],
+  impactOpportunities: (summary.value?.impactOpportunities ?? []) as string[],
+  tailoringTips: (summary.value?.tailoringTips ?? []) as string[],
 }));
 
 const linkedCompany = computed(() => {
@@ -206,35 +213,37 @@ function formatDate(value?: string | null) {
             </p>
           </UCard>
 
-          <div class="grid gap-6 md:grid-cols-2">
-            <FitScoreVisualization :score="score" />
-            <UCard v-if="!hasSummary">
-              <UEmpty :title="t('matching.page.states.emptyTitle')" icon="i-heroicons-sparkles">
-                <p class="text-sm text-dimmed">
-                  {{ t('matching.page.states.emptyDescription') }}
-                </p>
-                <template #actions>
-                  <UButton
-                    color="primary"
-                    icon="i-heroicons-sparkles"
-                    :label="t('matching.page.actions.generate')"
-                    :loading="isGenerating"
-                    :disabled="isGenerating"
-                    data-testid="matching-empty-generate"
-                    @click="handleGenerate"
-                  />
-                </template>
-              </UEmpty>
-            </UCard>
-          </div>
+          <UCard v-if="!hasSummary">
+            <UEmpty :title="t('matching.page.states.emptyTitle')" icon="i-heroicons-sparkles">
+              <p class="text-sm text-dimmed">
+                {{ t('matching.page.states.emptyDescription') }}
+              </p>
+              <template #actions>
+                <UButton
+                  color="primary"
+                  icon="i-heroicons-sparkles"
+                  :label="t('matching.page.actions.generate')"
+                  :loading="isGenerating"
+                  :disabled="isGenerating"
+                  data-testid="matching-empty-generate"
+                  @click="handleGenerate"
+                />
+              </template>
+            </UEmpty>
+          </UCard>
 
           <MatchingSummaryCard
             v-if="hasSummary"
             class="mt-6"
-            :summary-paragraph="summaryProps.summaryParagraph"
-            :impact-areas="summaryProps.impactAreas"
-            :contribution-map="summaryProps.contributionMap"
-            :risk-mitigation-points="summaryProps.riskMitigationPoints"
+            :overall-score="summaryProps.overallScore"
+            :score-breakdown="summaryProps.scoreBreakdown"
+            :recommendation="summaryProps.recommendation"
+            :reasoning-highlights="summaryProps.reasoningHighlights"
+            :strengths-for-this-role="summaryProps.strengthsForThisRole"
+            :skill-match="summaryProps.skillMatch"
+            :risky-points="summaryProps.riskyPoints"
+            :impact-opportunities="summaryProps.impactOpportunities"
+            :tailoring-tips="summaryProps.tailoringTips"
           />
         </template>
       </UPageBody>

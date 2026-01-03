@@ -1121,14 +1121,22 @@
     },
     "summaryCard": {
       "title": "Matching Summary",
-      "summaryHeading": "Fit narrative",
-      "emptySummary": "No narrative available yet.",
-      "impactAreas": "Impact areas",
-      "contributionMap": "Contribution map",
-      "risks": "Risks & mitigation",
-      "emptyImpactAreas": "No impact areas identified",
-      "emptyContributionMap": "No contributions mapped yet",
-      "emptyRisks": "No risks documented"
+      "overallScore": "Overall Match Score",
+      "skillFit": "Skills",
+      "experienceFit": "Experience",
+      "interestFit": "Interest",
+      "edge": "Edge",
+      "recommendation": {
+        "apply": "✅ Recommended - Apply",
+        "maybe": "⚠️ Consider - Maybe Apply",
+        "skip": "❌ Not Recommended - Skip"
+      },
+      "reasoning": "Key Assessment Points",
+      "strengths": "Your Strengths for This Role",
+      "skillMatch": "Skill Match Analysis",
+      "risks": "Risks & Mitigation Strategies",
+      "impact": "Quick Impact Opportunities",
+      "tailoring": "Application Tailoring Tips"
     },
     "score": {
       "title": "Fit score",
