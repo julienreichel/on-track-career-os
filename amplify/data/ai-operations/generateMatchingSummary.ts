@@ -188,24 +188,15 @@ ${OUTPUT_SCHEMA}`;
 }
 
 type HandlerEvent = {
-  arguments: {
-    payload: GenerateMatchingSummaryInput | string;
-  };
+  arguments: GenerateMatchingSummaryInput;
 };
 
-function parsePayload(payload: GenerateMatchingSummaryInput | string): GenerateMatchingSummaryInput {
-  if (typeof payload === 'string') {
-    return JSON.parse(payload) as GenerateMatchingSummaryInput;
-  }
-  return payload;
-}
-
 export const handler = async (event: HandlerEvent) => {
-  if (!event?.arguments?.payload) {
-    throw new Error('payload is required');
+  if (!event?.arguments) {
+    throw new Error('arguments are required');
   }
 
-  const normalizedArgs = parsePayload(event.arguments.payload);
+  const normalizedArgs = event.arguments;
 
   return withAiOperationHandlerObject(
     'generateMatchingSummary',

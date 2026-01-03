@@ -86,7 +86,7 @@ describe('ai.generateMatchingSummary', () => {
 
     mockSend.mockResolvedValue(buildBedrockResponse(mockOutput));
 
-    const response = await handler({ arguments: { payload: validArguments } });
+    const response = await handler({ arguments: validArguments });
 
     expect(response.summaryParagraph).toContain('Casey');
     expect(response.impactAreas).toEqual(['Scale delivery', 'Improve retention']);
@@ -99,7 +99,7 @@ describe('ai.generateMatchingSummary', () => {
     mockSend.mockResolvedValueOnce(buildBedrockResponse('not json'));
     mockSend.mockResolvedValueOnce(buildBedrockResponse('still not json'));
 
-    const response = await handler({ arguments: { payload: validArguments } });
+    const response = await handler({ arguments: validArguments });
 
     expect(response.summaryParagraph).toBe('');
     expect(response.impactAreas).toEqual([]);

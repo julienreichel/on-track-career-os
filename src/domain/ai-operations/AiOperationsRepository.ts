@@ -387,9 +387,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
 
   async generateMatchingSummary(input: MatchingSummaryInput): Promise<MatchingSummaryResult> {
     const { data, errors } = await this.client.generateMatchingSummary(
-      {
-        payload: JSON.stringify(input),
-      },
+      input,
       gqlOptions()
     );
 
@@ -401,7 +399,6 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-    return parsed as MatchingSummaryResult;
+    return data as MatchingSummaryResult;
   }
 }

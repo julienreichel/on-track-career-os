@@ -473,9 +473,76 @@ export const schema = a
     generateMatchingSummary: a
       .query()
       .arguments({
-        payload: a.json().required(),
+        user: a.customType({
+          profile: a.customType({
+            fullName: a.string().required(),
+            headline: a.string(),
+            location: a.string(),
+            seniorityLevel: a.string(),
+            workPermitInfo: a.string(),
+            goals: a.string().array(),
+            aspirations: a.string().array(),
+            personalValues: a.string().array(),
+            strengths: a.string().array(),
+            interests: a.string().array(),
+            skills: a.string().array(),
+            certifications: a.string().array(),
+            languages: a.string().array(),
+          }).required(),
+          personalCanvas: a.customType({
+            customerSegments: a.string().array(),
+            valueProposition: a.string().array(),
+            channels: a.string().array(),
+            customerRelationships: a.string().array(),
+            keyActivities: a.string().array(),
+            keyResources: a.string().array(),
+            keyPartners: a.string().array(),
+            costStructure: a.string().array(),
+            revenueStreams: a.string().array(),
+          }),
+          experienceSignals: a.customType({
+            experiences: a.customType({
+              title: a.string().required(),
+              companyName: a.string(),
+              startDate: a.string(),
+              endDate: a.string(),
+              responsibilities: a.string().array(),
+              tasks: a.string().array(),
+              achievements: a.string().array(),
+              kpiSuggestions: a.string().array(),
+            }).array().required(),
+          }),
+        }).required(),
+        job: a.customType({
+          title: a.string().required(),
+          seniorityLevel: a.string(),
+          roleSummary: a.string(),
+          responsibilities: a.string().array(),
+          requiredSkills: a.string().array(),
+          behaviours: a.string().array(),
+          successCriteria: a.string().array(),
+          explicitPains: a.string().array(),
+        }).required(),
+        company: a.customType({
+          companyProfile: a.customType({
+            companyName: a.string().required(),
+            industry: a.string(),
+            sizeRange: a.string(),
+            website: a.string(),
+            description: a.string(),
+          }),
+          companyCanvas: a.json(),
+        }),
       })
-      .returns(a.json())
+      .returns(a.customType({
+        userFitScore: a.integer(),
+        impactAreas: a.string().array().required(),
+        contributionMap: a.string().array().required(),
+        riskMitigationPoints: a.string().array().required(),
+        summaryParagraph: a.string().required(),
+        generatedAt: a.string().required(),
+        needsUpdate: a.boolean().required(),
+      }))
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateMatchingSummaryFunction)),
 

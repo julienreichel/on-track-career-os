@@ -522,7 +522,7 @@ describe('AiOperationsRepository', () => {
 
     it('returns parsed matching summary', async () => {
       mockClient.generateMatchingSummary.mockResolvedValue({
-        data: JSON.stringify(summaryResponse),
+        data: summaryResponse,
         errors: undefined,
       });
 
@@ -530,9 +530,7 @@ describe('AiOperationsRepository', () => {
 
       expect(result).toEqual(summaryResponse);
       expect(mockClient.generateMatchingSummary).toHaveBeenCalledWith(
-        {
-          payload: JSON.stringify(matchingInput),
-        },
+        matchingInput,
         expect.objectContaining({ authMode: 'userPool' })
       );
     });
