@@ -49,9 +49,8 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
         : t('matching.page.actions.generate'),
     icon: 'i-heroicons-sparkles',
     color: 'primary',
-    loading: isGenerating.value,
     disabled: isGenerating.value || isLoading.value,
-    click: handleGenerate,
+    onClick: handleGenerate,
   },
 ]);
 
