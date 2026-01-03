@@ -281,24 +281,14 @@ async function loadCompanyPayload(
   canvasService: CompanyCanvasService
 ) {
   try {
-    const [company, canvas] = await Promise.all([
-      companyService.getCompany(companyId),
-      canvasService.getByCompanyId(companyId),
-    ]);
+    const company = await companyService.getCompany(companyId);
 
     if (!company) {
       return undefined;
     }
 
-    const payload: NonNullable<MatchingSummaryInput['company']> = {
-      companyProfile: mapCompanyProfile(company),
-    };
-
-    if (canvas) {
-      payload.companyCanvas = mapCompanyCanvas(canvas);
-    }
-
-    return payload;
+    // Return flat structure matching GraphQL schema CompanyType
+    return mapCompanyProfile(company);
   } catch (err) {
     console.warn('[useMatchingEngine] Unable to load company context', err);
     return undefined;

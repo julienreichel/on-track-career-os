@@ -386,26 +386,8 @@ export class AiOperationsRepository implements IAiOperationsRepository {
   }
 
   async generateMatchingSummary(input: MatchingSummaryInput): Promise<MatchingSummaryResult> {
-    // Destructure input to match GraphQL schema arguments
-    const { user, job, company } = input;
-    
-    // Map company structure for GraphQL (simplified CompanyType vs internal structure)
-    const companyArg = company?.companyProfile ? {
-      companyName: company.companyProfile.companyName,
-      industry: company.companyProfile.industry,
-      sizeRange: company.companyProfile.sizeRange,
-      website: company.companyProfile.website,
-      description: company.companyProfile.description,
-    } : undefined;
-
-    const { data, errors } = await this.client.generateMatchingSummary(
-      {
-        user,
-        job,
-        company: companyArg,
-      },
-      gqlOptions()
-    );
+    // Input structure matches GraphQL schema directly - no transformation needed
+    const { data, errors } = await this.client.generateMatchingSummary(input, gqlOptions());
 
     if (errors && errors.length > 0) {
       throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);

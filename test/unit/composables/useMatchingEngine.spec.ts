@@ -235,7 +235,7 @@ function createDepsBase() {
     const inputArg = aiGenerateMock.mock.calls[0][0] as MatchingSummaryInput;
     expect(inputArg.user.profile.fullName).toBe('Casey Candidate');
     expect(inputArg.job.title).toBe('Head of Engineering');
-    expect(inputArg.company?.companyProfile?.companyName).toBe('Acme Corp');
+    expect(inputArg.company?.companyName).toBe('Acme Corp');
     expect(engine.matchingSummary.value).toEqual(persistedSummary);
   });
 

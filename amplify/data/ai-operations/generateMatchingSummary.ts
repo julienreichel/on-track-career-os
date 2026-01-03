@@ -74,17 +74,12 @@ export interface MatchingJobDescription {
   explicitPains?: string[];
 }
 
-export interface MatchingCompanyProfile {
+export interface MatchingCompany {
   companyName: string;
   industry?: string;
   sizeRange?: string;
   website?: string;
   description?: string;
-}
-
-export interface MatchingCompanyPayload {
-  companyProfile?: MatchingCompanyProfile;
-  companyCanvas?: Record<string, unknown>;
 }
 
 export interface GenerateMatchingSummaryInput {
@@ -94,7 +89,7 @@ export interface GenerateMatchingSummaryInput {
     experienceSignals?: MatchingExperienceSignals;
   };
   job: MatchingJobDescription;
-  company?: MatchingCompanyPayload;
+  company?: MatchingCompany;
 }
 
 export interface GenerateMatchingSummaryOutput {
@@ -191,43 +186,17 @@ ${OUTPUT_SCHEMA}`;
 }
 
 type HandlerEvent = {
-  arguments: {
-    user: GenerateMatchingSummaryInput['user'];
-    job: GenerateMatchingSummaryInput['job'];
-    company?: {
-      companyName: string;
-      industry?: string;
-      sizeRange?: string;
-      website?: string;
-      description?: string;
-    };
-  };
+  arguments: GenerateMatchingSummaryInput;
 };
-
-function parseInput(args: HandlerEvent['arguments']): GenerateMatchingSummaryInput {
-  // Map company to expected structure
-  const company = args.company ? {
-    companyProfile: args.company,
-    companyCanvas: undefined,
-  } : undefined;
-
-  return {
-    user: args.user,
-    job: args.job,
-    company,
-  };
-}
 
 export const handler = async (event: HandlerEvent) => {
   if (!event?.arguments) {
     throw new Error('arguments are required');
   }
 
-  const normalizedArgs = parseInput(event.arguments);
-
   return withAiOperationHandlerObject(
     'generateMatchingSummary',
-    { arguments: normalizedArgs },
+    { arguments: event.arguments },
     async (args) => {
       const userPrompt = buildUserPrompt(args);
 

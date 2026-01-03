@@ -681,6 +681,7 @@ The output is **strict JSON only**, validated against a schema, and is persisted
 
   company?: {
     // MINIMAL company context (avoid overwhelming the AI)
+    // Flat structure - no nested objects
     companyName: string
     industry?: string
     sizeRange?: string
@@ -695,6 +696,8 @@ The output is **strict JSON only**, validated against a schema, and is persisted
 - Inputs must be **structured JSON only**.
 - No raw CV text, no raw job posting text, no free-form notes blobs.
 - `company` is optional (because `MatchingSummary.companyId` is optional in DB).
+- `company` is a **flat object** - GraphQL schema uses `a.ref('CompanyType')` which maps directly to the structure above.
+- Lambda handler receives this structure **as-is** - no transformation layer needed.
 - `experienceSignals.experiences` should include the **most relevant experiences** for the job (selection happens outside this operation).
 - If `experienceSignals` is missing, the operation must still return valid output, but quality may degrade (still deterministic + safe).
 
