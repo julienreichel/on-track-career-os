@@ -1,14 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
 import type { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import type { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { Experience } from '@/domain/experience/Experience';
+import type { STARStory } from '@/domain/starstory/STARStory';
 
-// Mock the repository
+// Mock the repositories
 vi.mock('@/domain/experience/ExperienceRepository');
+vi.mock('@/domain/starstory/STARStoryService');
 
 describe('ExperienceService', () => {
   let service: ExperienceService;
   let mockRepository: ReturnType<typeof vi.mocked<ExperienceRepository>>;
+  let mockStarStoryService: ReturnType<typeof vi.mocked<STARStoryService>>;
 
   beforeEach(() => {
     mockRepository = {
@@ -19,7 +23,22 @@ describe('ExperienceService', () => {
       delete: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<ExperienceRepository>>;
 
-    service = new ExperienceService(mockRepository);
+    mockStarStoryService = {
+      getStoriesByExperience: vi.fn(),
+      deleteStory: vi.fn(),
+      getFullSTARStory: vi.fn(),
+      getAllStories: vi.fn(),
+      generateStar: vi.fn(),
+      generateAchievements: vi.fn(),
+      createAndLinkStory: vi.fn(),
+      updateStory: vi.fn(),
+      linkStoryToExperience: vi.fn(),
+    } as unknown as ReturnType<typeof vi.mocked<STARStoryService>>;
+
+    service = new ExperienceService({
+      repo: mockRepository,
+      starStoryService: mockStarStoryService,
+    });
   });
 
   describe('getFullExperience', () => {
@@ -115,6 +134,72 @@ describe('ExperienceService', () => {
 
       expect(mockRepository.create).toHaveBeenCalledWith(newExperience);
       expect(result).toEqual(createdExperience);
+    });
+  });
+
+  describe('deleteExperience', () => {
+    it('should cascade delete associated STAR stories and then delete the experience', async () => {
+      const experienceId = 'exp-123';
+      const mockStories: STARStory[] = [
+        {
+          id: 'story-1',
+          title: 'Story 1',
+          situation: 'Situation',
+          task: 'Task',
+          action: 'Action',
+          result: 'Result',
+          experienceId,
+          userId: 'user-123',
+          createdAt: '2025-01-01T00:00:00Z',
+          updatedAt: '2025-01-01T00:00:00Z',
+          owner: 'user-123::user-123',
+        } as STARStory,
+        {
+          id: 'story-2',
+          title: 'Story 2',
+          situation: 'Situation',
+          task: 'Task',
+          action: 'Action',
+          result: 'Result',
+          experienceId,
+          userId: 'user-123',
+          createdAt: '2025-01-01T00:00:00Z',
+          updatedAt: '2025-01-01T00:00:00Z',
+          owner: 'user-123::user-123',
+        } as STARStory,
+      ];
+
+      mockStarStoryService.getStoriesByExperience.mockResolvedValue(mockStories);
+      mockStarStoryService.deleteStory.mockResolvedValue(undefined);
+      mockRepository.delete.mockResolvedValue(undefined);
+
+      await service.deleteExperience(experienceId);
+
+      expect(mockStarStoryService.getStoriesByExperience).toHaveBeenCalledWith(experienceId);
+      expect(mockStarStoryService.deleteStory).toHaveBeenCalledTimes(2);
+      expect(mockStarStoryService.deleteStory).toHaveBeenCalledWith('story-1');
+      expect(mockStarStoryService.deleteStory).toHaveBeenCalledWith('story-2');
+      expect(mockRepository.delete).toHaveBeenCalledWith(experienceId);
+    });
+
+    it('should delete experience even when no STAR stories exist', async () => {
+      const experienceId = 'exp-456';
+
+      mockStarStoryService.getStoriesByExperience.mockResolvedValue([]);
+      mockRepository.delete.mockResolvedValue(undefined);
+
+      await service.deleteExperience(experienceId);
+
+      expect(mockStarStoryService.getStoriesByExperience).toHaveBeenCalledWith(experienceId);
+      expect(mockStarStoryService.deleteStory).not.toHaveBeenCalled();
+      expect(mockRepository.delete).toHaveBeenCalledWith(experienceId);
+    });
+
+    it('should throw error when experienceId is not provided', async () => {
+      await expect(service.deleteExperience('')).rejects.toThrow('Experience ID is required');
+
+      expect(mockStarStoryService.getStoriesByExperience).not.toHaveBeenCalled();
+      expect(mockRepository.delete).not.toHaveBeenCalled();
     });
   });
 });
