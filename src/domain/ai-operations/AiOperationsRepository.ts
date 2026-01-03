@@ -399,6 +399,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return data as MatchingSummaryResult;
+    const parsed = typeof data === 'string' ? JSON.parse(data) : data;
+    return parsed as MatchingSummaryResult;
   }
 }

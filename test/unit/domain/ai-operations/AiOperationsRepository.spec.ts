@@ -522,7 +522,7 @@ describe('AiOperationsRepository', () => {
 
     it('returns parsed matching summary', async () => {
       mockClient.generateMatchingSummary.mockResolvedValue({
-        data: summaryResponse,
+        data: JSON.stringify(summaryResponse),
         errors: undefined,
       });
 

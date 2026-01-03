@@ -188,15 +188,27 @@ ${OUTPUT_SCHEMA}`;
 }
 
 type HandlerEvent = {
-  arguments: GenerateMatchingSummaryInput;
+  arguments: {
+    user: unknown;
+    job: unknown;
+    company?: unknown;
+  };
 };
+
+function parseInput(args: HandlerEvent['arguments']): GenerateMatchingSummaryInput {
+  return {
+    user: args.user as GenerateMatchingSummaryInput['user'],
+    job: args.job as GenerateMatchingSummaryInput['job'],
+    company: args.company as GenerateMatchingSummaryInput['company'],
+  };
+}
 
 export const handler = async (event: HandlerEvent) => {
   if (!event?.arguments) {
     throw new Error('arguments are required');
   }
 
-  const normalizedArgs = event.arguments;
+  const normalizedArgs = parseInput(event.arguments);
 
   return withAiOperationHandlerObject(
     'generateMatchingSummary',
