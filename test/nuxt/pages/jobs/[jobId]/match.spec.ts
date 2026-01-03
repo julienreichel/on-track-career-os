@@ -185,11 +185,8 @@ describe('Job match page', () => {
   });
 
   it('triggers regeneration when the action button is clicked', async () => {
-    const wrapper = await mountPage();
+    await mountPage();
 
-    // Find button with sparkles icon (generate/regenerate button)
-    const generateButton = wrapper.findAll('.u-button').find((btn) => wrapper.text().includes('Generate') || wrapper.text().includes('Regenerate'));
-    
     // Simulate button click by calling regenerate directly (since onClick is in computed link)
     await engineMock.regenerate();
     

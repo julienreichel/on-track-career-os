@@ -167,8 +167,15 @@ const IMPACT_MAX = 6;
 const TAILORING_MIN = 3;
 const TAILORING_MAX = 6;
 
+// Thresholds for guardrails
+const MISSING_RATIO_SKIP = 0.55;
+const MISSING_RATIO_MAYBE = 0.40;
+const MISSING_RATIO_APPLY = 0.20;
+const SKILL_FIT_CAP_SKIP = 20;
+const SKILL_FIT_CAP_MAYBE = 25;
+const SKILL_FIT_MIN_APPLY = 35;
+
 // Skill match tag patterns
-const VALID_SKILL_TAGS = ['[MATCH]', '[PARTIAL]', '[MISSING]', '[OVER]'] as const;
 const SKILL_TAG_REGEX = /^\[(MATCH|PARTIAL|MISSING|OVER)\]/;
 const RISKY_POINT_REGEX = /^Risk:.*Mitigation:/i;
 
@@ -236,7 +243,7 @@ function applyRecommendationGuardrails(
   skillFit: number
 ): { recommendation: 'apply' | 'maybe' | 'skip'; skillFit: number } {
   const validRecommendations: Array<'apply' | 'maybe' | 'skip'> = ['apply', 'maybe', 'skip'];
-  let finalRecommendation = validRecommendations.includes(recommendation as any)
+  let finalRecommendation = validRecommendations.includes(recommendation as 'apply' | 'maybe' | 'skip')
     ? (recommendation as 'apply' | 'maybe' | 'skip')
     : 'maybe';
   
@@ -244,15 +251,15 @@ function applyRecommendationGuardrails(
   let cappedSkillFit = skillFit;
   
   // Guardrail: High missing ratio must limit recommendation and skill score
-  if (missingRatio > 0.55) {
+  if (missingRatio > MISSING_RATIO_SKIP) {
     finalRecommendation = 'skip';
-    cappedSkillFit = Math.min(cappedSkillFit, 20);
-  } else if (missingRatio > 0.40) {
+    cappedSkillFit = Math.min(cappedSkillFit, SKILL_FIT_CAP_SKIP);
+  } else if (missingRatio > MISSING_RATIO_MAYBE) {
     if (finalRecommendation === 'apply') {
       finalRecommendation = 'maybe';
     }
-    cappedSkillFit = Math.min(cappedSkillFit, 25);
-  } else if (missingRatio <= 0.20 && skillFit >= 35) {
+    cappedSkillFit = Math.min(cappedSkillFit, SKILL_FIT_CAP_MAYBE);
+  } else if (missingRatio <= MISSING_RATIO_APPLY && skillFit >= SKILL_FIT_MIN_APPLY) {
     // Strong match - can be "apply" if LLM suggested it
     // (no override needed, keep LLM's assessment)
   }
@@ -271,10 +278,6 @@ function finalizeOutput(
   const experienceFit = sanitizeScore(raw.scoreBreakdown?.experienceFit, EXPERIENCE_FIT_MAX);
   const interestFit = sanitizeScore(raw.scoreBreakdown?.interestFit, INTEREST_FIT_MAX);
   const edge = sanitizeScore(raw.scoreBreakdown?.edge, EDGE_MAX);
-  
-  // Recompute overall score from components
-  const computedScore = skillFit + experienceFit + interestFit + edge;
-  const overallScore = clamp(computedScore, SCORE_MIN, SCORE_MAX);
   
   // Sanitize arrays
   const reasoningHighlights = sanitizeArray(raw.reasoningHighlights, REASONING_MIN, REASONING_MAX);

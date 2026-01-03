@@ -637,13 +637,22 @@ describe('AiOperationsService', () => {
     };
 
     const summaryResult: MatchingSummaryResult = {
-      summaryParagraph: 'Casey can align engineering strategy with the job requirements.',
-      impactAreas: ['Accelerate delivery'],
-      contributionMap: ['Scaling agile teams'],
-      riskMitigationPoints: ['Needs deeper knowledge of healthcare compliance'],
+      overallScore: 82,
+      scoreBreakdown: {
+        skillFit: 45,
+        experienceFit: 25,
+        interestFit: 7,
+        edge: 5,
+      },
+      recommendation: 'apply',
+      reasoningHighlights: ['Strong engineering leadership', 'Good strategic alignment'],
+      strengthsForThisRole: ['Team scaling', 'Agile delivery'],
+      skillMatch: ['[MATCH] Leadership — demonstrated', '[PARTIAL] Healthcare — limited'],
+      riskyPoints: ['Risk: Limited healthcare knowledge. Mitigation: Study compliance requirements.'],
+      impactOpportunities: ['Accelerate delivery', 'Scale agile teams'],
+      tailoringTips: ['Emphasize team growth metrics', 'Address healthcare learning plan'],
       generatedAt: '2025-01-01T00:00:00.000Z',
       needsUpdate: false,
-      userFitScore: 82,
     };
 
     it('returns a normalized matching summary from the repository', async () => {

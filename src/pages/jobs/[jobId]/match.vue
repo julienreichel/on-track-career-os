@@ -61,20 +61,30 @@ const isGenerating = computed(() => engine.isGenerating.value);
 const hasSummary = computed(() => engine.hasSummary.value);
 const errorMessage = engine.error;
 
+function parseScoreBreakdown(scoreBreakdown: unknown) {
+  if (!scoreBreakdown) {
+    return { skillFit: 0, experienceFit: 0, interestFit: 0, edge: 0 };
+  }
+  if (typeof scoreBreakdown === 'string') {
+    return JSON.parse(scoreBreakdown);
+  }
+  return scoreBreakdown;
+}
+
+function safeStringArray(value: unknown): string[] {
+  return (value ?? []) as string[];
+}
+
 const summaryProps = computed(() => ({
   overallScore: summary.value?.overallScore ?? 0,
-  scoreBreakdown: summary.value?.scoreBreakdown
-    ? (typeof summary.value.scoreBreakdown === 'string'
-        ? JSON.parse(summary.value.scoreBreakdown)
-        : summary.value.scoreBreakdown)
-    : { skillFit: 0, experienceFit: 0, interestFit: 0, edge: 0 },
+  scoreBreakdown: parseScoreBreakdown(summary.value?.scoreBreakdown),
   recommendation: (summary.value?.recommendation as 'apply' | 'maybe' | 'skip') ?? 'maybe',
-  reasoningHighlights: (summary.value?.reasoningHighlights ?? []) as string[],
-  strengthsForThisRole: (summary.value?.strengthsForThisRole ?? []) as string[],
-  skillMatch: (summary.value?.skillMatch ?? []) as string[],
-  riskyPoints: (summary.value?.riskyPoints ?? []) as string[],
-  impactOpportunities: (summary.value?.impactOpportunities ?? []) as string[],
-  tailoringTips: (summary.value?.tailoringTips ?? []) as string[],
+  reasoningHighlights: safeStringArray(summary.value?.reasoningHighlights),
+  strengthsForThisRole: safeStringArray(summary.value?.strengthsForThisRole),
+  skillMatch: safeStringArray(summary.value?.skillMatch),
+  riskyPoints: safeStringArray(summary.value?.riskyPoints),
+  impactOpportunities: safeStringArray(summary.value?.impactOpportunities),
+  tailoringTips: safeStringArray(summary.value?.tailoringTips),
 }));
 
 const linkedCompany = computed(() => {

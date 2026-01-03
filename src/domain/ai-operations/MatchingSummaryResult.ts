@@ -18,13 +18,18 @@ export function isMatchingSummaryResult(value: unknown): value is MatchingSummar
 
   const candidate = value as MatchingSummaryResult;
   const arraysValid =
-    Array.isArray(candidate.impactAreas) &&
-    Array.isArray(candidate.contributionMap) &&
-    Array.isArray(candidate.riskMitigationPoints);
+    Array.isArray(candidate.reasoningHighlights) &&
+    Array.isArray(candidate.strengthsForThisRole) &&
+    Array.isArray(candidate.skillMatch) &&
+    Array.isArray(candidate.riskyPoints) &&
+    Array.isArray(candidate.impactOpportunities) &&
+    Array.isArray(candidate.tailoringTips);
 
   return (
     arraysValid &&
-    typeof candidate.summaryParagraph === 'string' &&
+    typeof candidate.overallScore === 'number' &&
+    typeof candidate.scoreBreakdown === 'object' &&
+    typeof candidate.recommendation === 'string' &&
     typeof candidate.generatedAt === 'string' &&
     typeof candidate.needsUpdate === 'boolean'
   );

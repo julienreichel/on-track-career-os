@@ -556,7 +556,7 @@ export const schema = a
             experienceFit: a.integer().required(),
             interestFit: a.integer().required(),
             edge: a.integer().required(),
-          }).required(),
+          }),
           recommendation: a.string().required(),
           reasoningHighlights: a.string().array().required(),
           strengthsForThisRole: a.string().array().required(),
