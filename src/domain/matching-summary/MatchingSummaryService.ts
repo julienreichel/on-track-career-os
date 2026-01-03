@@ -35,12 +35,14 @@ export function mapMatchingSummaryResult(
 ): Omit<MatchingSummaryCreateInput, 'userId' | 'jobId'> {
   const normalized: Omit<MatchingSummaryCreateInput, 'userId' | 'jobId'> = {
     overallScore: typeof result.overallScore === 'number' ? result.overallScore : 0,
-    scoreBreakdown: JSON.stringify(result.scoreBreakdown || {
-      skillFit: 0,
-      experienceFit: 0,
-      interestFit: 0,
-      edge: 0,
-    }),
+    scoreBreakdown: JSON.stringify(
+      result.scoreBreakdown || {
+        skillFit: 0,
+        experienceFit: 0,
+        interestFit: 0,
+        edge: 0,
+      }
+    ),
     recommendation: result.recommendation || 'maybe',
     reasoningHighlights: sanitizeArray(result.reasoningHighlights),
     strengthsForThisRole: sanitizeArray(result.strengthsForThisRole),

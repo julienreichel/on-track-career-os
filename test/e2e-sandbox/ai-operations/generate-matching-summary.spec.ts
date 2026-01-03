@@ -101,7 +101,7 @@ describe('AI Operations - Generate Matching Summary (E2E Sandbox)', () => {
     expect(Array.isArray(summary.riskyPoints)).toBe(true);
     expect(Array.isArray(summary.impactOpportunities)).toBe(true);
     expect(Array.isArray(summary.tailoringTips)).toBe(true);
-    
+
     // Validate skill match format
     summary.skillMatch.forEach((item: string) => {
       expect(item).toMatch(/^\[(MATCH|PARTIAL|MISSING|OVER)\]/);

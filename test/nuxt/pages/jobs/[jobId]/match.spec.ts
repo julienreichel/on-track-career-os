@@ -189,7 +189,7 @@ describe('Job match page', () => {
 
     // Simulate button click by calling regenerate directly (since onClick is in computed link)
     await engineMock.regenerate();
-    
+
     expect(engineMock.regenerate).toHaveBeenCalled();
   });
 });

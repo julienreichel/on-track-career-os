@@ -169,8 +169,8 @@ const TAILORING_MAX = 6;
 
 // Thresholds for guardrails
 const MISSING_RATIO_SKIP = 0.55;
-const MISSING_RATIO_MAYBE = 0.40;
-const MISSING_RATIO_APPLY = 0.20;
+const MISSING_RATIO_MAYBE = 0.4;
+const MISSING_RATIO_APPLY = 0.2;
 const SKILL_FIT_CAP_SKIP = 20;
 const SKILL_FIT_CAP_MAYBE = 25;
 const SKILL_FIT_MIN_APPLY = 35;
@@ -198,10 +198,10 @@ function sanitizeArray(value: unknown, min: number, max: number): string[] {
   if (!Array.isArray(value)) {
     return [];
   }
-  
+
   const seen = new Set<string>();
   const list: string[] = [];
-  
+
   for (const entry of value) {
     const text = sanitizeString(entry);
     if (text && !seen.has(text)) {
@@ -209,29 +209,33 @@ function sanitizeArray(value: unknown, min: number, max: number): string[] {
       list.push(text);
     }
   }
-  
+
   // Trim to max length
   const trimmed = list.slice(0, max);
-  
+
   // Pad to min if needed (avoid inventing data - use neutral placeholders only if critical)
   while (trimmed.length < min && trimmed.length < list.length) {
     const nextItem = list[trimmed.length];
     if (nextItem) trimmed.push(nextItem);
   }
-  
+
   return trimmed;
 }
 
 function validateSkillMatchFormat(items: string[]): string[] {
-  return items.filter(item => SKILL_TAG_REGEX.test(item));
+  return items.filter((item) => SKILL_TAG_REGEX.test(item));
 }
 
 function validateRiskyPointsFormat(items: string[]): string[] {
-  return items.filter(item => RISKY_POINT_REGEX.test(item));
+  return items.filter((item) => RISKY_POINT_REGEX.test(item));
 }
 
-function countMissingSkills(skillMatch: string[]): { missing: number; total: number; ratio: number } {
-  const missing = skillMatch.filter(item => item.startsWith('[MISSING]')).length;
+function countMissingSkills(skillMatch: string[]): {
+  missing: number;
+  total: number;
+  ratio: number;
+} {
+  const missing = skillMatch.filter((item) => item.startsWith('[MISSING]')).length;
   const total = skillMatch.length;
   const ratio = total > 0 ? missing / total : 0;
   return { missing, total, ratio };
@@ -243,13 +247,15 @@ function applyRecommendationGuardrails(
   skillFit: number
 ): { recommendation: 'apply' | 'maybe' | 'skip'; skillFit: number } {
   const validRecommendations: Array<'apply' | 'maybe' | 'skip'> = ['apply', 'maybe', 'skip'];
-  let finalRecommendation = validRecommendations.includes(recommendation as 'apply' | 'maybe' | 'skip')
+  let finalRecommendation = validRecommendations.includes(
+    recommendation as 'apply' | 'maybe' | 'skip'
+  )
     ? (recommendation as 'apply' | 'maybe' | 'skip')
     : 'maybe';
-  
+
   const { ratio: missingRatio } = countMissingSkills(skillMatch);
   let cappedSkillFit = skillFit;
-  
+
   // Guardrail: High missing ratio must limit recommendation and skill score
   if (missingRatio > MISSING_RATIO_SKIP) {
     finalRecommendation = 'skip';
@@ -263,7 +269,7 @@ function applyRecommendationGuardrails(
     // Strong match - can be "apply" if LLM suggested it
     // (no override needed, keep LLM's assessment)
   }
-  
+
   return { recommendation: finalRecommendation, skillFit: cappedSkillFit };
 }
 
@@ -272,17 +278,21 @@ function finalizeOutput(
   { fallback }: { fallback: boolean }
 ): GenerateMatchingSummaryOutput {
   const now = new Date().toISOString();
-  
+
   // Sanitize scores
   let skillFit = sanitizeScore(raw.scoreBreakdown?.skillFit, SKILL_FIT_MAX);
   const experienceFit = sanitizeScore(raw.scoreBreakdown?.experienceFit, EXPERIENCE_FIT_MAX);
   const interestFit = sanitizeScore(raw.scoreBreakdown?.interestFit, INTEREST_FIT_MAX);
   const edge = sanitizeScore(raw.scoreBreakdown?.edge, EDGE_MAX);
-  
+
   // Sanitize arrays
   const reasoningHighlights = sanitizeArray(raw.reasoningHighlights, REASONING_MIN, REASONING_MAX);
-  const strengthsForThisRole = sanitizeArray(raw.strengthsForThisRole, STRENGTHS_MIN, STRENGTHS_MAX);
-  
+  const strengthsForThisRole = sanitizeArray(
+    raw.strengthsForThisRole,
+    STRENGTHS_MIN,
+    STRENGTHS_MAX
+  );
+
   let skillMatch = sanitizeArray(raw.skillMatch, SKILL_MATCH_MIN, SKILL_MATCH_MAX);
   skillMatch = validateSkillMatchFormat(skillMatch);
   if (skillMatch.length < SKILL_MATCH_MIN) {
@@ -291,30 +301,36 @@ function finalizeOutput(
       skillMatch.push('[MISSING] Additional skill analysis needed');
     }
   }
-  
+
   let riskyPoints = sanitizeArray(raw.riskyPoints, RISKY_MIN, RISKY_MAX);
   riskyPoints = validateRiskyPointsFormat(riskyPoints);
   if (riskyPoints.length < RISKY_MIN) {
     // Pad with neutral risk/mitigation if needed
     while (riskyPoints.length < RISKY_MIN) {
-      riskyPoints.push('Risk: Limited data for full assessment. Mitigation: Review all requirements carefully.');
+      riskyPoints.push(
+        'Risk: Limited data for full assessment. Mitigation: Review all requirements carefully.'
+      );
     }
   }
-  
+
   const impactOpportunities = sanitizeArray(raw.impactOpportunities, IMPACT_MIN, IMPACT_MAX);
   const tailoringTips = sanitizeArray(raw.tailoringTips, TAILORING_MIN, TAILORING_MAX);
-  
+
   // Apply recommendation guardrails
   const { recommendation, skillFit: cappedSkillFit } = applyRecommendationGuardrails(
     raw.recommendation || 'maybe',
     skillMatch,
     skillFit
   );
-  
+
   // Update skill fit if capped
   skillFit = cappedSkillFit;
-  const finalOverallScore = clamp(skillFit + experienceFit + interestFit + edge, SCORE_MIN, SCORE_MAX);
-  
+  const finalOverallScore = clamp(
+    skillFit + experienceFit + interestFit + edge,
+    SCORE_MIN,
+    SCORE_MAX
+  );
+
   return {
     overallScore: finalOverallScore,
     scoreBreakdown: {
@@ -368,11 +384,7 @@ function buildFallbackOutput(): GenerateMatchingSummaryOutput {
       'Risk: Incomplete assessment. Mitigation: Review all input fields.',
       'Risk: Cannot determine fit. Mitigation: Manually review requirements.',
     ],
-    impactOpportunities: [
-      'Analysis unavailable',
-      'Please retry generation',
-      'Review manually',
-    ],
+    impactOpportunities: ['Analysis unavailable', 'Please retry generation', 'Review manually'],
     tailoringTips: [
       'Complete profile data first',
       'Retry matching analysis',
@@ -386,7 +398,7 @@ function buildFallbackOutput(): GenerateMatchingSummaryOutput {
 function buildUserPrompt(args: GenerateMatchingSummaryInput) {
   const userSkills = args.user.profile.skills || [];
   const jobSkills = args.job.requiredSkills || [];
-  
+
   return `Analyze this job-candidate match with skepticism and honesty.
 
 USER DATA:

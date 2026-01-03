@@ -648,7 +648,9 @@ describe('AiOperationsService', () => {
       reasoningHighlights: ['Strong engineering leadership', 'Good strategic alignment'],
       strengthsForThisRole: ['Team scaling', 'Agile delivery'],
       skillMatch: ['[MATCH] Leadership — demonstrated', '[PARTIAL] Healthcare — limited'],
-      riskyPoints: ['Risk: Limited healthcare knowledge. Mitigation: Study compliance requirements.'],
+      riskyPoints: [
+        'Risk: Limited healthcare knowledge. Mitigation: Study compliance requirements.',
+      ],
       impactOpportunities: ['Accelerate delivery', 'Scale agile teams'],
       tailoringTips: ['Emphasize team growth metrics', 'Address healthcare learning plan'],
       generatedAt: '2025-01-01T00:00:00.000Z',

@@ -11,12 +11,7 @@
             <p class="text-4xl font-bold text-highlighted">{{ overallScore }}</p>
             <p class="text-sm text-dimmed">/100</p>
           </div>
-          <UBadge
-            :color="recommendationColor"
-            variant="soft"
-            class="mt-2"
-            size="lg"
-          >
+          <UBadge :color="recommendationColor" variant="soft" class="mt-2" size="lg">
             {{ recommendationLabel }}
           </UBadge>
         </div>
@@ -87,12 +82,7 @@
           :key="`skill-${idx}`"
           class="flex items-start gap-2 text-sm"
         >
-          <UBadge
-            :color="getSkillTagColor(item)"
-            variant="soft"
-            size="xs"
-            class="mt-0.5 shrink-0"
-          >
+          <UBadge :color="getSkillTagColor(item)" variant="soft" size="xs" class="mt-0.5 shrink-0">
             {{ getSkillTag(item) }}
           </UBadge>
           <span class="leading-snug text-default">{{ getSkillText(item) }}</span>
@@ -199,10 +189,30 @@ const props = withDefaults(
 const { t } = useI18n();
 
 const scoreBreakdownItems = computed(() => [
-  { key: 'skill', label: t('matching.summaryCard.skillFit'), value: props.scoreBreakdown?.skillFit || 0, max: 50 },
-  { key: 'experience', label: t('matching.summaryCard.experienceFit'), value: props.scoreBreakdown?.experienceFit || 0, max: 30 },
-  { key: 'interest', label: t('matching.summaryCard.interestFit'), value: props.scoreBreakdown?.interestFit || 0, max: 10 },
-  { key: 'edge', label: t('matching.summaryCard.edge'), value: props.scoreBreakdown?.edge || 0, max: 10 },
+  {
+    key: 'skill',
+    label: t('matching.summaryCard.skillFit'),
+    value: props.scoreBreakdown?.skillFit || 0,
+    max: 50,
+  },
+  {
+    key: 'experience',
+    label: t('matching.summaryCard.experienceFit'),
+    value: props.scoreBreakdown?.experienceFit || 0,
+    max: 30,
+  },
+  {
+    key: 'interest',
+    label: t('matching.summaryCard.interestFit'),
+    value: props.scoreBreakdown?.interestFit || 0,
+    max: 10,
+  },
+  {
+    key: 'edge',
+    label: t('matching.summaryCard.edge'),
+    value: props.scoreBreakdown?.edge || 0,
+    max: 10,
+  },
 ]);
 
 const recommendationColor = computed(() => {
