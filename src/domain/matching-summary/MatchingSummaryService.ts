@@ -6,9 +6,6 @@ import type {
 import { MatchingSummaryRepository } from './MatchingSummaryRepository';
 import type { MatchingSummaryResult } from '@/domain/ai-operations/MatchingSummaryResult';
 
-const SCORE_MIN = 0;
-const SCORE_MAX = 100;
-
 export interface MatchingSummaryContext {
   userId: string;
   jobId: string;
@@ -33,34 +30,27 @@ function sanitizeArray(value: unknown) {
     .filter((entry) => Boolean(entry));
 }
 
-function clampScore(value: unknown) {
-  if (typeof value !== 'number' || Number.isNaN(value)) {
-    return undefined;
-  }
-  return Math.max(SCORE_MIN, Math.min(SCORE_MAX, value));
-}
-
 export function mapMatchingSummaryResult(
   result: MatchingSummaryResult
 ): Omit<MatchingSummaryCreateInput, 'userId' | 'jobId'> {
-  const riskSource =
-    result.riskMitigationPoints && result.riskMitigationPoints.length > 0
-      ? result.riskMitigationPoints
-      : (result as Record<string, unknown>)?.risks;
-
   const normalized: Omit<MatchingSummaryCreateInput, 'userId' | 'jobId'> = {
-    summaryParagraph: sanitizeString(result.summaryParagraph),
-    impactAreas: sanitizeArray(result.impactAreas),
-    contributionMap: sanitizeArray(result.contributionMap),
-    riskMitigationPoints: sanitizeArray(riskSource),
+    overallScore: typeof result.overallScore === 'number' ? result.overallScore : 0,
+    scoreBreakdown: JSON.stringify(result.scoreBreakdown || {
+      skillFit: 0,
+      experienceFit: 0,
+      interestFit: 0,
+      edge: 0,
+    }),
+    recommendation: result.recommendation || 'maybe',
+    reasoningHighlights: sanitizeArray(result.reasoningHighlights),
+    strengthsForThisRole: sanitizeArray(result.strengthsForThisRole),
+    skillMatch: sanitizeArray(result.skillMatch),
+    riskyPoints: sanitizeArray(result.riskyPoints),
+    impactOpportunities: sanitizeArray(result.impactOpportunities),
+    tailoringTips: sanitizeArray(result.tailoringTips),
     generatedAt: sanitizeString(result.generatedAt) || new Date().toISOString(),
     needsUpdate: Boolean(result.needsUpdate),
   };
-
-  const score = clampScore(result.userFitScore);
-  if (typeof score === 'number') {
-    normalized.userFitScore = score;
-  }
 
   return normalized;
 }

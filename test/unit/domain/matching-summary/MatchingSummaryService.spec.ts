@@ -10,13 +10,22 @@ import type { MatchingSummaryResult } from '@/domain/ai-operations/MatchingSumma
 vi.mock('@/domain/matching-summary/MatchingSummaryRepository');
 
 const buildSummary = (): MatchingSummaryResult => ({
-  summaryParagraph: 'Casey aligns to the role.',
-  impactAreas: ['Scale delivery', 'Improve mentoring '],
-  contributionMap: [' Lead EMs '],
-  riskMitigationPoints: ['Needs deeper compliance context'],
+  overallScore: 78,
+  scoreBreakdown: {
+    skillFit: 40,
+    experienceFit: 25,
+    interestFit: 8,
+    edge: 5,
+  },
+  recommendation: 'apply',
+  reasoningHighlights: ['Casey aligns to the role'],
+  strengthsForThisRole: ['Team leadership'],
+  skillMatch: ['[MATCH] Leadership — demonstrated'],
+  riskyPoints: ['Risk: Needs deeper compliance context. Mitigation: Study requirements.'],
+  impactOpportunities: ['Scale delivery', 'Improve mentoring '],
+  tailoringTips: [' Lead EMs '],
   generatedAt: '2025-01-01T00:00:00.000Z',
   needsUpdate: false,
-  userFitScore: 78,
 });
 
 describe('MatchingSummaryService', () => {
@@ -81,7 +90,8 @@ describe('MatchingSummaryService', () => {
         userId: 'user-1',
         jobId: 'job-1',
         companyId: 'comp-1',
-        impactAreas: ['Scale delivery', 'Improve mentoring'],
+        impactOpportunities: ['Scale delivery', 'Improve mentoring'],
+        recommendation: 'apply',
       })
     );
   });
@@ -89,7 +99,7 @@ describe('MatchingSummaryService', () => {
   it('upserts summaries by updating when one exists', async () => {
     const summary = buildSummary();
     mockRepo.findByContext.mockResolvedValue({ id: 'existing' } as MatchingSummary);
-    mockRepo.update.mockResolvedValue({ id: 'existing', summaryParagraph: 'Updated' } as MatchingSummary);
+    mockRepo.update.mockResolvedValue({ id: 'existing', overallScore: 78 } as MatchingSummary);
 
     const updated = await service.upsertSummary({
       userId: 'user-1',
@@ -102,7 +112,8 @@ describe('MatchingSummaryService', () => {
     expect(mockRepo.update).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'existing',
-        summaryParagraph: 'Casey aligns to the role.',
+        overallScore: 78,
+        recommendation: 'apply',
       })
     );
   });
@@ -122,18 +133,34 @@ describe('MatchingSummaryService', () => {
 describe('mapMatchingSummaryResult', () => {
   it('normalizes strings, arrays, and score', () => {
     const mapped = mapMatchingSummaryResult({
-      summaryParagraph: '  Fit  ',
-      impactAreas: ['Value', ''],
-      contributionMap: [' Action '],
-      riskMitigationPoints: ['Risk'],
+      overallScore: 85,
+      scoreBreakdown: {
+        skillFit: 45,
+        experienceFit: 25,
+        interestFit: 10,
+        edge: 5,
+      },
+      recommendation: 'apply',
+      reasoningHighlights: ['  Strong fit  '],
+      strengthsForThisRole: ['Value', ''],
+      skillMatch: [' [MATCH] Leadership '],
+      riskyPoints: ['Risk'],
+      impactOpportunities: ['Impact'],
+      tailoringTips: ['Tip'],
       generatedAt: '',
       needsUpdate: false,
-      userFitScore: 120,
     } as MatchingSummaryResult);
 
-    expect(mapped.summaryParagraph).toBe('Fit');
-    expect(mapped.impactAreas).toEqual(['Value']);
-    expect(mapped.userFitScore).toBe(100);
+    expect(mapped.overallScore).toBe(85);
+    expect(mapped.recommendation).toBe('apply');
+    expect(mapped.strengthsForThisRole).toEqual(['Value']);
+    expect(mapped.skillMatch).toEqual(['[MATCH] Leadership']);
     expect(mapped.generatedAt).toMatch(/T/);
+    expect(JSON.parse(mapped.scoreBreakdown as string)).toEqual({
+      skillFit: 45,
+      experienceFit: 25,
+      interestFit: 10,
+      edge: 5,
+    });
   });
 });
