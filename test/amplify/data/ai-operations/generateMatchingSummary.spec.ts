@@ -13,17 +13,31 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => {
 
 describe('ai.generateMatchingSummary', () => {
   type Handler = (event: { arguments: unknown }) => Promise<{
-    summaryParagraph: string;
-    impactAreas: string[];
-    contributionMap: string[];
-    riskMitigationPoints: string[];
+    overallScore: number;
+    scoreBreakdown: {
+      skillFit: number;
+      experienceFit: number;
+      interestFit: number;
+      edge: number;
+    };
+    recommendation: 'apply' | 'maybe' | 'skip';
+    reasoningHighlights: string[];
+    strengthsForThisRole: string[];
+    skillMatch: string[];
+    riskyPoints: string[];
+    impactOpportunities: string[];
+    tailoringTips: string[];
     generatedAt: string;
     needsUpdate: boolean;
-    userFitScore?: number;
   }>;
 
   let handler: Handler;
   let mockSend: ReturnType<typeof vi.fn>;
+  let mockOutput: Awaited<ReturnType<Handler>>;
+
+  afterEach(() => {
+    vi.resetModules();
+  });
 
   const buildBedrockResponse = (payload: unknown) => ({
     body: new TextEncoder().encode(
@@ -42,6 +56,7 @@ describe('ai.generateMatchingSummary', () => {
       profile: {
         fullName: 'Casey Candidate',
         strengths: ['Mentorship'],
+        skills: ['Leadership', 'Strategic Planning'],
       },
       experienceSignals: {
         experiences: [
@@ -56,7 +71,7 @@ describe('ai.generateMatchingSummary', () => {
     job: {
       title: 'Head of Engineering',
       responsibilities: ['Lead multi-team org'],
-      requiredSkills: ['Strategic planning'],
+      requiredSkills: ['Strategic planning', 'Team building', 'Technical architecture'],
     },
   };
 
@@ -67,42 +82,82 @@ describe('ai.generateMatchingSummary', () => {
     const clientInstance = new BedrockRuntimeClient();
     mockSend = clientInstance.send as ReturnType<typeof vi.fn>;
 
+    // Import handler after mocks are set up
     const module = await import('@amplify/data/ai-operations/generateMatchingSummary');
     handler = module.handler;
-  });
 
-  afterEach(() => {
-    vi.resetModules();
-  });
-
-  it('returns a normalized matching summary', async () => {
-    const mockOutput = {
-      summaryParagraph: 'Casey can lead the org with empathy.',
-      impactAreas: ['Scale delivery', 'Improve retention', 'Improve retention'],
-      contributionMap: ['Mentor managers'],
-      riskMitigationPoints: ['Needs more healthcare context'],
-      userFitScore: 87.5,
+    mockOutput = {
+      overallScore: 75,
+      scoreBreakdown: {
+        skillFit: 40,
+        experienceFit: 25,
+        interestFit: 5,
+        edge: 5,
+      },
+      recommendation: 'apply',
+      reasoningHighlights: [
+        'Casey has strong leadership experience',
+        'Strategic planning skills align well',
+        'Team mentorship is a key strength',
+      ],
+      strengthsForThisRole: [
+        'Proven team leadership experience',
+        'Strategic thinking demonstrated',
+        'Strong people management',
+      ],
+      skillMatch: [
+        '[MATCH] Leadership — Engineering Manager role demonstrates this',
+        '[MATCH] Strategic Planning — listed in user skills',
+        '[PARTIAL] Team building — experience present but limited scale',
+        '[MISSING] Technical architecture — not mentioned in profile',
+        '[MATCH] Mentorship — core strength for growing teams',
+        '[PARTIAL] Healthcare domain — limited context mentioned',
+      ],
+      riskyPoints: [
+        'Risk: Technical architecture experience not evident. Mitigation: Highlight any technical design work.',
+        'Risk: Limited multi-team leadership scale. Mitigation: Emphasize potential and learning agility.',
+        'Risk: Healthcare context unclear. Mitigation: Research company and address in cover letter.',
+      ],
+      impactOpportunities: [
+        'Scale team processes quickly',
+        'Improve retention metrics',
+        'Mentor managers effectively',
+      ],
+      tailoringTips: [
+        'Highlight team retention improvement metric',
+        'Emphasize strategic planning experience',
+        'Address technical architecture in cover letter',
+      ],
     };
+  });
 
+  it('returns a normalized matching summary with structured output', async () => {
     mockSend.mockResolvedValue(buildBedrockResponse(mockOutput));
 
     const response = await handler({ arguments: validArguments as never });
 
-    expect(response.summaryParagraph).toContain('Casey');
-    expect(response.impactAreas).toEqual(['Scale delivery', 'Improve retention']);
-    expect(response.userFitScore).toBe(87.5);
+    expect(response.overallScore).toBe(75);
+    expect(response.scoreBreakdown.skillFit).toBe(40);
+    expect(response.recommendation).toBe('apply');
+    expect(response.reasoningHighlights).toContain('Casey has strong leadership experience');
+    expect(response.skillMatch).toHaveLength(6);
+    expect(response.skillMatch[0]).toMatch(/^\[MATCH\]/);
     expect(response.needsUpdate).toBe(false);
     expect(new Date(response.generatedAt).toString()).not.toBe('Invalid Date');
   });
 
-  it('falls back to empty summary when AI output is invalid', async () => {
+  it('falls back to structured empty summary when AI output is invalid', async () => {
     mockSend.mockResolvedValueOnce(buildBedrockResponse('not json'));
     mockSend.mockResolvedValueOnce(buildBedrockResponse('still not json'));
 
     const response = await handler({ arguments: validArguments as never });
 
-    expect(response.summaryParagraph).toBe('');
-    expect(response.impactAreas).toEqual([]);
+    expect(response.overallScore).toBe(0);
+    expect(response.recommendation).toBe('skip');
+    expect(response.reasoningHighlights).toHaveLength(3);
+    expect(response.skillMatch).toHaveLength(6);
+    expect(response.skillMatch.every((s) => s.startsWith('[MISSING]'))).toBe(true);
     expect(response.needsUpdate).toBe(true);
+    expect(new Date(response.generatedAt).toString()).not.toBe('Invalid Date');
   });
 });
