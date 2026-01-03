@@ -16,7 +16,6 @@ import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import { CompanyService } from '@/domain/company/CompanyService';
 import type { Company } from '@/domain/company/Company';
 import { CompanyCanvasService } from '@/domain/company-canvas/CompanyCanvasService';
-import type { CompanyCanvas } from '@/domain/company-canvas/CompanyCanvas';
 
 const MAX_EXPERIENCE_SIGNALS = 8;
 
@@ -48,8 +47,7 @@ function createDependencies(
 ): MatchingEngineDependencies {
   return {
     aiService: overrides.aiService ?? new AiOperationsService(),
-    matchingSummaryService:
-      overrides.matchingSummaryService ?? new MatchingSummaryService(),
+    matchingSummaryService: overrides.matchingSummaryService ?? new MatchingSummaryService(),
     jobService: overrides.jobService ?? new JobDescriptionService(),
     userProfileService: overrides.userProfileService ?? new UserProfileService(),
     personalCanvasRepo: overrides.personalCanvasRepo ?? new PersonalCanvasRepository(),
@@ -78,12 +76,7 @@ type EngineStateArgs = {
   auth: AuthComposable;
 };
 
-function createMatchingEngineState({
-  jobId,
-  providedUserId,
-  deps,
-  auth,
-}: EngineStateArgs) {
+function createMatchingEngineState({ jobId, providedUserId, deps, auth }: EngineStateArgs) {
   const matchingSummary = ref<MatchingSummary | null>(null);
   const job = ref<JobDescription | null>(null);
   const userProfile = ref<UserProfile | null>(null);
@@ -130,11 +123,7 @@ function createMatchingEngineState({
       const experiences = await deps.experienceRepo.list(userId);
       const experienceSignals = await loadExperienceSignals(experiences, deps.storyService);
       const companyPayload = jobRecord.companyId
-        ? await loadCompanyPayload(
-            jobRecord.companyId,
-            deps.companyService,
-            deps.companyCanvasService
-          )
+        ? await loadCompanyPayload(jobRecord.companyId, deps.companyService)
         : undefined;
 
       const matchingInput = buildMatchingInput({
@@ -229,10 +218,7 @@ async function ensureProfile(userId: string, service: UserProfileService) {
   return profile;
 }
 
-async function loadExperienceSignals(
-  experiences: Experience[],
-  storyService: STARStoryService
-) {
+async function loadExperienceSignals(experiences: Experience[], storyService: STARStoryService) {
   if (!experiences.length) {
     return undefined;
   }
@@ -251,12 +237,8 @@ async function loadExperienceSignals(
 
   const signals = limited.map((exp, index) => {
     const stories = storySets[index] ?? [];
-    const achievements = flattenStrings(
-      stories.flatMap((story) => story.achievements ?? [])
-    );
-    const kpiSuggestions = flattenStrings(
-      stories.flatMap((story) => story.kpiSuggestions ?? [])
-    );
+    const achievements = flattenStrings(stories.flatMap((story) => story.achievements ?? []));
+    const kpiSuggestions = flattenStrings(stories.flatMap((story) => story.kpiSuggestions ?? []));
 
     return {
       title: exp.title || '',
@@ -275,11 +257,7 @@ async function loadExperienceSignals(
   };
 }
 
-async function loadCompanyPayload(
-  companyId: string,
-  companyService: CompanyService,
-  canvasService: CompanyCanvasService
-) {
+async function loadCompanyPayload(companyId: string, companyService: CompanyService) {
   try {
     const company = await companyService.getCompany(companyId);
 
@@ -377,28 +355,6 @@ function mapCompanyProfile(company: Company) {
     website: company.website || undefined,
     description: company.description || undefined,
   };
-}
-
-function mapCompanyCanvas(canvas: CompanyCanvas) {
-  const payload: Record<string, unknown> = {
-    customerSegments: normalizeStringArray(canvas.customerSegments),
-    valuePropositions: normalizeStringArray(canvas.valuePropositions),
-    channels: normalizeStringArray(canvas.channels),
-    customerRelationships: normalizeStringArray(canvas.customerRelationships),
-    revenueStreams: normalizeStringArray(canvas.revenueStreams),
-    keyResources: normalizeStringArray(canvas.keyResources),
-    keyActivities: normalizeStringArray(canvas.keyActivities),
-    keyPartners: normalizeStringArray(canvas.keyPartners),
-    costStructure: normalizeStringArray(canvas.costStructure),
-  };
-  if (canvas.companyName) {
-    payload.companyName = canvas.companyName;
-  }
-  if (canvas.lastGeneratedAt) {
-    payload.lastGeneratedAt = canvas.lastGeneratedAt;
-  }
-  payload.needsUpdate = Boolean(canvas.needsUpdate);
-  return payload;
 }
 
 function normalizeStringArray(values?: (string | null)[] | null) {

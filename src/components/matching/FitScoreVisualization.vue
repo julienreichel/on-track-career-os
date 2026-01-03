@@ -45,7 +45,8 @@ const normalizedScore = computed(() => {
     return 0;
   }
 
-  return Math.min(100, Math.max(0, Number(props.score)));
+  const PERCENT = 100;
+  return Math.min(PERCENT, Math.max(0, Number(props.score)));
 });
 
 const formattedScore = computed(() => `${Math.round(normalizedScore.value)}`);

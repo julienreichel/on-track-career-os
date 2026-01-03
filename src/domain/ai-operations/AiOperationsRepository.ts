@@ -151,9 +151,7 @@ export type AmplifyAiOperations = {
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 
   generateMatchingSummary: (
-    input: {
-      payload: string;
-    },
+    input: MatchingSummaryInput,
     options?: Record<string, unknown>
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 

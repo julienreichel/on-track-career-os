@@ -161,47 +161,45 @@ describe('useMatchingEngine', () => {
     } as MatchingSummary;
   });
 
-type DepsStub = ReturnType<typeof createDepsBase>;
+  type DepsStub = ReturnType<typeof createDepsBase>;
 
-function createDeps(
-  overrides: Partial<DepsStub> = {}
-): DepsStub {
-  const base = createDepsBase();
-  return { ...base, ...overrides };
-}
+  function createDeps(overrides: Partial<DepsStub> = {}): DepsStub {
+    const base = createDepsBase();
+    return { ...base, ...overrides };
+  }
 
-function createDepsBase() {
-  return {
-    aiService: {
-      generateMatchingSummary: vi.fn().mockResolvedValue(aiResult),
-    } as unknown as AiOperationsService,
-    matchingSummaryService: {
-      getByContext: vi.fn().mockResolvedValue(null),
-      upsertSummary: vi.fn().mockResolvedValue(persistedSummary),
-    } as unknown as MatchingSummaryService,
-    jobService: {
-      getFullJobDescription: vi.fn().mockResolvedValue(job),
-    } as unknown as JobDescriptionService,
-    userProfileService: {
-      getFullUserProfile: vi.fn().mockResolvedValue(userProfile),
-    } as unknown as UserProfileService,
-    personalCanvasRepo: {
-      list: vi.fn().mockResolvedValue([personalCanvas]),
-    } as unknown as PersonalCanvasRepository,
-    experienceRepo: {
-      list: vi.fn().mockResolvedValue(experiences),
-    } as unknown as ExperienceRepository,
-    storyService: {
-      getStoriesByExperience: vi.fn().mockResolvedValue([story]),
-    } as unknown as STARStoryService,
-    companyService: {
-      getCompany: vi.fn().mockResolvedValue(company),
-    } as unknown as CompanyService,
-    companyCanvasService: {
-      getByCompanyId: vi.fn().mockResolvedValue(companyCanvas),
-    } as unknown as CompanyCanvasService,
-  };
-}
+  function createDepsBase() {
+    return {
+      aiService: {
+        generateMatchingSummary: vi.fn().mockResolvedValue(aiResult),
+      } as unknown as AiOperationsService,
+      matchingSummaryService: {
+        getByContext: vi.fn().mockResolvedValue(null),
+        upsertSummary: vi.fn().mockResolvedValue(persistedSummary),
+      } as unknown as MatchingSummaryService,
+      jobService: {
+        getFullJobDescription: vi.fn().mockResolvedValue(job),
+      } as unknown as JobDescriptionService,
+      userProfileService: {
+        getFullUserProfile: vi.fn().mockResolvedValue(userProfile),
+      } as unknown as UserProfileService,
+      personalCanvasRepo: {
+        list: vi.fn().mockResolvedValue([personalCanvas]),
+      } as unknown as PersonalCanvasRepository,
+      experienceRepo: {
+        list: vi.fn().mockResolvedValue(experiences),
+      } as unknown as ExperienceRepository,
+      storyService: {
+        getStoriesByExperience: vi.fn().mockResolvedValue([story]),
+      } as unknown as STARStoryService,
+      companyService: {
+        getCompany: vi.fn().mockResolvedValue(company),
+      } as unknown as CompanyService,
+      companyCanvasService: {
+        getByCompanyId: vi.fn().mockResolvedValue(companyCanvas),
+      } as unknown as CompanyCanvasService,
+    };
+  }
 
   it('loads existing summary context and regenerates via AI', async () => {
     const deps = createDeps();
