@@ -41,6 +41,18 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     icon: 'i-heroicons-briefcase',
     to: jobId.value ? `/jobs/${jobId.value}` : undefined,
   },
+  {
+    label: isGenerating.value
+      ? t('matching.page.actions.generating')
+      : hasSummary.value
+        ? t('matching.page.actions.regenerate')
+        : t('matching.page.actions.generate'),
+    icon: 'i-heroicons-sparkles',
+    color: 'primary',
+    loading: isGenerating.value,
+    disabled: isGenerating.value || isLoading.value,
+    click: handleGenerate,
+  },
 ]);
 
 const jobTitle = computed(() => job.value?.title?.trim() || t('jobList.card.noTitle'));
@@ -126,25 +138,7 @@ function formatDate(value?: string | null) {
         :title="jobTitle"
         :description="t('matching.page.description')"
         :links="headerLinks"
-      >
-        <template #actions>
-          <UButton
-            color="primary"
-            icon="i-heroicons-sparkles"
-            :label="
-              isGenerating
-                ? t('matching.page.actions.generating')
-                : hasSummary
-                  ? t('matching.page.actions.regenerate')
-                  : t('matching.page.actions.generate')
-            "
-            :loading="isGenerating"
-            :disabled="isGenerating || isLoading"
-            data-testid="matching-generate-button"
-            @click="handleGenerate"
-          />
-        </template>
-      </UPageHeader>
+      />
 
       <UPageBody>
         <UAlert
