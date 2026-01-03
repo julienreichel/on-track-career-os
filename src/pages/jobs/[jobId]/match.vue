@@ -134,7 +134,9 @@ function formatDate(value?: string | null) {
             :label="
               isGenerating
                 ? t('matching.page.actions.generating')
-                : t('matching.page.actions.generate')
+                : hasSummary
+                  ? t('matching.page.actions.regenerate')
+                  : t('matching.page.actions.generate')
             "
             :loading="isGenerating"
             :disabled="isGenerating || isLoading"
