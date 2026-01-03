@@ -10,12 +10,14 @@ import type { ParsedJobDescription } from '@/domain/ai-operations/ParsedJobDescr
 import type { CompanyRepository } from '@/domain/company/CompanyRepository';
 import type { CompanyCanvasRepository } from '@/domain/company-canvas/CompanyCanvasRepository';
 import type { Company } from '@/domain/company/Company';
+import type { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
 
 // Mock the repository
 vi.mock('@/domain/job-description/JobDescriptionRepository');
 vi.mock('@/domain/ai-operations/AiOperationsService');
 vi.mock('@/domain/company/CompanyRepository');
 vi.mock('@/domain/company-canvas/CompanyCanvasRepository');
+vi.mock('@/domain/matching-summary/MatchingSummaryService');
 
 describe('JobDescriptionService', () => {
   let service: JobDescriptionService;
@@ -23,6 +25,7 @@ describe('JobDescriptionService', () => {
   let mockAiService: ReturnType<typeof vi.mocked<AiOperationsService>>;
   let mockCompanyRepo: ReturnType<typeof vi.mocked<CompanyRepository>>;
   let mockCanvasRepo: ReturnType<typeof vi.mocked<CompanyCanvasRepository>>;
+  let mockMatchingSummaryService: ReturnType<typeof vi.mocked<MatchingSummaryService>>;
 
   beforeEach(() => {
     mockRepository = {
@@ -47,12 +50,18 @@ describe('JobDescriptionService', () => {
       create: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<CompanyCanvasRepository>>;
 
-    service = new JobDescriptionService(
-      mockRepository,
-      mockAiService,
-      mockCompanyRepo,
-      mockCanvasRepo
-    );
+    mockMatchingSummaryService = {
+      listByJob: vi.fn(),
+      deleteSummary: vi.fn(),
+    } as unknown as ReturnType<typeof vi.mocked<MatchingSummaryService>>;
+
+    service = new JobDescriptionService({
+      repo: mockRepository,
+      aiService: mockAiService,
+      companyRepo: mockCompanyRepo,
+      companyCanvasRepo: mockCanvasRepo,
+      matchingSummaryService: mockMatchingSummaryService,
+    });
 
     mockAiService.analyzeCompanyInfo.mockRejectedValue(new Error('AI disabled'));
   });
@@ -382,12 +391,39 @@ describe('JobDescriptionService', () => {
   });
 
   describe('deleteJob', () => {
-    it('should call repository delete', async () => {
+    it('should cascade delete matching summaries and job', async () => {
+      const mockSummaries = [
+        { id: 'summary-1', jobId: 'job-1' },
+        { id: 'summary-2', jobId: 'job-1' },
+      ];
+      mockMatchingSummaryService.listByJob.mockResolvedValue(mockSummaries as never);
+      mockMatchingSummaryService.deleteSummary.mockResolvedValue(undefined);
       mockRepository.delete.mockResolvedValue(undefined);
 
       await service.deleteJob('job-1');
 
+      expect(mockMatchingSummaryService.listByJob).toHaveBeenCalledWith('job-1');
+      expect(mockMatchingSummaryService.deleteSummary).toHaveBeenCalledTimes(2);
+      expect(mockMatchingSummaryService.deleteSummary).toHaveBeenCalledWith('summary-1');
+      expect(mockMatchingSummaryService.deleteSummary).toHaveBeenCalledWith('summary-2');
       expect(mockRepository.delete).toHaveBeenCalledWith('job-1');
+    });
+
+    it('should delete job even when no matching summaries exist', async () => {
+      mockMatchingSummaryService.listByJob.mockResolvedValue([]);
+      mockRepository.delete.mockResolvedValue(undefined);
+
+      await service.deleteJob('job-1');
+
+      expect(mockMatchingSummaryService.listByJob).toHaveBeenCalledWith('job-1');
+      expect(mockMatchingSummaryService.deleteSummary).not.toHaveBeenCalled();
+      expect(mockRepository.delete).toHaveBeenCalledWith('job-1');
+    });
+
+    it('should throw error when jobId is not provided', async () => {
+      await expect(service.deleteJob('')).rejects.toThrow('Job ID is required');
+      expect(mockMatchingSummaryService.listByJob).not.toHaveBeenCalled();
+      expect(mockRepository.delete).not.toHaveBeenCalled();
     });
   });
 });

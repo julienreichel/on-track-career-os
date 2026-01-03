@@ -12,16 +12,32 @@ import { CompanyCanvasRepository } from '@/domain/company-canvas/CompanyCanvasRe
 import type { CompanyAnalysisResult } from '@/domain/ai-operations/CompanyAnalysis';
 import { normalizeCompanyName, mergeCompanyProfile } from '@/domain/company/companyMatching';
 import { normalizeStringArray } from '@/domain/company/companyUtils';
+import { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
 
 const DEFAULT_JOB_TITLE = 'Job description pending analysis';
 
+export interface JobDescriptionServiceDependencies {
+  repo?: JobDescriptionRepository;
+  aiService?: AiOperationsService;
+  companyRepo?: CompanyRepository;
+  companyCanvasRepo?: CompanyCanvasRepository;
+  matchingSummaryService?: MatchingSummaryService;
+}
+
 export class JobDescriptionService {
-  constructor(
-    private repo = new JobDescriptionRepository(),
-    private aiService = new AiOperationsService(),
-    private companyRepo = new CompanyRepository(),
-    private companyCanvasRepo = new CompanyCanvasRepository()
-  ) {}
+  private repo: JobDescriptionRepository;
+  private aiService: AiOperationsService;
+  private companyRepo: CompanyRepository;
+  private companyCanvasRepo: CompanyCanvasRepository;
+  private matchingSummaryService: MatchingSummaryService;
+
+  constructor(deps: JobDescriptionServiceDependencies = {}) {
+    this.repo = deps.repo ?? new JobDescriptionRepository();
+    this.aiService = deps.aiService ?? new AiOperationsService();
+    this.companyRepo = deps.companyRepo ?? new CompanyRepository();
+    this.companyCanvasRepo = deps.companyCanvasRepo ?? new CompanyCanvasRepository();
+    this.matchingSummaryService = deps.matchingSummaryService ?? new MatchingSummaryService();
+  }
 
   async getFullJobDescription(id: string): Promise<JobDescription | null> {
     return this.repo.get(id);
@@ -111,6 +127,17 @@ export class JobDescriptionService {
   }
 
   async deleteJob(jobId: string): Promise<void> {
+    if (!jobId) {
+      throw new Error('Job ID is required');
+    }
+
+    // Cascade delete: Remove all associated matching summaries first
+    const matchingSummaries = await this.matchingSummaryService.listByJob(jobId);
+    await Promise.all(
+      matchingSummaries.map((summary) => this.matchingSummaryService.deleteSummary(summary.id))
+    );
+
+    // Delete the job description itself
     await this.repo.delete(jobId);
   }
 
