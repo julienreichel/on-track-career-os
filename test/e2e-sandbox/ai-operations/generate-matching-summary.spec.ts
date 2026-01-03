@@ -88,9 +88,23 @@ describe('AI Operations - Generate Matching Summary (E2E Sandbox)', () => {
       },
     });
 
-    expect(typeof summary.summaryParagraph).toBe('string');
-    expect(Array.isArray(summary.impactAreas)).toBe(true);
-    expect(Array.isArray(summary.contributionMap)).toBe(true);
-    expect(Array.isArray(summary.riskMitigationPoints)).toBe(true);
+    expect(typeof summary.overallScore).toBe('number');
+    expect(summary.overallScore).toBeGreaterThanOrEqual(0);
+    expect(summary.overallScore).toBeLessThanOrEqual(100);
+    expect(typeof summary.scoreBreakdown).toBe('object');
+    expect(summary.scoreBreakdown).toHaveProperty('skillFit');
+    expect(summary.scoreBreakdown).toHaveProperty('experienceFit');
+    expect(['apply', 'maybe', 'skip']).toContain(summary.recommendation);
+    expect(Array.isArray(summary.reasoningHighlights)).toBe(true);
+    expect(Array.isArray(summary.strengthsForThisRole)).toBe(true);
+    expect(Array.isArray(summary.skillMatch)).toBe(true);
+    expect(Array.isArray(summary.riskyPoints)).toBe(true);
+    expect(Array.isArray(summary.impactOpportunities)).toBe(true);
+    expect(Array.isArray(summary.tailoringTips)).toBe(true);
+    
+    // Validate skill match format
+    summary.skillMatch.forEach((item: string) => {
+      expect(item).toMatch(/^\[(MATCH|PARTIAL|MISSING|OVER)\]/);
+    });
   });
 });
