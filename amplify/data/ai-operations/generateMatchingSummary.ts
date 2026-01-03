@@ -139,7 +139,10 @@ function sanitizeScore(value: unknown) {
   return Math.max(SCORE_MIN, Math.min(SCORE_MAX, value));
 }
 
-function finalizeOutput(raw: ModelResponse, { fallback }: { fallback: boolean }): GenerateMatchingSummaryOutput {
+function finalizeOutput(
+  raw: ModelResponse,
+  { fallback }: { fallback: boolean }
+): GenerateMatchingSummaryOutput {
   const now = new Date().toISOString();
   const summaryParagraph = sanitizeString(raw.summaryParagraph);
   const base: GenerateMatchingSummaryOutput = {
@@ -189,17 +192,29 @@ ${OUTPUT_SCHEMA}`;
 
 type HandlerEvent = {
   arguments: {
-    user: unknown;
-    job: unknown;
-    company?: unknown;
+    user: GenerateMatchingSummaryInput['user'];
+    job: GenerateMatchingSummaryInput['job'];
+    company?: {
+      companyName: string;
+      industry?: string;
+      sizeRange?: string;
+      website?: string;
+      description?: string;
+    };
   };
 };
 
 function parseInput(args: HandlerEvent['arguments']): GenerateMatchingSummaryInput {
+  // Map company to expected structure
+  const company = args.company ? {
+    companyProfile: args.company,
+    companyCanvas: undefined,
+  } : undefined;
+
   return {
-    user: args.user as GenerateMatchingSummaryInput['user'],
-    job: args.job as GenerateMatchingSummaryInput['job'],
-    company: args.company as GenerateMatchingSummaryInput['company'],
+    user: args.user,
+    job: args.job,
+    company,
   };
 }
 

@@ -1,244 +1,265 @@
-# generateMatchingSummary Type Safety Improvements
+# generateMatchingSummary Type Safety with a.ref()
 
 ## Summary
 
-Improved the `generateMatchingSummary` AI operation to use **proper typed interfaces** with better validation and clarity, while working within Amplify Gen2's constraints.
+Implemented proper type safety for `generateMatchingSummary` AI operation using Amplify Gen2's **`a.ref()` pattern** for reusable custom types, providing full type safety from GraphQL schema through to Lambda execution.
 
 ## Approach
 
-Due to Amplify Gen2 limitations where `a.customType()` doesn't support `.required()` or `.array()` modifiers, we use:
-- **GraphQL**: `a.json()` for transport (validated by TypeScript at compile time)
-- **Lambda**: Strongly-typed TypeScript interfaces with runtime validation
-- **Repository**: Type-safe calls with explicit interface contracts
+Following [Amplify's data modeling documentation](https://docs.amplify.aws/react/build-a-backend/data/data-modeling/add-fields/), we use `a.ref()` to reference named custom types:
 
-This provides the best of both worlds: flexible GraphQL transport with strict TypeScript enforcement.
+```typescript
+// Define types once
+ProfileType: a.customType({ ... }),
 
-## Changes Made
+// Reference with a.ref()
+user: a.ref('ProfileType').required()
+```
 
-### 1. GraphQL Schema (amplify/data/resource.ts)
+This enables:
+- ✅ **DRY**: Define types once, reuse everywhere
+- ✅ **Type Safety**: GraphQL validates structure automatically
+- ✅ **Composability**: Build complex types from simpler ones
+- ✅ **Modifiers**: `.required()` and `.array()` work on refs
 
-**Approach:**
+## GraphQL Schema Structure
+
+### Reusable Custom Types
+
+```typescript
+ProfileType: a.customType({
+  fullName: a.string().required(),
+  headline: a.string(),
+  location: a.string(),
+  seniorityLevel: a.string(),
+  workPermitInfo: a.string(),
+  goals: a.string().array(),
+  aspirations: a.string().array(),
+  personalValues: a.string().array(),
+  strengths: a.string().array(),
+  interests: a.string().array(),
+  skills: a.string().array(),
+  certifications: a.string().array(),
+  languages: a.string().array(),
+}),
+
+PersonalCanvasType: a.customType({
+  customerSegments: a.string().array(),
+  valueProposition: a.string().array(),
+  channels: a.string().array(),
+  customerRelationships: a.string().array(),
+  keyActivities: a.string().array(),
+  keyResources: a.string().array(),
+  keyPartners: a.string().array(),
+  costStructure: a.string().array(),
+  revenueStreams: a.string().array(),
+}),
+
+ExperienceType: a.customType({
+  title: a.string().required(),
+  companyName: a.string(),
+  startDate: a.string(),
+  endDate: a.string(),
+  responsibilities: a.string().array(),
+  tasks: a.string().array(),
+  achievements: a.string().array(),
+  kpiSuggestions: a.string().array(),
+}),
+
+// Composed type using a.ref()
+UserType: a.customType({
+  profile: a.ref('ProfileType').required(),
+  personalCanvas: a.ref('PersonalCanvasType'),
+  experienceSignals: a.customType({
+    experiences: a.ref('ExperienceType').array().required(),
+  }),
+}),
+
+JobType: a.customType({
+  title: a.string().required(),
+  seniorityLevel: a.string(),
+  roleSummary: a.string(),
+  responsibilities: a.string().array(),
+  requiredSkills: a.string().array(),
+  behaviours: a.string().array(),
+  successCriteria: a.string().array(),
+  explicitPains: a.string().array(),
+}),
+
+CompanyType: a.customType({
+  companyName: a.string().required(),
+  industry: a.string(),
+  sizeRange: a.string(),
+  website: a.string(),
+  description: a.string(),
+}),
+```
+
+### Query Definition
+
 ```typescript
 generateMatchingSummary: a
   .query()
   .arguments({
-    user: a.json().required(),     // Flexible transport
-    job: a.json().required(),      // GraphQL doesn't validate deeply
-    company: a.json(),             // Optional company context
+    user: a.ref('UserType').required(),
+    job: a.ref('JobType').required(),
+    company: a.ref('CompanyType'),
   })
-  .returns(a.json())              // Transport layer
+  .returns(
+    a.customType({
+      userFitScore: a.integer(),
+      impactAreas: a.string().array().required(),
+      contributionMap: a.string().array().required(),
+      riskMitigationPoints: a.string().array().required(),
+      summaryParagraph: a.string().required(),
+      generatedAt: a.string().required(),
+      needsUpdate: a.boolean().required(),
+    })
+  )
+  .authorization((allow) => [allow.authenticated()])
+  .handler(a.handler.function(generateMatchingSummaryFunction))
 ```
 
-**Why JSON?** Amplify Gen2's `a.customType()` has limitations:
-- No `.required()` modifier support on customType
-- No `.array()` modifier support on nested customTypes  
-- Complex nested structures become verbose and error-prone
+## Lambda Handler
 
-### 2. Lambda Handler (amplify/data/ai-operations/generateMatchingSummary.ts)
+The Lambda receives properly typed arguments directly from Amplify:
 
-### 2. Lambda Handler (amplify/data/ai-operations/generateMatchingSummary.ts)
-
-**Strongly-typed interfaces:**
 ```typescript
-// Explicit TypeScript interfaces match AI Interaction Contract exactly
-export interface MatchingUserProfile {
-  fullName: string;
-  headline?: string;
-  // ... all fields typed
-}
-
-export interface GenerateMatchingSummaryInput {
-  user: {
-    profile: MatchingUserProfile;
-    personalCanvas?: MatchingPersonalCanvas;
-    experienceSignals?: MatchingExperienceSignals;
-  };
-  job: MatchingJobDescription;
-  company?: MatchingCompanyPayload;
-}
-
-export interface GenerateMatchingSummaryOutput {
-  userFitScore?: number;
-  impactAreas: string[];
-  contributionMap: string[];
-  riskMitigationPoints: string[];
-  summaryParagraph: string;
-  generatedAt: string;
-  needsUpdate: boolean;
-}
-
-// Handler receives untyped JSON, validates/casts to typed interfaces
 type HandlerEvent = {
   arguments: {
-    user: unknown;
-    job: unknown;
-    company?: unknown;
+    user: GenerateMatchingSummaryInput['user'];
+    job: GenerateMatchingSummaryInput['job'];
+    company?: {
+      companyName: string;
+      industry?: string;
+      sizeRange?: string;
+      website?: string;
+      description?: string;
+    };
   };
 };
 
 function parseInput(args: HandlerEvent['arguments']): GenerateMatchingSummaryInput {
+  // Map company to expected internal structure (companyProfile + companyCanvas)
+  const company = args.company ? {
+    companyProfile: args.company,
+    companyCanvas: undefined,
+  } : undefined;
+
   return {
-    user: args.user as GenerateMatchingSummaryInput['user'],
-    job: args.job as GenerateMatchingSummaryInput['job'],
-    company: args.company as GenerateMatchingSummaryInput['company'],
+    user: args.user,
+    job: args.job,
+    company,
   };
 }
 ```
 
-**Benefits:**
-- ✅ Type-safe business logic despite JSON transport
-- ✅ Matches AI_Interaction_Contract.md schema exactly
-- ✅ Runtime validation can be added at parseInput()
-- ✅ IDE autocomplete throughout Lambda code
+**Key points:**
+- Arguments arrive with correct types from GraphQL schema
+- `parseInput()` adapts external schema to internal Lambda structure
+- Company argument simplified at GraphQL level, expanded internally as needed
 
-### 3. Repository (src/domain/ai-operations/AiOperationsRepository.ts)
+## Repository
 
-**Type-safe interface contract:**
+Repository passes typed objects directly:
+
 ```typescript
-// Repository interface enforces exact types
 async generateMatchingSummary(input: MatchingSummaryInput): Promise<MatchingSummaryResult> {
-  const { data, errors } = await this.client.generateMatchingSummary(
-    input,  // Pass typed object directly
-    gqlOptions()
-  );
-  // ...
-  const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-  return parsed as MatchingSummaryResult;
+  const { data, errors } = await this.client.generateMatchingSummary(input, gqlOptions());
+
+  if (errors && errors.length > 0) {
+    throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+  }
+
+  if (!data) {
+    throw new Error('AI operation returned no data');
+  }
+
+  // With a.ref() types, data comes back properly typed
+  return data as MatchingSummaryResult;
 }
 ```
 
 **Benefits:**
-- ✅ Type-safe calls from composables/services
-- ✅ No manual stringification needed
-- ✅ GraphQL handles JSON serialization automatically
-- ✅ Response parsing handles both string and object (defensive)
-
-### 4. Tests Updated
-
-- **amplify/data/ai-operations/generateMatchingSummary.spec.ts**: Updated to pass arguments directly instead of nested `payload`
-- **test/unit/domain/ai-operations/AiOperationsRepository.spec.ts**: Updated mock to return typed object instead of JSON string
+- No manual JSON stringification
+- No parsing required
+- Type-safe throughout
 
 ## Benefits
 
-### ✅ Type Safety Where It Matters
-- **Lambda code**: Full TypeScript type checking via interfaces
-- **Repository/Service**: Type-safe function signatures
-- **Composables**: Autocomplete and compile-time validation
-- **GraphQL transport**: Flexible, handles serialization automatically
+### ✅ Full Type Safety
+- **GraphQL layer**: Schema enforces structure
+- **Lambda layer**: TypeScript types match schema
+- **Repository layer**: Type-safe interfaces
+- **Composable layer**: Autocomplete and validation
 
-### ✅ Clarity
-- TypeScript interfaces **explicitly match** AI_Interaction_Contract.md
-- No ambiguity: interfaces document the exact structure
-- parseInput() provides single validation/casting point
-- Matches documented schema precisely
+### ✅ Matches Documentation
+- Uses Amplify's recommended `a.ref()` pattern
+- Types explicitly match AI_Interaction_Contract.md
+- Clear, maintainable schema definitions
 
-### ✅ Performance
-- GraphQL handles JSON serialization efficiently
-- No unnecessary stringify/parse cycles in application code
-- Lambda receives JSON directly from API Gateway
+### ✅ DRY Principles
+- Define types once (ProfileType, JobType, etc.)
+- Reference everywhere with `a.ref()`
+- Easy to update: change definition in one place
 
-### ✅ Maintainability
-- Easy to understand: types match documentation
-- Refactoring is safer with TypeScript interfaces
-- Errors caught at compile time (TypeScript) and runtime (parseInput)
-- Single source of truth: TypeScript interfaces exported from Lambda
+### ✅ Composability
+- Build complex types from simple ones
+- Nested refs work correctly (UserType uses ProfileType)
+- Array and required modifiers work on refs
 
-### ✅ Pragmatic Approach
-- Works within Amplify Gen2's `customType` limitations
-- Balances type safety with practical constraints
-- Future-proof: can migrate to stricter schema when Amplify supports it
-
-## Architecture Pattern
-
-This establishes a clear **type safety architecture** for AI operations:
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ Frontend (src/)                                             │
-│ ┌─────────────────────────────────────────────────────────┐ │
-│ │ Composables/Services                                    │ │
-│ │ • Type: MatchingSummaryInput → MatchingSummaryResult   │ │
-│ │ • TypeScript enforces correctness                       │ │
-│ └─────────────────────────────────────────────────────────┘ │
-│                           ↓                                 │
-│ ┌─────────────────────────────────────────────────────────┐ │
-│ │ Repository                                              │ │
-│ │ • Interface contract with typed methods                 │ │
-│ │ • GraphQL client auto-generated types                   │ │
-│ └─────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────────┐
-│ GraphQL Layer (Amplify Gen2)                                │
-│ • Transport: a.json() for flexibility                       │
-│ • Serialization handled automatically                       │
-└─────────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────────┐
-│ Lambda (amplify/data/ai-operations/)                        │
-│ ┌─────────────────────────────────────────────────────────┐ │
-│ │ Strongly-typed TypeScript interfaces                    │ │
-│ │ • GenerateMatchingSummaryInput                          │ │
-│ │ • GenerateMatchingSummaryOutput                         │ │
-│ │ • parseInput() validates/casts incoming JSON            │ │
-│ └─────────────────────────────────────────────────────────┘ │
-│                           ↓                                 │
-│ ┌─────────────────────────────────────────────────────────┐ │
-│ │ Business Logic                                          │ │
-│ │ • Type-safe operations                                  │ │
-│ │ • Validation, AI calls, response building               │ │
-│ └─────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-```
+### ✅ Auto-Generated Types
+- Amplify generates TypeScript types from schema
+- Frontend gets type-safe GraphQL client
+- Lambda handler gets typed event structures
 
 ## Schema Mapping
 
-The typed schema now explicitly matches the AI Interaction Contract:
+External schema (GraphQL) → Internal structure (Lambda):
 
-### Input Schema
+### Input Mapping
 ```typescript
+// GraphQL receives:
 {
-  user: {
-    profile: { fullName, headline, skills, ... }
-    personalCanvas: { customerSegments, valueProposition, ... }
-    experienceSignals: { experiences: [...] }
-  }
-  job: { title, responsibilities, requiredSkills, ... }
+  user: UserType,
+  job: JobType,
+  company?: CompanyType
+}
+
+// Lambda internally uses:
+{
+  user: { profile, personalCanvas, experienceSignals },
+  job: { ... },
   company?: { companyProfile, companyCanvas }
 }
 ```
 
+The `parseInput()` function bridges this gap, mapping the simpler GraphQL structure to the richer internal structure needed by the AI operation.
+
 ### Output Schema
 ```typescript
 {
-  userFitScore?: number         // 0-100
-  impactAreas: string[]        // Where user creates value
-  contributionMap: string[]    // User signals → job needs
-  riskMitigationPoints: string[] // Risks + mitigations
-  summaryParagraph: string     // Concise fit narrative
-  generatedAt: string          // ISO datetime
-  needsUpdate: boolean         // Fallback indicator
+  userFitScore?: number,
+  impactAreas: string[],
+  contributionMap: string[],
+  riskMitigationPoints: string[],
+  summaryParagraph: string,
+  generatedAt: string,
+  needsUpdate: boolean
 }
 ```
 
-## Validation
+## Testing
 
-All tests pass:
+All tests pass with typed approach:
 - ✅ 119 Amplify Lambda tests
-- ✅ 690 Unit tests
-- ✅ 1115 Total tests (including Nuxt component/page tests)
+- ✅ 1115 Total tests
+- Lambda tests use properly typed mock arguments
+- Repository tests expect typed responses
 
-## Migration Notes
+## Future: Apply to Other AI Operations
 
-This is a **breaking change** for the Lambda signature but:
-- ✅ No frontend code changes needed (types were already correct)
-- ✅ Repository automatically handles the new format
-- ✅ All tests updated and passing
-- ✅ GraphQL auto-generates matching TypeScript types
-
-## Future Work
-
-Consider applying the same pattern to other AI operations that still use `a.json()`:
+This pattern should be applied to remaining AI operations:
 - `parseCvText`
 - `extractExperienceBlocks`
 - `generateStarStory`
@@ -248,4 +269,11 @@ Consider applying the same pattern to other AI operations that still use `a.json
 - `generateCompanyCanvas`
 - `generateCv`
 
-This would provide consistent type safety across all AI operations.
+Each operation can define custom types and use `a.ref()` for type-safe, reusable schemas.
+
+## References
+
+- [Amplify Data Modeling: Add Fields](https://docs.amplify.aws/react/build-a-backend/data/data-modeling/add-fields/)
+- AI Interaction Contract: `docs/AI_Interaction_Contract.md`
+- Schema definition: `amplify/data/resource.ts`
+- Lambda implementation: `amplify/data/ai-operations/generateMatchingSummary.ts`
