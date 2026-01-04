@@ -784,25 +784,24 @@ Each page includes:
 
 ---
 
-## **4.1 Matching Summary** ❌
+## **4.1 Matching Summary** ✅
 
-**Route:** `/jobs/[jobId]/match` (planned)
+**Route:** `/jobs/[jobId]/match`
 
 ### UI
 
 - `<UCard>`
 - `<UAlert>`
 - `<UBadge>`
-- `<UProgress>` (fit score)
+- Fit score visualization (score breakdown cards)
 
 ### Components
 
-- Matching Summary Component (planned)
-- Fit Score Visualization (planned)
+- `MatchingSummaryCard`
 
 ### Composables
 
-- `useMatchingEngine()` (not implemented)
+- `useMatchingEngine()` ✅
 - `useUserProfile()` ✅
 - `useJobAnalysis()` ✅
 - `useCanvasEngine()` ✅
@@ -817,10 +816,10 @@ Each page includes:
 
 ### AI Ops
 
-- `ai.generateMatchingSummary` (not implemented)
+`ai.generateMatchingSummary` ✅
 
-**Status:** ❌ Not Implemented  
-**Blocking:** EPIC 5C - AI operation, composable, and UI missing  
+**Status:** ✅ Implemented  
+**Blocking:** None  
 **Dependencies:** EPIC 5B (Company Canvas) recommended but not required
 
 ---
@@ -1099,15 +1098,15 @@ Each page includes:
 | Job List               | `/jobs`                                               | ✅     | 5A   |
 | Job Upload             | `/jobs/new`                                           | ✅     | 5A   |
 | Job Detail             | `/jobs/[jobId]`                                       | ✅     | 5A   |
+| Matching Summary       | `/jobs/[jobId]/match`                                 | ✅     | 5C   |
 | Company List           | `/companies`                                          | ✅     | 5B   |
 | Company New            | `/companies/new`                                      | ✅     | 5B   |
 | Company Detail         | `/companies/[companyId]`                              | ✅     | 5B   |
 
-## 8.2 Planned Pages (9 Routes)
+## 8.2 Planned Pages (8 Routes)
 
 | Page                | Route                               | Status | EPIC | Blocker               |
 | ------------------- | ----------------------------------- | ------ | ---- | --------------------- |
-| Matching Summary    | `/jobs/:jobId/match`                | ❌     | 5C   | AI operation missing  |
 | Tailored CV         | `/applications/:jobId/cv`           | ❌     | 6    | AI operation missing  |
 | Cover Letter        | `/applications/:jobId/cover-letter` | ❌     | 6    | AI operation missing  |
 | Speech Builder      | `/speech`                           | ❌     | 4    | AI operation missing  |
@@ -1189,7 +1188,7 @@ Each page includes:
 - `useStoryEnhancer()` - AI story generation
 - `useBreadcrumbMapping()` - dynamic breadcrumbs
 
-## 8.5 AI Operations Status (6/17 Implemented)
+## 8.5 AI Operations Status (10/17 Implemented)
 
 **✅ Implemented:**
 
@@ -1200,20 +1199,19 @@ Each page includes:
 5. `ai.generateAchievementsAndKpis` - generate KPIs from story
 6. `ai.generateCv` - generate markdown CV
 7. `ai.parseJobDescription` - extract job fields from text
+8. `ai.analyzeCompanyInfo` - analyze company research notes
+9. `ai.generateCompanyCanvas` - generate company BMC
+10. `ai.generateMatchingSummary` - generate matching summary
 
-**❌ Missing (11 operations):**
+**❌ Missing (7 operations):**
 
-1. `ai.generateSpeech` - EPIC 4
-2. `ai.analyzeCompanyInfo` - EPIC 5B
-3. `ai.generateCompanyCanvas` - EPIC 5B
-4. `ai.generateMatchingSummary` - EPIC 5C
-5. `ai.generateTailoredCvBlocks` - EPIC 6
-6. `ai.generateCoverLetter` - EPIC 6
-7. `ai.generateTailoredSpeech` - EPIC 6
-8. `ai.generateTailoredKpis` - EPIC 6
-9. `ai.generateInterviewQuestions` - EPIC 7
-10. `ai.simulateInterviewTurn` - EPIC 7
-11. `ai.evaluateInterviewAnswer` - EPIC 7
+1. `ai.generateTailoredCvBlocks` - EPIC 6
+2. `ai.generateCoverLetter` - EPIC 6
+3. `ai.generateTailoredSpeech` - EPIC 6
+4. `ai.generateTailoredKpis` - EPIC 6
+5. `ai.generateInterviewQuestions` - EPIC 7
+6. `ai.simulateInterviewTurn` - EPIC 7
+7. `ai.evaluateInterviewAnswer` - EPIC 7
 
 ---
 
@@ -1480,20 +1478,15 @@ Each page includes:
 
 ### 3. Matching Visualization
 
-**Needed for:** EPIC 5C
+**Needed for:** EPIC 5C (completed)
 
-**Requirements:**
+**Implemented:**
 
-- Fit score display (0-100%)
-- Impact areas (radar chart?)
-- Strengths/gaps lists
-- Recommendations
+- Fit score display + score breakdown cards
+- Strengths, skill match, risks, impact, tailoring lists
+- Matching summary layout via `MatchingSummaryCard`
 
-**Recommendation:**
-
-- Create `FitScoreGauge` component
-- Create `ImpactAreasChart` component (consider Chart.js)
-- Design `MatchingResults` layout
+**Note:** Dedicated gauge/chart components are optional enhancements.
 
 ---
 
@@ -1609,7 +1602,7 @@ Each page includes:
 
 ## Phase 5: Future EPIC Preparation (2-3 weeks)
 
-**Priority:** Medium (before starting EPICs 4, 5B, 5C, 6, 7)  
+**Priority:** Medium (before starting EPICs 4, 6, 7)  
 **Impact:** Enables faster EPIC implementation
 
 ### Tasks:
@@ -1620,11 +1613,10 @@ Each page includes:
    - [ ] Create `ComparisonView.vue` component
    - [ ] Create `TailoredContentEditor.vue` base component
 
-2. **Matching Engine Foundation (EPIC 5C)**
-   - [ ] Design `MatchingResult` type
-   - [ ] Create `FitScoreGauge.vue` component
-   - [ ] Create `ImpactAreasChart.vue` component (research charting library)
-   - [ ] Create `MatchingResults.vue` layout
+2. **Matching Engine Foundation (EPIC 5C) ✅**
+   - [x] Define `MatchingSummaryResult` type + validation
+   - [x] Build `MatchingSummaryCard` layout with score breakdown
+   - [x] Render strengths, skill match, risks, impact, tailoring lists
 
 3. **Interview Engine Foundation (EPIC 7)**
    - [ ] Design `InterviewMessage`, `InterviewSession` types
@@ -1632,10 +1624,10 @@ Each page includes:
    - [ ] Create `InterviewChat.vue` component skeleton
    - [ ] Create `PerformanceFeedback.vue` component
 
-4. **Company Canvas (EPIC 5B)**
-   - [ ] Verify `PersonalCanvasComponent` can be reused for company canvas
-   - [ ] Create `CompanyCanvasComponent.vue` (extend personal canvas pattern)
-   - [ ] Create `CompanyForm.vue` component
+4. **Company Canvas (EPIC 5B) ✅**
+   - [x] Reuse personal canvas layout patterns
+   - [x] Build `CompanyCanvasEditor` + `CanvasBlockSection`
+   - [x] Build `CompanyForm` for company profile editing
 
 **Estimated Effort:** 20-30 hours (parallel with EPIC development)  
 **Files Affected:** +10 new components, +3 new composables
@@ -1667,7 +1659,7 @@ Each page includes:
 
 # 11. NEXT IMMEDIATE ACTIONS
 
-## Before Starting EPIC 4/5B/5C/6/7
+## Before Starting EPIC 4/6/7
 
 1. **Complete Phase 1 Refactoring** (Component Extraction)
    - Extract `JobForm`, `CvList`, `JobList` components

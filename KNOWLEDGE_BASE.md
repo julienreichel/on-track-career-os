@@ -29,7 +29,7 @@ The workflow is:
 
 Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer**.
 
-**Current Implementation Status (December 2025):**
+**Current Implementation Status (January 2026):**
 
 - ✅ EPIC 1A (User Data Intake) — 100% complete
 - ✅ EPIC 1B (Personal Canvas) — 100% complete end-to-end
@@ -38,11 +38,12 @@ Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer
 - ✅ EPIC 3B (CV Header & Contact Information) — 100% complete
 - ✅ EPIC 5A (Job Description Analysis) — 100% complete
 - ✅ EPIC 5B (Company Analysis & Canvas) — 100% complete
-- ⚠️ Remaining EPICs 4, 5C, 6, 7 still in early implementation stages
+- ✅ EPIC 5C (User-Job-Company Matching) — 100% complete
+- ⚠️ Remaining EPICs 4, 6, 7 still in early implementation stages
 
-### 2.1 Frontend (Nuxt 3)
+### 2.1 Frontend (Nuxt 4)
 
-- Nuxt 3 + TypeScript (strict)
+- Nuxt 4 + TypeScript (strict)
 - Nuxt UI components + Tailwind
 - State via composables
 - Pages structured by domain: Profile / Jobs & Companies / Applications / Interview Prep
@@ -92,7 +93,7 @@ _(Condensed from full CDM; only key-developer-relevant models.)_
 - **JobDescription**: rawText, title, seniorityLevel, roleSummary, responsibilities, requiredSkills, behaviours, successCriteria, explicitPains, status (draft/analyzed/complete), companyId
 - **Company**: companyName, industry, sizeRange, website, productsServices, targetMarkets, customerSegments, description, additionalNotes, lastAnalyzedAt
 - **CompanyCanvas**: 9 Business Model Canvas blocks (keyPartners, keyActivities, keyResources, valuePropositions, customerRelationships, channels, customerSegments, costStructure, revenueStreams), summary, lastUpdatedAt
-- **MatchingSummary**: fitScore, competitiveAdvantages, contributions, risks
+- **MatchingSummary**: overallScore, scoreBreakdown, recommendation, reasoningHighlights, strengthsForThisRole, skillMatch, riskyPoints, impactOpportunities, tailoringTips, generatedAt, needsUpdate
 
 ### 3.4 Application Materials
 
@@ -143,7 +144,8 @@ _(From Component Model + Component→Page Mapping) _
 - `useCompanyCanvas()` - Company Canvas generation/editing
 - `useCompanyUpload()` - Company research notes upload
 - `useCompanyJobs()` - Fetch jobs linked to a company
-- `useMatchingEngine()` - User-Job-Company matching (not implemented)
+- `useMatchingEngine()` - User-Job-Company matching workflow
+- `useMatchingSummary()` - MatchingSummary CRUD + persistence
 - `useTailoringEngine()` - Tailored materials (not implemented)
 - `useInterviewEngine()` - Interview prep (not implemented)
 - `useAiOperations()` - AI operations orchestration
@@ -172,6 +174,7 @@ _(Structured per navigation zones)_
 - `/jobs` - Job list with search, status badges, delete modal
 - `/jobs/new` - Upload job description (PDF/TXT) → AI parsing
 - `/jobs/:id` - View/edit job details with 5 tabbed sections, reanalyse, company linking
+- `/jobs/:id/match` - Matching summary with fit score + structured sections
 - `/companies` - Company list with search, delete modal
 - `/companies/new` - Create company with optional AI analysis
 - `/companies/:companyId` - View/edit company info, BMC canvas, and linked jobs
@@ -248,12 +251,13 @@ _(From AI Interaction Contract) _
 
 ### Matching
 
-10. `ai.generateMatchingSummary`
+9. `ai.generateMatchingSummary`
 
 ### Tailored Application Materials
 
-11. `ai.generateCv`
-12. 12. `ai.generateCoverLetter`
+10. `ai.generateCv`
+11. `ai.generateTailoredCvBlocks`
+12. `ai.generateCoverLetter`
 13. `ai.generateTailoredSpeech`
 14. `ai.generateTailoredKpis`
 
@@ -274,7 +278,7 @@ _(From AI Interaction Contract) _
 
 ## 8. Current Implementation Status
 
-### MVP Progress: ~65% Complete
+### MVP Progress: ~70% Complete
 
 #### ✅ EPIC 1A: User Data Intake & Identity (100% Complete)
 

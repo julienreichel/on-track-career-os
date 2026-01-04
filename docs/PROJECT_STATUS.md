@@ -1,7 +1,7 @@
 # Project Status — AI Career OS
 
-**Last Updated:** 2025-12-31  
-**Version:** MVP Phase — Job & Company Analysis Complete
+**Last Updated:** 2026-01-04  
+**Version:** MVP Phase — Job, Company, and Matching Analysis Complete
 
 ---
 
@@ -13,9 +13,9 @@ The project has established a **strong backend and domain foundation** with comp
 
 - **Key Achievements:**
 
-- ✅ 8 of 17 AI operations implemented (47%)
+- ✅ 10 of 17 AI operations implemented (59%)
 - ✅ 16 data models in GraphQL schema (complete for MVP)
-- ✅ 7 domain modules with full repository/service/composable layers
+- ✅ 8 domain modules with full repository/service/composable layers
 - ✅ 350+ tests passing across 35+ test suites (lint + unit + E2E all green)
 - ✅ Type-safe architecture with single source of truth pattern
 - ✅ CV header now renders profile photo, contact, work-permit, and social links sourced from profile data with user-controlled toggles
@@ -23,13 +23,15 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ Full E2E test coverage for jobs flow with fixtures
 - ✅ Company workflow complete: create → analyze → canvas → link to jobs
 - ✅ Full E2E test coverage for company workflow with automatic extraction
+- ✅ Matching workflow complete: generate summary → persist → reload
+- ✅ Matching summary page live at `/jobs/:jobId/match` with E2E coverage
 
-**MVP Readiness:** ~65% complete
+**MVP Readiness:** ~70% complete
 
 - Backend Infrastructure: 98% complete
 - Domain Logic: 98% complete
-- Frontend UI: 55% complete (EPICs 1A, 1B, 2, 3, 3B, 5A, 5B fully implemented)
-- AI Operations: 47% complete (8/17)
+- Frontend UI: 60% complete (EPICs 1A, 1B, 2, 3, 3B, 5A, 5B, 5C fully implemented)
+- AI Operations: 59% complete (10/17)
 
 ---
 
@@ -47,7 +49,7 @@ The project has established a **strong backend and domain foundation** with comp
 | **4**  | User Speech Builder         | 30%     | 0%     | 0% (0/1)   | 0%       | **5%**   |
 | **5A** | Job Description Analysis    | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **5B** | Company Analysis & Canvas   | 100%    | 100%   | 100% (2/2) | 100%     | **100%** |
-| **5C** | User-Job-Company Matching   | 70%     | 0%     | 0% (0/1)   | 0%       | **10%**  |
+| **5C** | User-Job-Company Matching   | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **6**  | Tailored Materials          | 60%     | 0%     | 0% (0/4)   | 0%       | **10%**  |
 | **7**  | Interview Prep              | 60%     | 0%     | 0% (0/3)   | 0%       | **10%**  |
 
@@ -477,29 +479,19 @@ The project has established a **strong backend and domain foundation** with comp
 
 ---
 
-#### ❌ EPIC 5C: User-Job-Company Matching (10% Complete)
+#### ✅ EPIC 5C: User-Job-Company Matching (100% Complete)
 
-**Status:** Data model exists, no AI operations
+**Status:** Fully implemented across AI ops, domain, and UI.
 
 **Implemented:**
 
-- ✅ MatchingSummary GraphQL model
-
-**Missing:**
-
-- ✅ `ai.generateMatchingSummary` Lambda
-- ❌ Matching repository/service/composable
-- ❌ Matching summary page
-- ❌ Fit score visualization
-- ❌ Impact areas display
-
-**Next Steps:**
-
-1. Implement `ai.generateMatchingSummary` Lambda ✅
-2. Create matching domain layer
-3. Create `/jobs/:jobId/match` page
-4. Add fit score visualization
-5. Display impact areas, contributions, risks
+- ✅ MatchingSummary GraphQL model with scoring + actionable sections
+- ✅ `ai.generateMatchingSummary` Lambda with strict JSON validation
+- ✅ MatchingSummary repository/service + `useMatchingSummary`
+- ✅ `useMatchingEngine` workflow orchestration
+- ✅ `/jobs/:jobId/match` page with summary cards and regeneration
+- ✅ Fit score visualization + structured sections (reasoning, strengths, skills, risks, impact, tailoring)
+- ✅ E2E coverage via `test/e2e/matching-summary-flow.spec.ts`
 
 ---
 
@@ -559,7 +551,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 ---
 
-## 🤖 AI Operations Status (6/17 Complete)
+## 🤖 AI Operations Status (10/17 Complete)
 
 ### Implemented Operations ✅
 
@@ -574,8 +566,9 @@ The project has established a **strong backend and domain foundation** with comp
 | `ai.parseJobDescription`         | ✅     | 8 passing  | ✅     | Production ready |
 | `ai.analyzeCompanyInfo`          | ✅     | 4 passing  | ✅     | Production ready |
 | `ai.generateCompanyCanvas`       | ✅     | 5 passing  | ✅     | Production ready |
+| `ai.generateMatchingSummary`     | ✅     | 3 passing  | ✅     | Production ready |
 
-**Total: 8/17 (47%)**
+**Total: 10/17 (59%)**
 
 ### Missing Operations ❌
 
@@ -585,9 +578,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Job & Company Analysis (0 remaining):** All complete ✅
 
-**Matching Engine (1 missing):**
-
-- ✅ `ai.generateMatchingSummary`
+**Matching Engine (0 remaining):** All complete ✅
 
 **Application Materials (4 missing):**
 
@@ -606,7 +597,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 ## 📦 Domain Models Status
 
-### Implemented Models (9/16 MVP Required)
+### Implemented Models (10/16 MVP Required)
 
 | Domain              | Models         | Repository | Service | Composable | Tests            |
 | ------------------- | -------------- | ---------- | ------- | ---------- | ---------------- |
@@ -618,11 +609,10 @@ The project has established a **strong backend and domain foundation** with comp
 | **JobDescription**  | JobDescription | ✅         | ✅      | ✅         | 25+ tests        |
 | **Company**         | Company        | ✅         | ✅      | ✅         | 50+ tests        |
 | **CompanyCanvas**   | CompanyCanvas  | ✅         | ✅      | ✅         | 50+ tests        |
+| **MatchingSummary** | MatchingSummary | ✅        | ✅      | ✅         | 6 tests          |
 | **AI Operations**   | (Lambdas)      | ✅         | ✅      | ✅         | 44 Amplify tests |
 
-### Missing Domain Layers (7 models exist in schema but no domain layer)
-
-- ❌ MatchingSummary
+### Missing Domain Layers (6 models exist in schema but no domain layer)
 - ❌ CoverLetter
 - ❌ SpeechBlock
 - ❌ KPISet
@@ -633,7 +623,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 ---
 
-## 🎨 Frontend Status (45% Complete)
+## 🎨 Frontend Status (50% Complete)
 
 ### Implemented Pages (21+)
 
@@ -684,7 +674,7 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ CompanySelector — Dropdown for job-company linking
 - ✅ LinkedCompanyBadge — Display linked company with navigation
 
-### Missing Pages (Estimated 6+ pages for MVP)
+### Remaining Pages (Estimated 5+ pages for MVP)
 
 **Profile & Identity (0 remaining - all complete):**
 
@@ -714,9 +704,9 @@ The project has established a **strong backend and domain foundation** with comp
 
 - `/speech` — View/edit speech blocks
 
-**Matching (1 page):**
+**Matching (0 remaining - complete):**
 
-- `/jobs/:jobId/match` — View matching summary
+- ✅ `/jobs/:jobId/match` — View matching summary
 
 **Application Materials (3 pages):**
 
@@ -742,10 +732,11 @@ The project has established a **strong backend and domain foundation** with comp
 - **Sandbox Tests:** 10 test files passing
   - **35 E2E sandbox tests** (AI operations)
 - **Playwright E2E Tests:** Fully functional
-  - canvas-flow.spec.ts
-  - stories-flow.spec.ts
-  - jobs-flow.spec.ts
-  - company-workflow.spec.ts (new)
+- canvas-flow.spec.ts
+- stories-flow.spec.ts
+- jobs-flow.spec.ts
+- company-workflow.spec.ts (new)
+- matching-summary-flow.spec.ts
 
 **Coverage by Layer:**
 
@@ -904,33 +895,27 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Achievement:** Users can now analyze jobs and companies, generate business model canvases, and link jobs to companies for context-aware application materials
 
-**Remaining for Complete Job/Company Context:**
+**Matching Context Status:**
 
-- ⚠️ EPIC 5C: Matching (AI op ready – Awaiting domain + UI layers)
-- ❌ Matching page: `/jobs/:jobId/match`
+- ✅ EPIC 5C complete (AI op, domain, UI, and E2E)
+- ✅ Matching page live at `/jobs/:jobId/match`
 
-**Estimated Effort:** 1-2 weeks for EPIC 5C  
-**Value:** Complete user-job-company fit analysis
+**Value:** Complete user-job-company fit analysis now available
 
 ---
 
-### Phase 5: Implement User-Job-Company Matching (EPIC 5C)
+### Phase 5: Implement User-Job-Company Matching (EPIC 5C) — Complete
 
 **Goal:** Connect user strengths with job/company needs to reveal fit and impact
 
-**Tasks:**
+**Delivered:**
 
-1. Implement `ai.generateMatchingSummary` operation + domain layer (AI operation ✅, domain layer pending)
-2. Create MatchingSummary repository/service/composable
-3. Create `/jobs/:jobId/match` page with:
-   - Fit score visualization
-   - Competitive advantages display
-   - Contributions and impact areas
-   - Risks and mitigation strategies
-4. Integrate user canvas, job analysis, and company canvas data
-5. Add E2E tests for matching flow
+1. ✅ `ai.generateMatchingSummary` operation with strict schema validation
+2. ✅ MatchingSummary repository/service/composable + `useMatchingEngine`
+3. ✅ `/jobs/:jobId/match` page with fit score and structured sections
+4. ✅ Context aggregation across user profile, job analysis, and company data
+5. ✅ E2E coverage for the matching flow
 
-**Estimated Effort:** 1-2 weeks  
 **Value:** Users understand exactly how they fit and where they add value
 
 ---
@@ -999,8 +984,8 @@ The project has established a **strong backend and domain foundation** with comp
 
 ## 📈 MVP Completion Roadmap
 
-**Current State:** ~65% complete  
-**Estimated Remaining Effort:** 4-7 weeks (1-1.75 months)
+**Current State:** ~70% complete  
+**Estimated Remaining Effort:** 3-6 weeks (0.75-1.5 months)
 
 **Critical Path:**
 
@@ -1008,12 +993,12 @@ The project has established a **strong backend and domain foundation** with comp
 2. Phase 2: ✅ COMPLETED - Experience Builder Frontend (EPIC 2) → **100% complete**
 3. Phase 3: ✅ COMPLETED - CV Generation (EPICs 3 + 3B) → **100% complete**
 4. Phase 4: ✅ COMPLETED - Job & Company Analysis (EPICs 5A + 5B) → **100% complete**
-5. Phase 5: User-Job-Company Matching (EPIC 5C) - 1-2 weeks → **0% complete**
+5. Phase 5: ✅ COMPLETED - User-Job-Company Matching (EPIC 5C) → **100% complete**
 6. Phase 6: Speech Builder (EPIC 4) - 1-2 weeks → **0% complete**
 7. Phase 7: Tailoring Engine (EPIC 6) - 3-4 weeks → **0% complete**
 8. Phase 8: Interview Prep (EPIC 7) - 2-3 weeks → **0% complete**
 
-**Next Immediate Priority:** Complete EPIC 5C (User-Job-Company Matching) to enable fit analysis, then EPIC 4 (Speech Builder) before tackling EPIC 6 (Tailoring Engine)
+**Next Immediate Priority:** Start EPIC 4 (Speech Builder), then tackle EPIC 6 (Tailoring Engine)
 
 **Parallel Work Opportunities:**
 
@@ -1034,7 +1019,7 @@ The project has established a **strong backend and domain foundation** with comp
 - [x] EPIC 3B: CV Header & Contact Information (100%)
 - [x] EPIC 5A: Job Description Analysis (100%)
 - [x] EPIC 5B: Company Analysis & Canvas (100%)
-- [ ] EPIC 5C: User-Job-Company Matching (0%)
+- [x] EPIC 5C: User-Job-Company Matching (100%)
 - [ ] EPIC 4: User Speech Builder (0%)
 - [ ] EPIC 6: Tailored Application Materials (0%)
 - [ ] EPIC 7: Interview Prep (0%)
@@ -1057,7 +1042,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 ## 📝 Conclusion
 
-The **AI Career OS** project has made **excellent progress** with 7 of 10 MVP EPICs fully implemented (1A, 1B, 2, 3, 3B, 5A, 5B). The backend and domain layers are production-ready, with comprehensive testing (1050+ tests passing) and clean architecture following Domain-Driven Design principles.
+The **AI Career OS** project has made **excellent progress** with 8 of 10 MVP EPICs fully implemented (1A, 1B, 2, 3, 3B, 5A, 5B, 5C). The backend and domain layers are production-ready, with comprehensive testing (1050+ tests passing) and clean architecture following Domain-Driven Design principles.
 
 **Major Milestones Achieved:**
 
@@ -1068,7 +1053,8 @@ The **AI Career OS** project has made **excellent progress** with 7 of 10 MVP EP
 - ✅ Job description parsing and analysis
 - ✅ Company analysis with Business Model Canvas
 - ✅ Job-company linking with automatic extraction
+- ✅ Matching summary generation with persistence and reload
 
-**Key Insight:** The project is **65% complete** for MVP with a solid foundation. The remaining work focuses on **matching engine (EPIC 5C), speech builder (EPIC 4), tailored materials (EPIC 6), and interview prep (EPIC 7)**.
+**Key Insight:** The project is **70% complete** for MVP with a solid foundation. The remaining work focuses on **speech builder (EPIC 4), tailored materials (EPIC 6), and interview prep (EPIC 7)**.
 
-**Next Immediate Action:** Implement EPIC 5C (User-Job-Company Matching) to connect all the data and reveal fit, then proceed with EPIC 4 (Speech Builder) before tackling the tailoring engine.
+**Next Immediate Action:** Implement EPIC 4 (Speech Builder), then proceed with the tailoring engine (EPIC 6).

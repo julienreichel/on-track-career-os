@@ -291,8 +291,6 @@ Added to `package.json`:
 **Pending EPIC implementation:**
 
 - ⏸️ **EPIC 4** (Speech Builder): Awaiting implementation
-- ⏸️ **EPIC 5B** (Company Analysis): Awaiting AI operations
-- ⏸️ **EPIC 5C** (Matching): Awaiting AI operations
 - ⏸️ **EPIC 6** (Tailored Materials): Awaiting AI operations
 - ⏸️ **EPIC 7** (Interview Prep): Awaiting AI operations
 
@@ -317,7 +315,7 @@ Added to `package.json`:
 
 ## Integration with Testing Pyramid
 
-**Complete Test Coverage: EPICs 1A, 1B, 2, 3, 3B, 5A**
+**Complete Test Coverage: EPICs 1A, 1B, 2, 3, 3B, 5A, 5B, 5C**
 
 | Layer     | Framework       | Tests    | Status           |
 | --------- | --------------- | -------- | ---------------- |
@@ -497,22 +495,12 @@ Test Suites:
    - Test speech generation and editing
    - ~5-10 tests estimated
 
-2. **EPIC 5B (Company Analysis)**:
-   - Create `test/e2e/company-flow.spec.ts`
-   - Test company upload, analysis, canvas
-   - ~10-15 tests estimated
-
-3. **EPIC 5C (Matching)**:
-   - Create `test/e2e/matching.spec.ts`
-   - Test job-profile matching scores
-   - ~5-8 tests estimated
-
-4. **EPIC 6 (Tailored Materials)**:
+2. **EPIC 6 (Tailored Materials)**:
    - Create `test/e2e/tailoring.spec.ts`
    - Test tailored CV, cover letter, speech, KPIs
    - ~15-20 tests estimated
-
-5. **EPIC 7 (Interview Prep)**:
+ 
+3. **EPIC 7 (Interview Prep)**:
    - Create `test/e2e/interview-prep.spec.ts`
    - Test question generation and simulator
    - ~10-15 tests estimated

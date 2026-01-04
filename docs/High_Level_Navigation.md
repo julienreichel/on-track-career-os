@@ -11,7 +11,7 @@ The application is organized around **five main navigation zones**:
    Identity, experiences, stories, personal canvas.
 
 2. **Jobs & Companies** ⚠️ Partial
-   Job intake, job role card (implemented), company canvas (not implemented), matching (not implemented).
+   Job intake, job role card (implemented), company canvas (implemented), matching (implemented).
 
 3. **Applications** ⚠️ Partial
    CV builder (implemented), cover letters (not implemented), speech builder (not implemented), KPI generator (not implemented).
@@ -429,20 +429,20 @@ _(EPIC 5A)_
 
 **Nuxt UI:** `<UPage>`, `<UTabs>`, `<UCard>`, `<UFormGroup>`, `<UInput>`, `<UTextarea>`, `<UButton>`, `<UModal>`
 
-**Future Enhancements:**
+**Implemented Enhancements:**
 
-- Link to company (EPIC 5B)
-- View matching summary (EPIC 5C)
+- ✅ Link to company (EPIC 5B)
+- ✅ View matching summary (EPIC 5C)
 
 ---
 
-## PAGE 2.4 — Company List ❌ NOT IMPLEMENTED
+## PAGE 2.4 — Company List ✅ IMPLEMENTED
 
 _(EPIC 5B)_
 
-**Status:** Blocked by missing AI operations
+**Status:** Live with list, search, and navigation.
 
-**Planned Actions:**
+**Actions:**
 
 - Add company
 - Open company canvas
@@ -450,13 +450,13 @@ _(EPIC 5B)_
 
 ---
 
-## PAGE 2.5 — Add Company Information ❌ NOT IMPLEMENTED
+## PAGE 2.5 — Add Company Information ✅ IMPLEMENTED
 
 _(EPIC 5B)_
 
-**Status:** Blocked by `ai.analyzeCompanyInfo`
+**Status:** Live with optional AI analysis.
 
-**Planned Fields:**
+**Fields:**
 
 - Company name
 - Industry
@@ -467,50 +467,42 @@ _(EPIC 5B)_
 
 ---
 
-## PAGE 2.6 — Company Business Model Canvas ❌ NOT IMPLEMENTED
+## PAGE 2.6 — Company Business Model Canvas ✅ IMPLEMENTED
 
 _(EPIC 5B)_
 
-**Status:** Blocked by `ai.generateCompanyCanvas`
+**Status:** Live with AI generation and editing.
 
-**Planned Features:**
+**Features:**
 
-- Tag-based canvas (similar to personal canvas)
+- Tag-based canvas (mirrors personal canvas layout)
 - AI-generated items:
   - Market pains
   - Internal challenges
   - Customer pains
   - Strategic priorities
-
-**Note:** `PersonalCanvasComponent` pattern can likely be reused
+- Per-block editing + save
 
 ---
 
-## PAGE 2.7 — Matching Summary (User ↔ Job ↔ Company) ❌ NOT IMPLEMENTED
+## PAGE 2.7 — Matching Summary (User ↔ Job ↔ Company) ✅ IMPLEMENTED
 
 _(EPIC 5C — MVP)_
 
-**Status:** Blocked by `ai.generateMatchingSummary` and EPIC 5B dependencies
+**Status:** Live with AI generation, persistence, and reload.
 
-A key synthesis page.
+**Features:**
 
-**Planned Features:**
+- Fit score visualization + breakdown
+- Strengths, skill match, risks, impact, and tailoring tips
+- Persistent summary loaded from `MatchingSummary`
 
-- Fit score visualization
-- Strengths ↔ Job pains map
-- Achievements relevant to the job
-- Potential contributions
-- Risks & mitigation strategies
-- Summary paragraph
+**UI:**
+`<UBadge>`, `<UAlert>`, `<UCard>`, `MatchingSummaryCard`
 
-**Planned UI:**
-`<UBadge>`, `<UAlert>`, `<UCard>`, potentially chart components
+**Actions:**
 
-**Planned Actions:**
-
-- Regenerate
-- Refine with prompts
-- Send to Tailoring Engine
+- Generate / Regenerate
 
 ---
 
@@ -697,12 +689,12 @@ Dashboard → Navigate to Profile/CV/Jobs
 
 1. Upload Job Description (`/jobs/new`) ✅
 2. Edit Job Details (`/jobs/[jobId]`) ✅
-3. Add Company Info ❌ Not Implemented (EPIC 5B)
-4. Company Canvas ❌ Not Implemented (EPIC 5B)
+3. Add Company Info ✅ (EPIC 5B)
+4. Company Canvas ✅ (EPIC 5B)
 
-### STEP 4 — Matching ❌ Not Implemented
+### STEP 4 — Matching ✅ Implemented
 
-- Matching Summary (EPIC 5C)
+- Matching Summary (`/jobs/:jobId/match`) ✅
 - Review suggestions
 
 ### STEP 5 — Generate Materials ⚠️ Partial
@@ -779,13 +771,13 @@ Dashboard → Navigate to Profile/CV/Jobs
 │       ├── Tab 3: Required Skills (tags)
 │       ├── Tab 4: Cultural Fit (tags)
 │       └── Tab 5: Success Metrics (tags)
-└── Companies ❌
-    ├── Company List ❌ (EPIC 5B)
-    ├── Add Company ❌ (EPIC 5B)
-    └── Company Canvas ❌ (EPIC 5B)
+└── Companies ✅
+    ├── Company List ✅ (EPIC 5B)
+    ├── Add Company ✅ (EPIC 5B)
+    └── Company Canvas ✅ (EPIC 5B)
 
-🔗 Matching ❌
-└── Matching Summary ❌ (EPIC 5C)
+🔗 Matching ✅
+└── Matching Summary ✅ (EPIC 5C)
 
 📝 CV Documents (/cv) ✅
 ├── CV List (/cv) ✅
@@ -831,12 +823,9 @@ Dashboard → Navigate to Profile/CV/Jobs
 - CV Print Export
 
 **⚠️ Partially Implemented:**
-- Jobs & Companies (jobs ✅, companies ❌)
 - Application Materials (generic CV ✅, tailored materials ❌)
 
-**❌ Not Implemented (40%):**
-- Company Analysis & Canvas (EPIC 5B)
-- Matching Engine (EPIC 5C)
+**❌ Not Implemented (30%):**
 - Speech Builder (EPIC 4)
 - Tailored Materials (EPIC 6)
 - Interview Prep & Simulator (EPIC 7, 9)

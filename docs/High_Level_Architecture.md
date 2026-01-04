@@ -165,21 +165,21 @@ _(Supports EPIC 5A)_
 
 ---
 
-## 2.4 Matching Engine Component ❌ NOT IMPLEMENTED
+## 2.4 Matching Engine Component ✅ IMPLEMENTED
 
 _(Supports EPIC 5C)_
 
-- Compares user data, job card, and company canvas
+- Compares user data, job card, and company context
 - Produces:
-  - Fit Summary
-  - Impact Areas
-  - Contribution Map
-  - Risk mitigation suggestions
+  - Fit score + breakdown
+  - Strengths and skill matches
+  - Risk + mitigation list
+  - Impact opportunities and tailoring tips
 
-**Status:** EPIC 5C - Blocked by missing AI operation (`ai.generateMatchingSummary`) and EPIC 5B dependencies
+**Status:** EPIC 5C complete (AI op, domain layer, and UI delivered)
 
-**Planned Nuxt UI:**
-Match Summary page with `<UAlert>` and `<UBadge>` highlights
+**Nuxt UI:**
+Match Summary page with `<UPage>`, `<UCard>`, `<UAlert>`, `<UBadge>`, and `MatchingSummaryCard`
 
 ---
 
@@ -217,7 +217,7 @@ _(Support EPIC 3, EPIC 4, EPIC 6, EPIC 7)_
 - Generate from user + job + company + matching
 - Fully editable
 
-**Status:** EPIC 6 - Blocked by missing AI operation (`ai.generateCoverLetter`) and EPIC 5B/5C dependencies
+**Status:** EPIC 6 - Blocked by missing AI operation (`ai.generateCoverLetter`); matching context now available
 
 **Planned Nuxt UI:**
 `<URadioGroup>`, `<UTextarea>` or markdown editor
@@ -244,7 +244,7 @@ _(Supports EPIC 4)_
 - Suggests 2–3 KPIs grounded in company pains & user strengths
 - Adds justification/explanation
 
-**Status:** EPIC 6 - Blocked by missing AI operation (`ai.generateTailoredKpis`) and EPIC 5B/5C dependencies
+**Status:** EPIC 6 - Blocked by missing AI operation (`ai.generateTailoredKpis`); matching context now available
 
 **Note:** `AchievementsKpisPanel` component exists for story-level KPIs (uses `ai.generateAchievementsAndKpis`)
 

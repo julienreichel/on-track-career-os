@@ -121,7 +121,7 @@ const schema = a.schema({
 });
 ```
 
-**Implemented Models (7):**
+**Implemented Models (9):**
 
 - ✅ `UserProfile` - User identity, values, goals, strengths
 - ✅ `Experience` - Work experiences with responsibilities, tasks, achievements
@@ -129,12 +129,11 @@ const schema = a.schema({
 - ✅ `PersonalCanvas` - 9-section Business Model Canvas for user
 - ✅ `CVDocument` - Generated CV documents
 - ✅ `JobDescription` - Job postings with parsed fields
-- ✅ `Company` - Company information (schema exists, not yet used)
+- ✅ `Company` - Company information + analysis
+- ✅ `CompanyCanvas` - Company Business Model Canvas (EPIC 5B)
+- ✅ `MatchingSummary` - Job-user fit analysis (EPIC 5C)
 
 **Planned Models (5):**
-
-- ❌ `CompanyCanvas` - Company Business Model Canvas (EPIC 5B)
-- ❌ `MatchingSummary` - Job-user fit analysis (EPIC 5C)
 - ❌ `CoverLetter` - Cover letter documents (EPIC 6)
 - ❌ `SpeechBlock` - Speech/pitch content (EPIC 4)
 - ❌ `KPISet` - Job-specific KPIs (EPIC 6)
@@ -163,7 +162,9 @@ const schema = a.schema({
 - ✅ `personalCanvasRepository.ts`
 - ✅ `cvDocumentRepository.ts`
 - ✅ `jobDescriptionRepository.ts`
-- ✅ `companyRepository.ts` (exists, not yet used)
+- ✅ `companyRepository.ts`
+- ✅ `companyCanvasRepository.ts`
+- ✅ `matchingSummaryRepository.ts`
 
 **Composable Layers:**
 
@@ -225,8 +226,8 @@ const schema = a.schema({
 
 - ❌ `ai.generateSpeech` (EPIC 4)
 - ❌ `ai.analyzeCompanyInfo` (EPIC 5B)
-- ❌ `ai.generateCompanyCanvas` (EPIC 5B)
-- ❌ `ai.generateMatchingSummary` (EPIC 5C)
+- ✅ `ai.generateCompanyCanvas` (EPIC 5B)
+- ✅ `ai.generateMatchingSummary` (EPIC 5C)
 - ❌ `ai.generateTailoredCvBlocks` (EPIC 6)
 - ❌ `ai.generateCoverLetter` (EPIC 6)
 - ❌ `ai.generateTailoredSpeech` (EPIC 6)
@@ -428,7 +429,7 @@ project-root/
 │   │   ├── companies/            # Company Analysis (EPIC 5B) ❌
 │   │   │   └── (planned)
 │   │   │
-│   │   ├── matching/             # Matching Engine (EPIC 5C) ❌
+│   │   ├── matching/             # Matching Engine (EPIC 5C) ✅
 │   │   │   └── (planned)
 │   │   │
 │   │   ├── applications/         # Tailored Materials (EPIC 6) ❌
