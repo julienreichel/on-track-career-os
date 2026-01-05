@@ -10,7 +10,6 @@
             icon: 'i-heroicons-plus',
             onClick: handleCreate,
             disabled: creating,
-            'data-testid': 'create-speech-button',
           },
         ]"
       />
@@ -39,7 +38,6 @@
             <UButton
               icon="i-heroicons-plus"
               :label="t('speech.list.emptyState.action')"
-              data-testid="create-speech-button"
               @click="handleCreate"
             />
           </template>
@@ -69,7 +67,7 @@
         :description="t('speech.list.confirmDeleteDescription')"
         :confirm-label="t('common.delete')"
         :cancel-label="t('common.cancel')"
-        confirm-color="red"
+        confirm-color="error"
         :loading="deleting"
         @confirm="handleDelete"
       />
