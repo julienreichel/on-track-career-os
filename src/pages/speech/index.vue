@@ -156,8 +156,7 @@ const handleDelete = async () => {
 };
 
 const resolveTitle = (block: SpeechBlock) => {
-  const raw =
-    block.elevatorPitch?.trim() || block.careerStory?.trim() || block.whyMe?.trim() || '';
+  const raw = block.elevatorPitch?.trim() || block.careerStory?.trim() || block.whyMe?.trim() || '';
   if (!raw) {
     return t('speech.list.untitled');
   }
@@ -165,8 +164,7 @@ const resolveTitle = (block: SpeechBlock) => {
 };
 
 const resolvePreview = (block: SpeechBlock) => {
-  const raw =
-    block.careerStory?.trim() || block.elevatorPitch?.trim() || block.whyMe?.trim() || '';
+  const raw = block.careerStory?.trim() || block.elevatorPitch?.trim() || block.whyMe?.trim() || '';
   if (!raw) {
     return t('speech.list.emptyPreview');
   }
