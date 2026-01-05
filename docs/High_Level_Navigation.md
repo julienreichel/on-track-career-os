@@ -14,7 +14,7 @@ The application is organized around **five main navigation zones**:
    Job intake, job role card (implemented), company canvas (implemented), matching (implemented).
 
 3. **Applications** ⚠️ Partial
-   CV builder (implemented), cover letters (not implemented), speech builder (not implemented).
+   CV builder (implemented), cover letters (not implemented), speech builder (implemented - EPIC 4).
 
 4. **Interview Prep** ❌ Not Implemented
    Interview questions generator, interview simulator.
@@ -548,15 +548,34 @@ Workflow:
 
 ---
 
-## PAGE 3.3 — Speech Builder
+## PAGE 3.3 — Speech Builder ✅
 
-_(EPIC 4 & EPIC 6)_
+_(EPIC 4 — Fully Implemented)_
 
-Create or refine:
+**Routes:**
+- `/speech` - List view with create action
+- `/speech/:id` - Editor with three sections
 
-- Elevator pitch
-- Career story
-- “Why me?” tailored variant
+**Features:**
+
+- Create new speech blocks (generic or job-targeted)
+- AI generation via `generateSpeech` Lambda
+- Three speech sections:
+  - Elevator pitch (text + key messages)
+  - Career story (text + key messages)
+  - "Why me?" statement (text + key messages)
+- Tag-based editing for key messages
+- Character count display for text sections
+- Optional job targeting strategy
+- Save and regenerate functionality
+- Card-based UI consistent with CV/matching patterns
+
+**Technical Implementation:**
+
+- 3 components: SpeechBlockEditorCard, SpeechSectionEditor, SpeechGenerateButton
+- 3 composables: useSpeechBlock, useSpeechBlocks, useSpeechEngine
+- E2E test coverage (7 tests)
+- Semantic selectors for accessibility
 
 ---
 
@@ -700,9 +719,9 @@ Dashboard → Navigate to Profile/CV/Jobs
 ### STEP 5 — Generate Materials ⚠️ Partial
 
 - Generic CV (`/cv/new`, `/cv/:id`) ✅
+- Speech Builder (`/speech`, `/speech/:id`) ✅ Implemented (EPIC 4)
 - Tailored CV ❌ Not Implemented (EPIC 6)
 - Tailored Letter ❌ Not Implemented (EPIC 6)
-- Speech Builder (`/speech`, `/speech/[id]`) ❌ Not Implemented (EPIC 4, job optional)
 
 ### STEP 6 — Prepare Interview ❌ Not Implemented
 
@@ -789,10 +808,15 @@ Dashboard → Navigate to Profile/CV/Jobs
 └── CV Print View (/cv/:id/print) ✅
     └── A4 Layout
 
-📝 Application Materials (Tailored) ❌
+📝 Application Materials ❌
 ├── Tailored CV ❌ (EPIC 6)
 ├── Cover Letter Builder ❌ (EPIC 6)
-├── Speech Builder ❌ (EPIC 4 + 6)
+└── Speech Builder ✅ (EPIC 4)
+    ├── Speech List (/speech) ✅
+    └── Speech Editor (/speech/:id) ✅
+        ├── Elevator Pitch Section
+        ├── Career Story Section
+        └── Why Me Section
 
 
 🎤 Interview Prep ❌
@@ -808,7 +832,7 @@ Dashboard → Navigate to Profile/CV/Jobs
 
 ## Implementation Summary
 
-**✅ Fully Implemented (60%):**
+**✅ Fully Implemented (65%):**
 - Dashboard & Navigation
 - Profile Management (full CRUD)
 - CV Upload & Parsing
@@ -817,15 +841,17 @@ Dashboard → Navigate to Profile/CV/Jobs
 - Personal Canvas (generation + editing)
 - Job Upload & Analysis
 - Job Detail Editing
+- Company Management & Canvas
+- Matching Summary
 - CV Generation & Editing
 - CV Print Export
+- Speech Builder (EPIC 4)
 
 **⚠️ Partially Implemented:**
-- Application Materials (generic CV ✅, tailored materials ❌)
+- Application Materials (generic CV ✅, speech builder ✅, tailored CV/letters ❌)
 
-**❌ Not Implemented (30%):**
-- Speech Builder (EPIC 4)
-- Tailored Materials (EPIC 6)
+**❌ Not Implemented (25%):**
+- Tailored CV/Letters (EPIC 6)
 - Interview Prep & Simulator (EPIC 7, 9)
 - System Utilities (EPIC 12, Settings)
 - Voice Simulator (EPIC 14 - V2)

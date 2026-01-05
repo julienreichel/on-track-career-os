@@ -900,38 +900,53 @@ Each page includes:
 
 ---
 
-## **5.3 Speech Builder** ❌
+## **5.3 Speech Builder** ✅
 
-**Route:** `/speech` and `/speech/[id]` (planned)
+**Route:** `/speech` and `/speech/:id` (implemented)
 
 ### UI
 
-- `<UTextarea>`
-- `<USteps>` (multi-section)
+- `<UCard>` with card-based section layout
+- `<UTextarea>` for text sections
+- `<UButton>` for generate/save/cancel actions
+- `<TagInput>` for key messages
 
 ### Components
 
-- Speech Builder Component (planned)
+- **SpeechBlockEditorCard.vue** - Card layout for speech sections
+- **SpeechSectionEditor.vue** - Tag-based editor with character count
+- **SpeechGenerateButton.vue** - AI generation trigger
 
 ### Composables
 
+- `useSpeechBlock()` ✅ - CRUD operations with AI generation
+- `useSpeechBlocks()` ✅ - List management
+- `useSpeechEngine()` ✅ - Workflow orchestration
 - `useUserProfile()` ✅
-- `useCanvasEngine()` ✅
+- `useJobAnalysis()` ✅ (for job targeting)
 
 ### CDM Entities
 
-- **SpeechBlock** (create/update)
+- **SpeechBlock** (CRUD complete)
+  - elevatorPitch: { text, keyMessages[] }
+  - careerStory: { text, keyMessages[] }
+  - whyMe: { text, keyMessages[] }
+  - jobId (optional)
 
 ### AI Ops
 
-- `ai.generateSpeech` (not implemented - EPIC 4, job optional)
+- `ai.generateSpeech` ✅ (EPIC 4 complete - job targeting optional)
 
 **Notes:**
 
-- Tailoring is enabled by optional job input on the same operation (no separate tailored route).
+- Job targeting enabled via optional jobId parameter
+- Card-based UI consistent with CV/matching patterns
+- Three sections: elevator pitch, career story, why me
+- Tag-based editing for key messages
+- Character count display for text sections
 
-**Status:** ❌ Not Implemented  
-**Blocking:** EPIC 4 - AI operation missing
+**Status:** ✅ Fully Implemented  
+**Testing:** E2E coverage with 7 tests in speech-flow.spec.ts
 
 ---
 
@@ -1068,20 +1083,20 @@ Each page includes:
 | Company List           | `/companies`                                          | ✅     | 5B   |
 | Company New            | `/companies/new`                                      | ✅     | 5B   |
 | Company Detail         | `/companies/[companyId]`                              | ✅     | 5B   |
+| Speech List            | `/speech`                                             | ✅     | 4    |
+| Speech Editor          | `/speech/:id`                                         | ✅     | 4    |
 
-## 8.2 Planned Pages (8 Routes)
+## 8.2 Planned Pages (6 Routes)
 
 | Page                | Route                               | Status | EPIC | Blocker               |
 | ------------------- | ----------------------------------- | ------ | ---- | --------------------- |
 | Tailored CV         | `/applications/:jobId/cv`           | ❌     | 6    | AI operation missing  |
 | Cover Letter        | `/applications/:jobId/cover-letter` | ❌     | 6    | AI operation missing  |
-| Speech Builder      | `/speech`                           | ❌     | 4    | AI operation missing  |
-| Speech Editor       | `/speech/[id]`                      | ❌     | 4    | AI operation missing  |
 | Interview Prep      | `/interviews/:jobId/prep`           | ❌     | 7    | AI operation missing  |
 | Interview Simulator | `/interviews/:jobId/simulate`       | ❌     | 7    | AI operations missing |
 | Settings            | `/settings`                         | ❌     | -    | Low priority          |
 
-## 8.3 Implemented Components (20 Core + 7 Company + 9 CV + 2 Job)
+## 8.3 Implemented Components (20 Core + 7 Company + 9 CV + 2 Job + 3 Speech)
 
 **Core Components (Domain):**
 
@@ -1121,7 +1136,13 @@ Each page includes:
 - `ProfileFullForm` - complete profile editor
 - `ProfileSummaryCard` - profile overview
 
-## 8.4 Implemented Composables (20+)
+**Speech Components:**
+
+- `SpeechBlockEditorCard` - card layout for speech sections
+- `SpeechSectionEditor` - tag-based editor with character count
+- `SpeechGenerateButton` - AI generation trigger
+
+## 8.4 Implemented Composables (23+)
 
 **Application Layer (`src/application/`):**
 
@@ -1142,7 +1163,7 @@ Each page includes:
 - `useCvUploadWorkflow()` - CV upload orchestration
 - `useCvParsing()` - CV parsing logic
 - `useExperienceImport()` - import extracted experiences
-- `useProfileMerge()` - merge profile data
+- `useProfileMerge()` - profile data merge
 - `useJobAnalysis()` - job CRUD + AI operations
 - `useJobUpload()` - job file upload
 - `useCvGenerator()` - CV generation logic
@@ -1152,8 +1173,11 @@ Each page includes:
 - `useStarInterview(sourceText)` - guided STAR interview
 - `useStoryEnhancer()` - AI story generation
 - `useBreadcrumbMapping()` - dynamic breadcrumbs
+- `useSpeechBlock(id)` - single speech CRUD with AI
+- `useSpeechBlocks()` - speech list operations
+- `useSpeechEngine()` - speech workflow orchestration
 
-## 8.5 AI Operations Status (10/17 Implemented)
+## 8.5 AI Operations Status (11/17 Implemented)
 
 **✅ Implemented:**
 
@@ -1167,14 +1191,14 @@ Each page includes:
 8. `ai.analyzeCompanyInfo` - analyze company research notes
 9. `ai.generateCompanyCanvas` - generate company BMC
 10. `ai.generateMatchingSummary` - generate matching summary
+11. `ai.generateSpeech` - generate speech blocks (elevator pitch, career story, why me)
 
-**❌ Missing (7 operations):**
+**❌ Missing (6 operations):**
 
-2. `ai.generateCoverLetter` - EPIC 6
-3. `ai.generateSpeech` - EPIC 4 (job optional)
-4. `ai.generateInterviewQuestions` - EPIC 7
-5. `ai.simulateInterviewTurn` - EPIC 7
-6. `ai.evaluateInterviewAnswer` - EPIC 7
+1. `ai.generateCoverLetter` - EPIC 6
+2. `ai.generateInterviewQuestions` - EPIC 7
+3. `ai.simulateInterviewTurn` - EPIC 7
+4. `ai.evaluateInterviewAnswer` - EPIC 7
 
 ---
 

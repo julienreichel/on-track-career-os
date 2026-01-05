@@ -1,7 +1,7 @@
 # Project Status — AI Career OS
 
-**Last Updated:** 2026-01-04  
-**Version:** MVP Phase — Job, Company, and Matching Analysis Complete
+**Last Updated:** 2026-01-05  
+**Version:** MVP Phase — Job, Company, Matching, and Speech Generation Complete
 
 ---
 
@@ -13,10 +13,10 @@ The project has established a **strong backend and domain foundation** with comp
 
 - **Key Achievements:**
 
-- ✅ 10 of 17 AI operations implemented (59%)
+- ✅ 11 of 17 AI operations implemented (65%)
 - ✅ 16 data models in GraphQL schema (complete for MVP)
-- ✅ 8 domain modules with full repository/service/composable layers
-- ✅ 350+ tests passing across 35+ test suites (lint + unit + E2E all green)
+- ✅ 9 domain modules with full repository/service/composable layers
+- ✅ 360+ tests passing across 38+ test suites (lint + unit + E2E all green)
 - ✅ Type-safe architecture with single source of truth pattern
 - ✅ CV header now renders profile photo, contact, work-permit, and social links sourced from profile data with user-controlled toggles
 - ✅ Jobs workflow complete: upload → parse → list → search → edit → save
@@ -25,13 +25,15 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ Full E2E test coverage for company workflow with automatic extraction
 - ✅ Matching workflow complete: generate summary → persist → reload
 - ✅ Matching summary page live at `/jobs/:jobId/match` with E2E coverage
+- ✅ Speech workflow complete: create → generate → edit → save
+- ✅ Speech pages live at `/speech` and `/speech/:id` with E2E coverage
 
 **MVP Readiness:** ~70% complete
 
 - Backend Infrastructure: 98% complete
 - Domain Logic: 98% complete
-- Frontend UI: 60% complete (EPICs 1A, 1B, 2, 3, 3B, 5A, 5B, 5C fully implemented)
-- AI Operations: 59% complete (10/17)
+- Frontend UI: 65% complete (EPICs 1A, 1B, 2, 3, 3B, 4, 5A, 5B, 5C fully implemented)
+- AI Operations: 65% complete (11/17)
 
 ---
 
@@ -46,14 +48,14 @@ The project has established a **strong backend and domain foundation** with comp
 | **2**  | Experience Builder (STAR)   | 100%    | 100%   | 100% (2/2) | 90%      | **95%**  |
 | **3**  | Generic CV Generator        | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **3B** | CV Header & Contact Info    | 100%    | 100%   | 100% (0/0) | 100%     | **100%** |
-| **4**  | User Speech Builder         | 30%     | 0%     | 0% (0/1)   | 0%       | **5%**   |
+| **4**  | User Speech Builder         | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **5A** | Job Description Analysis    | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **5B** | Company Analysis & Canvas   | 100%    | 100%   | 100% (2/2) | 100%     | **100%** |
 | **5C** | User-Job-Company Matching   | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **6**  | Tailored Materials          | 60%     | 0%     | 0% (0/4)   | 0%       | **10%**  |
 | **7**  | Interview Prep              | 60%     | 0%     | 0% (0/3)   | 0%       | **10%**  |
 
-**Overall MVP Progress:** ~65%
+**Overall MVP Progress:** ~70%
 
 ### Detailed EPIC Analysis
 
@@ -252,13 +254,72 @@ The project has established a **strong backend and domain foundation** with comp
 - ❌ Career story UI
 - ❌ "Why me?" statement UI
 
-**Next Steps:**
+---
 
-1. Define `ai.generateSpeech` in AI contract
-2. Implement Lambda
-3. Create domain layer (repository/service/composable)
-4. Create `/speech` page with editor
-5. Add sections for pitch, story, why-me
+#### ✅ EPIC 4: User Speech Builder (100% Complete)
+
+**Status:** ✅ **FULLY IMPLEMENTED** — End-to-end speech generation and editing workflow complete
+
+**Implemented:**
+
+- ✅ SpeechBlock GraphQL model with three sections:
+  - `elevatorPitch` (object with text and keyMessages[])
+  - `careerStory` (object with text and keyMessages[])
+  - `whyMe` (object with text and keyMessages[])
+  - Optional `jobId` for targeting strategy
+- ✅ `ai.generateSpeech` Lambda (135 lines) + comprehensive tests
+  - Generates all three speech sections from user profile
+  - Optional job-targeted strategy when jobId provided
+  - Validates output schema with strict JSON
+  - 8 Amplify tests + sandbox E2E test
+- ✅ SpeechBlockRepository (5 CRUD methods, 5 unit tests)
+- ✅ SpeechBlockService (7 business logic methods, 7 unit tests):
+  - `getSpeechBlock()` - fetch by ID with populated job
+  - `listSpeechBlocks()` - fetch all user's speeches
+  - `createSpeechBlock()` - create new speech
+  - `updateSpeechBlock()` - manual editing
+  - `generateSpeech()` - AI generation with optional job
+  - `regenerateSpeech()` - re-run AI on existing speech
+  - `deleteSpeechBlock()` - remove speech
+- ✅ useSpeechBlock composable (109 lines, 7 unit tests):
+  - State management (loading, error, currentSpeech)
+  - Full CRUD operations
+  - AI generation and regeneration
+  - Job-targeted strategy support
+- ✅ useSpeechBlocks composable (78 lines, 5 unit tests):
+  - List management with loading/error states
+  - Create and delete operations
+  - Refresh functionality
+- ✅ useSpeechEngine composable (93 lines, 5 unit tests):
+  - High-level orchestration for speech workflows
+  - Generation with optional job targeting
+  - Error handling and state management
+- ✅ Speech UI components (3 components):
+  - SpeechBlockEditorCard.vue - Card layout for section editing
+  - SpeechSectionEditor.vue - Tag-based editor with character count
+  - SpeechGenerateButton.vue - AI generation trigger
+- ✅ Speech pages:
+  - `/speech` - List view with create action and empty state
+  - `/speech/:id` - Editor with 3 sections, save/generate actions
+- ✅ E2E test coverage (7 tests in 23.4s):
+  - Navigation to speech page
+  - Create new speech block
+  - Display empty speech block
+  - Generate speech with AI
+  - Edit speech sections
+  - Save changes
+  - Persist and reload changes
+- ✅ Navigation integration (links in default layout + home page)
+- ✅ i18n translations for all speech UI elements
+
+**Technical Details:**
+
+- Card-based UI pattern consistent with CV/matching features
+- Semantic E2E selectors (getByRole, getByText, getByLabel)
+- Serial mode E2E tests with shared state
+- Tag input for key messages with add/remove functionality
+- Character count display for text sections
+- Optional job targeting when creating/generating speeches
 
 ---
 
@@ -334,7 +395,6 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Missing (Optional Enhancements):**
 
-- ⚠️ Second AI operation `ai.generateJobRoleCard` not implemented (deprecated - consolidated into parseJobDescription)
 - ⚠️ Company linking (CompanyCanvas generation is EPIC 5B)
 - ⚠️ Job templates/presets for common roles
 

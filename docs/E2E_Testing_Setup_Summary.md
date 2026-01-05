@@ -290,9 +290,12 @@ Added to `package.json`:
 
 **Pending EPIC implementation:**
 
-- ⏸️ **EPIC 4** (Speech Builder): Awaiting implementation
 - ⏸️ **EPIC 6** (Tailored Materials): Awaiting AI operations
 - ⏸️ **EPIC 7** (Interview Prep): Awaiting AI operations
+
+**Recently Completed:**
+
+- ✅ **EPIC 4** (Speech Builder): Fully implemented with E2E test coverage (`test/e2e/speech-flow.spec.ts`, 7 tests)
 
 **Test Strategy:** E2E tests will be added as each EPIC is implemented
 
@@ -315,14 +318,14 @@ Added to `package.json`:
 
 ## Integration with Testing Pyramid
 
-**Complete Test Coverage: EPICs 1A, 1B, 2, 3, 3B, 5A, 5B, 5C**
+**Complete Test Coverage: EPICs 1A, 1B, 2, 3, 3B, 4, 5A, 5B, 5C**
 
 | Layer     | Framework       | Tests    | Status           |
 | --------- | --------------- | -------- | ---------------- |
-| Unit      | Vitest          | 975      | ✅ Passing       |
-| Sandbox   | Vitest (AI Ops) | 31       | ✅ Passing       |
-| E2E       | Playwright      | 89       | ✅ Passing       |
-| **Total** |                 | **1095** | **100% Passing** |
+| Unit      | Vitest          | 1000+    | ✅ Passing       |
+| Sandbox   | Vitest (AI Ops) | 32       | ✅ Passing       |
+| E2E       | Playwright      | 96       | ✅ Passing       |
+| **Total** |                 | **1128+**| **100% Passing** |
 
 **Coverage Breakdown by EPIC:**
 
@@ -332,9 +335,10 @@ Added to `package.json`:
 | 1B        | Personal Canvas                      | 11        | ✅     |
 | 2         | STAR Stories                         | 29        | ✅     |
 | 3         | CV Generation                        | 24        | ✅     |
+| 4         | Speech Builder                       | 7         | ✅     |
 | 5A        | Job Analysis                         | 1         | ✅     |
 | -         | Infrastructure (Smoke, Navigation)   | 5         | ✅     |
-| **Total** |                                      | **89**    | **✅** |
+| **Total** |                                      | **96**    | **✅** |
 
 ## How to Use
 
@@ -490,20 +494,23 @@ Test Suites:
 
 ### For Future EPICs (New Tests)
 
-1. **EPIC 4 (Speech Builder)**:
-   - Create `test/e2e/speech-builder.spec.ts`
-   - Test speech generation and editing
-   - ~5-10 tests estimated
-
-2. **EPIC 6 (Tailored Materials)**:
+1. **EPIC 6 (Tailored Materials)**:
    - Create `test/e2e/tailoring.spec.ts`
-   - Test tailored CV, cover letter, speech, KPIs
+   - Test tailored CV, cover letter, tailored speech
    - ~15-20 tests estimated
  
-3. **EPIC 7 (Interview Prep)**:
+2. **EPIC 7 (Interview Prep)**:
    - Create `test/e2e/interview-prep.spec.ts`
    - Test question generation and simulator
    - ~10-15 tests estimated
+
+### Recently Completed E2E Tests
+
+1. **EPIC 4 (Speech Builder)**: ✅
+   - `test/e2e/speech-flow.spec.ts` (7 tests)
+   - Tests: navigation, create, display, generate, edit, save, persist
+   - Serial mode with shared state
+   - Semantic selectors (getByRole, getByText, getByLabel)
 
 **Estimated Final Coverage:** ~145-180 E2E tests for complete system
 

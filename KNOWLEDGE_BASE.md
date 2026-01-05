@@ -36,10 +36,11 @@ Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer
 - ✅ EPIC 2 (Experience Builder - STAR Stories) — 100% complete
 - ✅ EPIC 3 (Generic CV Generator) — 100% complete
 - ✅ EPIC 3B (CV Header & Contact Information) — 100% complete
+- ✅ EPIC 4 (User Speech Builder) — 100% complete
 - ✅ EPIC 5A (Job Description Analysis) — 100% complete
 - ✅ EPIC 5B (Company Analysis & Canvas) — 100% complete
 - ✅ EPIC 5C (User-Job-Company Matching) — 100% complete
-- ⚠️ Remaining EPICs 4, 6, 7 still in early implementation stages
+- ⚠️ Remaining EPICs 6, 7 still in early implementation stages
 
 ### 2.1 Frontend (Nuxt 4)
 
@@ -99,7 +100,7 @@ _(Condensed from full CDM; only key-developer-relevant models.)_
 
 - **CVDocument**
 - **CoverLetter**
-- **SpeechBlock**
+- **SpeechBlock**: elevatorPitch (text + keyMessages[]), careerStory (text + keyMessages[]), whyMe (text + keyMessages[]), optional jobId for targeting
 
 ### 3.5 Interview Domain
 
@@ -144,6 +145,9 @@ _(From Component Model + Component→Page Mapping) _
 - `useCompanyJobs()` - Fetch jobs linked to a company
 - `useMatchingEngine()` - User-Job-Company matching workflow
 - `useMatchingSummary()` - MatchingSummary CRUD + persistence
+- `useSpeechBlock()` - SpeechBlock CRUD with AI generation
+- `useSpeechBlocks()` - SpeechBlock list management
+- `useSpeechEngine()` - Speech workflow orchestration
 - `useTailoringEngine()` - Tailored materials (not implemented)
 - `useInterviewEngine()` - Interview prep (not implemented)
 - `useAiOperations()` - AI operations orchestration
@@ -256,7 +260,7 @@ _(From AI Interaction Contract) _
 
 10. `ai.generateCv`
 11. `ai.generateCoverLetter`
-12. `ai.generateSpeech`
+12. `ai.generateSpeech` - **IMPLEMENTED:** Generates elevator pitch, career story, and "why me" sections with optional job targeting
 
 ### Interview
 
@@ -366,9 +370,34 @@ _(From AI Interaction Contract) _
 - Focused on core company profile fields
 - Business Model Canvas provides structured business understanding
 
+#### ✅ EPIC 4: User Speech Builder (100% Complete)
+
+**Fully Implemented:**
+
+- Backend: SpeechBlock GraphQL model + `generateSpeech` Lambda + repository/service/composables (25+ tests)
+- Frontend: `/speech` list and `/speech/:id` editor pages
+- 3 speech components: SpeechBlockEditorCard, SpeechSectionEditor, SpeechGenerateButton
+- Three speech sections with tag-based editing: elevator pitch, career story, why me
+- Optional job targeting strategy
+- Card-based UI consistent with CV/matching patterns
+- Full i18n support (speech translations)
+- E2E test coverage (speech-flow.spec.ts with 7 tests)
+- Semantic selectors for accessibility (getByRole, getByText, getByLabel)
+- 1 E2E sandbox test (generate-speech)
+- Navigation integration with links from default layout and home page
+
+**Technical Implementation:**
+
+- SpeechBlock entity with `elevatorPitch`, `careerStory`, and `whyMe` objects
+- Each section contains `text` (string) and `keyMessages` (array)
+- Optional `jobId` for job-targeted speech generation
+- Complete workflow: create → generate → edit → save → persist
+- Character count display for text sections
+- Tag input for key messages with add/remove functionality
+
 #### ⚠️ Other EPICs: Backend foundations in place, frontend implementation pending
 
-See `docs/PROJECT_STATUS.md` for detailed progress on all 10 MVP EPICs.
+See [PROJECT_STATUS.md](PROJECT_STATUS.md) for detailed progress on all 10 MVP EPICs.
 
 ---
 
