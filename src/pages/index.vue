@@ -30,6 +30,12 @@
             icon="i-heroicons-document-text"
             :to="{ name: 'cv' }"
           />
+          <UPageCard
+            :title="t('features.speech.title')"
+            :description="t('features.speech.description')"
+            icon="i-heroicons-chat-bubble-left-right"
+            :to="{ name: 'speech' }"
+          />
         </UPageGrid>
       </UCard>
     </UPageBody>

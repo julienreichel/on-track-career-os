@@ -34,7 +34,6 @@ export interface SpeechUserProfile {
   aspirations?: string[];
   personalValues?: string[];
   strengths?: string[];
-  values?: string[];
   interests?: string[];
   skills?: string[];
   certifications?: string[];
@@ -47,7 +46,9 @@ export interface SpeechExperience {
   startDate?: string;
   endDate?: string;
   responsibilities?: string[];
+  tasks?: string[];
   achievements?: string[];
+  kpiSuggestions?: string[];
 }
 
 export interface SpeechStory {
@@ -60,14 +61,19 @@ export interface SpeechStory {
 }
 
 export interface SpeechPersonalCanvas {
+  customerSegments?: string[];
   valueProposition?: string[];
+  channels?: string[];
+  customerRelationships?: string[];
   keyActivities?: string[];
-  strengths?: string[];
-  targetRoles?: string[];
+  keyResources?: string[];
+  keyPartners?: string[];
+  costStructure?: string[];
+  revenueStreams?: string[];
 }
 
 export interface SpeechJobDescription {
-  title?: string;
+  title: string;
   seniorityLevel?: string;
   roleSummary?: string;
   responsibilities?: string[];

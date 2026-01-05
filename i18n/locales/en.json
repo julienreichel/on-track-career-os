@@ -10,6 +10,7 @@
     "jobs": "Jobs",
     "companies": "Companies",
     "applications": "Applications",
+    "speech": "Speech",
     "interview": "Interview Prep",
     "backToProfile": "Back to Profile",
     "backToHome": "Back to Home",
@@ -43,6 +44,10 @@
     "applications": {
       "title": "Applications",
       "description": "Generate tailored CVs and cover letters"
+    },
+    "speech": {
+      "title": "Speech",
+      "description": "Draft your elevator pitch and career story"
     },
     "interview": {
       "title": "Interview Prep",
@@ -1144,6 +1149,78 @@
       "badge": "AI generated",
       "outOf": "Out of 100",
       "description": "Use this score as a directional signal. Refresh whenever your profile, job, or company data changes."
+    }
+  },
+  "speech": {
+    "list": {
+      "title": "Speech",
+      "subtitle": "Draft concise narratives for introductions and interviews.",
+      "actions": {
+        "create": "Create speech"
+      },
+      "emptyState": {
+        "title": "No speech yet",
+        "description": "Create a speech to draft your elevator pitch and career story.",
+        "action": "Create speech"
+      },
+      "untitled": "Untitled speech",
+      "updated": "Updated {date}",
+      "updatedUnknown": "Updated date unavailable",
+      "emptyPreview": "Add content to preview your speech here.",
+      "confirmDelete": "Delete speech",
+      "confirmDeleteDescription": "Are you sure you want to delete this speech? This action cannot be undone.",
+      "toast": {
+        "deleted": "Speech deleted",
+        "deleteFailed": "Unable to delete speech",
+        "createFailed": "Unable to create speech"
+      }
+    },
+    "detail": {
+      "title": "Speech",
+      "description": "Build your elevator pitch, career story, and why-me narrative.",
+      "states": {
+        "errorTitle": "Unable to load speech",
+        "generateErrorTitle": "Unable to generate speech",
+        "notFound": "Speech not found",
+        "notFoundDescription": "We could not find that speech. Return to the list to create a new one."
+      },
+      "delete": {
+        "title": "Delete speech",
+        "description": "Are you sure you want to delete this speech?"
+      },
+      "toast": {
+        "saved": "Speech saved",
+        "saveFailed": "Unable to save speech",
+        "generated": "Speech updated from AI",
+        "deleted": "Speech deleted",
+        "deleteFailed": "Unable to delete speech"
+      }
+    },
+    "editor": {
+      "actions": {
+        "generate": "Generate speech",
+        "regenerate": "Regenerate speech",
+        "generating": "Generating speech..."
+      },
+      "charCount": "{count} / {max} chars",
+      "charCountSimple": "{count} chars",
+      "sections": {
+        "elevatorPitch": {
+          "label": "Elevator pitch",
+          "description": "A concise introduction you can deliver in under a minute.",
+          "placeholder": "Write a short introduction that highlights your value."
+        },
+        "careerStory": {
+          "label": "Career story",
+          "description": "A narrative that connects your experiences to your current direction.",
+          "placeholder": "Outline the key chapters of your career journey."
+        },
+        "whyMe": {
+          "label": "Why me",
+          "description": "Explain why you are a compelling candidate for your target roles.",
+          "placeholder": "Summarize your strengths and the outcomes you deliver."
+        }
+      }
     }
   }
 }

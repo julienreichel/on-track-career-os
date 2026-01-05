@@ -22,6 +22,7 @@ export class SpeechBlockService {
   async createSpeechBlock(input: SpeechBlockCreateInput): Promise<SpeechBlock | null> {
     return this.repo.create({
       ...input,
+      ...(input.jobId === null && { jobId: undefined }),
       elevatorPitch: normalizeText(input.elevatorPitch),
       careerStory: normalizeText(input.careerStory),
       whyMe: normalizeText(input.whyMe),
@@ -44,9 +45,10 @@ export class SpeechBlockService {
   }
 
   createDraftSpeechBlock(userId: string, jobId?: string | null): SpeechBlockCreateInput {
+    const normalizedJobId = jobId ?? undefined;
     return {
       userId,
-      jobId: jobId ?? null,
+      ...(normalizedJobId && { jobId: normalizedJobId }),
       elevatorPitch: '',
       careerStory: '',
       whyMe: '',
