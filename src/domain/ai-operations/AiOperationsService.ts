@@ -18,6 +18,8 @@ import type { GeneratedCompanyCanvas, GeneratedCompanyCanvasInput } from './Comp
 import { isGeneratedCompanyCanvas } from './CompanyCanvasResult';
 import type { MatchingSummaryInput, MatchingSummaryResult } from './MatchingSummaryResult';
 import { isMatchingSummaryResult } from './MatchingSummaryResult';
+import type { SpeechInput, SpeechResult } from './SpeechResult';
+import { isSpeechResult } from './SpeechResult';
 
 type AnalyzeCompanyMock =
   | CompanyAnalysisResult
@@ -28,6 +30,7 @@ type CanvasMock =
 type MatchingSummaryMock =
   | MatchingSummaryResult
   | ((input: MatchingSummaryInput) => MatchingSummaryResult);
+type SpeechMock = SpeechResult | ((input: SpeechInput) => SpeechResult);
 
 function cloneResult<T>(value: T): T {
   if (typeof structuredClone === 'function') {
@@ -48,9 +51,14 @@ function resolveAiMock(
   key: 'generateMatchingSummary',
   input: MatchingSummaryInput
 ): MatchingSummaryResult | null;
+function resolveAiMock(key: 'generateSpeech', input: SpeechInput): SpeechResult | null;
 function resolveAiMock(
-  key: 'analyzeCompanyInfo' | 'generateCompanyCanvas' | 'generateMatchingSummary',
-  input: AnalyzeCompanyInfoInput | GeneratedCompanyCanvasInput | MatchingSummaryInput
+  key: 'analyzeCompanyInfo' | 'generateCompanyCanvas' | 'generateMatchingSummary' | 'generateSpeech',
+  input:
+    | AnalyzeCompanyInfoInput
+    | GeneratedCompanyCanvasInput
+    | MatchingSummaryInput
+    | SpeechInput
 ) {
   if (typeof window === 'undefined' || !window.__AI_OPERATION_MOCKS__) {
     return null;
@@ -392,6 +400,23 @@ export class AiOperationsService {
     }
     return result;
   }
+
+  async generateSpeech(input: SpeechInput): Promise<SpeechResult> {
+    if (!input?.profile?.fullName) {
+      throw new Error('User profile with fullName is required');
+    }
+
+    const mocked = resolveAiMock('generateSpeech', input);
+    if (mocked) {
+      return mocked;
+    }
+
+    const result = await this.repo.generateSpeech(input);
+    if (!isSpeechResult(result)) {
+      throw new Error('Invalid speech generation result');
+    }
+    return result;
+  }
 }
 
 declare global {
@@ -400,6 +425,7 @@ declare global {
       analyzeCompanyInfo?: AnalyzeCompanyMock;
       generateCompanyCanvas?: CanvasMock;
       generateMatchingSummary?: MatchingSummaryMock;
+      generateSpeech?: SpeechMock;
     };
   }
 }

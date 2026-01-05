@@ -11,6 +11,7 @@ import type { GenerateCvInput } from '@/domain/ai-operations/types/generateCv';
 import type { CompanyAnalysisResult } from '@/domain/ai-operations/CompanyAnalysis';
 import type { GeneratedCompanyCanvas } from '@/domain/ai-operations/CompanyCanvasResult';
 import type { MatchingSummaryResult } from '@/domain/ai-operations/MatchingSummaryResult';
+import type { SpeechResult } from '@/domain/ai-operations/SpeechResult';
 
 // Mock the repository
 vi.mock('@/domain/ai-operations/AiOperationsRepository');
@@ -27,6 +28,7 @@ describe('AiOperationsService', () => {
     analyzeCompanyInfo: ReturnType<typeof vi.fn>;
     generateCompanyCanvas: ReturnType<typeof vi.fn>;
     generateMatchingSummary: ReturnType<typeof vi.fn>;
+    generateSpeech: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -41,6 +43,7 @@ describe('AiOperationsService', () => {
       analyzeCompanyInfo: vi.fn(),
       generateCompanyCanvas: vi.fn(),
       generateMatchingSummary: vi.fn(),
+      generateSpeech: vi.fn(),
     };
 
     // Create service with mocked repo
@@ -688,6 +691,42 @@ describe('AiOperationsService', () => {
 
       await expect(service.generateMatchingSummary(validInput as never)).rejects.toThrow(
         'Invalid matching summary result'
+      );
+    });
+  });
+
+  describe('generateSpeech', () => {
+    const validInput = {
+      profile: { fullName: 'Casey Candidate' },
+      experiences: [],
+    };
+
+    it('should generate speech successfully', async () => {
+      const speechResult: SpeechResult = {
+        elevatorPitch: 'Pitch',
+        careerStory: 'Story',
+        whyMe: 'Why me',
+      };
+      mockRepo.generateSpeech.mockResolvedValue(speechResult);
+
+      const result = await service.generateSpeech(validInput as never);
+
+      expect(result).toEqual(speechResult);
+      expect(mockRepo.generateSpeech).toHaveBeenCalledWith(validInput);
+    });
+
+    it('should throw if profile fullName missing', async () => {
+      await expect(service.generateSpeech({ profile: {}, experiences: [] } as never)).rejects.toThrow(
+        'User profile with fullName is required'
+      );
+      expect(mockRepo.generateSpeech).not.toHaveBeenCalled();
+    });
+
+    it('should throw if output is invalid', async () => {
+      mockRepo.generateSpeech.mockResolvedValue({ invalid: true });
+
+      await expect(service.generateSpeech(validInput as never)).rejects.toThrow(
+        'Invalid speech generation result'
       );
     });
   });

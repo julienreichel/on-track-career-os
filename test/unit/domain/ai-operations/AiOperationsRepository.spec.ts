@@ -30,6 +30,7 @@ describe('AiOperationsRepository', () => {
     analyzeCompanyInfo: ReturnType<typeof vi.fn>;
     generateCompanyCanvas: ReturnType<typeof vi.fn>;
     generateMatchingSummary: ReturnType<typeof vi.fn>;
+    generateSpeech: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -45,6 +46,7 @@ describe('AiOperationsRepository', () => {
       analyzeCompanyInfo: vi.fn(),
       generateCompanyCanvas: vi.fn(),
       generateMatchingSummary: vi.fn(),
+      generateSpeech: vi.fn(),
     };
 
     // Inject the mocks via constructor (dependency injection)
@@ -553,6 +555,56 @@ describe('AiOperationsRepository', () => {
       });
 
       await expect(repository.generateMatchingSummary(matchingInput as never)).rejects.toThrow(
+        'AI operation returned no data'
+      );
+    });
+  });
+
+  describe('generateSpeech', () => {
+    const speechInput = {
+      profile: { fullName: 'Casey Candidate' },
+      experiences: [],
+    };
+
+    const speechResponse = {
+      elevatorPitch: 'Pitch',
+      careerStory: 'Story',
+      whyMe: 'Why me',
+    };
+
+    it('returns parsed speech blocks', async () => {
+      mockClient.generateSpeech.mockResolvedValue({
+        data: speechResponse,
+        errors: undefined,
+      });
+
+      const result = await repository.generateSpeech(speechInput as never);
+
+      expect(result).toEqual(speechResponse);
+      expect(mockClient.generateSpeech).toHaveBeenCalledWith(
+        speechInput,
+        expect.objectContaining({ authMode: 'userPool' })
+      );
+    });
+
+    it('throws when AI returns errors', async () => {
+      mockClient.generateSpeech.mockResolvedValue({
+        data: null,
+        errors: [{ message: 'bad' }],
+      });
+
+      await expect(repository.generateSpeech(speechInput as never)).rejects.toThrow(
+        'AI operation failed'
+      );
+    });
+
+    it('throws when no data returned', async () => {
+      mockClient.generateSpeech.mockResolvedValue({
+        data: null,
+        errors: undefined,
+      });
+
+      await expect(repository.generateSpeech(speechInput as never)).rejects.toThrow(
         'AI operation returned no data'
       );
     });

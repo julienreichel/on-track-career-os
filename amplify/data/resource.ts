@@ -86,6 +86,14 @@ export const generateMatchingSummaryFunction = defineFunction({
   timeoutSeconds: 60,
 });
 
+export const generateSpeechFunction = defineFunction({
+  entry: './ai-operations/generateSpeech.ts',
+  environment: {
+    MODEL_ID,
+  },
+  timeoutSeconds: 60,
+});
+
 export const schema = a
   .schema({
     // =====================================================
@@ -334,9 +342,9 @@ export const schema = a
 
     SpeechBlock: a
       .model({
-        elevatorPitch: a.string(),
-        careerStory: a.string(),
-        whyMe: a.string(),
+        elevatorPitch: a.string().required(),
+        careerStory: a.string().required(),
+        whyMe: a.string().required(),
 
         userId: a.id().required(),
         user: a.belongsTo('UserProfile', 'userId'),
@@ -485,6 +493,15 @@ export const schema = a
       kpiSuggestions: a.string().array(),
     }),
 
+    SpeechStoryType: a.customType({
+      title: a.string(),
+      situation: a.string(),
+      task: a.string(),
+      action: a.string(),
+      result: a.string(),
+      achievements: a.string().array(),
+    }),
+
     UserType: a.customType({
       profile: a.ref('ProfileType').required(),
       personalCanvas: a.ref('PersonalCanvasType'),
@@ -541,6 +558,25 @@ export const schema = a
       )
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateMatchingSummaryFunction)),
+
+    generateSpeech: a
+      .query()
+      .arguments({
+        profile: a.ref('ProfileType').required(),
+        experiences: a.ref('ExperienceType').array().required(),
+        stories: a.ref('SpeechStoryType').array(),
+        personalCanvas: a.ref('PersonalCanvasType'),
+        jobDescription: a.ref('JobType'),
+      })
+      .returns(
+        a.customType({
+          elevatorPitch: a.string().required(),
+          careerStory: a.string().required(),
+          whyMe: a.string().required(),
+        })
+      )
+      .authorization((allow) => [allow.authenticated()])
+      .handler(a.handler.function(generateSpeechFunction)),
 
     // =====================================================
     // UTILITY FUNCTIONS (Custom Queries)

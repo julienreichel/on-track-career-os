@@ -9,6 +9,7 @@ import type { ParsedJobDescription } from './ParsedJobDescription';
 import type { AnalyzeCompanyInfoInput, CompanyAnalysisResult } from './CompanyAnalysis';
 import type { GeneratedCompanyCanvas, GeneratedCompanyCanvasInput } from './CompanyCanvasResult';
 import type { MatchingSummaryInput, MatchingSummaryResult } from './MatchingSummaryResult';
+import type { SpeechInput, SpeechResult } from './SpeechResult';
 
 /**
  * Repository interface for AI operations
@@ -80,6 +81,11 @@ export interface IAiOperationsRepository {
    * Generate a structured matching summary between user and job
    */
   generateMatchingSummary(input: MatchingSummaryInput): Promise<MatchingSummaryResult>;
+
+  /**
+   * Generate speech blocks from user data and optional job context
+   */
+  generateSpeech(input: SpeechInput): Promise<SpeechResult>;
 }
 
 /**
@@ -152,6 +158,11 @@ export type AmplifyAiOperations = {
 
   generateMatchingSummary: (
     input: MatchingSummaryInput,
+    options?: Record<string, unknown>
+  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
+
+  generateSpeech: (
+    input: SpeechInput,
     options?: Record<string, unknown>
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 
@@ -397,5 +408,19 @@ export class AiOperationsRepository implements IAiOperationsRepository {
 
     // With a.ref() types, data comes back properly typed
     return data as MatchingSummaryResult;
+  }
+
+  async generateSpeech(input: SpeechInput): Promise<SpeechResult> {
+    const { data, errors } = await this.client.generateSpeech(input, gqlOptions());
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    return data as SpeechResult;
   }
 }

@@ -1004,13 +1004,13 @@ Return ONLY valid JSON.
 Use the following data to create personal speech material:
 
 PROFILE:
-{{userProfile}}
+{{profile}}
 
 STAR STORIES:
 {{stories}}
 
 PERSONAL CANVAS:
-{{canvas}}
+{{personalCanvas}}
 
 EXPERIENCE SUMMARY:
 {{experiences}}
@@ -1031,7 +1031,7 @@ Return JSON with:
   "profile": {},
   "experiences": [],
   "stories": [],
-  "canvas": {},
+  "personalCanvas": {},
   "jobDescription?": {}
 }
 ```
