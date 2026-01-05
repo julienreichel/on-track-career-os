@@ -122,14 +122,14 @@ test.describe('Speech Block E2E Flow', () => {
 
     const elevatorPitchTextarea = page.getByTestId('speech-textarea-elevator-pitch');
 
-    // Get current value and edit it
-    const originalValue = await elevatorPitchTextarea.inputValue();
-    const editedText = `${originalValue}\n\nEdited at ${Date.now()}`;
-    
-    // Clear and fill to ensure complete replacement
+    // Create edited text that respects the maxlength constraint (320 chars)
+    const timestamp = Date.now();
+    const editedText = `Senior Software Engineer with cloud expertise and team leadership. Edited at ${timestamp}`;
+
+    // Clear and fill with new content
     await elevatorPitchTextarea.clear();
     await elevatorPitchTextarea.fill(editedText);
-    
+
     // Verify the edit took effect before saving
     await expect(elevatorPitchTextarea).toHaveValue(editedText);
 
@@ -143,7 +143,9 @@ test.describe('Speech Block E2E Flow', () => {
 
     // Wait for success toast and let it disappear to ensure save completed
     await expect(page.getByText('Speech saved', { exact: true })).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText('Speech saved', { exact: true })).not.toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Speech saved', { exact: true })).not.toBeVisible({
+      timeout: 10000,
+    });
 
     // Navigate away and back to verify persistence
     await page.goto('/speech');
@@ -151,14 +153,13 @@ test.describe('Speech Block E2E Flow', () => {
 
     await page.goto(speechUrl);
     await page.waitForLoadState('networkidle');
-    
+
     // Wait for form to fully load before checking content
     await expect(elevatorPitchTextarea).toBeVisible();
-    
+
     // Use retry logic for flaky persistence check
     await expect(async () => {
       const persistedValue = await elevatorPitchTextarea.inputValue();
-      expect(persistedValue).toContain('Edited at');
       expect(persistedValue).toBe(editedText);
     }).toPass({ timeout: 10000 });
 

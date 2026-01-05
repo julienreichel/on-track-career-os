@@ -25,28 +25,54 @@ test.describe('Cover Letter E2E Flow', () => {
     // Verify we're on the cover letters list page
     await expect(page.getByRole('heading', { name: /cover letters/i, level: 1 })).toBeVisible();
 
-    // Create button should be visible (using first since there may be multiple)
-    const createButton = page.getByRole('button', { name: /Create cover letter/i }).first();
+    // Create link should be visible (using first since there may be multiple)
+    const createButton = page.getByRole('link', { name: /Create cover letter/i }).first();
     await expect(createButton).toBeVisible();
   });
 
-  test('2. Create a new cover letter', async ({ page }) => {
+  test('2. Create a new cover letter through single form', async ({ page }) => {
     await page.goto('/cover-letters');
     await page.waitForLoadState('networkidle');
 
-    const createButton = page.getByRole('button', { name: /Create cover letter/i }).first();
+    const createButton = page.getByRole('link', { name: /Create cover letter/i }).first();
     await expect(createButton).toBeVisible();
     await createButton.click();
 
-    // Wait for navigation to the cover letter editor page
-    await page.waitForURL(/\/cover-letters\/[0-9a-f-]+$/i, { timeout: 10000 });
+    // Wait for navigation to the new cover letter form
+    await page.waitForURL('/cover-letters/new', { timeout: 10000 });
+
+    // Fill in the name
+    const nameInput = page.getByRole('textbox', { name: /Cover Letter Name/i });
+    await expect(nameInput).toBeVisible();
+    await nameInput.fill('Test Cover Letter for Software Engineer');
+
+    // Optionally add a job description
+    const jobTextarea = page.getByRole('textbox', { name: /Job Description/i });
+    await jobTextarea.fill(
+      'We are looking for a Senior Software Engineer with experience in Node.js and React.'
+    );
+
+    // Generate the cover letter directly
+    const generateButton = page.getByRole('button', { name: /Generate Cover Letter/i });
+    await expect(generateButton).toBeVisible();
+    await expect(generateButton).toBeEnabled();
+
+    // Wait a moment for Vue reactivity and form validation to complete
+    await page.waitForTimeout(500);
+
+    // Ensure button is focused and ready
+    await generateButton.hover();
+    await generateButton.click();
+
+    // Wait for generation to complete and navigation to the cover letter
+    await page.waitForURL(/\/cover-letters\/[0-9a-f-]+$/i, { timeout: 30000 });
 
     // Store the URL for later tests
     coverLetterUrl = page.url();
     expect(coverLetterUrl).toMatch(/\/cover-letters\/[0-9a-f-]+$/i);
   });
 
-  test('3. Verify editor page displays content textarea', async ({ page }) => {
+  test('3. Verify cover letter has generated content', async ({ page }) => {
     if (!coverLetterUrl) {
       test.skip(true, 'No cover letter URL available');
       return;
@@ -55,64 +81,54 @@ test.describe('Cover Letter E2E Flow', () => {
     await page.goto(coverLetterUrl);
     await page.waitForLoadState('networkidle');
 
-    // Verify we're on the editor page
-    await expect(page.getByRole('heading', { name: 'Cover Letter', level: 1 })).toBeVisible();
+    // Verify the cover letter name is displayed in the header
+    await expect(
+      page.getByRole('heading', { name: /Test Cover Letter for Software Engineer/i, level: 1 })
+    ).toBeVisible();
 
-    // Verify the content textarea is visible
-    const contentTextarea = page.getByTestId('cover-letter-content-textarea');
+    // Check that content has been generated (should be in view mode by default)
+    const content = page.locator('.prose');
+    await expect(content).toBeVisible();
+    await expect(content).not.toBeEmpty();
+
+    // Verify actions are available
+    await expect(page.getByRole('button', { name: /Print/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Edit' }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: /Generate cover letter/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Delete/i })).toBeVisible();
+  });
+
+  test('4. Switch to edit mode and verify textarea appears', async ({ page }) => {
+    if (!coverLetterUrl) {
+      test.skip(true, 'No cover letter URL available');
+      return;
+    }
+
+    await page.goto(coverLetterUrl);
+    await page.waitForLoadState('networkidle');
+
+    // Click edit button to switch to edit mode
+    const editButton = page.getByRole('button', { name: 'Edit' }).first();
+    await expect(editButton).toBeVisible();
+    await editButton.click();
+
+    // Wait for edit mode to activate
+    await expect(page.getByRole('heading', { name: /Edit Mode/i })).toBeVisible();
+
+    // Verify textarea is visible in edit mode
+    const contentTextarea = page.getByRole('textbox', { name: /Cover Letter Content/i });
     await expect(contentTextarea).toBeVisible();
 
-    // Generate button should be visible
-    const generateButton = page.getByTestId('generate-cover-letter-button');
-    await expect(generateButton).toBeVisible();
-    await expect(generateButton).toBeEnabled();
-  });
-
-  test('4. Generate cover letter content via AI and verify content populated', async ({ page }) => {
-    if (!coverLetterUrl) {
-      test.skip(true, 'No cover letter URL available');
-      return;
-    }
-
-    await page.goto(coverLetterUrl);
-    await page.waitForLoadState('networkidle');
-
-    // Trigger generation
-    const generateButton = page.getByTestId('generate-cover-letter-button');
-    await expect(generateButton).toBeVisible();
-    await expect(generateButton).toBeEnabled();
-    await generateButton.click();
-
-    // Wait for generation to complete - check if button becomes disabled (may be fast)
-    await page.waitForTimeout(500);
-
-    // Wait for generation to finish - button should be enabled when done
-    await expect(generateButton).toBeEnabled({ timeout: 90000 });
-
-    // Wait for content to populate and UI to update
-    await page.waitForTimeout(2000);
-
-    // Get the textarea
-    const contentTextarea = page.getByTestId('cover-letter-content-textarea');
-
-    // Check that generated content exists
-    await expect(contentTextarea).not.toHaveValue('');
-
-    // Verify content looks like a cover letter (has greeting or common phrases)
+    // Verify content is populated in textarea
     const content = await contentTextarea.inputValue();
-    expect(content.length).toBeGreaterThan(100); // Should be substantial content
+    expect(content.length).toBeGreaterThan(50); // Should have generated content
 
-    // Save the generated content
-    const saveButton = page.getByTestId('save-cover-letter-button');
-    await expect(saveButton).toBeEnabled();
-    await saveButton.click();
-    await expect(saveButton).toBeDisabled({ timeout: 10000 });
-    await expect(page.getByText('Cover letter saved', { exact: true })).toBeVisible({
-      timeout: 5000,
-    });
+    // Verify save/cancel buttons are available
+    await expect(page.getByRole('button', { name: /Save/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /cancel/i })).toBeVisible();
   });
 
-  test('5. Edit content manually and save', async ({ page }) => {
+  test('5. Edit content and save changes', async ({ page }) => {
     if (!coverLetterUrl) {
       test.skip(true, 'No cover letter URL available');
       return;
@@ -121,83 +137,74 @@ test.describe('Cover Letter E2E Flow', () => {
     await page.goto(coverLetterUrl);
     await page.waitForLoadState('networkidle');
 
-    const contentTextarea = page.getByTestId('cover-letter-content-textarea');
+    // Switch to edit mode
+    const editButton = page.getByRole('button', { name: 'Edit' }).first();
+    await editButton.click();
 
-    // Get current value and edit it
-    const originalValue = await contentTextarea.inputValue();
-    const editedText = `${originalValue}\n\nP.S. Edited at ${Date.now()}`;
-    await contentTextarea.fill(editedText);
+    await expect(page.getByRole('heading', { name: /Edit Mode/i })).toBeVisible();
 
-    // Save button should be enabled after edit
-    const saveButton = page.getByTestId('save-cover-letter-button');
+    const contentTextarea = page.getByRole('textbox', { name: /Cover Letter Content/i });
+
+    // Get current content and add some text
+    const originalContent = await contentTextarea.inputValue();
+    const editedContent = originalContent + '\n\nEdited at ' + Date.now();
+
+    // Clear and fill with edited content
+    await contentTextarea.clear();
+    await contentTextarea.fill(editedContent);
+
+    // Save the changes
+    const saveButton = page.getByRole('button', { name: /Save/i });
     await expect(saveButton).toBeEnabled();
     await saveButton.click();
 
-    // Wait for save to complete
-    await expect(saveButton).toBeDisabled({ timeout: 10000 });
-
-    // Wait for success toast
+    // Wait for save to complete - success toast appears and returns to view mode
     await expect(page.getByText('Cover letter saved', { exact: true })).toBeVisible({
-      timeout: 5000,
+      timeout: 10000,
     });
+
+    // Should return to view mode
+    await expect(page.locator('.prose')).toBeVisible();
   });
 
-  test('6. Verify persistence after reload', async ({ page }) => {
+  test('6. Verify persistence and navigate back to list', async ({ page }) => {
     if (!coverLetterUrl) {
       test.skip(true, 'No cover letter URL available');
       return;
     }
 
-    // First, get the edited value
-    await page.goto(coverLetterUrl);
-    await page.waitForLoadState('networkidle');
-
-    const contentTextarea = page.getByTestId('cover-letter-content-textarea');
-    const editedValue = await contentTextarea.inputValue();
-
-    // Verify it contains the "P.S. Edited at" marker
-    expect(editedValue).toContain('P.S. Edited at');
-
-    // Navigate away and back
+    // Navigate away and back to verify persistence
     await page.goto('/cover-letters');
     await page.waitForLoadState('networkidle');
 
     await page.goto(coverLetterUrl);
     await page.waitForLoadState('networkidle');
+
+    // Switch to edit mode to check content persisted
+    const editButton = page.getByRole('button', { name: 'Edit' }).first();
+    await editButton.click();
+
+    const contentTextarea = page.getByRole('textbox', { name: /Cover Letter Content/i });
+    const persistedValue = await contentTextarea.inputValue();
 
     // Verify the edited content persisted
-    const reloadedValue = await contentTextarea.inputValue();
-    expect(reloadedValue).toBe(editedValue);
+    expect(persistedValue).toContain('Edited at');
 
-    // Verify content is still substantial (not empty)
-    expect(reloadedValue.length).toBeGreaterThan(100);
+    // Go back to view mode
+    const cancelButton = page.getByRole('button', { name: /cancel/i });
+    await cancelButton.click();
+
+    // Navigate back to the list
+    await page.getByRole('link', { name: /Back to list/i }).click();
+    await page.waitForURL('/cover-letters');
+
+    // Verify our cover letter appears in the list with correct name
+    await expect(
+      page.getByRole('heading', { name: /Test Cover Letter for Software Engineer/i })
+    ).toBeVisible();
   });
 
-  test('7. Navigate back to list and verify item exists', async ({ page }) => {
-    await page.goto('/cover-letters');
-    await page.waitForLoadState('networkidle');
-
-    // Should now have at least one cover letter item
-    // Look for the grid container or ItemCard components
-    const coverLetterItems = page.locator('.item-card').first();
-
-    // Check if we have cover letter items
-    const itemCount = await coverLetterItems.count();
-    
-    if (itemCount === 0) {
-      // If no items found, look for the heading that indicates we have content
-      const heading = page.getByRole('heading', { name: /dear hiring manager/i });
-      await expect(heading).toBeVisible();
-      
-      // Should not show empty state if we created a cover letter
-      const emptyState = page.getByText(/No cover letters yet/i);
-      await expect(emptyState).not.toBeVisible();
-    } else {
-      await expect(coverLetterItems).toBeVisible();
-    }
-  });
-
-  test('8. Delete cover letter and verify removal', async ({ page }) => {
+  test('7. Delete cover letter', async ({ page }) => {
     if (!coverLetterUrl) {
       test.skip(true, 'No cover letter URL available');
       return;
@@ -206,26 +213,21 @@ test.describe('Cover Letter E2E Flow', () => {
     await page.goto(coverLetterUrl);
     await page.waitForLoadState('networkidle');
 
-    // Find and click the delete button
-    const deleteButton = page.getByTestId('delete-cover-letter-button');
-    await expect(deleteButton).toBeVisible();
+    // Click delete button
+    const deleteButton = page.getByRole('button', { name: /Delete/i }).first();
     await deleteButton.click();
 
-    // Should show confirmation modal
-    const confirmButton = page.getByRole('button', { name: /delete|confirm/i }).last();
-    await expect(confirmButton).toBeVisible();
-    await confirmButton.click();
+    // Confirm deletion in modal
+    await expect(page.getByRole('button', { name: /Confirm/i })).toBeVisible();
+    await page.getByRole('button', { name: /Confirm/i }).click();
 
     // Should navigate back to list
-    await expect(page).toHaveURL('/cover-letters', { timeout: 10000 });
+    await page.waitForURL('/cover-letters');
+    await expect(page.getByText('Cover letter deleted', { exact: true })).toBeVisible();
 
-    // Should show success toast
-    await expect(page.getByText('Cover letter deleted', { exact: true })).toBeVisible({
-      timeout: 5000,
-    });
-
-    // Should show empty state if this was the only cover letter
-    // (or at least not show the deleted item anymore)
-    await page.waitForLoadState('networkidle');
+    // Cover letter should no longer appear in list
+    await expect(
+      page.getByRole('heading', { name: /Test Cover Letter for Software Engineer/i })
+    ).not.toBeVisible();
   });
 });

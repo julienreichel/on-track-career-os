@@ -17,19 +17,17 @@ const coverLetterId = computed(() => route.params.id as string);
 const { item, loading, error, load, save, remove } = useCoverLetter(coverLetterId.value);
 const engine = useCoverLetterEngine();
 
-const formState = ref({
-  content: '',
-});
-const originalState = ref({ ...formState.value });
+// View/Edit state
+const isEditing = ref(false);
+const editContent = ref('');
+const originalContent = ref('');
 const saving = ref(false);
 const cancelModalOpen = ref(false);
 const deleteModalOpen = ref(false);
 const deleting = ref(false);
 const isGenerating = computed(() => engine.isGenerating.value);
 
-const hasChanges = computed(() => formState.value.content !== originalState.value.content);
-
-const hasContent = computed(() => Boolean(formState.value.content.trim()));
+const hasChanges = computed(() => editContent.value !== originalContent.value);
 
 const headerLinks = computed<PageHeaderLink[]>(() => [
   {
@@ -37,18 +35,38 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     icon: 'i-heroicons-arrow-left',
     to: '/cover-letters',
   },
-  {
-    label: isGenerating.value
-      ? t('coverLetter.editor.actions.generating')
-      : hasContent.value
-        ? t('coverLetter.editor.actions.regenerate')
-        : t('coverLetter.editor.actions.generate'),
-    icon: 'i-heroicons-sparkles',
-    color: 'primary',
-    disabled: loading.value || saving.value || isGenerating.value || !engine.hasProfile.value,
-    onClick: handleGenerate,
-    'data-testid': 'generate-cover-letter-button',
-  },
+  ...(isEditing.value
+    ? [
+        // Edit mode actions
+      ]
+    : [
+        // View mode actions
+        {
+          label: t('coverLetter.display.actions.print'),
+          icon: 'i-heroicons-printer',
+          color: 'gray',
+          onClick: handlePrint,
+          'data-testid': 'print-cover-letter-button',
+        },
+        {
+          label: t('coverLetter.display.actions.edit'),
+          icon: 'i-heroicons-pencil',
+          color: 'primary',
+          disabled: loading.value,
+          onClick: toggleEdit,
+          'data-testid': 'edit-cover-letter-button',
+        },
+        {
+          label: isGenerating.value
+            ? t('coverLetter.display.actions.generating')
+            : t('coverLetter.display.actions.regenerate'),
+          icon: 'i-heroicons-sparkles',
+          color: 'primary',
+          disabled: loading.value || isGenerating.value || !engine.hasProfile.value,
+          onClick: handleGenerate,
+          'data-testid': 'generate-cover-letter-button',
+        },
+      ]),
   {
     label: t('common.delete'),
     icon: 'i-heroicons-trash',
@@ -59,15 +77,18 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
   },
 ]);
 
-const applyGeneratedContent = (content: string) => {
-  formState.value.content = content;
-};
-
-const resetForm = () => {
-  formState.value = {
-    content: item.value?.content ?? '',
-  };
-  originalState.value = { ...formState.value };
+const toggleEdit = () => {
+  if (isEditing.value) {
+    if (hasChanges.value) {
+      cancelModalOpen.value = true;
+    } else {
+      isEditing.value = false;
+    }
+  } else {
+    editContent.value = item.value?.content || '';
+    originalContent.value = editContent.value;
+    isEditing.value = true;
+  }
 };
 
 const handleSave = async () => {
@@ -76,13 +97,14 @@ const handleSave = async () => {
   try {
     const updated = await save({
       id: item.value.id,
-      content: formState.value.content,
+      content: editContent.value,
     });
     if (updated) {
-      toast.add({ title: t('coverLetter.editor.toast.saved'), color: 'primary' });
-      originalState.value = { ...formState.value };
+      toast.add({ title: t('coverLetter.display.toast.saved'), color: 'primary' });
+      originalContent.value = editContent.value;
+      isEditing.value = false;
     } else {
-      toast.add({ title: t('coverLetter.editor.toast.saveFailed'), color: 'error' });
+      toast.add({ title: t('coverLetter.display.toast.saveFailed'), color: 'error' });
     }
   } finally {
     saving.value = false;
@@ -93,13 +115,24 @@ const handleGenerate = async () => {
   try {
     await engine.load();
     const result = await engine.generate();
-    console.log('[coverLetterEditor] Generate result:', result);
-    applyGeneratedContent(result);
-    toast.add({ title: t('coverLetter.editor.toast.generated'), color: 'primary' });
+    console.log('[coverLetterDisplay] Generate result:', result);
+
+    if (isEditing.value) {
+      editContent.value = result;
+    } else {
+      // Apply directly and save
+      const updated = await save({
+        id: item.value!.id,
+        content: result,
+      });
+      if (updated) {
+        toast.add({ title: t('coverLetter.display.toast.generated'), color: 'primary' });
+      }
+    }
   } catch (err) {
-    console.error('[coverLetterEditor] Failed to generate cover letter', err);
+    console.error('[coverLetterDisplay] Failed to generate cover letter', err);
     toast.add({
-      title: t('coverLetter.editor.toast.generateFailed'),
+      title: t('coverLetter.display.toast.generateFailed'),
       color: 'error',
       description: err instanceof Error ? err.message : 'Unknown error',
     });
@@ -109,12 +142,19 @@ const handleGenerate = async () => {
 const handleCancel = () => {
   if (hasChanges.value) {
     cancelModalOpen.value = true;
+  } else {
+    isEditing.value = false;
   }
 };
 
 const handleDiscard = () => {
-  resetForm();
+  editContent.value = originalContent.value;
+  isEditing.value = false;
   cancelModalOpen.value = false;
+};
+
+const handlePrint = () => {
+  window.print();
 };
 
 const handleDelete = async () => {
@@ -123,14 +163,14 @@ const handleDelete = async () => {
   try {
     const success = await remove();
     if (success) {
-      toast.add({ title: t('coverLetter.editor.toast.deleted'), color: 'primary' });
+      toast.add({ title: t('coverLetter.display.toast.deleted'), color: 'primary' });
       await router.push('/cover-letters');
     } else {
-      toast.add({ title: t('coverLetter.editor.toast.deleteFailed'), color: 'error' });
+      toast.add({ title: t('coverLetter.display.toast.deleteFailed'), color: 'error' });
     }
   } catch (err) {
-    console.error('[coverLetterEditor] Delete failed', err);
-    toast.add({ title: t('coverLetter.editor.toast.deleteFailed'), color: 'error' });
+    console.error('[coverLetterDisplay] Delete failed', err);
+    toast.add({ title: t('coverLetter.display.toast.deleteFailed'), color: 'error' });
   } finally {
     deleting.value = false;
     deleteModalOpen.value = false;
@@ -138,15 +178,15 @@ const handleDelete = async () => {
 };
 
 onMounted(async () => {
-  route.meta.breadcrumbLabel = t('coverLetter.editor.title');
+  route.meta.breadcrumbLabel = t('coverLetter.display.title');
   await engine.load();
   await load();
-  resetForm();
 });
 
 watch(item, (newValue) => {
-  if (newValue && !hasChanges.value) {
-    resetForm();
+  if (newValue && !isEditing.value) {
+    editContent.value = newValue.content || '';
+    originalContent.value = editContent.value;
   }
 });
 </script>
@@ -156,8 +196,8 @@ watch(item, (newValue) => {
     <UContainer>
       <UPage>
         <UPageHeader
-          :title="t('coverLetter.editor.title')"
-          :description="t('coverLetter.editor.description')"
+          :title="item?.name || t('coverLetter.display.untitled')"
+          :description="t('coverLetter.display.description')"
           :links="headerLinks"
         />
 
@@ -167,7 +207,7 @@ watch(item, (newValue) => {
             icon="i-heroicons-exclamation-triangle"
             color="error"
             variant="soft"
-            :title="t('coverLetter.editor.states.errorTitle')"
+            :title="t('coverLetter.display.states.errorTitle')"
             :description="error"
             class="mb-6"
             :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
@@ -179,7 +219,7 @@ watch(item, (newValue) => {
             icon="i-heroicons-exclamation-triangle"
             color="warning"
             variant="soft"
-            :title="t('coverLetter.editor.states.generateErrorTitle')"
+            :title="t('coverLetter.display.states.generateErrorTitle')"
             :description="engine.error.value"
             class="mb-6"
             :close-button="{
@@ -205,30 +245,38 @@ watch(item, (newValue) => {
             <USkeleton class="mt-4 h-96 w-full" />
           </UCard>
 
-          <template v-else-if="item">
+          <!-- Edit Mode -->
+          <template v-else-if="item && isEditing">
             <UCard>
-              <UFormField
-                :label="t('coverLetter.editor.content.label')"
-                name="content"
-                class="mb-4"
-              >
-                <UTextarea
-                  v-model="formState.content"
-                  :placeholder="t('coverLetter.editor.content.placeholder')"
-                  :disabled="loading || saving"
-                  :rows="20"
-                  autoresize
-                  data-testid="cover-letter-content-textarea"
-                />
-              </UFormField>
+              <div class="space-y-4">
+                <div>
+                  <h3 class="text-lg font-semibold mb-2">
+                    {{ t('coverLetter.display.editMode') }}
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ t('coverLetter.display.editModeDescription') }}
+                  </p>
+                </div>
+
+                <UFormField :label="t('coverLetter.display.contentLabel')" required>
+                  <UTextarea
+                    v-model="editContent"
+                    :rows="25"
+                    :placeholder="t('coverLetter.display.contentPlaceholder')"
+                    class="w-full"
+                    data-testid="cover-letter-content-textarea"
+                  />
+                </UFormField>
+              </div>
             </UCard>
 
-            <div class="mt-6 flex flex-wrap justify-end gap-3">
+            <!-- Edit Mode Actions -->
+            <div class="mt-6 flex justify-end gap-3">
               <UButton
                 color="neutral"
                 variant="ghost"
                 :label="t('common.cancel')"
-                :disabled="!hasChanges || loading || saving"
+                :disabled="loading || saving"
                 @click="handleCancel"
               />
               <UButton
@@ -242,13 +290,25 @@ watch(item, (newValue) => {
             </div>
           </template>
 
+          <!-- View Mode -->
+          <template v-else-if="item">
+            <UCard>
+              <div class="prose prose-gray max-w-none dark:prose-invert">
+                <div v-if="item.content" class="whitespace-pre-wrap">{{ item.content }}</div>
+                <div v-else class="text-gray-500 dark:text-gray-400 italic">
+                  {{ t('coverLetter.display.emptyContent') }}
+                </div>
+              </div>
+            </UCard>
+          </template>
+
           <UCard v-else-if="!loading && !item">
             <UAlert
               icon="i-heroicons-exclamation-circle"
               color="warning"
               variant="soft"
-              :title="t('coverLetter.editor.states.notFound')"
-              :description="t('coverLetter.editor.states.notFoundDescription')"
+              :title="t('coverLetter.display.states.notFound')"
+              :description="t('coverLetter.display.states.notFoundDescription')"
             />
           </UCard>
         </UPageBody>
@@ -263,8 +323,8 @@ watch(item, (newValue) => {
 
     <ConfirmModal
       v-model:open="deleteModalOpen"
-      :title="t('coverLetter.editor.delete.title')"
-      :description="t('coverLetter.editor.delete.description')"
+      :title="t('coverLetter.display.delete.title')"
+      :description="t('coverLetter.display.delete.description')"
       :loading="deleting"
       @confirm="handleDelete"
       @cancel="deleteModalOpen = false"

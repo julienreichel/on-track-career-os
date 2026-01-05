@@ -321,7 +321,7 @@ export const schema = a
 
     CVDocument: a
       .model({
-        name: a.string().required(),
+        name: a.string(),
         templateId: a.string(),
         isTailored: a.boolean(),
         content: a.string(),
@@ -337,6 +337,7 @@ export const schema = a
 
     CoverLetter: a
       .model({
+        name: a.string(),
         tone: a.string(),
         content: a.string(),
 
@@ -350,6 +351,7 @@ export const schema = a
 
     SpeechBlock: a
       .model({
+        name: a.string(),
         elevatorPitch: a.string().required(),
         careerStory: a.string().required(),
         whyMe: a.string().required(),

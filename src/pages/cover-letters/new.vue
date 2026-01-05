@@ -1,0 +1,167 @@
+<template>
+  <UPage>
+    <UPageHeader
+      :title="$t('coverLetter.new.title')"
+      :description="$t('coverLetter.new.subtitle')"
+    />
+
+    <UPageBody>
+      <UCard>
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-2">
+              {{ $t('coverLetter.new.setup.title') }}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('coverLetter.new.setup.description') }}
+            </p>
+          </div>
+
+          <UFormField :label="$t('coverLetter.new.setup.nameLabel')" required>
+            <UInput
+              v-model="coverLetterName"
+              :placeholder="$t('coverLetter.new.setup.namePlaceholder')"
+              data-testid="cover-letter-name-input"
+            />
+          </UFormField>
+
+          <UFormField
+            :label="$t('coverLetter.new.setup.jobLabel')"
+            :description="$t('coverLetter.new.setup.jobDescription')"
+          >
+            <UTextarea
+              v-model="jobDescription"
+              :placeholder="$t('coverLetter.new.setup.jobPlaceholder')"
+              :rows="6"
+              data-testid="job-description-textarea"
+            />
+          </UFormField>
+
+          <!-- Error Display -->
+          <UAlert
+            v-if="generationError"
+            color="error"
+            icon="i-heroicons-exclamation-triangle"
+            :title="$t('coverLetter.new.generate.error')"
+            :description="generationError"
+            class="mb-4"
+          />
+
+          <div class="flex justify-end gap-3">
+            <UButton :label="$t('common.cancel')" variant="ghost" @click="cancel" />
+            <UButton
+              :label="$t('coverLetter.new.generate.action')"
+              icon="i-heroicons-sparkles"
+              :disabled="!coverLetterName.trim() || generating"
+              :loading="generating"
+              data-testid="generate-cover-letter-button"
+              @click="generateCoverLetter"
+            />
+          </div>
+        </div>
+      </UCard>
+    </UPageBody>
+  </UPage>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
+import { useAuthUser } from '@/composables/useAuthUser';
+import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
+import { useCoverLetterEngine } from '@/composables/useCoverLetterEngine';
+
+const { t } = useI18n();
+const router = useRouter();
+const toast = useToast();
+
+// Get current user ID from auth
+const { userId } = useAuthUser();
+
+const { createCoverLetter } = useCoverLetters();
+const engine = useCoverLetterEngine();
+
+// Form state
+const coverLetterName = ref('');
+const jobDescription = ref('');
+
+// Generation state
+const generating = ref(false);
+const generationError = ref<string | null>(null);
+
+const cancel = () => {
+  router.push({ name: 'cover-letters' });
+};
+
+const generateCoverLetter = async () => {
+  if (!coverLetterName.value.trim() || !userId.value) {
+    return;
+  }
+
+  generating.value = true;
+  generationError.value = null;
+
+  try {
+    // Load engine data
+    await engine.load();
+
+    // Generate content using the engine
+    const jobDescriptionObj = coverLetterName.value.trim()
+      ? {
+          title: coverLetterName.value.trim(),
+          roleSummary: jobDescription.value || undefined,
+        }
+      : undefined;
+
+    const content = await engine.generate(jobDescriptionObj);
+
+    if (!content) {
+      toast.add({
+        title: t('coverLetter.new.toast.generationFailed'),
+        description: engine.error.value || undefined,
+        color: 'error',
+      });
+      return;
+    }
+
+    // Create cover letter document
+    const coverLetter = await createCoverLetter({
+      name: coverLetterName.value,
+      content,
+      userId: userId.value,
+      jobId: undefined, // For now, we don't associate with a specific job
+    });
+
+    if (coverLetter) {
+      toast.add({
+        title: t('coverLetter.new.toast.created'),
+        color: 'primary',
+      });
+
+      // Navigate to the cover letter
+      await router.push({
+        name: 'cover-letters-id',
+        params: { id: coverLetter.id },
+      });
+    } else {
+      console.error(
+        '[coverLetterNew] Failed to create cover letter - createCoverLetter returned null'
+      );
+      toast.add({
+        title: t('coverLetter.new.toast.createFailed'),
+        color: 'error',
+      });
+    }
+  } catch (err) {
+    console.error('[coverLetterNew] Error generating cover letter:', err);
+    generationError.value = err instanceof Error ? err.message : 'Unknown error';
+    toast.add({
+      title: t('coverLetter.new.toast.error'),
+      color: 'error',
+    });
+  } finally {
+    generating.value = false;
+  }
+};
+</script>

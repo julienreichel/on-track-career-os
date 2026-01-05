@@ -692,6 +692,8 @@
     "confirm": "Confirm",
     "yes": "Yes",
     "no": "No",
+    "next": "Next",
+    "back": "Back",
     "stay": "Stay",
     "leave": "Leave",
     "discard": "Discard",
@@ -1169,6 +1171,8 @@
         "action": "Create cover letter"
       },
       "untitled": "Untitled cover letter",
+      "tailored": "Tailored for job",
+      "generic": "Generic letter",
       "updated": "Updated {date}",
       "updatedUnknown": "Updated date unavailable",
       "emptyPreview": "Add content to preview your cover letter here.",
@@ -1178,6 +1182,74 @@
         "deleted": "Cover letter deleted",
         "deleteFailed": "Unable to delete cover letter",
         "createFailed": "Unable to create cover letter"
+      }
+    },
+    "new": {
+      "title": "Create Cover Letter",
+      "subtitle": "Generate a professional cover letter with AI assistance",
+      "steps": {
+        "setup": "Setup",
+        "generate": "Generate"
+      },
+      "setup": {
+        "title": "Cover Letter Details",
+        "description": "Provide basic information for your cover letter",
+        "nameLabel": "Cover Letter Name",
+        "namePlaceholder": "e.g., Software Engineer at Acme Corp",
+        "jobLabel": "Job Description (Optional)",
+        "jobDescription": "Paste the job description to tailor your cover letter",
+        "jobPlaceholder": "Paste the job description here to create a tailored cover letter..."
+      },
+      "generate": {
+        "title": "Generate Cover Letter",
+        "description": "Review your settings and generate your cover letter",
+        "summary": {
+          "name": "Name",
+          "tailored": "Tailored to job"
+        },
+        "action": "Generate Cover Letter",
+        "error": "Failed to generate cover letter"
+      },
+      "toast": {
+        "created": "Cover letter created successfully!",
+        "createFailed": "Failed to create cover letter",
+        "generationFailed": "Failed to generate cover letter content",
+        "error": "An error occurred"
+      }
+    },
+    "display": {
+      "title": "Cover Letter",
+      "description": "View and edit your cover letter",
+      "untitled": "Untitled Cover Letter",
+      "editMode": "Edit Mode",
+      "editModeDescription": "Edit your cover letter content directly",
+      "contentLabel": "Cover Letter Content",
+      "contentPlaceholder": "Enter your cover letter content...",
+      "emptyContent": "No content available. Click generate to create content.",
+      "states": {
+        "errorTitle": "Unable to load cover letter",
+        "generateErrorTitle": "Unable to generate cover letter",
+        "notFound": "Cover letter not found",
+        "notFoundDescription": "We could not find that cover letter. Return to the list to create a new one."
+      },
+      "actions": {
+        "print": "Print",
+        "edit": "Edit",
+        "generate": "Generate cover letter",
+        "regenerate": "Regenerate cover letter",
+        "generating": "Generating cover letter..."
+      },
+      "delete": {
+        "title": "Delete cover letter",
+        "description": "Are you sure you want to delete this cover letter?"
+      },
+      "toast": {
+        "saved": "Cover letter saved",
+        "saveFailed": "Unable to save cover letter",
+        "generated": "Cover letter generated",
+        "generateFailed": "Unable to generate cover letter",
+        "deleted": "Cover letter deleted",
+        "deleteFailed": "Unable to delete cover letter"
       }
     },
     "editor": {

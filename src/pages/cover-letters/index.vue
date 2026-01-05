@@ -8,8 +8,7 @@
           {
             label: t('coverLetter.list.actions.create'),
             icon: 'i-heroicons-plus',
-            onClick: handleCreate,
-            disabled: creating,
+            to: { name: 'cover-letters-new' },
           },
         ]"
       />
@@ -38,7 +37,7 @@
             <UButton
               icon="i-heroicons-plus"
               :label="t('coverLetter.list.emptyState.action')"
-              @click="handleCreate"
+              :to="{ name: 'cover-letters-new' }"
             />
           </template>
         </UEmpty>
@@ -48,7 +47,7 @@
             v-for="letter in items"
             :key="letter.id"
             :title="resolveTitle(letter)"
-            :subtitle="formatUpdatedAt(letter.updatedAt)"
+            :subtitle="resolveSubtitle(letter)"
             @edit="navigateTo({ name: 'cover-letters-id', params: { id: letter.id } })"
             @delete="confirmDelete(letter)"
           >
@@ -81,20 +80,17 @@ import { useI18n } from 'vue-i18n';
 import ItemCard from '@/components/ItemCard.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
-import { CoverLetterService } from '@/domain/cover-letter/CoverLetterService';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 import { useAuthUser } from '@/composables/useAuthUser';
 
 const { t } = useI18n();
 const toast = useToast();
 const { userId, loadUserId } = useAuthUser();
-const { items, loading, error, loadAll, deleteCoverLetter, createCoverLetter } = useCoverLetters();
-const service = new CoverLetterService();
+const { items, loading, error, loadAll, deleteCoverLetter } = useCoverLetters();
 
 const deleteModalOpen = ref(false);
 const letterToDelete = ref<CoverLetter | null>(null);
 const deleting = ref(false);
-const creating = ref(false);
 const TITLE_MAX_LENGTH = 72;
 const PREVIEW_MAX_LENGTH = 140;
 
@@ -105,31 +101,6 @@ onMounted(async () => {
   }
   await loadAll({ filter: { userId: { eq: userId.value } } });
 });
-
-const handleCreate = async () => {
-  if (creating.value) return;
-  creating.value = true;
-  try {
-    if (!userId.value) {
-      await loadUserId();
-    }
-    if (!userId.value) {
-      throw new Error(t('coverLetter.list.toast.createFailed'));
-    }
-    const draft = service.createDraftCoverLetter(userId.value);
-    const created = await createCoverLetter(draft);
-    if (created?.id) {
-      await navigateTo({ name: 'cover-letters-id', params: { id: created.id } });
-    } else {
-      toast.add({ title: t('coverLetter.list.toast.createFailed'), color: 'error' });
-    }
-  } catch (err) {
-    console.error('[coverLetterList] Failed to create cover letter', err);
-    toast.add({ title: t('coverLetter.list.toast.createFailed'), color: 'error' });
-  } finally {
-    creating.value = false;
-  }
-};
 
 const confirmDelete = (letter: CoverLetter) => {
   letterToDelete.value = letter;
@@ -154,12 +125,19 @@ const handleDelete = async () => {
 };
 
 const resolveTitle = (letter: CoverLetter): string => {
+  // Use the name field if available, fallback to content-based title
+  if (letter.name?.trim()) {
+    return letter.name.length > TITLE_MAX_LENGTH
+      ? letter.name.substring(0, TITLE_MAX_LENGTH) + '...'
+      : letter.name;
+  }
+
+  // Fallback to old logic for letters created before name field
   const content = letter.content || '';
   if (content.length === 0) {
     return t('coverLetter.list.untitled');
   }
 
-  // Extract first meaningful line as title
   const lines = content.split('\n').filter((line) => line.trim().length > 0);
   const firstLine = lines[0] || t('coverLetter.list.untitled');
 
@@ -167,6 +145,14 @@ const resolveTitle = (letter: CoverLetter): string => {
     return firstLine.substring(0, TITLE_MAX_LENGTH) + '...';
   }
   return firstLine;
+};
+
+const resolveSubtitle = (letter: CoverLetter): string => {
+  // Show if it's tailored to a specific job
+  if (letter.jobId) {
+    return t('coverLetter.list.tailored');
+  }
+  return t('coverLetter.list.generic');
 };
 
 const resolvePreview = (letter: CoverLetter): string => {
@@ -178,14 +164,5 @@ const resolvePreview = (letter: CoverLetter): string => {
   // Get first few lines as preview
   const preview = content.substring(0, PREVIEW_MAX_LENGTH);
   return preview.length < content.length ? preview + '...' : preview;
-};
-
-const formatUpdatedAt = (date?: string): string => {
-  if (!date) return '';
-  try {
-    return new Date(date).toLocaleDateString();
-  } catch {
-    return '';
-  }
 };
 </script>
