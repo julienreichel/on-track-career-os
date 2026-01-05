@@ -6,6 +6,22 @@ import { createTestI18n } from '../../../utils/createTestI18n';
 import SpeechDetailPage from '@/pages/speech/[id].vue';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 
+// Mock the SpeechBlockRepository to avoid Amplify client instantiation
+vi.mock('@/domain/speech-block/SpeechBlockRepository', () => ({
+  SpeechBlockRepository: vi.fn().mockImplementation(() => ({
+    get: vi.fn().mockResolvedValue(null),
+    update: vi.fn(),
+    delete: vi.fn(),
+  })),
+}));
+
+// Mock the SpeechBlockService
+vi.mock('@/domain/speech-block/SpeechBlockService', () => ({
+  SpeechBlockService: vi.fn().mockImplementation(() => ({
+    generateSpeech: vi.fn(),
+  })),
+}));
+
 const itemRef = ref<SpeechBlock | null>(null);
 const loadingRef = ref(false);
 const errorRef = ref<string | null>(null);
