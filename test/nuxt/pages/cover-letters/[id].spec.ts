@@ -109,7 +109,7 @@ const stubs = {
     props: ['modelValue', 'placeholder', 'rows'],
     emits: ['update:modelValue'],
     template:
-      '<textarea :value="modelValue" @input="$emit(\"update:modelValue\", $event.target.value)" :placeholder="placeholder" :rows="rows" />',
+      '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" :placeholder="placeholder" :rows="rows" />',
   },
   UButton: {
     props: ['variant', 'color', 'size', 'disabled', 'loading'],
@@ -121,32 +121,6 @@ const stubs = {
   UFormField: {
     props: ['label', 'name'],
     template: '<div class="u-form-field"><label>{{ label }}</label><slot /></div>',
-  },
-  ConfirmModal: {
-    props: ['modelValue'],
-    template: '<div class="confirm-modal" v-if="modelValue"></div>',
-  },
-  UnsavedChangesModal: {
-    props: ['modelValue'],
-    template: '<div class="unsaved-modal" v-if="modelValue"></div>',
-  },
-  UCard: { template: '<div class="u-card"><slot /></div>' },
-  USkeleton: { template: '<div class="u-skeleton"></div>' },
-  UFormField: {
-    props: ['label', 'name'],
-    template: '<div class="u-form-field"><label>{{ label }}</label><slot /></div>',
-  },
-  UTextarea: {
-    props: ['modelValue', 'disabled', 'placeholder'],
-    emits: ['update:modelValue'],
-    template:
-      '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-  },
-  UButton: {
-    props: ['label', 'disabled', 'loading'],
-    emits: ['click'],
-    template:
-      '<button type="button" :disabled="disabled || loading" @click="$emit(\'click\')">{{ label }}</button>',
   },
   ConfirmModal: {
     props: ['modelValue'],

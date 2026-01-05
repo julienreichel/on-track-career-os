@@ -35,6 +35,23 @@ const { resolveSegment, isUUID } = useBreadcrumbMapping();
 // Reactive breadcrumb items that update when IDs are resolved
 const breadcrumbItems = ref<Array<{ label: string; to: string; icon?: string }>>([]);
 
+// Map route segments to their translated labels
+const getSegmentLabel = (segment: string): string => {
+  const segmentMap: Record<string, string> = {
+    profile: t('navigation.profile'),
+    'cv-upload': t('navigation.cvUpload'),
+    experiences: t('navigation.experiences'),
+    jobs: t('navigation.jobs'),
+    companies: t('navigation.companies'),
+    applications: t('navigation.applications'),
+    'cover-letters': t('navigation.coverLetters'),
+    speech: t('navigation.speech'),
+    interview: t('navigation.interview'),
+    stories: t('stories.list.title'),
+  };
+  return segmentMap[segment] || segment;
+};
+
 const handleSignOut = async () => {
   try {
     const { $Amplify } = useNuxtApp();
@@ -89,30 +106,8 @@ const generateBreadcrumbs = async () => {
       continue;
     }
 
-    // Map route segments to translation keys or use the segment itself
-    let label = segment;
-    if (segment === 'profile') {
-      label = t('navigation.profile');
-    } else if (segment === 'cv-upload') {
-      label = t('navigation.cvUpload');
-    } else if (segment === 'experiences') {
-      label = t('navigation.experiences');
-    } else if (segment === 'jobs') {
-      label = t('navigation.jobs');
-    } else if (segment === 'companies') {
-      label = t('navigation.companies');
-    } else if (segment === 'applications') {
-      label = t('navigation.applications');
-    } else if (segment === 'cover-letters') {
-      label = t('navigation.coverLetters');
-    } else if (segment === 'speech') {
-      label = t('navigation.speech');
-    } else if (segment === 'interview') {
-      label = t('navigation.interview');
-    } else if (segment === 'stories') {
-      label = t('stories.list.title');
-    }
-
+    // Use the mapped label for the segment
+    const label = getSegmentLabel(segment);
     items.push({
       label,
       to: currentPath,
