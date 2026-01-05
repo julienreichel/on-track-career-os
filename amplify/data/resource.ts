@@ -94,6 +94,14 @@ export const generateSpeechFunction = defineFunction({
   timeoutSeconds: 60,
 });
 
+export const generateCoverLetterFunction = defineFunction({
+  entry: './ai-operations/generateCoverLetter.ts',
+  environment: {
+    MODEL_ID,
+  },
+  timeoutSeconds: 60,
+});
+
 export const schema = a
   .schema({
     // =====================================================
@@ -577,6 +585,23 @@ export const schema = a
       )
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateSpeechFunction)),
+
+    generateCoverLetter: a
+      .query()
+      .arguments({
+        profile: a.ref('ProfileType').required(),
+        experiences: a.ref('ExperienceType').array().required(),
+        stories: a.ref('SpeechStoryType').array(),
+        personalCanvas: a.ref('PersonalCanvasType'),
+        jobDescription: a.ref('JobType'),
+      })
+      .returns(
+        a.customType({
+          content: a.string().required(),
+        })
+      )
+      .authorization((allow) => [allow.authenticated()])
+      .handler(a.handler.function(generateCoverLetterFunction)),
 
     // =====================================================
     // UTILITY FUNCTIONS (Custom Queries)
