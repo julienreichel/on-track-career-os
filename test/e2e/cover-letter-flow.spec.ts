@@ -92,8 +92,8 @@ test.describe('Cover Letter E2E Flow', () => {
     await expect(content).not.toBeEmpty();
 
     // Verify actions are available at the bottom (matching CV pattern)
-    await expect(page.getByRole('button', { name: /Print/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Edit/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Print', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Edit', exact: true })).toBeVisible();
   });
 
   test('4. Switch to edit mode and verify textarea appears', async ({ page }) => {
@@ -106,7 +106,7 @@ test.describe('Cover Letter E2E Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Click edit button to switch to edit mode
-    const editButton = page.getByRole('button', { name: 'Edit' }).first();
+    const editButton = page.getByRole('button', { name: 'Edit', exact: true });
     await expect(editButton).toBeVisible();
     await editButton.click();
 
@@ -122,8 +122,8 @@ test.describe('Cover Letter E2E Flow', () => {
     expect(content.length).toBeGreaterThan(50); // Should have generated content
 
     // Verify save/cancel buttons are available
-    await expect(page.getByRole('button', { name: /Save/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /cancel/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Cancel', exact: true })).toBeVisible();
   });
 
   test('5. Edit content and save changes', async ({ page }) => {
@@ -136,7 +136,7 @@ test.describe('Cover Letter E2E Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Switch to edit mode
-    const editButton = page.getByRole('button', { name: 'Edit' }).first();
+    const editButton = page.getByRole('button', { name: 'Edit', exact: true });
     await editButton.click();
 
     await expect(page.getByRole('heading', { name: /Edit Mode/i })).toBeVisible();
@@ -152,7 +152,7 @@ test.describe('Cover Letter E2E Flow', () => {
     await contentTextarea.fill(editedContent);
 
     // Save the changes
-    const saveButton = page.getByRole('button', { name: /Save/i });
+    const saveButton = page.getByRole('button', { name: 'Save', exact: true });
     await expect(saveButton).toBeEnabled();
     await saveButton.click();
 
@@ -179,7 +179,7 @@ test.describe('Cover Letter E2E Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Switch to edit mode to check content persisted
-    const editButton = page.getByRole('button', { name: 'Edit' }).first();
+    const editButton = page.getByRole('button', { name: 'Edit', exact: true });
     await editButton.click();
 
     const contentTextarea = page.getByRole('textbox', { name: /Cover Letter Content/i });
@@ -189,7 +189,7 @@ test.describe('Cover Letter E2E Flow', () => {
     expect(persistedValue).toContain('Edited at');
 
     // Go back to view mode
-    const cancelButton = page.getByRole('button', { name: /cancel/i });
+    const cancelButton = page.getByRole('button', { name: 'Cancel', exact: true });
     await cancelButton.click();
 
     // Navigate back to the list
@@ -208,21 +208,28 @@ test.describe('Cover Letter E2E Flow', () => {
       return;
     }
 
-    await page.goto(coverLetterUrl);
+    // Go to the list page where delete functionality exists
+    await page.goto('/cover-letters');
     await page.waitForLoadState('networkidle');
 
-    // Click delete button
-    const deleteButton = page.getByRole('button', { name: /Delete/i }).first();
+    // Verify our cover letter is visible
+    await expect(
+      page.getByRole('heading', { name: /Test Cover Letter for Software Engineer/i })
+    ).toBeVisible();
+
+    // Find the delete button directly (it's visible in the page snapshot)
+    const deleteButton = page.getByRole('button', { name: 'Delete', exact: true });
+    await expect(deleteButton).toBeVisible();
     await deleteButton.click();
 
     // Confirm deletion in modal
-    await expect(page.getByRole('button', { name: /Confirm/i })).toBeVisible();
-    await page.getByRole('button', { name: /Confirm/i }).click();
+    const modal = page.getByRole('dialog', { name: 'Delete cover letter' });
+    const confirmDeleteButton = modal.getByRole('button', { name: 'Delete', exact: true });
+    await expect(confirmDeleteButton).toBeVisible();
+    await confirmDeleteButton.click();
 
-    // Should navigate back to list
-    await page.waitForURL('/cover-letters');
     await expect(page.getByText('Cover letter deleted', { exact: true })).toBeVisible();
-
+    
     // Cover letter should no longer appear in list
     await expect(
       page.getByRole('heading', { name: /Test Cover Letter for Software Engineer/i })
