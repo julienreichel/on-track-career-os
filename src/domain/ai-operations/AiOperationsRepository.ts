@@ -86,6 +86,7 @@ export interface IAiOperationsRepository {
    * Generate speech blocks from user data and optional job context
    */
   generateSpeech(input: SpeechInput): Promise<SpeechResult>;
+  generateCoverLetter(input: SpeechInput): Promise<string>;
 }
 
 /**
@@ -423,4 +424,16 @@ export class AiOperationsRepository implements IAiOperationsRepository {
 
     return data as SpeechResult;
   }
-}
+  async generateCoverLetter(input: SpeechInput): Promise<string> {
+    const { data, errors } = await this.client.generateCoverLetter(input, gqlOptions());
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    return data;
+  }}

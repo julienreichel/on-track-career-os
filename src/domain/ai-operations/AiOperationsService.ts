@@ -31,6 +31,7 @@ type MatchingSummaryMock =
   | MatchingSummaryResult
   | ((input: MatchingSummaryInput) => MatchingSummaryResult);
 type SpeechMock = SpeechResult | ((input: SpeechInput) => SpeechResult);
+type CoverLetterMock = string | ((input: SpeechInput) => string);
 
 function cloneResult<T>(value: T): T {
   if (typeof structuredClone === 'function') {
@@ -52,12 +53,14 @@ function resolveAiMock(
   input: MatchingSummaryInput
 ): MatchingSummaryResult | null;
 function resolveAiMock(key: 'generateSpeech', input: SpeechInput): SpeechResult | null;
+function resolveAiMock(key: 'generateCoverLetter', input: SpeechInput): string | null;
 function resolveAiMock(
-  key: 'analyzeCompanyInfo' | 'generateCompanyCanvas' | 'generateMatchingSummary' | 'generateSpeech',
+  key: 'analyzeCompanyInfo' | 'generateCompanyCanvas' | 'generateMatchingSummary' | 'generateSpeech' | 'generateCoverLetter',
   input:
     | AnalyzeCompanyInfoInput
     | GeneratedCompanyCanvasInput
     | MatchingSummaryInput
+    | SpeechInput
     | SpeechInput
 ) {
   if (typeof window === 'undefined' || !window.__AI_OPERATION_MOCKS__) {
@@ -417,6 +420,23 @@ export class AiOperationsService {
     }
     return result;
   }
+
+  async generateCoverLetter(input: SpeechInput): Promise<string> {
+    if (!input?.profile?.fullName) {
+      throw new Error('User profile with fullName is required');
+    }
+
+    const mocked = resolveAiMock('generateCoverLetter', input);
+    if (mocked) {
+      return mocked;
+    }
+
+    const result = await this.repo.generateCoverLetter(input);
+    if (typeof result !== 'string') {
+      throw new Error('Invalid cover letter generation result');
+    }
+    return result;
+  }
 }
 
 declare global {
@@ -426,6 +446,7 @@ declare global {
       generateCompanyCanvas?: CanvasMock;
       generateMatchingSummary?: MatchingSummaryMock;
       generateSpeech?: SpeechMock;
+      generateCoverLetter?: CoverLetterMock;
     };
   }
 }
