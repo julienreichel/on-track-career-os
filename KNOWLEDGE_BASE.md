@@ -36,6 +36,7 @@ Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer
 - ✅ EPIC 3 (Generic CV Generator) — 100% complete
 - ✅ EPIC 3B (CV Header & Contact Information) — 100% complete
 - ✅ EPIC 4 (User Speech Builder) — 100% complete
+- ✅ EPIC 4B (Generic Cover Letter Generator) — 100% complete
 - ✅ EPIC 5A (Job Description Analysis) — 100% complete
 - ✅ EPIC 5B (Company Analysis & Canvas) — 100% complete
 - ✅ EPIC 5C (User-Job-Company Matching) — 100% complete
@@ -98,7 +99,7 @@ _(Condensed from full CDM; only key-developer-relevant models.)_
 ### 3.4 Application Materials
 
 - **CVDocument**
-- **CoverLetter**
+- **CoverLetter**: name, content (Markdown), jobId (optional), generatedAt, needsUpdate, status
 - **SpeechBlock**: elevatorPitch (text + keyMessages[]), careerStory (text + keyMessages[]), whyMe (text + keyMessages[]), optional jobId for targeting
 
 (From CDM document )
@@ -140,6 +141,9 @@ _(From Component Model + Component→Page Mapping) _
 - `useSpeechBlock()` - SpeechBlock CRUD with AI generation
 - `useSpeechBlocks()` - SpeechBlock list management
 - `useSpeechEngine()` - Speech workflow orchestration
+- `useCoverLetter()` - CoverLetter CRUD with AI generation
+- `useCoverLetters()` - CoverLetter list management
+- `useCoverLetterEngine()` - Cover letter workflow orchestration
 - `useTailoringEngine()` - Tailored materials (not implemented)
 - `useAiOperations()` - AI operations orchestration
 - `useCvDocuments()` - CV document management
@@ -180,6 +184,10 @@ _(Structured per navigation zones)_
 - `/cv/:id/print` - A4 print layout with auto-print
 - `/speech` - Speech block list
 - `/speech/:id` - Speech block editor
+- `/cover-letters` - Cover letter list
+- `/cover-letters/new` - Cover letter creation wizard
+- `/cover-letters/:id` - Cover letter editor
+- `/cover-letters/:id/print` - Cover letter print layout
   (From Navigation Structure & Component Mapping )
 
 ### 5.1 My Profile

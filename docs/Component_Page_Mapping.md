@@ -864,39 +864,42 @@ Each page includes:
 
 ---
 
-## **5.2 Cover Letter Builder** ❌
+## **5.2 Cover Letter Builder** ✅
 
-**Route:** `/cover-letters` and `/cover-letters/:id` (planned)
+**Route:** `/cover-letters`, `/cover-letters/new`, `/cover-letters/:id`, `/cover-letters/:id/print`
 
 ### UI
 
-- `<UCard>` section layout
-- `<UTextarea>` for letter content
-- Optional tone selector (if needed)
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<ItemCard>` for list view
+- `<UTextarea>` for Markdown editing
+- `<UButton>` for actions (Edit, Print, Regenerate)
 
 ### Components
 
-- Cover Letter Generator Component (planned)
+- None - uses existing ItemCard component pattern
 
 ### Composables
 
-- `useCoverLetterEngine()` (not implemented)
-- `useCoverLetters()` (not implemented)
-- `useCoverLetter()` (not implemented)
+- `useCoverLetterEngine()` - workflow orchestration with AI generation
+- `useCoverLetters()` - list management
+- `useCoverLetter()` - CRUD operations
 
 ### CDM Entities
 
-- **CoverLetter** (create/update)
+- **CoverLetter** (create/read/update/delete)
 - **UserProfile** (read)
 - **JobDescription** (optional, read)
 - **PersonalCanvas** (read)
+- **Experience** (read)
+- **STARStory** (read)
 
 ### AI Ops
 
-- `ai.generateCoverLetter` (not implemented)
+- `ai.generateCoverLetter` - generates professional cover letter with optional job targeting
 
-**Status:** ❌ Not Implemented  
-**Blocking:** EPIC 4B - AI operation and editor not implemented
+**Status:** ✅ Fully Implemented  
+**Pattern:** Matches CV flow - List → Create/Generate → Edit → Print
 
 ---
 
@@ -1013,17 +1016,19 @@ Each page includes:
 | Company Detail         | `/companies/[companyId]`                              | ✅     | 5B   |
 | Speech List            | `/speech`                                             | ✅     | 4    |
 | Speech Editor          | `/speech/:id`                                         | ✅     | 4    |
+| Cover Letter List      | `/cover-letters`                                      | ✅     | 4B   |
+| Cover Letter New       | `/cover-letters/new`                                  | ✅     | 4B   |
+| Cover Letter Editor    | `/cover-letters/:id`                                  | ✅     | 4B   |
+| Cover Letter Print     | `/cover-letters/:id/print`                            | ✅     | 4B   |
 
-## 8.2 Planned Pages (6 Routes)
+## 8.2 Planned Pages (4 Routes)
 
-| Page                | Route                          | Status | EPIC | Blocker               |
-| ------------------- | ------------------------------ | ------ | ---- | --------------------- |
-| Tailored CV         | `/applications/:jobId/cv`      | ❌     | 6    | AI operation missing  |
-| Cover Letter List   | `/cover-letters`               | ❌     | 4B   | AI operation missing  |
-| Cover Letter Editor | `/cover-letters/:id`           | ❌     | 4B   | AI operation missing  |
-| Interview Prep      | `/interviews/:jobId/prep`      | ❌     | 7    | AI operation missing  |
-| Interview Simulator | `/interviews/:jobId/simulate`  | ❌     | 7    | AI operations missing |
-| Settings            | `/settings`                    | ❌     | -    | Low priority          |
+| Page                | Route                         | Status | EPIC | Blocker               |
+| ------------------- | ----------------------------- | ------ | ---- | --------------------- |
+| Tailored CV         | `/applications/:jobId/cv`     | ❌     | 6    | AI operation missing  |
+| Interview Prep      | `/interviews/:jobId/prep`     | ❌     | 7    | AI operation missing  |
+| Interview Simulator | `/interviews/:jobId/simulate` | ❌     | 7    | AI operations missing |
+| Settings            | `/settings`                   | ❌     | -    | Low priority          |
 
 ## 8.3 Implemented Components (20 Core + 7 Company + 9 CV + 2 Job + 3 Speech)
 

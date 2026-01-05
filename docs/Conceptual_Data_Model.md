@@ -274,19 +274,25 @@ _(EPIC 3 + EPIC 6)_
 
 ## **ENTITY: CoverLetter**
 
-_(EPIC 4B)_
+_(EPIC 4B - ✅ Implemented)_
 
 **Attributes:**
 
-- letterId
-- tone
-- content
-- jobId (optional)
+- id
+- name (title/identifier)
+- content (Markdown-formatted letter)
+- jobId (optional, for targeting)
+- generatedAt
+- needsUpdate (boolean)
+- status
+- userId (owner)
+- createdAt
+- updatedAt
 
 **Relationships:**
 
-- 1 CoverLetter → 1 UserProfile
-- 1 CoverLetter → 1 JobDescription (optional)
+- 1 CoverLetter → 1 UserProfile (belongsTo)
+- 1 CoverLetter → 1 JobDescription (optional, belongsTo)
 
 ---
 
