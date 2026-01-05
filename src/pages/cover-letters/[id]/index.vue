@@ -25,57 +25,16 @@ const saving = ref(false);
 const cancelModalOpen = ref(false);
 const deleteModalOpen = ref(false);
 const deleting = ref(false);
-const isGenerating = computed(() => engine.isGenerating.value);
 
 const hasChanges = computed(() => editContent.value !== originalContent.value);
 
-const headerLinks = computed<PageHeaderLink[]>(() => [
+const headerLinks: PageHeaderLink[] = [
   {
     label: t('common.backToList'),
     icon: 'i-heroicons-arrow-left',
     to: '/cover-letters',
   },
-  ...(isEditing.value
-    ? [
-        // Edit mode actions
-      ]
-    : [
-        // View mode actions
-        {
-          label: t('coverLetter.display.actions.print'),
-          icon: 'i-heroicons-printer',
-          color: 'gray',
-          onClick: handlePrint,
-          'data-testid': 'print-cover-letter-button',
-        },
-        {
-          label: t('coverLetter.display.actions.edit'),
-          icon: 'i-heroicons-pencil',
-          color: 'primary',
-          disabled: loading.value,
-          onClick: toggleEdit,
-          'data-testid': 'edit-cover-letter-button',
-        },
-        {
-          label: isGenerating.value
-            ? t('coverLetter.display.actions.generating')
-            : t('coverLetter.display.actions.regenerate'),
-          icon: 'i-heroicons-sparkles',
-          color: 'primary',
-          disabled: loading.value || isGenerating.value || !engine.hasProfile.value,
-          onClick: handleGenerate,
-          'data-testid': 'generate-cover-letter-button',
-        },
-      ]),
-  {
-    label: t('common.delete'),
-    icon: 'i-heroicons-trash',
-    color: 'error',
-    disabled: loading.value || saving.value || deleting.value,
-    onClick: () => (deleteModalOpen.value = true),
-    'data-testid': 'delete-cover-letter-button',
-  },
-]);
+];
 
 const toggleEdit = () => {
   if (isEditing.value) {
@@ -111,34 +70,6 @@ const handleSave = async () => {
   }
 };
 
-const handleGenerate = async () => {
-  try {
-    await engine.load();
-    const result = await engine.generate();
-    console.log('[coverLetterDisplay] Generate result:', result);
-
-    if (isEditing.value) {
-      editContent.value = result;
-    } else {
-      // Apply directly and save
-      const updated = await save({
-        id: item.value!.id,
-        content: result,
-      });
-      if (updated) {
-        toast.add({ title: t('coverLetter.display.toast.generated'), color: 'primary' });
-      }
-    }
-  } catch (err) {
-    console.error('[coverLetterDisplay] Failed to generate cover letter', err);
-    toast.add({
-      title: t('coverLetter.display.toast.generateFailed'),
-      color: 'error',
-      description: err instanceof Error ? err.message : 'Unknown error',
-    });
-  }
-};
-
 const handleCancel = () => {
   if (hasChanges.value) {
     cancelModalOpen.value = true;
@@ -154,7 +85,9 @@ const handleDiscard = () => {
 };
 
 const handlePrint = () => {
-  window.print();
+  // Open print view in new window
+  const printUrl = `/cover-letters/${coverLetterId.value}/print`;
+  window.open(printUrl, '_blank');
 };
 
 const handleDelete = async () => {
@@ -185,7 +118,8 @@ onMounted(async () => {
 
 watch(item, (newValue) => {
   if (newValue && !isEditing.value) {
-    editContent.value = newValue.content || '';
+    const content = newValue.content;
+    editContent.value = content ? content : '';
     originalContent.value = editContent.value;
   }
 });
@@ -300,6 +234,22 @@ watch(item, (newValue) => {
                 </div>
               </div>
             </UCard>
+
+            <!-- View Mode Actions -->
+            <div class="mt-6 flex justify-end gap-3">
+              <UButton
+                :label="t('coverLetter.display.actions.print')"
+                icon="i-heroicons-arrow-down-tray"
+                variant="outline"
+                @click="handlePrint"
+              />
+              <UButton
+                :label="t('coverLetter.display.actions.edit')"
+                icon="i-heroicons-pencil"
+                variant="outline"
+                @click="toggleEdit"
+              />
+            </div>
           </template>
 
           <UCard v-else-if="!loading && !item">

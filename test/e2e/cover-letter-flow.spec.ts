@@ -91,11 +91,9 @@ test.describe('Cover Letter E2E Flow', () => {
     await expect(content).toBeVisible();
     await expect(content).not.toBeEmpty();
 
-    // Verify actions are available
+    // Verify actions are available at the bottom (matching CV pattern)
     await expect(page.getByRole('button', { name: /Print/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Edit' }).first()).toBeVisible();
-    await expect(page.getByRole('button', { name: /Generate cover letter/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Delete/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Edit/i })).toBeVisible();
   });
 
   test('4. Switch to edit mode and verify textarea appears', async ({ page }) => {

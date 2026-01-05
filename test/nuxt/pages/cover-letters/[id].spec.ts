@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
-import CoverLetterDetailPage from '@/pages/cover-letters/[id].vue';
+import CoverLetterDetailPage from '@/pages/cover-letters/[id]/index.vue';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 
 // Mock the CoverLetterRepository to avoid Amplify client instantiation
@@ -108,11 +108,13 @@ const stubs = {
   UTextarea: {
     props: ['modelValue', 'placeholder', 'rows'],
     emits: ['update:modelValue'],
-    template: '<textarea :value="modelValue" @input="$emit(\"update:modelValue\", $event.target.value)" :placeholder="placeholder" :rows="rows" />',
+    template:
+      '<textarea :value="modelValue" @input="$emit(\"update:modelValue\", $event.target.value)" :placeholder="placeholder" :rows="rows" />',
   },
   UButton: {
     props: ['variant', 'color', 'size', 'disabled', 'loading'],
-    template: '<button type="button" :disabled="disabled || loading" :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')" :class="[variant, color, size]"><slot /></button>',
+    template:
+      '<button type="button" :disabled="disabled || loading" :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')" :class="[variant, color, size]"><slot /></button>',
   },
   UCard: { template: '<div class="u-card"><slot /></div>' },
   USkeleton: { template: '<div class="u-skeleton"></div>' },
@@ -198,7 +200,7 @@ describe('Cover letter detail page', () => {
     const wrapper = await mountPage();
     expect(mockLoad).toHaveBeenCalled();
     expect(engineMock.load).toHaveBeenCalled();
-    
+
     // Should be in view mode by default
     expect(wrapper.find('.prose').exists()).toBe(true);
     expect(wrapper.text()).toContain(itemRef.value?.content);
@@ -206,17 +208,17 @@ describe('Cover letter detail page', () => {
 
   it('displays content in view mode and edit mode', async () => {
     const wrapper = await mountPage();
-    
+
     // First check view mode content
     const proseContent = wrapper.find('.prose');
     expect(proseContent.exists()).toBe(true);
     expect(proseContent.text()).toContain(itemRef.value?.content);
-    
+
     // Switch to edit mode by clicking edit button
     const editButton = wrapper.find('[data-testid="edit-cover-letter-button"]');
     if (editButton.exists()) {
       await editButton.trigger('click');
-      
+
       // Now check textarea appears
       const textarea = wrapper.find('textarea');
       expect(textarea.exists()).toBe(true);
@@ -224,19 +226,8 @@ describe('Cover letter detail page', () => {
     }
   });
 
-  it('invokes generate when generate button is clicked', async () => {
-    const wrapper = await mountPage();
-    const generateButton = wrapper.find('[data-testid="generate-cover-letter-button"]');
-    await generateButton.trigger('click');
-    expect(generateMock).toHaveBeenCalled();
-  });
-
-  it('displays loading state during generation', async () => {
-    engineMock.isGenerating.value = true;
-    const wrapper = await mountPage();
-    const generateButton = wrapper.find('[data-testid="generate-cover-letter-button"]');
-    expect(generateButton.attributes('disabled')).toBeDefined();
-  });
+  // Note: Generate button has been removed from detail page to match CV pattern
+  // Generation happens during creation flow only
 
   it('saves changes when save button is clicked', async () => {
     const wrapper = await mountPage();
@@ -245,11 +236,11 @@ describe('Cover letter detail page', () => {
     const editButton = wrapper.find('[data-testid="edit-cover-letter-button"]');
     if (editButton.exists()) {
       await editButton.trigger('click');
-      
+
       // Now modify content
       const textarea = wrapper.find('textarea');
       expect(textarea.exists()).toBe(true);
-      
+
       await textarea.setValue('Updated cover letter content');
       await wrapper.vm.$nextTick();
 
@@ -259,7 +250,7 @@ describe('Cover letter detail page', () => {
 
       expect(mockSave).toHaveBeenCalledWith({
         id: 'cl-1',
-        content: 'Updated cover letter content'
+        content: 'Updated cover letter content',
       });
     } else {
       // Skip test if edit button not found
@@ -267,16 +258,6 @@ describe('Cover letter detail page', () => {
     }
   });
 
-  it('shows info alert when profile is not complete', async () => {
-    engineMock.hasProfile.value = false;
-    const wrapper = await mountPage();
-    expect(wrapper.text()).toContain('Profile required');
-  });
-
-  it('disables generate button when profile is not complete', async () => {
-    engineMock.hasProfile.value = false;
-    const wrapper = await mountPage();
-    const generateButton = wrapper.find('[data-testid="generate-cover-letter-button"]');
-    expect(generateButton.attributes('disabled')).toBeDefined();
-  });
+  // Note: Generate button and profile validation have been removed from detail page
+  // These validations now happen during the creation flow
 });

@@ -162,11 +162,11 @@ describe('Cover letter list page', () => {
 
     const wrapper = await mountPage();
     await wrapper.vm.$nextTick();
-    
+
     // Check that the grid container exists (v-else block)
     const grid = wrapper.find('.grid');
     expect(grid.exists()).toBe(true);
-    
+
     // Find by class instead of component name
     const itemCards = wrapper.findAll('.item-card');
     expect(itemCards).toHaveLength(2);
@@ -186,7 +186,7 @@ describe('Cover letter list page', () => {
 
     const wrapper = await mountPage();
     await wrapper.vm.$nextTick();
-    
+
     // The create button is a link (router-link), not a button that calls createCoverLetter
     // Check that the page renders correctly with the create link
     expect(wrapper.find('.u-page-header').exists()).toBe(true);

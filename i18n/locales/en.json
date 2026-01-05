@@ -1221,6 +1221,7 @@
       "title": "Cover Letter",
       "description": "View and edit your cover letter",
       "untitled": "Untitled Cover Letter",
+      "loading": "Loading cover letter...",
       "editMode": "Edit Mode",
       "editModeDescription": "Edit your cover letter content directly",
       "contentLabel": "Cover Letter Content",

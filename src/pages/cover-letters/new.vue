@@ -85,6 +85,13 @@ const engine = useCoverLetterEngine();
 // Form state
 const coverLetterName = ref('');
 const jobDescription = ref('');
+const jobDescriptionObj = computed(() => {
+  if (!jobDescription.value) return undefined;
+  return {
+    title: coverLetterName.value.trim(),
+    roleSummary: jobDescription.value.trim(),
+  };
+});
 
 // Generation state
 const generating = ref(false);
@@ -107,14 +114,7 @@ const generateCoverLetter = async () => {
     await engine.load();
 
     // Generate content using the engine
-    const jobDescriptionObj = coverLetterName.value.trim()
-      ? {
-          title: coverLetterName.value.trim(),
-          roleSummary: jobDescription.value || undefined,
-        }
-      : undefined;
-
-    const content = await engine.generate(jobDescriptionObj);
+    const content = await engine.generate(jobDescriptionObj.value);
 
     if (!content) {
       toast.add({
