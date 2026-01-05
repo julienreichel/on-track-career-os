@@ -53,7 +53,6 @@ The project has established a **strong backend and domain foundation** with comp
 | **5B** | Company Analysis & Canvas   | 100%    | 100%   | 100% (2/2) | 100%     | **100%** |
 | **5C** | User-Job-Company Matching   | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **6**  | Tailored Materials          | 60%     | 0%     | 0% (0/4)   | 0%       | **10%**  |
-| **7**  | Interview Prep              | 60%     | 0%     | 0% (0/3)   | 0%       | **10%**  |
 
 **Overall MVP Progress:** ~70%
 
@@ -580,35 +579,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 ---
 
-#### ❌ EPIC 7: Interview Prep (10% Complete)
-
-**Status:** Models exist, no AI operations
-
-**Implemented:**
-
-- ✅ InterviewQuestionSet GraphQL model
-- ✅ InterviewSession GraphQL model
-
-**Missing:**
-
-- ❌ `ai.generateInterviewQuestions` Lambda
-- ❌ `ai.simulateInterviewTurn` Lambda
-- ❌ `ai.evaluateInterviewAnswer` Lambda
-- ❌ All domain layers
-- ❌ Interview prep pages
-- ❌ Interview simulator UI
-
-**Next Steps:**
-
-1. Implement 3 interview AI operations
-2. Create domain layers
-3. Create `/interviews/:jobId/prep` page
-4. Create `/interviews/:jobId/simulate` page
-5. Add feedback/scoring display
-
----
-
-## 🤖 AI Operations Status (10/17 Complete)
+## 🤖 AI Operations Status (11/14 Complete)
 
 ### Implemented Operations ✅
 
@@ -640,13 +611,6 @@ The project has established a **strong backend and domain foundation** with comp
 **Application Materials (4 missing):**
 
 - ❌ `ai.generateCoverLetter`
-- ❌ `ai.generateSpeech`
-
-**Interview Prep (3 missing):**
-
-- ❌ `ai.generateInterviewQuestions`
-- ❌ `ai.simulateInterviewTurn`
-- ❌ `ai.evaluateInterviewAnswer`
 
 ---
 
@@ -667,14 +631,12 @@ The project has established a **strong backend and domain foundation** with comp
 | **MatchingSummary** | MatchingSummary | ✅         | ✅      | ✅         | 6 tests          |
 | **AI Operations**   | (Lambdas)       | ✅         | ✅      | ✅         | 44 Amplify tests |
 
-### Missing Domain Layers (6 models exist in schema but no domain layer)
+### Missing Domain Layers (4 models exist in schema but no domain layer)
 
 - ❌ CoverLetter
 - ❌ SpeechBlock
-- ❌ InterviewQuestionSet
-- ❌ InterviewSession
 
-**Note:** All 16 GraphQL models exist in `amplify/data/resource.ts` with proper relationships and authorization. The gap is in creating domain/repository/service/composable layers for the 9 missing models.
+**Note:** All 14 GraphQL models exist in `amplify/data/resource.ts` with proper relationships and authorization. The gap is in creating domain/repository/service/composable layers for the missing models.
 
 ---
 
@@ -769,11 +731,6 @@ The project has established a **strong backend and domain foundation** with comp
 - `/applications/:jobId/cv` — Tailored CV
 - `/applications/:jobId/cover-letter` — Cover letter
 - `/applications/:jobId/kpis` — KPI set
-
-**Interview Prep (2 pages):**
-
-- `/interviews/:jobId/prep` — Question bank
-- `/interviews/:jobId/simulate` — Interview simulator
 
 ---
 
@@ -890,7 +847,7 @@ The project has established a **strong backend and domain foundation** with comp
 8. ✅ Delete and edit story functionality
 9. ✅ Comprehensive E2E and unit tests
 
-**Achievement:** Users can now create rich STAR stories for CVs and interviews
+**Achievement:** Users can now create rich STAR stories for CVs and professional materials
 
 ---
 
@@ -1050,7 +1007,6 @@ The project has established a **strong backend and domain foundation** with comp
 5. Phase 5: ✅ COMPLETED - User-Job-Company Matching (EPIC 5C) → **100% complete**
 6. Phase 6: Speech Builder (EPIC 4) - 1-2 weeks → **0% complete**
 7. Phase 7: Tailoring Engine (EPIC 6) - 3-4 weeks → **0% complete**
-8. Phase 8: Interview Prep (EPIC 7) - 2-3 weeks → **0% complete**
 
 **Next Immediate Priority:** Start EPIC 4 (Speech Builder), then tackle EPIC 6 (Tailoring Engine)
 
@@ -1076,10 +1032,9 @@ The project has established a **strong backend and domain foundation** with comp
 - [x] EPIC 5C: User-Job-Company Matching (100%)
 - [ ] EPIC 4: User Speech Builder (0%)
 - [ ] EPIC 6: Tailored Application Materials (0%)
-- [ ] EPIC 7: Interview Prep (0%)
-- [ ] All 17 AI operations implemented and tested
+- [ ] All 14 AI operations implemented and tested
 - [ ] 25+ frontend pages operational
-- [ ] End-to-end user flow tested (upload CV → generate materials → interview prep)
+- [ ] End-to-end user flow tested (upload CV → generate materials)
 - [ ] Error handling and fallback UIs implemented
 - [ ] i18n translations complete (EN + FR minimum)
 - [ ] Deployed to production (Amplify Gen2)
@@ -1109,6 +1064,6 @@ The **AI Career OS** project has made **excellent progress** with 8 of 10 MVP EP
 - ✅ Job-company linking with automatic extraction
 - ✅ Matching summary generation with persistence and reload
 
-**Key Insight:** The project is **70% complete** for MVP with a solid foundation. The remaining work focuses on **speech builder (EPIC 4), tailored materials (EPIC 6), and interview prep (EPIC 7)**.
+**Key Insight:** The project is **70% complete** for MVP with a solid foundation. The remaining work focuses on **tailored materials (EPIC 6)**
 
-**Next Immediate Action:** Implement EPIC 4 (Speech Builder), then proceed with the tailoring engine (EPIC 6).
+**Next Immediate Action:** Complete EPIC 4 (Speech Builder), then proceed with the tailoring engine (EPIC 6).

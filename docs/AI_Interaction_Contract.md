@@ -61,12 +61,6 @@ Each operation must conform to:
 
 12. `ai.generateCoverLetter`
 
-### Interview Prep (EPIC 7 / 9)
-
-15. `ai.generateInterviewQuestions`
-16. `ai.simulateInterviewTurn`
-17. `ai.evaluateInterviewAnswer`
-
 ---
 
 # 4. PROMPT TEMPLATES (System + User)

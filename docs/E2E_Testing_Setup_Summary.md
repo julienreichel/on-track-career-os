@@ -291,7 +291,6 @@ Added to `package.json`:
 **Pending EPIC implementation:**
 
 - ⏸️ **EPIC 6** (Tailored Materials): Awaiting AI operations
-- ⏸️ **EPIC 7** (Interview Prep): Awaiting AI operations
 
 **Recently Completed:**
 
@@ -320,12 +319,12 @@ Added to `package.json`:
 
 **Complete Test Coverage: EPICs 1A, 1B, 2, 3, 3B, 4, 5A, 5B, 5C**
 
-| Layer     | Framework       | Tests    | Status           |
-| --------- | --------------- | -------- | ---------------- |
-| Unit      | Vitest          | 1000+    | ✅ Passing       |
-| Sandbox   | Vitest (AI Ops) | 32       | ✅ Passing       |
-| E2E       | Playwright      | 96       | ✅ Passing       |
-| **Total** |                 | **1128+**| **100% Passing** |
+| Layer     | Framework       | Tests     | Status           |
+| --------- | --------------- | --------- | ---------------- |
+| Unit      | Vitest          | 1000+     | ✅ Passing       |
+| Sandbox   | Vitest (AI Ops) | 32        | ✅ Passing       |
+| E2E       | Playwright      | 96        | ✅ Passing       |
+| **Total** |                 | **1128+** | **100% Passing** |
 
 **Coverage Breakdown by EPIC:**
 
@@ -498,15 +497,7 @@ Test Suites:
    - Create `test/e2e/tailoring.spec.ts`
    - Test tailored CV, cover letter, tailored speech
    - ~15-20 tests estimated
- 
-2. **EPIC 7 (Interview Prep)**:
-   - Create `test/e2e/interview-prep.spec.ts`
-   - Test question generation and simulator
-   - ~10-15 tests estimated
 
-### Recently Completed E2E Tests
-
-1. **EPIC 4 (Speech Builder)**: ✅
    - `test/e2e/speech-flow.spec.ts` (7 tests)
    - Tests: navigation, create, display, generate, edit, save, persist
    - Serial mode with shared state

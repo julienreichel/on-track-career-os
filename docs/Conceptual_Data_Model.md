@@ -6,13 +6,12 @@
 
 # 1. PRIMARY ENTITY CLUSTERS
 
-The platform contains **five major data domains**:
+The platform contains **four major data domains**:
 
 1. **User Identity Domain**
 2. **Experience & Story Domain**
 3. **Job & Company Domain**
 4. **Application Materials Domain**
-5. **Interview Domain**
 
 Each domain and its entities are described below.
 
@@ -309,46 +308,6 @@ _(EPIC 4)_
 
 ---
 
-# 6. INTERVIEW DOMAIN
-
-## **ENTITY: InterviewQuestionSet**
-
-_(EPIC 7)_
-
-**Attributes:**
-
-- setId
-- behavioralQuestions
-- technicalQuestions
-- culturalQuestions
-- painBasedQuestions
-
-**Relationships:**
-
-- 1 QuestionSet → 1 JobDescription
-- 1 QuestionSet → \* STARStories (linked)
-
----
-
-## **ENTITY: InterviewSession**
-
-_(EPIC 9)_
-
-**Attributes:**
-
-- sessionId
-- transcript
-- scores (clarity, structure, relevance)
-- feedback
-- createdAt
-
-**Relationships:**
-
-- 1 InterviewSession → 1 UserProfile
-- 1 InterviewSession → 1 JobDescription
-
----
-
 # 7. RELATIONSHIP SUMMARY
 
 ```
@@ -375,9 +334,6 @@ MatchingSummary ↔ (User, Job, Company)
 
 JobDescription ↔ (CV / CoverLetter / Speech )
 1 ↔ 1 (tailored)
-
-InterviewSession ↔ (UserProfile / JobDescription)
-multiple sessions permitted
 ```
 
 ---
@@ -409,7 +365,3 @@ multiple sessions permitted
 
 - Created → Edited → Exported
 - (V2) Versioning planned
-
-### **InterviewSession**
-
-- Read-only after generation

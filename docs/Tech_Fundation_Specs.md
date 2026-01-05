@@ -133,12 +133,10 @@ const schema = a.schema({
 - ✅ `CompanyCanvas` - Company Business Model Canvas (EPIC 5B)
 - ✅ `MatchingSummary` - Job-user fit analysis (EPIC 5C)
 
-**Planned Models (5):**
+**Planned Models (3):**
 
 - ❌ `CoverLetter` - Cover letter documents (EPIC 6)
-- ❌ `SpeechBlock` - Speech/pitch content (EPIC 4)
-- ❌ `InterviewQuestionSet` - Interview questions (EPIC 7)
-- ❌ `InterviewSession` - Interview simulator sessions (EPIC 9)
+- ✅ `SpeechBlock` - Speech/pitch content (EPIC 4)
 
 **Authorization:**
 
@@ -222,16 +220,13 @@ const schema = a.schema({
 6. ✅ `ai.generateCv` - Generate markdown CV
 7. ✅ `ai.parseJobDescription` - Parse job posting
 
-**Planned Operations (10):**
+**Planned Operations (7):**
 
-- ❌ `ai.generateSpeech` (EPIC 4)
+- ✅ `ai.generateSpeech` (EPIC 4)
 - ❌ `ai.analyzeCompanyInfo` (EPIC 5B)
 - ✅ `ai.generateCompanyCanvas` (EPIC 5B)
 - ✅ `ai.generateMatchingSummary` (EPIC 5C)
 - ❌ `ai.generateCoverLetter` (EPIC 6)
-- ❌ `ai.generateInterviewQuestions` (EPIC 7)
-- ❌ `ai.simulateInterviewTurn` (EPIC 7/9)
-- ❌ `ai.evaluateInterviewAnswer` (EPIC 7/9)
 
 Frontend **never** calls AI providers directly.
 
@@ -359,7 +354,7 @@ FAKE_AI_PROVIDER=true  # for testing
 
 ## Layout
 
-- Sidebar navigation (Dashboard, Profile, Jobs, Applications, Interview)
+- Sidebar navigation (Dashboard, Profile, Jobs, Applications, Speech)
 - Topbar with:
   - Environment indicator
   - User menu
@@ -429,10 +424,7 @@ project-root/
 │   │   ├── matching/             # Matching Engine (EPIC 5C) ✅
 │   │   │   └── (planned)
 │   │   │
-│   │   ├── applications/         # Tailored Materials (EPIC 6) ❌
-│   │   │   └── (planned)
-│   │   │
-│   │   └── interview/            # Interview Prep (EPIC 7, 9) ❌
+│   │   └── applications/         # Tailored Materials (EPIC 6) ❌
 │   │       └── (planned)
 │   │
 │   ├── components/               # Auto-imported Vue components ✅
@@ -482,7 +474,6 @@ project-root/
 │   │   ├── useCvDocuments.ts
 │   │   ├── useStoryList.ts
 │   │   ├── useStoryEditor.ts
-│   │   ├── useStarInterview.ts
 │   │   ├── useStoryEnhancer.ts
 │   │   └── useBreadcrumbMapping.ts
 │   │

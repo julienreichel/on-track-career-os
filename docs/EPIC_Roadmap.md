@@ -375,23 +375,6 @@ More authentic and personalized applications.
 
 ---
 
-## EPIC 9 — Virtual Interview Simulator (Text)
-
-**Goal:** Provide interactive interview practice with feedback.
-
-### Includes
-
-- Simulated recruiter
-- Answer scoring
-- Coaching feedback
-- Summary report
-
-### User Value
-
-Improves confidence and interview mastery.
-
----
-
 ## EPIC 10 — Job Fit Score & Recommendation Engine
 
 **Goal:** Recommend roles based on user profile.
@@ -457,19 +440,3 @@ Professional-grade materials.
 ### User Value
 
 Power-user functionality for serious job hunters.
-
----
-
-## EPIC 14 — Voice-based Interview Simulator
-
-**Goal:** Simulate real interviews with voice.
-
-### Includes
-
-- Voice recognition
-- Pacing feedback
-- Filler-word detection
-
-### User Value
-
-Adds realism and real-world practice.

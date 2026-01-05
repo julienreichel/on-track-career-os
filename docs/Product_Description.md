@@ -14,14 +14,12 @@ It combines:
 - **Career modeling**
 - **Job & company analysis**
 - **Communication tools (CV, letter, speech, KPIs)**
-- **Interview preparation**
 
 into a **single coherent system** — a **Personal AI Career Coach** whose mission is to help users:
 
 1. Understand their professional identity
 2. Decode job descriptions and company needs
 3. Articulate their value clearly
-4. Practice interviews and increase success
 
 Long-term, this becomes a **Career Operating System** people return to throughout their careers — not only during job searches.
 
@@ -48,7 +46,7 @@ Every document is built upon:
 
 ### ✔ Everything connects
 
-User identity → Career Canvas → Job/Company Canvas → Materials → Interview prep.
+User identity → Career Canvas → Job/Company Canvas → Materials.
 
 ---
 
@@ -78,7 +76,6 @@ Users can:
 - Craft compelling stories and narratives
 - Understand companies deeply
 - Generate strategic CVs & cover letters
-- Prepare for interviews with real-time AI feedback
 - Highlight measurable impact via tailored KPIs
 - Gain clarity and confidence through guided reflection
 
@@ -128,7 +125,6 @@ This becomes foundational data for:
 
 - CV
 - Cover letter
-- Interview answers
 - Stories
 - KPIs
 - Personal Canvas
@@ -155,7 +151,6 @@ AI assists with:
 Stories feed directly into:
 
 - Cover letters
-- Interview answers
 - Personal Canvas
 
 ---
@@ -262,22 +257,7 @@ Editable and exportable.
 
 ---
 
-## 5.8 Interview Simulator
-
-### Interview Types
-
-- Recruiter screening
-- Behavioral
-- Technical
-- Leadership
-- Stress/adversarial
-
-### Flow
-
-1. AI asks questions
-2. User answers
-3. AI evaluates:
-   - clarity
+# 6. Technical Architecture
    - relevance
    - confidence
    - structure
@@ -306,35 +286,6 @@ Example outputs:
 - “Increase onboarding completion rate by 20%…”
 - “Reduce deployment incidents by 30%…”
 
-Goal: Present **credible, high-impact contributions** in interviews.
-
----
-
-# 6. Technical Architecture
-
-### Backend
-
-- AWS Amplify
-- GraphQL API
-- AWS Lambda for AI orchestration
-- DynamoDB for user data
-
-### Frontend
-
-- Web app (Nuxt, Vue, or React)
-- Rich text editors
-- Canvas tools
-- Real-time editing
-
-### AI Layer
-
-- Orchestrated LLM prompts for:
-  - Extraction
-  - Synthesis
-  - Modeling
-  - Document generation
-  - Interview simulation
-
 ### Security
 
 - Cognito authentication
@@ -356,10 +307,8 @@ Goal: Present **credible, high-impact contributions** in interviews.
    - CV
    - Cover letter
    - KPIs
-   - Interview questions
 
-9. Interview simulator
-10. Export & apply
+9. Export & apply
 
 ---
 
@@ -376,12 +325,10 @@ Goal: Present **credible, high-impact contributions** in interviews.
 - CV builder (limited templates)
 - Cover letter generator
 - KPI generator
-- Text-based interview simulator
 
 ### **Excluded (future)**
 
 - LinkedIn API
-- Voice interviews
 - Competitor analysis
 - Revision history
 - Mobile app

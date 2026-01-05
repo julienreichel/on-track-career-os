@@ -85,13 +85,13 @@ _(Supports EPIC 2)_
 - Collects STAR stories through guided Q&A
 - Allows editing & polishing with AI
 - Links stories to experiences
-- Generates reusable "story blocks" for CVs, letters, interviews
+- Generates reusable "story blocks" for CVs, letters, and applications
 
 **Implementation:**
 
 - Pages: `/profile/stories`, `/profile/experiences/:experienceId/stories`, `/profile/experiences/:experienceId/stories/:storyId`
 - Components: `StoryBuilder` (3 modes: free text→AI, auto-generate, manual interview), `StoryForm`, `StoryList`, `StoryCard`, `StoryViewModal`, `AchievementsKpisPanel`
-- Composables: `useStoryEngine()`, `useSTARStory()`, `useStoryEditor()`, `useStoryList()`, `useStarInterview()`, `useStoryEnhancer()`
+- Composables: `useStoryEngine()`, `useSTARStory()`, `useStoryEditor()`, `useStoryList()`, `useStoryEnhancer()`
 - AI Ops: `ai.generateStarStory`, `ai.generateAchievementsAndKpis`
 
 **Nuxt UI:**
@@ -185,7 +185,7 @@ Match Summary page with `<UPage>`, `<UCard>`, `<UAlert>`, `<UBadge>`, and `Match
 
 # 3. Content Generation Components
 
-_(Support EPIC 3, EPIC 4, EPIC 6, EPIC 7)_
+_(Support EPIC 3, EPIC 4, EPIC 6)_
 
 ## 3.1 CV Builder Component ✅ IMPLEMENTED (Generic CV)
 
@@ -239,54 +239,7 @@ _(Supports EPIC 4)_
 
 ---
 
-## 3.5 Interview Question Generator ❌ NOT IMPLEMENTED
-
-_(Supports EPIC 7)_
-
-- Generates questions per category
-- Suggests answers based on user stories
-- Exportable preparation sheet
-
-**Status:** EPIC 7 - Blocked by missing AI operation (`ai.generateInterviewQuestions`)
-
-**Planned Nuxt UI:**
-`<UAccordion>`, `<UCard>`
-
----
-
-# 4. Interview Simulation Components
-
-_(Support EPIC 9 and EPIC 14)_
-
-## 4.1 Text Interview Simulator ❌ NOT IMPLEMENTED
-
-- Role-play with AI
-- Real-time or post-session feedback
-- Summary reporting
-
-**Status:** EPIC 7/9 - Blocked by missing AI operations (`ai.simulateInterviewTurn`, `ai.evaluateInterviewAnswer`)
-
-**Planned Nuxt UI:**
-Custom chat component or Nuxt UI chat, `<UProgress>`, `<UAlert>`
-
----
-
-## 4.2 Voice Interview Simulator ❌ NOT IMPLEMENTED (V2)
-
-- Voice recognition
-- Natural pacing & filler-word analysis
-- Realistic live simulation
-
-**Status:** EPIC 14 - Future enhancement (V2)
-
-**Planned Flow:**
-Speech → Analysis Engine → Feedback Report
-
----
-
-# 5. Supporting Components
-
-## 5.1 Dashboard (Home) ✅ IMPLEMENTED
+# 4. Supporting Components
 
 - Hub page with navigation cards
 - Quick access to main features
@@ -346,10 +299,6 @@ Matching Component (User ↔ Job ↔ Company)
 Tailoring Engine
              ↓
 CV Builder | Cover Letter | Speech Builder | KPI Generator
-             ↓
-Interview Question Generator
-             ↓
-Interview Simulator
 ```
 
 ---
@@ -386,9 +335,7 @@ Interview Simulator
 | **useCvDocuments()**             | CV list operations           | ✅     |
 | **useStoryList()**               | Story list operations        | ✅     |
 | **useStoryEditor(storyId)**      | Story CRUD workflow          | ✅     |
-| **useStarInterview(sourceText)** | Guided STAR interview        | ✅     |
 | **useStoryEnhancer()**           | AI story generation          | ✅     |
 | **useBreadcrumbMapping()**       | Dynamic breadcrumbs          | ✅     |
 | **useMatchingEngine()**          | Fit analysis (planned)       | ❌     |
 | **useTailoringEngine()**         | Material tailoring (planned) | ❌     |
-| **useInterviewEngine()**         | Interview prep (planned)     | ❌     |

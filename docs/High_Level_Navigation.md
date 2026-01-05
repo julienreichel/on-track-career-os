@@ -553,6 +553,7 @@ Workflow:
 _(EPIC 4 — Fully Implemented)_
 
 **Routes:**
+
 - `/speech` - List view with create action
 - `/speech/:id` - Editor with three sections
 
@@ -723,11 +724,6 @@ Dashboard → Navigate to Profile/CV/Jobs
 - Tailored CV ❌ Not Implemented (EPIC 6)
 - Tailored Letter ❌ Not Implemented (EPIC 6)
 
-### STEP 6 — Prepare Interview ❌ Not Implemented
-
-- Interview Questions (EPIC 7)
-- Interview Simulator (EPIC 9)
-
 ### STEP 7 — Export & Apply ⚠️ Partial
 
 - Print CV (`/cv/:id/print`) ✅
@@ -819,10 +815,6 @@ Dashboard → Navigate to Profile/CV/Jobs
         └── Why Me Section
 
 
-🎤 Interview Prep ❌
-├── Interview Questions ❌ (EPIC 7)
-├── Interview Simulator (Text) ❌ (EPIC 9)
-└── Voice Simulator ❌ (EPIC 14 - V2)
 
 🧱 System Utilities
 ├── Template Library ❌ (EPIC 12 - V1)
@@ -852,7 +844,6 @@ Dashboard → Navigate to Profile/CV/Jobs
 
 **❌ Not Implemented (25%):**
 - Tailored CV/Letters (EPIC 6)
-- Interview Prep & Simulator (EPIC 7, 9)
 - System Utilities (EPIC 12, Settings)
 - Voice Simulator (EPIC 14 - V2)
 ```

@@ -950,78 +950,6 @@ Each page includes:
 
 ---
 
-# 6. INTERVIEW PREP (EPIC 7)
-
----
-
-## **6.1 Interview Questions Generator** ❌
-
-**Route:** `/interviews/[jobId]/prep` (planned)
-
-### UI
-
-- `<UAccordion>`
-- `<UCard>`
-- `<UButton>` (generate, practice)
-
-### Components
-
-- Interview Questions Component (planned)
-
-### Composables
-
-- `useInterviewEngine()` (not implemented)
-- `useStoryEngine()` ✅
-
-### CDM Entities
-
-- **InterviewQuestionSet** (create/read)
-- **JobDescription** (read)
-- **STARStory** (read - for answer preparation)
-
-### AI Ops
-
-- `ai.generateInterviewQuestions` (not implemented)
-
-**Status:** ❌ Not Implemented  
-**Blocking:** EPIC 7 - AI operation and interview engine missing
-
----
-
-## **6.2 Interview Simulator** ❌
-
-**Route:** `/interviews/[jobId]/simulate` (planned)
-
-### UI
-
-- Custom `<ChatPane>` or `<UChat>`
-- `<UProgress>` (session progress)
-- `<UBadge>` (performance feedback)
-
-### Components
-
-- Interview Simulation Component (planned)
-- Feedback Panel Component (planned)
-
-### Composables
-
-- `useInterviewEngine()` (not implemented)
-
-### CDM Entities
-
-- **InterviewSession** (create/update)
-- **InterviewQuestionSet** (read)
-
-### AI Ops
-
-- `ai.simulateInterviewTurn` (not implemented)
-- `ai.evaluateInterviewAnswer` (not implemented)
-
-**Status:** ❌ Not Implemented  
-**Blocking:** EPIC 7 - AI operations and real-time engine missing
-
----
-
 # 7. SYSTEM PAGES
 
 ---
@@ -1177,7 +1105,7 @@ Each page includes:
 - `useSpeechBlocks()` - speech list operations
 - `useSpeechEngine()` - speech workflow orchestration
 
-## 8.5 AI Operations Status (11/17 Implemented)
+## 8.5 AI Operations Status (11/14 Implemented)
 
 **✅ Implemented:**
 
@@ -1193,12 +1121,9 @@ Each page includes:
 10. `ai.generateMatchingSummary` - generate matching summary
 11. `ai.generateSpeech` - generate speech blocks (elevator pitch, career story, why me)
 
-**❌ Missing (6 operations):**
+**❌ Missing (1 operation):**
 
 1. `ai.generateCoverLetter` - EPIC 6
-2. `ai.generateInterviewQuestions` - EPIC 7
-3. `ai.simulateInterviewTurn` - EPIC 7
-4. `ai.evaluateInterviewAnswer` - EPIC 7
 
 ---
 
