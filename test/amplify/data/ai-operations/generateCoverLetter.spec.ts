@@ -12,9 +12,7 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => {
 });
 
 describe('ai.generateCoverLetter', () => {
-  type Handler = (event: { arguments: unknown }) => Promise<{
-    content: string;
-  }>;
+  type Handler = (event: { arguments: unknown }) => Promise<string>;
 
   let handler: Handler;
   let mockSend: ReturnType<typeof vi.fn>;
@@ -99,9 +97,9 @@ Casey Candidate`;
 
     const response = await handler({ arguments: validArguments as never });
 
-    expect(response.content).toContain('Head of Engineering');
-    expect(response.content).toContain('Casey Candidate');
-    expect(response.content).toContain('Tech Corp');
+    expect(response).toContain('Head of Engineering');
+    expect(response).toContain('Casey Candidate');
+    expect(response).toContain('Tech Corp');
   });
 
   it('generates generic cover letter when no job description provided', async () => {
@@ -157,9 +155,8 @@ Casey Candidate`;
 
     const response = await handler({ arguments: validArguments as never });
 
-    expect(response).toHaveProperty('content');
-    expect(typeof response.content).toBe('string');
-    expect(response.content.length).toBeGreaterThan(0);
+    expect(typeof response).toBe('string');
+    expect(response.length).toBeGreaterThan(0);
   });
 
   it('falls back to empty string when AI output is invalid JSON', async () => {
@@ -168,9 +165,7 @@ Casey Candidate`;
 
     const response = await handler({ arguments: validArguments as never });
 
-    expect(response).toEqual({
-      content: '',
-    });
+    expect(response).toBe('');
   });
 
   it('falls back to empty string when AI output has wrong schema', async () => {
@@ -187,9 +182,7 @@ Casey Candidate`;
 
     const response = await handler({ arguments: validArguments as never });
 
-    expect(response).toEqual({
-      content: '',
-    });
+    expect(response).toBe('');
   });
 
   it('includes STAR stories in the prompt', async () => {
@@ -239,6 +232,6 @@ Casey Candidate`;
 
     const response = await handler({ arguments: validArguments as never });
 
-    expect(response.content).toBe('Trimmed content');
+    expect(response).toBe('Trimmed content');
   });
 });

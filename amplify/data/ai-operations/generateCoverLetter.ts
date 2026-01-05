@@ -88,26 +88,18 @@ export interface GenerateCoverLetterInput {
   jobDescription?: CoverLetterJobDescription;
 }
 
-export interface GenerateCoverLetterOutput {
-  content: string;
-}
-
-type ModelResponse = Partial<GenerateCoverLetterOutput>;
+type ModelResponse = { content?: string };
 
 function sanitizeString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function sanitizeCoverLetterOutput(raw: ModelResponse): GenerateCoverLetterOutput {
-  return {
-    content: sanitizeString(raw.content),
-  };
+function sanitizeCoverLetterOutput(raw: ModelResponse): string {
+  return sanitizeString(raw.content);
 }
 
-function buildFallbackOutput(): GenerateCoverLetterOutput {
-  return {
-    content: '',
-  };
+function buildFallbackOutput(): string {
+  return '';
 }
 
 function buildUserPrompt(args: GenerateCoverLetterInput): string {
@@ -149,7 +141,7 @@ type HandlerEvent = {
   arguments: GenerateCoverLetterInput;
 };
 
-export const handler = async (event: HandlerEvent) => {
+export const handler = async (event: HandlerEvent): Promise<string> => {
   if (!event?.arguments) {
     throw new Error('arguments are required');
   }

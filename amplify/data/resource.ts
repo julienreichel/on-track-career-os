@@ -595,11 +595,7 @@ export const schema = a
         personalCanvas: a.ref('PersonalCanvasType'),
         jobDescription: a.ref('JobType'),
       })
-      .returns(
-        a.customType({
-          content: a.string().required(),
-        })
-      )
+      .returns(a.string())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateCoverLetterFunction)),
 
