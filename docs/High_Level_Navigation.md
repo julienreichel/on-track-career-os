@@ -14,7 +14,7 @@ The application is organized around **five main navigation zones**:
    Job intake, job role card (implemented), company canvas (implemented), matching (implemented).
 
 3. **Applications** ⚠️ Partial
-   CV builder (implemented), cover letters (not implemented), speech builder (not implemented), KPI generator (not implemented).
+   CV builder (implemented), cover letters (not implemented), speech builder (not implemented).
 
 4. **Interview Prep** ❌ Not Implemented
    Interview questions generator, interview simulator.
@@ -702,8 +702,7 @@ Dashboard → Navigate to Profile/CV/Jobs
 - Generic CV (`/cv/new`, `/cv/:id`) ✅
 - Tailored CV ❌ Not Implemented (EPIC 6)
 - Tailored Letter ❌ Not Implemented (EPIC 6)
-- Tailored Speech ❌ Not Implemented (EPIC 4 + 6)
-- KPI Generator ❌ Not Implemented (EPIC 6)
+- Speech Builder (`/speech`, `/speech/[id]`) ❌ Not Implemented (EPIC 4, job optional)
 
 ### STEP 6 — Prepare Interview ❌ Not Implemented
 
@@ -794,8 +793,7 @@ Dashboard → Navigate to Profile/CV/Jobs
 ├── Tailored CV ❌ (EPIC 6)
 ├── Cover Letter Builder ❌ (EPIC 6)
 ├── Speech Builder ❌ (EPIC 4 + 6)
-└── KPI Generator ❌ (EPIC 6)
-    └── Note: Story-level KPIs exist ✅
+
 
 🎤 Interview Prep ❌
 ├── Interview Questions ❌ (EPIC 7)

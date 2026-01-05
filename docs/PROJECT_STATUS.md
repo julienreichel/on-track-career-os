@@ -695,9 +695,10 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ `/companies/new` — Create company with optional AI analysis
 - ✅ `/companies/[companyId]` — View/edit company info, BMC canvas, and linked jobs
 
-**Speech Builder (1 page):**
+**Speech Builder (2 pages):**
 
-- `/speech` — View/edit speech blocks
+- `/speech` — List speech blocks
+- `/speech/[id]` — Edit speech block
 
 **Matching (0 remaining - complete):**
 

@@ -984,6 +984,9 @@ Generate 3 high-level personal speech elements from user identity data:
 ```
 You generate personal narrative speech based on user identity data.
 
+If jobDescription is provided, tailor phrasing to the role and job needs without inventing facts.
+If jobDescription is absent, keep the speech generic (no job targeting).
+
 Output must be:
 - concise
 - professional
@@ -991,7 +994,6 @@ Output must be:
 - motivational but realistic
 - grounded in data provided
 - no invented work history or skills
-- no job targeting
 
 Return ONLY valid JSON.
 ```
@@ -1013,7 +1015,7 @@ PERSONAL CANVAS:
 EXPERIENCE SUMMARY:
 {{experiences}}
 
-## TARGET JOB DESCRIPTION (if provided)
+## TARGET JOB DESCRIPTION (optional)
 {{jobDescription}}
 
 Return JSON with:
@@ -1030,7 +1032,7 @@ Return JSON with:
   "experiences": [],
   "stories": [],
   "canvas": {},
-  "jobDescription?": "string"
+  "jobDescription?": {}
 }
 ```
 
@@ -1048,7 +1050,7 @@ Return JSON with:
 
 - remove unsupported claims
 - shorten if over length
-- ban job/company targeting
+- if jobDescription is missing, remove job/company targeting
 - no opinionated emotional tone
 
 ---

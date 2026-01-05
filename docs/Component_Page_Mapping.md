@@ -902,13 +902,12 @@ Each page includes:
 
 ## **5.3 Speech Builder** ❌
 
-**Route:** `/speech` or `/applications/[jobId]/speech` (planned)
+**Route:** `/speech` and `/speech/[id]` (planned)
 
 ### UI
 
 - `<UTextarea>`
 - `<USteps>` (multi-section)
-- `<UTabs>` (generic vs tailored)
 
 ### Components
 
@@ -916,7 +915,6 @@ Each page includes:
 
 ### Composables
 
-- `useTailoringEngine()` (not implemented)
 - `useUserProfile()` ✅
 - `useCanvasEngine()` ✅
 
@@ -926,10 +924,14 @@ Each page includes:
 
 ### AI Ops
 
-- `ai.generateSpeech` (not implemented - EPIC 4)
+- `ai.generateSpeech` (not implemented - EPIC 4, job optional)
+
+**Notes:**
+
+- Tailoring is enabled by optional job input on the same operation (no separate tailored route).
 
 **Status:** ❌ Not Implemented  
-**Blocking:** EPIC 4 (generic) + EPIC 6 (tailored) - AI operations missing
+**Blocking:** EPIC 4 - AI operation missing
 
 ---
 
@@ -1074,8 +1076,7 @@ Each page includes:
 | Tailored CV         | `/applications/:jobId/cv`           | ❌     | 6    | AI operation missing  |
 | Cover Letter        | `/applications/:jobId/cover-letter` | ❌     | 6    | AI operation missing  |
 | Speech Builder      | `/speech`                           | ❌     | 4    | AI operation missing  |
-| Tailored Speech     | `/applications/:jobId/speech`       | ❌     | 6    | AI operation missing  |
-| KPI Generator       | `/applications/:jobId/kpis`         | ❌     | 6    | AI operation missing  |
+| Speech Editor       | `/speech/[id]`                      | ❌     | 4    | AI operation missing  |
 | Interview Prep      | `/interviews/:jobId/prep`           | ❌     | 7    | AI operation missing  |
 | Interview Simulator | `/interviews/:jobId/simulate`       | ❌     | 7    | AI operations missing |
 | Settings            | `/settings`                         | ❌     | -    | Low priority          |
@@ -1170,7 +1171,7 @@ Each page includes:
 **❌ Missing (7 operations):**
 
 2. `ai.generateCoverLetter` - EPIC 6
-3. `ai.generateSpeech` - EPIC 6
+3. `ai.generateSpeech` - EPIC 4 (job optional)
 4. `ai.generateInterviewQuestions` - EPIC 7
 5. `ai.simulateInterviewTurn` - EPIC 7
 6. `ai.evaluateInterviewAnswer` - EPIC 7

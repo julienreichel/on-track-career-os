@@ -183,6 +183,8 @@ _(Structured per navigation zones)_
 - `/cv/new` - CV creation wizard (experience picker, options)
 - `/cv/:id` - CV Markdown editor with preview
 - `/cv/:id/print` - A4 print layout with auto-print
+- `/speech` - Speech block list
+- `/speech/:id` - Speech block editor
   (From Navigation Structure & Component Mapping )
 
 ### 5.1 My Profile

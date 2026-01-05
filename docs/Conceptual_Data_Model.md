@@ -300,11 +300,12 @@ _(EPIC 4)_
 - elevatorPitch
 - careerStory
 - whyMe
+- jobId (optional)
 
 **Relationships:**
 
 - 1 SpeechBlock → 1 UserProfile
-- 1 SpeechBlock → 1 JobDescription (tailored) (optional)
+- 1 SpeechBlock → 1 JobDescription (optional)
 
 ---
 
