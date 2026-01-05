@@ -86,7 +86,7 @@ test.describe('Speech Block E2E Flow', () => {
 
     // Wait for generation to complete - check if button becomes disabled (may be fast)
     await page.waitForTimeout(500);
-    
+
     // Wait for generation to finish - button should be enabled when done
     await expect(generateButton).toBeEnabled({ timeout: 90000 });
 
