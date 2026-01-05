@@ -86,6 +86,7 @@ describe('useCanvasEngine', () => {
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      getByUserId: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<PersonalCanvasRepository>>;
 
     mockUserProfileRepo = {
@@ -467,7 +468,7 @@ describe('useCanvasEngine', () => {
   describe('initializeForUser', () => {
     it('should load user profile and existing canvas', async () => {
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
-      mockRepository.list.mockResolvedValue([mockPersonalCanvas]);
+      mockRepository.getByUserId.mockResolvedValue(mockPersonalCanvas);
       mockService.getFullPersonalCanvas.mockResolvedValue(mockPersonalCanvas);
 
       const { profile, canvas, initializeForUser } = useCanvasEngine();
@@ -477,7 +478,7 @@ describe('useCanvasEngine', () => {
       expect(profile.value).toEqual(mockUserProfile);
       expect(canvas.value).toEqual(mockPersonalCanvas);
       expect(mockUserProfileRepo.get).toHaveBeenCalledWith('user-123');
-      expect(mockRepository.list).toHaveBeenCalledWith({ userId: { eq: 'user-123' } });
+      expect(mockRepository.getByUserId).toHaveBeenCalledWith('user-123');
     });
 
     it('should handle missing user profile', async () => {
@@ -492,7 +493,7 @@ describe('useCanvasEngine', () => {
 
     it('should handle user without existing canvas', async () => {
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
-      mockRepository.list.mockResolvedValue([]);
+      mockRepository.getByUserId.mockResolvedValue(null);
 
       const { profile, canvas, error, initializeForUser } = useCanvasEngine();
 
@@ -599,7 +600,7 @@ describe('useCanvasEngine', () => {
   describe('saveEdits', () => {
     it('should save manual edits to canvas', async () => {
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
-      mockRepository.list.mockResolvedValue([mockPersonalCanvas]);
+      mockRepository.getByUserId.mockResolvedValue(mockPersonalCanvas);
       mockService.getFullPersonalCanvas.mockResolvedValue(mockPersonalCanvas);
       mockRepository.update.mockResolvedValue({
         ...mockPersonalCanvas,

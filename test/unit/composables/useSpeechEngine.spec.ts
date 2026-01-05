@@ -92,6 +92,7 @@ describe('useSpeechEngine', () => {
       } as unknown as UserProfileService,
       personalCanvasRepo: {
         list: vi.fn().mockResolvedValue([canvas]),
+        getByUserId: vi.fn().mockResolvedValue(canvas),
       } as unknown as PersonalCanvasRepository,
       experienceRepo: {
         list: vi.fn().mockResolvedValue(experiences),
