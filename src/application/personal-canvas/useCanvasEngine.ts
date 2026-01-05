@@ -149,9 +149,9 @@ export function useCanvasEngine() {
       }
 
       // Try to load existing canvas for this user
-      const canvasList = await repository.list({ userId: { eq: userId } });
-      if (canvasList && canvasList.length > 0 && canvasList[0]) {
-        await loadCanvas(canvasList[0].id);
+      const existingCanvas = await repository.getByUserId(userId);
+      if (existingCanvas) {
+        await loadCanvas(existingCanvas.id);
       }
     } catch (err) {
       console.error('[useCanvasEngine] Error initializing:', err);

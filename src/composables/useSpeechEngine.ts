@@ -175,8 +175,7 @@ async function ensureProfile(userId: string, service: UserProfileService) {
 }
 
 async function loadCanvas(userId: string, repo: PersonalCanvasRepository) {
-  const [canvas] = await repo.list({ filter: { userId: { eq: userId } } });
-  return canvas ?? null;
+  return await repo.getByUserId(userId);
 }
 
 async function loadStories(experiences: Experience[], storyService: STARStoryService) {

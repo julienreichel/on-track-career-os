@@ -71,4 +71,13 @@ export class PersonalCanvasRepository {
   async delete(id: string) {
     await this.model.delete({ id }, gqlOptions());
   }
+
+  async getByUserId(userId: string) {
+    const results = await this.list({
+      filter: {
+        userId: { eq: userId },
+      },
+    });
+    return results[0] ?? null;
+  }
 }

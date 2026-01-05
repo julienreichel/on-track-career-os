@@ -203,6 +203,11 @@ async function loadStories(
 
 // Mapping functions (reuse from Speech)
 
+function filterNulls<T>(arr: T[] | null | undefined): Exclude<T, null>[] | undefined {
+  if (!arr) return undefined;
+  return arr.filter((item): item is Exclude<T, null> => item !== null);
+}
+
 function mapProfileToSpeechProfile(profile: UserProfile) {
   return {
     fullName: profile.fullName,
@@ -210,14 +215,14 @@ function mapProfileToSpeechProfile(profile: UserProfile) {
     location: profile.location ?? undefined,
     seniorityLevel: profile.seniorityLevel ?? undefined,
     workPermitInfo: profile.workPermitInfo ?? undefined,
-    goals: profile.goals ?? undefined,
-    aspirations: profile.aspirations ?? undefined,
-    personalValues: profile.personalValues ?? undefined,
-    strengths: profile.strengths ?? undefined,
-    interests: profile.interests ?? undefined,
-    skills: profile.skills ?? undefined,
-    certifications: profile.certifications ?? undefined,
-    languages: profile.languages ?? undefined,
+    goals: filterNulls(profile.goals),
+    aspirations: filterNulls(profile.aspirations),
+    personalValues: filterNulls(profile.personalValues),
+    strengths: filterNulls(profile.strengths),
+    interests: filterNulls(profile.interests),
+    skills: filterNulls(profile.skills),
+    certifications: filterNulls(profile.certifications),
+    languages: filterNulls(profile.languages),
   };
 }
 
@@ -227,8 +232,8 @@ function mapExperienceToSpeechExperience(exp: Experience) {
     companyName: exp.companyName ?? undefined,
     startDate: exp.startDate ?? undefined,
     endDate: exp.endDate ?? undefined,
-    responsibilities: exp.responsibilities ?? undefined,
-    tasks: exp.tasks ?? undefined,
+    responsibilities: filterNulls(exp.responsibilities),
+    tasks: filterNulls(exp.tasks),
     achievements: [],
     kpiSuggestions: [],
   };
@@ -241,20 +246,20 @@ function mapStoryToSpeechStory(story: STARStory) {
     task: story.task ?? undefined,
     action: story.action ?? undefined,
     result: story.result ?? undefined,
-    achievements: story.achievements ?? undefined,
+    achievements: filterNulls(story.achievements),
   };
 }
 
 function mapCanvasToSpeechCanvas(canvas: PersonalCanvas) {
   return {
-    customerSegments: canvas.customerSegments ?? undefined,
-    valueProposition: canvas.valueProposition ?? undefined,
-    channels: canvas.channels ?? undefined,
-    customerRelationships: canvas.customerRelationships ?? undefined,
-    keyActivities: canvas.keyActivities ?? undefined,
-    keyResources: canvas.keyResources ?? undefined,
-    keyPartners: canvas.keyPartners ?? undefined,
-    costStructure: canvas.costStructure ?? undefined,
-    revenueStreams: canvas.revenueStreams ?? undefined,
+    customerSegments: filterNulls(canvas.customerSegments),
+    valueProposition: filterNulls(canvas.valueProposition),
+    channels: filterNulls(canvas.channels),
+    customerRelationships: filterNulls(canvas.customerRelationships),
+    keyActivities: filterNulls(canvas.keyActivities),
+    keyResources: filterNulls(canvas.keyResources),
+    keyPartners: filterNulls(canvas.keyPartners),
+    costStructure: filterNulls(canvas.costStructure),
+    revenueStreams: filterNulls(canvas.revenueStreams),
   };
 }
