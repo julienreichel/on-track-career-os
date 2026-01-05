@@ -56,6 +56,26 @@
                 {{ resolvePreview(letter) }}
               </p>
             </div>
+
+            <!-- Custom Actions -->
+            <template #actions>
+              <UButton
+                :label="$t('coverLetter.display.actions.print')"
+                icon="i-heroicons-printer"
+                size="xs"
+                color="neutral"
+                variant="soft"
+                @click="handlePrint(letter)"
+              />
+              <UButton
+                :label="$t('common.edit')"
+                icon="i-heroicons-pencil"
+                size="xs"
+                color="primary"
+                variant="soft"
+                @click="navigateTo({ name: 'cover-letters-id', params: { id: letter.id } })"
+              />
+            </template>
           </ItemCard>
         </div>
       </UPageBody>
@@ -105,6 +125,11 @@ onMounted(async () => {
 const confirmDelete = (letter: CoverLetter) => {
   letterToDelete.value = letter;
   deleteModalOpen.value = true;
+};
+
+const handlePrint = (letter: CoverLetter) => {
+  const printUrl = `/cover-letters/${letter.id}/print`;
+  window.open(printUrl, '_blank');
 };
 
 const handleDelete = async () => {

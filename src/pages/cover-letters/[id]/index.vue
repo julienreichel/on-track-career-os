@@ -111,7 +111,6 @@ const handleDelete = async () => {
 };
 
 onMounted(async () => {
-  route.meta.breadcrumbLabel = t('coverLetter.display.title');
   await engine.load();
   await load();
 });
@@ -121,6 +120,8 @@ watch(item, (newValue) => {
     const content = newValue.content;
     editContent.value = content ? content : '';
     originalContent.value = editContent.value;
+    // Update breadcrumb with cover letter name
+    route.meta.breadcrumbLabel = newValue.name || t('coverLetter.display.untitled');
   }
 });
 </script>
