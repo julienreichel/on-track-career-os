@@ -304,24 +304,7 @@ _(EPIC 4)_
 **Relationships:**
 
 - 1 SpeechBlock → 1 UserProfile
-- 1 SpeechBlock → 1 JobDescription (tailored)
-
----
-
-## **ENTITY: KPISet**
-
-_(EPIC 6)_
-
-**Attributes:**
-
-- kpiId
-- kpiList
-- justificationList
-
-**Relationships:**
-
-- 1 KPISet → 1 JobDescription
-- 1 KPISet → 1 MatchingSummary
+- 1 SpeechBlock → 1 JobDescription (tailored) (optional)
 
 ---
 
@@ -389,7 +372,7 @@ Company ↔ Jobs
 MatchingSummary ↔ (User, Job, Company)
 1 match per unique combination
 
-JobDescription ↔ (CV / CoverLetter / Speech / KPISet)
+JobDescription ↔ (CV / CoverLetter / Speech )
 1 ↔ 1 (tailored)
 
 InterviewSession ↔ (UserProfile / JobDescription)

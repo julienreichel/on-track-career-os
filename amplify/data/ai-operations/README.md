@@ -34,10 +34,9 @@ This directory contains AWS Lambda functions implementing the 17 AI operations d
 
 ### Application Materials (EPIC 6)
 
-- ⏳ `ai.generateTailoredCvBlocks` - Tailored CV sections
+- ⏳ `ai.generateCv` - Tailored CV
 - ⏳ `ai.generateCoverLetter` - Generate cover letters
-- ⏳ `ai.generateTailoredSpeech` - Elevator pitches
-- ⏳ `ai.generateTailoredKpis` - Tailored KPI suggestions
+- ⏳ `ai.generateSpeech` - Elevator pitches
 
 ### Interview Prep (EPIC 7 / 9)
 

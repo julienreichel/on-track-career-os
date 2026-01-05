@@ -11,7 +11,7 @@
 
 1. **Know Yourself** → Build your professional profile, document experiences with STAR methodology, generate your Personal Canvas
 2. **Understand the Opportunity** → Analyze job descriptions, research companies, create role and company canvases
-3. **Communicate Your Value** → Generate tailored CVs, cover letters, elevator pitches, and KPIs that match your strengths to company needs
+3. **Communicate Your Value** → Generate tailored CVs, cover letters, elevator pitches that match your strengths to company needs
 4. **Prepare & Apply** → Practice with AI-generated interview questions and simulations
 
 ## 🏗️ Architecture

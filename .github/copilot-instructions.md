@@ -9,7 +9,7 @@
 1. User Identity: `UserProfile`, `PersonalCanvas`, `Experience`
 2. Stories: `STARStory` (STAR methodology)
 3. Job/Company: `JobDescription`, `Company`, `CompanyCanvas`
-4. Materials: `CVDocument`, `CoverLetter`, `SpeechBlock`, `KPISet`
+4. Materials: `CVDocument`, `CoverLetter`, `SpeechBlock`
 5. Interview: `InterviewQuestionSet`, `InterviewSession`
 
 Owner-based auth on all models: `authorization((allow) => [allow.owner()])`

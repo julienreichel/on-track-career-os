@@ -157,7 +157,6 @@ Cross-template formatting, user-controlled toggles, and print layout visual desi
 - Generate personal pitch
 - Generate career story
 - Generate “Why me?” statements
-- Editable speech blocks
 
 ### User Value
 
@@ -166,6 +165,38 @@ Users feel more confident when explaining their professional story.
 ### Reason in MVP
 
 Used for cover letters, interviews, and self-positioning.
+
+---
+
+## **EPIC 4B — Generic Cover Letter Generator**
+
+**Goal:**
+Provide users with a clear, well-structured, and editable cover letter that expresses their motivation and value proposition in writing.
+
+### Includes
+
+- Generate a generic cover letter based on:
+  - User profile (identity, values, strengths)
+  - Key experiences and stories
+  - Personal positioning (canvas, career direction)
+
+- Structured letter sections (introduction, motivation, value contribution, closing)
+- Editable text with full user control
+- Regenerate at any time without losing the ability to edit
+- Store and manage multiple cover letters
+
+### User Value
+
+Users obtain a professional, coherent cover letter that:
+
+- Clearly explains who they are and what they bring
+- Reduces the cognitive load of “starting from a blank page”
+- Serves as a strong base for later job-specific tailoring
+
+### Reason in MVP
+
+A cover letter is a core application deliverable.
+Providing a high-quality generic version ensures users can apply quickly while maintaining consistency across CV, speech, and personal narrative.
 
 ---
 
@@ -278,14 +309,13 @@ Tailoring requires this synthesis.
 
 ## EPIC 6 — Tailored Application Materials
 
-**Goal:** Create job-specific CVs, letters, KPIs, and speech.
+**Goal:** Create job-specific CVs, letters, and speech.
 
 ### Includes
 
 - Tailored CV
 - Tailored cover letter
 - Tailored elevator pitch
-- Tailored KPI proposition
 
 ### User Value
 

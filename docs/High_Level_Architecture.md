@@ -239,20 +239,6 @@ _(Supports EPIC 4)_
 
 ---
 
-## 3.4 KPI Proposition Generator ❌ NOT IMPLEMENTED
-
-- Suggests 2–3 KPIs grounded in company pains & user strengths
-- Adds justification/explanation
-
-**Status:** EPIC 6 - Blocked by missing AI operation (`ai.generateTailoredKpis`); matching context now available
-
-**Note:** `AchievementsKpisPanel` component exists for story-level KPIs (uses `ai.generateAchievementsAndKpis`)
-
-**Planned Nuxt UI:**
-`<UBadge>`, `<UCard>`, `<UAlert>`
-
----
-
 ## 3.5 Interview Question Generator ❌ NOT IMPLEMENTED
 
 _(Supports EPIC 7)_

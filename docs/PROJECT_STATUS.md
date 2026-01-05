@@ -502,14 +502,11 @@ The project has established a **strong backend and domain foundation** with comp
 **Implemented:**
 
 - ✅ CoverLetter GraphQL model
-- ✅ KPISet GraphQL model
 
 **Missing:**
 
-- ❌ `ai.generateTailoredCvBlocks` Lambda
 - ❌ `ai.generateCoverLetter` Lambda
-- ❌ `ai.generateTailoredSpeech` Lambda
-- ❌ `ai.generateTailoredKpis` Lambda
+- ❌ `ai.generateSpeech` Lambda
 - ❌ All domain layers
 - ❌ All UI pages
 
@@ -582,10 +579,8 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Application Materials (4 missing):**
 
-- ❌ `ai.generateTailoredCvBlocks`
 - ❌ `ai.generateCoverLetter`
-- ❌ `ai.generateTailoredSpeech`
-- ❌ `ai.generateTailoredKpis`
+- ❌ `ai.generateSpeech`
 
 **Interview Prep (3 missing):**
 
@@ -599,23 +594,23 @@ The project has established a **strong backend and domain foundation** with comp
 
 ### Implemented Models (10/16 MVP Required)
 
-| Domain              | Models         | Repository | Service | Composable | Tests            |
-| ------------------- | -------------- | ---------- | ------- | ---------- | ---------------- |
-| **User Identity**   | UserProfile    | ✅         | ✅      | ✅         | ✅               |
-| **Experience**      | Experience     | ✅         | ✅      | ✅         | ✅               |
-| **STAR Story**      | STARStory      | ✅         | ✅      | ✅         | ✅               |
-| **Personal Canvas** | PersonalCanvas | ✅         | ✅      | ✅         | 40 tests         |
-| **CV Document**     | CVDocument     | ✅         | ✅      | ✅         | 44 tests         |
-| **JobDescription**  | JobDescription | ✅         | ✅      | ✅         | 25+ tests        |
-| **Company**         | Company        | ✅         | ✅      | ✅         | 50+ tests        |
-| **CompanyCanvas**   | CompanyCanvas  | ✅         | ✅      | ✅         | 50+ tests        |
-| **MatchingSummary** | MatchingSummary | ✅        | ✅      | ✅         | 6 tests          |
-| **AI Operations**   | (Lambdas)      | ✅         | ✅      | ✅         | 44 Amplify tests |
+| Domain              | Models          | Repository | Service | Composable | Tests            |
+| ------------------- | --------------- | ---------- | ------- | ---------- | ---------------- |
+| **User Identity**   | UserProfile     | ✅         | ✅      | ✅         | ✅               |
+| **Experience**      | Experience      | ✅         | ✅      | ✅         | ✅               |
+| **STAR Story**      | STARStory       | ✅         | ✅      | ✅         | ✅               |
+| **Personal Canvas** | PersonalCanvas  | ✅         | ✅      | ✅         | 40 tests         |
+| **CV Document**     | CVDocument      | ✅         | ✅      | ✅         | 44 tests         |
+| **JobDescription**  | JobDescription  | ✅         | ✅      | ✅         | 25+ tests        |
+| **Company**         | Company         | ✅         | ✅      | ✅         | 50+ tests        |
+| **CompanyCanvas**   | CompanyCanvas   | ✅         | ✅      | ✅         | 50+ tests        |
+| **MatchingSummary** | MatchingSummary | ✅         | ✅      | ✅         | 6 tests          |
+| **AI Operations**   | (Lambdas)       | ✅         | ✅      | ✅         | 44 Amplify tests |
 
 ### Missing Domain Layers (6 models exist in schema but no domain layer)
+
 - ❌ CoverLetter
 - ❌ SpeechBlock
-- ❌ KPISet
 - ❌ InterviewQuestionSet
 - ❌ InterviewSession
 
@@ -947,15 +942,13 @@ The project has established a **strong backend and domain foundation** with comp
 **Tasks:**
 
 1. Implement 4 tailoring AI operations:
-   - `ai.generateTailoredCvBlocks`
+   - `ai.generateCv`
    - `ai.generateCoverLetter`
-   - `ai.generateTailoredSpeech`
-   - `ai.generateTailoredKpis`
-2. Create domain layers for CoverLetter and KPISet
+   - `ai.generateSpeech`
+2. Create domain layers for CoverLetter
 3. Create 3 tailored material pages:
    - `/applications/:jobId/cv` — Tailored CV
    - `/applications/:jobId/cover-letter` — Cover letter
-   - `/applications/:jobId/kpis` — KPI set
 
 **Estimated Effort:** 3-4 weeks  
 **Value:** Complete application workflow

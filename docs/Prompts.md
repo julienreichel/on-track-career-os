@@ -41,392 +41,805 @@ Output:
 
 ---
 
-## Master Prompt 1 — Implement `ai.generateMatchingSummary` AI Operation (Lambda + schemas + tests)
+## Master Prompt 1 — Documentation + Contract Alignment for EPIC 4 (Speech)
 
 ### 1) Title
 
-EPIC 5C — Add AI Operation `ai.generateMatchingSummary` (strict JSON, deterministic, validated)
+EPIC 4 — Align docs + AI Interaction Contract to single `ai.generateSpeech` (job optional)
 
-### 2) Intro (context + why)
+### 2) Intro
 
-EPIC 5C is blocked primarily by the missing AI operation that produces the **matching summary** used by the UI and downstream EPIC 6 tailoring. The project uses a deterministic **AI operations registry** where **the app never receives free-form text**—only JSON validated by strict schemas + fallback rules. `ai.generateMatchingSummary` is explicitly planned and currently missing.
+We’re starting EPIC 4 implementation. Current docs are inconsistent: speech is referenced both as generic and tailored, and the AI contract currently defines `ai.generateUserSpeech` (not `ai.generateSpeech`) and includes a “no job targeting” rule, which conflicts with our “job optional tailoring” strategy. Fix docs/contracts first to prevent implementation drift.
 
 ### 3) Feature scope
 
-**Implement:**
+**In scope**
 
-- A new Lambda-backed AI operation: `ai.generateMatchingSummary`
-- Strict input/output schema validation (pre-call + post-call)
-- Fallback strategy consistent with the AI Interaction Contract “ERROR FALLBACK RULES”
-- Unit/sandbox tests for schema validation + fallback behavior
+- Update documentation and AI Interaction Contract to reflect the final decisions:
+  - single op: `ai.generateSpeech`
+  - optional `jobDescription` input enables tailored variant
+  - routes: `/speech` and `/speech/[id]` (CV pattern)
 
-**Out of scope:**
+- Update conceptual notes to clarify `SpeechBlock.jobId` is optional (tailoring comes later through same op)
 
-- Any new frameworks or UI work (handled in other prompts)
+**Out of scope**
+
+- No production code changes beyond what is necessary to keep docs/contracts consistent with implementation (no UI building yet)
+- No EPIC 6 pages/routes
 
 ### 4) Composables / services / repositories / domain modules
 
-- Add operation definition to the AI operations registry (same pattern as existing ops like `ai.parseJobDescription`, `ai.analyzeCompanyInfo`)
-- Add shared schema types exported in the same “single source of truth” style used elsewhere (Lambda → types re-exported to frontend)
+- None (doc-only), but call out any “naming changes” that the implementation must follow (operation name, schema key names).
 
 ### 5) Components
 
-- None
+- None.
 
 ### 6) Pages/routes
 
-- None
+- Ensure docs state:
+  - List page: `/speech`
+  - Detail editor: `/speech/[id]`
 
-### 7) AI operations impact (names, inputs/outputs, validation + fallback, call sites)
+### 7) AI operations impact
 
-**Operation name:** `ai.generateMatchingSummary`
+Update **AI_Interaction_Contract.md**:
 
-**Output schema (MVP):**
-Return JSON containing these fields (names should match app expectations; allow snake_case → normalize to camelCase if your Lambda infra already supports that):
+- Rename `ai.generateUserSpeech` → `ai.generateSpeech`
+- Update **System Prompt rule**:
+  - If `jobDescription` is absent → generic speech (no job targeting)
+  - If `jobDescription` is present → tailor phrasing to role/job needs **without inventing facts**
 
-- `fitSummary: string`
-- `impactAreas: string[]`
-- `contributionMap: string[]`
-- `risks: string[]`
+- Ensure **Output Schema keys** exactly match what will be persisted in `SpeechBlock` (`elevatorPitch`, `careerStory`, `whyMe`) (avoid mismatches like “whyMeStatement” vs “whyMe”).
 
-**Input schema (define explicitly):**
-Use structured inputs only—no raw free-text. Input should be a JSON object that can be composed from existing models:
+Update **Component_Page_Mapping.md**:
 
-- `userProfile: {…}` (the profile fields used by other operations)
-- `personalCanvas?: {…}` (optional but recommended; if missing, AI must still produce stable output)
-- `jobDescription: {…}` (the analyzed job fields, not the raw posting)
-- `company?: { companyProfile?: {…}, companyCanvas?: {…} }` (optional, because job may not have a linked company/canvas)
+- Remove `ai.generateTailoredSpeech` references; keep a single `ai.generateSpeech`
+- Update routes for speech from the planned `/applications/[jobId]/speech` to `/speech/[id]` and note tailoring occurs via optional job input (later)
 
-**Fallback rules (must implement):**
-Follow the contract’s global rules:
+Update **Conceptual_Data_Model.md**:
 
-- If output is not valid JSON → attempt substring parse → retry once with “Return ONLY VALID JSON matching schema”
-- Missing strings → `""`; missing arrays → `[]`; missing objects → `{}`
-- Log fallback steps used + store input/output payloads for traceability
-
-**Where it is called from (later prompts implement caller):**
-
-- Called by `useMatchingEngine()` (workflow composable) when user requests/opens the match page, and persisted to `MatchingSummary`
+- Clarify SpeechBlock ↔ JobDescription relationship is **optional** (job-tailored speech is still SpeechBlock, with jobId nullable).
 
 ### 8) Testing requirements
 
-Add tests at the same rigor level as existing AI ops:
+- No tests (doc-only change), but ensure schemas are deterministic and validate-able.
 
-- Lambda unit tests:
-  - Valid input → valid output schema passes
-  - Output missing fields → fallback fills defaults
-  - Output invalid JSON → retry path exercised (mock AI response)
+### 9) Acceptance criteria
 
-- Sandbox E2E AI tests: one happy path, one fallback path
-
-### 9) Acceptance criteria (checklist)
-
-- [ ] `ai.generateMatchingSummary` exists in the AI ops registry and can be invoked with strict schemas
-- [ ] Output JSON is always normalized + schema-valid (never free text reaches app)
-- [ ] Fallback behavior matches contract rules (retry + defaults)
-- [ ] Comprehensive tests pass (unit + sandbox), consistent with existing AI op quality gates
-- [ ] No new dependencies/frameworks introduced
+- [ ] AI Interaction Contract contains **`ai.generateSpeech`** (not `ai.generateUserSpeech`)
+- [ ] Contract explicitly defines **optional job tailoring** behavior
+- [ ] Output schema keys match persisted entity fields exactly: `elevatorPitch`, `careerStory`, `whyMe`
+- [ ] Component/Page mapping references `/speech` + `/speech/[id]` and a single AI op
+- [ ] Conceptual model clarifies `jobId` optional for SpeechBlock
 
 ---
 
-## Master Prompt 2 — Add MatchingSummary Domain Layer (Repository + Service + Application Composable)
+## Master Prompt 2 — SpeechBlock Backend Model + Domain Layer (Repo/Service/Composables)
 
 ### 1) Title
 
-EPIC 5C — Implement MatchingSummary domain layer (Amplify Gen2 GraphQL + type-safe repo/service)
+EPIC 4 — Implement SpeechBlock CRUD domain layer (Amplify Gen2 + strict TS)
 
-### 2) Intro (context + why)
+### 2) Intro
 
-The CDM already includes `MatchingSummary`, but EPIC 5C is missing the domain layer: repository/service/composables. The app follows a clean split: repositories in `src/data/repositories`, domain services, and entity CRUD composables in `src/application`, plus workflow composables in `src/composables`.
+EPIC 4 is currently blocked because the SpeechBlock model exists but there is no domain layer (repository/service/composable). PROJECT_STATUS explicitly lists SpeechBlock model as implemented but everything else missing.
 
 ### 3) Feature scope
 
-**Implement:**
+**In scope**
 
-- Repository for `MatchingSummary` CRUD using Amplify GraphQL patterns
-- Service encapsulating “upsert for (userId, jobId, companyId?)” semantics
-- Application-layer composable `useMatchingSummary(matchId | byJobId)` consistent with other entities
+- Ensure GraphQL model for `SpeechBlock` supports:
+  - required: `elevatorPitch`, `careerStory`, `whyMe`
+  - relationship to `UserProfile` (owner)
+  - optional relationship to `JobDescription` (future tailoring; keep nullable)
+  - created/updated timestamps (follow existing conventions)
 
-**Out of scope:**
+- Implement:
+  - `SpeechBlockRepository` (CRUD)
+  - `SpeechBlockService` (business rules + orchestration helpers)
+  - composables: `useSpeechBlocks()` (list) and `useSpeechBlock(id)` (single), consistent with `useCVDocument(s)` patterns
 
-- Workflow orchestration or AI calls (covered in Prompt 3)
-- UI rendering (Prompt 4)
+**Out of scope**
 
-### 4) Composables / services / repositories / domain modules to create or update
+- No AI operation implementation here
+- No UI pages/components (those are separate prompts)
+- No EPIC 6 job-tailoring page
+
+### 4) Composables / services / repositories / domain modules
 
 Create/update:
 
-- `src/data/repositories/matchingSummaryRepository.ts`
-- `src/domain/services/MatchingSummaryService.ts` (or existing naming conventions used in the repo)
-- `src/application/useMatchingSummary(...)` (entity-level CRUD composable)
+- `src/domain/speech/SpeechBlockRepository.ts`
+- `src/domain/speech/SpeechBlockService.ts`
+- `src/application/useSpeechBlocks.ts` (list + search/filter pattern if applicable)
+- `src/application/useSpeechBlock.ts` (single CRUD)
+- Types + mapper utilities consistent with existing domain conventions (no `any`, strict nullability)
 
-Key domain decisions to enforce (DRY):
+Business rules (service level):
 
-- Support “get existing summary for user+job(+company)” and update it instead of creating duplicates
-- Persist fields aligned with CDM:
-  - `impactAreas`
-  - `contributionMap`
-  - `riskMitigationPoints` (or alias mapping from AI `risks`)
-  - `summaryParagraph` (or alias mapping from AI `fitSummary`)
+- “One generic speech block” recommendation can be enforced at UI later; service should be flexible:
+  - allow multiple speech blocks
+  - allow optional `jobId` (nullable)
+
+- Add helper to “create draft SpeechBlock” (empty strings) for new flows if that matches CV patterns.
 
 ### 5) Components
 
-- None
+- None in this prompt.
 
 ### 6) Pages/routes
 
-- None
+- None in this prompt.
 
 ### 7) AI operations impact
 
-- None directly (domain layer should be AI-agnostic; workflow comp will call AI then persist via service)
+- None. Domain layer must be ready to persist AI results later.
 
 ### 8) Testing requirements
 
-Vitest tests:
+Add Vitest unit tests:
 
-- Repository tests:
-  - create/read/update
-  - list/query patterns used by the workflow
+- Repository CRUD happy path + error path (mock GraphQL client the same way as other repos)
+- Service methods:
+  - create/update validation (e.g., trimming, empty handling rules if you adopt them)
+  - optional jobId behavior
 
-- Service tests:
-  - “upsert-by-job” behavior (no duplicates)
-  - mapping logic between AI output DTO and persisted entity fields (explicit mapping function)
-
-### 9) Acceptance criteria
-
-- [ ] `MatchingSummary` has a full repo/service/application composable consistent with other entities
-- [ ] Upsert behavior prevents duplicates for the same job context
-- [ ] Field mapping is centralized (single mapping function) and unit tested
-- [ ] All tests pass; lint clean; no new patterns introduced
-
----
-
-## Master Prompt 3 — Build `useMatchingEngine()` Workflow Composable (data gathering + AI call + persistence)
-
-### 1) Title
-
-EPIC 5C — Implement workflow composable `useMatchingEngine()` (User × Job × Company)
-
-### 2) Intro (context + why)
-
-The matching page needs a single orchestration layer that gathers all required structured inputs (user profile, personal canvas, job description, optional company+canvas), invokes `ai.generateMatchingSummary`, applies fallback rules, and persists the result into `MatchingSummary`. The mapping doc explicitly calls for a `useMatchingEngine()` composable and reuse of existing patterns like `useJobAnalysis()` and `useCanvasEngine()`.
-
-### 3) Feature scope
-
-**Implement:**
-
-- `useMatchingEngine(jobId)` (or similar signature matching your conventions)
-- A single “generate or refresh matching” method:
-  - load required models
-  - validate prerequisites
-  - call AI operation
-  - persist summary
-  - expose UI-ready computed state (loading/error/empty)
-
-**Out of scope:**
-
-- Any new global store
-- Any background regeneration strategy (no polling); keep it user-triggered or page-entry-triggered
-
-### 4) Composables / services / repositories / domain modules to create or update
-
-Create:
-
-- `src/composables/useMatchingEngine.ts`
-
-Reuse:
-
-- `useUserProfile()` for current user data
-- `useCanvasEngine()` / `usePersonalCanvas()` for personal canvas access
-- `useJobAnalysis()` / job composables for `JobDescription`
-- Company composables from EPIC 5B for `Company` and `CompanyCanvas` (optional)
-
-### 5) Components
-
-- None (but shape the returned data so components can stay “dumb”)
-
-### 6) Pages/routes
-
-- None
-
-### 7) AI operations impact (where called from + fallback)
-
-- Call `ai.generateMatchingSummary` only with structured JSON input (no raw text)
-- Enforce “optional company context”:
-  - If job has no company or company has no canvas, still produce stable output
-
-- Apply the same strict schema validation and fallback approach used across AI ops (but don’t duplicate the Lambda validator—use shared client-side type guards if present, or rely on the fact Lambda already returns validated JSON)
-
-### 8) Testing requirements
-
-Vitest:
-
-- Workflow composable tests:
-  - happy path: all inputs exist → AI called → persisted → state updated
-  - missing company/canvas path: still calls AI with reduced input
-  - missing personal canvas path: either block with a clear error state or proceed with reduced input (choose one behavior and test it)
-  - error path: AI op fails → composable exposes stable error + no partial writes
+- Composables:
+  - loading/error state
+  - list refresh after create/delete
+  - optimistic update rules if used elsewhere
 
 ### 9) Acceptance criteria
 
-- [ ] `useMatchingEngine` composes existing composables (no duplication of canvas/job/company logic)
-- [ ] Works with or without linked company/canvas
-- [ ] Exposes clear states: `isLoading`, `error`, `matchingSummary`, and `regenerate()`
-- [ ] Tests cover all major branches; lint clean; strict TS passes
+- [ ] SpeechBlock CRUD works via repository/service/composables
+- [ ] Strict TS types, no `any`, correct nullable job relationship
+- [ ] Unit tests cover repository/service/composables (happy + error paths)
+- [ ] Conventions match existing entities (naming, folder structure, error handling)
 
 ---
 
-## Master Prompt 4 — Implement Matching Summary UI (components + `/jobs/[jobId]/match` page + navigation)
+## Master Prompt 3 — Implement `ai.generateSpeech` Operation (Lambda + strict schema + fallback)
 
 ### 1) Title
 
-EPIC 5C — Create `/jobs/[jobId]/match` page + MatchingSummary components (Nuxt UI scaffold)
+EPIC 4 — Add AI operation `ai.generateSpeech` with strict JSON schema validation + fallback
 
-### 2) Intro (context + why)
+### 2) Intro
 
-EPIC 5C’s planned UI route is `/jobs/[jobId]/match`. The mapping doc defines the UI primitives (UCard/UAlert/UBadge/UProgress) and required data (MatchingSummary + Job + Canvas context). The UI must follow the standard scaffold: `UContainer → UPage → UPageHeader/UPageBody`, reuse card patterns, and integrate breadcrumbs/navigation consistent with the Jobs & Companies section.
+EPIC 4 is blocked by the missing AI operation. The system uses a deterministic registry of AI operations with strict input/output schemas and fallback behavior. Speech generation must output JSON only. High-level intended sections are in roadmap/status docs: elevator pitch, career story, why-me.
 
 ### 3) Feature scope
 
-**Implement:**
+**In scope**
 
-- New page: `/jobs/[jobId]/match`
-- Page header:
-  - breadcrumb: Jobs & Companies → Job (title) → Match
-  - optional action button: “Generate / Refresh match”
+- Implement `ai.generateSpeech` in the AI-Operations Lambda layer:
+  - build prompt deterministically
+  - validate response strictly against schema
+  - implement contract-compatible fallback (retry once, then return safe empty JSON + needsUpdate flag if that’s the system pattern)
 
-- Page body:
-  - A primary “Matching Summary” card rendering:
-    - `summaryParagraph` / `fitSummary`
-    - impact areas
-    - contribution map
-    - risks + mitigation points (depending on final field naming)
+- Input must support:
+  - user identity data (UserProfile + optionally PersonalCanvas)
+  - selected experiences/stories summary (use existing patterns from CV/matching operations)
+  - optional `jobDescription` (string or structured summary) to tailor output
 
-- Optional “Fit score visualization” UI element:
-  - If no score exists (MVP), render a placeholder or hide component (do not invent score)
+- Output must be:
+  - `{ elevatorPitch: string, careerStory: string, whyMe: string }` only (no extra keys)
 
-**Out of scope:**
+**Out of scope**
 
-- Any tailoring pages (EPIC 6)
-- Any new charting library/framework
+- No UI calls directly into AI layer (must be orchestrated via composable/service)
+- No streaming, no free-text
+- No EPIC 6 tailoring engine
 
 ### 4) Composables / services / repositories / domain modules
 
-Use:
+- Add operation registration in existing AI ops registry (mirror `ai.generateMatchingSummary` or `ai.generateCv` patterns).
+- Add small shared helper if needed for “speech prompt input building” (but avoid duplication; reuse existing aggregation utilities if any exist for profile/stories).
 
-- `useMatchingEngine()` for orchestration
-- Existing job composable to show job title & linked company badge in header area (reuse `LinkedCompanyBadge` if appropriate)
+### 5) Components
 
-### 5) Components to create or update (Nuxt UI)
+- None.
 
-Create components (keep them presentational; data comes from composable):
+### 6) Pages/routes
 
-- `MatchingSummaryCard` (renders summary + lists)
-- `FitScoreVisualization` (optional; should accept nullable/optional score; hide when undefined)
-- Consider reusing existing “Card pattern” components used in other pages (do not fork patterns)
-
-### 6) Pages/routes to create or update (navigation/breadcrumb behavior)
-
-Create:
-
-- `pages/jobs/[jobId]/match.vue`
-
-Update:
-
-- `pages/jobs/[jobId].vue` to include a visible navigation entry/button/link to “View Match” (only enabled when job is analyzed; optionally warn if prerequisites missing)
-
-Breadcrumb expectations:
-
-- Must include dynamic job title
-- Must be consistent with existing job detail breadcrumb pattern
+- None.
 
 ### 7) AI operations impact
 
-- The page should call `useMatchingEngine().regenerate()` on user action and/or on initial mount (choose one consistent behavior; avoid double calls)
-- Must never handle free-form text; render only validated fields already persisted/returned by the workflow
+Operation: `ai.generateSpeech`
+
+**Input (recommendation)**
+
+- `userProfile` minimal set (headline, strengths, goals, values, etc.)
+- `personalCanvas` optional summary fields if already used elsewhere
+- `experiences` / `stories` condensed arrays (strings), consistent with earlier “no objects in arrays unless contract says so” rules used in the contract
+- `jobDescription?` optional string: if present, tailor; if absent, generic
+
+**Output**
+
+- Strict schema (exact keys):
+  - `elevatorPitch: string`
+  - `careerStory: string`
+  - `whyMe: string`
+
+**Validation & fallback rules**
+
+- Validate JSON parse + schema exactness (no extra keys).
+- Retry once with stricter “JSON only, exact keys” instruction.
+- If still invalid: return fallback JSON with empty strings + set a `needsUpdate` flag only if your standard pattern supports it; otherwise keep empty strings but ensure UI stability. (Align with contract-wide fallback approach.)
 
 ### 8) Testing requirements
 
 Vitest:
 
-- Page test for `/jobs/[jobId]/match`:
-  - renders loading state
-  - renders empty/error state
-  - renders match data state (with mocked composable)
+- AI operation unit tests with mocked model output:
+  - valid output passes validation
+  - extra keys rejected
+  - invalid JSON triggers retry then fallback
+  - jobDescription present changes prompt (assert prompt content includes job section)
+    Sandbox E2E (if you follow the existing pattern like generateCv):
 
-- Component tests:
-  - `MatchingSummaryCard` renders lists robustly for empty arrays
-  - `FitScoreVisualization` hides safely when score missing
-
-Playwright is covered in Prompt 5.
+- GraphQL invocation of deployed lambda returns schema-valid JSON
 
 ### 9) Acceptance criteria
 
-- [ ] `/jobs/[jobId]/match` exists with standard Nuxt UI scaffold
-- [ ] Uses `useMatchingEngine` and does not duplicate orchestration logic
-- [ ] Presents summary + 3 sections (impact, contribution, risks) with good empty states
-- [ ] Navigation from job detail → match works and breadcrumb is correct
-- [ ] All Vitest component/page tests pass; strict TS; lint clean
+- [ ] `ai.generateSpeech` exists in registry and can be invoked via GraphQL
+- [ ] Output is always strict JSON matching schema exactly
+- [ ] Optional `jobDescription` influences prompt but does not change schema
+- [ ] Retry + fallback works and is tested
+- [ ] Tests exist: unit + sandbox E2E (if used in this repo for other ops)
 
 ---
 
-## Master Prompt 5 — Add the Single Playwright E2E Happy Path for EPIC 5C
+## Master Prompt 4 — Speech UI Components + Editor Pattern (Nuxt UI, composable-first)
 
 ### 1) Title
 
-EPIC 5C — Playwright E2E: job → match generation → persistence → refresh
+EPIC 4 — Build Speech editor components (sections + generate/regenerate + save)
 
-### 2) Intro (context + why)
+### 2) Intro
 
-The repo maintains robust E2E “happy path” coverage per EPIC (e.g., jobs-flow, company-workflow). EPIC 5C requires exactly one E2E spec validating that a user can open a job and generate/view a matching summary using strict JSON AI output and persisted `MatchingSummary`.
+We need a consistent UI to view/edit the three speech sections, with a “Generate” action driven by the AI op. Use existing Nuxt UI scaffolds and “Card patterns”, and keep pages thin by pushing logic into composables/services (similar to CV + matching pages).
 
 ### 3) Feature scope
 
-**Test must cover:**
+**In scope**
 
-- Navigate to an existing analyzed job (or create one if your E2E pattern does that)
-- Go to `/jobs/[jobId]/match`
-- Trigger matching generation (button or auto-generate)
-- Verify key UI elements render (summary + at least one list section)
-- Refresh/reload page and verify it loads from persisted `MatchingSummary` (no re-generation required unless user triggers it)
+- Create reusable components for editing a SpeechBlock:
+  - Three sections: Elevator pitch, Career story, Why me
+  - Generate/regenerate controls
+  - Save/cancel behaviors with dirty-state management
 
-**Out of scope:**
+- Reuse existing design patterns:
+  - `<UContainer> → <UPage> → <UPageHeader>/<UPageBody>`
+  - `UCard` sections
+  - consistent loading/error/empty states
 
-- Negative cases (AI failure), separate tests
-- Visual regression
+**Out of scope**
 
-### 4) Composables/services/repositories
+- No job-specific tailoring UI yet (just keep the optional hook in place)
+- No cross-export to CV/letter
+- No rich text editor unless already used; default to `<UTextarea>` like planned
 
-- None directly; but the test assumes the full stack is wired (workflow composable, AI op, persistence)
+### 4) Composables / services / repositories / domain modules
 
-### 5) Components
+Create/update:
 
-- Use stable locators:
-  - Prefer `getByRole()` / `getByTestId()` patterns consistent with your existing suite
-  - Avoid ambiguous `getByText()` strict mode pitfalls (scope locators to region/cards)
+- `useSpeechEngine()` (or similar) orchestration composable:
+  - fetch required context (profile/canvas/stories) using existing composables
+  - call backend service method that triggers AI op
+  - merge AI output into editable local state
+  - handle retry/fallback display states cleanly
 
-### 6) Pages/routes (navigation expectations)
+- Keep persistence via `useSpeechBlock(id)` composable from Prompt 2.
 
-- Start from `/jobs` list → open job detail
-- Use explicit link/button to match page OR direct navigation to `/jobs/${jobId}/match`
-- Validate breadcrumb shows job title and “Match”
+### 5) Components to create or update
+
+Suggested components (reuse naming conventions):
+
+- `SpeechBlockEditorCard.vue` (main editor wrapper)
+- `SpeechSectionEditor.vue` (DRY: label + helper copy + textarea + char count)
+- `SpeechGenerateButton.vue` (optional: encapsulate loading + tooltip + disabled rules)
+- `EmptyStateCard.vue` reuse if exists; otherwise use existing empty state pattern
+
+### 6) Pages/routes to create or update
+
+- `/speech` list page:
+  - shows saved speech blocks as cards (CV-style)
+  - primary CTA: “Create Speech Block”
+  - each item links to `/speech/[id]`
+
+- `/speech/[id]` detail page:
+  - breadcrumb: Dashboard → Applications (or Speech) → Speech Block
+  - header actions: Save, Generate/Regenerate, Delete (if consistent with other entities)
+  - body: 3 section cards
+
+Navigation alignment:
+
+- Add entry in the dashboard/navigation area consistent with “Applications / Speech Builder” placement.
 
 ### 7) AI operations impact
 
-- The E2E should use the real AI operation in the environment if that’s the standard for your other E2Es; otherwise, follow the same mock/sandbox approach used in existing workflows
-- Must validate the UI receives JSON-shaped content (implicitly, by presence of rendered structured sections)
+- Pages/components must **not** call AI operation directly.
+- AI op invoked from the orchestration layer (e.g., `useSpeechEngine()` or service method), consistent with matching rules.
+- Inputs sourced deterministically from:
+  - UserProfile + PersonalCanvas + selected Experiences/Stories
+
+- Output merged into the editable SpeechBlock model.
 
 ### 8) Testing requirements
 
-Add **one** Playwright spec file, similar style to `jobs-flow.spec.ts` / `company-workflow.spec.ts`:
+Vitest:
 
-- Setup: authenticated user
-- Steps: open job → open match → generate → assert → reload → assert
+- Component tests:
+  - `SpeechSectionEditor` renders, emits updates, shows validation/char count
+  - `SpeechBlockEditorCard` merges AI output into form state
+
+- Page tests:
+  - `/speech` list renders empty state + list state
+  - `/speech/[id]` loads data and binds fields, save triggers repository update
+    Composable tests:
+
+- `useSpeechEngine` builds deterministic AI op input and handles error + fallback states
 
 ### 9) Acceptance criteria
 
-- [ ] One Playwright test exists for EPIC 5C and passes reliably
-- [ ] Uses stable locators and avoids strict mode collisions
-- [ ] Demonstrates persistence (reload shows same match without manual re-entry)
-- [ ] Leaves the environment clean (if tests create data, they should delete it per your existing conventions)
+- [ ] `/speech` and `/speech/[id]` exist and follow Nuxt UI scaffold conventions
+- [ ] User can edit all 3 sections and save to SpeechBlock
+- [ ] Generate/Regenerate updates all sections from AI output (while preserving strict schema)
+- [ ] Errors/fallbacks show stable UI (no crashes, no free-text leakage)
+- [ ] Pages stay thin; logic in composables/services; code DRY
+
+---
+
+## Master Prompt 5 — End-to-End Workflow + Playwright Happy Path (EPIC 4)
+
+### 1) Title
+
+EPIC 4 — Single Playwright E2E happy path: create → generate → edit → save → reopen
+
+### 2) Intro
+
+EPIC 4 must ship with one Playwright happy-path flow, similar to job upload and matching flows. This validates integration across routing, persistence, AI orchestration, and UI states.
+
+### 3) Feature scope
+
+**In scope**
+
+- Implement one E2E scenario:
+  1. Navigate to `/speech`
+  2. Create a new SpeechBlock
+  3. Trigger Generate (mock AI if E2E uses mocking; otherwise sandbox approach)
+  4. Confirm fields populated (3 sections)
+  5. Edit one section manually
+  6. Save
+  7. Reload page / reopen the speech block and verify persistence
+
+**Out of scope**
+
+- No tailoring with job in E2E yet
+- No export/print
+- No multi-language assertions unless your E2E suite already covers i18n
+
+### 4) Composables / services / repositories / domain modules
+
+- Ensure E2E can run deterministically:
+  - stable test ids / aria labels
+  - predictable loading states
+  - ability to mock AI op response if that’s how other E2Es are structured
+
+### 5) Components
+
+- Add `data-testid` where needed (consistent naming):
+  - create button
+  - generate button
+  - three textareas
+  - save button
+  - toast/alert confirmation
+
+### 6) Pages/routes
+
+- `/speech` and `/speech/[id]` must support the flow without flakiness:
+  - stable selectors
+  - no ambiguous text collisions (Playwright strict mode)
+
+### 7) AI operations impact
+
+- In E2E, prefer one of:
+  - mocked AI response at GraphQL layer, or
+  - sandbox E2E suite that calls deployed lambda (match existing project practice for generateCv/matching if present)
+
+### 8) Testing requirements
+
+- Add `speech-flow.spec.ts` (or equivalent)
+- Ensure it runs in CI with the existing Playwright command setup
+
+### 9) Acceptance criteria
+
+- [ ] One Playwright test passes reliably (no flaky selectors)
+- [ ] Confirms generated content appears in all 3 fields
+- [ ] Confirms manual edits persist after reload
+- [ ] Confirms no strict-mode violations (selectors are precise)
+- [ ] CI-ready: uses existing testing toolchain, no new deps
+
+---
+
+## Master Prompt 1 — EPIC 4B Contract & Model Alignment (Cover Letter)
+
+### 1) Title
+
+EPIC 4B — Align Cover Letter model, routes, and AI contract with CV & Speech patterns
+
+### 2) Intro
+
+EPIC 4B introduces cover letters as a first-class deliverable, parallel to CVs (EPIC 3) and Speech (EPIC 4). Before implementation, we must align the data model, routing, and AI contract to avoid divergence. This prompt ensures cover letters follow the same architectural rules: generic-first, optional job context later, strict JSON outputs, editable persistence.
+
+### 3) Feature scope
+
+**In scope**
+
+- Confirm and document:
+  - `CoverLetter` as a persisted domain entity
+  - Generic cover letter as default (no job required)
+  - Optional `jobId` for future tailoring (nullable)
+
+- Align naming, routes, and contract expectations with CV & Speech
+
+**Out of scope**
+
+- No UI or backend implementation yet
+- No EPIC 6 (tailored application bundle)
+
+### 4) Composables / services / repositories / domain modules
+
+- Documentation-only clarification of:
+  - `CoverLetter` entity purpose and lifecycle
+  - Relationship to `UserProfile` (required) and `JobDescription` (optional)
+
+### 5) Components
+
+- None
+
+### 6) Pages/routes
+
+Document the canonical routes:
+
+- `/cover-letters` → list (same role as `/cv` and `/speech`)
+- `/cover-letters/[id]` → editor/detail view
+
+### 7) AI operations impact
+
+- Confirm single AI operation name:
+  - `ai.generateCoverLetter`
+
+- Document that:
+  - Job context is **optional**
+  - Output schema is **stable regardless of job presence**
+  - Tailoring is phrasing-level only when job is provided
+
+### 8) Testing requirements
+
+- None (doc-only)
+
+### 9) Acceptance criteria
+
+- [ ] `CoverLetter` is clearly defined as generic-first
+- [ ] Optional job relationship is explicitly documented
+- [ ] Routes follow CV/Speech symmetry
+- [ ] AI op naming is consistent and unambiguous
+- [ ] No references to separate “tailored cover letter” generators
+
+---
+
+## Master Prompt 2 — CoverLetter Backend Domain Layer (CRUD + Composables)
+
+### 1) Title
+
+EPIC 4B — Implement CoverLetter domain layer (GraphQL + repository + composables)
+
+### 2) Intro
+
+Cover letters must behave like CVs and Speech blocks: persisted, editable, regenerable, and owned by the user. This prompt covers the backend/domain foundation needed before UI or AI wiring.
+
+### 3) Feature scope
+
+**In scope**
+
+- Implement `CoverLetter` domain support:
+  - GraphQL model (owner-based auth)
+  - CRUD repository
+  - Service layer for orchestration rules
+  - Application composables for list + single entity
+
+- Fields should support:
+  - `content` (string or structured blocks — follow CV/Speech consistency)
+  - `jobId?` (nullable)
+  - timestamps
+
+**Out of scope**
+
+- No AI generation yet
+- No UI components
+- No job-specific constraints beyond nullable link
+
+### 4) Composables / services / repositories / domain modules
+
+Create/update:
+
+- `CoverLetterRepository`
+- `CoverLetterService`
+- `useCoverLetters()` (list, delete, refresh)
+- `useCoverLetter(id)` (load, save, update)
+
+Follow existing conventions from:
+
+- `CVDocumentRepository`
+- `SpeechBlockRepository`
+
+### 5) Components
+
+- None
+
+### 6) Pages/routes
+
+- None
+
+### 7) AI operations impact
+
+- None in this step
+
+### 8) Testing requirements
+
+Vitest:
+
+- Repository CRUD tests (happy + error paths)
+- Service tests (creation, update, delete)
+- Composable tests:
+  - loading/error states
+  - refresh after create/delete
+  - strict typing and nullability
+
+### 9) Acceptance criteria
+
+- [ ] CoverLetter CRUD works end-to-end
+- [ ] Optional jobId handled correctly
+- [ ] No duplication with CV/Speech logic
+- [ ] Strict TypeScript typing
+- [ ] Unit tests in place and passing
+
+---
+
+## Master Prompt 3 — AI Operation `ai.generateCoverLetter`
+
+### 1) Title
+
+EPIC 4B — Implement `ai.generateCoverLetter` (strict JSON, generic-first)
+
+### 2) Intro
+
+Cover letter generation must match the AI-operation discipline used elsewhere: deterministic input building, strict schema validation, and safe fallback behavior. This operation produces a **generic** cover letter by default and optionally adapts phrasing if job context is provided.
+
+### 3) Feature scope
+
+**In scope**
+
+- Implement AI op `ai.generateCoverLetter`
+- Deterministic prompt construction from:
+  - UserProfile
+  - PersonalCanvas
+  - Selected experiences/stories
+  - Optional JobDescription
+
+- Strict JSON output only
+
+**Out of scope**
+
+- No streaming
+- No free-form text to frontend
+- No EPIC 6 bundling logic
+
+### 4) Composables / services / repositories / domain modules
+
+- Register the AI op in the AI registry
+- Reuse shared helpers for:
+  - profile/canvas/story aggregation
+
+- Expose operation via GraphQL with schema validation
+
+### 5) Components
+
+- None
+
+### 6) Pages/routes
+
+- None
+
+### 7) AI operations impact
+
+Operation: `ai.generateCoverLetter`
+
+**Input**
+
+- `userProfile`
+- `personalCanvas?`
+- `stories[]`
+- `jobDescription?`
+
+**Output (exact schema)**
+
+```json
+{
+  "content": "string"
+}
+```
+
+**Rules**
+
+- Generic if no job provided
+- Tailored phrasing only if job is provided
+- No invented facts
+- Retry once on invalid output
+- Fallback returns `{ content: "" }` (or platform-standard safe fallback)
+
+### 8) Testing requirements
+
+Vitest:
+
+- Valid output passes schema
+- Invalid JSON triggers retry then fallback
+- Prompt differs when jobDescription is present
+  Sandbox E2E (if used elsewhere):
+- GraphQL invocation returns schema-valid JSON
+
+### 9) Acceptance criteria
+
+- [ ] AI op returns strict JSON only
+- [ ] Output schema is stable
+- [ ] Optional job context alters prompt, not schema
+- [ ] Retry + fallback tested
+- [ ] Operation registered and callable
+
+---
+
+## Master Prompt 4 — Cover Letter UI (List + Editor)
+
+### 1) Title
+
+EPIC 4B — Build Cover Letter UI (list + editor, CV/Speech parity)
+
+### 2) Intro
+
+Cover letters must feel familiar and predictable to users. The UX should mirror CV and Speech flows: list page, editor page, generate/regenerate, manual editing, save/reopen. This prompt covers UI implementation only.
+
+### 3) Feature scope
+
+**In scope**
+
+- List page showing existing cover letters
+- Editor page with:
+  - Generated content
+  - Manual editing
+  - Generate / Regenerate action
+  - Save / Delete
+
+- Nuxt UI scaffolding and card patterns
+
+**Out of scope**
+
+- Job-specific selection UI
+- Export/print
+- EPIC 6 application bundling
+
+### 4) Composables / services / repositories / domain modules
+
+- Create orchestration composable:
+  - `useCoverLetterEngine()`
+    - builds AI input
+    - calls service/AI op
+    - merges result into editable state
+
+- Persist via `useCoverLetter(id)`
+
+### 5) Components to create or update
+
+- `CoverLetterCard.vue` (list item)
+- `CoverLetterEditor.vue`
+- Reuse:
+  - `<UTextarea>`
+  - existing empty-state and card patterns
+
+### 6) Pages/routes
+
+- `/cover-letters`
+  - empty state CTA: “Create cover letter”
+
+- `/cover-letters/[id]`
+  - breadcrumb aligned with CV/Speech
+  - header actions: Generate, Save, Delete
+
+### 7) AI operations impact
+
+- UI never calls AI directly
+- AI invoked via orchestration composable/service
+- Loading and fallback states must be visible and stable
+
+### 8) Testing requirements
+
+Vitest:
+
+- Component tests (editor rendering, updates)
+- Page tests:
+  - list renders empty + populated states
+  - editor loads, edits, saves content
+    Composable tests:
+
+- AI input building
+- merge + fallback behavior
+
+### 9) Acceptance criteria
+
+- [ ] Cover letter list and editor pages exist
+- [ ] User can generate, edit, save, reopen a letter
+- [ ] UI consistent with CV/Speech
+- [ ] Logic in composables, pages thin
+- [ ] No free-text leakage from AI
+
+---
+
+## Master Prompt 5 — Playwright E2E: Cover Letter Happy Path
+
+### 1) Title
+
+EPIC 4B — Playwright E2E happy path (generic cover letter)
+
+### 2) Intro
+
+As with CVs and Speech, EPIC 4B must ship with a single, reliable E2E test proving the full workflow works end-to-end.
+
+### 3) Feature scope
+
+**Scenario**
+
+1. Go to `/cover-letters`
+2. Create a new cover letter
+3. Generate content
+4. Verify content appears
+5. Edit manually
+6. Save
+7. Reload and verify persistence
+
+### 4) Composables / services / repositories / domain modules
+
+- Ensure stable selectors (`data-testid`)
+- Ensure AI op can be mocked or sandboxed consistently
+
+### 5) Components
+
+- Add test IDs for:
+  - create button
+  - generate button
+  - textarea
+  - save button
+  - success toast
+
+### 6) Pages/routes
+
+- `/cover-letters`
+- `/cover-letters/[id]`
+
+### 7) AI operations impact
+
+- Mock AI response or use sandbox pattern consistent with the rest of the repo
+
+### 8) Testing requirements
+
+- `cover-letter-flow.spec.ts`
+- Runs in CI without flakiness
+
+### 9) Acceptance criteria
+
+- [ ] One Playwright test passes reliably
+- [ ] Confirms generation + edit + persistence
+- [ ] No strict-mode selector violations
+- [ ] Uses existing test tooling only

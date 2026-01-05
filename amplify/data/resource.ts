@@ -199,8 +199,6 @@ export const schema = a
 
         experienceId: a.id().required(),
         experience: a.belongsTo('Experience', 'experienceId'),
-
-        applicationMaterials: a.hasMany('ApplicationMaterialLink', 'storyId'),
       })
       .authorization((allow) => [allow.owner()]),
 
@@ -227,7 +225,6 @@ export const schema = a
         coverLetters: a.hasMany('CoverLetter', 'jobId'),
         cvs: a.hasMany('CVDocument', 'jobId'),
         speechBlocks: a.hasMany('SpeechBlock', 'jobId'),
-        kpiSets: a.hasMany('KPISet', 'jobId'),
         matchingSummaries: a.hasMany('MatchingSummary', 'jobId'),
       })
       .authorization((allow) => [allow.owner()]),
@@ -299,8 +296,6 @@ export const schema = a
         // Company should be optional in MVP (job may not have one)
         companyId: a.id(),
         company: a.belongsTo('Company', 'companyId'),
-
-        kpis: a.hasMany('KPISet', 'matchingSummaryId'),
       })
       .authorization((allow) => [allow.owner()]),
 
@@ -332,7 +327,7 @@ export const schema = a
         userId: a.id().required(),
         user: a.belongsTo('UserProfile', 'userId'),
 
-        jobId: a.id().required(),
+        jobId: a.id(),
         job: a.belongsTo('JobDescription', 'jobId'),
       })
       .authorization((allow) => [allow.owner()]),
@@ -348,30 +343,6 @@ export const schema = a
 
         jobId: a.id(),
         job: a.belongsTo('JobDescription', 'jobId'),
-      })
-      .authorization((allow) => [allow.owner()]),
-
-    KPISet: a
-      .model({
-        kpiList: a.string().array().required(),
-        justificationList: a.string().array(),
-
-        jobId: a.id().required(),
-        job: a.belongsTo('JobDescription', 'jobId'),
-
-        matchingSummaryId: a.id().required(),
-        matchingSummary: a.belongsTo('MatchingSummary', 'matchingSummaryId'),
-      })
-      .authorization((allow) => [allow.owner()]),
-
-    ApplicationMaterialLink: a
-      .model({
-        materialType: a.enum(['cv', 'coverletter', 'kpiset', 'speech']),
-
-        storyId: a.id().required(),
-        story: a.belongsTo('STARStory', 'storyId'),
-
-        materialId: a.string().required(),
       })
       .authorization((allow) => [allow.owner()]),
 

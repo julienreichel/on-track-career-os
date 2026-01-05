@@ -59,10 +59,7 @@ Each operation must conform to:
 
 ### Application Materials (EPIC 6)
 
-11. `ai.generateTailoredCvBlocks`
 12. `ai.generateCoverLetter`
-13. `ai.generateTailoredSpeech`
-14. `ai.generateTailoredKpis`
 
 ### Interview Prep (EPIC 7 / 9)
 
@@ -973,7 +970,7 @@ The Markdown follows standard formatting conventions and is ready to be rendered
 }
 ```
 
-### `ai.generateUserSpeech`
+### `ai.generateSpeech`
 
 **Purpose**
 Generate 3 high-level personal speech elements from user identity data:
@@ -1022,7 +1019,7 @@ EXPERIENCE SUMMARY:
 Return JSON with:
 - elevatorPitch (80 words max)
 - careerStory (160 words max)
-- whyMeStatement (120 words max)
+- whyMe (120 words max)
 ```
 
 **Input schema**

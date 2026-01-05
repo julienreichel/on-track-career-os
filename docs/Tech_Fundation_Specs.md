@@ -134,9 +134,9 @@ const schema = a.schema({
 - ✅ `MatchingSummary` - Job-user fit analysis (EPIC 5C)
 
 **Planned Models (5):**
+
 - ❌ `CoverLetter` - Cover letter documents (EPIC 6)
 - ❌ `SpeechBlock` - Speech/pitch content (EPIC 4)
-- ❌ `KPISet` - Job-specific KPIs (EPIC 6)
 - ❌ `InterviewQuestionSet` - Interview questions (EPIC 7)
 - ❌ `InterviewSession` - Interview simulator sessions (EPIC 9)
 
@@ -228,10 +228,7 @@ const schema = a.schema({
 - ❌ `ai.analyzeCompanyInfo` (EPIC 5B)
 - ✅ `ai.generateCompanyCanvas` (EPIC 5B)
 - ✅ `ai.generateMatchingSummary` (EPIC 5C)
-- ❌ `ai.generateTailoredCvBlocks` (EPIC 6)
 - ❌ `ai.generateCoverLetter` (EPIC 6)
-- ❌ `ai.generateTailoredSpeech` (EPIC 6)
-- ❌ `ai.generateTailoredKpis` (EPIC 6)
 - ❌ `ai.generateInterviewQuestions` (EPIC 7)
 - ❌ `ai.simulateInterviewTurn` (EPIC 7/9)
 - ❌ `ai.evaluateInterviewAnswer` (EPIC 7/9)

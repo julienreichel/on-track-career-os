@@ -11,14 +11,14 @@ This project is **Your AI Career OS** — an AI-powered job-search and career-de
 - Understanding their professional identity
 - Modeling job roles and companies
 - Mapping user strengths to company pains
-- Generating tailored CVs, cover letters, speeches, KPIs
+- Generating tailored CVs, cover letters, speeches
 - Preparing for interviews with questions and simulations
 
 The workflow is:
 
 1. **Know Yourself** → Profile, Experiences, STAR stories, Personal Canvas
 2. **Understand the Opportunity** → Job Role Card, Company Canvas
-3. **Communicate Your Value** → Tailored CV/Letter/Speech/KPIs
+3. **Communicate Your Value** → Tailored CV/Letter/Speech
 4. **Prepare & Apply** → Interview questions + simulator
 
 (From product description & vision )
@@ -100,7 +100,6 @@ _(Condensed from full CDM; only key-developer-relevant models.)_
 - **CVDocument**
 - **CoverLetter**
 - **SpeechBlock**
-- **KPISet**
 
 ### 3.5 Interview Domain
 
@@ -127,7 +126,6 @@ _(From Component Model + Component→Page Mapping) _
 - **CV Builder**
 - **Cover Letter Generator**
 - **Speech Builder**
-- **KPI Generator**
 - **Interview Question Generator**
 - **Interview Simulator (Chat)**
 - **Dashboard Widgets**
@@ -213,7 +211,6 @@ _(Structured per navigation zones)_
   - Markdown editor with preview + print/export-ready layout, including top-right profile photo badge when enabled
 - **Cover Letter Builder**
 - **Speech Builder**
-- **KPI Generator**
 
 ### 5.4 Interview Prep
 
@@ -256,10 +253,8 @@ _(From AI Interaction Contract) _
 ### Tailored Application Materials
 
 10. `ai.generateCv`
-11. `ai.generateTailoredCvBlocks`
-12. `ai.generateCoverLetter`
-13. `ai.generateTailoredSpeech`
-14. `ai.generateTailoredKpis`
+11. `ai.generateCoverLetter`
+12. `ai.generateSpeech`
 
 ### Interview
 

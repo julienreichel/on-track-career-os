@@ -855,7 +855,7 @@ Each page includes:
 
 ### AI Ops
 
-- `ai.generateTailoredCvBlocks` (not implemented)
+- `ai.generateCv` (partially implemented)
 
 **Status:** ❌ Not Implemented  
 **Blocking:** EPIC 6 - AI operation and tailoring engine missing
@@ -927,45 +927,9 @@ Each page includes:
 ### AI Ops
 
 - `ai.generateSpeech` (not implemented - EPIC 4)
-- `ai.generateTailoredSpeech` (not implemented - EPIC 6)
 
 **Status:** ❌ Not Implemented  
 **Blocking:** EPIC 4 (generic) + EPIC 6 (tailored) - AI operations missing
-
----
-
-## **5.4 KPI Generator** ❌
-
-**Route:** `/applications/[jobId]/kpis` (planned)
-
-### UI
-
-- `<UCard>`
-- `<UBadge>`
-- `<UButton>` (generate)
-
-### Components
-
-- KPI Proposition Component (planned)
-
-### Composables
-
-- `useTailoringEngine()` (not implemented)
-- `useStoryEngine()` ✅
-
-### CDM Entities
-
-- **KPISet** (create/update)
-- **STARStory** (read - for KPI extraction)
-
-### AI Ops
-
-- `ai.generateTailoredKpis` (not implemented)
-
-**Status:** ❌ Not Implemented  
-**Blocking:** EPIC 6 - AI operation missing
-
-**Note:** Current `ai.generateAchievementsAndKpis` generates story-level KPIs. This needs job-tailored aggregation.
 
 ---
 
@@ -1205,13 +1169,11 @@ Each page includes:
 
 **❌ Missing (7 operations):**
 
-1. `ai.generateTailoredCvBlocks` - EPIC 6
 2. `ai.generateCoverLetter` - EPIC 6
-3. `ai.generateTailoredSpeech` - EPIC 6
-4. `ai.generateTailoredKpis` - EPIC 6
-5. `ai.generateInterviewQuestions` - EPIC 7
-6. `ai.simulateInterviewTurn` - EPIC 7
-7. `ai.evaluateInterviewAnswer` - EPIC 7
+3. `ai.generateSpeech` - EPIC 6
+4. `ai.generateInterviewQuestions` - EPIC 7
+5. `ai.simulateInterviewTurn` - EPIC 7
+6. `ai.evaluateInterviewAnswer` - EPIC 7
 
 ---
 
