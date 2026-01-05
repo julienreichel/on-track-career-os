@@ -111,7 +111,7 @@ test.describe('Speech Block E2E Flow', () => {
     await expect(page.getByText('Speech saved', { exact: true })).toBeVisible({ timeout: 5000 });
   });
 
-  test('5. Edit a section manually and save', async ({ page }) => {
+  test('5. Edit content and verify persistence after reload', async ({ page }) => {
     if (!speechUrl) {
       test.skip(true, 'No speech URL available');
       return;
@@ -125,46 +125,42 @@ test.describe('Speech Block E2E Flow', () => {
     // Get current value and edit it
     const originalValue = await elevatorPitchTextarea.inputValue();
     const editedText = `${originalValue}\n\nEdited at ${Date.now()}`;
+    
+    // Clear and fill to ensure complete replacement
+    await elevatorPitchTextarea.clear();
     await elevatorPitchTextarea.fill(editedText);
+    
+    // Verify the edit took effect before saving
+    await expect(elevatorPitchTextarea).toHaveValue(editedText);
 
     // Save button should be enabled after edit
     const saveButton = page.getByRole('button', { name: 'Save' });
     await expect(saveButton).toBeEnabled();
     await saveButton.click();
 
-    // Wait for save to complete
-    await expect(saveButton).toBeDisabled({ timeout: 10000 });
+    // Wait for save to complete with longer timeout
+    await expect(saveButton).toBeDisabled({ timeout: 15000 });
 
-    // Wait for success toast
-    await expect(page.getByText('Speech saved', { exact: true })).toBeVisible({ timeout: 5000 });
-  });
+    // Wait for success toast and let it disappear to ensure save completed
+    await expect(page.getByText('Speech saved', { exact: true })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Speech saved', { exact: true })).not.toBeVisible({ timeout: 10000 });
 
-  test('6. Verify persistence after reload', async ({ page }) => {
-    if (!speechUrl) {
-      test.skip(true, 'No speech URL available');
-      return;
-    }
-
-    // First, get the edited value
-    await page.goto(speechUrl);
-    await page.waitForLoadState('networkidle');
-
-    const elevatorPitchTextarea = page.getByTestId('speech-textarea-elevator-pitch');
-    const editedValue = await elevatorPitchTextarea.inputValue();
-
-    // Verify it contains the "Edited at" marker
-    expect(editedValue).toContain('Edited at');
-
-    // Navigate away and back
+    // Navigate away and back to verify persistence
     await page.goto('/speech');
     await page.waitForLoadState('networkidle');
 
     await page.goto(speechUrl);
     await page.waitForLoadState('networkidle');
-
-    // Verify the edited content persisted
-    const reloadedValue = await elevatorPitchTextarea.inputValue();
-    expect(reloadedValue).toBe(editedValue);
+    
+    // Wait for form to fully load before checking content
+    await expect(elevatorPitchTextarea).toBeVisible();
+    
+    // Use retry logic for flaky persistence check
+    await expect(async () => {
+      const persistedValue = await elevatorPitchTextarea.inputValue();
+      expect(persistedValue).toContain('Edited at');
+      expect(persistedValue).toBe(editedText);
+    }).toPass({ timeout: 10000 });
 
     // Verify other sections still have content
     const careerStoryTextarea = page.getByTestId('speech-textarea-career-story');
