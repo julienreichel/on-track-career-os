@@ -159,29 +159,24 @@ Casey Candidate`;
     expect(response.length).toBeGreaterThan(0);
   });
 
-  it('falls back to empty string when AI output is invalid JSON', async () => {
+  it('falls back to raw text when AI output is invalid JSON', async () => {
     mockSend.mockResolvedValueOnce(buildBedrockResponse('not json at all'));
-    mockSend.mockResolvedValueOnce(buildBedrockResponse('still not json'));
 
     const response = await handler({ arguments: validArguments as never });
 
-    expect(response).toBe('');
+    expect(response).toBe('not json at all');
   });
 
-  it('falls back to empty string when AI output has wrong schema', async () => {
+  it('returns empty string when AI output has wrong schema', async () => {
     mockSend.mockResolvedValueOnce(
       buildBedrockResponse({
         wrongKey: 'wrong value',
       })
     );
-    mockSend.mockResolvedValueOnce(
-      buildBedrockResponse({
-        stillWrongKey: 'wrong again',
-      })
-    );
 
     const response = await handler({ arguments: validArguments as never });
 
+    // Wrong schema (missing content field) returns empty string
     expect(response).toBe('');
   });
 

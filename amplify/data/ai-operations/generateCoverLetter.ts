@@ -1,4 +1,4 @@
-import { invokeAiWithRetry } from './utils/bedrock';
+import { invokeBedrock } from './utils/bedrock';
 import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 const SYSTEM_PROMPT = `You generate professional cover letters based on user identity data.
@@ -88,19 +88,7 @@ export interface GenerateCoverLetterInput {
   jobDescription?: CoverLetterJobDescription;
 }
 
-type ModelResponse = { content?: string };
 
-function sanitizeString(value: unknown): string {
-  return typeof value === 'string' ? value.trim() : '';
-}
-
-function sanitizeCoverLetterOutput(raw: ModelResponse): string {
-  return sanitizeString(raw.content);
-}
-
-function buildFallbackOutput(): string {
-  return '';
-}
 
 function buildUserPrompt(args: GenerateCoverLetterInput): string {
   const hasJob = Boolean(args.jobDescription);
@@ -151,22 +139,21 @@ export const handler = async (event: HandlerEvent): Promise<string> => {
     { arguments: event.arguments },
     async (args) => {
       const userPrompt = buildUserPrompt(args);
+      const responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);
+      
+      console.log('[generateCoverLetter] Generated cover letter length:', responseText.length);
 
+      // Parse JSON response and extract content
       try {
-        const response = await invokeAiWithRetry<ModelResponse>({
-          systemPrompt: SYSTEM_PROMPT,
-          userPrompt,
-          outputSchema: OUTPUT_SCHEMA,
-          validate: (raw) => sanitizeCoverLetterOutput(raw ?? {}),
-          operationName: 'generateCoverLetter',
+        const parsed = JSON.parse(responseText);
+        const content = typeof parsed.content === 'string' ? parsed.content.trim() : '';
+        return content;
+      } catch (parseError) {
+        console.error('[generateCoverLetter] Failed to parse JSON response, returning raw text', {
+          error: (parseError as Error).message,
         });
-
-        return response;
-      } catch (error) {
-        console.error('generateCoverLetter fallback triggered', {
-          reason: (error as Error).message,
-        });
-        return buildFallbackOutput();
+        // If JSON parsing fails, return the raw text as fallback
+        return responseText.trim();
       }
     },
     (args) => ({
