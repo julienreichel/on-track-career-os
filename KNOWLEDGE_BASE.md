@@ -12,14 +12,13 @@ This project is **Your AI Career OS** — an AI-powered job-search and career-de
 - Modeling job roles and companies
 - Mapping user strengths to company pains
 - Generating tailored CVs, cover letters, speeches
-- Preparing for interviews with questions and simulations
 
 The workflow is:
 
 1. **Know Yourself** → Profile, Experiences, STAR stories, Personal Canvas
 2. **Understand the Opportunity** → Job Role Card, Company Canvas
 3. **Communicate Your Value** → Tailored CV/Letter/Speech
-4. **Prepare & Apply** → Interview questions + simulator
+4. **Prepare & Apply**
 
 (From product description & vision )
 
@@ -40,14 +39,14 @@ Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer
 - ✅ EPIC 5A (Job Description Analysis) — 100% complete
 - ✅ EPIC 5B (Company Analysis & Canvas) — 100% complete
 - ✅ EPIC 5C (User-Job-Company Matching) — 100% complete
-- ⚠️ Remaining EPICs 6, 7 still in early implementation stages
+- ⚠️ Remaining EPIC 6 still in early implementation stages
 
 ### 2.1 Frontend (Nuxt 4)
 
 - Nuxt 4 + TypeScript (strict)
 - Nuxt UI components + Tailwind
 - State via composables
-- Pages structured by domain: Profile / Jobs & Companies / Applications / Interview Prep
+- Pages structured by domain: Profile / Jobs & Companies / Applications
 - Calls backend through server routes that proxy Lambda functions
   (From Tech Foundations & Navigation Structure )
 
@@ -102,11 +101,6 @@ _(Condensed from full CDM; only key-developer-relevant models.)_
 - **CoverLetter**
 - **SpeechBlock**: elevatorPitch (text + keyMessages[]), careerStory (text + keyMessages[]), whyMe (text + keyMessages[]), optional jobId for targeting
 
-### 3.5 Interview Domain
-
-- **InterviewQuestionSet**
-- **InterviewSession**
-
 (From CDM document )
 
 ---
@@ -127,8 +121,6 @@ _(From Component Model + Component→Page Mapping) _
 - **CV Builder**
 - **Cover Letter Generator**
 - **Speech Builder**
-- **Interview Question Generator**
-- **Interview Simulator (Chat)**
 - **Dashboard Widgets**
 
 ### 4.2 Composables
@@ -149,7 +141,6 @@ _(From Component Model + Component→Page Mapping) _
 - `useSpeechBlocks()` - SpeechBlock list management
 - `useSpeechEngine()` - Speech workflow orchestration
 - `useTailoringEngine()` - Tailored materials (not implemented)
-- `useInterviewEngine()` - Interview prep (not implemented)
 - `useAiOperations()` - AI operations orchestration
 - `useCvDocuments()` - CV document management
 - `useCvGenerator()` - CV generation from user data
@@ -218,12 +209,7 @@ _(Structured per navigation zones)_
 - **Cover Letter Builder**
 - **Speech Builder**
 
-### 5.4 Interview Prep
-
-- **Interview Questions Generator**
-- **Interview Simulator** (chat-based)
-
-### 5.5 System Pages
+### 5.4 System Pages
 
 - **Dashboard**
 - **Template Library**
@@ -261,12 +247,6 @@ _(From AI Interaction Contract) _
 10. `ai.generateCv`
 11. `ai.generateCoverLetter`
 12. `ai.generateSpeech` - **IMPLEMENTED:** Generates elevator pitch, career story, and "why me" sections with optional job targeting
-
-### Interview
-
-15. `ai.generateInterviewQuestions`
-16. `ai.simulateInterviewTurn`
-17. `ai.evaluateInterviewAnswer`
 
 **Rules:**
 
