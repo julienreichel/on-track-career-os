@@ -86,7 +86,7 @@ const generateBreadcrumbs = async () => {
     const previousSegment = i > 0 ? pathSegments[i - 1] : undefined;
 
     // Try to resolve ID segments to names first
-    if (isUUID(segment)) {
+    if (segment && isUUID(segment)) {
       const resolvedName = await resolveSegment(segment, previousSegment);
       if (resolvedName) {
         items.push({
@@ -107,7 +107,7 @@ const generateBreadcrumbs = async () => {
     }
 
     // Use the mapped label for the segment
-    const label = getSegmentLabel(segment);
+    const label = getSegmentLabel(segment ?? '');
     items.push({
       label,
       to: currentPath,
