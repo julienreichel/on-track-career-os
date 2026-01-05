@@ -61,6 +61,7 @@ const countLabel = computed(() => {
       :maxlength="maxLength"
       :disabled="disabled"
       :readonly="readonly"
+      :data-testid="`speech-textarea-${label.toLowerCase().replace(/\s+/g, '-')}`"
       class="mt-4 w-full"
       @update:model-value="emit('update:modelValue', $event)"
     />

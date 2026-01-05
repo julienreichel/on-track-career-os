@@ -10,6 +10,7 @@
             icon: 'i-heroicons-plus',
             onClick: handleCreate,
             disabled: creating,
+            'data-testid': 'create-speech-button',
           },
         ]"
       />
@@ -35,7 +36,12 @@
           icon="i-heroicons-chat-bubble-left-right"
         >
           <template #actions>
-            <UButton icon="i-heroicons-plus" :label="t('speech.list.emptyState.action')" @click="handleCreate" />
+            <UButton
+              icon="i-heroicons-plus"
+              :label="t('speech.list.emptyState.action')"
+              data-testid="create-speech-button"
+              @click="handleCreate"
+            />
           </template>
         </UEmpty>
 

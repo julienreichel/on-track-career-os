@@ -38,6 +38,7 @@ const updateField = (field: keyof SpeechBlockForm, value: string) => {
       :max-length="320"
       :disabled="disabled"
       :readonly="readonly"
+      data-testid="elevator-pitch-section"
       @update:model-value="updateField('elevatorPitch', $event)"
     />
 
@@ -49,6 +50,7 @@ const updateField = (field: keyof SpeechBlockForm, value: string) => {
       :max-length="800"
       :disabled="disabled"
       :readonly="readonly"
+      data-testid="career-story-section"
       @update:model-value="updateField('careerStory', $event)"
     />
 
@@ -60,6 +62,7 @@ const updateField = (field: keyof SpeechBlockForm, value: string) => {
       :max-length="480"
       :disabled="disabled"
       :readonly="readonly"
+      data-testid="why-me-section"
       @update:model-value="updateField('whyMe', $event)"
     />
   </div>

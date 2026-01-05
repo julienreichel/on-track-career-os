@@ -3,7 +3,6 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import SpeechBlockEditorCard from '@/components/speech/SpeechBlockEditorCard.vue';
-import ConfirmModal from '@/components/ConfirmModal.vue';
 import UnsavedChangesModal from '@/components/UnsavedChangesModal.vue';
 import { useSpeechBlock } from '@/application/speech-block/useSpeechBlock';
 import { useSpeechEngine } from '@/composables/useSpeechEngine';
@@ -15,7 +14,7 @@ const route = useRoute();
 const toast = useToast();
 
 const speechId = computed(() => route.params.id as string);
-const { item, loading, error, load, save, remove } = useSpeechBlock(speechId.value);
+const { item, loading, error, load, save } = useSpeechBlock(speechId.value);
 const engine = useSpeechEngine();
 
 const formState = ref({
@@ -25,7 +24,6 @@ const formState = ref({
 });
 const originalState = ref({ ...formState.value });
 const saving = ref(false);
-const deleteModalOpen = ref(false);
 const cancelModalOpen = ref(false);
 const isGenerating = computed(() => engine.isGenerating.value);
 
@@ -59,6 +57,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     color: 'primary',
     disabled: loading.value || saving.value || isGenerating.value,
     onClick: handleGenerate,
+    'data-testid': 'generate-speech-button',
   },
 ]);
 
@@ -194,6 +193,7 @@ watch(item, (newValue) => {
                 :label="t('common.save')"
                 :disabled="!hasChanges || loading || saving"
                 :loading="saving"
+                data-testid="save-speech-button"
                 @click="handleSave"
               />
             </div>
