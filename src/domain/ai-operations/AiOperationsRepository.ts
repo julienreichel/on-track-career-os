@@ -436,4 +436,5 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     }
 
     return data;
-  }}
+  }
+}

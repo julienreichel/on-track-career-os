@@ -55,7 +55,12 @@ function resolveAiMock(
 function resolveAiMock(key: 'generateSpeech', input: SpeechInput): SpeechResult | null;
 function resolveAiMock(key: 'generateCoverLetter', input: SpeechInput): string | null;
 function resolveAiMock(
-  key: 'analyzeCompanyInfo' | 'generateCompanyCanvas' | 'generateMatchingSummary' | 'generateSpeech' | 'generateCoverLetter',
+  key:
+    | 'analyzeCompanyInfo'
+    | 'generateCompanyCanvas'
+    | 'generateMatchingSummary'
+    | 'generateSpeech'
+    | 'generateCoverLetter',
   input:
     | AnalyzeCompanyInfoInput
     | GeneratedCompanyCanvasInput

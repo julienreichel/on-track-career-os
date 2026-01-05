@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CoverLetterService } from '@/domain/cover-letter/CoverLetterService';
-import { CoverLetterRepository } from '@/domain/cover-letter/CoverLetterRepository';
+import type { CoverLetterRepository } from '@/domain/cover-letter/CoverLetterRepository';
 import type {
   CoverLetter,
   CoverLetterCreateInput,
@@ -52,7 +52,6 @@ describe('CoverLetterService', () => {
       expect(mockRepository.get).toHaveBeenCalledWith('non-existent-id');
       expect(result).toBeNull();
     });
-
   });
 
   it('lists cover letters with filters', async () => {

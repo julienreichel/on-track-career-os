@@ -88,14 +88,12 @@ export interface GenerateCoverLetterInput {
   jobDescription?: CoverLetterJobDescription;
 }
 
-
-
 function buildUserPrompt(args: GenerateCoverLetterInput): string {
   const hasJob = Boolean(args.jobDescription);
-  
+
   const instruction = hasJob
     ? 'Create a cover letter tailored to the target job description.'
-    : 'Create a generic cover letter showcasing the candidate\'s professional value.';
+    : "Create a generic cover letter showcasing the candidate's professional value.";
 
   return `${instruction}
 
@@ -140,7 +138,7 @@ export const handler = async (event: HandlerEvent): Promise<string> => {
     async (args) => {
       const userPrompt = buildUserPrompt(args);
       const responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);
-      
+
       console.log('[generateCoverLetter] Generated cover letter length:', responseText.length);
 
       // Parse JSON response and extract content

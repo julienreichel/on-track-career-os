@@ -102,7 +102,9 @@ function createCoverLetterEngineState({ providedUserId, deps, auth }: EngineStat
         profile: mapProfileToSpeechProfile(userProfile.value),
         experiences: experiences.value.map(mapExperienceToSpeechExperience),
         stories: stories.value.map(mapStoryToSpeechStory),
-        personalCanvas: personalCanvas.value ? mapCanvasToSpeechCanvas(personalCanvas.value) : undefined,
+        personalCanvas: personalCanvas.value
+          ? mapCanvasToSpeechCanvas(personalCanvas.value)
+          : undefined,
         jobDescription: jobDescription || undefined,
       };
 
