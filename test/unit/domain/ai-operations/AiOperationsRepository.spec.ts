@@ -17,6 +17,7 @@ vi.mock('@/data/graphql/options', () => ({
   }),
 }));
 
+// eslint-disable-next-line max-lines-per-function
 describe('AiOperationsRepository', () => {
   let repository: AiOperationsRepository;
   let mockClient: {
