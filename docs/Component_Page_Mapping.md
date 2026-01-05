@@ -866,12 +866,13 @@ Each page includes:
 
 ## **5.2 Cover Letter Builder** ❌
 
-**Route:** `/applications/[jobId]/cover-letter` (planned)
+**Route:** `/cover-letters` and `/cover-letters/:id` (planned)
 
 ### UI
 
-- `<URadioGroup>` (tone selection)
-- `<UEditor>`
+- `<UCard>` section layout
+- `<UTextarea>` for letter content
+- Optional tone selector (if needed)
 
 ### Components
 
@@ -879,16 +880,15 @@ Each page includes:
 
 ### Composables
 
-- `useTailoringEngine()` (not implemented)
-- `useStoryEngine()` ✅
-- `useCanvasEngine()` ✅
-- `useJobAnalysis()` ✅
+- `useCoverLetterEngine()` (not implemented)
+- `useCoverLetters()` (not implemented)
+- `useCoverLetter()` (not implemented)
 
 ### CDM Entities
 
 - **CoverLetter** (create/update)
-- **JobDescription** (read)
-- **MatchingSummary** (read)
+- **UserProfile** (read)
+- **JobDescription** (optional, read)
 - **PersonalCanvas** (read)
 
 ### AI Ops
@@ -896,7 +896,7 @@ Each page includes:
 - `ai.generateCoverLetter` (not implemented)
 
 **Status:** ❌ Not Implemented  
-**Blocking:** EPIC 6 - AI operation missing
+**Blocking:** EPIC 4B - AI operation and editor not implemented
 
 ---
 
@@ -1016,13 +1016,14 @@ Each page includes:
 
 ## 8.2 Planned Pages (6 Routes)
 
-| Page                | Route                               | Status | EPIC | Blocker               |
-| ------------------- | ----------------------------------- | ------ | ---- | --------------------- |
-| Tailored CV         | `/applications/:jobId/cv`           | ❌     | 6    | AI operation missing  |
-| Cover Letter        | `/applications/:jobId/cover-letter` | ❌     | 6    | AI operation missing  |
-| Interview Prep      | `/interviews/:jobId/prep`           | ❌     | 7    | AI operation missing  |
-| Interview Simulator | `/interviews/:jobId/simulate`       | ❌     | 7    | AI operations missing |
-| Settings            | `/settings`                         | ❌     | -    | Low priority          |
+| Page                | Route                          | Status | EPIC | Blocker               |
+| ------------------- | ------------------------------ | ------ | ---- | --------------------- |
+| Tailored CV         | `/applications/:jobId/cv`      | ❌     | 6    | AI operation missing  |
+| Cover Letter List   | `/cover-letters`               | ❌     | 4B   | AI operation missing  |
+| Cover Letter Editor | `/cover-letters/:id`           | ❌     | 4B   | AI operation missing  |
+| Interview Prep      | `/interviews/:jobId/prep`      | ❌     | 7    | AI operation missing  |
+| Interview Simulator | `/interviews/:jobId/simulate`  | ❌     | 7    | AI operations missing |
+| Settings            | `/settings`                    | ❌     | -    | Low priority          |
 
 ## 8.3 Implemented Components (20 Core + 7 Company + 9 CV + 2 Job + 3 Speech)
 
@@ -1123,7 +1124,7 @@ Each page includes:
 
 **❌ Missing (1 operation):**
 
-1. `ai.generateCoverLetter` - EPIC 6
+1. `ai.generateCoverLetter` - EPIC 4B
 
 ---
 

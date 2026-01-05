@@ -14,7 +14,7 @@ The application is organized around **five main navigation zones**:
    Job intake, job role card (implemented), company canvas (implemented), matching (implemented).
 
 3. **Applications** ⚠️ Partial
-   CV builder (implemented), cover letters (not implemented), speech builder (implemented - EPIC 4).
+   CV builder (implemented), cover letters (planned at `/cover-letters`), speech builder (implemented - EPIC 4).
 
 4. **Interview Prep** ❌ Not Implemented
    Interview questions generator, interview simulator.

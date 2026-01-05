@@ -955,12 +955,71 @@ The Markdown follows standard formatting conventions and is ready to be rendered
   - Verify minimum length (>100 characters)
   - Log warning if format seems incorrect but don't fail
 
-### Cover Letter
+### `ai.generateCoverLetter`
+
+**Purpose**  
+Generate a generic-first cover letter that can optionally be tailored when job context is provided.
+
+**System Prompt**
+
+```
+You generate a professional cover letter based on user identity data.
+
+If jobDescription is provided, tailor phrasing to the role and job needs without inventing facts.
+If jobDescription is absent, keep the letter generic (no job targeting).
+
+Output must be:
+- concise
+- professional
+- first-person voice
+- aligned to the user's experience
+- no invented work history or skills
+- JSON only
+```
+
+**User Prompt**
+
+```
+Use the following data to create a cover letter:
+
+PROFILE:
+{{profile}}
+
+EXPERIENCES:
+{{experiences}}
+
+STORIES:
+{{stories}}
+
+PERSONAL CANVAS:
+{{personalCanvas}}
+
+TARGET JOB DESCRIPTION (optional):
+{{jobDescription}}
+
+Return JSON with:
+- tone
+- content
+```
+
+**Input schema**
 
 ```json
 {
-  "paragraphs": ["string"],
-  "closing": "string"
+  "profile": {},
+  "experiences": [],
+  "stories": [],
+  "personalCanvas": {},
+  "jobDescription?": {}
+}
+```
+
+**Output schema**
+
+```json
+{
+  "tone": "string",
+  "content": "string"
 }
 ```
 

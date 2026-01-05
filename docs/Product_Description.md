@@ -258,10 +258,11 @@ Editable and exportable.
 ---
 
 # 6. Technical Architecture
-   - relevance
-   - confidence
-   - structure
-   - alignment with company pains
+
+- relevance
+- confidence
+- structure
+- alignment with company pains
 
 4. AI produces improvement suggestions
 5. Generates summary report

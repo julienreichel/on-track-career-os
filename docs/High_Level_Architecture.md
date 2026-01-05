@@ -322,20 +322,20 @@ CV Builder | Cover Letter | Speech Builder | KPI Generator
 
 ## Workflow Layer (`src/composables/`) - Orchestration
 
-| Composable                       | Purpose                      | Status |
-| -------------------------------- | ---------------------------- | ------ |
-| **useAuthUser()**                | Auth state wrapper (Amplify) | ✅     |
-| **useCvUploadWorkflow()**        | CV upload orchestration      | ✅     |
-| **useCvParsing()**               | CV parsing logic             | ✅     |
-| **useExperienceImport()**        | Import extracted experiences | ✅     |
-| **useProfileMerge()**            | Merge profile data           | ✅     |
-| **useJobAnalysis()**             | Job CRUD + AI operations     | ✅     |
-| **useJobUpload()**               | Job file upload              | ✅     |
-| **useCvGenerator()**             | CV generation workflow       | ✅     |
-| **useCvDocuments()**             | CV list operations           | ✅     |
-| **useStoryList()**               | Story list operations        | ✅     |
-| **useStoryEditor(storyId)**      | Story CRUD workflow          | ✅     |
-| **useStoryEnhancer()**           | AI story generation          | ✅     |
-| **useBreadcrumbMapping()**       | Dynamic breadcrumbs          | ✅     |
-| **useMatchingEngine()**          | Fit analysis (planned)       | ❌     |
-| **useTailoringEngine()**         | Material tailoring (planned) | ❌     |
+| Composable                  | Purpose                      | Status |
+| --------------------------- | ---------------------------- | ------ |
+| **useAuthUser()**           | Auth state wrapper (Amplify) | ✅     |
+| **useCvUploadWorkflow()**   | CV upload orchestration      | ✅     |
+| **useCvParsing()**          | CV parsing logic             | ✅     |
+| **useExperienceImport()**   | Import extracted experiences | ✅     |
+| **useProfileMerge()**       | Merge profile data           | ✅     |
+| **useJobAnalysis()**        | Job CRUD + AI operations     | ✅     |
+| **useJobUpload()**          | Job file upload              | ✅     |
+| **useCvGenerator()**        | CV generation workflow       | ✅     |
+| **useCvDocuments()**        | CV list operations           | ✅     |
+| **useStoryList()**          | Story list operations        | ✅     |
+| **useStoryEditor(storyId)** | Story CRUD workflow          | ✅     |
+| **useStoryEnhancer()**      | AI story generation          | ✅     |
+| **useBreadcrumbMapping()**  | Dynamic breadcrumbs          | ✅     |
+| **useMatchingEngine()**     | Fit analysis (planned)       | ❌     |
+| **useTailoringEngine()**    | Material tailoring (planned) | ❌     |

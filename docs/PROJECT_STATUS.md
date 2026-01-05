@@ -729,7 +729,8 @@ The project has established a **strong backend and domain foundation** with comp
 **Application Materials (3 pages):**
 
 - `/applications/:jobId/cv` — Tailored CV
-- `/applications/:jobId/cover-letter` — Cover letter
+- `/cover-letters` — Cover letter list
+- `/cover-letters/:id` — Cover letter editor
 - `/applications/:jobId/kpis` — KPI set
 
 ---
@@ -966,7 +967,8 @@ The project has established a **strong backend and domain foundation** with comp
 2. Create domain layers for CoverLetter
 3. Create 3 tailored material pages:
    - `/applications/:jobId/cv` — Tailored CV
-   - `/applications/:jobId/cover-letter` — Cover letter
+   - `/cover-letters` — Cover letter list
+   - `/cover-letters/:id` — Cover letter editor
 
 **Estimated Effort:** 3-4 weeks  
 **Value:** Complete application workflow

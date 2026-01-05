@@ -274,18 +274,19 @@ _(EPIC 3 + EPIC 6)_
 
 ## **ENTITY: CoverLetter**
 
-_(EPIC 6)_
+_(EPIC 4B)_
 
 **Attributes:**
 
 - letterId
 - tone
 - content
+- jobId (optional)
 
 **Relationships:**
 
 - 1 CoverLetter → 1 UserProfile
-- 1 CoverLetter → 1 JobDescription
+- 1 CoverLetter → 1 JobDescription (optional)
 
 ---
 
@@ -332,8 +333,8 @@ Company ↔ Jobs
 MatchingSummary ↔ (User, Job, Company)
 1 match per unique combination
 
-JobDescription ↔ (CV / CoverLetter / Speech )
-1 ↔ 1 (tailored)
+JobDescription ↔ (CV / CoverLetter / Speech)
+1 ↔ 0..* (optional tailoring)
 ```
 
 ---
