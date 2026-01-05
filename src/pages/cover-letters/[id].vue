@@ -14,7 +14,7 @@ const router = useRouter();
 const toast = useToast();
 
 const coverLetterId = computed(() => route.params.id as string);
-const { item, loading, error, loadItem, updateContent } = useCoverLetter(coverLetterId.value);
+const { item, loading, error, load, save, remove } = useCoverLetter(coverLetterId.value);
 const engine = useCoverLetterEngine();
 
 const formState = ref({
@@ -74,7 +74,10 @@ const handleSave = async () => {
   if (!item.value?.id || saving.value || !hasChanges.value) return;
   saving.value = true;
   try {
-    const updated = await updateContent(formState.value.content);
+    const updated = await save({
+      id: item.value.id,
+      content: formState.value.content,
+    });
     if (updated) {
       toast.add({ title: t('coverLetter.editor.toast.saved'), color: 'primary' });
       originalState.value = { ...formState.value };
@@ -90,10 +93,16 @@ const handleGenerate = async () => {
   try {
     await engine.load();
     const result = await engine.generate();
+    console.log('[coverLetterEditor] Generate result:', result);
     applyGeneratedContent(result);
     toast.add({ title: t('coverLetter.editor.toast.generated'), color: 'primary' });
   } catch (err) {
     console.error('[coverLetterEditor] Failed to generate cover letter', err);
+    toast.add({
+      title: t('coverLetter.editor.toast.generateFailed'),
+      color: 'error',
+      description: err instanceof Error ? err.message : 'Unknown error',
+    });
   }
 };
 
@@ -112,11 +121,13 @@ const handleDelete = async () => {
   if (!item.value?.id || deleting.value) return;
   deleting.value = true;
   try {
-    const { CoverLetterService } = await import('@/domain/cover-letter/CoverLetterService');
-    const service = new CoverLetterService();
-    await service.deleteCoverLetter(item.value.id);
-    toast.add({ title: t('coverLetter.editor.toast.deleted'), color: 'primary' });
-    await router.push('/cover-letters');
+    const success = await remove();
+    if (success) {
+      toast.add({ title: t('coverLetter.editor.toast.deleted'), color: 'primary' });
+      await router.push('/cover-letters');
+    } else {
+      toast.add({ title: t('coverLetter.editor.toast.deleteFailed'), color: 'error' });
+    }
   } catch (err) {
     console.error('[coverLetterEditor] Delete failed', err);
     toast.add({ title: t('coverLetter.editor.toast.deleteFailed'), color: 'error' });
@@ -129,7 +140,7 @@ const handleDelete = async () => {
 onMounted(async () => {
   route.meta.breadcrumbLabel = t('coverLetter.editor.title');
   await engine.load();
-  await loadItem();
+  await load();
   resetForm();
 });
 
@@ -245,13 +256,13 @@ watch(item, (newValue) => {
     </UContainer>
 
     <UnsavedChangesModal
-      v-model="cancelModalOpen"
+      v-model:open="cancelModalOpen"
       @discard="handleDiscard"
       @cancel="cancelModalOpen = false"
     />
 
     <ConfirmModal
-      v-model="deleteModalOpen"
+      v-model:open="deleteModalOpen"
       :title="t('coverLetter.editor.delete.title')"
       :description="t('coverLetter.editor.delete.description')"
       :loading="deleting"

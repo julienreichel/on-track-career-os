@@ -1197,6 +1197,7 @@
         "saved": "Cover letter saved",
         "saveFailed": "Unable to save cover letter",
         "generated": "Cover letter generated",
+        "generateFailed": "Unable to generate cover letter",
         "deleted": "Cover letter deleted",
         "deleteFailed": "Unable to delete cover letter"
       },

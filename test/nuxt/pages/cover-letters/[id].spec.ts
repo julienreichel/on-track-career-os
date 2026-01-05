@@ -107,7 +107,8 @@ const stubs = {
   UTextarea: {
     props: ['modelValue', 'disabled', 'placeholder'],
     emits: ['update:modelValue'],
-    template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+    template:
+      '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
   },
   UButton: {
     props: ['label', 'disabled', 'loading'],
@@ -190,7 +191,7 @@ describe('Cover letter detail page', () => {
 
   it('saves changes when save button is clicked', async () => {
     const wrapper = await mountPage();
-    
+
     // Modify content
     const textarea = wrapper.find('textarea');
     await textarea.setValue('Updated cover letter content');

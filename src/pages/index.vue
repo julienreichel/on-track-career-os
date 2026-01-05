@@ -31,6 +31,12 @@
             :to="{ name: 'cv' }"
           />
           <UPageCard
+            :title="t('features.coverLetters.title')"
+            :description="t('features.coverLetters.description')"
+            icon="i-heroicons-document-text"
+            :to="{ name: 'cover-letters' }"
+          />
+          <UPageCard
             :title="t('features.speech.title')"
             :description="t('features.speech.description')"
             icon="i-heroicons-chat-bubble-left-right"

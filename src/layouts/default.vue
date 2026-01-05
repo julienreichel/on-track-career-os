@@ -103,6 +103,8 @@ const generateBreadcrumbs = async () => {
       label = t('navigation.companies');
     } else if (segment === 'applications') {
       label = t('navigation.applications');
+    } else if (segment === 'cover-letters') {
+      label = t('navigation.coverLetters');
     } else if (segment === 'speech') {
       label = t('navigation.speech');
     } else if (segment === 'interview') {

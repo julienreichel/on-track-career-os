@@ -171,7 +171,10 @@ function createStateRunner(errorRef: Ref<string | null>) {
 }
 
 async function ensureProfile(userId: string, service: UserProfileService): Promise<UserProfile> {
-  const profile = await service.loadOrCreateProfile(userId);
+  const profile = await service.getFullUserProfile(userId);
+  if (!profile) {
+    throw new Error('User profile not found');
+  }
   if (!profile.fullName) {
     throw new Error('Profile fullName is required to generate cover letter');
   }
@@ -193,7 +196,7 @@ async function loadStories(
   experiences: Experience[],
   service: STARStoryService
 ): Promise<STARStory[]> {
-  const storyPromises = experiences.map((exp) => service.listByExperience(exp.id));
+  const storyPromises = experiences.map((exp) => service.getStoriesByExperience(exp.id));
   const storyArrays = await Promise.all(storyPromises);
   return storyArrays.flat();
 }
