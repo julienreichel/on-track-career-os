@@ -269,6 +269,7 @@ describe('Job Detail Page', () => {
     const titleInput = wrapper.find('[data-testid="job-title-input"]');
     expect((titleInput.element as HTMLInputElement).value).toBe('Lead Engineer');
     expect(router.currentRoute.value.meta.breadcrumbLabel).toBe('Lead Engineer');
+    expect(wrapper.find('.tailored-materials-card').exists()).toBe(true);
   });
 
   it('saves scalar fields when clicking save', async () => {

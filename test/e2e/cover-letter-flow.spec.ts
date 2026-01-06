@@ -229,7 +229,7 @@ test.describe('Cover Letter E2E Flow', () => {
     await confirmDeleteButton.click();
 
     await expect(page.getByText('Cover letter deleted', { exact: true })).toBeVisible();
-    
+
     // Cover letter should no longer appear in list
     await expect(
       page.getByRole('heading', { name: /Test Cover Letter for Software Engineer/i })

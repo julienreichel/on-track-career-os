@@ -171,6 +171,7 @@ describe('Job match page', () => {
     expect(engineMock.load).toHaveBeenCalled();
     expect(wrapper.text()).toContain('Lead Engineer');
     expect(wrapper.find('.matching-card').text()).toContain('82');
+    expect(wrapper.find('.tailored-materials-card').exists()).toBe(true);
   });
 
   it('shows an empty state when no summary exists', async () => {

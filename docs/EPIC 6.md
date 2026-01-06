@@ -157,11 +157,11 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
   - `/cover-letters/:id`
   - `/speech/:id`
 
-- [ ] Keep existing routes; no new application routes.
+- [x] Keep existing routes; no new application routes.
 
 ### 5.3 Tests
 
-- [ ] Nuxt component/page tests:
+- [x] Nuxt component/page tests:
   - card renders on both pages
   - clicking each action triggers correct workflow method
   - error UI shown on failure
