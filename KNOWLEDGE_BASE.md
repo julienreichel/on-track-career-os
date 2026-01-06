@@ -40,7 +40,7 @@ Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer
 - ✅ EPIC 5A (Job Description Analysis) — 100% complete
 - ✅ EPIC 5B (Company Analysis & Canvas) — 100% complete
 - ✅ EPIC 5C (User-Job-Company Matching) — 100% complete
-- ⚠️ Remaining EPIC 6 still in early implementation stages
+- ✅ EPIC 6 (Tailored Application Materials) — 100% complete
 
 ### 2.1 Frontend (Nuxt 4)
 
@@ -61,7 +61,7 @@ Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer
 
 ### 2.3 AI Layer
 
-- 17 AI operations defined by the AI Interaction Contract
+- 12 core AI operations defined by the AI Interaction Contract
 - Strict JSON I/O schemas with validation + fallback
 - No free text returned; all results are structured
   (From AIC contract )
@@ -119,6 +119,8 @@ _(From Component Model + Component→Page Mapping) _
 - **Company Canvas Component**
 - **Job Role Card Component**
 - **Matching Summary Component**
+- **Tailored Materials Card**
+- **Tailored Job Banner**
 - **CV Builder**
 - **Cover Letter Generator**
 - **Speech Builder**
@@ -144,7 +146,7 @@ _(From Component Model + Component→Page Mapping) _
 - `useCoverLetter()` - CoverLetter CRUD with AI generation
 - `useCoverLetters()` - CoverLetter list management
 - `useCoverLetterEngine()` - Cover letter workflow orchestration
-- `useTailoringEngine()` - Tailored materials (not implemented)
+- `useTailoredMaterials()` - Tailored CV/cover letter/speech generation + reuse
 - `useAiOperations()` - AI operations orchestration
 - `useCvDocuments()` - CV document management
 - `useCvGenerator()` - CV generation from user data
@@ -172,6 +174,7 @@ _(Structured per navigation zones)_
 - `/jobs/new` - Upload job description (PDF/TXT) → AI parsing
 - `/jobs/:id` - View/edit job details with 5 tabbed sections, reanalyse, company linking
 - `/jobs/:id/match` - Matching summary with fit score + structured sections
+- `/jobs/:id` and `/jobs/:id/match` include Application Materials card for tailored CV/letter/speech
 - `/companies` - Company list with search, delete modal
 - `/companies/new` - Create company with optional AI analysis
 - `/companies/:companyId` - View/edit company info, BMC canvas, and linked jobs
@@ -188,6 +191,7 @@ _(Structured per navigation zones)_
 - `/cover-letters/new` - Cover letter creation wizard
 - `/cover-letters/:id` - Cover letter editor
 - `/cover-letters/:id/print` - Cover letter print layout
+- `/cv/:id`, `/cover-letters/:id`, `/speech/:id` show job backlink + regenerate tailored action when jobId exists
   (From Navigation Structure & Component Mapping )
 
 ### 5.1 My Profile
@@ -216,6 +220,9 @@ _(Structured per navigation zones)_
   - Markdown editor with preview + print/export-ready layout, including top-right profile photo badge when enabled
 - **Cover Letter Builder**
 - **Speech Builder**
+- **Tailored Materials**
+  - Generate tailored CV/cover letter/speech from `/jobs/:id` or `/jobs/:id/match`
+  - Regenerate from document pages via job backlink banner when jobId exists
 
 ### 5.4 System Pages
 
@@ -262,12 +269,14 @@ _(From AI Interaction Contract) _
 - Validate input + output
 - Retry with schema-fix prompt
 - Return structured error contract
+- Tailoring inputs: jobDescription + matchingSummary + optional company summary
+- Invalid tailoring context falls back to generic output
 
 ---
 
 ## 8. Current Implementation Status
 
-### MVP Progress: ~70% Complete
+### MVP Progress: ~90% Complete
 
 #### ✅ EPIC 1A: User Data Intake & Identity (100% Complete)
 
