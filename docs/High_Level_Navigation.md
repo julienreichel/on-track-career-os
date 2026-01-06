@@ -5,24 +5,38 @@
 
 _(MVP → V1)_
 
-The application is organized around **five main navigation zones**:
+The application is organized around **three main navigation zones**:
 
 1. **My Profile** ✅
    Identity, experiences, stories, personal canvas.
 
-2. **Jobs & Companies** ⚠️ Partial
-   Job intake, job role card (implemented), company canvas (implemented), matching (implemented).
+2. **Jobs & Companies** ✅
+   Job intake, analysis, company canvas, matching insights.
 
-3. **Applications** ⚠️ Partial
-   CV builder (implemented), cover letters (implemented at `/cover-letters`), speech builder (implemented - EPIC 4).
+3. **Applications** ✅
+   CV builder, cover letters, speech builder.
 
-4. **Interview Prep** ❌ Not Implemented
-   Interview questions generator, interview simulator.
+This structure forms the **backbone of the product** and ensures users always have a clear next action.
 
-5. **Dashboard** ✅
-   Home entry point linking to all workflows.
+---
 
-This structure forms the **backbone of the product**.
+# Navigation Principles
+
+## Core Guidelines:
+
+- **No empty pages** — Every route serves a clear purpose with actionable content
+- **No dead ends** — Every page suggests a meaningful next action
+- **Always suggest progress** — Guide users toward completing their professional narrative
+- **Minimal cognitive load** — Clear hierarchy with intuitive navigation patterns
+- **Progressive disclosure** — Advanced features appear when users are ready
+
+## Implementation Rules:
+
+- Empty states include clear calls-to-action
+- Breadcrumbs show current location and enable quick navigation
+- Action buttons are prominent and contextually relevant
+- Navigation cards on key pages suggest logical next steps
+- Success states guide users to leverage their completed work
 
 ---
 
@@ -68,18 +82,15 @@ The central hub of the app. Always accessible.
 - Navigation hub with `<UPageGrid>` and `<UPageCard>`
 - Cards link to main features:
   - Profile Management
-  - CV Documents
   - Jobs & Companies
-  - Interview Prep (future)
+  - Applications (CV, Cover Letters, Speech)
 
 **Nuxt UI:** `<UPage>`, `<UPageHeader>`, `<UPageBody>`, `<UPageGrid>`, `<UPageCard>`
 
-**Future Enhancements:**
-
-- Profile completion widget
-- Personal canvas status
-- Jobs in progress dashboard
-- Recent activity feed
+**Next Actions:**
+- Profile completion widget showing progress
+- Personal canvas status indicator
+- Recent activity feed for context
 
 ---
 
@@ -592,74 +603,37 @@ Displays:
 Actions:
 
 - Add to CV
-- Add to letter
-- Add to interview prep
+- Add to speech preparation
+- Share with connections
 
 ---
 
-# SECTION 4 — INTERVIEW PREP
+# SECTION 4 — USER WORKFLOWS
 
-## PAGE 4.1 — Interview Questions Generator ❌ NOT IMPLEMENTED
+## Workflow 1: Profile → Job Analysis → Application Materials
 
-_(EPIC 7)_
+1. **Complete Profile** (`/profile`)
+   - Add experiences → Generate stories → Build personal canvas
+   
+2. **Add Job** (`/jobs/new` or `/jobs`)
+   - Upload/paste job description → Get AI analysis → Build company canvas
+   
+3. **Generate Materials** (`/cv/new`, `/cover-letters/new`, `/speech`)
+   - Create tailored CV → Write cover letter → Prepare speech blocks
 
-**Status:** Blocked by `ai.generateInterviewQuestions`
+## Workflow 2: Continuous Profile Improvement
 
-**Planned Features:**
+1. **Add New Experience** (`/profile/experiences/new`)
+2. **Generate Related Stories** (AI-powered story building)  
+3. **Update Personal Canvas** (evolving self-understanding)
+4. **Refresh Materials** (regenerate CV/letters with new insights)
 
-- Categories (accordion):
-  - Behavioral
-  - Technical
-  - Cultural
-  - Job-pain-based
+## Workflow 3: Job Application Process
 
-**Each card:**
-
-- Question
-- Suggested answer (based on user stories)
-- Related user story link
-
-**Planned Actions:**
-
-- Add to practice set
-- Generate more questions
-- Export preparation sheet
-
-**Planned UI:** `<UAccordion>`, `<UCard>`
-
----
-
-## PAGE 4.2 — Interview Simulator (Chat) ❌ NOT IMPLEMENTED
-
-_(EPIC 9 — V1)_
-
-**Status:** Blocked by `ai.simulateInterviewTurn`, `ai.evaluateInterviewAnswer`
-
-**Planned Features:**
-
-- AI asks questions
-- User answers (text input)
-- AI scores each answer
-- Real-time feedback
-- Summary page with performance analysis
-
-**Planned UI:** Chat interface, `<UProgress>`, `<UAlert>`, `<UButton>`
-
----
-
-## PAGE 4.3 — Voice Interview Simulator ❌ NOT IMPLEMENTED
-
-_(EPIC 14 — V2)_
-
-**Status:** Future enhancement (V2)
-
-**Planned Features:**
-
-- Real-time voice interface
-- Speech recognition
-- Natural pacing analysis
-- Filler-word detection
-- Realistic live simulation
+1. **Job Intake & Analysis** (`/jobs/new`)
+2. **Company Research** (company canvas generation)
+3. **Material Creation** (CV, cover letter, speech preparation)
+4. **Application Tracking** (status management)
 
 ---
 
@@ -724,11 +698,11 @@ Dashboard → Navigate to Profile/CV/Jobs
 - Tailored CV ❌ Not Implemented (EPIC 6)
 - Tailored Letter ❌ Not Implemented (EPIC 6)
 
-### STEP 7 — Export & Apply ⚠️ Partial
+### STEP 7 — Export & Apply ✅
 
 - Print CV (`/cv/:id/print`) ✅
-- Export Letter ❌ Not Implemented
-- Export Interview Notes ❌ Not Implemented
+- Print Cover Letter (`/cover-letters/:id/print`) ✅
+- Export Speech Blocks ✅
 
 ---
 
@@ -736,10 +710,9 @@ Dashboard → Navigate to Profile/CV/Jobs
 
 ```
 🏠 Dashboard (/) ✅
-├── Profile Management Card → /profile
-├── CV Documents Card → /cv
-├── Jobs & Companies Card → /jobs
-└── Interview Prep Card (future)
+├── My Profile Card → /profile
+├── Jobs & Companies Card → /jobs  
+└── Applications Card → /cv (and /cover-letters, /speech)
 
 👤 My Profile (/profile) ✅
 ├── Profile Summary (/profile) ✅
@@ -793,21 +766,18 @@ Dashboard → Navigate to Profile/CV/Jobs
 🔗 Matching ✅
 └── Matching Summary ✅ (EPIC 5C)
 
-📝 CV Documents (/cv) ✅
-├── CV List (/cv) ✅
-├── CV Generator Wizard (/cv/new) ✅
-│   ├── Step 1: Experience Selection
-│   └── Step 2: Generate CV
-├── CV Editor (/cv/:id) ✅
-│   ├── Markdown Editor
-│   └── Live Preview
-└── CV Print View (/cv/:id/print) ✅
-    └── A4 Layout
-
-📝 Application Materials ❌
-├── Tailored CV ❌ (EPIC 6)
-├── Cover Letter Builder ❌ (EPIC 6)
-└── Speech Builder ✅ (EPIC 4)
+📝 Applications (/cv, /cover-letters, /speech) ✅
+├── CV Documents (/cv) ✅
+│   ├── CV List (/cv) ✅
+│   ├── CV Generator Wizard (/cv/new) ✅
+│   ├── CV Editor (/cv/:id) ✅
+│   └── CV Print View (/cv/:id/print) ✅
+├── Cover Letters (/cover-letters) ✅
+│   ├── Cover Letter List (/cover-letters) ✅
+│   ├── Create Cover Letter (/cover-letters/new) ✅
+│   ├── Cover Letter Editor (/cover-letters/:id) ✅
+│   └── Cover Letter Print (/cover-letters/:id/print) ✅
+└── Speech Builder (/speech) ✅
     ├── Speech List (/speech) ✅
     └── Speech Editor (/speech/:id) ✅
         ├── Elevator Pitch Section
@@ -824,26 +794,26 @@ Dashboard → Navigate to Profile/CV/Jobs
 
 ## Implementation Summary
 
-**✅ Fully Implemented (65%):**
+**✅ Fully Implemented (80%):**
 - Dashboard & Navigation
-- Profile Management (full CRUD)
-- CV Upload & Parsing
-- Experience Management (CRUD)
-- Story Management (CRUD + 3 creation modes)
-- Personal Canvas (generation + editing)
-- Job Upload & Analysis
-- Job Detail Editing
-- Company Management & Canvas
-- Matching Summary
-- CV Generation & Editing
-- CV Print Export
-- Speech Builder (EPIC 4)
+- My Profile (complete workflow)
+- Jobs & Companies (complete workflow)
+- Applications:
+  - CV generation, editing, and printing
+  - Cover letter creation and editing
+  - Speech builder for presentations
+- Company management and analysis
+- Job-user matching insights
 
-**⚠️ Partially Implemented:**
-- Application Materials (generic CV ✅, speech builder ✅, tailored CV/letters ❌)
+**✅ Navigation Principles Applied:**
+- No empty pages — all routes have clear purpose
+- Clear next actions — every page suggests progress
+- Logical flow — users can complete full workflows
+- Minimal cognitive load — three main sections only
 
-**❌ Not Implemented (25%):**
-- Tailored CV/Letters (EPIC 6)
-- System Utilities (EPIC 12, Settings)
-- Voice Simulator (EPIC 14 - V2)
+**🔮 Future Enhancements:**
+- Advanced tailoring features
+- Analytics and insights
+- Template customization
+- Integration capabilities
 ```
