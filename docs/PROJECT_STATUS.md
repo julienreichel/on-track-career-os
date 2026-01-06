@@ -635,7 +635,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Next Steps:**
 
-1. Proceed to EPIC 7 (Interview Prep)
+1. Continue post-MVP roadmap planning
 
 ---
 
@@ -871,13 +871,7 @@ The project has established a **strong backend and domain foundation** with comp
 
 ## 🚀 Recommended Next Steps (Prioritized)
 
-### 1) Interview Prep (EPIC 7)
-
-- Implement interview AI ops and supporting domain layers.
-- Build `/interviews/:jobId/prep` and `/interviews/:jobId/simulate` pages.
-- Add E2E coverage for the interview flow.
-
-### 2) Settings + UX hardening
+### 1) Settings + UX hardening
 
 - Add `/settings` page for account preferences.
 - Improve user-facing error states for AI failures (beyond alerts).
@@ -902,7 +896,7 @@ The project has established a **strong backend and domain foundation** with comp
 8. Phase 8: Tailoring Engine (EPIC 6) → **100% complete**
 9. Phase 9: Interview Prep (EPIC 7) → **0% complete**
 
-**Next Immediate Priority:** EPIC 7 (Interview Prep)
+**Next Immediate Priority:** Production hardening + Settings
 
 **Parallel Work Opportunities:**
 
@@ -959,6 +953,6 @@ The **AI Career OS** project has made **excellent progress** with 11 of 11 MVP E
 - ✅ Job-company linking with automatic extraction
 - ✅ Matching summary generation with persistence and reload
 
-**Key Insight:** The project is **~90% complete** for MVP with a solid foundation. The remaining work focuses on **interview prep (EPIC 7)** and production hardening.
+**Key Insight:** The project is **~90% complete** for MVP with a solid foundation. The remaining MVP work focuses on production hardening and settings, with EPIC 7 next in the roadmap.
 
-**Next Immediate Action:** Proceed with EPIC 7 (Interview Prep).
+**Next Immediate Action:** Ship production hardening + settings, then plan EPIC 7.

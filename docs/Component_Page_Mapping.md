@@ -1040,8 +1040,8 @@ Each page includes:
 
 | Page                | Route                         | Status | EPIC | Blocker               |
 | ------------------- | ----------------------------- | ------ | ---- | --------------------- |
-| Interview Prep      | `/interviews/:jobId/prep`     | ❌     | 7    | AI operation missing  |
-| Interview Simulator | `/interviews/:jobId/simulate` | ❌     | 7    | AI operations missing |
+| Interview Prep      | `/interviews/:jobId/prep`     | ❌     | 7    | Planned               |
+| Interview Simulator | `/interviews/:jobId/simulate` | ❌     | 7    | Planned               |
 | Settings            | `/settings`                   | ❌     | -    | Low priority          |
 
 ## 8.3 Implemented Components
