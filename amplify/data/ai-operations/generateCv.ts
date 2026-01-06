@@ -357,6 +357,7 @@ function formatExperiencesWithStories(
  */
 // eslint-disable-next-line complexity
 function buildUserPrompt(input: GenerateCvInput): string {
+  const JSON_INDENT = 2;
   const tailoring = resolveTailoringContext(input);
   const jobDescription = tailoring?.jobDescription ?? null;
   const matchingSummary = tailoring?.matchingSummary ?? null;
@@ -402,10 +403,10 @@ function buildUserPrompt(input: GenerateCvInput): string {
 
   // Add job description for tailoring
   if (jobDescription) {
-    prompt += `## TARGET JOB DESCRIPTION\n${JSON.stringify(jobDescription, null, 2)}\n\n`;
-    prompt += `## MATCHING SUMMARY\n${JSON.stringify(matchingSummary, null, 2)}\n\n`;
+    prompt += `## TARGET JOB DESCRIPTION\n${JSON.stringify(jobDescription, null, JSON_INDENT)}\n\n`;
+    prompt += `## MATCHING SUMMARY\n${JSON.stringify(matchingSummary, null, JSON_INDENT)}\n\n`;
     if (company) {
-      prompt += `## COMPANY SUMMARY\n${JSON.stringify(company, null, 2)}\n\n`;
+      prompt += `## COMPANY SUMMARY\n${JSON.stringify(company, null, JSON_INDENT)}\n\n`;
     }
     prompt += `TAILORING INSTRUCTIONS:\n`;
     prompt += `- Prioritize experiences and skills matching this job description\n`;

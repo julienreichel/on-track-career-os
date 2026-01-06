@@ -63,6 +63,9 @@ vi.mock('@/composables/useAuthUser', () => ({
 const tailoredMaterialsMock = {
   isGenerating: ref(false),
   error: ref<string | null>(null),
+  contextLoading: ref(false),
+  contextError: ref<null | string>(null),
+  loadTailoringContext: vi.fn().mockResolvedValue({ ok: false, error: null }),
   regenerateTailoredSpeechForJob: vi.fn(),
 };
 

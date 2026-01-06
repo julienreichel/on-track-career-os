@@ -19,6 +19,8 @@ import type { CompanyService } from '@/domain/company/CompanyService';
 import type { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
 import type { CoverLetterService } from '@/domain/cover-letter/CoverLetterService';
 import type { SpeechBlockService } from '@/domain/speech-block/SpeechBlockService';
+import type { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
+import type { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
 
 const buildAuthStub = () => ({
   userId: ref<string | null>('user-1'),
@@ -163,6 +165,12 @@ describe('useTailoredMaterials', () => {
       createSpeechBlock: vi.fn().mockResolvedValue(speechBlock),
       updateSpeechBlock: vi.fn().mockResolvedValue(speechBlock),
     } as unknown as SpeechBlockService,
+    jobService: {
+      getFullJobDescription: vi.fn().mockResolvedValue(job),
+    } as unknown as JobDescriptionService,
+    matchingSummaryService: {
+      getByContext: vi.fn().mockResolvedValue(matchingSummary),
+    } as unknown as MatchingSummaryService,
   });
 
   it('generates tailored CV and persists jobId', async () => {

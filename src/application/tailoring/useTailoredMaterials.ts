@@ -11,6 +11,8 @@ import { CompanyService } from '@/domain/company/CompanyService';
 import { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
 import { CoverLetterService } from '@/domain/cover-letter/CoverLetterService';
 import { SpeechBlockService } from '@/domain/speech-block/SpeechBlockService';
+import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
+import { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
 import type { GenerateCvInput } from '@/domain/ai-operations/types/generateCv';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
@@ -18,10 +20,6 @@ import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
 import type { Experience } from '@/domain/experience/Experience';
 import type { STARStory } from '@/domain/starstory/STARStory';
-import type { Company } from '@/domain/company/Company';
-import type { CVDocument } from '@/domain/cvdocument/CVDocument';
-import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
-import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 
 type AuthComposable = {
   userId: Ref<string | null>;
@@ -38,6 +36,8 @@ type TailoredMaterialsDependencies = {
   cvRepository: CVDocumentRepository;
   coverLetterService: CoverLetterService;
   speechBlockService: SpeechBlockService;
+  jobService: JobDescriptionService;
+  matchingSummaryService: MatchingSummaryService;
 };
 
 type TailoredCvOptions = {
@@ -75,11 +75,19 @@ type UseTailoredMaterialsOptions = {
   dependencies?: Partial<TailoredMaterialsDependencies>;
 };
 
+type TailoringContextError = 'unauthenticated' | 'jobNotFound' | 'loadContextFailed';
+
+type TailoringContextResult =
+  | { ok: true; job: JobDescription; matchingSummary: MatchingSummary | null }
+  | { ok: false; error: TailoringContextError | null };
+
 export function useTailoredMaterials(options: UseTailoredMaterialsOptions = {}) {
   const deps = createDependencies(options.dependencies);
   const auth = options.auth ?? useAuthUser();
   const isGenerating = ref(false);
   const error = ref<string | null>(null);
+  const contextLoading = ref(false);
+  const contextError = ref<TailoringContextError | null>(null);
 
   const resolveUserId = createUserResolver({
     providedUserId: options.userId ?? null,
@@ -89,259 +97,146 @@ export function useTailoredMaterials(options: UseTailoredMaterialsOptions = {}) 
 
   const runWithState = createStateRunner(error, isGenerating);
 
-  const generateTailoredCvForJob = (params: TailoredJobParams<TailoredCvOptions>) =>
-    runWithState(async () => {
-      const userId = await resolveUserId();
-      const context = await loadUserContext(userId, deps);
-      const company = await loadCompanySummary(params.job.companyId, deps.companyService);
-      const tailoring = buildTailoringContext({
-        userProfile: context.profile,
-        job: params.job,
-        matchingSummary: params.matchingSummary,
-        company,
-      });
+  const loadTailoringContext = createTailoringContextLoader({
+    deps,
+    auth,
+    contextLoading,
+    contextError,
+  });
 
-      if (!tailoring.ok) {
-        throw new Error(tailoring.error);
-      }
-
-      const cvInput = buildCvInput({
-        profile: context.profile,
-        experiences: context.experiences,
-        stories: context.stories,
-        options: params.options,
-      });
-
-      const aiInput: GenerateCvInput = {
-        ...cvInput,
-        jobDescription: tailoring.value.jobDescription,
-        matchingSummary: tailoring.value.matchingSummary,
-        company: tailoring.value.company,
-      };
-
-      const content = await deps.aiService.generateCv(aiInput);
-      const created = await deps.cvRepository.create({
-        name: params.options?.name ?? `Tailored CV — ${params.job.title}`,
-        templateId: params.options?.templateId,
-        isTailored: true,
-        content,
-        showProfilePhoto: params.options?.showProfilePhoto ?? true,
-        userId,
-        jobId: params.job.id,
-      });
-
-      return created;
-    });
-
-  const regenerateTailoredCvForJob = (params: RegenerateJobParams<TailoredCvOptions>) =>
-    runWithState(async () => {
-      const userId = await resolveUserId();
-      const context = await loadUserContext(userId, deps);
-      const company = await loadCompanySummary(params.job.companyId, deps.companyService);
-      const tailoring = buildTailoringContext({
-        userProfile: context.profile,
-        job: params.job,
-        matchingSummary: params.matchingSummary,
-        company,
-      });
-
-      if (!tailoring.ok) {
-        throw new Error(tailoring.error);
-      }
-
-      const cvInput = buildCvInput({
-        profile: context.profile,
-        experiences: context.experiences,
-        stories: context.stories,
-        options: params.options,
-      });
-
-      const aiInput: GenerateCvInput = {
-        ...cvInput,
-        jobDescription: tailoring.value.jobDescription,
-        matchingSummary: tailoring.value.matchingSummary,
-        company: tailoring.value.company,
-      };
-
-      const content = await deps.aiService.generateCv(aiInput);
-      const updated = await deps.cvRepository.update({
-        id: params.id,
-        name: params.options?.name,
-        templateId: params.options?.templateId,
-        isTailored: true,
-        content,
-        showProfilePhoto: params.options?.showProfilePhoto,
-        jobId: params.job.id,
-      });
-
-      return updated;
-    });
-
-  const generateTailoredCoverLetterForJob = (params: TailoredJobParams<TailoredCoverLetterOptions>) =>
-    runWithState(async () => {
-      const userId = await resolveUserId();
-      const context = await loadUserContext(userId, deps);
-      const company = await loadCompanySummary(params.job.companyId, deps.companyService);
-      const tailoring = buildTailoringContext({
-        userProfile: context.profile,
-        job: params.job,
-        matchingSummary: params.matchingSummary,
-        company,
-      });
-
-      if (!tailoring.ok) {
-        throw new Error(tailoring.error);
-      }
-
-      const speechInput = buildSpeechInput({
-        profile: context.profile,
-        personalCanvas: context.personalCanvas,
-        experiences: context.experiences,
-        stories: context.stories,
-        tailoring: {
-          jobDescription: tailoring.value.jobDescription,
-          matchingSummary: tailoring.value.matchingSummary,
-          company: tailoring.value.company,
-        },
-      });
-
-      const content = await deps.aiService.generateCoverLetter(speechInput);
-      return deps.coverLetterService.createCoverLetter({
-        name: params.options?.name ?? `Cover Letter — ${params.job.title}`,
-        tone: params.options?.tone ?? 'Professional',
-        content,
-        userId,
-        jobId: params.job.id,
-      });
-    });
-
-  const regenerateTailoredCoverLetterForJob = (
-    params: RegenerateJobParams<TailoredCoverLetterOptions>
-  ) =>
-    runWithState(async () => {
-      const userId = await resolveUserId();
-      const context = await loadUserContext(userId, deps);
-      const company = await loadCompanySummary(params.job.companyId, deps.companyService);
-      const tailoring = buildTailoringContext({
-        userProfile: context.profile,
-        job: params.job,
-        matchingSummary: params.matchingSummary,
-        company,
-      });
-
-      if (!tailoring.ok) {
-        throw new Error(tailoring.error);
-      }
-
-      const speechInput = buildSpeechInput({
-        profile: context.profile,
-        personalCanvas: context.personalCanvas,
-        experiences: context.experiences,
-        stories: context.stories,
-        tailoring: {
-          jobDescription: tailoring.value.jobDescription,
-          matchingSummary: tailoring.value.matchingSummary,
-          company: tailoring.value.company,
-        },
-      });
-
-      const content = await deps.aiService.generateCoverLetter(speechInput);
-      return deps.coverLetterService.updateCoverLetter({
-        id: params.id,
-        name: params.options?.name,
-        tone: params.options?.tone,
-        content,
-        jobId: params.job.id,
-      });
-    });
-
-  const generateTailoredSpeechForJob = (params: TailoredJobParams<TailoredSpeechOptions>) =>
-    runWithState(async () => {
-      const userId = await resolveUserId();
-      const context = await loadUserContext(userId, deps);
-      const company = await loadCompanySummary(params.job.companyId, deps.companyService);
-      const tailoring = buildTailoringContext({
-        userProfile: context.profile,
-        job: params.job,
-        matchingSummary: params.matchingSummary,
-        company,
-      });
-
-      if (!tailoring.ok) {
-        throw new Error(tailoring.error);
-      }
-
-      const speechInput = buildSpeechInput({
-        profile: context.profile,
-        personalCanvas: context.personalCanvas,
-        experiences: context.experiences,
-        stories: context.stories,
-        tailoring: {
-          jobDescription: tailoring.value.jobDescription,
-          matchingSummary: tailoring.value.matchingSummary,
-          company: tailoring.value.company,
-        },
-      });
-
-      const speech = await deps.aiService.generateSpeech(speechInput);
-      return deps.speechBlockService.createSpeechBlock({
-        name: params.options?.name ?? `Speech — ${params.job.title}`,
-        elevatorPitch: speech.elevatorPitch,
-        careerStory: speech.careerStory,
-        whyMe: speech.whyMe,
-        userId,
-        jobId: params.job.id,
-      });
-    });
-
-  const regenerateTailoredSpeechForJob = (params: RegenerateJobParams<TailoredSpeechOptions>) =>
-    runWithState(async () => {
-      const userId = await resolveUserId();
-      const context = await loadUserContext(userId, deps);
-      const company = await loadCompanySummary(params.job.companyId, deps.companyService);
-      const tailoring = buildTailoringContext({
-        userProfile: context.profile,
-        job: params.job,
-        matchingSummary: params.matchingSummary,
-        company,
-      });
-
-      if (!tailoring.ok) {
-        throw new Error(tailoring.error);
-      }
-
-      const speechInput = buildSpeechInput({
-        profile: context.profile,
-        personalCanvas: context.personalCanvas,
-        experiences: context.experiences,
-        stories: context.stories,
-        tailoring: {
-          jobDescription: tailoring.value.jobDescription,
-          matchingSummary: tailoring.value.matchingSummary,
-          company: tailoring.value.company,
-        },
-      });
-
-      const speech = await deps.aiService.generateSpeech(speechInput);
-      return deps.speechBlockService.updateSpeechBlock({
-        id: params.id,
-        name: params.options?.name,
-        elevatorPitch: speech.elevatorPitch,
-        careerStory: speech.careerStory,
-        whyMe: speech.whyMe,
-        jobId: params.job.id,
-      });
-    });
+  const generators = createTailoredGenerators({
+    deps,
+    resolveUserId,
+    runWithState,
+  });
 
   return {
     isGenerating,
     error,
-    generateTailoredCvForJob,
-    regenerateTailoredCvForJob,
-    generateTailoredCoverLetterForJob,
-    regenerateTailoredCoverLetterForJob,
-    generateTailoredSpeechForJob,
-    regenerateTailoredSpeechForJob,
+    contextLoading,
+    contextError,
+    loadTailoringContext,
+    ...generators,
+  };
+}
+
+type TailoredGenerators = {
+  generateTailoredCvForJob: (params: TailoredJobParams<TailoredCvOptions>) => Promise<unknown>;
+  regenerateTailoredCvForJob: (params: RegenerateJobParams<TailoredCvOptions>) => Promise<unknown>;
+  generateTailoredCoverLetterForJob: (
+    params: TailoredJobParams<TailoredCoverLetterOptions>
+  ) => Promise<unknown>;
+  regenerateTailoredCoverLetterForJob: (
+    params: RegenerateJobParams<TailoredCoverLetterOptions>
+  ) => Promise<unknown>;
+  generateTailoredSpeechForJob: (params: TailoredJobParams<TailoredSpeechOptions>) => Promise<unknown>;
+  regenerateTailoredSpeechForJob: (
+    params: RegenerateJobParams<TailoredSpeechOptions>
+  ) => Promise<unknown>;
+};
+
+type TailoredGeneratorArgs = {
+  deps: TailoredMaterialsDependencies;
+  resolveUserId: () => Promise<string>;
+  runWithState: <T>(operation: () => Promise<T | null>) => Promise<T | null>;
+};
+
+type TailoringContextLoaderArgs = {
+  deps: TailoredMaterialsDependencies;
+  auth: AuthComposable;
+  contextLoading: Ref<boolean>;
+  contextError: Ref<TailoringContextError | null>;
+};
+
+function createTailoringContextLoader({
+  deps,
+  auth,
+  contextLoading,
+  contextError,
+}: TailoringContextLoaderArgs) {
+  return async (jobId?: string | null): Promise<TailoringContextResult> => {
+    if (!jobId) {
+      contextError.value = null;
+      return { ok: false, error: null };
+    }
+
+    contextLoading.value = true;
+    contextError.value = null;
+
+    try {
+      if (!auth.userId.value) {
+        await auth.loadUserId();
+      }
+
+      if (!auth.userId.value) {
+        contextError.value = 'unauthenticated';
+        return { ok: false, error: contextError.value };
+      }
+
+      const job = await deps.jobService.getFullJobDescription(jobId);
+      if (!job) {
+        contextError.value = 'jobNotFound';
+        return { ok: false, error: contextError.value };
+      }
+
+      const companyId = job.companyId ?? null;
+      let summary = await deps.matchingSummaryService.getByContext({
+        userId: auth.userId.value,
+        jobId,
+        companyId,
+      });
+
+      if (!summary && companyId) {
+        summary = await deps.matchingSummaryService.getByContext({
+          userId: auth.userId.value,
+          jobId,
+          companyId: null,
+        });
+      }
+
+      return { ok: true, job, matchingSummary: summary ?? null };
+    } catch (err) {
+      console.error('[useTailoredMaterials] Failed to load tailoring context', err);
+      contextError.value = 'loadContextFailed';
+      return { ok: false, error: contextError.value };
+    } finally {
+      contextLoading.value = false;
+    }
+  };
+}
+
+function createTailoredGenerators({
+  deps,
+  resolveUserId,
+  runWithState,
+}: TailoredGeneratorArgs): TailoredGenerators {
+  return {
+    generateTailoredCvForJob: createGenerateTailoredCvForJob(deps, resolveUserId, runWithState),
+    regenerateTailoredCvForJob: createRegenerateTailoredCvForJob(
+      deps,
+      resolveUserId,
+      runWithState
+    ),
+    generateTailoredCoverLetterForJob: createGenerateTailoredCoverLetterForJob(
+      deps,
+      resolveUserId,
+      runWithState
+    ),
+    regenerateTailoredCoverLetterForJob: createRegenerateTailoredCoverLetterForJob(
+      deps,
+      resolveUserId,
+      runWithState
+    ),
+    generateTailoredSpeechForJob: createGenerateTailoredSpeechForJob(
+      deps,
+      resolveUserId,
+      runWithState
+    ),
+    regenerateTailoredSpeechForJob: createRegenerateTailoredSpeechForJob(
+      deps,
+      resolveUserId,
+      runWithState
+    ),
   };
 }
 
@@ -358,6 +253,8 @@ function createDependencies(
     cvRepository: overrides.cvRepository ?? new CVDocumentRepository(),
     coverLetterService: overrides.coverLetterService ?? new CoverLetterService(),
     speechBlockService: overrides.speechBlockService ?? new SpeechBlockService(),
+    jobService: overrides.jobService ?? new JobDescriptionService(),
+    matchingSummaryService: overrides.matchingSummaryService ?? new MatchingSummaryService(),
   };
 }
 
@@ -395,6 +292,280 @@ function createStateRunner(errorRef: Ref<string | null>, loadingRef: Ref<boolean
       loadingRef.value = false;
     }
   };
+}
+
+function createGenerateTailoredCvForJob(
+  deps: TailoredMaterialsDependencies,
+  resolveUserId: () => Promise<string>,
+  runWithState: <T>(operation: () => Promise<T | null>) => Promise<T | null>
+) {
+  return (params: TailoredJobParams<TailoredCvOptions>) =>
+    runWithState(async () => {
+      const userId = await resolveUserId();
+      const context = await loadUserContext(userId, deps);
+      const company = await loadCompanySummary(params.job.companyId, deps.companyService);
+      const tailoring = buildTailoringContext({
+        userProfile: context.profile,
+        job: params.job,
+        matchingSummary: params.matchingSummary,
+        company,
+      });
+
+      if (!tailoring.ok) {
+        throw new Error(tailoring.error);
+      }
+
+      const cvInput = buildCvInput({
+        profile: context.profile,
+        experiences: context.experiences,
+        stories: context.stories,
+        options: params.options,
+      });
+
+      const aiInput: GenerateCvInput = {
+        ...cvInput,
+        jobDescription: tailoring.value.jobDescription,
+        matchingSummary: tailoring.value.matchingSummary,
+        company: tailoring.value.company,
+      };
+
+      const content = await deps.aiService.generateCv(aiInput);
+      return deps.cvRepository.create({
+        name: params.options?.name ?? `Tailored CV — ${params.job.title}`,
+        templateId: params.options?.templateId,
+        isTailored: true,
+        content,
+        showProfilePhoto: params.options?.showProfilePhoto ?? true,
+        userId,
+        jobId: params.job.id,
+      });
+    });
+}
+
+function createRegenerateTailoredCvForJob(
+  deps: TailoredMaterialsDependencies,
+  resolveUserId: () => Promise<string>,
+  runWithState: <T>(operation: () => Promise<T | null>) => Promise<T | null>
+) {
+  return (params: RegenerateJobParams<TailoredCvOptions>) =>
+    runWithState(async () => {
+      const userId = await resolveUserId();
+      const context = await loadUserContext(userId, deps);
+      const company = await loadCompanySummary(params.job.companyId, deps.companyService);
+      const tailoring = buildTailoringContext({
+        userProfile: context.profile,
+        job: params.job,
+        matchingSummary: params.matchingSummary,
+        company,
+      });
+
+      if (!tailoring.ok) {
+        throw new Error(tailoring.error);
+      }
+
+      const cvInput = buildCvInput({
+        profile: context.profile,
+        experiences: context.experiences,
+        stories: context.stories,
+        options: params.options,
+      });
+
+      const aiInput: GenerateCvInput = {
+        ...cvInput,
+        jobDescription: tailoring.value.jobDescription,
+        matchingSummary: tailoring.value.matchingSummary,
+        company: tailoring.value.company,
+      };
+
+      const content = await deps.aiService.generateCv(aiInput);
+      return deps.cvRepository.update({
+        id: params.id,
+        name: params.options?.name,
+        templateId: params.options?.templateId,
+        isTailored: true,
+        content,
+        showProfilePhoto: params.options?.showProfilePhoto,
+        jobId: params.job.id,
+      });
+    });
+}
+
+function createGenerateTailoredCoverLetterForJob(
+  deps: TailoredMaterialsDependencies,
+  resolveUserId: () => Promise<string>,
+  runWithState: <T>(operation: () => Promise<T | null>) => Promise<T | null>
+) {
+  return (params: TailoredJobParams<TailoredCoverLetterOptions>) =>
+    runWithState(async () => {
+      const userId = await resolveUserId();
+      const context = await loadUserContext(userId, deps);
+      const company = await loadCompanySummary(params.job.companyId, deps.companyService);
+      const tailoring = buildTailoringContext({
+        userProfile: context.profile,
+        job: params.job,
+        matchingSummary: params.matchingSummary,
+        company,
+      });
+
+      if (!tailoring.ok) {
+        throw new Error(tailoring.error);
+      }
+
+      const speechInput = buildSpeechInput({
+        profile: context.profile,
+        personalCanvas: context.personalCanvas,
+        experiences: context.experiences,
+        stories: context.stories,
+        tailoring: {
+          jobDescription: tailoring.value.jobDescription,
+          matchingSummary: tailoring.value.matchingSummary,
+          company: tailoring.value.company,
+        },
+      });
+
+      const content = await deps.aiService.generateCoverLetter(speechInput);
+      return deps.coverLetterService.createCoverLetter({
+        name: params.options?.name ?? `Cover Letter — ${params.job.title}`,
+        tone: params.options?.tone ?? 'Professional',
+        content,
+        userId,
+        jobId: params.job.id,
+      });
+    });
+}
+
+function createRegenerateTailoredCoverLetterForJob(
+  deps: TailoredMaterialsDependencies,
+  resolveUserId: () => Promise<string>,
+  runWithState: <T>(operation: () => Promise<T | null>) => Promise<T | null>
+) {
+  return (params: RegenerateJobParams<TailoredCoverLetterOptions>) =>
+    runWithState(async () => {
+      const userId = await resolveUserId();
+      const context = await loadUserContext(userId, deps);
+      const company = await loadCompanySummary(params.job.companyId, deps.companyService);
+      const tailoring = buildTailoringContext({
+        userProfile: context.profile,
+        job: params.job,
+        matchingSummary: params.matchingSummary,
+        company,
+      });
+
+      if (!tailoring.ok) {
+        throw new Error(tailoring.error);
+      }
+
+      const speechInput = buildSpeechInput({
+        profile: context.profile,
+        personalCanvas: context.personalCanvas,
+        experiences: context.experiences,
+        stories: context.stories,
+        tailoring: {
+          jobDescription: tailoring.value.jobDescription,
+          matchingSummary: tailoring.value.matchingSummary,
+          company: tailoring.value.company,
+        },
+      });
+
+      const content = await deps.aiService.generateCoverLetter(speechInput);
+      return deps.coverLetterService.updateCoverLetter({
+        id: params.id,
+        name: params.options?.name,
+        tone: params.options?.tone,
+        content,
+        jobId: params.job.id,
+      });
+    });
+}
+
+function createGenerateTailoredSpeechForJob(
+  deps: TailoredMaterialsDependencies,
+  resolveUserId: () => Promise<string>,
+  runWithState: <T>(operation: () => Promise<T | null>) => Promise<T | null>
+) {
+  return (params: TailoredJobParams<TailoredSpeechOptions>) =>
+    runWithState(async () => {
+      const userId = await resolveUserId();
+      const context = await loadUserContext(userId, deps);
+      const company = await loadCompanySummary(params.job.companyId, deps.companyService);
+      const tailoring = buildTailoringContext({
+        userProfile: context.profile,
+        job: params.job,
+        matchingSummary: params.matchingSummary,
+        company,
+      });
+
+      if (!tailoring.ok) {
+        throw new Error(tailoring.error);
+      }
+
+      const speechInput = buildSpeechInput({
+        profile: context.profile,
+        personalCanvas: context.personalCanvas,
+        experiences: context.experiences,
+        stories: context.stories,
+        tailoring: {
+          jobDescription: tailoring.value.jobDescription,
+          matchingSummary: tailoring.value.matchingSummary,
+          company: tailoring.value.company,
+        },
+      });
+
+      const speech = await deps.aiService.generateSpeech(speechInput);
+      return deps.speechBlockService.createSpeechBlock({
+        name: params.options?.name ?? `Speech — ${params.job.title}`,
+        elevatorPitch: speech.elevatorPitch,
+        careerStory: speech.careerStory,
+        whyMe: speech.whyMe,
+        userId,
+        jobId: params.job.id,
+      });
+    });
+}
+
+function createRegenerateTailoredSpeechForJob(
+  deps: TailoredMaterialsDependencies,
+  resolveUserId: () => Promise<string>,
+  runWithState: <T>(operation: () => Promise<T | null>) => Promise<T | null>
+) {
+  return (params: RegenerateJobParams<TailoredSpeechOptions>) =>
+    runWithState(async () => {
+      const userId = await resolveUserId();
+      const context = await loadUserContext(userId, deps);
+      const company = await loadCompanySummary(params.job.companyId, deps.companyService);
+      const tailoring = buildTailoringContext({
+        userProfile: context.profile,
+        job: params.job,
+        matchingSummary: params.matchingSummary,
+        company,
+      });
+
+      if (!tailoring.ok) {
+        throw new Error(tailoring.error);
+      }
+
+      const speechInput = buildSpeechInput({
+        profile: context.profile,
+        personalCanvas: context.personalCanvas,
+        experiences: context.experiences,
+        stories: context.stories,
+        tailoring: {
+          jobDescription: tailoring.value.jobDescription,
+          matchingSummary: tailoring.value.matchingSummary,
+          company: tailoring.value.company,
+        },
+      });
+
+      const speech = await deps.aiService.generateSpeech(speechInput);
+      return deps.speechBlockService.updateSpeechBlock({
+        id: params.id,
+        name: params.options?.name,
+        elevatorPitch: speech.elevatorPitch,
+        careerStory: speech.careerStory,
+        whyMe: speech.whyMe,
+        jobId: params.job.id,
+      });
+    });
 }
 
 async function loadUserContext(
@@ -443,11 +614,6 @@ function buildCvInput(args: {
   stories: STARStory[];
   options?: TailoredCvOptions;
 }): GenerateCvInput {
-  const includeSkills = args.options?.includeSkills ?? true;
-  const includeLanguages = args.options?.includeLanguages ?? true;
-  const includeCertifications = args.options?.includeCertifications ?? true;
-  const includeInterests = args.options?.includeInterests ?? true;
-
   const input: GenerateCvInput = {
     language: 'en',
     userProfile: {
@@ -486,20 +652,35 @@ function buildCvInput(args: {
     })),
   };
 
-  if (includeSkills) {
-    input.skills = filterStrings(args.profile.skills);
-  }
-  if (includeLanguages) {
-    input.languages = filterStrings(args.profile.languages);
-  }
-  if (includeCertifications) {
-    input.certifications = filterStrings(args.profile.certifications);
-  }
-  if (includeInterests) {
-    input.interests = filterStrings(args.profile.interests);
-  }
+  applyOptionalList(input, 'skills', args.profile.skills, args.options?.includeSkills ?? true);
+  applyOptionalList(input, 'languages', args.profile.languages, args.options?.includeLanguages ?? true);
+  applyOptionalList(
+    input,
+    'certifications',
+    args.profile.certifications,
+    args.options?.includeCertifications ?? true
+  );
+  applyOptionalList(
+    input,
+    'interests',
+    args.profile.interests,
+    args.options?.includeInterests ?? true
+  );
 
   return input;
+}
+
+function applyOptionalList(
+  input: GenerateCvInput,
+  key: 'skills' | 'languages' | 'certifications' | 'interests',
+  values: (string | null)[] | null | undefined,
+  include: boolean
+) {
+  if (!include) return;
+  const filtered = filterStrings(values);
+  if (filtered?.length) {
+    input[key] = filtered;
+  }
 }
 
 function filterStrings(values?: (string | null)[] | null): string[] | undefined {

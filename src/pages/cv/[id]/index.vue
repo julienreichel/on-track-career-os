@@ -29,7 +29,7 @@
           :regenerate-error-title="t('tailoredMaterials.regenerateCvErrorTitle')"
           :missing-summary-title="t('tailoredMaterials.missingSummaryTitle')"
           :missing-summary-description="t('tailoredMaterials.missingSummaryCv')"
-          :context-error="contextError"
+          :context-error="contextErrorMessage"
           :regenerate-error="regenerateError"
           :missing-summary="missingSummary"
           @regenerate="handleRegenerateTailored"
@@ -120,7 +120,7 @@
                     :src="profilePhotoUrl"
                     :alt="$t('cvDisplay.photoAlt')"
                     class="h-16 w-16 rounded-full object-cover border border-gray-200 dark:border-gray-700"
-                  />
+                  >
                   <p class="text-xs text-gray-500 dark:text-gray-400">
                     {{ $t('cvDisplay.photoPreviewHelp') }}
                   </p>
@@ -137,7 +137,7 @@
                   :src="profilePhotoUrl!"
                   :alt="$t('cvDisplay.photoAlt')"
                   class="cv-photo-image"
-                />
+                >
               </div>
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div class="prose prose-gray max-w-none" v-html="renderedHtml" />
@@ -192,8 +192,6 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { marked } from 'marked';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
-import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
-import { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import { useAuthUser } from '@/composables/useAuthUser';
@@ -210,8 +208,6 @@ const toast = useToast();
 const cvId = computed(() => route.params.id as string);
 
 const service = new CVDocumentService();
-const jobService = new JobDescriptionService();
-const matchingSummaryService = new MatchingSummaryService();
 const userProfileService = new UserProfileService();
 const profilePhotoService = new ProfilePhotoService();
 const auth = useAuthUser();
@@ -222,8 +218,6 @@ const saving = ref(false);
 const error = ref<string | null>(null);
 const targetJob = ref<JobDescription | null>(null);
 const matchingSummary = ref<MatchingSummary | null>(null);
-const contextLoading = ref(false);
-const contextError = ref<string | null>(null);
 
 const isEditing = ref(false);
 const editContent = ref('');
@@ -244,6 +238,11 @@ const matchLink = computed(() =>
   targetJob.value?.id ? `/jobs/${targetJob.value.id}/match` : null
 );
 const isRegenerating = computed(() => tailoredMaterials.isGenerating.value);
+const contextLoading = computed(() => tailoredMaterials.contextLoading.value);
+const contextErrorCode = computed(() => tailoredMaterials.contextError.value);
+const contextErrorMessage = computed(() =>
+  contextErrorCode.value ? t(`tailoredMaterials.errors.${contextErrorCode.value}`) : null
+);
 const canRegenerate = computed(() =>
   Boolean(document.value?.id && targetJob.value && matchingSummary.value)
 );
@@ -384,55 +383,15 @@ const handlePrint = () => {
 };
 
 const loadTailoringContext = async (jobId?: string | null) => {
-  if (!jobId) {
-    targetJob.value = null;
-    matchingSummary.value = null;
-    contextError.value = null;
+  const result = await tailoredMaterials.loadTailoringContext(jobId);
+  if (result.ok) {
+    targetJob.value = result.job;
+    matchingSummary.value = result.matchingSummary;
     return;
   }
 
-  contextLoading.value = true;
-  contextError.value = null;
-
-  try {
-    if (!auth.userId.value) {
-      await auth.loadUserId();
-    }
-
-    if (!auth.userId.value) {
-      throw new Error(t('tailoredMaterials.errors.unauthenticated'));
-    }
-
-    const job = await jobService.getFullJobDescription(jobId);
-    if (!job) {
-      throw new Error(t('tailoredMaterials.errors.jobNotFound'));
-    }
-    targetJob.value = job;
-
-    const companyId = job.companyId ?? null;
-    let summary = await matchingSummaryService.getByContext({
-      userId: auth.userId.value,
-      jobId,
-      companyId,
-    });
-
-    if (!summary && companyId) {
-      summary = await matchingSummaryService.getByContext({
-        userId: auth.userId.value,
-        jobId,
-        companyId: null,
-      });
-    }
-
-    matchingSummary.value = summary;
-  } catch (err) {
-    contextError.value = err instanceof Error ? err.message : t('tailoredMaterials.errors.loadContextFailed');
-    console.error('[cvDisplay] Error loading tailored context:', err);
-    targetJob.value = null;
-    matchingSummary.value = null;
-  } finally {
-    contextLoading.value = false;
-  }
+  targetJob.value = null;
+  matchingSummary.value = null;
 };
 
 const handleRegenerateTailored = async () => {
