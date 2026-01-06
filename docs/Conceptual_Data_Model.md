@@ -6,12 +6,13 @@
 
 # 1. PRIMARY ENTITY CLUSTERS
 
-The platform contains **four major data domains**:
+The platform contains **five major data domains**:
 
 1. **User Identity Domain**
 2. **Experience & Story Domain**
 3. **Job & Company Domain**
 4. **Application Materials Domain**
+5. **Feedback & Learning Domain** _(New - V1 Enhancement)_
 
 Each domain and its entities are described below.
 
@@ -312,6 +313,74 @@ _(EPIC 4)_
 
 ---
 
+# 6. FEEDBACK & LEARNING DOMAIN
+
+**Purpose:** Collect lightweight signals to improve AI recommendations and user experience without compromising privacy.
+
+---
+
+## **ENTITY: AIFeedback**
+
+Captures user validation of AI-generated content to improve future recommendations.
+
+**Attributes:**
+
+- feedbackId (PK)
+- userId (FK to UserProfile)
+- aiOperationType (enum: personalCanvas, starStory, jobAnalysis, companyCanvas, matchingSummary, cvGeneration, coverLetterGeneration, speechGeneration)
+- sourceEntityId (references the entity that was AI-generated)
+- feedbackType (enum: thumbsUp, thumbsDown, edit, regenerate)
+- userSatisfaction (1-5 scale, optional)
+- specificIssue (enum: inaccurate, irrelevant, toneIncorrect, missingInfo, tooGeneric, other, optional)
+- userComment (optional, max 500 chars)
+- createdAt
+
+**Relationships:**
+
+- N AIFeedback → 1 UserProfile
+- AIFeedback references any AI-generated entity via sourceEntityId
+
+**Intent:** 
+- Enable users to quickly signal satisfaction/dissatisfaction with AI outputs
+- Collect patterns to improve prompts and AI operations
+- Non-invasive: appears as simple thumbs up/down with optional details
+- Privacy-first: no content stored, only satisfaction signals and issue categories
+
+---
+
+## **ENTITY: UsageSignal** _(Optional)_
+
+Aggregated, privacy-preserving usage patterns to understand user behavior.
+
+**Attributes:**
+
+- signalId (PK)
+- userId (FK to UserProfile, hashed/anonymized)
+- eventType (enum: profileCompleted, storyCreated, jobAnalyzed, cvGenerated, coverLetterGenerated, speechBuilt, materialExported)
+- contextMetadata (JSON: {seniorityLevel, industry, featureUsed} - no PII)
+- timestamp
+- sessionId (optional, for flow analysis)
+
+**Relationships:**
+
+- N UsageSignal → 1 UserProfile (via anonymized userId)
+
+**Intent:**
+- Understand which features drive value
+- Identify drop-off points in user journeys  
+- Measure feature adoption and success patterns
+- Guide product development priorities
+- All data aggregated and anonymized - no personal content stored
+
+**Privacy Safeguards:**
+- No personal information stored
+- UserIds are hashed/anonymized
+- Only behavioral patterns tracked, not content
+- Aggregated analysis only
+- User opt-out available
+
+---
+
 # 7. RELATIONSHIP SUMMARY
 
 ```
@@ -338,6 +407,12 @@ MatchingSummary ↔ (User, Job, Company)
 
 JobDescription ↔ (CV / CoverLetter / Speech)
 1 ↔ 0..* (optional tailoring)
+
+UserProfile ↔ AIFeedback
+1 ↔ * (user can provide feedback on multiple AI outputs)
+
+UserProfile ↔ UsageSignal
+1 ↔ * (user generates multiple usage signals over time)
 ```
 
 ---
@@ -369,3 +444,17 @@ JobDescription ↔ (CV / CoverLetter / Speech)
 
 - Created → Edited → Exported
 - (V2) Versioning planned
+
+### **AIFeedback**
+
+- Created when user provides feedback on AI-generated content
+- Immutable once created (for data integrity)
+- Used for AI improvement and user experience optimization
+- Optional - users can skip feedback without impacting workflow
+
+### **UsageSignal**
+
+- Created automatically during user interactions (with consent)
+- Aggregated for analytics - individual signals not analyzed
+- Anonymized and privacy-preserving by design
+- Used for product improvement and feature prioritization
