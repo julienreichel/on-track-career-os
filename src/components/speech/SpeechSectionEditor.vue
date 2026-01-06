@@ -9,7 +9,7 @@ const props = withDefaults(
     description?: string;
     placeholder?: string;
     rows?: number;
-    maxLength?: number;
+    maxWords?: number;
     disabled?: boolean;
     readonly?: boolean;
   }>(),
@@ -17,7 +17,7 @@ const props = withDefaults(
     description: undefined,
     placeholder: undefined,
     rows: 6,
-    maxLength: undefined,
+    maxWords: undefined,
     disabled: false,
     readonly: false,
   }
@@ -29,12 +29,14 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const count = computed(() => props.modelValue?.length ?? 0);
+const countWords = (value: string | null | undefined) =>
+  value ? value.trim().split(/\s+/).filter(Boolean).length : 0;
+const wordCount = computed(() => countWords(props.modelValue));
 const countLabel = computed(() => {
-  if (props.maxLength) {
-    return t('speech.editor.charCount', { count: count.value, max: props.maxLength });
+  if (props.maxWords) {
+    return t('speech.editor.wordCount', { count: wordCount.value, max: props.maxWords });
   }
-  return t('speech.editor.charCountSimple', { count: count.value });
+  return t('speech.editor.wordCountSimple', { count: wordCount.value });
 });
 </script>
 
@@ -58,7 +60,6 @@ const countLabel = computed(() => {
       :model-value="modelValue"
       :rows="rows"
       :placeholder="placeholder"
-      :maxlength="maxLength"
       :disabled="disabled"
       :readonly="readonly"
       :data-testid="`speech-textarea-${label.toLowerCase().replace(/\s+/g, '-')}`"

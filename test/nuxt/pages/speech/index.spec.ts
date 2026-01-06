@@ -6,6 +6,8 @@ import { createTestI18n } from '../../../utils/createTestI18n';
 import SpeechIndexPage from '@/pages/speech/index.vue';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 
+const navigateToMock = vi.fn().mockResolvedValue(undefined);
+
 // Mock the SpeechBlockRepository to avoid Amplify client instantiation
 vi.mock('@/domain/speech-block/SpeechBlockRepository', () => ({
   SpeechBlockRepository: vi.fn().mockImplementation(() => ({
@@ -38,6 +40,22 @@ vi.mock('@/composables/useAuthUser', () => ({
     userId: ref('user-1'),
     loadUserId: vi.fn().mockResolvedValue(undefined),
   }),
+}));
+
+const generateMock = vi.fn();
+const engineMock = {
+  isGenerating: ref(false),
+  error: ref<string | null>(null),
+  generate: generateMock,
+};
+
+vi.mock('@/composables/useSpeechEngine', () => ({
+  useSpeechEngine: () => engineMock,
+}));
+
+vi.mock('#app', () => ({
+  navigateTo: navigateToMock,
+  useToast: () => mockToast,
 }));
 
 const mockToast = {
@@ -131,6 +149,9 @@ describe('Speech list page', () => {
     loadingRef.value = false;
     errorRef.value = null;
     mockLoadAll.mockClear();
+    mockCreateSpeechBlock.mockClear();
+    generateMock.mockClear();
+    navigateToMock.mockClear();
   });
 
   it('loads speech blocks on mount', async () => {
@@ -153,7 +174,8 @@ describe('Speech list page', () => {
       {
         id: 'speech-older',
         userId: 'user-1',
-        elevatorPitch: 'Older pitch',
+        name: 'Older pitch',
+        elevatorPitch: '',
         careerStory: '',
         whyMe: '',
         createdAt: '2024-01-01T00:00:00.000Z',
@@ -162,7 +184,8 @@ describe('Speech list page', () => {
       {
         id: 'speech-newer',
         userId: 'user-1',
-        elevatorPitch: 'Newer pitch',
+        name: 'Newer pitch',
+        elevatorPitch: '',
         careerStory: '',
         whyMe: '',
         createdAt: '2024-02-01T00:00:00.000Z',
@@ -184,7 +207,8 @@ describe('Speech list page', () => {
       {
         id: 'speech-match',
         userId: 'user-1',
-        elevatorPitch: 'Targeted pitch',
+        name: 'Targeted pitch',
+        elevatorPitch: '',
         careerStory: '',
         whyMe: '',
         createdAt: '2024-01-01T00:00:00.000Z',
@@ -193,7 +217,8 @@ describe('Speech list page', () => {
       {
         id: 'speech-other',
         userId: 'user-1',
-        elevatorPitch: 'Other pitch',
+        name: 'Other pitch',
+        elevatorPitch: '',
         careerStory: '',
         whyMe: '',
         createdAt: '2024-01-02T00:00:00.000Z',
@@ -210,5 +235,44 @@ describe('Speech list page', () => {
     const cards = wrapper.findAll('.item-card');
     expect(cards).toHaveLength(1);
     expect(cards[0]?.text()).toContain('Targeted pitch');
+  });
+
+  it('creates a speech block with AI content from the list', async () => {
+    generateMock.mockResolvedValue({
+      elevatorPitch: 'AI pitch',
+      careerStory: 'AI story',
+      whyMe: 'AI why',
+    });
+    mockCreateSpeechBlock.mockResolvedValue({
+      id: 'speech-1',
+      userId: 'user-1',
+      elevatorPitch: 'AI pitch',
+      careerStory: 'AI story',
+      whyMe: 'AI why',
+      createdAt: '2024-02-01T00:00:00.000Z',
+      updatedAt: '2024-02-01T00:00:00.000Z',
+    });
+
+    const wrapper = await mountPage();
+    await wrapper.vm.$nextTick();
+
+    const createButton = wrapper
+      .findAll('button')
+      .find((button) => button.text().includes(i18n.global.t('speech.list.actions.create')));
+    expect(createButton).toBeDefined();
+
+    await createButton?.trigger('click');
+
+    expect(generateMock).toHaveBeenCalled();
+    expect(mockCreateSpeechBlock).toHaveBeenCalledWith({
+      userId: 'user-1',
+      elevatorPitch: 'AI pitch',
+      careerStory: 'AI story',
+      whyMe: 'AI why',
+    });
+    expect(navigateToMock).toHaveBeenCalledWith({
+      name: 'speech-id',
+      params: { id: 'speech-1' },
+    });
   });
 });

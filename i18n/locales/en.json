@@ -1284,11 +1284,15 @@
       "description": "View and edit your cover letter",
       "untitled": "Untitled Cover Letter",
       "loading": "Loading cover letter...",
+      "titleLabel": "Cover letter title",
+      "titlePlaceholder": "e.g., Head of Engineering cover letter",
       "editMode": "Edit Mode",
       "editModeDescription": "Edit your cover letter content directly",
       "contentLabel": "Cover Letter Content",
       "contentPlaceholder": "Enter your cover letter content...",
       "emptyContent": "No content available. Click generate to create content.",
+      "profileRequiredTitle": "Profile required",
+      "profileRequiredDescription": "Complete your profile before generating a cover letter.",
       "states": {
         "errorTitle": "Unable to load cover letter",
         "generateErrorTitle": "Unable to generate cover letter",
@@ -1372,12 +1376,16 @@
       "toast": {
         "deleted": "Speech deleted",
         "deleteFailed": "Unable to delete speech",
-        "createFailed": "Unable to create speech"
+        "createFailed": "Unable to create speech",
+        "generateFailed": "Unable to generate speech"
       }
     },
     "detail": {
       "title": "Speech",
       "description": "Build your elevator pitch, career story, and why-me narrative.",
+      "untitled": "Untitled speech",
+      "titleLabel": "Speech title",
+      "titlePlaceholder": "e.g., Engineering leadership speech",
       "states": {
         "errorTitle": "Unable to load speech",
         "generateErrorTitle": "Unable to generate speech",
@@ -1402,8 +1410,8 @@
         "regenerate": "Regenerate speech",
         "generating": "Generating speech..."
       },
-      "charCount": "{count} / {max} chars",
-      "charCountSimple": "{count} chars",
+      "wordCount": "{count} / {max} words",
+      "wordCountSimple": "{count} words",
       "sections": {
         "elevatorPitch": {
           "label": "Elevator pitch",

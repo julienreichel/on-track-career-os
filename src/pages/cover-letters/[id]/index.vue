@@ -28,6 +28,8 @@ const matchingSummary = ref<MatchingSummary | null>(null);
 
 // View/Edit state
 const isEditing = ref(false);
+const editTitle = ref('');
+const originalTitle = ref('');
 const editContent = ref('');
 const originalContent = ref('');
 const saving = ref(false);
@@ -35,7 +37,9 @@ const cancelModalOpen = ref(false);
 const deleteModalOpen = ref(false);
 const deleting = ref(false);
 
-const hasChanges = computed(() => editContent.value !== originalContent.value);
+const hasChanges = computed(
+  () => editTitle.value !== originalTitle.value || editContent.value !== originalContent.value
+);
 const hasJobContext = computed(() => Boolean(item.value?.jobId));
 const targetJobTitle = computed(
   () => targetJob.value?.title?.trim() || t('tailoredMaterials.unknownJobTitle')
@@ -68,6 +72,10 @@ const headerLinks: PageHeaderLink[] = [
     to: '/cover-letters',
   },
 ];
+const displayTitle = computed(() => {
+  const name = isEditing.value ? editTitle.value : item.value?.name ?? '';
+  return name.trim() || t('coverLetter.display.untitled');
+});
 
 const toggleEdit = () => {
   if (isEditing.value) {
@@ -77,6 +85,8 @@ const toggleEdit = () => {
       isEditing.value = false;
     }
   } else {
+    editTitle.value = item.value?.name || '';
+    originalTitle.value = editTitle.value;
     editContent.value = item.value?.content || '';
     originalContent.value = editContent.value;
     isEditing.value = true;
@@ -89,10 +99,12 @@ const handleSave = async () => {
   try {
     const updated = await save({
       id: item.value.id,
+      name: editTitle.value,
       content: editContent.value,
     });
     if (updated) {
       toast.add({ title: t('coverLetter.display.toast.saved'), color: 'primary' });
+      originalTitle.value = editTitle.value;
       originalContent.value = editContent.value;
       isEditing.value = false;
     } else {
@@ -112,6 +124,7 @@ const handleCancel = () => {
 };
 
 const handleDiscard = () => {
+  editTitle.value = originalTitle.value;
   editContent.value = originalContent.value;
   isEditing.value = false;
   cancelModalOpen.value = false;
@@ -191,6 +204,9 @@ onMounted(async () => {
 
 watch(item, (newValue) => {
   if (newValue && !isEditing.value) {
+    const name = newValue.name;
+    editTitle.value = name ? name : '';
+    originalTitle.value = editTitle.value;
     const content = newValue.content;
     editContent.value = content ? content : '';
     originalContent.value = editContent.value;
@@ -206,7 +222,7 @@ watch(item, (newValue) => {
     <UContainer>
       <UPage>
         <UPageHeader
-          :title="item?.name || t('coverLetter.display.untitled')"
+          :title="displayTitle"
           :description="t('coverLetter.display.description')"
           :links="headerLinks"
         />
@@ -267,8 +283,8 @@ watch(item, (newValue) => {
             icon="i-heroicons-information-circle"
             color="info"
             variant="soft"
-            title="Profile required"
-            description="Complete your profile before generating a cover letter."
+            :title="t('coverLetter.display.profileRequiredTitle')"
+            :description="t('coverLetter.display.profileRequiredDescription')"
             class="mb-6"
           />
 
@@ -289,6 +305,14 @@ watch(item, (newValue) => {
                     {{ t('coverLetter.display.editModeDescription') }}
                   </p>
                 </div>
+
+                <UFormField :label="t('coverLetter.display.titleLabel')">
+                  <UInput
+                    v-model="editTitle"
+                    :placeholder="t('coverLetter.display.titlePlaceholder')"
+                    data-testid="cover-letter-title-input"
+                  />
+                </UFormField>
 
                 <UFormField :label="t('coverLetter.display.contentLabel')" required>
                   <UTextarea
@@ -345,6 +369,7 @@ watch(item, (newValue) => {
                 :label="t('coverLetter.display.actions.edit')"
                 icon="i-heroicons-pencil"
                 variant="outline"
+                data-testid="edit-cover-letter-button"
                 @click="toggleEdit"
               />
             </div>

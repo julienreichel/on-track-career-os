@@ -149,6 +149,12 @@ const stubs = {
     template:
       '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" :placeholder="placeholder" :rows="rows" />',
   },
+  UInput: {
+    props: ['modelValue', 'placeholder'],
+    emits: ['update:modelValue'],
+    template:
+      '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" :placeholder="placeholder" />',
+  },
   UButton: {
     props: ['label', 'variant', 'color', 'size', 'disabled', 'loading'],
     template:
@@ -238,6 +244,10 @@ describe('Cover letter detail page', () => {
       const textarea = wrapper.find('textarea');
       expect(textarea.exists()).toBe(true);
       expect((textarea.element as HTMLTextAreaElement).value).toBe(itemRef.value?.content);
+
+      const titleInput = wrapper.find('input');
+      expect(titleInput.exists()).toBe(true);
+      expect((titleInput.element as HTMLInputElement).value).toBe(itemRef.value?.name);
     }
   });
 
@@ -264,7 +274,11 @@ describe('Cover letter detail page', () => {
     if (editButton.exists()) {
       await editButton.trigger('click');
 
-      // Now modify content
+      // Now modify title + content
+      const titleInput = wrapper.find('[data-testid="cover-letter-title-input"]');
+      expect(titleInput.exists()).toBe(true);
+      await titleInput.setValue('Updated cover letter');
+
       const textarea = wrapper.find('textarea');
       expect(textarea.exists()).toBe(true);
 
@@ -277,6 +291,7 @@ describe('Cover letter detail page', () => {
 
       expect(mockSave).toHaveBeenCalledWith({
         id: 'cl-1',
+        name: 'Updated cover letter',
         content: 'Updated cover letter content',
       });
     } else {

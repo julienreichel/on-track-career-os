@@ -3,6 +3,7 @@ import { useI18n } from 'vue-i18n';
 import SpeechSectionEditor from '@/components/speech/SpeechSectionEditor.vue';
 
 type SpeechBlockForm = {
+  title?: string;
   elevatorPitch: string;
   careerStory: string;
   whyMe: string;
@@ -35,7 +36,7 @@ const updateField = (field: keyof SpeechBlockForm, value: string) => {
       :label="t('speech.editor.sections.elevatorPitch.label')"
       :description="t('speech.editor.sections.elevatorPitch.description')"
       :placeholder="t('speech.editor.sections.elevatorPitch.placeholder')"
-      :max-length="320"
+      :max-words="120"
       :disabled="disabled"
       :readonly="readonly"
       data-testid="elevator-pitch-section"
@@ -47,7 +48,7 @@ const updateField = (field: keyof SpeechBlockForm, value: string) => {
       :label="t('speech.editor.sections.careerStory.label')"
       :description="t('speech.editor.sections.careerStory.description')"
       :placeholder="t('speech.editor.sections.careerStory.placeholder')"
-      :max-length="800"
+      :max-words="360"
       :disabled="disabled"
       :readonly="readonly"
       data-testid="career-story-section"
@@ -59,7 +60,7 @@ const updateField = (field: keyof SpeechBlockForm, value: string) => {
       :label="t('speech.editor.sections.whyMe.label')"
       :description="t('speech.editor.sections.whyMe.description')"
       :placeholder="t('speech.editor.sections.whyMe.placeholder')"
-      :max-length="480"
+      :max-words="240"
       :disabled="disabled"
       :readonly="readonly"
       data-testid="why-me-section"

@@ -15,6 +15,7 @@
             icon: 'i-heroicons-plus',
             onClick: handleCreate,
             disabled: creating,
+            loading: creating,
           },
         ]"
       />
@@ -52,6 +53,8 @@
             <UButton
               icon="i-heroicons-plus"
               :label="t('speech.list.emptyState.action')"
+              :loading="creating"
+              :disabled="creating"
               @click="handleCreate"
             />
           </template>
@@ -104,12 +107,14 @@ import { useSpeechBlocks } from '@/application/speech-block/useSpeechBlocks';
 import { SpeechBlockService } from '@/domain/speech-block/SpeechBlockService';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 import { useAuthUser } from '@/composables/useAuthUser';
+import { useSpeechEngine } from '@/composables/useSpeechEngine';
 
 const { t } = useI18n();
 const toast = useToast();
 const { userId, loadUserId } = useAuthUser();
 const { items, loading, error, loadAll, deleteSpeechBlock, createSpeechBlock } = useSpeechBlocks();
 const service = new SpeechBlockService();
+const engine = useSpeechEngine();
 
 const deleteModalOpen = ref(false);
 const speechToDelete = ref<SpeechBlock | null>(null);
@@ -137,7 +142,7 @@ const filteredItems = computed(() => {
   if (!query) return sortedItems.value;
 
   return sortedItems.value.filter((block) => {
-    const fields = [block.elevatorPitch, block.careerStory, block.whyMe];
+    const fields = [block.name, block.elevatorPitch, block.careerStory, block.whyMe];
     return fields.some((field) => field?.toLowerCase().includes(query));
   });
 });
@@ -160,8 +165,14 @@ const handleCreate = async () => {
     if (!userId.value) {
       throw new Error(t('speech.list.toast.createFailed'));
     }
+    const result = await engine.generate();
     const draft = service.createDraftSpeechBlock(userId.value);
-    const created = await createSpeechBlock(draft);
+    const created = await createSpeechBlock({
+      ...draft,
+      elevatorPitch: result.elevatorPitch ?? '',
+      careerStory: result.careerStory ?? '',
+      whyMe: result.whyMe ?? '',
+    });
     if (created?.id) {
       await navigateTo({ name: 'speech-id', params: { id: created.id } });
     } else {
@@ -169,7 +180,10 @@ const handleCreate = async () => {
     }
   } catch (err) {
     console.error('[speechList] Failed to create speech block', err);
-    toast.add({ title: t('speech.list.toast.createFailed'), color: 'error' });
+    const toastKey = engine.error.value
+      ? 'speech.list.toast.generateFailed'
+      : 'speech.list.toast.createFailed';
+    toast.add({ title: t(toastKey), color: 'error' });
   } finally {
     creating.value = false;
   }
@@ -198,7 +212,12 @@ const handleDelete = async () => {
 };
 
 const resolveTitle = (block: SpeechBlock) => {
-  const raw = block.elevatorPitch?.trim() || block.careerStory?.trim() || block.whyMe?.trim() || '';
+  const raw =
+    block.name?.trim() ||
+    block.elevatorPitch?.trim() ||
+    block.careerStory?.trim() ||
+    block.whyMe?.trim() ||
+    '';
   if (!raw) {
     return t('speech.list.untitled');
   }

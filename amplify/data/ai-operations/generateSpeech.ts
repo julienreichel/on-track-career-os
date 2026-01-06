@@ -128,9 +128,9 @@ export interface GenerateSpeechOutput {
 
 type ModelResponse = Partial<GenerateSpeechOutput>;
 
-const ELEVATOR_MAX_WORDS = 80;
-const CAREER_MAX_WORDS = 160;
-const WHY_ME_MAX_WORDS = 120;
+const ELEVATOR_MAX_WORDS = 120;
+const CAREER_MAX_WORDS = 360;
+const WHY_ME_MAX_WORDS = 240;
 
 function sanitizeString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';

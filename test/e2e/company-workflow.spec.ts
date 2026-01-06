@@ -58,7 +58,7 @@ test.describe('Company workflow', () => {
 
     const analyzeButton = page.getByRole('button', { name: /analyze company info/i });
     const websiteInput = page.getByLabel('Website');
-    const summaryInput = page.getByLabel(/Company summary/i);
+    const summaryInput = page.getByLabel(/Company name/i);
 
     let analysisSucceeded = false;
     for (let attempt = 0; attempt < 2; attempt += 1) {

@@ -27,6 +27,7 @@ const targetJob = ref<JobDescription | null>(null);
 const matchingSummary = ref<MatchingSummary | null>(null);
 
 const formState = ref({
+  title: '',
   elevatorPitch: '',
   careerStory: '',
   whyMe: '',
@@ -36,6 +37,7 @@ const saving = ref(false);
 const cancelModalOpen = ref(false);
 const isGenerating = computed(() => engine.isGenerating.value);
 const hasJobContext = computed(() => Boolean(item.value?.jobId));
+const detailTitle = computed(() => item.value?.name?.trim() || t('speech.detail.untitled'));
 const targetJobTitle = computed(
   () => targetJob.value?.title?.trim() || t('tailoredMaterials.unknownJobTitle')
 );
@@ -49,19 +51,20 @@ const contextErrorCode = computed(() => tailoredMaterials.contextError.value);
 const contextErrorMessage = computed(() =>
   contextErrorCode.value ? t(`tailoredMaterials.errors.${contextErrorCode.value}`) : null
 );
-const canRegenerate = computed(
-  () => Boolean(item.value?.id && targetJob.value && matchingSummary.value)
+const canRegenerate = computed(() =>
+  Boolean(item.value?.id && targetJob.value && matchingSummary.value)
 );
 const regenerateDisabled = computed(
   () => !canRegenerate.value || contextLoading.value || isRegenerating.value
 );
 const regenerateError = computed(() => tailoredMaterials.error.value);
-const missingSummary = computed(
-  () => Boolean(item.value?.jobId && targetJob.value && !matchingSummary.value)
+const missingSummary = computed(() =>
+  Boolean(item.value?.jobId && targetJob.value && !matchingSummary.value)
 );
 
 const hasChanges = computed(
   () =>
+    formState.value.title !== originalState.value.title ||
     formState.value.elevatorPitch !== originalState.value.elevatorPitch ||
     formState.value.careerStory !== originalState.value.careerStory ||
     formState.value.whyMe !== originalState.value.whyMe
@@ -74,28 +77,36 @@ const hasContent = computed(
     Boolean(formState.value.whyMe.trim())
 );
 
-const headerLinks = computed<PageHeaderLink[]>(() => [
-  {
-    label: t('common.backToList'),
-    icon: 'i-heroicons-arrow-left',
-    to: '/speech',
-  },
-  {
-    label: isGenerating.value
-      ? t('speech.editor.actions.generating')
-      : hasContent.value
-        ? t('speech.editor.actions.regenerate')
-        : t('speech.editor.actions.generate'),
-    icon: 'i-heroicons-sparkles',
-    color: 'primary',
-    disabled: loading.value || saving.value || isGenerating.value,
-    onClick: handleGenerate,
-    'data-testid': 'generate-speech-button',
-  },
-]);
+const headerLinks = computed<PageHeaderLink[]>(() => {
+  const links: PageHeaderLink[] = [
+    {
+      label: t('common.backToList'),
+      icon: 'i-heroicons-arrow-left',
+      to: '/speech',
+    },
+  ];
+
+  if (!hasJobContext.value) {
+    links.push({
+      label: isGenerating.value
+        ? t('speech.editor.actions.generating')
+        : hasContent.value
+          ? t('speech.editor.actions.regenerate')
+          : t('speech.editor.actions.generate'),
+      icon: 'i-heroicons-sparkles',
+      color: 'primary',
+      disabled: loading.value || saving.value || isGenerating.value,
+      onClick: handleGenerate,
+      'data-testid': 'generate-speech-button',
+    });
+  }
+
+  return links;
+});
 
 const applySpeechResult = (result: SpeechResult) => {
   formState.value = {
+    title: formState.value.title,
     elevatorPitch: result.elevatorPitch ?? '',
     careerStory: result.careerStory ?? '',
     whyMe: result.whyMe ?? '',
@@ -104,6 +115,7 @@ const applySpeechResult = (result: SpeechResult) => {
 
 const resetForm = () => {
   formState.value = {
+    title: item.value?.name ?? '',
     elevatorPitch: item.value?.elevatorPitch ?? '',
     careerStory: item.value?.careerStory ?? '',
     whyMe: item.value?.whyMe ?? '',
@@ -117,6 +129,7 @@ const handleSave = async () => {
   try {
     const updated = await save({
       id: item.value.id,
+      name: formState.value.title.trim(),
       elevatorPitch: formState.value.elevatorPitch,
       careerStory: formState.value.careerStory,
       whyMe: formState.value.whyMe,
@@ -197,15 +210,18 @@ const handleRegenerateTailored = async () => {
 };
 
 onMounted(async () => {
-  route.meta.breadcrumbLabel = t('speech.detail.title');
   await load();
   resetForm();
+  route.meta.breadcrumbLabel = detailTitle.value;
 });
 
 watch(item, (newValue) => {
   if (newValue && !hasChanges.value) {
     resetForm();
     void loadTailoringContext(newValue.jobId);
+  }
+  if (newValue) {
+    route.meta.breadcrumbLabel = detailTitle.value;
   }
 });
 </script>
@@ -215,7 +231,7 @@ watch(item, (newValue) => {
     <UContainer>
       <UPage>
         <UPageHeader
-          :title="t('speech.detail.title')"
+          :title="detailTitle"
           :description="t('speech.detail.description')"
           :links="headerLinks"
         />
@@ -278,6 +294,18 @@ watch(item, (newValue) => {
           </UCard>
 
           <template v-else-if="item">
+            <div class="mb-6">
+              <UFormField :label="t('speech.detail.titleLabel')">
+                <UInput
+                  v-model="formState.title"
+                  :placeholder="t('speech.detail.titlePlaceholder')"
+                  :disabled="loading || saving"
+                  data-testid="speech-title-input"
+                  class="w-full"
+                />
+              </UFormField>
+            </div>
+
             <SpeechBlockEditorCard v-model="formState" :disabled="loading || saving" />
             <div class="mt-6 flex flex-wrap justify-end gap-3">
               <UButton

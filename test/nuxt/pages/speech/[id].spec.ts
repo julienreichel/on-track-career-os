@@ -130,6 +130,16 @@ const stubs = {
     emits: ['close'],
     template: '<div class="u-alert">{{ title }} {{ description }}</div>',
   },
+  UInput: {
+    props: ['modelValue', 'placeholder', 'disabled'],
+    emits: ['update:modelValue'],
+    template:
+      '<input :value="modelValue" :placeholder="placeholder" :disabled="disabled" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+  },
+  UFormField: {
+    props: ['label'],
+    template: '<label><span>{{ label }}</span><slot /></label>',
+  },
   UCard: { template: '<div class="u-card"><slot /></div>' },
   USkeleton: { template: '<div class="u-skeleton"></div>' },
   UButton: {
@@ -194,7 +204,8 @@ describe('Speech detail page', () => {
   it('invokes generate when action is triggered', async () => {
     const wrapper = await mountPage();
     const buttons = wrapper.findAll('button');
-    const generateButton = buttons.find((button) => button.text().includes('Generate'));
+    const generateLabel = i18n.global.t('speech.editor.actions.regenerate');
+    const generateButton = buttons.find((button) => button.text().includes(generateLabel));
     if (!generateButton) {
       throw new Error('Expected generate action button');
     }
@@ -212,5 +223,33 @@ describe('Speech detail page', () => {
     const wrapper = await mountPage();
     expect(wrapper.text()).toContain('Target job');
     expect(wrapper.text()).toContain('Regenerate tailored speech');
+
+    const buttons = wrapper.findAll('button');
+    const genericGenerate = buttons.find((button) =>
+      [
+        i18n.global.t('speech.editor.actions.generate'),
+        i18n.global.t('speech.editor.actions.regenerate'),
+      ].some((label) => button.text().includes(label))
+    );
+    expect(genericGenerate).toBeUndefined();
+  });
+
+  it('saves the speech title', async () => {
+    const wrapper = await mountPage();
+
+    const titleInput = wrapper.find('[data-testid="speech-title-input"]');
+    expect(titleInput.exists()).toBe(true);
+    await titleInput.setValue('Updated speech title');
+
+    const saveButton = wrapper.find('[data-testid="save-speech-button"]');
+    await saveButton.trigger('click');
+
+    expect(mockSave).toHaveBeenCalledWith({
+      id: 'speech-1',
+      name: 'Updated speech title',
+      elevatorPitch: 'Pitch',
+      careerStory: 'Story',
+      whyMe: 'Why',
+    });
   });
 });
