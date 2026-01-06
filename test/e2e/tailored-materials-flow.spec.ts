@@ -55,7 +55,7 @@ test.describe('Tailored materials workflow', () => {
     await page.goto(`/jobs/${jobId}/match`);
     await page.waitForLoadState('networkidle');
 
-    const generateButton = page.getByRole('button', { name: /generate match/i });
+    const generateButton = page.getByRole('button', { name: /generate match/i }).first();
     await expect(generateButton).toBeVisible();
     await generateButton.click();
 
@@ -102,14 +102,14 @@ test.describe('Tailored materials workflow', () => {
     await page.goto('/cover-letters');
     await page.waitForLoadState('networkidle');
 
-    const coverLetterHeading = page.getByRole('heading', { name: new RegExp(jobTitle, 'i') });
+    const coverLetterHeading = page.getByRole('heading', {
+      name: new RegExp(`Cover Letter\\s+—\\s+${jobTitle}`, 'i'),
+    });
     await expect(coverLetterHeading).toBeVisible();
 
-    const card = page
-      .locator('.u-card')
-      .filter({ has: coverLetterHeading })
-      .first();
-    await card.getByRole('button', { name: /delete/i }).click();
+    const deleteButton = page.getByRole('button', { name: 'Delete', exact: true });
+    await expect(deleteButton).toBeVisible();
+    await deleteButton.click();
 
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();

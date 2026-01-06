@@ -199,12 +199,12 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
 
 Create **one** E2E test that proves the whole EPIC:
 
-- [ ] Setup fixture user with profile + experiences/stories (or use existing seed)
-- [ ] Upload/create a Job
-- [ ] Generate Matching Summary
-- [ ] From `/jobs/:jobId/match`, click “Generate tailored cover letter”
-- [ ] Assert navigation to cover letter page
-- [ ] Assert:
+- [x] Setup fixture user with profile + experiences/stories (or use existing seed)
+- [x] Upload/create a Job
+- [x] Generate Matching Summary
+- [x] From `/jobs/:jobId/match`, click “Generate tailored cover letter”
+- [x] Assert navigation to cover letter page
+- [x] Assert:
   - content exists
   - job backlink is visible and points to `/jobs/:jobId`
   - (optional) content includes at least one keyword from job (light assertion, avoid brittle checks)
