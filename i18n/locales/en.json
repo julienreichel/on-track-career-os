@@ -895,6 +895,36 @@
     "photoPreviewHelp": "This preview shows how your profile photo will appear in the CV header.",
     "photoAlt": "Profile photo"
   },
+  "tailoredMaterials": {
+    "targetJobLabel": "Target job",
+    "unknownJobTitle": "Target job",
+    "viewJob": "View job",
+    "viewMatch": "View match",
+    "regenerateCv": "Regenerate tailored CV",
+    "regenerateCoverLetter": "Regenerate tailored cover letter",
+    "regenerateSpeech": "Regenerate tailored speech",
+    "contextErrorTitle": "Unable to load job context",
+    "regenerateCvErrorTitle": "Unable to regenerate tailored CV",
+    "regenerateCoverLetterErrorTitle": "Unable to regenerate cover letter",
+    "regenerateSpeechErrorTitle": "Unable to regenerate speech",
+    "missingSummaryTitle": "Matching summary required",
+    "missingSummaryCv": "Generate a matching summary before regenerating this CV.",
+    "missingSummaryCoverLetter": "Generate a matching summary before regenerating this cover letter.",
+    "missingSummarySpeech": "Generate a matching summary before regenerating this speech.",
+    "toast": {
+      "cvRegenerated": "Tailored CV regenerated.",
+      "cvRegenerateFailed": "Failed to regenerate tailored CV.",
+      "coverLetterRegenerated": "Tailored cover letter regenerated.",
+      "coverLetterRegenerateFailed": "Failed to regenerate tailored cover letter.",
+      "speechRegenerated": "Tailored speech regenerated.",
+      "speechRegenerateFailed": "Failed to regenerate tailored speech."
+    },
+    "errors": {
+      "unauthenticated": "User not authenticated",
+      "jobNotFound": "Job not found",
+      "loadContextFailed": "Failed to load tailored context"
+    }
+  },
   "cvBlock": {
     "types": {
       "summary": "Summary",

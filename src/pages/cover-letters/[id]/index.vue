@@ -43,7 +43,9 @@ const deleting = ref(false);
 
 const hasChanges = computed(() => editContent.value !== originalContent.value);
 const hasJobContext = computed(() => Boolean(item.value?.jobId));
-const targetJobTitle = computed(() => targetJob.value?.title?.trim() || 'Target job');
+const targetJobTitle = computed(
+  () => targetJob.value?.title?.trim() || t('tailoredMaterials.unknownJobTitle')
+);
 const jobLink = computed(() => (targetJob.value?.id ? `/jobs/${targetJob.value.id}` : null));
 const matchLink = computed(() =>
   targetJob.value?.id ? `/jobs/${targetJob.value.id}/match` : null
@@ -159,12 +161,12 @@ const loadTailoringContext = async (jobId?: string | null) => {
     }
 
     if (!auth.userId.value) {
-      throw new Error('User not authenticated');
+      throw new Error(t('tailoredMaterials.errors.unauthenticated'));
     }
 
     const job = await jobService.getFullJobDescription(jobId);
     if (!job) {
-      throw new Error('Job not found');
+      throw new Error(t('tailoredMaterials.errors.jobNotFound'));
     }
     targetJob.value = job;
 
@@ -185,7 +187,7 @@ const loadTailoringContext = async (jobId?: string | null) => {
 
     matchingSummary.value = summary;
   } catch (err) {
-    contextError.value = err instanceof Error ? err.message : 'Failed to load tailored context';
+    contextError.value = err instanceof Error ? err.message : t('tailoredMaterials.errors.loadContextFailed');
     console.error('[coverLetterDisplay] Error loading tailored context:', err);
     targetJob.value = null;
     matchingSummary.value = null;
@@ -215,11 +217,11 @@ const handleRegenerateTailored = async () => {
       editContent.value = updated.content || '';
       originalContent.value = editContent.value;
       isEditing.value = false;
-      toast.add({ title: 'Tailored cover letter regenerated.', color: 'primary' });
+      toast.add({ title: t('tailoredMaterials.toast.coverLetterRegenerated'), color: 'primary' });
     }
   } catch (err) {
     console.error('[coverLetterDisplay] Failed to regenerate tailored cover letter', err);
-    toast.add({ title: 'Failed to regenerate tailored cover letter.', color: 'error' });
+    toast.add({ title: t('tailoredMaterials.toast.coverLetterRegenerateFailed'), color: 'error' });
   }
 };
 
@@ -255,13 +257,18 @@ watch(item, (newValue) => {
             v-if="hasJobContext"
             class="mb-6"
             :job-title="targetJobTitle"
+            :target-job-label="t('tailoredMaterials.targetJobLabel')"
+            :view-job-label="t('tailoredMaterials.viewJob')"
+            :view-match-label="t('tailoredMaterials.viewMatch')"
             :job-link="jobLink"
             :match-link="matchLink"
-            regenerate-label="Regenerate tailored cover letter"
+            :regenerate-label="t('tailoredMaterials.regenerateCoverLetter')"
             :regenerate-loading="isRegenerating"
             :regenerate-disabled="regenerateDisabled"
-            regenerate-error-title="Unable to regenerate cover letter"
-            missing-summary-description="Generate a matching summary before regenerating this cover letter."
+            :context-error-title="t('tailoredMaterials.contextErrorTitle')"
+            :regenerate-error-title="t('tailoredMaterials.regenerateCoverLetterErrorTitle')"
+            :missing-summary-title="t('tailoredMaterials.missingSummaryTitle')"
+            :missing-summary-description="t('tailoredMaterials.missingSummaryCoverLetter')"
             :context-error="contextError"
             :regenerate-error="regenerateError"
             :missing-summary="missingSummary"

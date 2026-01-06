@@ -17,13 +17,18 @@
           v-if="hasJobContext"
           class="mb-6"
           :job-title="targetJobTitle"
+          :target-job-label="t('tailoredMaterials.targetJobLabel')"
+          :view-job-label="t('tailoredMaterials.viewJob')"
+          :view-match-label="t('tailoredMaterials.viewMatch')"
           :job-link="jobLink"
           :match-link="matchLink"
-          regenerate-label="Regenerate tailored CV"
+          :regenerate-label="t('tailoredMaterials.regenerateCv')"
           :regenerate-loading="isRegenerating"
           :regenerate-disabled="regenerateDisabled"
-          regenerate-error-title="Unable to regenerate tailored CV"
-          missing-summary-description="Generate a matching summary before regenerating this CV."
+          :context-error-title="t('tailoredMaterials.contextErrorTitle')"
+          :regenerate-error-title="t('tailoredMaterials.regenerateCvErrorTitle')"
+          :missing-summary-title="t('tailoredMaterials.missingSummaryTitle')"
+          :missing-summary-description="t('tailoredMaterials.missingSummaryCv')"
           :context-error="contextError"
           :regenerate-error="regenerateError"
           :missing-summary="missingSummary"
@@ -231,7 +236,9 @@ const profilePhotoLoading = ref(false);
 const profilePhotoError = ref<string | null>(null);
 
 const hasJobContext = computed(() => Boolean(document.value?.jobId));
-const targetJobTitle = computed(() => targetJob.value?.title?.trim() || 'Target job');
+const targetJobTitle = computed(
+  () => targetJob.value?.title?.trim() || t('tailoredMaterials.unknownJobTitle')
+);
 const jobLink = computed(() => (targetJob.value?.id ? `/jobs/${targetJob.value.id}` : null));
 const matchLink = computed(() =>
   targetJob.value?.id ? `/jobs/${targetJob.value.id}/match` : null
@@ -393,12 +400,12 @@ const loadTailoringContext = async (jobId?: string | null) => {
     }
 
     if (!auth.userId.value) {
-      throw new Error('User not authenticated');
+      throw new Error(t('tailoredMaterials.errors.unauthenticated'));
     }
 
     const job = await jobService.getFullJobDescription(jobId);
     if (!job) {
-      throw new Error('Job not found');
+      throw new Error(t('tailoredMaterials.errors.jobNotFound'));
     }
     targetJob.value = job;
 
@@ -419,7 +426,7 @@ const loadTailoringContext = async (jobId?: string | null) => {
 
     matchingSummary.value = summary;
   } catch (err) {
-    contextError.value = err instanceof Error ? err.message : 'Failed to load tailored context';
+    contextError.value = err instanceof Error ? err.message : t('tailoredMaterials.errors.loadContextFailed');
     console.error('[cvDisplay] Error loading tailored context:', err);
     targetJob.value = null;
     matchingSummary.value = null;
@@ -452,11 +459,11 @@ const handleRegenerateTailored = async () => {
       const shouldShow = updated.showProfilePhoto ?? true;
       showProfilePhotoSetting.value = shouldShow;
       originalShowProfilePhoto.value = shouldShow;
-      toast.add({ title: 'Tailored CV regenerated.', color: 'primary' });
+      toast.add({ title: t('tailoredMaterials.toast.cvRegenerated'), color: 'primary' });
     }
   } catch (err) {
     console.error('[cvDisplay] Failed to regenerate tailored CV', err);
-    toast.add({ title: 'Failed to regenerate tailored CV.', color: 'error' });
+    toast.add({ title: t('tailoredMaterials.toast.cvRegenerateFailed'), color: 'error' });
   }
 };
 
