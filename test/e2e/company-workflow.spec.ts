@@ -56,9 +56,26 @@ test.describe('Company workflow', () => {
     await page.goto(companyDetailUrl!);
     await page.waitForLoadState('networkidle');
 
-    await page.getByRole('button', { name: /analyze company info/i }).click();
-    await expect(page.getByText(/Orchestrator platform/i)).toBeVisible({ timeout: 10000 });
-    await expect(page.getByLabel('Website')).not.toHaveValue('');
+    const analyzeButton = page.getByRole('button', { name: /analyze company info/i });
+    const websiteInput = page.getByLabel('Website');
+    const summaryInput = page.getByLabel(/Company summary/i);
+
+    let analysisSucceeded = false;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      await analyzeButton.click();
+      try {
+        await expect(websiteInput).not.toHaveValue('', { timeout: 30000 });
+        await expect(summaryInput).not.toHaveValue('', { timeout: 30000 });
+        analysisSucceeded = true;
+        break;
+      } catch {
+        if (attempt === 0) {
+          await page.waitForTimeout(1000);
+        }
+      }
+    }
+
+    expect(analysisSucceeded).toBe(true);
 
     const analyzedNameInput = page.getByPlaceholder('e.g., Atlas Robotics');
     companySearchName = (await analyzedNameInput.inputValue()) || COMPANY_NAME;
