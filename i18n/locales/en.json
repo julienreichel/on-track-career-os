@@ -15,6 +15,7 @@
     "interview": "Interview Prep",
     "backToProfile": "Back to Profile",
     "backToHome": "Back to Home",
+    "backToApplications": "Back to Applications",
     "new": "New"
   },
   "auth": {
@@ -24,6 +25,10 @@
   "home": {
     "title": "Welcome to AI Career OS",
     "description": "You are successfully authenticated!"
+  },
+  "applicationsPage": {
+    "title": "Applications",
+    "description": "Manage your CVs, cover letters, and speech materials."
   },
   "features": {
     "profile": {
@@ -44,7 +49,7 @@
     },
     "applications": {
       "title": "Applications",
-      "description": "Generate tailored CVs and cover letters"
+      "description": "Generate tailored CVs, cover letters, and speech"
     },
     "coverLetters": {
       "title": "Cover Letters",
@@ -464,6 +469,8 @@
       "personalCanvasDescription": "Your business model canvas",
       "cvDocuments": "CV Documents",
       "cvDocumentsDescription": "Manage and export your CV documents",
+      "applications": "Applications",
+      "applicationsDescription": "Access your CVs, cover letters, and speech materials",
       "communication": "Communication Profile",
       "communicationDescription": "Your strengths and style (Coming soon)",
       "backToSummary": "Profile summary"

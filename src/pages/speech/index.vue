@@ -6,6 +6,11 @@
         :description="t('speech.list.subtitle')"
         :links="[
           {
+            label: t('navigation.backToApplications'),
+            icon: 'i-heroicons-arrow-left',
+            to: { name: 'applications' },
+          },
+          {
             label: t('speech.list.actions.create'),
             icon: 'i-heroicons-plus',
             onClick: handleCreate,

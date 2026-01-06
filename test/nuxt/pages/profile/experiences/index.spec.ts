@@ -214,6 +214,29 @@ describe('Experiences Page Component', () => {
       expect(link.exists()).toBe(true);
       expect(link.text()).toContain(i18n.global.t('cvUpload.title'));
     });
+
+    it('renders back to profile link in header links', async () => {
+      const wrapper = mount(ExperiencesPage, {
+        global: {
+          plugins: [i18n, router],
+          stubs: {
+            ...pageComponentStubs,
+            UPageHeader: {
+              props: ['title', 'description', 'links'],
+              template: `
+                <div class="u-page-header">
+                  <div v-for="(link, idx) in links" :key="idx">{{ link.label }}</div>
+                </div>
+              `,
+            },
+          },
+        },
+      });
+
+      await flushPromises();
+
+      expect(wrapper.text()).toContain(i18n.global.t('common.backToProfile'));
+    });
   });
 
   describe('Empty State', () => {

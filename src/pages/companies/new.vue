@@ -42,7 +42,7 @@ const disableActions = computed(() => saving.value || analyzing.value);
 
 const headerLinks = computed(() => [
   {
-    label: t('companies.list.actions.back'),
+    label: t('common.backToList'),
     icon: 'i-heroicons-arrow-left',
     to: '/companies',
   },

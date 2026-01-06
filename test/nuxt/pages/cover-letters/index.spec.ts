@@ -193,6 +193,12 @@ describe('Cover letter list page', () => {
     expect(wrapper.text()).toContain(i18n.global.t('coverLetter.list.actions.create'));
   });
 
+  it('renders back to applications link', async () => {
+    const wrapper = await mountPage();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.text()).toContain(i18n.global.t('navigation.backToApplications'));
+  });
+
   it('displays error when loading fails', async () => {
     errorRef.value = 'Failed to load cover letters';
 

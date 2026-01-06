@@ -6,6 +6,11 @@
         :description="t('coverLetter.list.subtitle')"
         :links="[
           {
+            label: t('navigation.backToApplications'),
+            icon: 'i-heroicons-arrow-left',
+            to: { name: 'applications' },
+          },
+          {
             label: t('coverLetter.list.actions.create'),
             icon: 'i-heroicons-plus',
             to: { name: 'cover-letters-new' },

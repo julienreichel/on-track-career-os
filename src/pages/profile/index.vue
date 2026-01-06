@@ -70,10 +70,10 @@
           />
 
           <UPageCard
-            :title="t('profile.links.cvDocuments')"
-            :description="t('profile.links.cvDocumentsDescription')"
+            :title="t('profile.links.applications')"
+            :description="t('profile.links.applicationsDescription')"
             icon="i-heroicons-document-duplicate"
-            to="/cv"
+            to="/applications"
           />
 
           <UPageCard

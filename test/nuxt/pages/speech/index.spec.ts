@@ -131,4 +131,9 @@ describe('Speech list page', () => {
     const wrapper = await mountPage();
     expect(wrapper.text()).toContain(i18n.global.t('speech.list.emptyState.title'));
   });
+
+  it('renders back to applications link', async () => {
+    const wrapper = await mountPage();
+    expect(wrapper.text()).toContain(i18n.global.t('navigation.backToApplications'));
+  });
 });

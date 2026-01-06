@@ -6,6 +6,11 @@
         :description="$t('cvList.subtitle')"
         :links="[
           {
+            label: $t('navigation.backToApplications'),
+            icon: 'i-heroicons-arrow-left',
+            to: { name: 'applications' },
+          },
+          {
             label: $t('cvList.actions.create'),
             icon: 'i-heroicons-plus',
             to: { name: 'cv-new' },

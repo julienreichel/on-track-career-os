@@ -124,6 +124,39 @@ describe('Canvas Index Page', () => {
       expect(wrapper.find('[data-testid="canvas-component"]').exists()).toBe(true);
     });
 
+    it('renders back to profile link in header links', () => {
+      const wrapper = mount(CanvasIndexPage, {
+        global: {
+          plugins: [i18n],
+          mocks: {
+            useI18n: () => ({
+              t: (key: string) => key,
+            }),
+            useToast: () => mockToast,
+          },
+          stubs: {
+            UContainer: { template: '<div class="u-container"><slot /></div>' },
+            UPage: { template: '<div class="u-page"><slot /></div>' },
+            UPageHeader: {
+              props: ['title', 'description', 'links'],
+              template: `
+                <div class="u-page-header">
+                  <div v-for="(link, idx) in links" :key="idx">{{ link.label }}</div>
+                </div>
+              `,
+            },
+            UPageBody: { template: '<div class="u-page-body"><slot /></div>' },
+            UAlert: { template: '<div class="u-alert"><slot /></div>' },
+            PersonalCanvasComponent: {
+              template: '<div class="canvas-component" data-testid="canvas-component"></div>',
+            },
+          },
+        },
+      });
+
+      expect(wrapper.text()).toContain(i18n.global.t('common.backToProfile'));
+    });
+
     it('displays error alert when error exists', () => {
       mockCanvasEngine.error.value = 'Test error message';
 

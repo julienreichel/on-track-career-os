@@ -48,7 +48,7 @@ const toStringArray = (values?: (string | null)[] | null) =>
 
 const headerLinks = computed(() => [
   {
-    label: t('companies.detail.actions.back'),
+    label: t('common.backToList'),
     icon: 'i-heroicons-arrow-left',
     to: '/companies',
   },

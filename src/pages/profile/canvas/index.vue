@@ -1,7 +1,11 @@
 <template>
   <UContainer>
     <UPage>
-      <UPageHeader :title="t('canvas.page.title')" :description="t('canvas.page.description')" />
+      <UPageHeader
+        :title="t('canvas.page.title')"
+        :description="t('canvas.page.description')"
+        :links="headerLinks"
+      />
 
       <UPageBody>
         <!-- Error Alert -->
@@ -29,10 +33,11 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue';
+import { computed, watch } from 'vue';
 import { useCanvasEngine } from '@/application/personal-canvas/useCanvasEngine';
 import { useAuthUser } from '@/composables/useAuthUser';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
+import type { PageHeaderLink } from '@/types/ui';
 
 definePageMeta({
   breadcrumbLabel: 'Canvas',
@@ -43,6 +48,14 @@ const toast = useToast();
 const { userId } = useAuthUser();
 const { canvas, loading, error, initializeForUser, generateAndSave, regenerateAndSave, saveEdits } =
   useCanvasEngine();
+
+const headerLinks = computed<PageHeaderLink[]>(() => [
+  {
+    label: t('common.backToProfile'),
+    icon: 'i-heroicons-arrow-left',
+    to: '/profile',
+  },
+]);
 
 // Initialize canvas engine when userId is available
 watch(

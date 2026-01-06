@@ -5,7 +5,7 @@
         :title="document?.name || $t('cvDisplay.untitled')"
         :links="[
           {
-            label: $t('cvDisplay.backToCvs'),
+            label: $t('common.backToList'),
             to: '/cv',
             icon: 'i-heroicons-arrow-left',
           },

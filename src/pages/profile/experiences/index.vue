@@ -31,6 +31,11 @@ const experienceToDelete = ref<string | null>(null);
 
 const headerLinks = computed<PageHeaderLink[]>(() => [
   {
+    label: t('common.backToProfile'),
+    icon: 'i-heroicons-arrow-left',
+    to: '/profile',
+  },
+  {
     label: t('cvUpload.title'),
     icon: 'i-heroicons-arrow-up-tray',
     to: '/profile/cv-upload',
