@@ -10,6 +10,7 @@ import { useAuthUser } from '@/composables/useAuthUser';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
 import { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
+import TailoredJobBanner from '@/components/tailoring/TailoredJobBanner.vue';
 import type { PageHeaderLink } from '@/types/ui';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
@@ -250,69 +251,22 @@ watch(item, (newValue) => {
         />
 
         <UPageBody>
-          <UCard v-if="hasJobContext" class="mb-6">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p class="text-sm text-gray-500">Target job</p>
-                <p class="text-lg font-semibold">{{ targetJobTitle }}</p>
-                <UButton
-                  v-if="jobLink"
-                  class="mt-2"
-                  color="neutral"
-                  variant="ghost"
-                  icon="i-heroicons-arrow-top-right-on-square"
-                  label="View job"
-                  :to="jobLink"
-                />
-              </div>
-              <div class="flex flex-wrap items-center gap-3">
-                <UButton
-                  color="primary"
-                  icon="i-heroicons-sparkles"
-                  label="Regenerate tailored cover letter"
-                  :loading="isRegenerating"
-                  :disabled="regenerateDisabled"
-                  @click="handleRegenerateTailored"
-                />
-                <UButton
-                  v-if="matchLink"
-                  color="neutral"
-                  variant="outline"
-                  icon="i-heroicons-sparkles"
-                  label="View match"
-                  :to="matchLink"
-                />
-              </div>
-            </div>
-
-            <UAlert
-              v-if="contextError"
-              class="mt-4"
-              icon="i-heroicons-exclamation-triangle"
-              color="warning"
-              variant="soft"
-              title="Unable to load job context"
-              :description="contextError"
-            />
-            <UAlert
-              v-else-if="regenerateError"
-              class="mt-4"
-              icon="i-heroicons-exclamation-triangle"
-              color="warning"
-              variant="soft"
-              title="Unable to regenerate cover letter"
-              :description="regenerateError"
-            />
-            <UAlert
-              v-else-if="missingSummary"
-              class="mt-4"
-              icon="i-heroicons-information-circle"
-              color="info"
-              variant="soft"
-              title="Matching summary required"
-              description="Generate a matching summary before regenerating this cover letter."
-            />
-          </UCard>
+          <TailoredJobBanner
+            v-if="hasJobContext"
+            class="mb-6"
+            :job-title="targetJobTitle"
+            :job-link="jobLink"
+            :match-link="matchLink"
+            regenerate-label="Regenerate tailored cover letter"
+            :regenerate-loading="isRegenerating"
+            :regenerate-disabled="regenerateDisabled"
+            regenerate-error-title="Unable to regenerate cover letter"
+            missing-summary-description="Generate a matching summary before regenerating this cover letter."
+            :context-error="contextError"
+            :regenerate-error="regenerateError"
+            :missing-summary="missingSummary"
+            @regenerate="handleRegenerateTailored"
+          />
 
           <UAlert
             v-if="error"
