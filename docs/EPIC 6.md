@@ -53,7 +53,7 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
   - enforces `language: "en"`
   - **limits company fields** (no CompanyCanvas, no rawNotes dump)
 
-- [ ] Ensure CV/Letter/Speech flows reuse it (no duplication).
+- [x] Ensure CV/Letter/Speech flows reuse it (no duplication).
 
 ### 2.2 Tests
 
@@ -115,12 +115,12 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
 
 ### 4.1 Add “generateTailored\*ForJob” workflow methods
 
-- [ ] Implement/extend composables to support:
+- [x] Implement/extend composables to support:
   - generate/regenerate tailored CV for a Job
   - generate/regenerate tailored Cover Letter for a Job
   - generate/regenerate tailored Speech for a Job
 
-- [ ] Each method:
+- [x] Each method:
   - receives full `job` + `matchingSummary`
   - loads optional company summary (if job has company)
   - builds payload via shared TailoringContext builder
@@ -130,7 +130,7 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
 
 ### 4.2 Tests
 
-- [ ] Vitest composable tests:
+- [x] Vitest composable tests:
   - calls correct AI op with tailored payload
   - persists jobId
   - overwrite rule respected

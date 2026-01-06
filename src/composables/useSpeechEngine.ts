@@ -103,7 +103,7 @@ function createSpeechEngineState({ providedUserId, deps, auth }: EngineStateArgs
         personalCanvas: personalCanvas.value,
         experiences: experiences.value,
         stories: stories.value,
-        jobDescription,
+        tailoring: { jobDescription },
       });
 
       return deps.aiService.generateSpeech(input);
@@ -197,12 +197,14 @@ async function loadStories(experiences: Experience[], storyService: STARStorySer
   return storySets.flat();
 }
 
-function buildSpeechInput(args: {
+type SpeechTailoringInput = Pick<SpeechInput, 'jobDescription' | 'matchingSummary' | 'company'>;
+
+export function buildSpeechInput(args: {
   profile: UserProfile;
   personalCanvas?: PersonalCanvas | null;
   experiences: Experience[];
   stories: STARStory[];
-  jobDescription?: SpeechInput['jobDescription'];
+  tailoring?: SpeechTailoringInput;
 }): SpeechInput {
   const input: SpeechInput = {
     language: 'en',
@@ -219,8 +221,16 @@ function buildSpeechInput(args: {
     input.personalCanvas = mapPersonalCanvas(args.personalCanvas);
   }
 
-  if (args.jobDescription) {
-    input.jobDescription = args.jobDescription;
+  if (args.tailoring?.jobDescription) {
+    input.jobDescription = args.tailoring.jobDescription;
+  }
+
+  if (args.tailoring?.matchingSummary) {
+    input.matchingSummary = args.tailoring.matchingSummary;
+  }
+
+  if (args.tailoring?.company) {
+    input.company = args.tailoring.company;
   }
 
   return input;
