@@ -141,18 +141,18 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
 
 ### 5.1 Add “Application Materials” section at bottom
 
-- [ ] On `/jobs/:jobId`:
+- [x] On `/jobs/:jobId`:
   - render a Nuxt UI card with 3 actions: CV / Letter / Speech
   - if matching summary not available here, either:
     - fetch latest matching summary for this job, or
     - guide user to generate match first (pick MVP approach and document it)
 
-- [ ] On `/jobs/:jobId/match`:
+- [x] On `/jobs/:jobId/match`:
   - same card, using already-loaded matching summary
 
 ### 5.2 Navigation behavior
 
-- [ ] After success, route to existing pages:
+- [x] After success, route to existing pages:
   - `/cv/:id`
   - `/cover-letters/:id`
   - `/speech/:id`

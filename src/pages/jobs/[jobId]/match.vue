@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import MatchingSummaryCard from '@/components/matching/MatchingSummaryCard.vue';
 import LinkedCompanyBadge from '@/components/company/LinkedCompanyBadge.vue';
 import { useMatchingEngine } from '@/composables/useMatchingEngine';
 import { useCompanies } from '@/composables/useCompanies';
+import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import type { PageHeaderLink } from '@/types/ui';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 
@@ -14,8 +15,10 @@ definePageMeta({
 });
 
 const route = useRoute();
+const router = useRouter();
 const { t } = useI18n();
 const companyStore = useCompanies();
+const tailoredMaterials = useTailoredMaterials();
 
 const jobId = computed(() => route.params.jobId as string | undefined);
 
@@ -60,6 +63,11 @@ const isLoading = computed(() => engine.isLoading.value);
 const isGenerating = computed(() => engine.isGenerating.value);
 const hasSummary = computed(() => engine.hasSummary.value);
 const errorMessage = engine.error;
+const isGeneratingMaterials = computed(() => tailoredMaterials.isGenerating.value);
+const materialsError = computed(() => tailoredMaterials.error.value);
+const canGenerateMaterials = computed(() => Boolean(job.value && summary.value));
+const materialsDisabled = computed(() => !canGenerateMaterials.value || isGeneratingMaterials.value);
+const activeMaterial = ref<'cv' | 'cover-letter' | 'speech' | null>(null);
 
 function parseScoreBreakdown(scoreBreakdown: unknown) {
   if (!scoreBreakdown) {
@@ -125,6 +133,63 @@ const handleGenerate = async () => {
     console.error('[matching] Failed to regenerate match', error);
   }
 };
+
+async function handleGenerateCv() {
+  if (!job.value || !summary.value) {
+    return;
+  }
+
+  activeMaterial.value = 'cv';
+  try {
+    const created = await tailoredMaterials.generateTailoredCvForJob({
+      job: job.value,
+      matchingSummary: summary.value,
+    });
+    if (created?.id) {
+      await router.push(`/cv/${created.id}`);
+    }
+  } finally {
+    activeMaterial.value = null;
+  }
+}
+
+async function handleGenerateCoverLetter() {
+  if (!job.value || !summary.value) {
+    return;
+  }
+
+  activeMaterial.value = 'cover-letter';
+  try {
+    const created = await tailoredMaterials.generateTailoredCoverLetterForJob({
+      job: job.value,
+      matchingSummary: summary.value,
+    });
+    if (created?.id) {
+      await router.push(`/cover-letters/${created.id}`);
+    }
+  } finally {
+    activeMaterial.value = null;
+  }
+}
+
+async function handleGenerateSpeech() {
+  if (!job.value || !summary.value) {
+    return;
+  }
+
+  activeMaterial.value = 'speech';
+  try {
+    const created = await tailoredMaterials.generateTailoredSpeechForJob({
+      job: job.value,
+      matchingSummary: summary.value,
+    });
+    if (created?.id) {
+      await router.push(`/speech/${created.id}`);
+    }
+  } finally {
+    activeMaterial.value = null;
+  }
+}
 
 onMounted(async () => {
   try {
@@ -240,6 +305,61 @@ function formatDate(value?: string | null) {
                 />
               </template>
             </UEmpty>
+          </UCard>
+
+          <UCard class="mt-6">
+            <template #header>
+              <div>
+                <h3 class="text-lg font-semibold">Application materials</h3>
+                <p class="text-sm text-gray-500">
+                  Generate tailored documents using this matching summary.
+                </p>
+              </div>
+            </template>
+
+            <div class="space-y-4">
+              <UAlert
+                v-if="materialsError"
+                icon="i-heroicons-exclamation-triangle"
+                color="warning"
+                variant="soft"
+                title="Unable to generate materials"
+                :description="materialsError"
+              />
+
+              <p v-else-if="!hasSummary" class="text-sm text-gray-600 dark:text-gray-400">
+                Generate a matching summary first to unlock tailored materials.
+              </p>
+
+              <div class="grid gap-3 sm:grid-cols-3">
+                <UButton
+                  color="primary"
+                  icon="i-heroicons-document-text"
+                  label="Generate tailored CV"
+                  :loading="isGeneratingMaterials && activeMaterial === 'cv'"
+                  :disabled="materialsDisabled"
+                  @click="handleGenerateCv"
+                />
+                <UButton
+                  color="primary"
+                  variant="outline"
+                  icon="i-heroicons-envelope"
+                  label="Generate cover letter"
+                  :loading="isGeneratingMaterials && activeMaterial === 'cover-letter'"
+                  :disabled="materialsDisabled"
+                  @click="handleGenerateCoverLetter"
+                />
+                <UButton
+                  color="primary"
+                  variant="outline"
+                  icon="i-heroicons-microphone"
+                  label="Generate speech"
+                  :loading="isGeneratingMaterials && activeMaterial === 'speech'"
+                  :disabled="materialsDisabled"
+                  @click="handleGenerateSpeech"
+                />
+              </div>
+            </div>
           </UCard>
 
           <MatchingSummaryCard
