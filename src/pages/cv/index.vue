@@ -51,7 +51,7 @@
         <!-- CV List -->
         <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <ItemCard
-            v-for="cv in items"
+            v-for="cv in sortedItems"
             :key="cv.id"
             :title="cv.name || $t('cvList.untitled')"
             @edit="navigateTo({ name: 'cv-id', params: { id: cv.id } })"
@@ -108,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useCvDocuments } from '@/composables/useCvDocuments';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 
@@ -120,6 +120,20 @@ const { items, loading, error, loadAll, deleteDocument } = useCvDocuments();
 const deleteModalOpen = ref(false);
 const cvToDelete = ref<CVDocument | null>(null);
 const deleting = ref(false);
+
+const toTimestamp = (value?: string | null): number => {
+  if (!value) return 0;
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
+const sortedItems = computed(() =>
+  [...items.value].sort((a, b) => {
+    const aTime = toTimestamp(a.updatedAt ?? a.createdAt);
+    const bTime = toTimestamp(b.updatedAt ?? b.createdAt);
+    return bTime - aTime;
+  })
+);
 
 onMounted(() => {
   loadAll();

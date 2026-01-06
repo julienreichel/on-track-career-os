@@ -30,13 +30,24 @@ const headerLinks = computed(() => [
 ]);
 
 const jobs = jobAnalysis.jobs;
+const toTimestamp = (value?: string | null): number => {
+  if (!value) return 0;
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+const sortedJobs = computed(() =>
+  [...jobs.value].sort((a, b) => {
+    const aTime = toTimestamp(a.updatedAt ?? a.createdAt);
+    const bTime = toTimestamp(b.updatedAt ?? b.createdAt);
+    return bTime - aTime;
+  })
+);
 const filteredJobs = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
-  if (!query) {
-    return jobs.value;
-  }
+  const list = sortedJobs.value;
+  if (!query) return list;
 
-  return jobs.value.filter((job) => {
+  return list.filter((job) => {
     const fields = [job.title, job.seniorityLevel, job.roleSummary, job.status];
     return fields.some((field) => field?.toLowerCase().includes(query));
   });

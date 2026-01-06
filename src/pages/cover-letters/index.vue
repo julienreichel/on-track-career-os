@@ -49,7 +49,7 @@
 
         <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <ItemCard
-            v-for="letter in items"
+            v-for="letter in sortedItems"
             :key="letter.id"
             :title="resolveTitle(letter)"
             :subtitle="resolveSubtitle(letter)"
@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ItemCard from '@/components/ItemCard.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
@@ -118,6 +118,19 @@ const letterToDelete = ref<CoverLetter | null>(null);
 const deleting = ref(false);
 const TITLE_MAX_LENGTH = 72;
 const PREVIEW_MAX_LENGTH = 140;
+const toTimestamp = (value?: string | null): number => {
+  if (!value) return 0;
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
+const sortedItems = computed(() =>
+  [...items.value].sort((a, b) => {
+    const aTime = toTimestamp(a.updatedAt ?? a.createdAt);
+    const bTime = toTimestamp(b.updatedAt ?? b.createdAt);
+    return bTime - aTime;
+  })
+);
 
 onMounted(async () => {
   await loadUserId();

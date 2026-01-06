@@ -172,6 +172,35 @@ describe('Cover letter list page', () => {
     expect(itemCards).toHaveLength(2);
   });
 
+  it('orders cover letters by newest updated date', async () => {
+    itemsRef.value = [
+      {
+        id: 'cl-older',
+        userId: 'user-1',
+        name: 'Older Cover Letter',
+        content: 'Older content',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      },
+      {
+        id: 'cl-newer',
+        userId: 'user-1',
+        name: 'Newer Cover Letter',
+        content: 'Newer content',
+        createdAt: '2024-02-01T00:00:00.000Z',
+        updatedAt: '2024-02-02T00:00:00.000Z',
+      },
+    ];
+
+    const wrapper = await mountPage();
+    await wrapper.vm.$nextTick();
+
+    const itemCards = wrapper.findAll('.item-card');
+    expect(itemCards).toHaveLength(2);
+    expect(itemCards[0]?.text()).toContain('Newer Cover Letter');
+    expect(itemCards[1]?.text()).toContain('Older Cover Letter');
+  });
+
   it('creates a new cover letter when create button is clicked', async () => {
     const newCoverLetter: CoverLetter = {
       id: 'new-cl',

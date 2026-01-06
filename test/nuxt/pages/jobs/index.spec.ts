@@ -174,4 +174,51 @@ describe('Jobs List Page', () => {
     expect(wrapper.findAll('.job-card-stub')).toHaveLength(1);
     expect(wrapper.text()).toContain('Head of Engineering');
   });
+
+  it('orders jobs by newest updated date first', async () => {
+    jobsRef.value = [
+      {
+        id: 'job-older',
+        title: 'Older Job',
+        seniorityLevel: 'Senior',
+        roleSummary: 'Older summary.',
+        responsibilities: [],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
+        status: 'analyzed',
+        rawText: 'text',
+        companyId: null,
+        owner: 'user-1',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      },
+      {
+        id: 'job-newer',
+        title: 'Newer Job',
+        seniorityLevel: 'Lead',
+        roleSummary: 'Newer summary.',
+        responsibilities: [],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
+        status: 'analyzed',
+        rawText: 'text',
+        companyId: null,
+        owner: 'user-1',
+        createdAt: '2024-02-01T00:00:00.000Z',
+        updatedAt: '2024-02-02T00:00:00.000Z',
+      },
+    ];
+
+    const wrapper = await mountPage();
+    await wrapper.vm.$nextTick();
+
+    const cards = wrapper.findAll('.job-card-stub');
+    expect(cards).toHaveLength(2);
+    expect(cards[0]?.text()).toContain('Newer Job');
+    expect(cards[1]?.text()).toContain('Older Job');
+  });
 });

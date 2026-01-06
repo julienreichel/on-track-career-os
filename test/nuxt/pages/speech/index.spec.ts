@@ -136,4 +136,35 @@ describe('Speech list page', () => {
     const wrapper = await mountPage();
     expect(wrapper.text()).toContain(i18n.global.t('navigation.backToApplications'));
   });
+
+  it('orders speech blocks by newest updated date', async () => {
+    itemsRef.value = [
+      {
+        id: 'speech-older',
+        userId: 'user-1',
+        elevatorPitch: 'Older pitch',
+        careerStory: '',
+        whyMe: '',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      },
+      {
+        id: 'speech-newer',
+        userId: 'user-1',
+        elevatorPitch: 'Newer pitch',
+        careerStory: '',
+        whyMe: '',
+        createdAt: '2024-02-01T00:00:00.000Z',
+        updatedAt: '2024-02-02T00:00:00.000Z',
+      },
+    ];
+
+    const wrapper = await mountPage();
+    await wrapper.vm.$nextTick();
+
+    const cards = wrapper.findAll('.item-card');
+    expect(cards).toHaveLength(2);
+    expect(cards[0]?.text()).toContain('Newer pitch');
+    expect(cards[1]?.text()).toContain('Older pitch');
+  });
 });

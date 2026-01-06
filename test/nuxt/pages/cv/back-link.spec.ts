@@ -53,7 +53,10 @@ const stubs = {
   UEmpty: { template: '<div class="u-empty"></div>' },
   UButton: { template: '<button type="button"></button>' },
   UIcon: { template: '<span class="u-icon"></span>' },
-  ItemCard: { template: '<div class="item-card"><slot /></div>' },
+  ItemCard: {
+    props: ['title'],
+    template: '<div class="item-card"><h3>{{ title }}</h3><slot /></div>',
+  },
   ConfirmModal: { template: '<div class="confirm-modal"></div>' },
 };
 
@@ -75,5 +78,28 @@ describe('CV list page', () => {
   it('renders back to applications link', async () => {
     const wrapper = await mountPage();
     expect(wrapper.text()).toContain(i18n.global.t('navigation.backToApplications'));
+  });
+
+  it('orders CVs by newest updated date', async () => {
+    itemsRef.value = [
+      {
+        id: 'cv-older',
+        name: 'Older CV',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      },
+      {
+        id: 'cv-newer',
+        name: 'Newer CV',
+        createdAt: '2024-02-01T00:00:00.000Z',
+        updatedAt: '2024-02-02T00:00:00.000Z',
+      },
+    ];
+
+    const wrapper = await mountPage();
+    const cards = wrapper.findAll('.item-card');
+    expect(cards).toHaveLength(2);
+    expect(cards[0]?.text()).toContain('Newer CV');
+    expect(cards[1]?.text()).toContain('Older CV');
   });
 });
