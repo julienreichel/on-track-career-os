@@ -20,6 +20,9 @@ import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
 import type { Experience } from '@/domain/experience/Experience';
 import type { STARStory } from '@/domain/starstory/STARStory';
+import type { CVDocument } from '@/domain/cvdocument/CVDocument';
+import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
+import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 
 type AuthComposable = {
   userId: Ref<string | null>;
@@ -121,18 +124,24 @@ export function useTailoredMaterials(options: UseTailoredMaterialsOptions = {}) 
 }
 
 type TailoredGenerators = {
-  generateTailoredCvForJob: (params: TailoredJobParams<TailoredCvOptions>) => Promise<unknown>;
-  regenerateTailoredCvForJob: (params: RegenerateJobParams<TailoredCvOptions>) => Promise<unknown>;
+  generateTailoredCvForJob: (
+    params: TailoredJobParams<TailoredCvOptions>
+  ) => Promise<CVDocument | null>;
+  regenerateTailoredCvForJob: (
+    params: RegenerateJobParams<TailoredCvOptions>
+  ) => Promise<CVDocument | null>;
   generateTailoredCoverLetterForJob: (
     params: TailoredJobParams<TailoredCoverLetterOptions>
-  ) => Promise<unknown>;
+  ) => Promise<CoverLetter | null>;
   regenerateTailoredCoverLetterForJob: (
     params: RegenerateJobParams<TailoredCoverLetterOptions>
-  ) => Promise<unknown>;
-  generateTailoredSpeechForJob: (params: TailoredJobParams<TailoredSpeechOptions>) => Promise<unknown>;
+  ) => Promise<CoverLetter | null>;
+  generateTailoredSpeechForJob: (
+    params: TailoredJobParams<TailoredSpeechOptions>
+  ) => Promise<SpeechBlock | null>;
   regenerateTailoredSpeechForJob: (
     params: RegenerateJobParams<TailoredSpeechOptions>
-  ) => Promise<unknown>;
+  ) => Promise<SpeechBlock | null>;
 };
 
 type TailoredGeneratorArgs = {
@@ -212,11 +221,7 @@ function createTailoredGenerators({
 }: TailoredGeneratorArgs): TailoredGenerators {
   return {
     generateTailoredCvForJob: createGenerateTailoredCvForJob(deps, resolveUserId, runWithState),
-    regenerateTailoredCvForJob: createRegenerateTailoredCvForJob(
-      deps,
-      resolveUserId,
-      runWithState
-    ),
+    regenerateTailoredCvForJob: createRegenerateTailoredCvForJob(deps, resolveUserId, runWithState),
     generateTailoredCoverLetterForJob: createGenerateTailoredCoverLetterForJob(
       deps,
       resolveUserId,
@@ -653,7 +658,12 @@ function buildCvInput(args: {
   };
 
   applyOptionalList(input, 'skills', args.profile.skills, args.options?.includeSkills ?? true);
-  applyOptionalList(input, 'languages', args.profile.languages, args.options?.includeLanguages ?? true);
+  applyOptionalList(
+    input,
+    'languages',
+    args.profile.languages,
+    args.options?.includeLanguages ?? true
+  );
   applyOptionalList(
     input,
     'certifications',

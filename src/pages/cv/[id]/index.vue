@@ -120,7 +120,7 @@
                     :src="profilePhotoUrl"
                     :alt="$t('cvDisplay.photoAlt')"
                     class="h-16 w-16 rounded-full object-cover border border-gray-200 dark:border-gray-700"
-                  >
+                  />
                   <p class="text-xs text-gray-500 dark:text-gray-400">
                     {{ $t('cvDisplay.photoPreviewHelp') }}
                   </p>
@@ -137,7 +137,7 @@
                   :src="profilePhotoUrl!"
                   :alt="$t('cvDisplay.photoAlt')"
                   class="cv-photo-image"
-                >
+                />
               </div>
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div class="prose prose-gray max-w-none" v-html="renderedHtml" />
@@ -412,13 +412,17 @@ const handleRegenerateTailored = async () => {
     });
 
     if (updated) {
-      document.value = updated;
-      editContent.value = updated.content || '';
-      originalContent.value = updated.content || '';
-      const shouldShow = updated.showProfilePhoto ?? true;
-      showProfilePhotoSetting.value = shouldShow;
-      originalShowProfilePhoto.value = shouldShow;
-      toast.add({ title: t('tailoredMaterials.toast.cvRegenerated'), color: 'primary' });
+      // Reload the full document to ensure all relationships are populated
+      const reloadedDocument = await service.getFullCVDocument(updated.id);
+      if (reloadedDocument) {
+        document.value = reloadedDocument;
+        editContent.value = reloadedDocument.content || '';
+        originalContent.value = reloadedDocument.content || '';
+        const shouldShow = reloadedDocument.showProfilePhoto ?? true;
+        showProfilePhotoSetting.value = shouldShow;
+        originalShowProfilePhoto.value = shouldShow;
+        toast.add({ title: t('tailoredMaterials.toast.cvRegenerated'), color: 'primary' });
+      }
     }
   } catch (err) {
     console.error('[cvDisplay] Failed to regenerate tailored CV', err);
