@@ -64,8 +64,8 @@ test.describe('Company workflow', () => {
     for (let attempt = 0; attempt < 2; attempt += 1) {
       await analyzeButton.click();
       try {
-        await expect(websiteInput).not.toHaveValue('', { timeout: 30000 });
-        await expect(summaryInput).not.toHaveValue('', { timeout: 30000 });
+        await expect(websiteInput).not.toHaveValue('', { timeout: 5000 });
+        await expect(summaryInput).not.toHaveValue('', { timeout: 5000 });
         analysisSucceeded = true;
         break;
       } catch {
