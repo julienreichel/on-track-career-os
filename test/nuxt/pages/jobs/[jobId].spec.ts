@@ -74,24 +74,6 @@ vi.mock('@/composables/useAuthUser', () => ({
   useAuthUser: () => authMock,
 }));
 
-const tailoredMaterialsMock = {
-  isGenerating: ref(false),
-  error: ref<string | null>(null),
-  materialsLoading: ref(false),
-  materialsError: ref<null | string>(null),
-  loadExistingMaterialsForJob: vi.fn().mockResolvedValue({
-    ok: true,
-    data: { cv: null, coverLetter: null, speechBlock: null },
-  }),
-  generateTailoredCvForJob: vi.fn(),
-  generateTailoredCoverLetterForJob: vi.fn(),
-  generateTailoredSpeechForJob: vi.fn(),
-};
-
-vi.mock('@/application/tailoring/useTailoredMaterials', () => ({
-  useTailoredMaterials: () => tailoredMaterialsMock,
-}));
-
 const matchingSummaryMock = {
   getByContext: vi.fn().mockResolvedValue({ id: 'summary-1' }),
 };
@@ -246,6 +228,10 @@ const stubs = {
         </button>
       </div>
     `,
+  },
+  TailoredMaterialsCard: {
+    props: ['job', 'matchingSummary', 'summaryLoading', 'summaryError', 'descriptionKey'],
+    template: '<section class="tailored-materials-card"></section>',
   },
 };
 

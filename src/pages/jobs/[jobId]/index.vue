@@ -7,16 +7,13 @@ import LinkedCompanyBadge from '@/components/company/LinkedCompanyBadge.vue';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { useCompanies } from '@/composables/useCompanies';
-import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
+import TailoredMaterialsCard from '@/components/tailoring/TailoredMaterialsCard.vue';
 import { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
 import type {
   JobDescription,
   JobDescriptionUpdateInput,
 } from '@/domain/job-description/JobDescription';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
-import type { CVDocument } from '@/domain/cvdocument/CVDocument';
-import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
-import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 import type { PageHeaderLink } from '@/types/ui';
 
 type ScalarField = 'title' | 'seniorityLevel' | 'roleSummary';
@@ -48,7 +45,6 @@ const { t } = useI18n();
 const jobAnalysis = useJobAnalysis();
 const companyStore = useCompanies();
 const auth = useAuthUser();
-const tailoredMaterials = useTailoredMaterials({ auth });
 const matchingSummaryService = new MatchingSummaryService();
 
 const jobId = computed(() => route.params.jobId as string | undefined);
@@ -59,10 +55,6 @@ const errorMessage = ref<string | null>(null);
 const matchingSummary = ref<MatchingSummary | null>(null);
 const matchingSummaryLoading = ref(false);
 const matchingSummaryError = ref<string | null>(null);
-const activeMaterial = ref<'cv' | 'cover-letter' | 'speech' | null>(null);
-const existingCv = ref<CVDocument | null>(null);
-const existingCoverLetter = ref<CoverLetter | null>(null);
-const existingSpeech = ref<SpeechBlock | null>(null);
 const showReanalyseModal = ref(false);
 const reanalysing = ref(false);
 const saving = ref(false);
@@ -157,28 +149,6 @@ const statusLabel = computed(() => {
   return t(`jobList.status.${status}`);
 });
 
-const hasMatchingSummary = computed(() => Boolean(matchingSummary.value));
-const isGeneratingMaterials = computed(() => tailoredMaterials.isGenerating.value);
-const materialsError = computed(() => tailoredMaterials.error.value);
-const materialsLoading = computed(() => tailoredMaterials.materialsLoading.value);
-const materialsErrorCode = computed(() => tailoredMaterials.materialsError.value);
-const materialsErrorMessage = computed(() =>
-  materialsErrorCode.value ? t(`tailoredMaterials.errors.${materialsErrorCode.value}`) : null
-);
-const canGenerateMaterials = computed(() => Boolean(job.value && matchingSummary.value));
-const materialsDisabled = computed(
-  () => !canGenerateMaterials.value || isGeneratingMaterials.value || matchingSummaryLoading.value
-);
-const cvLink = computed(() => (existingCv.value?.id ? `/cv/${existingCv.value.id}` : null));
-const coverLetterLink = computed(() =>
-  existingCoverLetter.value?.id ? `/cover-letters/${existingCoverLetter.value.id}` : null
-);
-const speechLink = computed(() =>
-  existingSpeech.value?.id ? `/speech/${existingSpeech.value.id}` : null
-);
-const hasExistingMaterials = computed(() =>
-  Boolean(cvLink.value || coverLetterLink.value || speechLink.value)
-);
 
 const formattedCreatedAt = computed(() => formatDate(job.value?.createdAt));
 const formattedUpdatedAt = computed(() => formatDate(job.value?.updatedAt));
@@ -206,13 +176,6 @@ watch(
   { immediate: true }
 );
 
-watch(
-  jobId,
-  () => {
-    void loadExistingMaterials();
-  },
-  { immediate: true }
-);
 
 onMounted(async () => {
   if (!job.value) {
@@ -340,24 +303,6 @@ async function loadMatchingSummary() {
   }
 }
 
-async function loadExistingMaterials() {
-  const id = jobId.value;
-  if (!id) {
-    return;
-  }
-
-  const result = await tailoredMaterials.loadExistingMaterialsForJob(id);
-  if (result.ok) {
-    existingCv.value = result.data.cv;
-    existingCoverLetter.value = result.data.coverLetter;
-    existingSpeech.value = result.data.speechBlock;
-    return;
-  }
-
-  existingCv.value = null;
-  existingCoverLetter.value = null;
-  existingSpeech.value = null;
-}
 
 function arraysEqual(a: string[], b: string[]) {
   if (a.length !== b.length) {
@@ -494,62 +439,6 @@ async function confirmReanalyse() {
   }
 }
 
-async function handleGenerateCv() {
-  if (!job.value || !matchingSummary.value) {
-    return;
-  }
-
-  activeMaterial.value = 'cv';
-  try {
-    const created = await tailoredMaterials.generateTailoredCvForJob({
-      job: job.value,
-      matchingSummary: matchingSummary.value,
-    });
-    if (created?.id) {
-      await router.push(`/cv/${created.id}`);
-    }
-  } finally {
-    activeMaterial.value = null;
-  }
-}
-
-async function handleGenerateCoverLetter() {
-  if (!job.value || !matchingSummary.value) {
-    return;
-  }
-
-  activeMaterial.value = 'cover-letter';
-  try {
-    const created = await tailoredMaterials.generateTailoredCoverLetterForJob({
-      job: job.value,
-      matchingSummary: matchingSummary.value,
-    });
-    if (created?.id) {
-      await router.push(`/cover-letters/${created.id}`);
-    }
-  } finally {
-    activeMaterial.value = null;
-  }
-}
-
-async function handleGenerateSpeech() {
-  if (!job.value || !matchingSummary.value) {
-    return;
-  }
-
-  activeMaterial.value = 'speech';
-  try {
-    const created = await tailoredMaterials.generateTailoredSpeechForJob({
-      job: job.value,
-      matchingSummary: matchingSummary.value,
-    });
-    if (created?.id) {
-      await router.push(`/speech/${created.id}`);
-    }
-  } finally {
-    activeMaterial.value = null;
-  }
-}
 </script>
 
 <template>
@@ -721,127 +610,14 @@ async function handleGenerateSpeech() {
             </div>
           </UCard>
 
-          <UCard class="mt-6">
-            <template #header>
-              <div>
-                <h3 class="text-lg font-semibold">
-                  {{ t('tailoredMaterials.materials.title') }}
-                </h3>
-                <p class="text-sm text-gray-500">
-                  {{ t('tailoredMaterials.materials.description') }}
-                </p>
-              </div>
-            </template>
-
-            <div class="space-y-4">
-              <UAlert
-                v-if="matchingSummaryError"
-                icon="i-heroicons-exclamation-triangle"
-                color="warning"
-                variant="soft"
-                :title="t('tailoredMaterials.materials.summaryErrorTitle')"
-                :description="matchingSummaryError"
-              />
-
-              <UAlert
-                v-else-if="materialsError"
-                icon="i-heroicons-exclamation-triangle"
-                color="warning"
-                variant="soft"
-                :title="t('tailoredMaterials.materials.generateErrorTitle')"
-                :description="materialsError"
-              />
-
-              <UAlert
-                v-else-if="materialsErrorMessage"
-                icon="i-heroicons-exclamation-triangle"
-                color="warning"
-                variant="soft"
-                :title="t('tailoredMaterials.materials.loadErrorTitle')"
-                :description="materialsErrorMessage"
-              />
-
-              <div
-                v-else-if="!hasMatchingSummary && !matchingSummaryLoading && !hasExistingMaterials"
-                class="space-y-3"
-              >
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                  {{ t('tailoredMaterials.materials.missingSummaryHint') }}
-                </p>
-                <UButton
-                  v-if="matchLink"
-                  color="neutral"
-                  variant="outline"
-                  icon="i-heroicons-sparkles"
-                  :label="t('tailoredMaterials.materials.generateMatch')"
-                  :to="matchLink"
-                  :disabled="!matchLink"
-                />
-              </div>
-
-              <USkeleton
-                v-else-if="matchingSummaryLoading || materialsLoading"
-                class="h-10 w-full"
-              />
-
-              <div class="grid gap-3 sm:grid-cols-3">
-                <UButton
-                  v-if="cvLink"
-                  color="neutral"
-                  variant="outline"
-                  icon="i-heroicons-document-text"
-                  :label="t('tailoredMaterials.materials.viewCv')"
-                  :to="cvLink"
-                />
-                <UButton
-                  v-else
-                  color="neutral"
-                  variant="outline"
-                  icon="i-heroicons-document-text"
-                  :label="t('tailoredMaterials.materials.generateCv')"
-                  :loading="isGeneratingMaterials && activeMaterial === 'cv'"
-                  :disabled="materialsDisabled"
-                  @click="handleGenerateCv"
-                />
-                <UButton
-                  v-if="coverLetterLink"
-                  color="neutral"
-                  variant="outline"
-                  icon="i-heroicons-envelope"
-                  :label="t('tailoredMaterials.materials.viewCoverLetter')"
-                  :to="coverLetterLink"
-                />
-                <UButton
-                  v-else
-                  color="neutral"
-                  variant="outline"
-                  icon="i-heroicons-envelope"
-                  :label="t('tailoredMaterials.materials.generateCoverLetter')"
-                  :loading="isGeneratingMaterials && activeMaterial === 'cover-letter'"
-                  :disabled="materialsDisabled"
-                  @click="handleGenerateCoverLetter"
-                />
-                <UButton
-                  v-if="speechLink"
-                  color="neutral"
-                  variant="outline"
-                  icon="i-heroicons-microphone"
-                  :label="t('tailoredMaterials.materials.viewSpeech')"
-                  :to="speechLink"
-                />
-                <UButton
-                  v-else
-                  color="neutral"
-                  variant="outline"
-                  icon="i-heroicons-microphone"
-                  :label="t('tailoredMaterials.materials.generateSpeech')"
-                  :loading="isGeneratingMaterials && activeMaterial === 'speech'"
-                  :disabled="materialsDisabled"
-                  @click="handleGenerateSpeech"
-                />
-              </div>
-            </div>
-          </UCard>
+          <TailoredMaterialsCard
+            :job="job"
+            :matching-summary="matchingSummary"
+            :match-link="matchLink"
+            :summary-loading="matchingSummaryLoading"
+            :summary-error="matchingSummaryError"
+            description-key="description"
+          />
         </template>
 
         <UCard v-else>

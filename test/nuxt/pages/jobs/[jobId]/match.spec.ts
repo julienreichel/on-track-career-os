@@ -59,24 +59,6 @@ vi.mock('@/composables/useCompanies', () => ({
   useCompanies: () => companyStoreMock,
 }));
 
-const tailoredMaterialsMock = {
-  isGenerating: ref(false),
-  error: ref<string | null>(null),
-  materialsLoading: ref(false),
-  materialsError: ref<null | string>(null),
-  loadExistingMaterialsForJob: vi.fn().mockResolvedValue({
-    ok: true,
-    data: { cv: null, coverLetter: null, speechBlock: null },
-  }),
-  generateTailoredCvForJob: vi.fn(),
-  generateTailoredCoverLetterForJob: vi.fn(),
-  generateTailoredSpeechForJob: vi.fn(),
-};
-
-vi.mock('@/application/tailoring/useTailoredMaterials', () => ({
-  useTailoredMaterials: () => tailoredMaterialsMock,
-}));
-
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
@@ -147,6 +129,10 @@ const stubs = {
     ],
     template: '<div class="matching-card">Score: {{ overallScore }}</div>',
   },
+  TailoredMaterialsCard: {
+    props: ['job', 'matchingSummary', 'summaryLoading', 'summaryError', 'descriptionKey'],
+    template: '<section class="tailored-materials-card"></section>',
+  },
 };
 
 const i18n = createTestI18n();
@@ -177,8 +163,6 @@ describe('Job match page', () => {
     engineMock.load.mockResolvedValue(undefined);
     engineMock.regenerate.mockResolvedValue(undefined);
     companyStoreMock.listCompanies.mockClear();
-    tailoredMaterialsMock.isGenerating.value = false;
-    tailoredMaterialsMock.error.value = null;
   });
 
   it('loads data on mount and renders summary information', async () => {
