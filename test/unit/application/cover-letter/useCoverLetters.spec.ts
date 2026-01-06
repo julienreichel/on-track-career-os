@@ -80,6 +80,7 @@ describe('useCoverLetters', () => {
         userId: 'user-1',
         tone: 'Formal',
         content: 'Hello',
+        jobId: null,
       };
       const created = { id: 'cl-1', ...input } as CoverLetter;
 
@@ -90,8 +91,34 @@ describe('useCoverLetters', () => {
       const result = await createCoverLetter(input as never);
 
       expect(result).toEqual(created);
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        userId: 'user-1',
+        tone: 'Formal',
+        content: 'Hello',
+        jobId: undefined,
+      });
       expect(items.value).toHaveLength(1);
       expect(items.value[0]).toEqual(created);
+    });
+
+    it('should persist jobId when provided', async () => {
+      const input = {
+        userId: 'user-1',
+        tone: 'Formal',
+        content: 'Hello',
+        jobId: 'job-123',
+      };
+      const created = { id: 'cl-2', ...input } as CoverLetter;
+
+      mockRepository.create.mockResolvedValue(created);
+
+      const { items, createCoverLetter } = useCoverLetters();
+
+      const result = await createCoverLetter(input as never);
+
+      expect(result).toEqual(created);
+      expect(mockRepository.create).toHaveBeenCalledWith(input);
+      expect(items.value).toHaveLength(1);
     });
 
     it(
@@ -119,10 +146,44 @@ describe('useCoverLetters', () => {
       const { items, updateCoverLetter } = useCoverLetters();
       items.value = [mockLetter];
 
-      const result = await updateCoverLetter({ id: 'cl-1', content: 'New' } as never);
+      const result = await updateCoverLetter({
+        id: 'cl-1',
+        content: 'New',
+        jobId: null,
+      } as never);
 
       expect(result).toEqual(updated);
       expect(items.value[0]).toEqual(updated);
+      expect(items.value).toHaveLength(1);
+      expect(mockRepository.update).toHaveBeenCalledWith({
+        id: 'cl-1',
+        content: 'New',
+        jobId: undefined,
+      });
+    });
+
+    it('should keep jobId when updating tailored cover letter', async () => {
+      const mockLetter = { id: 'cl-2', content: 'Old', jobId: 'job-123' } as CoverLetter;
+      const updated = { ...mockLetter, content: 'New' } as CoverLetter;
+
+      mockRepository.update.mockResolvedValue(updated);
+
+      const { items, updateCoverLetter } = useCoverLetters();
+      items.value = [mockLetter];
+
+      const result = await updateCoverLetter({
+        id: 'cl-2',
+        content: 'New',
+        jobId: 'job-123',
+      } as never);
+
+      expect(result).toEqual(updated);
+      expect(items.value[0]).toEqual(updated);
+      expect(mockRepository.update).toHaveBeenCalledWith({
+        id: 'cl-2',
+        content: 'New',
+        jobId: 'job-123',
+      });
     });
 
     it(

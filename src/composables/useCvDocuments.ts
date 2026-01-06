@@ -52,7 +52,10 @@ export function useCvDocuments() {
     error.value = null;
 
     try {
-      const created = await repository.create(input);
+      const created = await repository.create({
+        ...input,
+        ...(input.jobId === null && { jobId: undefined }),
+      });
       if (created) {
         items.value.push(created);
       }
@@ -74,7 +77,10 @@ export function useCvDocuments() {
     error.value = null;
 
     try {
-      const updated = await repository.update(input);
+      const updated = await repository.update({
+        ...input,
+        ...(input.jobId === null && { jobId: undefined }),
+      });
       updateItemInArray(items.value, updated);
       return updated;
     } catch (err) {

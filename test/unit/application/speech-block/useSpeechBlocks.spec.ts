@@ -81,6 +81,7 @@ describe('useSpeechBlocks', () => {
         elevatorPitch: 'Pitch',
         careerStory: 'Story',
         whyMe: 'Why',
+        jobId: null,
       };
       const created = { id: 'sb-1', ...input } as SpeechBlock;
 
@@ -91,8 +92,36 @@ describe('useSpeechBlocks', () => {
       const result = await createSpeechBlock(input as never);
 
       expect(result).toEqual(created);
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        userId: 'user-1',
+        elevatorPitch: 'Pitch',
+        careerStory: 'Story',
+        whyMe: 'Why',
+        jobId: undefined,
+      });
       expect(items.value).toHaveLength(1);
       expect(items.value[0]).toEqual(created);
+    });
+
+    it('should persist jobId when provided', async () => {
+      const input = {
+        userId: 'user-1',
+        elevatorPitch: 'Pitch',
+        careerStory: 'Story',
+        whyMe: 'Why',
+        jobId: 'job-123',
+      };
+      const created = { id: 'sb-2', ...input } as SpeechBlock;
+
+      mockRepository.create.mockResolvedValue(created);
+
+      const { items, createSpeechBlock } = useSpeechBlocks();
+
+      const result = await createSpeechBlock(input as never);
+
+      expect(result).toEqual(created);
+      expect(mockRepository.create).toHaveBeenCalledWith(input);
+      expect(items.value).toHaveLength(1);
     });
 
     it(
@@ -120,10 +149,40 @@ describe('useSpeechBlocks', () => {
       const { items, updateSpeechBlock } = useSpeechBlocks();
       items.value = [mockBlock];
 
-      const result = await updateSpeechBlock({ id: 'sb-1', whyMe: 'New' } as never);
+      const result = await updateSpeechBlock({ id: 'sb-1', whyMe: 'New', jobId: null } as never);
 
       expect(result).toEqual(updated);
       expect(items.value[0]).toEqual(updated);
+      expect(items.value).toHaveLength(1);
+      expect(mockRepository.update).toHaveBeenCalledWith({
+        id: 'sb-1',
+        whyMe: 'New',
+        jobId: undefined,
+      });
+    });
+
+    it('should keep jobId when updating tailored speech block', async () => {
+      const mockBlock = { id: 'sb-2', whyMe: 'Old', jobId: 'job-123' } as SpeechBlock;
+      const updated = { ...mockBlock, whyMe: 'New' } as SpeechBlock;
+
+      mockRepository.update.mockResolvedValue(updated);
+
+      const { items, updateSpeechBlock } = useSpeechBlocks();
+      items.value = [mockBlock];
+
+      const result = await updateSpeechBlock({
+        id: 'sb-2',
+        whyMe: 'New',
+        jobId: 'job-123',
+      } as never);
+
+      expect(result).toEqual(updated);
+      expect(items.value[0]).toEqual(updated);
+      expect(mockRepository.update).toHaveBeenCalledWith({
+        id: 'sb-2',
+        whyMe: 'New',
+        jobId: 'job-123',
+      });
     });
 
     it(

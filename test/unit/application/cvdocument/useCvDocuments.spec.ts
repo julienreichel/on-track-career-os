@@ -100,6 +100,7 @@ describe('useCvDocuments', () => {
         name: 'New CV',
         userId: 'user-1',
         isTailored: false,
+        jobId: null,
       };
 
       const mockCreated = {
@@ -114,10 +115,39 @@ describe('useCvDocuments', () => {
 
       const result = await createDocument(input as never);
 
-      expect(mockRepository.create).toHaveBeenCalledWith(input);
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        name: 'New CV',
+        userId: 'user-1',
+        isTailored: false,
+        jobId: undefined,
+      });
       expect(result).toEqual(mockCreated);
       expect(items.value).toHaveLength(1);
       expect(items.value[0]).toEqual(mockCreated);
+    });
+
+    it('should persist jobId when provided', async () => {
+      const input = {
+        name: 'Tailored CV',
+        userId: 'user-1',
+        isTailored: true,
+        jobId: 'job-123',
+      };
+
+      const mockCreated = {
+        ...input,
+        id: 'cv-456',
+      } as CVDocument;
+
+      mockRepository.create.mockResolvedValue(mockCreated);
+
+      const { items, createDocument } = useCvDocuments();
+
+      const result = await createDocument(input as never);
+
+      expect(mockRepository.create).toHaveBeenCalledWith(input);
+      expect(result).toEqual(mockCreated);
+      expect(items.value).toHaveLength(1);
     });
 
     it(
@@ -156,10 +186,45 @@ describe('useCvDocuments', () => {
       const { items, loadAll, updateDocument } = useCvDocuments();
 
       await loadAll();
-      const result = await updateDocument({ id: 'cv-1', name: 'New Name' } as never);
+      const result = await updateDocument({
+        id: 'cv-1',
+        name: 'New Name',
+        jobId: null,
+      } as never);
 
       expect(result).toEqual(mockUpdated);
       expect(items.value[0]).toEqual(mockUpdated);
+      expect(items.value).toHaveLength(1);
+      expect(mockRepository.update).toHaveBeenCalledWith({
+        id: 'cv-1',
+        name: 'New Name',
+        jobId: undefined,
+      });
+    });
+
+    it('should keep jobId when updating tailored CV', async () => {
+      const mockCV = { id: 'cv-2', name: 'Tailored CV', jobId: 'job-123' } as CVDocument;
+      const mockUpdated = { ...mockCV, name: 'Updated CV' };
+
+      mockRepository.list.mockResolvedValue([mockCV]);
+      mockRepository.update.mockResolvedValue(mockUpdated);
+
+      const { items, loadAll, updateDocument } = useCvDocuments();
+
+      await loadAll();
+      const result = await updateDocument({
+        id: 'cv-2',
+        name: 'Updated CV',
+        jobId: 'job-123',
+      } as never);
+
+      expect(result).toEqual(mockUpdated);
+      expect(items.value[0]).toEqual(mockUpdated);
+      expect(mockRepository.update).toHaveBeenCalledWith({
+        id: 'cv-2',
+        name: 'Updated CV',
+        jobId: 'job-123',
+      });
     });
 
     it(
