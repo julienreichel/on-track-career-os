@@ -1,364 +1,97 @@
 # EPIC ROADMAP (MVP → V1 → V2 → V3)
 
-_Non-technical — Strategic — Complete_
-_Source: EPIC Roadmap document_
-
----
-
-## 🎯 MVP — Build the Core Job Search Engine
-
-**Goal:** Deliver the minimum complete workflow:
-**→ understand the user → understand the job → generate coherent materials**
-
----
-
-## EPIC 1A — User Data Intake & Identity Collection
-
-**Goal:** Capture the user’s professional identity through guided data input.
-
-### Description
-
-Collect all raw information about the user without interpreting it yet. All future features depend on this structured foundation.
-
-### Includes
-
-- Upload CV → extract text → segment experiences
-- Manual editing of extracted experiences
-- Create new experience blocks
-- Capture aspirations (future direction)
-- Capture professional goals
-- Capture personal values
-- Capture key strengths
-
-### User Value
-
-- Gives users a simple, structured way to express who they are
-- Helps users feel “seen” and guided
-- Builds the foundational dataset for CVs, letters, tailoring, analysis
-
-### Reason in MVP
-
-It is impossible to generate insights or documents without structured, accurate user data.
-
----
-
-## EPIC 1B — Generate the Personal Business Model Canvas
-
-**Goal:** Transform user data into a structured personal career model.
-
-### Description
-
-Convert user experiences, aspirations, values, and strengths into a structured, visual canvas. Editable and AI-assisted.
-
-### Includes
-
-- Auto-generate all Canvas sections from user data:
-  - Value Proposition
-  - Key Activities
-  - Strengths & Competitive Advantages
-  - Target Roles / Customers
-  - Channels
-  - Personal Resources (skills, assets)
-  - Career Direction
-  - Pain Relievers & Gain Creators
-
-- User editing & drag-and-drop
-- AI suggestions for weak sections
-- Save to backend
-- Regenerate anytime
-
-### User Value
-
-- Clear professional identity overview
-- Reveals insights users often miss
-- Central hub for consistency across CVs, letters, and stories
-
-### Reason in MVP
-
-It is the conceptual backbone of the entire system.
-
----
-
-## EPIC 2 — Experience Builder (STAR Model Guided Stories)
-
-**Goal:** Help users create clear, compelling situation-based examples.
-
-### Includes
-
-- Guided STAR interviews
-- AI-generated achievements
-- AI-generated KPI suggestions
-- Editable story library
-
-### User Value
-
-- Provides strong material for CVs, letters, and interviews
-- Helps users communicate achievements with clarity
-
-### Reason in MVP
-
-Generation features are useless without strong content.
-
----
-
-## EPIC 3 — Generic CV Generator
-
-**Goal:** Provide users with a clean, coherent, ready-to-export CV.
-
-### Includes
-
-- Basic 2-page layout
-- Markdown editing of CV
-- Print export
-
-### User Value
-
-Users instantly obtain a professional CV.
-
-### Reason in MVP
-
-A CV is an essential deliverable in any job search.
-
----
-
-## **EPIC 3B — CV Header & Contact Information**
+### EPIC F1 — Product Observability & Feedback Loops
 
 **Goal:**
-Enhance the UserProfile and generic CV system with photo, socials, contact and work-permit data, enabling cleaner and more professional CV headers.
+Understand how users actually use the product and where they struggle.
 
-**Why:**
-The CV currently lacks essential header information required for employability (photo, email, social links, phone, work permit). Today, these must be manually added into text blocks, which is inefficient and inconsistent.
+**Includes:**
 
-**Scope:**
-Extend the UserProfile model to store:
-
-- Profile photo (stored in S3)
-- Social links list
-- Contact information (email/phone)
-- Work eligibility info
-
-Add visibility toggles so users control what appears on their CV.
-Update CV generation, preview and print pages to render the new header elements.
+- Usage tracking at feature / page level (privacy-first)
+- Drop-off and friction detection
+- AI output feedback (👍 / 👎 / optional comment)
+- Confidence & usefulness signals on AI-generated data
+- Error & anomaly detection
 
 **Success Criteria:**
-User can upload a photo through their profile, add socials and contact fields, and decide if they show on CVs. CV preview/print layout displays the information top-right of the header.
 
-**Risks / Constraints:**
-Cross-template formatting, user-controlled toggles, and print layout visual design alignment.
-
----
-
-## EPIC 4 — User Speech Builder (Elevator Pitch & Career Story)
-
-**Goal:** Help users articulate their narrative verbally and in writing.
-
-### Includes
-
-- Generate personal pitch
-- Generate career story
-- Generate “Why me?” statements
-
-### User Value
-
-Users feel more confident when explaining their professional story.
-
-### Reason in MVP
-
-Used for cover letters, interviews, and self-positioning.
+- Clear visibility on user paths
+- Ability to identify unused or confusing features
+- Actionable feedback on AI usefulness
 
 ---
 
-## **EPIC 4B — Generic Cover Letter Generator**
+### EPIC F2 — Onboarding, Guidance & User Flow Clarity
 
 **Goal:**
-Provide users with a clear, well-structured, and editable cover letter that expresses their motivation and value proposition in writing.
+Ensure users always know **what to do next** and **why it matters**.
 
-### Includes
+**Includes:**
 
-- Generate a generic cover letter based on:
-  - User profile (identity, values, strengths)
-  - Key experiences and stories
-  - Personal positioning (canvas, career direction)
+- First-time user guidance
+- Contextual hints and explanations
+- Empty-state guidance
+- Progressive disclosure (reduce cognitive load)
+- Clear “next action” suggestions
 
-- Structured letter sections (introduction, motivation, value contribution, closing)
-- Editable text with full user control
-- Regenerate at any time without losing the ability to edit
-- Store and manage multiple cover letters
+**Success Criteria:**
 
-### User Value
-
-Users obtain a professional, coherent cover letter that:
-
-- Clearly explains who they are and what they bring
-- Reduces the cognitive load of “starting from a blank page”
-- Serves as a strong base for later job-specific tailoring
-
-### Reason in MVP
-
-A cover letter is a core application deliverable.
-Providing a high-quality generic version ensures users can apply quickly while maintaining consistency across CV, speech, and personal narrative.
+- Users complete core flows without external explanation
+- Reduced abandonment during early usage
+- Increased completion of profile, canvas, and first CV
 
 ---
 
-## EPIC 5A — Job Description Intake & Role Analysis
+### EPIC F3 — UI Simplification & UX Consistency
 
-**Goal:** Understand the job clearly and extract what success looks like.
+**Goal:**
+Make the interface minimal, predictable, and calm.
 
-### Description
+**Includes:**
 
-Focuses exclusively on the job itself: its role, expectations, and pains.
+- Remove visual noise and redundant UI
+- Enforce Nuxt UI usage everywhere
+- Eliminate custom CSS
+- Consistent layouts, spacing, and interaction patterns
+- Review navigation to remove dead or secondary paths
 
-### Includes
+**Success Criteria:**
 
-- Paste JD text
-- AI extracts:
-  - Responsibilities
-  - Required skills
-  - Required behaviours
-  - Seniority level
-  - Success criteria
-  - Explicit pains
-
-- Create a Job Role Card
-- Editing extracted fields
-
-### User Value
-
-- Clear understanding of what matters for each role
-- Reduces misinterpretation
-- Foundation for tailoring
-
-### Reason in MVP
-
-Cannot tailor without understanding the role.
+- Fewer UI components with clearer roles
+- Consistent look & feel across all pages
+- Faster user comprehension
 
 ---
 
-## EPIC 5B — Company Analysis & Company Business Model Canvas
+### EPIC F4 — Code Quality, Performance & Security Hardening
 
-**Goal:** Understand the company’s context, strategy, challenges.
+**Goal:**
+Ensure the codebase is efficient, secure, and easy to evolve.
 
-### Description
+**Includes:**
 
-Focuses on modeling the business context behind each job.
+- Enforce GraphQL best practices
+  - ❌ No `list()` in production paths
+  - ✅ Use relationships & filtered queries
 
-### Includes
+- Remove dead code (components, composables, models)
+- Ensure correct foldering & composable structure
+- Review data access for performance
+- Strengthen security & authorization patterns
 
-- Input company information:
-  - industry
-  - size
-  - products/services
-  - market position
+**Success Criteria:**
 
-- Optional company description paste
-- AI generates:
-  - Company BMC
-  - Market challenges
-  - Internal pains
-  - Customer pains
-  - Strategic priorities
-
-- Editable canvas
-
-### User Value
-
-- Understands the environment and strategic challenges
-- Helps user speak with confidence during interviews
-
-### Reason in MVP
-
-Critical for strategic tailoring.
-
----
-
-## EPIC 5C — User ↔ Job ↔ Company Matching
-
-**Goal:** Connect the three sources of truth into a coherent fit model.
-
-### Description
-
-Synthesis step to reveal where the user creates impact.
-
-### Includes
-
-- Analyze overlaps between:
-  - User strengths
-  - Achievements
-  - KPIs
-  - Job pains
-  - Company pains
-
-- Identify:
-  - Competitive advantages
-  - Contributions
-  - Risks & mitigation
-
-- Produce Fit Summary (impact & narrative)
-- Editable
-
-### User Value
-
-- Clarity and confidence: “Now I understand how I fit.”
-- Drives tailored CV, letter, pitch, KPIs, and interview prep
-
-### Reason in MVP
-
-Tailoring requires this synthesis.
-
----
-
-## EPIC 6 — Tailored Application Materials
-
-**Goal:** Create job-specific CVs, letters, and speech.
-
-### Includes
-
-- Tailored CV
-- Tailored cover letter
-- Tailored elevator pitch
-
-### User Value
-
-Strategic materials aligned with real company pains.
-
-### Reason in MVP
-
-Completes the full application workflow.
-
----
-
-# ✔ MVP Completion
-
-At this point the user can:
-**→ understand themselves → analyze a job → generate application materials**
+- Leaner codebase
+- Predictable data access costs
+- Clear architectural rules respected everywhere
 
 ---
 
 # V1 — Enhance Quality & Personalization
 
-## EPIC 7 — Generic Interview Question Generator
-
-**Goal:** Prepare users for interviews immediately.
-
-### Includes
-
-- Behavioral questions
-- Technical questions
-- Cultural questions
-- Pain-based questions
-- Suggested answers from user stories
-
-### User Value
-
-Plug-and-play interview preparation.
-
-### Reason in V1
-
-Completes the “prepare → apply → interview” cycle.
-
 ---
 
-## EPIC 8 — Expanded Personal Profile (Communication & Psychological)
+## EPIC 7 — Expanded Personal Profile (Communication & Psychological)
 
 **Goal:** Add deeper behavioral insights.
 
@@ -375,59 +108,9 @@ More authentic and personalized applications.
 
 ---
 
-## EPIC 10 — Job Fit Score & Recommendation Engine
-
-**Goal:** Recommend roles based on user profile.
-
-### Includes
-
-- Compare user canvas with JD
-- Score match
-- Suggest roles or industries
-
-### User Value
-
-Career orientation, not only job application help.
-
----
-
-## EPIC 11 — Advanced Pain Mapping Engine
-
-**Goal:** Understand deeper contextual job pains.
-
-### Includes
-
-- Industry patterns
-- Market maturity inference
-- Unstated needs
-- Stronger match scoring
-
-### User Value
-
-More accurate and unique insights.
-
----
-
-## EPIC 12 — Advanced CV & Portfolio Builder
-
-**Goal:** Improve formatting and visual quality.
-
-### Includes
-
-- More templates
-- Drag & drop layout
-- Design presets
-- ATS-friendly export
-
-### User Value
-
-Professional-grade materials.
-
----
-
 # V2 — Intelligence, Automation & Growth
 
-## EPIC 13 — Multi-Version Tracking & Revision History
+## EPIC 8 — Multi-Version Tracking & Revision History
 
 **Goal:** Support professional iterative workflows.
 

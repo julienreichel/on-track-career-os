@@ -6,14 +6,14 @@
 
 # 1. Overview
 
-This product is an **AI-powered platform** guiding individuals through the entire job-seeking journey.
+This product is an **AI-powered platform** helping professionals understand their value and get selected for meaningful first interviews.
 
 It combines:
 
 - **Self-discovery**
 - **Career modeling**
 - **Job & company analysis**
-- **Communication tools (CV, letter, speech, KPIs)**
+- **Communication tools (CV, letter, speech)**
 
 into a **single coherent system** — a **Personal AI Career Coach** whose mission is to help users:
 
@@ -21,7 +21,7 @@ into a **single coherent system** — a **Personal AI Career Coach** whose missi
 2. Decode job descriptions and company needs
 3. Articulate their value clearly
 
-Long-term, this becomes a **Career Operating System** people return to throughout their careers — not only during job searches.
+Over time, this becomes a valuable resource for career reflection and growth — focusing on getting users to meaningful conversations with employers.
 
 ---
 
@@ -50,6 +50,26 @@ User identity → Career Canvas → Job/Company Canvas → Materials.
 
 ---
 
+# 2.1 Product Principles
+
+- **Clarity over completeness** — Focus on essential insights rather than exhaustive analysis
+- **Guidance over automation** — Provide direction and suggestions, not black-box solutions
+- **User understanding over AI performance** — Success is measured by user learning, not algorithmic sophistication
+- **Feedback loops everywhere** — Every AI output invites user input and refinement
+- **Minimal UI, maximal signal** — Clean interfaces that surface the most important information
+
+---
+
+# 2.2 Observability Philosophy
+
+**AI outputs are suggestions, never truths.** Every recommendation comes with context about how it was generated and why it might be relevant. **All AI outputs are fully editable** and serve as starting points for user refinement.
+
+**User feedback is first-class data.** When users edit, reject, or improve AI suggestions, that becomes valuable signal for future recommendations.
+
+**Confidence & trust are built through transparency.** Users see the reasoning behind recommendations and can trace how their input data influences outputs. **User validation is always the final step** in any AI-assisted process.
+
+---
+
 # 3. User Segments
 
 ### **Primary**
@@ -61,7 +81,6 @@ User identity → Career Canvas → Job/Company Canvas → Materials.
 
 ### **Secondary (Later)**
 
-- HR professionals
 - Career coaches
 - Universities & bootcamps
 
@@ -71,13 +90,13 @@ User identity → Career Canvas → Job/Company Canvas → Materials.
 
 Users can:
 
-- Build a structured, evolving portrait of their career
-- Extract achievements & KPIs from each experience
-- Craft compelling stories and narratives
-- Understand companies deeply
-- Generate strategic CVs & cover letters
-- Highlight measurable impact via tailored KPIs
-- Gain clarity and confidence through guided reflection
+- **Understand their professional identity** through structured reflection
+- **Articulate their value clearly** with compelling stories and achievements
+- **Decode company needs** and role requirements effectively
+- **Create strategic materials** (CV, cover letters, pitches) that resonate
+- **Prepare confidently** for meaningful first interviews
+- **Build narrative clarity** around their career experiences
+- **Gain confidence** through guided self-discovery
 
 ---
 
@@ -257,35 +276,19 @@ Editable and exportable.
 
 ---
 
-# 6. Technical Architecture
+## 5.8 Speech & Presentation Tools
 
-- relevance
-- confidence
-- structure
-- alignment with company pains
+Users can develop:
 
-4. AI produces improvement suggestions
-5. Generates summary report
+- Elevator pitches
+- Career stories
+- Value propositions
 
-### Later:
-
-- Voice-based simulation
-- Transcript scoring
+Based on their Personal Canvas and target opportunities.
 
 ---
 
-## 5.9 KPI Generator
-
-AI proposes KPIs grounded in:
-
-- Company pains
-- User experience
-- Industry benchmarks
-
-Example outputs:
-
-- “Increase onboarding completion rate by 20%…”
-- “Reduce deployment incidents by 30%…”
+# 6. Technical Architecture
 
 ### Security
 
@@ -293,23 +296,30 @@ Example outputs:
 - Encrypted data at rest and in transit
 - User-owned data (fully deletable)
 
+### Platform
+
+- Nuxt 4 frontend with TypeScript
+- AWS Amplify Gen2 backend
+- GraphQL API with owner-based authorization
+- AI operations via AWS Bedrock
+
 ---
 
 # 7. End-to-End User Flow
 
-1. Upload CV / import LinkedIn
-2. Experience Builder → achievements & KPIs
+1. Upload CV
+2. Experience Builder → achievements & impact
 3. Story Builder → personal narrative
 4. Personal Canvas → auto-generated
 5. Input job description
 6. Company Canvas → auto-generated
-7. Pain Mapping → impact alignment
+7. Alignment Analysis → fit assessment
 8. Generate materials:
-   - CV
-   - Cover letter
-   - KPIs
+   - Tailored CV
+   - Strategic cover letter
+   - Speech components
 
-9. Export & apply
+9. Refine & apply
 
 ---
 
@@ -321,20 +331,21 @@ Example outputs:
 - Experience Builder
 - Story Builder
 - Personal Canvas
-- Basic company modeling
-- Basic pain analysis
+- Company modeling
+- Job analysis
 - CV builder (limited templates)
 - Cover letter generator
-- KPI generator
+- Speech tools
 
 ### **Excluded (future)**
 
 - LinkedIn API
-- Competitor analysis
+- Advanced analytics
 - Revision history
 - Mobile app
 - Team/coach collaboration
 - Application tracking
+- Interview simulation
 
 ---
 
@@ -342,38 +353,38 @@ Example outputs:
 
 - **Accuracy** — Represent users truthfully
 - **Empathy** — Safe environment for expression
-- **Clarity** — Structured job search
-- **Empowerment** — Users feel capable
-- **Reflection** — Users learn about themselves
-- **Strategy** — Jobs approached with precision
-- **Personalization** — Unique output per user
+- **Clarity** — Structured approach to career communication
+- **Learning** — Users discover insights about themselves
+- **Reflection** — Continuous improvement through feedback
+- **Strategy** — Thoughtful approach to opportunities
+- **Transparency** — Clear reasoning behind all suggestions
 
 ---
 
 # 10. Strategic Moat
 
-The moat is the **User Knowledge Base**, consisting of:
+The moat is the **Personal Understanding System**, consisting of:
 
-- Stories
-- Achievements
-- KPIs
-- Reflections
-- Canvas models
+- **Stories** that reveal character and capability
+- **Achievements** that demonstrate impact
+- **Reflections** that surface patterns and strengths
+- **Value articulation** that connects skills to outcomes
+- **Company insights** that guide strategic positioning
 
-This becomes a **long-term asset** that grows with the user — and no CV builder or ATS tool offers this today.
+This becomes a **foundation for confident communication** that grows with the user — enabling authentic, compelling narratives that no generic CV builder can provide.
 
 ---
 
 # 11. Why This Product Wins
 
-Because it does what humans do best:
+Because it does what humans need most in career transitions:
 
-- Understand stories
-- Extract meaning
-- Identify relevance
-- Build narratives
-- Map strengths to opportunities
+- **Understand their own story** and value proposition
+- **Extract meaning** from complex experiences
+- **Identify relevance** to specific opportunities
+- **Build authentic narratives** that resonate with employers
+- **Prepare confidently** for meaningful conversations
 
-**But at scale, privately, instantly, with unlimited patience.**
+**But with AI-powered guidance, unlimited patience, and structured frameworks.**
 
-This product unifies reflection, analysis, and communication — the hardest parts of job searching — into one coherent system.
+This product unifies self-discovery, strategic analysis, and clear communication — the essential foundations for career success — into one coherent system focused on getting users ready for their next meaningful opportunity.

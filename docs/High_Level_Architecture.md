@@ -3,7 +3,7 @@
 **Status:** 60% Implemented (EPICs 1A, 1B, 2, 3, 3B, 5A complete)  
 **Last Updated:** 2025-12-30
 
-Your system is composed of **four major layers**, each offering functional modules:
+Your system is composed of **five major layers**, each offering functional modules:
 
 ---
 
@@ -30,6 +30,44 @@ Orchestrated LLM logic used for extraction, modeling, generation, and synthesis.
 
 Stores all structured information:
 User profile, experiences, canvases, jobs, companies, documents, interview sessions.
+
+---
+
+## 5. Observability & Quality Layer
+
+Cross-cutting concerns that enable product learning and user trust.
+
+### Responsibilities:
+
+- **Usage Signals** — Track user interaction patterns, feature adoption, and workflow completion rates
+- **Error Tracking** — Monitor system failures, AI operation errors, and user experience disruptions  
+- **AI Feedback Collection** — Capture user edits, rejections, and improvements to AI suggestions
+- **UX Friction Detection** — Identify pain points, abandonment patterns, and usability issues
+
+### Purpose:
+
+This layer provides the feedback loops necessary for continuous product improvement and maintains transparency in AI-assisted workflows.
+
+---
+
+# AI Trust Model
+
+The system is built on the principle that **AI is assistive, not authoritative**.
+
+## Core Principles:
+
+- **All AI outputs are suggestions** that serve as starting points for user refinement
+- **Every AI-generated content is fully editable** by the user
+- **User validation is always the final step** in any AI-assisted process
+- **Transparency is built-in** — users can see reasoning behind AI recommendations
+- **User feedback improves the system** — edits and rejections become valuable learning signals
+
+## Implementation:
+
+- AI suggestions appear with clear indicators (e.g., "AI-generated", "Click to edit")
+- Users can accept, modify, or completely rewrite any AI output
+- The system tracks user modifications to improve future suggestions
+- No AI output is ever considered "final" without explicit user approval
 
 ---
 
