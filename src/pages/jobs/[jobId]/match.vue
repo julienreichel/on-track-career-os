@@ -7,6 +7,9 @@ import LinkedCompanyBadge from '@/components/company/LinkedCompanyBadge.vue';
 import { useMatchingEngine } from '@/composables/useMatchingEngine';
 import { useCompanies } from '@/composables/useCompanies';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
+import type { CVDocument } from '@/domain/cvdocument/CVDocument';
+import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
+import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 import type { PageHeaderLink } from '@/types/ui';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 
@@ -29,6 +32,9 @@ if (!jobId.value) {
 const engine = useMatchingEngine(jobId.value);
 const job = engine.job ?? ref<JobDescription | null>(null);
 const summary = engine.matchingSummary ?? ref(null);
+const existingCv = ref<CVDocument | null>(null);
+const existingCoverLetter = ref<CoverLetter | null>(null);
+const existingSpeech = ref<SpeechBlock | null>(null);
 
 const hasLoadedCompanies = ref(false);
 
@@ -65,9 +71,24 @@ const hasSummary = computed(() => engine.hasSummary.value);
 const errorMessage = engine.error;
 const isGeneratingMaterials = computed(() => tailoredMaterials.isGenerating.value);
 const materialsError = computed(() => tailoredMaterials.error.value);
+const materialsLoading = computed(() => tailoredMaterials.materialsLoading.value);
+const materialsErrorCode = computed(() => tailoredMaterials.materialsError.value);
+const materialsErrorMessage = computed(() =>
+  materialsErrorCode.value ? t(`tailoredMaterials.errors.${materialsErrorCode.value}`) : null
+);
 const canGenerateMaterials = computed(() => Boolean(job.value && summary.value));
 const materialsDisabled = computed(() => !canGenerateMaterials.value || isGeneratingMaterials.value);
 const activeMaterial = ref<'cv' | 'cover-letter' | 'speech' | null>(null);
+const cvLink = computed(() => (existingCv.value?.id ? `/cv/${existingCv.value.id}` : null));
+const coverLetterLink = computed(() =>
+  existingCoverLetter.value?.id ? `/cover-letters/${existingCoverLetter.value.id}` : null
+);
+const speechLink = computed(() =>
+  existingSpeech.value?.id ? `/speech/${existingSpeech.value.id}` : null
+);
+const hasExistingMaterials = computed(
+  () => Boolean(cvLink.value || coverLetterLink.value || speechLink.value)
+);
 
 function parseScoreBreakdown(scoreBreakdown: unknown) {
   if (!scoreBreakdown) {
@@ -134,6 +155,25 @@ const handleGenerate = async () => {
   }
 };
 
+async function loadExistingMaterials() {
+  const id = jobId.value;
+  if (!id) {
+    return;
+  }
+
+  const result = await tailoredMaterials.loadExistingMaterialsForJob(id);
+  if (result.ok) {
+    existingCv.value = result.data.cv;
+    existingCoverLetter.value = result.data.coverLetter;
+    existingSpeech.value = result.data.speechBlock;
+    return;
+  }
+
+  existingCv.value = null;
+  existingCoverLetter.value = null;
+  existingSpeech.value = null;
+}
+
 async function handleGenerateCv() {
   if (!job.value || !summary.value) {
     return;
@@ -197,6 +237,7 @@ onMounted(async () => {
   } catch (error) {
     console.error('[matching] Failed to load matching data', error);
   }
+  await loadExistingMaterials();
 });
 
 function formatDate(value?: string | null) {
@@ -310,9 +351,11 @@ function formatDate(value?: string | null) {
           <UCard class="mt-6">
             <template #header>
               <div>
-                <h3 class="text-lg font-semibold">Application materials</h3>
+                <h3 class="text-lg font-semibold">
+                  {{ t('tailoredMaterials.materials.title') }}
+                </h3>
                 <p class="text-sm text-gray-500">
-                  Generate tailored documents using this matching summary.
+                  {{ t('tailoredMaterials.materials.matchDescription') }}
                 </p>
               </div>
             </template>
@@ -323,37 +366,79 @@ function formatDate(value?: string | null) {
                 icon="i-heroicons-exclamation-triangle"
                 color="warning"
                 variant="soft"
-                title="Unable to generate materials"
+                :title="t('tailoredMaterials.materials.generateErrorTitle')"
                 :description="materialsError"
               />
 
-              <p v-else-if="!hasSummary" class="text-sm text-gray-600 dark:text-gray-400">
-                Generate a matching summary first to unlock tailored materials.
+              <UAlert
+                v-else-if="materialsErrorMessage"
+                icon="i-heroicons-exclamation-triangle"
+                color="warning"
+                variant="soft"
+                :title="t('tailoredMaterials.materials.loadErrorTitle')"
+                :description="materialsErrorMessage"
+              />
+
+              <p
+                v-else-if="!hasSummary && !hasExistingMaterials"
+                class="text-sm text-gray-600 dark:text-gray-400"
+              >
+                {{ t('tailoredMaterials.materials.missingSummaryHint') }}
               </p>
+
+              <USkeleton v-else-if="materialsLoading" class="h-10 w-full" />
 
               <div class="grid gap-3 sm:grid-cols-3">
                 <UButton
-                  color="primary"
+                  v-if="cvLink"
+                  color="neutral"
+                  variant="outline"
                   icon="i-heroicons-document-text"
-                  label="Generate tailored CV"
+                  :label="t('tailoredMaterials.materials.viewCv')"
+                  :to="cvLink"
+                />
+                <UButton
+                  v-else
+                  color="neutral"
+                  variant="outline"
+                  icon="i-heroicons-document-text"
+                  :label="t('tailoredMaterials.materials.generateCv')"
                   :loading="isGeneratingMaterials && activeMaterial === 'cv'"
                   :disabled="materialsDisabled"
                   @click="handleGenerateCv"
                 />
                 <UButton
-                  color="primary"
+                  v-if="coverLetterLink"
+                  color="neutral"
                   variant="outline"
                   icon="i-heroicons-envelope"
-                  label="Generate cover letter"
+                  :label="t('tailoredMaterials.materials.viewCoverLetter')"
+                  :to="coverLetterLink"
+                />
+                <UButton
+                  v-else
+                  color="neutral"
+                  variant="outline"
+                  icon="i-heroicons-envelope"
+                  :label="t('tailoredMaterials.materials.generateCoverLetter')"
                   :loading="isGeneratingMaterials && activeMaterial === 'cover-letter'"
                   :disabled="materialsDisabled"
                   @click="handleGenerateCoverLetter"
                 />
                 <UButton
-                  color="primary"
+                  v-if="speechLink"
+                  color="neutral"
                   variant="outline"
                   icon="i-heroicons-microphone"
-                  label="Generate speech"
+                  :label="t('tailoredMaterials.materials.viewSpeech')"
+                  :to="speechLink"
+                />
+                <UButton
+                  v-else
+                  color="neutral"
+                  variant="outline"
+                  icon="i-heroicons-microphone"
+                  :label="t('tailoredMaterials.materials.generateSpeech')"
                   :loading="isGeneratingMaterials && activeMaterial === 'speech'"
                   :disabled="materialsDisabled"
                   @click="handleGenerateSpeech"

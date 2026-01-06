@@ -84,6 +84,18 @@ type TailoringContextResult =
   | { ok: true; job: JobDescription; matchingSummary: MatchingSummary | null }
   | { ok: false; error: TailoringContextError | null };
 
+type MaterialsError = 'unauthenticated' | 'loadMaterialsFailed';
+
+type ExistingMaterials = {
+  cv: CVDocument | null;
+  coverLetter: CoverLetter | null;
+  speechBlock: SpeechBlock | null;
+};
+
+type ExistingMaterialsResult =
+  | { ok: true; data: ExistingMaterials }
+  | { ok: false; error: MaterialsError | null };
+
 export function useTailoredMaterials(options: UseTailoredMaterialsOptions = {}) {
   const deps = createDependencies(options.dependencies);
   const auth = options.auth ?? useAuthUser();
@@ -91,6 +103,8 @@ export function useTailoredMaterials(options: UseTailoredMaterialsOptions = {}) 
   const error = ref<string | null>(null);
   const contextLoading = ref(false);
   const contextError = ref<TailoringContextError | null>(null);
+  const materialsLoading = ref(false);
+  const materialsError = ref<MaterialsError | null>(null);
 
   const resolveUserId = createUserResolver({
     providedUserId: options.userId ?? null,
@@ -107,6 +121,13 @@ export function useTailoredMaterials(options: UseTailoredMaterialsOptions = {}) 
     contextError,
   });
 
+  const loadExistingMaterialsForJob = createExistingMaterialsLoader({
+    deps,
+    resolveUserId,
+    materialsLoading,
+    materialsError,
+  });
+
   const generators = createTailoredGenerators({
     deps,
     resolveUserId,
@@ -119,6 +140,9 @@ export function useTailoredMaterials(options: UseTailoredMaterialsOptions = {}) 
     contextLoading,
     contextError,
     loadTailoringContext,
+    materialsLoading,
+    materialsError,
+    loadExistingMaterialsForJob,
     ...generators,
   };
 }
@@ -155,6 +179,13 @@ type TailoringContextLoaderArgs = {
   auth: AuthComposable;
   contextLoading: Ref<boolean>;
   contextError: Ref<TailoringContextError | null>;
+};
+
+type ExistingMaterialsLoaderArgs = {
+  deps: TailoredMaterialsDependencies;
+  resolveUserId: () => Promise<string>;
+  materialsLoading: Ref<boolean>;
+  materialsError: Ref<MaterialsError | null>;
 };
 
 function createTailoringContextLoader({
@@ -210,6 +241,59 @@ function createTailoringContextLoader({
       return { ok: false, error: contextError.value };
     } finally {
       contextLoading.value = false;
+    }
+  };
+}
+
+function createExistingMaterialsLoader({
+  deps,
+  resolveUserId,
+  materialsLoading,
+  materialsError,
+}: ExistingMaterialsLoaderArgs) {
+  return async (jobId?: string | null): Promise<ExistingMaterialsResult> => {
+    if (!jobId) {
+      materialsError.value = null;
+      return {
+        ok: false,
+        error: null,
+      };
+    }
+
+    materialsLoading.value = true;
+    materialsError.value = null;
+
+    try {
+      const userId = await resolveUserId();
+      const [cvDocs, coverLetters, speechBlocks] = await Promise.all([
+        deps.cvRepository.list({
+          filter: { jobId: { eq: jobId }, userId: { eq: userId } },
+        }),
+        deps.coverLetterService.listCoverLetters({
+          filter: { jobId: { eq: jobId }, userId: { eq: userId } },
+        }),
+        deps.speechBlockService.listSpeechBlocks({
+          filter: { jobId: { eq: jobId }, userId: { eq: userId } },
+        }),
+      ]);
+
+      return {
+        ok: true,
+        data: {
+          cv: selectLatest(cvDocs),
+          coverLetter: selectLatest(coverLetters),
+          speechBlock: selectLatest(speechBlocks),
+        },
+      };
+    } catch (err) {
+      console.error('[useTailoredMaterials] Failed to load existing materials', err);
+      materialsError.value =
+        err instanceof Error && err.message === 'User not authenticated'
+          ? 'unauthenticated'
+          : 'loadMaterialsFailed';
+      return { ok: false, error: materialsError.value };
+    } finally {
+      materialsLoading.value = false;
     }
   };
 }
@@ -297,6 +381,33 @@ function createStateRunner(errorRef: Ref<string | null>, loadingRef: Ref<boolean
       loadingRef.value = false;
     }
   };
+}
+
+function selectLatest<T extends { updatedAt?: string | null; createdAt?: string | null }>(
+  items?: T[] | null
+): T | null {
+  if (!items?.length) {
+    return null;
+  }
+
+  return items.reduce((latest, item) => {
+    if (!latest) return item;
+    return getTimestamp(item) > getTimestamp(latest) ? item : latest;
+  }, items[0] ?? null);
+}
+
+function getTimestamp(item: { updatedAt?: string | null; createdAt?: string | null }) {
+  const updated = item.updatedAt ? Date.parse(item.updatedAt) : Number.NaN;
+  if (!Number.isNaN(updated)) {
+    return updated;
+  }
+
+  const created = item.createdAt ? Date.parse(item.createdAt) : Number.NaN;
+  if (!Number.isNaN(created)) {
+    return created;
+  }
+
+  return 0;
 }
 
 function createGenerateTailoredCvForJob(

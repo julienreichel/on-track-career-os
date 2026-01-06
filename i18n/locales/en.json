@@ -922,7 +922,24 @@
     "errors": {
       "unauthenticated": "User not authenticated",
       "jobNotFound": "Job not found",
-      "loadContextFailed": "Failed to load tailored context"
+      "loadContextFailed": "Failed to load tailored context",
+      "loadMaterialsFailed": "Failed to load existing materials"
+    },
+    "materials": {
+      "title": "Application materials",
+      "description": "Generate tailored documents using the matching summary.",
+      "matchDescription": "Generate tailored documents using this matching summary.",
+      "missingSummaryHint": "Generate a matching summary first to unlock tailored materials.",
+      "generateMatch": "Generate match",
+      "generateCv": "Generate tailored CV",
+      "generateCoverLetter": "Generate cover letter",
+      "generateSpeech": "Generate speech",
+      "viewCv": "View CV",
+      "viewCoverLetter": "View cover letter",
+      "viewSpeech": "View speech",
+      "summaryErrorTitle": "Unable to load matching summary",
+      "generateErrorTitle": "Unable to generate materials",
+      "loadErrorTitle": "Unable to load materials"
     }
   },
   "cvBlock": {

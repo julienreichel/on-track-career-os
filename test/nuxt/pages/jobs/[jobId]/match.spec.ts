@@ -62,6 +62,12 @@ vi.mock('@/composables/useCompanies', () => ({
 const tailoredMaterialsMock = {
   isGenerating: ref(false),
   error: ref<string | null>(null),
+  materialsLoading: ref(false),
+  materialsError: ref<null | string>(null),
+  loadExistingMaterialsForJob: vi.fn().mockResolvedValue({
+    ok: true,
+    data: { cv: null, coverLetter: null, speechBlock: null },
+  }),
   generateTailoredCvForJob: vi.fn(),
   generateTailoredCoverLetterForJob: vi.fn(),
   generateTailoredSpeechForJob: vi.fn(),
