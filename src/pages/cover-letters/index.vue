@@ -19,6 +19,15 @@
       />
 
       <UPageBody>
+        <div v-if="!loading && items.length > 0" class="mb-6">
+          <UInput
+            v-model="searchQuery"
+            icon="i-heroicons-magnifying-glass"
+            :placeholder="t('coverLetter.list.search.placeholder')"
+            size="lg"
+          />
+        </div>
+
         <UAlert
           v-if="error"
           color="error"
@@ -47,9 +56,18 @@
           </template>
         </UEmpty>
 
+        <UCard v-else-if="filteredItems.length === 0">
+          <UEmpty
+            :title="t('coverLetter.list.search.noResults')"
+            icon="i-heroicons-magnifying-glass"
+          >
+            <p class="text-sm text-gray-500">{{ t('coverLetter.list.search.placeholder') }}</p>
+          </UEmpty>
+        </UCard>
+
         <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <ItemCard
-            v-for="letter in sortedItems"
+            v-for="letter in filteredItems"
             :key="letter.id"
             :title="resolveTitle(letter)"
             :subtitle="resolveSubtitle(letter)"
@@ -116,6 +134,7 @@ const { items, loading, error, loadAll, deleteCoverLetter } = useCoverLetters();
 const deleteModalOpen = ref(false);
 const letterToDelete = ref<CoverLetter | null>(null);
 const deleting = ref(false);
+const searchQuery = ref('');
 const TITLE_MAX_LENGTH = 72;
 const PREVIEW_MAX_LENGTH = 140;
 const toTimestamp = (value?: string | null): number => {
@@ -131,6 +150,16 @@ const sortedItems = computed(() =>
     return bTime - aTime;
   })
 );
+
+const filteredItems = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) return sortedItems.value;
+
+  return sortedItems.value.filter((letter) => {
+    const fields = [letter.name, letter.content];
+    return fields.some((field) => field?.toLowerCase().includes(query));
+  });
+});
 
 onMounted(async () => {
   await loadUserId();

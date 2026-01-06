@@ -51,6 +51,17 @@ const stubs = {
   UPageBody: { template: '<div class="u-page-body"><slot /></div>' },
   UAlert: { template: '<div class="u-alert"></div>' },
   UEmpty: { template: '<div class="u-empty"></div>' },
+  UInput: {
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    template: `
+      <input
+        class="u-input"
+        :value="modelValue"
+        @input="$emit('update:modelValue', $event.target.value)"
+      />
+    `,
+  },
   UButton: { template: '<button type="button"></button>' },
   UIcon: { template: '<span class="u-icon"></span>' },
   ItemCard: {
@@ -101,5 +112,32 @@ describe('CV list page', () => {
     expect(cards).toHaveLength(2);
     expect(cards[0]?.text()).toContain('Newer CV');
     expect(cards[1]?.text()).toContain('Older CV');
+  });
+
+  it('filters CVs by search query', async () => {
+    itemsRef.value = [
+      {
+        id: 'cv-match',
+        name: 'Targeted CV',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+        content: 'Targeted content',
+      },
+      {
+        id: 'cv-other',
+        name: 'Other CV',
+        createdAt: '2024-01-02T00:00:00.000Z',
+        updatedAt: '2024-01-02T00:00:00.000Z',
+        content: 'Other content',
+      },
+    ];
+
+    const wrapper = await mountPage();
+    await wrapper.find('.u-input').setValue('Targeted');
+    await wrapper.vm.$nextTick();
+
+    const cards = wrapper.findAll('.item-card');
+    expect(cards).toHaveLength(1);
+    expect(cards[0]?.text()).toContain('Targeted CV');
   });
 });

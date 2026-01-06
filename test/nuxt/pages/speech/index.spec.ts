@@ -85,6 +85,17 @@ const stubs = {
     props: ['title', 'description'],
     template: '<div class="u-empty">{{ title }}<slot name="actions" /></div>',
   },
+  UInput: {
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    template: `
+      <input
+        class="u-input"
+        :value="modelValue"
+        @input="$emit('update:modelValue', $event.target.value)"
+      />
+    `,
+  },
   UButton: {
     props: ['label'],
     emits: ['click'],
@@ -166,5 +177,38 @@ describe('Speech list page', () => {
     expect(cards).toHaveLength(2);
     expect(cards[0]?.text()).toContain('Newer pitch');
     expect(cards[1]?.text()).toContain('Older pitch');
+  });
+
+  it('filters speech blocks by search query', async () => {
+    itemsRef.value = [
+      {
+        id: 'speech-match',
+        userId: 'user-1',
+        elevatorPitch: 'Targeted pitch',
+        careerStory: '',
+        whyMe: '',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      },
+      {
+        id: 'speech-other',
+        userId: 'user-1',
+        elevatorPitch: 'Other pitch',
+        careerStory: '',
+        whyMe: '',
+        createdAt: '2024-01-02T00:00:00.000Z',
+        updatedAt: '2024-01-02T00:00:00.000Z',
+      },
+    ];
+
+    const wrapper = await mountPage();
+    await wrapper.vm.$nextTick();
+
+    await wrapper.find('.u-input').setValue('Targeted');
+    await wrapper.vm.$nextTick();
+
+    const cards = wrapper.findAll('.item-card');
+    expect(cards).toHaveLength(1);
+    expect(cards[0]?.text()).toContain('Targeted pitch');
   });
 });

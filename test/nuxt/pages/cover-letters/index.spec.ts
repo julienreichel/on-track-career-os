@@ -89,6 +89,17 @@ const stubs = {
     props: ['title', 'description'],
     template: '<div class="u-empty">{{ title }}<slot name="actions" /></div>',
   },
+  UInput: {
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    template: `
+      <input
+        class="u-input"
+        :value="modelValue"
+        @input="$emit('update:modelValue', $event.target.value)"
+      />
+    `,
+  },
   UButton: {
     props: ['label'],
     emits: ['click'],
@@ -199,6 +210,37 @@ describe('Cover letter list page', () => {
     expect(itemCards).toHaveLength(2);
     expect(itemCards[0]?.text()).toContain('Newer Cover Letter');
     expect(itemCards[1]?.text()).toContain('Older Cover Letter');
+  });
+
+  it('filters cover letters by search query', async () => {
+    itemsRef.value = [
+      {
+        id: 'cl-match',
+        userId: 'user-1',
+        name: 'Targeted Letter',
+        content: 'Targeted content',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      },
+      {
+        id: 'cl-other',
+        userId: 'user-1',
+        name: 'Other Letter',
+        content: 'Other content',
+        createdAt: '2024-01-02T00:00:00.000Z',
+        updatedAt: '2024-01-02T00:00:00.000Z',
+      },
+    ];
+
+    const wrapper = await mountPage();
+    await wrapper.vm.$nextTick();
+
+    await wrapper.find('.u-input').setValue('Targeted');
+    await wrapper.vm.$nextTick();
+
+    const itemCards = wrapper.findAll('.item-card');
+    expect(itemCards).toHaveLength(1);
+    expect(itemCards[0]?.text()).toContain('Targeted Letter');
   });
 
   it('creates a new cover letter when create button is clicked', async () => {

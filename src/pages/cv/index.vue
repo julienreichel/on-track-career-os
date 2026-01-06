@@ -18,11 +18,20 @@
         ]"
       />
 
-      <UPageBody>
-        <!-- Error Alert -->
-        <UAlert
-          v-if="error"
-          color="error"
+    <UPageBody>
+        <div v-if="!loading && items.length > 0" class="mb-6">
+          <UInput
+            v-model="searchQuery"
+            icon="i-heroicons-magnifying-glass"
+            :placeholder="t('cvList.search.placeholder')"
+            size="lg"
+          />
+        </div>
+
+      <!-- Error Alert -->
+      <UAlert
+        v-if="error"
+        color="error"
           icon="i-heroicons-exclamation-triangle"
           :title="$t('common.error')"
           :description="error"
@@ -49,9 +58,15 @@
         </UEmpty>
 
         <!-- CV List -->
+        <UCard v-else-if="filteredItems.length === 0">
+          <UEmpty :title="$t('cvList.search.noResults')" icon="i-heroicons-magnifying-glass">
+            <p class="text-sm text-gray-500">{{ $t('cvList.search.placeholder') }}</p>
+          </UEmpty>
+        </UCard>
+
         <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <ItemCard
-            v-for="cv in sortedItems"
+            v-for="cv in filteredItems"
             :key="cv.id"
             :title="cv.name || $t('cvList.untitled')"
             @edit="navigateTo({ name: 'cv-id', params: { id: cv.id } })"
@@ -116,6 +131,7 @@ const { t } = useI18n();
 const toast = useToast();
 
 const { items, loading, error, loadAll, deleteDocument } = useCvDocuments();
+const searchQuery = ref('');
 
 const deleteModalOpen = ref(false);
 const cvToDelete = ref<CVDocument | null>(null);
@@ -134,6 +150,16 @@ const sortedItems = computed(() =>
     return bTime - aTime;
   })
 );
+
+const filteredItems = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) return sortedItems.value;
+
+  return sortedItems.value.filter((cv) => {
+    const fields = [cv.name, cv.content];
+    return fields.some((field) => field?.toLowerCase().includes(query));
+  });
+});
 
 onMounted(() => {
   loadAll();

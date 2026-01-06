@@ -767,6 +767,10 @@
   "cvList": {
     "title": "My CVs",
     "subtitle": "Manage your CV documents and create new ones",
+    "search": {
+      "placeholder": "Search CVs...",
+      "noResults": "No CVs match your search."
+    },
     "untitled": "Untitled CV",
     "tailored": "Tailored for job",
     "updated": "Updated",
@@ -1216,6 +1220,10 @@
     "list": {
       "title": "Cover Letters",
       "subtitle": "Create professional cover letters tailored to your profile and experiences.",
+      "search": {
+        "placeholder": "Search cover letters...",
+        "noResults": "No cover letters match your search."
+      },
       "actions": {
         "create": "Create cover letter"
       },
@@ -1343,6 +1351,10 @@
     "list": {
       "title": "Speech",
       "subtitle": "Draft concise narratives for introductions and interviews.",
+      "search": {
+        "placeholder": "Search speech blocks...",
+        "noResults": "No speech blocks match your search."
+      },
       "actions": {
         "create": "Create speech"
       },

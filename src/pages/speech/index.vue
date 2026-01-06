@@ -20,6 +20,15 @@
       />
 
       <UPageBody>
+        <div v-if="!loading && items.length > 0" class="mb-6">
+          <UInput
+            v-model="searchQuery"
+            icon="i-heroicons-magnifying-glass"
+            :placeholder="t('speech.list.search.placeholder')"
+            size="lg"
+          />
+        </div>
+
         <UAlert
           v-if="error"
           color="error"
@@ -48,9 +57,15 @@
           </template>
         </UEmpty>
 
+        <UCard v-else-if="filteredItems.length === 0">
+          <UEmpty :title="t('speech.list.search.noResults')" icon="i-heroicons-magnifying-glass">
+            <p class="text-sm text-gray-500">{{ t('speech.list.search.placeholder') }}</p>
+          </UEmpty>
+        </UCard>
+
         <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <ItemCard
-            v-for="block in sortedItems"
+            v-for="block in filteredItems"
             :key="block.id"
             :title="resolveTitle(block)"
             :subtitle="formatUpdatedAt(block.updatedAt)"
@@ -100,6 +115,7 @@ const deleteModalOpen = ref(false);
 const speechToDelete = ref<SpeechBlock | null>(null);
 const deleting = ref(false);
 const creating = ref(false);
+const searchQuery = ref('');
 const TITLE_MAX_LENGTH = 72;
 const PREVIEW_MAX_LENGTH = 140;
 const toTimestamp = (value?: string | null): number => {
@@ -115,6 +131,16 @@ const sortedItems = computed(() =>
     return bTime - aTime;
   })
 );
+
+const filteredItems = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) return sortedItems.value;
+
+  return sortedItems.value.filter((block) => {
+    const fields = [block.elevatorPitch, block.careerStory, block.whyMe];
+    return fields.some((field) => field?.toLowerCase().includes(query));
+  });
+});
 
 onMounted(async () => {
   await loadUserId();
