@@ -258,17 +258,18 @@ _(EPIC 3 + EPIC 6)_
 
 **Attributes:**
 
-- cvId
-- name
-- templateId
-- isTailored (boolean)
-- contentJSON (block-structured document)
+- id
+- name (optional)
+- templateId (optional)
+- isTailored (boolean, optional)
+- content (string)
+- showProfilePhoto (boolean)
+- jobId (optional)
 
 **Relationships:**
 
-- 1 CVDocument → \* ExperienceBlocks (references)
-- 1 UserProfile → \* CVDocuments
-- 1 JobDescription → 1 CVDocument (optional per job)
+- 1 CVDocument → 1 UserProfile
+- 1 CVDocument → 1 JobDescription (optional)
 
 ---
 
@@ -279,20 +280,15 @@ _(EPIC 4B - ✅ Implemented)_
 **Attributes:**
 
 - id
-- name (title/identifier)
-- content (Markdown-formatted letter)
-- jobId (optional, for targeting)
-- generatedAt
-- needsUpdate (boolean)
-- status
-- userId (owner)
-- createdAt
-- updatedAt
+- name (optional title/identifier)
+- tone (optional)
+- content (string)
+- jobId (optional)
 
 **Relationships:**
 
-- 1 CoverLetter → 1 UserProfile (belongsTo)
-- 1 CoverLetter → 1 JobDescription (optional, belongsTo)
+- 1 CoverLetter → 1 UserProfile
+- 1 CoverLetter → 1 JobDescription (optional)
 
 ---
 
@@ -302,7 +298,8 @@ _(EPIC 4)_
 
 **Attributes:**
 
-- speechId
+- id
+- name (optional)
 - elevatorPitch
 - careerStory
 - whyMe

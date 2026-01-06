@@ -237,36 +237,17 @@ The project has established a **strong backend and domain foundation** with comp
 
 ---
 
-#### ❌ EPIC 4: User Speech Builder (5% Complete)
-
-**Status:** Data model exists, no implementation
-
-**Implemented:**
-
-- ✅ SpeechBlock GraphQL model
-
-**Missing:**
-
-- ❌ `ai.generateSpeech` operation
-- ❌ Speech repository/service/composable
-- ❌ Speech editor page
-- ❌ Elevator pitch UI
-- ❌ Career story UI
-- ❌ "Why me?" statement UI
-
----
-
 #### ✅ EPIC 4: User Speech Builder (100% Complete)
 
 **Status:** ✅ **FULLY IMPLEMENTED** — End-to-end speech generation and editing workflow complete
 
 **Implemented:**
 
-- ✅ SpeechBlock GraphQL model with three sections:
-  - `elevatorPitch` (object with text and keyMessages[])
-  - `careerStory` (object with text and keyMessages[])
-  - `whyMe` (object with text and keyMessages[])
-  - Optional `jobId` for targeting strategy
+- ✅ SpeechBlock GraphQL model with three required fields:
+  - `elevatorPitch` (string)
+  - `careerStory` (string)
+  - `whyMe` (string)
+  - Optional `name` and `jobId` for organization/targeting
 - ✅ `ai.generateSpeech` Lambda (135 lines) + comprehensive tests
   - Generates all three speech sections from user profile
   - Optional job-targeted strategy when jobId provided
@@ -329,11 +310,11 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Implemented:**
 
-- ✅ CoverLetter GraphQL model with structured content:
-  - `name` - letter title/identifier
-  - `content` - full Markdown-formatted letter
+- ✅ CoverLetter GraphQL model:
+  - `name` - optional title/identifier
+  - `tone` - optional tone
+  - `content` - letter body (string)
   - `jobId` - optional job targeting
-  - `generatedAt`, `needsUpdate`, status tracking
 - ✅ `ai.generateCoverLetter` Lambda (98 lines) + comprehensive tests
   - Generates professional cover letter from user profile
   - Integrates experiences, stories, and personal canvas
@@ -699,63 +680,93 @@ The project has established a **strong backend and domain foundation** with comp
 
 ## 📦 Domain Models Status
 
-### Implemented Models (10/16 MVP Required)
+### Implemented Models (11/11 MVP Required)
 
-| Domain              | Models          | Repository | Service | Composable | Tests            |
-| ------------------- | --------------- | ---------- | ------- | ---------- | ---------------- |
-| **User Identity**   | UserProfile     | ✅         | ✅      | ✅         | ✅               |
-| **Experience**      | Experience      | ✅         | ✅      | ✅         | ✅               |
-| **STAR Story**      | STARStory       | ✅         | ✅      | ✅         | ✅               |
-| **Personal Canvas** | PersonalCanvas  | ✅         | ✅      | ✅         | 40 tests         |
-| **CV Document**     | CVDocument      | ✅         | ✅      | ✅         | 44 tests         |
-| **JobDescription**  | JobDescription  | ✅         | ✅      | ✅         | 25+ tests        |
-| **Company**         | Company         | ✅         | ✅      | ✅         | 50+ tests        |
-| **CompanyCanvas**   | CompanyCanvas   | ✅         | ✅      | ✅         | 50+ tests        |
-| **MatchingSummary** | MatchingSummary | ✅         | ✅      | ✅         | 6 tests          |
-| **AI Operations**   | (Lambdas)       | ✅         | ✅      | ✅         | 44 Amplify tests |
+| Domain              | Models          | Repository | Service | Composable | Tests     |
+| ------------------- | --------------- | ---------- | ------- | ---------- | --------- |
+| **User Identity**   | UserProfile     | ✅         | ✅      | ✅         | ✅        |
+| **Personal Canvas** | PersonalCanvas  | ✅         | ✅      | ✅         | 40 tests  |
+| **Experience**      | Experience      | ✅         | ✅      | ✅         | ✅        |
+| **STAR Story**      | STARStory       | ✅         | ✅      | ✅         | ✅        |
+| **JobDescription**  | JobDescription  | ✅         | ✅      | ✅         | 25+ tests |
+| **Company**         | Company         | ✅         | ✅      | ✅         | 50+ tests |
+| **CompanyCanvas**   | CompanyCanvas   | ✅         | ✅      | ✅         | 50+ tests |
+| **MatchingSummary** | MatchingSummary | ✅         | ✅      | ✅         | 6 tests   |
+| **CV Document**     | CVDocument      | ✅         | ✅      | ✅         | 44 tests  |
+| **Cover Letter**    | CoverLetter     | ✅         | ✅      | ✅         | ✅        |
+| **Speech Block**    | SpeechBlock     | ✅         | ✅      | ✅         | ✅        |
 
-### Missing Domain Layers (4 models exist in schema but no domain layer)
+### Missing Domain Layers
 
-- ❌ CoverLetter
-- ❌ SpeechBlock
+- None (all schema models have domain layers)
 
-**Note:** All 14 GraphQL models exist in `amplify/data/resource.ts` with proper relationships and authorization. The gap is in creating domain/repository/service/composable layers for the missing models.
+**Note:** All 11 GraphQL models in `amplify/data/resource.ts` have repository/service/composable layers.
 
 ---
 
-## 🎨 Frontend Status (50% Complete)
+## 🎨 Frontend Status (80% Complete)
 
-### Implemented Pages (21+)
+### Implemented Pages (29)
 
 **Auth & Home:**
 
 - ✅ `/login` — Login/signup page
-- ✅ `/` — Index page (placeholder)
+- ✅ `/` — Home dashboard
 
-**Profile & Identity (7 pages):**
+**Profile & Identity (9 pages):**
 
-- ✅ `/profile` — View/edit user profile (all fields)
+- ✅ `/profile` — View/edit user profile
+- ✅ `/profile/full` — Full profile form
 - ✅ `/profile/cv-upload` — Upload CV and AI extraction
 - ✅ `/profile/experiences` — List experiences with story counts
-- ✅ `/profile/experiences/new` — Add new experience
-- ✅ `/profile/experiences/:id` — Edit experience
-- ✅ `/profile/experiences/:id/stories` — Stories for experience
-- ✅ `/profile/experiences/:id/stories/new` — Create STAR story (3 modes)
-- ✅ `/profile/experiences/:id/stories/:storyId` — Edit STAR story
+- ✅ `/profile/experiences/[id]` — Edit experience (legacy route)
+- ✅ `/profile/experiences/[experienceId]` — Edit experience
+- ✅ `/profile/experiences/[experienceId]/stories` — Stories for experience
+- ✅ `/profile/experiences/[experienceId]/stories/[storyId]` — Edit STAR story
+- ✅ `/profile/stories` — Global story library
 
 **Personal Canvas (1 page):**
 
 - ✅ `/profile/canvas` — Business Model Canvas with per-section editing
 
-**Stories (1 page):**
+**CV Generator (4 pages):**
 
-- ✅ `/profile/stories` — Global story library
+- ✅ `/cv` — List CVs
+- ✅ `/cv/new` — Create new CV
+- ✅ `/cv/:id` — Edit/view CV
+- ✅ `/cv/:id/print` — Print CV
 
-### Components (20)
+**Jobs (4 pages):**
+
+- ✅ `/jobs` — List jobs with search
+- ✅ `/jobs/new` — Upload job description (PDF/TXT)
+- ✅ `/jobs/[jobId]` — View/edit job with tabbed sections + company linking
+- ✅ `/jobs/[jobId]/match` — Matching summary
+
+**Companies (3 pages):**
+
+- ✅ `/companies` — List companies with search
+- ✅ `/companies/new` — Create company with optional AI analysis
+- ✅ `/companies/[companyId]` — View/edit company info, BMC canvas, and linked jobs
+
+**Speech Builder (2 pages):**
+
+- ✅ `/speech` — List speech blocks
+- ✅ `/speech/:id` — Edit speech block
+
+**Cover Letters (4 pages):**
+
+- ✅ `/cover-letters` — List cover letters
+- ✅ `/cover-letters/new` — Create cover letter
+- ✅ `/cover-letters/:id` — Edit cover letter
+- ✅ `/cover-letters/:id/print` — Print cover letter
+
+### Components (24+)
 
 - ✅ PersonalCanvasComponent — Full canvas with 9 sections
 - ✅ CanvasSectionCard — Tag-based section editor
 - ✅ ExperienceList — Experience list with actions
+- ✅ ExperienceCard — Experience display card
 - ✅ ExperienceForm — Experience CRUD form
 - ✅ StoryBuilder — Guided STAR interview (3 modes)
 - ✅ StoryForm — Manual STAR story entry
@@ -773,48 +784,20 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ CompanyNotesInput — Research notes textarea
 - ✅ CompanySelector — Dropdown for job-company linking
 - ✅ LinkedCompanyBadge — Display linked company with navigation
+- ✅ ItemCard — Reusable card pattern
+- ✅ ConfirmModal — Confirmation modal
+- ✅ UnsavedChangesModal — Unsaved changes prompt
+- ✅ SpeechBlockEditorCard — Speech editor layout
+- ✅ SpeechSectionEditor — Speech section textarea
+- ✅ SpeechGenerateButton — Speech generation action
 
-### Remaining Pages (Estimated 5+ pages for MVP)
+### Remaining Pages (Planned / Not Implemented)
 
-**Profile & Identity (0 remaining - all complete):**
-
-**Personal Canvas (0 remaining - all complete):**
-
-**Stories (0 remaining - all complete):**
-
-**CV Generator (3 pages):**
-
-- ✅ `/cv` — List CVs
-- ✅ `/cv/new` — Create new CV
-- ✅ `/cv/:id` — Edit/view CV + `/cv/:id/print`
-
-**Jobs (3 pages):**
-
-- ✅ `/jobs` — List jobs with search
-- ✅ `/jobs/new` — Upload job description (PDF/TXT)
-- ✅ `/jobs/[jobId]` — View/edit job with tabbed sections + company linking
-
-**Companies (3 pages):**
-
-- ✅ `/companies` — List companies with search
-- ✅ `/companies/new` — Create company with optional AI analysis
-- ✅ `/companies/[companyId]` — View/edit company info, BMC canvas, and linked jobs
-
-**Speech Builder (2 pages):**
-
-- `/speech` — List speech blocks
-- `/speech/[id]` — Edit speech block
-
-**Matching (0 remaining - complete):**
-
-- ✅ `/jobs/:jobId/match` — View matching summary
-
-**Application Materials (3 pages):**
-
-- `/applications/:jobId/cv` — Tailored CV
-- `/cover-letters` — Cover letter list
-- `/cover-letters/:id` — Cover letter editor
-- `/applications/:jobId/kpis` — KPI set
+- ❌ `/applications/:jobId/cv` — Tailored CV
+- ❌ `/applications/:jobId/kpis` — KPI set
+- ❌ `/interviews/:jobId/prep` — Interview prep
+- ❌ `/interviews/:jobId/simulate` — Interview simulator
+- ❌ `/settings` — Settings
 
 ---
 
@@ -854,7 +837,7 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ All tests use realistic mock data
 - ✅ Error cases covered
 - ✅ E2E workflows tested with Playwright
-- ❌ E2E sandbox tests skipped (intentional)
+- ✅ E2E sandbox tests (run in CI; can be run locally anytime)
 
 ---
 
@@ -876,18 +859,19 @@ The project has established a **strong backend and domain foundation** with comp
 
 ### ⚠️ Gaps
 
-1. **AI Operations:** 9 of 17 missing (53% gap)
-2. **Domain Layers:** 7 models need repository/service/composable layers
-3. **Frontend Pages:** ~12 pages remaining for complete MVP
-4. **i18n Coverage:** Translations exist for implemented features, but incomplete for remaining EPICs
-5. **Error Handling UI:** Limited user-facing error feedback components
+1. **AI Operations:** Remaining ops for tailored application materials (EPIC 6)
+2. **Frontend Pages:** Tailored CV (`/applications/:jobId/cv`) and KPI set (`/applications/:jobId/kpis`) not implemented
+3. **Interview Prep:** `/interviews/:jobId/prep` and `/interviews/:jobId/simulate` not implemented
+4. **Settings:** `/settings` not implemented
+5. **i18n Coverage:** Missing translations for future EPICs (interviews, settings, tailored materials)
+6. **Error Handling UI:** Limited user-facing error states for AI failures beyond alerts
 
 ### 🔄 Technical Debt
 
 **Low Priority:**
 
-- E2E sandbox tests intentionally skipped
-- Some unit test coverage gaps (covered by integration tests)
+- Page-level duplication (see Component/Page Mapping refactoring plan)
+- Complex pages that would benefit from extracted form/list components
 
 **No Critical Technical Debt:** Architecture is solid, patterns are consistent
 
@@ -895,192 +879,29 @@ The project has established a **strong backend and domain foundation** with comp
 
 ## 🚀 Recommended Next Steps (Prioritized)
 
-### Phase 1: ✅ COMPLETED - User Identity EPICs (1A + 1B)
+### 1) Tailored Application Materials (EPIC 6)
 
-**Status:** ✅ **COMPLETE** - All user identity features implemented
+- Implement remaining AI ops for tailored workflows.
+- Build `/applications/:jobId/cv` and `/applications/:jobId/kpis` pages.
+- Add E2E coverage for tailored CV + KPI generation.
 
-**Completed:**
+### 2) Interview Prep (EPIC 7)
 
-1. ✅ `/profile` page with user profile form (all fields)
-2. ✅ `/profile/cv-upload` page with CV upload and AI extraction
-3. ✅ `/profile/experiences` page with experience list
-4. ✅ `/profile/experiences/:id/edit` page with full CRUD
-5. ✅ `/profile/canvas` page with Business Model Canvas layout
-6. ✅ "Generate Canvas" button with AI generation
-7. ✅ Per-section canvas editing with tag management
-8. ✅ Regenerate canvas functionality
-9. ✅ 139 tests for identity + 121 tests for canvas
+- Implement interview AI ops and supporting domain layers.
+- Build `/interviews/:jobId/prep` and `/interviews/:jobId/simulate` pages.
+- Add E2E coverage for the interview flow.
 
-**Achievement:** Users can now complete full EPICs 1A + 1B workflow end-to-end
+### 3) Settings + UX hardening
 
----
-
-### Phase 2: ✅ COMPLETED - Experience Builder (EPIC 2)
-
-**Status:** ✅ **COMPLETE** - All frontend pages and components implemented
-
-**Completed:**
-
-1. ✅ Global `/profile/stories` page (list across all experiences)
-2. ✅ Per-experience `/profile/experiences/:id/stories` page with auto-generate
-3. ✅ `/profile/experiences/:id/stories/new` page (3 creation modes)
-4. ✅ `/profile/experiences/:id/stories/:storyId` edit page
-5. ✅ AI-generated achievements/KPIs with TagInput editing
-6. ✅ Stories linked to experiences with counts
-7. ✅ Story view modal with full STAR display
-8. ✅ Delete and edit story functionality
-9. ✅ Comprehensive E2E and unit tests
-
-**Achievement:** Users can now create rich STAR stories for CVs and professional materials
-
----
-
-### Phase 3: ✅ COMPLETED - CV Generation (EPIC 3 + 3B)
-
-**Status:** ✅ **COMPLETE** - Full CV generation workflow implemented
-
-**Completed:**
-
-1. ✅ `ai.generateCv` Lambda with comprehensive testing
-2. ✅ CVDocument domain layer (repository/service/composable)
-3. ✅ `/cv` list page with deletion and print shortcuts
-4. ✅ `/cv/new` wizard with experience picker and options
-5. ✅ `/cv/:id` Markdown editor with live preview
-6. ✅ `/cv/:id/print` A4 layout with auto-print
-7. ✅ Profile photo upload and display in CV
-8. ✅ Contact info, work permit, social links in CV header
-9. ✅ 44+ CV-related tests passing
-
-**Achievement:** Users can generate professional CVs from their profile data
-
----
-
-### Phase 4: ✅ COMPLETED - Job & Company Analysis (EPICs 5A + 5B)
-
-**Status:** ✅ **EPICS 5A & 5B COMPLETE** (100%) - Full job and company analysis implemented
-
-**Completed:**
-
-**EPIC 5A: Job Description Analysis**
-
-1. ✅ `ai.parseJobDescription` Lambda with 8 tests
-2. ✅ JobDescription domain layer (repository/service/composable)
-3. ✅ `/jobs` list page with search functionality
-4. ✅ `/jobs/new` upload page (PDF/TXT support)
-5. ✅ `/jobs/[jobId]` detail page with tabbed editing + company linking
-6. ✅ JobCard and JobUploadStep components
-7. ✅ Full i18n support (jobUpload, jobList, jobDetail)
-8. ✅ E2E test coverage (jobs-flow.spec.ts)
-9. ✅ 25+ job-related tests passing
-
-**EPIC 5B: Company Analysis & Canvas**
-
-1. ✅ `ai.analyzeCompanyInfo` Lambda with 4 tests + sandbox E2E
-2. ✅ `ai.generateCompanyCanvas` Lambda with 5 tests + sandbox E2E
-3. ✅ Company domain layer (repository/service/composables)
-4. ✅ CompanyCanvas domain layer (repository/service/composable)
-5. ✅ `/companies` list page with search and delete
-6. ✅ `/companies/new` create page with optional AI analysis
-7. ✅ `/companies/[companyId]` detail page with form, BMC canvas, and linked jobs
-8. ✅ 7 company components (CompanyCard, CompanyForm, CompanyCanvasEditor, etc.)
-9. ✅ Job-company linking (bidirectional with CompanySelector)
-10. ✅ Automatic company extraction from job descriptions
-11. ✅ Company deduplication with smart matching
-12. ✅ Full i18n support (company, companyUpload)
-13. ✅ E2E test coverage (company-workflow.spec.ts)
-14. ✅ 50+ company-related tests passing
-
-**Achievement:** Users can now analyze jobs and companies, generate business model canvases, and link jobs to companies for context-aware application materials
-
-**Matching Context Status:**
-
-- ✅ EPIC 5C complete (AI op, domain, UI, and E2E)
-- ✅ Matching page live at `/jobs/:jobId/match`
-
-**Value:** Complete user-job-company fit analysis now available
-
----
-
-### Phase 5: Implement User-Job-Company Matching (EPIC 5C) — Complete
-
-**Goal:** Connect user strengths with job/company needs to reveal fit and impact
-
-**Delivered:**
-
-1. ✅ `ai.generateMatchingSummary` operation with strict schema validation
-2. ✅ MatchingSummary repository/service/composable + `useMatchingEngine`
-3. ✅ `/jobs/:jobId/match` page with fit score and structured sections
-4. ✅ Context aggregation across user profile, job analysis, and company data
-5. ✅ E2E coverage for the matching flow
-
-**Value:** Users understand exactly how they fit and where they add value
-
----
-
-### Phase 6: Implement Speech Builder (EPIC 4)
-
-**Goal:** Enable users to create professional speech blocks
-
-**Tasks:**
-
-1. Implement `ai.generateSpeech` operation + domain layer
-2. Create SpeechBlock repository/service/composable
-3. Create `/speech` editor page with sections:
-   - Elevator pitch
-   - Career story
-   - "Why me?" statement
-4. Add speech generation from profile + experiences + stories
-5. Add E2E tests for speech flow
-
-**Estimated Effort:** 1-2 weeks  
-**Value:** Users can articulate their value proposition
-
----
-
-### Phase 7: Implement Tailoring Engine (EPIC 6)
-
-**Goal:** Create job-specific materials
-
-**Tasks:**
-
-1. Implement 4 tailoring AI operations:
-   - `ai.generateCv`
-   - `ai.generateCoverLetter`
-   - `ai.generateSpeech`
-2. Create domain layers for CoverLetter
-3. Create 3 tailored material pages:
-   - `/applications/:jobId/cv` — Tailored CV
-   - `/cover-letters` — Cover letter list
-   - `/cover-letters/:id` — Cover letter editor
-
-**Estimated Effort:** 3-4 weeks  
-**Value:** Complete application workflow
-
----
-
-### Phase 8: Implement Interview Prep (EPIC 7)
-
-**Goal:** Complete MVP with interview preparation
-
-**Tasks:**
-
-1. Implement 3 interview AI operations:
-   - `ai.generateInterviewQuestions`
-   - `ai.simulateInterviewTurn`
-   - `ai.evaluateInterviewAnswer`
-2. Create domain layers for InterviewQuestionSet and InterviewSession
-3. Create interview prep pages:
-   - `/interviews/:jobId/prep` — Question bank
-   - `/interviews/:jobId/simulate` — Interview simulator
-
-**Estimated Effort:** 2-3 weeks  
-**Value:** MVP COMPLETE — full workflow operational
+- Add `/settings` page for account preferences.
+- Improve user-facing error states for AI failures (beyond alerts).
+- Fill remaining i18n for non-implemented EPICs.
 
 ---
 
 ## 📈 MVP Completion Roadmap
 
-**Current State:** ~70% complete  
+**Current State:** ~80% complete  
 **Estimated Remaining Effort:** 3-6 weeks (0.75-1.5 months)
 
 **Critical Path:**
@@ -1090,10 +911,12 @@ The project has established a **strong backend and domain foundation** with comp
 3. Phase 3: ✅ COMPLETED - CV Generation (EPICs 3 + 3B) → **100% complete**
 4. Phase 4: ✅ COMPLETED - Job & Company Analysis (EPICs 5A + 5B) → **100% complete**
 5. Phase 5: ✅ COMPLETED - User-Job-Company Matching (EPIC 5C) → **100% complete**
-6. Phase 6: Speech Builder (EPIC 4) - 1-2 weeks → **0% complete**
-7. Phase 7: Tailoring Engine (EPIC 6) - 3-4 weeks → **0% complete**
+6. Phase 6: Speech Builder (EPIC 4) → **100% complete**
+7. Phase 7: Cover Letters (EPIC 4B) → **100% complete**
+8. Phase 8: Tailoring Engine (EPIC 6) → **0% complete**
+9. Phase 9: Interview Prep (EPIC 7) → **0% complete**
 
-**Next Immediate Priority:** Start EPIC 4 (Speech Builder), then tackle EPIC 6 (Tailoring Engine)
+**Next Immediate Priority:** EPIC 6 (Tailoring Engine), then EPIC 7 (Interview Prep)
 
 **Parallel Work Opportunities:**
 
@@ -1115,10 +938,11 @@ The project has established a **strong backend and domain foundation** with comp
 - [x] EPIC 5A: Job Description Analysis (100%)
 - [x] EPIC 5B: Company Analysis & Canvas (100%)
 - [x] EPIC 5C: User-Job-Company Matching (100%)
-- [ ] EPIC 4: User Speech Builder (0%)
+- [x] EPIC 4: User Speech Builder (100%)
+- [x] EPIC 4B: Generic Cover Letter Generator (100%)
 - [ ] EPIC 6: Tailored Application Materials (0%)
-- [ ] All 14 AI operations implemented and tested
-- [ ] 25+ frontend pages operational
+- [ ] All AI operations implemented and tested
+- [x] 25+ frontend pages operational
 - [ ] End-to-end user flow tested (upload CV → generate materials)
 - [ ] Error handling and fallback UIs implemented
 - [ ] i18n translations complete (EN + FR minimum)
@@ -1149,6 +973,6 @@ The **AI Career OS** project has made **excellent progress** with 8 of 10 MVP EP
 - ✅ Job-company linking with automatic extraction
 - ✅ Matching summary generation with persistence and reload
 
-**Key Insight:** The project is **70% complete** for MVP with a solid foundation. The remaining work focuses on **tailored materials (EPIC 6)**
+**Key Insight:** The project is **~80% complete** for MVP with a solid foundation. The remaining work focuses on **tailored materials (EPIC 6)** and **interview prep (EPIC 7)**.
 
-**Next Immediate Action:** Complete EPIC 4 (Speech Builder), then proceed with the tailoring engine (EPIC 6).
+**Next Immediate Action:** Proceed with EPIC 6 (Tailoring Engine), then EPIC 7 (Interview Prep).

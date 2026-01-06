@@ -25,8 +25,8 @@ For EACH master prompt, use this structure:
 
 Constraints:
 
-- Must remain consistent with strict JSON I/O for AI ops; no free-text to the app.
-- Keep code CLEAN + DRY: reuse existing patterns; avoid duplicating canvas logic; prefer shared “canvas engine” abstractions if already present.
+- Must remain consistent with JSON/Text I/O for AI ops; no free-text to the app except for CV anc cover letter.
+- Keep code CLEAN + DRY + YANGNI: reuse existing patterns; avoid duplicating canvas logic; prefer shared “canvas engine” abstractions if already present.
 - No new frameworks; stay within Nuxt 3 + Nuxt UI + existing testing toolchain.
 
 Output:
@@ -41,381 +41,465 @@ Output:
 
 ---
 
-## Master Prompt 1 — EPIC 4B Contract & Model Alignment (Cover Letter)
+# Master Prompt 1 — Tailoring Contract + Shared Payload Builder
 
-### 1) Title
+## 1) Title
 
-EPIC 4B — Align Cover Letter model, routes, and AI contract with CV & Speech patterns
+EPIC 6 — Define Tailoring Contract + Shared Tailoring Payload Builder (Frontend)
 
-### 2) Intro
+## 2) Intro (context + why)
 
-EPIC 4B introduces cover letters as a first-class deliverable, parallel to CVs (EPIC 3) and Speech (EPIC 4). Before implementation, we must align the data model, routing, and AI contract to avoid divergence. This prompt ensures cover letters follow the same architectural rules: generic-first, optional job context later, strict JSON outputs, editable persistence.
+EPIC 6 is not a new documents EPIC: **CV, Cover Letter, and Speech generation already exist** and are used in production flows.
+We now need a **consistent tailoring contract** used across all three generation workflows to tailor outputs to a specific **JobDescription + MatchingSummary + lightweight Company summary** (not canvas), while keeping CLEAN/DRY and testability.
 
-### 3) Feature scope
-
-**In scope**
-
-- Confirm and document:
-  - `CoverLetter` as a persisted domain entity
-  - Generic cover letter as default (no job required)
-  - Optional `jobId` for future tailoring (nullable)
-
-- Align naming, routes, and contract expectations with CV & Speech
-
-**Out of scope**
-
-- No UI or backend implementation yet
-- No EPIC 6 (tailored application bundle)
-
-### 4) Composables / services / repositories / domain modules
-
-- Documentation-only clarification of:
-  - `CoverLetter` entity purpose and lifecycle
-  - Relationship to `UserProfile` (required) and `JobDescription` (optional)
-
-### 5) Components
-
-- None
-
-### 6) Pages/routes
-
-Document the canonical routes:
-
-- `/cover-letters` → list (same role as `/cv` and `/speech`)
-- `/cover-letters/[id]` → editor/detail view
-
-### 7) AI operations impact
-
-- Confirm single AI operation name:
-  - `ai.generateCoverLetter`
-
-- Document that:
-  - Job context is **optional**
-  - Output schema is **stable regardless of job presence**
-  - Tailoring is phrasing-level only when job is provided
-
-### 8) Testing requirements
-
-- None (doc-only)
-
-### 9) Acceptance criteria
-
-- [ ] `CoverLetter` is clearly defined as generic-first
-- [ ] Optional job relationship is explicitly documented
-- [ ] Routes follow CV/Speech symmetry
-- [ ] AI op naming is consistent and unambiguous
-- [ ] No references to separate “tailored cover letter” generators
-
----
-
-## Master Prompt 2 — CoverLetter Backend Domain Layer (CRUD + Composables)
-
-### 1) Title
-
-EPIC 4B — Implement CoverLetter domain layer (GraphQL + repository + composables)
-
-### 2) Intro
-
-Cover letters must behave like CVs and Speech blocks: persisted, editable, regenerable, and owned by the user. This prompt covers the backend/domain foundation needed before UI or AI wiring.
-
-### 3) Feature scope
+## 3) Feature scope
 
 **In scope**
 
-- Implement `CoverLetter` domain support:
-  - GraphQL model (owner-based auth)
-  - CRUD repository
-  - Service layer for orchestration rules
-  - Application composables for list + single entity
+- Define a shared “TailoringInput” shape used by the frontend when calling AI ops for:
+  - generateCv
+  - generateCoverLetter
+  - generateSpeech
 
-- Fields should support:
-  - `content` (string or structured blocks — follow CV/Speech consistency)
-  - `jobId?` (nullable)
-  - timestamps
+- Enforce EPIC constraints:
+  - Inputs are **full objects** (not IDs).
+  - Language is **English-only** for generation.
+  - Company context is **summary only** (avoid CompanyCanvas or large dumps).
 
-**Out of scope**
-
-- No AI generation yet
-- No UI components
-- No job-specific constraints beyond nullable link
-
-### 4) Composables / services / repositories / domain modules
-
-Create/update:
-
-- `CoverLetterRepository`
-- `CoverLetterService`
-- `useCoverLetters()` (list, delete, refresh)
-- `useCoverLetter(id)` (load, save, update)
-
-Follow existing conventions from:
-
-- `CVDocumentRepository`
-- `SpeechBlockRepository`
-
-### 5) Components
-
-- None
-
-### 6) Pages/routes
-
-- None
-
-### 7) AI operations impact
-
-- None in this step
-
-### 8) Testing requirements
-
-Vitest:
-
-- Repository CRUD tests (happy + error paths)
-- Service tests (creation, update, delete)
-- Composable tests:
-  - loading/error states
-  - refresh after create/delete
-  - strict typing and nullability
-
-### 9) Acceptance criteria
-
-- [ ] CoverLetter CRUD works end-to-end
-- [ ] Optional jobId handled correctly
-- [ ] No duplication with CV/Speech logic
-- [ ] Strict TypeScript typing
-- [ ] Unit tests in place and passing
-
----
-
-## Master Prompt 3 — AI Operation `ai.generateCoverLetter`
-
-### 1) Title
-
-EPIC 4B — Implement `ai.generateCoverLetter` (strict JSON, generic-first)
-
-### 2) Intro
-
-Cover letter generation must match the AI-operation discipline used elsewhere: deterministic input building, strict schema validation, and safe fallback behavior. This operation produces a **generic** cover letter by default and optionally adapts phrasing if job context is provided.
-
-### 3) Feature scope
-
-**In scope**
-
-- Implement AI op `ai.generateCoverLetter`
-- Deterministic prompt construction from:
+- Create a shared builder/normalizer that produces the final AI payload from:
   - UserProfile
-  - PersonalCanvas
-  - Selected experiences/stories
-  - Optional JobDescription
-
-- Strict JSON output only
+  - selected Experiences/Stories (if applicable)
+  - JobDescription
+  - MatchingSummary
+  - Company summary (lightweight)
 
 **Out of scope**
 
-- No streaming
-- No free-form text to frontend
-- No EPIC 6 bundling logic
+- Changing business meaning of Match scoring
+- Any multi-language support
+- Using CompanyCanvas in tailoring payload
 
-### 4) Composables / services / repositories / domain modules
+## 4) Composables / services / repositories / domain modules
 
-- Register the AI op in the AI registry
-- Reuse shared helpers for:
-  - profile/canvas/story aggregation
+- Create or update a shared helper (prefer in `src/composables/` or `src/application/` depending on existing conventions) such as:
+  - `buildTailoringContext()` or `useTailoringContext()`
 
-- Expose operation via GraphQL with schema validation
+- It must:
+  - accept full objects
+  - validate required presence of `job` + `matchingSummary` for “tailored mode”
+  - limit company fields to a curated subset (see acceptance criteria)
 
-### 5) Components
+Prefer reuse of existing patterns like `useCvGenerator`, `useSpeechEngine`, `useCoverLetterEngine` (names may differ; follow repo conventions).
 
-- None
+## 5) Components to create or update
 
-### 6) Pages/routes
+- None required in this prompt (pure composable/contract)
 
-- None
+## 6) Pages/routes to create or update
 
-### 7) AI operations impact
+- None required in this prompt
 
-Operation: `ai.generateCoverLetter`
+## 7) AI operations impact
 
-**Input**
+- No Lambda work in this prompt; only defines what frontend will send.
+- Must explicitly avoid sending CompanyCanvas; send company summary only (e.g., name, industry, sizeRange, website, description, productsServices, targetMarkets, and optionally one short “companySummary” string if present).
 
-- `userProfile`
-- `personalCanvas?`
-- `stories[]`
-- `jobDescription?`
-
-**Output (exact schema)**
-
-```json
-{
-  "content": "string"
-}
-```
-
-**Rules**
-
-- Generic if no job provided
-- Tailored phrasing only if job is provided
-- No invented facts
-- Retry once on invalid output
-- Fallback returns `{ content: "" }` (or platform-standard safe fallback)
-
-### 8) Testing requirements
+## 8) Testing requirements
 
 Vitest:
 
-- Valid output passes schema
-- Invalid JSON triggers retry then fallback
-- Prompt differs when jobDescription is present
-  Sandbox E2E (if used elsewhere):
-- GraphQL invocation returns schema-valid JSON
+- Unit tests for the tailoring builder:
+  - “minimal payload (job + match only)”
+  - “payload includes company summary when provided”
+  - “payload excludes CompanyCanvas fields”
+  - “englishOnly enforced”
+  - “fails/throws/returns structured error when job or matchingSummary missing in tailored mode”
 
-### 9) Acceptance criteria
+## 9) Acceptance criteria (checklist)
 
-- [ ] AI op returns strict JSON only
-- [ ] Output schema is stable
-- [ ] Optional job context alters prompt, not schema
-- [ ] Retry + fallback tested
-- [ ] Operation registered and callable
+- [ ] A single shared builder exists and is used by CV, Cover Letter, Speech generation flows.
+- [ ] Builder takes **full objects** (UserProfile, JobDescription, MatchingSummary, optional Company).
+- [ ] Company payload is **limited** (no CompanyCanvas; no large raw notes dump).
+- [ ] Language is forced to **English**.
+- [ ] Tests cover presence/absence, limits, and correctness.
 
 ---
 
-## Master Prompt 4 — Cover Letter UI (List + Editor)
+# Master Prompt 2 — AI Operations Upgrade for Tailoring (generateCv / generateCoverLetter / generateSpeech)
 
-### 1) Title
+## 1) Title
 
-EPIC 4B — Build Cover Letter UI (list + editor, CV/Speech parity)
+EPIC 6 — Update AI Ops Schemas + Prompts to Support Tailored Generation (CV/Letter/Speech)
 
-### 2) Intro
+## 2) Intro (context + why)
 
-Cover letters must feel familiar and predictable to users. The UX should mirror CV and Speech flows: list page, editor page, generate/regenerate, manual editing, save/reopen. This prompt covers UI implementation only.
+AI ops exist and are validated with strict schemas. EPIC 6 requires we **reuse the existing ops** and extend them to accept tailoring context so the outputs are ATS/human-screening optimized (keywords, relevant experience selection, strengths positioning).
 
-### 3) Feature scope
+## 3) Feature scope
 
 **In scope**
 
-- List page showing existing cover letters
-- Editor page with:
-  - Generated content
-  - Manual editing
-  - Generate / Regenerate action
-  - Save / Delete
+- Update the **input schemas** and prompts for:
+  - `ai.generateCv`
+  - `ai.generateCoverLetter`
+  - `ai.generateSpeech`
 
-- Nuxt UI scaffolding and card patterns
+- Add optional “tailoring mode” inputs:
+  - `jobDescription` (full object)
+  - `matchingSummary` (full object)
+  - `companySummary` (lightweight subset; not canvas)
+
+- Ensure outputs remain the same format as today:
+  - CV + Cover Letter: markdown content (existing pattern)
+  - Speech: strict JSON structure already used in app
+
+- Tailoring behavior definition (must be reflected in prompts):
+  - include job-relevant keywords naturally
+  - select most relevant experience/stories
+  - emphasize strengths aligned to job + company
+  - avoid inventing skills/experience
+  - optimize for ATS + human screening
 
 **Out of scope**
 
-- Job-specific selection UI
-- Export/print
-- EPIC 6 application bundling
+- New AI operations (no `generateTailoredCv` etc.)
+- Any multilingual generation
+- Any new document types (no interview scripts here)
 
-### 4) Composables / services / repositories / domain modules
+## 4) Composables / services / repositories / domain modules
 
-- Create orchestration composable:
-  - `useCoverLetterEngine()`
-    - builds AI input
-    - calls service/AI op
-    - merges result into editable state
+- Update the AI operations registry/types (shared types re-export pattern) so frontend stays type-safe.
+- Update the Lambda validation schemas and fallback recovery rules to incorporate the new optional tailoring inputs.
 
-- Persist via `useCoverLetter(id)`
+## 5) Components to create or update
 
-### 5) Components to create or update
+- None required in this prompt
 
-- `CoverLetterCard.vue` (list item)
-- `CoverLetterEditor.vue`
-- Reuse:
-  - `<UTextarea>`
-  - existing empty-state and card patterns
+## 6) Pages/routes to create or update
 
-### 6) Pages/routes
+- None required in this prompt
 
-- `/cover-letters`
-  - empty state CTA: “Create cover letter”
+## 7) AI operations impact (required detail)
 
-- `/cover-letters/[id]`
-  - breadcrumb aligned with CV/Speech
-  - header actions: Generate, Save, Delete
+Operations to update:
 
-### 7) AI operations impact
+### `ai.generateCv`
 
-- UI never calls AI directly
-- AI invoked via orchestration composable/service
-- Loading and fallback states must be visible and stable
+- **Inputs (additions):**
+  - `jobDescription?: JobDescription`
+  - `matchingSummary?: MatchingSummary`
+  - `company?: { companyName, industry?, sizeRange?, website?, description?, productsServices?, targetMarkets? }`
+  - `language: "en"`
 
-### 8) Testing requirements
+- **Outputs:** unchanged (markdown string)
+- **Validation & fallback:**
+  - If tailoring inputs are present but malformed: remove tailoring block and generate generic CV (with a warning flag if your contract supports it) OR fail with structured error (pick one consistent strategy).
+  - Must not produce extra wrappers (no ``` fences, etc.) consistent with existing CV note-stripping behavior.
 
-Vitest:
+### `ai.generateCoverLetter`
 
-- Component tests (editor rendering, updates)
-- Page tests:
-  - list renders empty + populated states
-  - editor loads, edits, saves content
-    Composable tests:
+- Inputs: same additions as above
+- Output: unchanged (cover letter markdown/text, per existing contract)
+- Must not invent company facts; use only provided company summary + job text.
 
-- AI input building
-- merge + fallback behavior
+### `ai.generateSpeech`
 
-### 9) Acceptance criteria
+- Inputs: same additions
+- Output: strict JSON (existing schema)
+- Must include job-tailored key messages but keep schema stable.
 
-- [ ] Cover letter list and editor pages exist
-- [ ] User can generate, edit, save, reopen a letter
-- [ ] UI consistent with CV/Speech
-- [ ] Logic in composables, pages thin
-- [ ] No free-text leakage from AI
+Also update the **AI Interaction Contract documentation** to reflect the new inputs consistently across all three ops.
+
+## 8) Testing requirements
+
+Vitest (Lambda/unit):
+
+- For each AI op:
+  - “generic mode still works”
+  - “tailored mode uses job + match and returns valid schema”
+  - “company summary inclusion doesn’t break output”
+  - “fallback path works when tailoring object missing required subfields”
+    Sandbox E2E (if you have these patterns already for AI ops):
+
+- One deployed invocation test per op in tailored mode (mirrors existing approach).
+
+## 9) Acceptance criteria
+
+- [ ] All 3 existing AI ops accept tailoring inputs and remain backwards-compatible.
+- [ ] Strict schema validation updated + covered by tests.
+- [ ] Tailored outputs include job-relevant keywords and emphasize relevant experience without hallucinations.
+- [ ] Company context is limited to summary fields (no canvas).
+- [ ] English-only generation enforced.
 
 ---
 
-## Master Prompt 5 — Playwright E2E: Cover Letter Happy Path
+# Master Prompt 3 — Data Model + “Job Link” for Documents + Regenerate Overwrites
 
-### 1) Title
+## 1) Title
 
-EPIC 4B — Playwright E2E happy path (generic cover letter)
+EPIC 6 — Persist Job Association on Documents + Overwrite-on-Regenerate Rules
 
-### 2) Intro
+## 2) Intro (context + why)
 
-As with CVs and Speech, EPIC 4B must ship with a single, reliable E2E test proving the full workflow works end-to-end.
+EPIC 6 adds navigation and traceability: tailored documents must be linked back to the Job they target, and regenerating should **overwrite** (not create versions). This must match existing “single source of truth” patterns and owner-based auth.
 
-### 3) Feature scope
+## 3) Feature scope
 
-**Scenario**
+**In scope**
 
-1. Go to `/cover-letters`
-2. Create a new cover letter
-3. Generate content
-4. Verify content appears
-5. Edit manually
-6. Save
-7. Reload and verify persistence
+- Ensure CV / CoverLetter / Speech entities can optionally reference a Job:
+  - `jobId?: id`
+  - (optionally) `job?: belongsTo(...)`
 
-### 4) Composables / services / repositories / domain modules
+- Update domain services so:
+  - Tailored generation sets/updates `jobId`
+  - Regeneration overwrites content of the existing doc record
 
-- Ensure stable selectors (`data-testid`)
-- Ensure AI op can be mocked or sandboxed consistently
+- Update repositories and composables accordingly
 
-### 5) Components
+**Out of scope**
 
-- Add test IDs for:
-  - create button
-  - generate button
-  - textarea
-  - save button
-  - success toast
+- Document version history
+- Multi-job linking per document
+- Company linking on documents (derive from job if needed)
 
-### 6) Pages/routes
+## 4) Composables / services / repositories / domain modules
 
-- `/cover-letters`
-- `/cover-letters/[id]`
+Update (or create if missing) consistently:
 
-### 7) AI operations impact
+- GraphQL schema models:
+  - `CVDocument`: add optional job relationship if not present
+  - `CoverLetter`: ensure model exists and supports job relationship (if already exists, update it)
+  - `SpeechBlock`: add optional job relationship if not present
 
-- Mock AI response or use sandbox pattern consistent with the rest of the repo
+- Repositories: CRUD updates + typed query includes job field when fetching
+- Services: implement “regenerate overwrites” rule by updating existing record instead of creating new one
+- Composables: expose `regenerateTailored({ job, matchingSummary })` methods
 
-### 8) Testing requirements
+## 5) Components to create or update
 
-- `cover-letter-flow.spec.ts`
-- Runs in CI without flakiness
+- Minimal UI additions (actual UI work is in other prompts):
+  - allow rendering a “Targeted job: …” link when `jobId` exists
 
-### 9) Acceptance criteria
+## 6) Pages/routes to create or update
 
-- [ ] One Playwright test passes reliably
-- [ ] Confirms generation + edit + persistence
-- [ ] No strict-mode selector violations
-- [ ] Uses existing test tooling only
+- None required here; only model + composable support.
+
+## 7) AI operations impact
+
+- Ensure generation workflows pass `jobDescription` + `matchingSummary` in calls (from shared builder), and store jobId on save/update.
+
+## 8) Testing requirements
+
+Vitest:
+
+- Repository tests for new field mapping
+- Service tests:
+  - “generate tailored doc updates existing record”
+  - “jobId is set/updated”
+  - “generic generation preserves jobId = undefined”
+    Nuxt tests:
+
+- If you have component tests for doc pages, add one asserting the job link renders only when jobId exists.
+
+## 9) Acceptance criteria
+
+- [ ] CVDocument, CoverLetter, SpeechBlock each can optionally link to a Job.
+- [ ] Tailored generation stores `jobId`.
+- [ ] Regenerate overwrites content on same doc id (no duplicates).
+- [ ] Tests cover persistence, overwrite logic, and relationship wiring.
+
+---
+
+# Master Prompt 4 — UI Entry Points: Job Page + Match Page “Generate Tailored” Links
+
+## 1) Title
+
+EPIC 6 — Add Tailored Documents Entry Points from Job and Match Pages
+
+## 2) Intro (context + why)
+
+Users should generate tailored application materials directly from where intent is strongest: the **JobDescription page** and the **MatchingSummary page**. This is a UX EPIC step: link existing doc systems, don’t rebuild them.
+
+## 3) Feature scope
+
+**In scope**
+
+- On JobDescription page (`/jobs/:jobId`):
+  - Add a bottom section “Application Materials”
+  - Provide actions to:
+    - create or regenerate a tailored CV
+    - create or regenerate a tailored Cover Letter
+    - create or regenerate a tailored Speech block
+
+- On Match page (`/jobs/:jobId/match`):
+  - Same “Application Materials” section, but uses the already-present MatchingSummary in page state.
+
+- Buttons should navigate to the resulting doc pages after success (routes unchanged).
+
+**Out of scope**
+
+- New pages
+- Multi-language toggles
+- Company canvas access from here
+
+## 4) Composables / services / repositories / domain modules
+
+- Update/extend the job page composable(s) (e.g. `useJobDescription`, `useJobAnalysis`, `useMatchingSummary`) to expose:
+  - `generateTailoredCvForJob(job, matchingSummary)`
+  - `generateTailoredCoverLetterForJob(...)`
+  - `generateTailoredSpeechForJob(...)`
+
+- Must use shared tailoring builder from Master Prompt 1.
+- Ensure these flows:
+  - fetch company summary (lightweight) if job has a linked company
+  - do NOT fetch CompanyCanvas
+
+## 5) Components to create or update
+
+- Create a reusable component, e.g. `ApplicationMaterialsActionsCard`:
+  - Nuxt UI `<UCard>` with 3 actions (CV / Letter / Speech)
+  - Loading + error states consistent with your patterns (toast/alert)
+  - Shows whether a tailored doc already exists for that job (if feasible without heavy queries; otherwise keep MVP simple)
+
+## 6) Pages/routes to create or update
+
+Update:
+
+- `/jobs/:jobId` (job details page)
+- `/jobs/:jobId/match` (matching summary page)
+
+Navigation behavior:
+
+- After generation:
+  - route to `/cv/:id`, `/cover-letters/:id`, `/speech/:id` (or existing equivalents)
+
+- Breadcrumbs:
+  - unchanged, but ensure the new card doesn’t break layout
+
+## 7) AI operations impact
+
+- Calls:
+  - `ai.generateCv` with tailoring inputs
+  - `ai.generateCoverLetter` with tailoring inputs
+  - `ai.generateSpeech` with tailoring inputs
+
+- Inputs are full objects; include company summary only.
+
+## 8) Testing requirements
+
+Vitest:
+
+- Nuxt page/component tests:
+  - card renders on both pages
+  - clicking actions calls the correct composable method
+  - error state is shown on failure
+    Playwright:
+
+- Single happy path E2E:
+  1. user uploads/has profile data
+  2. user uploads job
+  3. user generates matching summary
+  4. from match page, clicks “Generate tailored cover letter”
+  5. lands on cover letter page with content present and job link visible
+
+## 9) Acceptance criteria
+
+- [ ] Job page and Match page show “Application Materials” section at bottom.
+- [ ] Each action triggers tailored generation using job + matching summary (and optional company summary).
+- [ ] Successful generation navigates to existing doc pages.
+- [ ] Company canvas is not loaded/passed.
+- [ ] One Playwright happy path covers the end-to-end flow.
+
+---
+
+# Master Prompt 5 — Document Pages: Show Target Job + “Regenerate Tailored” UX
+
+## 1) Title
+
+EPIC 6 — Add Job Backlink + Tailored Regeneration Controls on CV / Cover Letter / Speech Pages
+
+## 2) Intro (context + why)
+
+EPIC 6 requires bidirectional navigation: from job → docs and from docs → job. Also, users must be able to regenerate tailored content and it must **overwrite** existing content (no new versions).
+
+## 3) Feature scope
+
+**In scope**
+
+- On CV detail page (`/cv/:id`):
+  - If `jobId` exists, show “Target job” link to `/jobs/:jobId` near the top (header area)
+  - Add a “Regenerate tailored” action if job context exists (uses stored job + matching summary if available, otherwise fetch latest matching summary for that job)
+
+- On Cover Letter page (`/cover-letters/:id`):
+  - Same job backlink + regenerate tailored
+
+- On Speech page (`/speech/:id`):
+  - Same job backlink + regenerate tailored
+
+**Out of scope**
+
+- Selecting a different job from the doc page (keep MVP simple)
+- Document version history
+- Multi-language
+
+## 4) Composables / services / repositories / domain modules
+
+- Update doc composables (CV, CoverLetter, Speech) to support:
+  - `regenerateTailored()` that:
+    - requires a job context
+    - loads JobDescription + latest MatchingSummary if needed
+    - calls the correct AI op with tailoring inputs
+    - overwrites the existing doc content
+
+- Ensure DRY: share “load job + load matching summary + load company summary” logic via shared helper if it exists.
+
+## 5) Components to create or update
+
+- Add a small reusable UI fragment, e.g. `TargetJobBanner`:
+  - `<UAlert>` or `<UCard>` with:
+    - job title
+    - link back to job
+    - optional “Regenerate tailored” button
+
+- Update doc pages to include this banner in a consistent location.
+
+## 6) Pages/routes to create or update
+
+Update existing routes only:
+
+- `/cv/:id`
+- `/cover-letters/:id`
+- `/speech/:id`
+
+Breadcrumb behavior:
+
+- Keep current route structure
+- Add a backlink element without changing breadcrumbs if your current breadcrumb system is simple.
+
+## 7) AI operations impact
+
+- Regenerate triggers the same AI ops as initial generation, with tailoring inputs.
+- Must overwrite persisted content.
+
+## 8) Testing requirements
+
+Vitest:
+
+- Doc composable/service tests:
+  - regenerate uses job + match inputs
+  - overwrites existing record (same id)
+
+- Nuxt page tests:
+  - banner renders when jobId exists
+  - regenerate button hidden when jobId missing
+    Playwright (optional extra beyond the single EPIC E2E):
+
+- If you keep only one E2E for EPIC 6, ensure it also asserts the backlink exists on the resulting doc page.
+
+## 9) Acceptance criteria
+
+- [ ] CV/CoverLetter/Speech pages show a Job backlink when jobId exists.
+- [ ] “Regenerate tailored” overwrites content (no new doc created).
+- [ ] Regenerate uses job + latest matching summary (and optional company summary).
+- [ ] Tests cover banner conditional rendering + overwrite behavior.
