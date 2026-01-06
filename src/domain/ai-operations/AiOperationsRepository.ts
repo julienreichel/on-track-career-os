@@ -310,19 +310,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
   }
 
   async generateCv(input: GenerateCvInput): Promise<GenerateCvResult> {
-    // GraphQL schema uses a.json() for complex objects, which expects JSON strings
-    const stringifiedInput = {
-      userProfile: JSON.stringify(input.userProfile),
-      selectedExperiences: JSON.stringify(input.selectedExperiences),
-      stories: input.stories ? JSON.stringify(input.stories) : undefined,
-      skills: input.skills,
-      languages: input.languages,
-      certifications: input.certifications,
-      interests: input.interests,
-      jobDescription: input.jobDescription ?? undefined,
-    };
-
-    const { data, errors } = await this.client.generateCv(stringifiedInput, gqlOptions());
+    const { data, errors } = await this.client.generateCv(input, gqlOptions());
 
     if (errors && errors.length > 0) {
       throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);

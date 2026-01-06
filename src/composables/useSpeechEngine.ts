@@ -205,6 +205,7 @@ function buildSpeechInput(args: {
   jobDescription?: SpeechInput['jobDescription'];
 }): SpeechInput {
   const input: SpeechInput = {
+    language: 'en',
     profile: mapUserProfile(args.profile),
     experiences: mapExperiences(args.experiences),
   };

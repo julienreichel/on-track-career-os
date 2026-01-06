@@ -202,7 +202,10 @@ describe('useCvGenerator', () => {
       });
 
       const aiInput = mockAiService.generateCv.mock.calls[0][0];
-      expect(aiInput.jobDescription).toBe(jobDescription);
+      expect(aiInput.jobDescription).toEqual({
+        title: 'Target role',
+        roleSummary: jobDescription,
+      });
     });
 
     it('should generate CV with multiple experiences', async () => {
@@ -216,6 +219,8 @@ describe('useCvGenerator', () => {
       expect(aiInput.selectedExperiences).toHaveLength(2);
       expect(aiInput.selectedExperiences[0].id).toBe('exp-1');
       expect(aiInput.selectedExperiences[1].id).toBe('exp-2');
+      expect(aiInput.selectedExperiences[0].title).toBe('Senior Software Engineer');
+      expect(aiInput.selectedExperiences[1].title).toBe('Software Engineer');
     });
 
     it('should filter null values from profile arrays', async () => {
@@ -331,6 +336,7 @@ describe('useCvGenerator', () => {
       });
 
       expect(input).not.toBeNull();
+      expect(input?.language).toBe('en');
       expect(input?.userProfile.fullName).toBe('John Doe');
       expect(input?.userProfile.headline).toBe('Senior Software Engineer');
       expect(input?.userProfile.location).toBe('San Francisco, CA');
@@ -348,7 +354,10 @@ describe('useCvGenerator', () => {
       expect(input?.languages).toEqual(['English', 'Spanish']);
       expect(input?.certifications).toEqual(['AWS Certified']);
       expect(input?.interests).toEqual(['Open source', 'Mentoring']);
-      expect(input?.jobDescription).toBe('Test job description');
+      expect(input?.jobDescription).toEqual({
+        title: 'Target role',
+        roleSummary: 'Test job description',
+      });
     });
 
     it('should map experience fields correctly', async () => {
@@ -359,7 +368,7 @@ describe('useCvGenerator', () => {
       const experience = input?.selectedExperiences[0];
       expect(experience?.id).toBe('exp-1');
       expect(experience?.title).toBe('Senior Software Engineer');
-      expect(experience?.company).toBe('Tech Corp');
+      expect(experience?.companyName).toBe('Tech Corp');
       expect(experience?.startDate).toBe('2022-01-01');
       expect(experience?.endDate).toBe('2024-01-01');
       expect(experience?.experienceType).toBe('work');
@@ -376,7 +385,6 @@ describe('useCvGenerator', () => {
       const input = await buildGenerationInput('user-123', ['exp-1']);
 
       const story = input?.stories[0];
-      expect(story?.id).toBe('story-1');
       expect(story?.experienceId).toBe('exp-1');
       expect(story?.situation).toBe('System was slow');
       expect(story?.task).toBe('Improve performance');

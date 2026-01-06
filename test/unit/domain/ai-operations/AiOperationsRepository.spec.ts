@@ -341,12 +341,13 @@ describe('AiOperationsRepository', () => {
 
   describe('generateCv', () => {
     const baseInput: GenerateCvInput = {
+      language: 'en',
       userProfile: { fullName: 'Jane Doe' },
       selectedExperiences: [
         {
           id: 'exp-1',
           title: 'Engineer',
-          company: 'Acme',
+          companyName: 'Acme',
           startDate: '2020-01-01',
         },
       ],
@@ -361,9 +362,7 @@ describe('AiOperationsRepository', () => {
       const result = await repository.generateCv(baseInput);
 
       expect(mockClient.generateCv).toHaveBeenCalledWith(
-        expect.objectContaining({
-          userProfile: JSON.stringify(baseInput.userProfile),
-        }),
+        baseInput,
         expect.objectContaining({ authMode: 'userPool' })
       );
       expect(result).toBe('# CV Markdown');
@@ -563,6 +562,7 @@ describe('AiOperationsRepository', () => {
 
   describe('generateSpeech', () => {
     const speechInput = {
+      language: 'en',
       profile: { fullName: 'Casey Candidate' },
       experiences: [],
     };

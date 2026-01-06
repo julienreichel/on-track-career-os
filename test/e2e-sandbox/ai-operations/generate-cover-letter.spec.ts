@@ -128,6 +128,7 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
 
   it('should generate cover letter from minimal input', async () => {
     const result = await repository.generateCoverLetter({
+      language: 'en',
       profile: mockUserProfile,
       experiences: mockExperiences,
       stories: [],
@@ -161,11 +162,28 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
     };
 
     const result = await repository.generateCoverLetter({
+      language: 'en',
       profile: mockUserProfile,
       experiences: mockExperiences,
       stories: mockStories,
       personalCanvas: undefined,
       jobDescription,
+      matchingSummary: {
+        overallScore: 75,
+        scoreBreakdown: {
+          skillFit: 35,
+          experienceFit: 20,
+          interestFit: 10,
+          edge: 10,
+        },
+        recommendation: 'maybe',
+        reasoningHighlights: ['Strong architecture experience'],
+        strengthsForThisRole: ['System design leadership'],
+        skillMatch: ['[MATCH] Microservices — led migration'],
+        riskyPoints: ['Risk: Limited startup scale. Mitigation: highlight adaptability.'],
+        impactOpportunities: ['Improve scalability'],
+        tailoringTips: ['Emphasize systems architecture wins'],
+      },
     });
 
     // Verify tailored result
@@ -180,6 +198,7 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
   it('should validate AI operation is properly configured', async () => {
     // Test with minimal valid input to ensure operation works
     const result = await repository.generateCoverLetter({
+      language: 'en',
       profile: {
         fullName: 'Test User',
         headline: 'Developer',

@@ -3,8 +3,9 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 const SYSTEM_PROMPT = `You generate personal narrative speech based on user identity data.
 
-If jobDescription is provided, tailor phrasing to the role and job needs without inventing facts.
-If jobDescription is absent, keep the speech generic (no job targeting).
+If tailoring context is provided (jobDescription + matchingSummary), tailor phrasing to the role and job needs without inventing facts.
+If tailoring context is absent, keep the speech generic (no job targeting).
+Use company context only when provided and only as summary-level framing.
 
 Output must be:
 - concise
@@ -83,12 +84,40 @@ export interface SpeechJobDescription {
   explicitPains?: string[];
 }
 
+export interface SpeechMatchingSummary {
+  overallScore: number;
+  scoreBreakdown: {
+    skillFit: number;
+    experienceFit: number;
+    interestFit: number;
+    edge: number;
+  };
+  recommendation: 'apply' | 'maybe' | 'skip';
+  reasoningHighlights: string[];
+  strengthsForThisRole: string[];
+  skillMatch: string[];
+  riskyPoints: string[];
+  impactOpportunities: string[];
+  tailoringTips: string[];
+}
+
+export interface SpeechCompanySummary {
+  companyName: string;
+  industry?: string;
+  sizeRange?: string;
+  website?: string;
+  description?: string;
+}
+
 export interface GenerateSpeechInput {
+  language: 'en';
   profile: SpeechUserProfile;
   experiences: SpeechExperience[];
   stories?: SpeechStory[];
   personalCanvas?: SpeechPersonalCanvas;
   jobDescription?: SpeechJobDescription;
+  matchingSummary?: SpeechMatchingSummary;
+  company?: SpeechCompanySummary;
 }
 
 export interface GenerateSpeechOutput {
@@ -132,7 +161,15 @@ function buildFallbackOutput(): GenerateSpeechOutput {
 }
 
 function buildUserPrompt(args: GenerateSpeechInput): string {
+  const tailoring = resolveTailoringContext(args);
+  const jobDescription = tailoring?.jobDescription ?? null;
+  const matchingSummary = tailoring?.matchingSummary ?? null;
+  const company = tailoring?.company ?? null;
+
   return `Use the following data to create personal speech material.
+
+LANGUAGE:
+${args.language}
 
 PROFILE:
 ${JSON.stringify(args.profile ?? {}, null, PROMPT_INDENT_SPACES)}
@@ -147,7 +184,13 @@ PERSONAL CANVAS:
 ${JSON.stringify(args.personalCanvas ?? {}, null, PROMPT_INDENT_SPACES)}
 
 TARGET JOB DESCRIPTION (optional):
-${JSON.stringify(args.jobDescription ?? null, null, PROMPT_INDENT_SPACES)}
+${JSON.stringify(jobDescription, null, PROMPT_INDENT_SPACES)}
+
+MATCHING SUMMARY (optional):
+${JSON.stringify(matchingSummary, null, PROMPT_INDENT_SPACES)}
+
+COMPANY SUMMARY (optional):
+${JSON.stringify(company, null, PROMPT_INDENT_SPACES)}
 
 Return JSON with:
 - elevatorPitch (80 words max)
@@ -156,6 +199,42 @@ Return JSON with:
 
 Return ONLY valid JSON matching this exact schema:
 ${OUTPUT_SCHEMA}`;
+}
+
+function resolveTailoringContext(args: GenerateSpeechInput) {
+  const hasJob = isValidJobDescription(args.jobDescription);
+  const hasSummary = isValidMatchingSummary(args.matchingSummary);
+
+  if (hasJob && hasSummary) {
+    return {
+      jobDescription: args.jobDescription ?? null,
+      matchingSummary: args.matchingSummary ?? null,
+      company: args.company ?? null,
+    };
+  }
+
+  if (args.jobDescription || args.matchingSummary) {
+    console.warn('[generateSpeech] Invalid tailoring context detected. Falling back to generic.');
+  }
+
+  return null;
+}
+
+function isValidJobDescription(value?: SpeechJobDescription | null): value is SpeechJobDescription {
+  return Boolean(value?.title);
+}
+
+function isValidMatchingSummary(
+  value?: SpeechMatchingSummary | null
+): value is SpeechMatchingSummary {
+  if (!value) return false;
+  return (
+    typeof value.overallScore === 'number' &&
+    typeof value.scoreBreakdown?.skillFit === 'number' &&
+    typeof value.scoreBreakdown?.experienceFit === 'number' &&
+    typeof value.scoreBreakdown?.interestFit === 'number' &&
+    typeof value.scoreBreakdown?.edge === 'number'
+  );
 }
 
 type HandlerEvent = {
@@ -195,6 +274,7 @@ export const handler = async (event: HandlerEvent) => {
       experienceCount: args.experiences?.length ?? 0,
       storyCount: args.stories?.length ?? 0,
       hasJobDescription: Boolean(args.jobDescription),
+      hasMatchingSummary: Boolean(args.matchingSummary),
       profilePreview: truncateForLog(JSON.stringify(args.profile ?? {})),
     })
   );

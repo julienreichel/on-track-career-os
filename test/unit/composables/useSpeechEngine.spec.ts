@@ -118,6 +118,7 @@ describe('useSpeechEngine', () => {
     expect(deps.aiService.generateSpeech).toHaveBeenCalledTimes(1);
 
     const input = (deps.aiService.generateSpeech as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    expect(input.language).toBe('en');
     expect(input.profile.fullName).toBe('Casey Candidate');
     expect(input.experiences).toHaveLength(1);
     expect(input.stories).toHaveLength(1);

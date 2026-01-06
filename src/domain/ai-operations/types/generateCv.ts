@@ -2,6 +2,7 @@
  * Input for generateCv AI operation
  */
 export interface GenerateCvInput {
+  language: 'en';
   userProfile: {
     fullName: string;
     headline?: string;
@@ -15,19 +16,18 @@ export interface GenerateCvInput {
     strengths?: string[];
   };
   selectedExperiences: Array<{
-    id: string;
+    id?: string;
     title: string;
-    company: string;
-    location?: string;
+    companyName?: string;
     startDate: string;
     endDate?: string;
-    isCurrent?: boolean;
     experienceType?: 'work' | 'education' | 'volunteer' | 'project';
     responsibilities?: string[];
     tasks?: string[];
+    achievements?: string[];
+    kpiSuggestions?: string[];
   }>;
   stories?: Array<{
-    id?: string;
     experienceId?: string;
     situation: string;
     task: string;
@@ -39,7 +39,39 @@ export interface GenerateCvInput {
   languages?: string[];
   certifications?: string[];
   interests?: string[];
-  jobDescription?: string;
+  jobDescription?: {
+    title: string;
+    seniorityLevel?: string;
+    roleSummary?: string;
+    responsibilities?: string[];
+    requiredSkills?: string[];
+    behaviours?: string[];
+    successCriteria?: string[];
+    explicitPains?: string[];
+  };
+  matchingSummary?: {
+    overallScore: number;
+    scoreBreakdown: {
+      skillFit: number;
+      experienceFit: number;
+      interestFit: number;
+      edge: number;
+    };
+    recommendation: 'apply' | 'maybe' | 'skip';
+    reasoningHighlights: string[];
+    strengthsForThisRole: string[];
+    skillMatch: string[];
+    riskyPoints: string[];
+    impactOpportunities: string[];
+    tailoringTips: string[];
+  };
+  company?: {
+    companyName: string;
+    industry?: string;
+    sizeRange?: string;
+    website?: string;
+    description?: string;
+  };
 }
 
 /**

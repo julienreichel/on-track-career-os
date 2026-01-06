@@ -38,6 +38,7 @@ describe('ai.generateSpeech', () => {
   });
 
   const validArguments = {
+    language: 'en',
     profile: {
       fullName: 'Casey Candidate',
       headline: 'Engineering Lead',
@@ -51,6 +52,29 @@ describe('ai.generateSpeech', () => {
     jobDescription: {
       title: 'Head of Engineering',
       roleSummary: 'Scale teams',
+    },
+    matchingSummary: {
+      overallScore: 72,
+      scoreBreakdown: {
+        skillFit: 30,
+        experienceFit: 22,
+        interestFit: 10,
+        edge: 10,
+      },
+      recommendation: 'maybe',
+      reasoningHighlights: ['Strong leadership background'],
+      strengthsForThisRole: ['Team scaling'],
+      skillMatch: ['[MATCH] Leadership — led teams of 10+'],
+      riskyPoints: ['Risk: Limited B2B. Mitigation: emphasize transferable wins.'],
+      impactOpportunities: ['Improve delivery cadence'],
+      tailoringTips: ['Emphasize mentoring outcomes'],
+    },
+    company: {
+      companyName: 'Acme Systems',
+      industry: 'Logistics',
+      sizeRange: '201-500',
+      website: 'https://acme.example',
+      description: 'AI workflow platform for logistics teams.',
     },
   };
 
@@ -100,6 +124,30 @@ describe('ai.generateSpeech', () => {
 
     expect(userPrompt).toContain('TARGET JOB DESCRIPTION');
     expect(userPrompt).toContain('Head of Engineering');
+    expect(userPrompt).toContain('MATCHING SUMMARY');
+    expect(userPrompt).toContain('COMPANY SUMMARY');
+    expect(userPrompt).toContain('Acme Systems');
+  });
+
+  it('drops job context when matching summary is missing', async () => {
+    mockSend.mockResolvedValue(
+      buildBedrockResponse({
+        elevatorPitch: 'Short pitch.',
+        careerStory: 'Short story.',
+        whyMe: 'Short why.',
+      })
+    );
+
+    const argsWithoutSummary = { ...validArguments, matchingSummary: undefined };
+    await handler({ arguments: argsWithoutSummary as never });
+
+    const { InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime');
+    const calls = (InvokeModelCommand as unknown as ReturnType<typeof vi.fn>).mock.calls;
+    const commandInput = calls[0][0];
+    const payload = JSON.parse(commandInput.body);
+    const userPrompt = payload.messages[0].content[0].text as string;
+
+    expect(userPrompt).not.toContain('Head of Engineering');
   });
 
   it('falls back to empty strings when AI output is invalid', async () => {

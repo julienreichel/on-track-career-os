@@ -101,10 +101,9 @@ describe('AI Operations - Generate CV (E2E Sandbox)', () => {
     fullName: 'Jane Smith',
     headline: 'Senior Software Engineer',
     location: 'San Francisco, CA',
-    email: 'jane.smith@example.com',
-    phone: '+1-555-0123',
-    linkedinUrl: 'https://linkedin.com/in/janesmith',
-    githubUrl: 'https://github.com/janesmith',
+    primaryEmail: 'jane.smith@example.com',
+    primaryPhone: '+1-555-0123',
+    socialLinks: ['https://linkedin.com/in/janesmith', 'https://github.com/janesmith'],
     goals: ['Lead technical teams', 'Architect scalable systems'],
     strengths: ['System design', 'Team mentorship', 'Cloud architecture'],
   };
@@ -113,11 +112,10 @@ describe('AI Operations - Generate CV (E2E Sandbox)', () => {
     {
       id: 'exp-1',
       title: 'Senior Software Engineer',
-      company: 'TechCorp Inc.',
+      companyName: 'TechCorp Inc.',
       startDate: 'March 2020',
       endDate: 'Present',
-      isCurrent: true,
-      location: 'San Francisco, CA',
+      experienceType: 'work',
       responsibilities: [
         'Led development of microservices architecture',
         'Mentored team of 5 junior engineers',
@@ -132,10 +130,10 @@ describe('AI Operations - Generate CV (E2E Sandbox)', () => {
     {
       id: 'exp-2',
       title: 'Software Engineer',
-      company: 'StartupCo',
+      companyName: 'StartupCo',
       startDate: 'June 2018',
       endDate: 'February 2020',
-      location: 'Seattle, WA',
+      experienceType: 'work',
       responsibilities: [
         'Full-stack development using React and Node.js',
         'Database design and optimization',
@@ -150,6 +148,7 @@ describe('AI Operations - Generate CV (E2E Sandbox)', () => {
 
   const mockStories = [
     {
+      experienceId: 'exp-1',
       situation: 'Legacy monolith causing frequent outages and slow deployments',
       task: 'Migrate to microservices architecture without disrupting production',
       action:
@@ -183,6 +182,7 @@ describe('AI Operations - Generate CV (E2E Sandbox)', () => {
   it('should generate CV in Markdown format with basic input', async () => {
     // Test basic CV generation without optional fields
     const result = await repository.generateCv({
+      language: 'en',
       userProfile: mockUserProfile,
       selectedExperiences: mockExperiences,
     });
@@ -213,6 +213,7 @@ describe('AI Operations - Generate CV (E2E Sandbox)', () => {
   it('should generate CV with all optional fields', async () => {
     // Test with stories, skills, languages, and certifications
     const result = await repository.generateCv({
+      language: 'en',
       userProfile: mockUserProfile,
       selectedExperiences: mockExperiences,
       stories: mockStories,
@@ -255,11 +256,31 @@ Must have 5+ years of experience and strong communication skills.
 `;
 
     const result = await repository.generateCv({
+      language: 'en',
       userProfile: mockUserProfile,
       selectedExperiences: mockExperiences,
       stories: mockStories,
       skills: mockSkills,
-      jobDescription,
+      jobDescription: {
+        title: 'Senior Software Engineer',
+        roleSummary: jobDescription.trim(),
+      },
+      matchingSummary: {
+        overallScore: 78,
+        scoreBreakdown: {
+          skillFit: 35,
+          experienceFit: 23,
+          interestFit: 10,
+          edge: 10,
+        },
+        recommendation: 'apply',
+        reasoningHighlights: ['Strong technical alignment'],
+        strengthsForThisRole: ['Microservices expertise'],
+        skillMatch: ['[MATCH] Kubernetes — production experience'],
+        riskyPoints: ['Risk: Limited fintech. Mitigation: highlight adaptability.'],
+        impactOpportunities: ['Modernize CI/CD'],
+        tailoringTips: ['Emphasize DevOps ownership'],
+      },
     });
 
     console.log('Tailored CV:', result.substring(0, 200) + '...');
@@ -284,12 +305,13 @@ Must have 5+ years of experience and strong communication skills.
       {
         id: 'exp-1',
         title: 'Software Engineer',
-        company: 'Tech Company',
+        companyName: 'Tech Company',
         startDate: '2020-01-01',
       },
     ];
 
     const result = await repository.generateCv({
+      language: 'en',
       userProfile: minimalProfile,
       selectedExperiences: minimalExperience,
     });
@@ -312,6 +334,7 @@ Must have 5+ years of experience and strong communication skills.
 
   it('should generate comprehensive CV with multiple sections', async () => {
     const result = await repository.generateCv({
+      language: 'en',
       userProfile: mockUserProfile,
       selectedExperiences: mockExperiences,
       skills: mockSkills,
@@ -349,13 +372,14 @@ Must have 5+ years of experience and strong communication skills.
       {
         id: 'test-1',
         title: 'Test Role',
-        company: 'Test Company',
+        companyName: 'Test Company',
         startDate: '2020-01-01',
       },
     ];
 
     try {
       const result = await repository.generateCv({
+        language: 'en',
         userProfile: testProfile,
         selectedExperiences: testExperience,
       });
@@ -392,13 +416,14 @@ Must have 5+ years of experience and strong communication skills.
       {
         id: 'invalid-1',
         title: '',
-        company: '',
+        companyName: '',
         startDate: '',
       },
     ];
 
     try {
       const result = await repository.generateCv({
+        language: 'en',
         userProfile: invalidProfile,
         selectedExperiences: invalidExperience,
       });

@@ -418,14 +418,17 @@ export const schema = a
     generateCv: a
       .query()
       .arguments({
-        userProfile: a.json().required(),
-        selectedExperiences: a.json().required(),
-        stories: a.json(),
+        language: a.string().required(),
+        userProfile: a.ref('ProfileType').required(),
+        selectedExperiences: a.ref('ExperienceType').array().required(),
+        stories: a.ref('SpeechStoryType').array(),
         skills: a.string().array(),
         languages: a.string().array(),
         certifications: a.string().array(),
         interests: a.string().array(),
-        jobDescription: a.string(),
+        jobDescription: a.ref('JobType'),
+        matchingSummary: a.ref('MatchingSummaryContextType'),
+        company: a.ref('CompanyType'),
       })
       .returns(a.string())
       .authorization((allow) => [allow.authenticated()])
@@ -469,7 +472,10 @@ export const schema = a
       headline: a.string(),
       location: a.string(),
       seniorityLevel: a.string(),
+      primaryEmail: a.string(),
+      primaryPhone: a.string(),
       workPermitInfo: a.string(),
+      socialLinks: a.string().array(),
       goals: a.string().array(),
       aspirations: a.string().array(),
       personalValues: a.string().array(),
@@ -493,10 +499,12 @@ export const schema = a
     }),
 
     ExperienceType: a.customType({
+      id: a.string(),
       title: a.string().required(),
       companyName: a.string(),
       startDate: a.string(),
       endDate: a.string(),
+      experienceType: a.string(),
       responsibilities: a.string().array(),
       tasks: a.string().array(),
       achievements: a.string().array(),
@@ -504,12 +512,30 @@ export const schema = a
     }),
 
     SpeechStoryType: a.customType({
+      experienceId: a.string(),
       title: a.string(),
       situation: a.string(),
       task: a.string(),
       action: a.string(),
       result: a.string(),
       achievements: a.string().array(),
+    }),
+
+    MatchingSummaryContextType: a.customType({
+      overallScore: a.integer().required(),
+      scoreBreakdown: a.customType({
+        skillFit: a.integer().required(),
+        experienceFit: a.integer().required(),
+        interestFit: a.integer().required(),
+        edge: a.integer().required(),
+      }),
+      recommendation: a.string().required(),
+      reasoningHighlights: a.string().array().required(),
+      strengthsForThisRole: a.string().array().required(),
+      skillMatch: a.string().array().required(),
+      riskyPoints: a.string().array().required(),
+      impactOpportunities: a.string().array().required(),
+      tailoringTips: a.string().array().required(),
     }),
 
     UserType: a.customType({
@@ -572,11 +598,14 @@ export const schema = a
     generateSpeech: a
       .query()
       .arguments({
+        language: a.string().required(),
         profile: a.ref('ProfileType').required(),
         experiences: a.ref('ExperienceType').array().required(),
         stories: a.ref('SpeechStoryType').array(),
         personalCanvas: a.ref('PersonalCanvasType'),
         jobDescription: a.ref('JobType'),
+        matchingSummary: a.ref('MatchingSummaryContextType'),
+        company: a.ref('CompanyType'),
       })
       .returns(
         a.customType({
@@ -591,11 +620,14 @@ export const schema = a
     generateCoverLetter: a
       .query()
       .arguments({
+        language: a.string().required(),
         profile: a.ref('ProfileType').required(),
         experiences: a.ref('ExperienceType').array().required(),
         stories: a.ref('SpeechStoryType').array(),
         personalCanvas: a.ref('PersonalCanvasType'),
         jobDescription: a.ref('JobType'),
+        matchingSummary: a.ref('MatchingSummaryContextType'),
+        company: a.ref('CompanyType'),
       })
       .returns(a.string())
       .authorization((allow) => [allow.authenticated()])

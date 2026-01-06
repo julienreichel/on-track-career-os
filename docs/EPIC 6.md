@@ -69,22 +69,22 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
 
 ### 3.1 Update AI op input schemas + types
 
-- [ ] Extend inputs for:
+- [x] Extend inputs for:
   - `ai.generateCv`
   - `ai.generateCoverLetter`
   - `ai.generateSpeech`
 
-- [ ] Add optional tailoring fields:
+- [x] Add optional tailoring fields:
   - `jobDescription?: JobDescription`
   - `matchingSummary?: MatchingSummary`
   - `company?: CompanySummarySubset`
   - `language: "en"`
 
-- [ ] Update shared types re-exported to frontend (single source of truth).
+- [x] Update shared types re-exported to frontend (single source of truth).
 
 ### 3.2 Update prompts (behavior)
 
-- [ ] Tailoring definition encoded:
+- [x] Tailoring definition encoded:
   - incorporate job keywords naturally (ATS)
   - select relevant expertise/stories
   - emphasize strengths aligned to job/company
@@ -93,14 +93,14 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
 
 ### 3.3 Fallback strategy (must be deterministic)
 
-- [ ] If tailoring payload invalid/malformed:
+- [x] If tailoring payload invalid/malformed:
   - either (preferred) drop tailoring block and generate generic
   - or return structured schema error
     Pick one approach and apply consistently across all 3 ops.
 
 ### 3.4 Tests
 
-- [ ] Vitest Lambda/unit tests per op:
+- [x] Vitest Lambda/unit tests per op:
   - generic mode still works
   - tailored mode returns valid output (schema / markdown expectations)
   - company summary doesn’t break output

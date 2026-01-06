@@ -3,8 +3,9 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 const SYSTEM_PROMPT = `You generate professional cover letters based on user identity data.
 
-If jobDescription is provided, tailor the letter to demonstrate fit for that specific role.
-If jobDescription is absent, create a generic cover letter showcasing the candidate's value proposition.
+If tailoring context is provided (jobDescription + matchingSummary), tailor the letter to demonstrate fit for that specific role.
+If tailoring context is absent, create a generic cover letter showcasing the candidate's value proposition.
+Use company context only when provided and only as summary-level framing.
 
 Output must be:
 - professional and authentic
@@ -80,22 +81,57 @@ export interface CoverLetterJobDescription {
   explicitPains?: string[];
 }
 
+export interface CoverLetterMatchingSummary {
+  overallScore: number;
+  scoreBreakdown: {
+    skillFit: number;
+    experienceFit: number;
+    interestFit: number;
+    edge: number;
+  };
+  recommendation: 'apply' | 'maybe' | 'skip';
+  reasoningHighlights: string[];
+  strengthsForThisRole: string[];
+  skillMatch: string[];
+  riskyPoints: string[];
+  impactOpportunities: string[];
+  tailoringTips: string[];
+}
+
+export interface CoverLetterCompanySummary {
+  companyName: string;
+  industry?: string;
+  sizeRange?: string;
+  website?: string;
+  description?: string;
+}
+
 export interface GenerateCoverLetterInput {
+  language: 'en';
   profile: CoverLetterUserProfile;
   experiences: CoverLetterExperience[];
   stories?: CoverLetterStory[];
   personalCanvas?: CoverLetterPersonalCanvas;
   jobDescription?: CoverLetterJobDescription;
+  matchingSummary?: CoverLetterMatchingSummary;
+  company?: CoverLetterCompanySummary;
 }
 
 function buildUserPrompt(args: GenerateCoverLetterInput): string {
-  const hasJob = Boolean(args.jobDescription);
+  const tailoring = resolveTailoringContext(args);
+  const hasJob = Boolean(tailoring?.jobDescription);
+  const jobDescription = tailoring?.jobDescription ?? null;
+  const matchingSummary = tailoring?.matchingSummary ?? null;
+  const company = tailoring?.company ?? null;
 
   const instruction = hasJob
     ? 'Create a cover letter tailored to the target job description.'
     : "Create a generic cover letter showcasing the candidate's professional value.";
 
   return `${instruction}
+
+LANGUAGE:
+${args.language}
 
 PROFILE:
 ${JSON.stringify(args.profile ?? {}, null, PROMPT_INDENT_SPACES)}
@@ -110,7 +146,13 @@ PERSONAL CANVAS:
 ${JSON.stringify(args.personalCanvas ?? {}, null, PROMPT_INDENT_SPACES)}
 
 TARGET JOB DESCRIPTION (optional):
-${JSON.stringify(args.jobDescription ?? null, null, PROMPT_INDENT_SPACES)}
+${JSON.stringify(jobDescription, null, PROMPT_INDENT_SPACES)}
+
+MATCHING SUMMARY (optional):
+${JSON.stringify(matchingSummary, null, PROMPT_INDENT_SPACES)}
+
+COMPANY SUMMARY (optional):
+${JSON.stringify(company, null, PROMPT_INDENT_SPACES)}
 
 Structure the cover letter with:
 1. Opening paragraph: Express interest and briefly introduce yourself
@@ -121,6 +163,44 @@ ${hasJob ? 'Demonstrate specific fit for the role and company needs.' : 'Focus o
 
 Return ONLY valid JSON matching this exact schema:
 ${OUTPUT_SCHEMA}`;
+}
+
+function resolveTailoringContext(args: GenerateCoverLetterInput) {
+  const hasJob = isValidJobDescription(args.jobDescription);
+  const hasSummary = isValidMatchingSummary(args.matchingSummary);
+
+  if (hasJob && hasSummary) {
+    return {
+      jobDescription: args.jobDescription ?? null,
+      matchingSummary: args.matchingSummary ?? null,
+      company: args.company ?? null,
+    };
+  }
+
+  if (args.jobDescription || args.matchingSummary) {
+    console.warn('[generateCoverLetter] Invalid tailoring context detected. Falling back to generic.');
+  }
+
+  return null;
+}
+
+function isValidJobDescription(
+  value?: CoverLetterJobDescription | null
+): value is CoverLetterJobDescription {
+  return Boolean(value?.title);
+}
+
+function isValidMatchingSummary(
+  value?: CoverLetterMatchingSummary | null
+): value is CoverLetterMatchingSummary {
+  if (!value) return false;
+  return (
+    typeof value.overallScore === 'number' &&
+    typeof value.scoreBreakdown?.skillFit === 'number' &&
+    typeof value.scoreBreakdown?.experienceFit === 'number' &&
+    typeof value.scoreBreakdown?.interestFit === 'number' &&
+    typeof value.scoreBreakdown?.edge === 'number'
+  );
 }
 
 type HandlerEvent = {
@@ -159,6 +239,7 @@ export const handler = async (event: HandlerEvent): Promise<string> => {
       experienceCount: args.experiences?.length ?? 0,
       storyCount: args.stories?.length ?? 0,
       hasJobDescription: Boolean(args.jobDescription),
+      hasMatchingSummary: Boolean(args.matchingSummary),
       profilePreview: truncateForLog(JSON.stringify(args.profile ?? {})),
     })
   );

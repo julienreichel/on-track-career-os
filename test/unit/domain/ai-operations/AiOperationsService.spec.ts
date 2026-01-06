@@ -389,12 +389,13 @@ describe('AiOperationsService', () => {
 
   describe('generateCv', () => {
     const baseInput: GenerateCvInput = {
+      language: 'en',
       userProfile: { fullName: 'Jane Doe' },
       selectedExperiences: [
         {
           id: 'exp-1',
           title: 'Engineer',
-          company: 'Acme',
+          companyName: 'Acme',
           startDate: '2020-01-01',
         },
       ],
@@ -420,9 +421,15 @@ describe('AiOperationsService', () => {
       await expect(
         service.generateCv({
           ...baseInput,
-          selectedExperiences: [{ id: 'exp', title: '', company: '', startDate: '2020-01-01' }],
+          selectedExperiences: [{ id: 'exp', title: '', companyName: 'Acme', startDate: '' }],
         })
-      ).rejects.toThrow('Each experience must have id, title, and company');
+      ).rejects.toThrow('Each experience must have title and startDate');
+    });
+
+    it('rejects when language is not supported', async () => {
+      await expect(service.generateCv({ ...baseInput, language: 'fr' as 'en' })).rejects.toThrow(
+        'Language must be "en"'
+      );
     });
 
     it('rejects when repo returns non-string payload', async () => {
@@ -697,6 +704,7 @@ describe('AiOperationsService', () => {
 
   describe('generateSpeech', () => {
     const validInput = {
+      language: 'en',
       profile: { fullName: 'Casey Candidate' },
       experiences: [],
     };
@@ -716,9 +724,16 @@ describe('AiOperationsService', () => {
     });
 
     it('should throw if profile fullName missing', async () => {
-      await expect(service.generateSpeech({ profile: {}, experiences: [] } as never)).rejects.toThrow(
-        'User profile with fullName is required'
-      );
+      await expect(
+        service.generateSpeech({ language: 'en', profile: {}, experiences: [] } as never)
+      ).rejects.toThrow('User profile with fullName is required');
+      expect(mockRepo.generateSpeech).not.toHaveBeenCalled();
+    });
+
+    it('should throw if language is not supported', async () => {
+      await expect(
+        service.generateSpeech({ ...validInput, language: 'fr' as 'en' } as never)
+      ).rejects.toThrow('Language must be "en"');
       expect(mockRepo.generateSpeech).not.toHaveBeenCalled();
     });
 

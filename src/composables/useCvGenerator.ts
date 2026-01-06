@@ -64,7 +64,7 @@ export function useCvGenerator() {
     userId: string,
     selectedExperienceIds: string[],
     options: {
-      jobDescription?: string;
+      jobDescription?: GenerateCvInput['jobDescription'] | string;
       includeSkills?: boolean;
       includeLanguages?: boolean;
       includeCertifications?: boolean;
@@ -89,6 +89,7 @@ export function useCvGenerator() {
 
       // Build input
       const input: GenerateCvInput = {
+        language: 'en',
         userProfile: {
           fullName: profile.fullName || '',
           headline: profile.headline || undefined,
@@ -105,7 +106,7 @@ export function useCvGenerator() {
         selectedExperiences: selectedExperiences.map((exp: Experience) => ({
           id: exp.id,
           title: exp.title || '',
-          company: exp.companyName || '',
+          companyName: exp.companyName || undefined,
           startDate: exp.startDate || '',
           endDate: exp.endDate || undefined,
           experienceType: exp.experienceType as
@@ -118,7 +119,6 @@ export function useCvGenerator() {
           tasks: exp.tasks?.filter((t): t is string => t !== null),
         })),
         stories: allStories.map((story) => ({
-          id: story.id,
           experienceId: story.experienceId,
           situation: story.situation,
           task: story.task,
@@ -143,7 +143,9 @@ export function useCvGenerator() {
       }
 
       // Add optional generation options
-      if (options.jobDescription) input.jobDescription = options.jobDescription;
+      if (options.jobDescription) {
+        input.jobDescription = normalizeJobDescription(options.jobDescription);
+      }
 
       return input;
     } catch (err) {
@@ -192,5 +194,18 @@ export function useCvGenerator() {
     // Actions
     generateCv,
     buildGenerationInput,
+  };
+}
+
+function normalizeJobDescription(
+  input: GenerateCvInput['jobDescription'] | string
+): GenerateCvInput['jobDescription'] {
+  if (typeof input !== 'string') {
+    return input;
+  }
+
+  return {
+    title: 'Target role',
+    roleSummary: input.trim(),
   };
 }

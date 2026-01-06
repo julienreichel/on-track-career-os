@@ -16,6 +16,8 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
  * - certifications: Optional array of certifications
  * - interests: Optional array of interests
  * - jobDescription: Optional job description for tailoring
+ * - matchingSummary: Optional matching summary for tailoring
+ * - company: Optional company summary context
  *
  * Output Schema:
  * - Returns complete CV as plain Markdown text
@@ -37,27 +39,61 @@ interface UserProfile {
 interface Experience {
   id?: string;
   title?: string;
-  company?: string;
   companyName?: string;
   startDate?: string;
   endDate?: string;
-  isCurrent?: boolean;
   experienceType?: 'work' | 'education' | 'volunteer' | 'project';
   responsibilities?: string[];
   tasks?: string[];
 }
 
 interface Story {
-  id?: string;
-  experienceId?: string;
   situation?: string;
+  experienceId?: string;
   task?: string;
   action?: string;
   result?: string;
   achievements?: string[];
 }
 
+interface CvJobDescription {
+  title: string;
+  seniorityLevel?: string;
+  roleSummary?: string;
+  responsibilities?: string[];
+  requiredSkills?: string[];
+  behaviours?: string[];
+  successCriteria?: string[];
+  explicitPains?: string[];
+}
+
+interface CvMatchingSummary {
+  overallScore: number;
+  scoreBreakdown: {
+    skillFit: number;
+    experienceFit: number;
+    interestFit: number;
+    edge: number;
+  };
+  recommendation: 'apply' | 'maybe' | 'skip';
+  reasoningHighlights: string[];
+  strengthsForThisRole: string[];
+  skillMatch: string[];
+  riskyPoints: string[];
+  impactOpportunities: string[];
+  tailoringTips: string[];
+}
+
+interface CvCompanySummary {
+  companyName: string;
+  industry?: string;
+  sizeRange?: string;
+  website?: string;
+  description?: string;
+}
+
 interface GenerateCvInput {
+  language: 'en';
   userProfile: UserProfile;
   selectedExperiences: Experience[];
   stories?: Story[];
@@ -65,7 +101,9 @@ interface GenerateCvInput {
   languages?: string[];
   certifications?: string[];
   interests?: string[];
-  jobDescription?: string;
+  jobDescription?: CvJobDescription;
+  matchingSummary?: CvMatchingSummary;
+  company?: CvCompanySummary;
 }
 
 /**
@@ -78,6 +116,8 @@ Your task is to generate a professional, ATS-optimized CV in Markdown format wit
 1. Output ONLY valid Markdown - no additional commentary
 2. Do NOT include explanations, commentary, or labels.
 3. Final CV must look like a real human-written CV, not raw database output.
+4. If matchingSummary is provided, use its tailoringTips/strengths to guide emphasis.
+5. If company summary is provided, use only summary-level info and do not invent details.
 
 ## INFORMATION-TRANSFORMATION PRINCIPLES
 ### **A. Preserve Uniqueness Over Compression**
@@ -205,10 +245,10 @@ function formatUserProfile(profile: UserProfile): string {
  */
 function formatSingleExperience(exp: Experience, stories: Story[] | undefined): string {
   let output = `\n### ${exp.title || 'Position'}\n`;
-  const companyName = exp.company || exp.companyName;
+  const companyName = exp.companyName;
   if (companyName) output += `**${companyName}**\n`;
   if (exp.startDate) {
-    const endDate = exp.endDate || (exp.isCurrent ? 'Present' : 'Not specified');
+    const endDate = exp.endDate || 'Present';
     output += `${exp.startDate} - ${endDate}\n`;
   }
 
@@ -223,7 +263,9 @@ function formatSingleExperience(exp: Experience, stories: Story[] | undefined): 
   }
 
   // Add related stories
-  const relatedStories = stories?.filter((s) => s.experienceId === exp.id) || [];
+  const relatedStories = exp.id
+    ? stories?.filter((s) => s.experienceId && s.experienceId === exp.id) || []
+    : [];
   if (relatedStories.length > 0) {
     output += `\nKey Achievements (from STAR stories):\n`;
     relatedStories.forEach((story) => {
@@ -313,7 +355,13 @@ function formatExperiencesWithStories(
 /**
  * Build the user prompt for CV generation
  */
+// eslint-disable-next-line complexity
 function buildUserPrompt(input: GenerateCvInput): string {
+  const tailoring = resolveTailoringContext(input);
+  const jobDescription = tailoring?.jobDescription ?? null;
+  const matchingSummary = tailoring?.matchingSummary ?? null;
+  const company = tailoring?.company ?? null;
+
   let prompt = 'Generate a professional, CONCISE CV in Markdown format.\n\n';
   prompt += 'SYNTHESIS INSTRUCTIONS:\n';
   prompt += '- CONDENSE verbose descriptions into impactful 1-line bullets\n';
@@ -322,6 +370,8 @@ function buildUserPrompt(input: GenerateCvInput): string {
   prompt += '- SELECT only the most relevant skills/interests (not all)\n';
   prompt += '- COMBINE similar responsibilities into single points\n';
   prompt += '- Professional summary: 2-3 lines maximum\n\n';
+
+  prompt += `LANGUAGE:\n${input.language}\n\n`;
 
   prompt += formatUserProfile(input.userProfile);
   prompt += formatExperiencesWithStories(input.selectedExperiences, input.stories);
@@ -351,8 +401,12 @@ function buildUserPrompt(input: GenerateCvInput): string {
   }
 
   // Add job description for tailoring
-  if (input.jobDescription) {
-    prompt += `## TARGET JOB DESCRIPTION\n${input.jobDescription}\n\n`;
+  if (jobDescription) {
+    prompt += `## TARGET JOB DESCRIPTION\n${JSON.stringify(jobDescription, null, 2)}\n\n`;
+    prompt += `## MATCHING SUMMARY\n${JSON.stringify(matchingSummary, null, 2)}\n\n`;
+    if (company) {
+      prompt += `## COMPANY SUMMARY\n${JSON.stringify(company, null, 2)}\n\n`;
+    }
     prompt += `TAILORING INSTRUCTIONS:\n`;
     prompt += `- Prioritize experiences and skills matching this job description\n`;
     prompt += `- Use keywords from the job posting\n`;
@@ -367,6 +421,40 @@ function buildUserPrompt(input: GenerateCvInput): string {
   prompt += `- Transform verbose input into professional, impactful output`;
 
   return prompt;
+}
+
+function resolveTailoringContext(input: GenerateCvInput) {
+  const hasJob = isValidJobDescription(input.jobDescription);
+  const hasSummary = isValidMatchingSummary(input.matchingSummary);
+
+  if (hasJob && hasSummary) {
+    return {
+      jobDescription: input.jobDescription ?? null,
+      matchingSummary: input.matchingSummary ?? null,
+      company: input.company ?? null,
+    };
+  }
+
+  if (input.jobDescription || input.matchingSummary) {
+    console.warn('[generateCv] Invalid tailoring context detected. Falling back to generic.');
+  }
+
+  return null;
+}
+
+function isValidJobDescription(value?: CvJobDescription | null): value is CvJobDescription {
+  return Boolean(value?.title);
+}
+
+function isValidMatchingSummary(value?: CvMatchingSummary | null): value is CvMatchingSummary {
+  if (!value) return false;
+  return (
+    typeof value.overallScore === 'number' &&
+    typeof value.scoreBreakdown?.skillFit === 'number' &&
+    typeof value.scoreBreakdown?.experienceFit === 'number' &&
+    typeof value.scoreBreakdown?.interestFit === 'number' &&
+    typeof value.scoreBreakdown?.edge === 'number'
+  );
 }
 
 /**
@@ -416,8 +504,9 @@ function prepareInputForLogging(input: GenerateCvInput) {
     storyCount: input.stories?.length || 0,
     skillCount: input.skills?.length || 0,
     hasJobDescription: !!input.jobDescription,
+    hasMatchingSummary: !!input.matchingSummary,
     jobDescriptionPreview: input.jobDescription
-      ? truncateForLog(input.jobDescription, LOG_TRUNCATE_LENGTH)
+      ? truncateForLog(JSON.stringify(input.jobDescription), LOG_TRUNCATE_LENGTH)
       : null,
   };
 }

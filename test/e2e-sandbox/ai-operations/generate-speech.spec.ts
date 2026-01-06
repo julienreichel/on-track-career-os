@@ -59,6 +59,7 @@ describe('AI Operations - Generate Speech (E2E Sandbox)', () => {
 
   it('generates speech blocks from structured inputs', async () => {
     const speech = await repository.generateSpeech({
+      language: 'en',
       profile: {
         fullName: 'Casey Candidate',
         headline: 'Engineering Lead',
@@ -75,6 +76,22 @@ describe('AI Operations - Generate Speech (E2E Sandbox)', () => {
       jobDescription: {
         title: 'Head of Engineering',
         roleSummary: 'Scale teams with reliable delivery',
+      },
+      matchingSummary: {
+        overallScore: 70,
+        scoreBreakdown: {
+          skillFit: 30,
+          experienceFit: 20,
+          interestFit: 10,
+          edge: 10,
+        },
+        recommendation: 'maybe',
+        reasoningHighlights: ['Leadership experience aligns'],
+        strengthsForThisRole: ['Team scaling'],
+        skillMatch: ['[MATCH] Leadership — led teams of 10+'],
+        riskyPoints: ['Risk: Limited fintech. Mitigation: emphasize adaptability.'],
+        impactOpportunities: ['Improve delivery cadence'],
+        tailoringTips: ['Highlight mentoring outcomes'],
       },
     });
     console.log(speech);

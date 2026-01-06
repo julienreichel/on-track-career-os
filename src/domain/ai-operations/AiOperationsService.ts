@@ -303,6 +303,10 @@ export class AiOperationsService {
       throw new Error('Invalid input structure');
     }
 
+    if (input.language !== 'en') {
+      throw new Error('Language must be "en"');
+    }
+
     if (!input.userProfile || typeof input.userProfile !== 'object') {
       throw new Error('User profile is required');
     }
@@ -321,8 +325,8 @@ export class AiOperationsService {
 
     // Validate each experience has required fields
     for (const exp of input.selectedExperiences) {
-      if (!exp.id || !exp.title || !exp.company) {
-        throw new Error('Each experience must have id, title, and company');
+      if (!exp.title || !exp.startDate) {
+        throw new Error('Each experience must have title and startDate');
       }
     }
   }
@@ -413,6 +417,9 @@ export class AiOperationsService {
     if (!input?.profile?.fullName) {
       throw new Error('User profile with fullName is required');
     }
+    if (input.language !== 'en') {
+      throw new Error('Language must be "en"');
+    }
 
     const mocked = resolveAiMock('generateSpeech', input);
     if (mocked) {
@@ -429,6 +436,9 @@ export class AiOperationsService {
   async generateCoverLetter(input: SpeechInput): Promise<string> {
     if (!input?.profile?.fullName) {
       throw new Error('User profile with fullName is required');
+    }
+    if (input.language !== 'en') {
+      throw new Error('Language must be "en"');
     }
 
     const mocked = resolveAiMock('generateCoverLetter', input);

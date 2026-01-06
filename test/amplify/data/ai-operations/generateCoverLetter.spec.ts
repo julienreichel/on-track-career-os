@@ -34,6 +34,7 @@ describe('ai.generateCoverLetter', () => {
   });
 
   const validArguments = {
+    language: 'en',
     profile: {
       fullName: 'Casey Candidate',
       headline: 'Engineering Lead',
@@ -63,6 +64,29 @@ describe('ai.generateCoverLetter', () => {
       title: 'Head of Engineering',
       roleSummary: 'Scale teams and drive technical excellence',
       requiredSkills: ['Leadership', 'Architecture'],
+    },
+    matchingSummary: {
+      overallScore: 78,
+      scoreBreakdown: {
+        skillFit: 35,
+        experienceFit: 25,
+        interestFit: 8,
+        edge: 10,
+      },
+      recommendation: 'apply',
+      reasoningHighlights: ['Strong leadership background'],
+      strengthsForThisRole: ['Team scaling'],
+      skillMatch: ['[MATCH] Leadership — led teams of 10+'],
+      riskyPoints: ['Risk: Limited B2B. Mitigation: emphasize transferable wins.'],
+      impactOpportunities: ['Improve delivery cadence'],
+      tailoringTips: ['Emphasize mentoring outcomes'],
+    },
+    company: {
+      companyName: 'Acme Systems',
+      industry: 'Logistics',
+      sizeRange: '201-500',
+      website: 'https://acme.example',
+      description: 'AI workflow platform for logistics teams.',
     },
   };
 
@@ -106,6 +130,7 @@ Casey Candidate`;
     const genericArgs = {
       ...validArguments,
       jobDescription: undefined,
+      matchingSummary: undefined,
     };
 
     mockSend.mockResolvedValue(
@@ -143,7 +168,29 @@ Casey Candidate`;
 
     expect(userPrompt).toContain('TARGET JOB DESCRIPTION');
     expect(userPrompt).toContain('Head of Engineering');
+    expect(userPrompt).toContain('MATCHING SUMMARY');
     expect(userPrompt).toContain('tailored');
+    expect(userPrompt).toContain('COMPANY SUMMARY');
+    expect(userPrompt).toContain('Acme Systems');
+  });
+
+  it('drops job context when matching summary is missing', async () => {
+    mockSend.mockResolvedValue(
+      buildBedrockResponse({
+        content: 'Generic cover letter content.',
+      })
+    );
+
+    const argsWithoutSummary = { ...validArguments, matchingSummary: undefined };
+    await handler({ arguments: argsWithoutSummary as never });
+
+    const { InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime');
+    const calls = (InvokeModelCommand as unknown as ReturnType<typeof vi.fn>).mock.calls;
+    const commandInput = calls[0][0];
+    const payload = JSON.parse(commandInput.body);
+    const userPrompt = payload.messages[0].content[0].text as string;
+
+    expect(userPrompt).not.toContain('Head of Engineering');
   });
 
   it('validates output schema and returns valid content', async () => {

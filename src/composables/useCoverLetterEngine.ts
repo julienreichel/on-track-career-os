@@ -99,6 +99,7 @@ function createCoverLetterEngineState({ providedUserId, deps, auth }: EngineStat
       }
 
       const input: SpeechInput = {
+        language: 'en',
         profile: mapProfileToSpeechProfile(userProfile.value),
         experiences: experiences.value.map(mapExperienceToSpeechExperience),
         stories: stories.value.map(mapStoryToSpeechStory),

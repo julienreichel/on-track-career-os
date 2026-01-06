@@ -96,6 +96,7 @@ Python, JavaScript, AWS, Docker, Kubernetes
 
     const result = await handler({
       arguments: {
+        language: 'en',
         userProfile: {
           fullName: 'John Doe',
           headline: 'Senior Software Engineer',
@@ -144,6 +145,7 @@ CS Degree`;
 
     const result = await handler({
       arguments: {
+        language: 'en',
         userProfile: { fullName: 'Jane Smith' },
         selectedExperiences: [],
       },
@@ -175,6 +177,7 @@ Some content without headers`;
 
     const result = await handler({
       arguments: {
+        language: 'en',
         userProfile: { fullName: 'Test User' },
         selectedExperiences: [],
       },
@@ -206,6 +209,7 @@ Seeking opportunities`;
 
     const result = await handler({
       arguments: {
+        language: 'en',
         userProfile: { fullName: 'Professional' },
         selectedExperiences: [],
       },
@@ -214,6 +218,102 @@ Seeking opportunities`;
     expect(typeof result).toBe('string');
     expect(result.length).toBeGreaterThan(0);
     expect(result).toContain('# Professional');
+  });
+
+  it('drops job context when matching summary is missing', async () => {
+    const mockMarkdown = `# Tailored CV`;
+
+    mockSend.mockResolvedValue({
+      body: Buffer.from(
+        JSON.stringify({
+          output: {
+            message: {
+              content: [{ text: mockMarkdown }],
+            },
+          },
+        })
+      ),
+    });
+
+    await handler({
+      arguments: {
+        language: 'en',
+        userProfile: { fullName: 'Taylor' },
+        selectedExperiences: [],
+        jobDescription: {
+          title: 'Staff Engineer',
+          roleSummary: 'Build scalable systems',
+        },
+      },
+    });
+
+    const { InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime');
+    const calls = (InvokeModelCommand as unknown as ReturnType<typeof vi.fn>).mock.calls;
+    const commandInput = calls[0][0];
+    const payload = JSON.parse(commandInput.body);
+    const userPrompt = payload.messages[0].content[0].text as string;
+
+    expect(userPrompt).not.toContain('Staff Engineer');
+  });
+
+  it('includes company summary when tailoring context is valid', async () => {
+    const mockMarkdown = `# Tailored CV`;
+
+    mockSend.mockResolvedValue({
+      body: Buffer.from(
+        JSON.stringify({
+          output: {
+            message: {
+              content: [{ text: mockMarkdown }],
+            },
+          },
+        })
+      ),
+    });
+
+    await handler({
+      arguments: {
+        language: 'en',
+        userProfile: { fullName: 'Taylor' },
+        selectedExperiences: [],
+        jobDescription: {
+          title: 'Staff Engineer',
+          roleSummary: 'Build scalable systems',
+        },
+        matchingSummary: {
+          overallScore: 80,
+          scoreBreakdown: {
+            skillFit: 35,
+            experienceFit: 25,
+            interestFit: 10,
+            edge: 10,
+          },
+          recommendation: 'apply',
+          reasoningHighlights: ['Strong technical alignment'],
+          strengthsForThisRole: ['System design leadership'],
+          skillMatch: ['[MATCH] Architecture — led platform redesign'],
+          riskyPoints: ['Risk: Limited fintech. Mitigation: highlight adaptability.'],
+          impactOpportunities: ['Improve delivery cadence'],
+          tailoringTips: ['Emphasize architecture wins'],
+        },
+        company: {
+          companyName: 'Acme Systems',
+          industry: 'Logistics',
+          sizeRange: '201-500',
+          website: 'https://acme.example',
+          description: 'AI workflow platform for logistics teams.',
+        },
+      },
+    });
+
+    const { InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime');
+    const calls = (InvokeModelCommand as unknown as ReturnType<typeof vi.fn>).mock.calls;
+    const commandInput = calls[0][0];
+    const payload = JSON.parse(commandInput.body);
+    const userPrompt = payload.messages[0].content[0].text as string;
+
+    expect(userPrompt).toContain('COMPANY SUMMARY');
+    expect(userPrompt).toContain('Acme Systems');
   });
 
   it('should generate CV with various section headers', async () => {
@@ -245,6 +345,7 @@ Skills list`;
 
     const result = await handler({
       arguments: {
+        language: 'en',
         userProfile: { fullName: 'Test' },
         selectedExperiences: [],
       },
