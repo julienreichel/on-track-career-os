@@ -48,7 +48,7 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
 
 ### 2.1 Create shared TailoringContext builder
 
-- [ ] Implement shared helper/composable:
+- [x] Implement shared helper/composable:
   - takes **full objects**: `UserProfile`, `JobDescription`, `MatchingSummary`, optional `Company (summary only)`
   - enforces `language: "en"`
   - **limits company fields** (no CompanyCanvas, no rawNotes dump)
@@ -57,7 +57,7 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
 
 ### 2.2 Tests
 
-- [ ] Vitest tests for builder:
+- [x] Vitest tests for builder:
   - minimal tailored payload
   - includes company summary when present
   - excludes canvas/large fields
