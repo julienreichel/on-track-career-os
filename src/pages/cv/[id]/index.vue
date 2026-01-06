@@ -13,6 +13,70 @@
       />
 
       <UPageBody>
+        <UCard v-if="hasJobContext" class="mb-6">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-gray-500">Target job</p>
+              <p class="text-lg font-semibold">{{ targetJobTitle }}</p>
+              <UButton
+                v-if="jobLink"
+                class="mt-2"
+                color="neutral"
+                variant="ghost"
+                icon="i-heroicons-arrow-top-right-on-square"
+                label="View job"
+                :to="jobLink"
+              />
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+              <UButton
+                color="primary"
+                icon="i-heroicons-sparkles"
+                label="Regenerate tailored CV"
+                :loading="isRegenerating"
+                :disabled="regenerateDisabled"
+                @click="handleRegenerateTailored"
+              />
+              <UButton
+                v-if="matchLink"
+                color="neutral"
+                variant="outline"
+                icon="i-heroicons-sparkles"
+                label="View match"
+                :to="matchLink"
+              />
+            </div>
+          </div>
+
+          <UAlert
+            v-if="contextError"
+            class="mt-4"
+            icon="i-heroicons-exclamation-triangle"
+            color="warning"
+            variant="soft"
+            title="Unable to load job context"
+            :description="contextError"
+          />
+          <UAlert
+            v-else-if="regenerateError"
+            class="mt-4"
+            icon="i-heroicons-exclamation-triangle"
+            color="warning"
+            variant="soft"
+            title="Unable to regenerate tailored CV"
+            :description="regenerateError"
+          />
+          <UAlert
+            v-else-if="missingSummary"
+            class="mt-4"
+            icon="i-heroicons-information-circle"
+            color="info"
+            variant="soft"
+            title="Matching summary required"
+            description="Generate a matching summary before regenerating this CV."
+          />
+        </UCard>
+
         <!-- Error Alert -->
         <UAlert
           v-if="error"
@@ -166,13 +230,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { marked } from 'marked';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
+import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
+import { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
+import { useAuthUser } from '@/composables/useAuthUser';
+import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
+import type { JobDescription } from '@/domain/job-description/JobDescription';
+import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -181,12 +251,20 @@ const toast = useToast();
 const cvId = computed(() => route.params.id as string);
 
 const service = new CVDocumentService();
+const jobService = new JobDescriptionService();
+const matchingSummaryService = new MatchingSummaryService();
 const userProfileService = new UserProfileService();
 const profilePhotoService = new ProfilePhotoService();
+const auth = useAuthUser();
+const tailoredMaterials = useTailoredMaterials({ auth });
 const document = ref<CVDocument | null>(null);
 const loading = ref(false);
 const saving = ref(false);
 const error = ref<string | null>(null);
+const targetJob = ref<JobDescription | null>(null);
+const matchingSummary = ref<MatchingSummary | null>(null);
+const contextLoading = ref(false);
+const contextError = ref<string | null>(null);
 
 const isEditing = ref(false);
 const editContent = ref('');
@@ -197,6 +275,24 @@ const showCancelConfirm = ref(false);
 const profilePhotoUrl = ref<string | null>(null);
 const profilePhotoLoading = ref(false);
 const profilePhotoError = ref<string | null>(null);
+
+const hasJobContext = computed(() => Boolean(document.value?.jobId));
+const targetJobTitle = computed(() => targetJob.value?.title?.trim() || 'Target job');
+const jobLink = computed(() => (targetJob.value?.id ? `/jobs/${targetJob.value.id}` : null));
+const matchLink = computed(() =>
+  targetJob.value?.id ? `/jobs/${targetJob.value.id}/match` : null
+);
+const isRegenerating = computed(() => tailoredMaterials.isGenerating.value);
+const canRegenerate = computed(
+  () => Boolean(document.value?.id && targetJob.value && matchingSummary.value)
+);
+const regenerateDisabled = computed(
+  () => !canRegenerate.value || contextLoading.value || isRegenerating.value
+);
+const regenerateError = computed(() => tailoredMaterials.error.value);
+const missingSummary = computed(
+  () => Boolean(document.value?.jobId && targetJob.value && !matchingSummary.value)
+);
 
 const renderedHtml = computed(() => {
   if (!document.value?.content) return '';
@@ -252,6 +348,7 @@ const load = async () => {
       showProfilePhotoSetting.value = shouldShow;
       originalShowProfilePhoto.value = shouldShow;
       await loadProfilePhoto(document.value.userId);
+      await loadTailoringContext(document.value.jobId);
     }
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load CV';
@@ -324,6 +421,97 @@ const handlePrint = () => {
   const printUrl = `/cv/${cvId.value}/print`;
   window.open(printUrl, '_blank');
 };
+
+const loadTailoringContext = async (jobId?: string | null) => {
+  if (!jobId) {
+    targetJob.value = null;
+    matchingSummary.value = null;
+    contextError.value = null;
+    return;
+  }
+
+  contextLoading.value = true;
+  contextError.value = null;
+
+  try {
+    if (!auth.userId.value) {
+      await auth.loadUserId();
+    }
+
+    if (!auth.userId.value) {
+      throw new Error('User not authenticated');
+    }
+
+    const job = await jobService.getFullJobDescription(jobId);
+    if (!job) {
+      throw new Error('Job not found');
+    }
+    targetJob.value = job;
+
+    const companyId = job.companyId ?? null;
+    let summary = await matchingSummaryService.getByContext({
+      userId: auth.userId.value,
+      jobId,
+      companyId,
+    });
+
+    if (!summary && companyId) {
+      summary = await matchingSummaryService.getByContext({
+        userId: auth.userId.value,
+        jobId,
+        companyId: null,
+      });
+    }
+
+    matchingSummary.value = summary;
+  } catch (err) {
+    contextError.value = err instanceof Error ? err.message : 'Failed to load tailored context';
+    console.error('[cvDisplay] Error loading tailored context:', err);
+    targetJob.value = null;
+    matchingSummary.value = null;
+  } finally {
+    contextLoading.value = false;
+  }
+};
+
+const handleRegenerateTailored = async () => {
+  if (!document.value?.id || !targetJob.value || !matchingSummary.value) {
+    return;
+  }
+
+  try {
+    const updated = await tailoredMaterials.regenerateTailoredCvForJob({
+      id: document.value.id,
+      job: targetJob.value,
+      matchingSummary: matchingSummary.value,
+      options: {
+        name: document.value.name,
+        templateId: document.value.templateId ?? undefined,
+        showProfilePhoto: document.value.showProfilePhoto ?? true,
+      },
+    });
+
+    if (updated) {
+      document.value = updated;
+      editContent.value = updated.content || '';
+      originalContent.value = updated.content || '';
+      const shouldShow = updated.showProfilePhoto ?? true;
+      showProfilePhotoSetting.value = shouldShow;
+      originalShowProfilePhoto.value = shouldShow;
+      toast.add({ title: 'Tailored CV regenerated.', color: 'primary' });
+    }
+  } catch (err) {
+    console.error('[cvDisplay] Failed to regenerate tailored CV', err);
+    toast.add({ title: 'Failed to regenerate tailored CV.', color: 'error' });
+  }
+};
+
+watch(
+  () => document.value?.jobId,
+  (jobId) => {
+    void loadTailoringContext(jobId);
+  }
+);
 
 onMounted(() => {
   load();

@@ -59,6 +59,18 @@ vi.mock('@/composables/useCompanies', () => ({
   useCompanies: () => companyStoreMock,
 }));
 
+const tailoredMaterialsMock = {
+  isGenerating: ref(false),
+  error: ref<string | null>(null),
+  generateTailoredCvForJob: vi.fn(),
+  generateTailoredCoverLetterForJob: vi.fn(),
+  generateTailoredSpeechForJob: vi.fn(),
+};
+
+vi.mock('@/application/tailoring/useTailoredMaterials', () => ({
+  useTailoredMaterials: () => tailoredMaterialsMock,
+}));
+
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
@@ -159,6 +171,8 @@ describe('Job match page', () => {
     engineMock.load.mockResolvedValue(undefined);
     engineMock.regenerate.mockResolvedValue(undefined);
     companyStoreMock.listCompanies.mockClear();
+    tailoredMaterialsMock.isGenerating.value = false;
+    tailoredMaterialsMock.error.value = null;
   });
 
   it('loads data on mount and renders summary information', async () => {

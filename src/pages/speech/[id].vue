@@ -6,8 +6,14 @@ import SpeechBlockEditorCard from '@/components/speech/SpeechBlockEditorCard.vue
 import UnsavedChangesModal from '@/components/UnsavedChangesModal.vue';
 import { useSpeechBlock } from '@/application/speech-block/useSpeechBlock';
 import { useSpeechEngine } from '@/composables/useSpeechEngine';
+import { useAuthUser } from '@/composables/useAuthUser';
+import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
+import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
+import { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
 import type { SpeechResult } from '@/domain/ai-operations/SpeechResult';
 import type { PageHeaderLink } from '@/types/ui';
+import type { JobDescription } from '@/domain/job-description/JobDescription';
+import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -16,6 +22,14 @@ const toast = useToast();
 const speechId = computed(() => route.params.id as string);
 const { item, loading, error, load, save } = useSpeechBlock(speechId.value);
 const engine = useSpeechEngine();
+const auth = useAuthUser();
+const tailoredMaterials = useTailoredMaterials({ auth });
+const jobService = new JobDescriptionService();
+const matchingSummaryService = new MatchingSummaryService();
+const targetJob = ref<JobDescription | null>(null);
+const matchingSummary = ref<MatchingSummary | null>(null);
+const contextLoading = ref(false);
+const contextError = ref<string | null>(null);
 
 const formState = ref({
   elevatorPitch: '',
@@ -26,6 +40,23 @@ const originalState = ref({ ...formState.value });
 const saving = ref(false);
 const cancelModalOpen = ref(false);
 const isGenerating = computed(() => engine.isGenerating.value);
+const hasJobContext = computed(() => Boolean(item.value?.jobId));
+const targetJobTitle = computed(() => targetJob.value?.title?.trim() || 'Target job');
+const jobLink = computed(() => (targetJob.value?.id ? `/jobs/${targetJob.value.id}` : null));
+const matchLink = computed(() =>
+  targetJob.value?.id ? `/jobs/${targetJob.value.id}/match` : null
+);
+const isRegenerating = computed(() => tailoredMaterials.isGenerating.value);
+const canRegenerate = computed(
+  () => Boolean(item.value?.id && targetJob.value && matchingSummary.value)
+);
+const regenerateDisabled = computed(
+  () => !canRegenerate.value || contextLoading.value || isRegenerating.value
+);
+const regenerateError = computed(() => tailoredMaterials.error.value);
+const missingSummary = computed(
+  () => Boolean(item.value?.jobId && targetJob.value && !matchingSummary.value)
+);
 
 const hasChanges = computed(
   () =>
@@ -120,6 +151,89 @@ const handleDiscard = () => {
   cancelModalOpen.value = false;
 };
 
+const loadTailoringContext = async (jobId?: string | null) => {
+  if (!jobId) {
+    targetJob.value = null;
+    matchingSummary.value = null;
+    contextError.value = null;
+    return;
+  }
+
+  contextLoading.value = true;
+  contextError.value = null;
+
+  try {
+    if (!auth.userId.value) {
+      await auth.loadUserId();
+    }
+
+    if (!auth.userId.value) {
+      throw new Error('User not authenticated');
+    }
+
+    const job = await jobService.getFullJobDescription(jobId);
+    if (!job) {
+      throw new Error('Job not found');
+    }
+    targetJob.value = job;
+
+    const companyId = job.companyId ?? null;
+    let summary = await matchingSummaryService.getByContext({
+      userId: auth.userId.value,
+      jobId,
+      companyId,
+    });
+
+    if (!summary && companyId) {
+      summary = await matchingSummaryService.getByContext({
+        userId: auth.userId.value,
+        jobId,
+        companyId: null,
+      });
+    }
+
+    matchingSummary.value = summary;
+  } catch (err) {
+    contextError.value = err instanceof Error ? err.message : 'Failed to load tailored context';
+    console.error('[speechDetail] Error loading tailored context:', err);
+    targetJob.value = null;
+    matchingSummary.value = null;
+  } finally {
+    contextLoading.value = false;
+  }
+};
+
+const handleRegenerateTailored = async () => {
+  if (!item.value?.id || !targetJob.value || !matchingSummary.value) {
+    return;
+  }
+
+  try {
+    const updated = await tailoredMaterials.regenerateTailoredSpeechForJob({
+      id: item.value.id,
+      job: targetJob.value,
+      matchingSummary: matchingSummary.value,
+      options: {
+        name: item.value.name ?? undefined,
+      },
+    });
+
+    if (updated) {
+      item.value = updated;
+      formState.value = {
+        elevatorPitch: updated.elevatorPitch ?? '',
+        careerStory: updated.careerStory ?? '',
+        whyMe: updated.whyMe ?? '',
+      };
+      originalState.value = { ...formState.value };
+      toast.add({ title: 'Tailored speech regenerated.', color: 'primary' });
+    }
+  } catch (err) {
+    console.error('[speechDetail] Failed to regenerate tailored speech', err);
+    toast.add({ title: 'Failed to regenerate tailored speech.', color: 'error' });
+  }
+};
+
 onMounted(async () => {
   route.meta.breadcrumbLabel = t('speech.detail.title');
   await load();
@@ -129,6 +243,7 @@ onMounted(async () => {
 watch(item, (newValue) => {
   if (newValue && !hasChanges.value) {
     resetForm();
+    void loadTailoringContext(newValue.jobId);
   }
 });
 </script>
@@ -144,6 +259,70 @@ watch(item, (newValue) => {
         />
 
         <UPageBody>
+          <UCard v-if="hasJobContext" class="mb-6">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm text-gray-500">Target job</p>
+                <p class="text-lg font-semibold">{{ targetJobTitle }}</p>
+                <UButton
+                  v-if="jobLink"
+                  class="mt-2"
+                  color="neutral"
+                  variant="ghost"
+                  icon="i-heroicons-arrow-top-right-on-square"
+                  label="View job"
+                  :to="jobLink"
+                />
+              </div>
+              <div class="flex flex-wrap items-center gap-3">
+                <UButton
+                  color="primary"
+                  icon="i-heroicons-sparkles"
+                  label="Regenerate tailored speech"
+                  :loading="isRegenerating"
+                  :disabled="regenerateDisabled"
+                  @click="handleRegenerateTailored"
+                />
+                <UButton
+                  v-if="matchLink"
+                  color="neutral"
+                  variant="outline"
+                  icon="i-heroicons-sparkles"
+                  label="View match"
+                  :to="matchLink"
+                />
+              </div>
+            </div>
+
+            <UAlert
+              v-if="contextError"
+              class="mt-4"
+              icon="i-heroicons-exclamation-triangle"
+              color="warning"
+              variant="soft"
+              title="Unable to load job context"
+              :description="contextError"
+            />
+            <UAlert
+              v-else-if="regenerateError"
+              class="mt-4"
+              icon="i-heroicons-exclamation-triangle"
+              color="warning"
+              variant="soft"
+              title="Unable to regenerate speech"
+              :description="regenerateError"
+            />
+            <UAlert
+              v-else-if="missingSummary"
+              class="mt-4"
+              icon="i-heroicons-information-circle"
+              color="info"
+              variant="soft"
+              title="Matching summary required"
+              description="Generate a matching summary before regenerating this speech."
+            />
+          </UCard>
+
           <UAlert
             v-if="error"
             icon="i-heroicons-exclamation-triangle"

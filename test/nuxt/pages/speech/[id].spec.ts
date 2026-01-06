@@ -51,6 +51,41 @@ vi.mock('@/composables/useSpeechEngine', () => ({
   useSpeechEngine: () => engineMock,
 }));
 
+const authMock = {
+  userId: ref('user-1'),
+  loadUserId: vi.fn().mockResolvedValue(undefined),
+};
+
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => authMock,
+}));
+
+const tailoredMaterialsMock = {
+  isGenerating: ref(false),
+  error: ref<string | null>(null),
+  regenerateTailoredSpeechForJob: vi.fn(),
+};
+
+vi.mock('@/application/tailoring/useTailoredMaterials', () => ({
+  useTailoredMaterials: () => tailoredMaterialsMock,
+}));
+
+const jobServiceMock = {
+  getFullJobDescription: vi.fn().mockResolvedValue({ id: 'job-1', title: 'Lead Engineer' }),
+};
+
+vi.mock('@/domain/job-description/JobDescriptionService', () => ({
+  JobDescriptionService: vi.fn().mockImplementation(() => jobServiceMock),
+}));
+
+const matchingSummaryMock = {
+  getByContext: vi.fn().mockResolvedValue({ id: 'summary-1' }),
+};
+
+vi.mock('@/domain/matching-summary/MatchingSummaryService', () => ({
+  MatchingSummaryService: vi.fn().mockImplementation(() => matchingSummaryMock),
+}));
+
 const mockToast = {
   add: vi.fn(),
 };
@@ -142,6 +177,9 @@ describe('Speech detail page', () => {
       careerStory: 'New story',
       whyMe: 'New why',
     });
+    tailoredMaterialsMock.isGenerating.value = false;
+    tailoredMaterialsMock.error.value = null;
+    matchingSummaryMock.getByContext.mockResolvedValue({ id: 'summary-1' });
   });
 
   it('loads speech block and renders editor', async () => {
@@ -159,5 +197,17 @@ describe('Speech detail page', () => {
     }
     await generateButton.trigger('click');
     expect(generateMock).toHaveBeenCalled();
+  });
+
+  it('shows tailored regeneration banner when jobId exists', async () => {
+    itemRef.value = {
+      ...(itemRef.value as SpeechBlock),
+      jobId: 'job-1',
+      name: 'Tailored speech',
+    } as SpeechBlock;
+
+    const wrapper = await mountPage();
+    expect(wrapper.text()).toContain('Target job');
+    expect(wrapper.text()).toContain('Regenerate tailored speech');
   });
 });

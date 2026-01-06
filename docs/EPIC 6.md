@@ -8,14 +8,14 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
 
 ### 0) Pre-flight
 
-- [ ] Pull latest main; confirm existing flows work:
+- [x] Pull latest main; confirm existing flows work:
   - CV generation + editor + print
   - Cover letter generation + editor
   - Speech generation + editor
   - Job upload + parse
   - Matching summary generation + page
 
-- [ ] Confirm “English-only” generation baseline (no language selectors).
+- [x] Confirm “English-only” generation baseline (no language selectors).
 
 ---
 
@@ -172,13 +172,13 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
 
 ### 6.1 Add “Target job” banner
 
-- [ ] On `/cv/:id`, `/cover-letters/:id`, `/speech/:id`:
+- [x] On `/cv/:id`, `/cover-letters/:id`, `/speech/:id`:
   - if `jobId` present, show banner with job title + link back to `/jobs/:jobId`
   - show “Regenerate tailored” button (only when jobId exists)
 
 ### 6.2 Regenerate behavior
 
-- [ ] Regenerate uses:
+- [x] Regenerate uses:
   - stored jobId → load job
   - load latest matching summary for that job (if not already stored/available)
   - optional company summary
@@ -186,11 +186,11 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
 
 ### 6.3 Tests
 
-- [ ] Nuxt page tests:
+- [x] Nuxt page tests:
   - banner visible when jobId exists, hidden otherwise
   - regenerate button conditional
 
-- [ ] Vitest service/composable tests:
+- [x] Vitest service/composable tests:
   - regenerate overwrites content (same id)
 
 ---

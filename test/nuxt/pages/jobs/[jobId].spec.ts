@@ -65,6 +65,35 @@ vi.mock('@/composables/useCompanies', () => ({
   useCompanies: () => companyStoreMock,
 }));
 
+const authMock = {
+  userId: ref('user-1'),
+  loadUserId: vi.fn().mockResolvedValue(undefined),
+};
+
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => authMock,
+}));
+
+const tailoredMaterialsMock = {
+  isGenerating: ref(false),
+  error: ref<string | null>(null),
+  generateTailoredCvForJob: vi.fn(),
+  generateTailoredCoverLetterForJob: vi.fn(),
+  generateTailoredSpeechForJob: vi.fn(),
+};
+
+vi.mock('@/application/tailoring/useTailoredMaterials', () => ({
+  useTailoredMaterials: () => tailoredMaterialsMock,
+}));
+
+const matchingSummaryMock = {
+  getByContext: vi.fn().mockResolvedValue({ id: 'summary-1' }),
+};
+
+vi.mock('@/domain/matching-summary/MatchingSummaryService', () => ({
+  MatchingSummaryService: vi.fn().mockImplementation(() => matchingSummaryMock),
+}));
+
 const i18n = createTestI18n();
 
 const router = createRouter({
@@ -240,6 +269,7 @@ describe('Job Detail Page', () => {
       { id: 'company-2', companyName: 'Global Freight' },
     ];
     companyStoreMock.listCompanies.mockResolvedValue(companyStoreMock.rawCompanies.value);
+    matchingSummaryMock.getByContext.mockResolvedValue({ id: 'summary-1' });
   });
 
   it('renders job details', async () => {

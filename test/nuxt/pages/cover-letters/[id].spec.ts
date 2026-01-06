@@ -54,6 +54,41 @@ vi.mock('@/composables/useCoverLetterEngine', () => ({
   useCoverLetterEngine: () => engineMock,
 }));
 
+const authMock = {
+  userId: ref('user-1'),
+  loadUserId: vi.fn().mockResolvedValue(undefined),
+};
+
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => authMock,
+}));
+
+const tailoredMaterialsMock = {
+  isGenerating: ref(false),
+  error: ref<string | null>(null),
+  regenerateTailoredCoverLetterForJob: vi.fn(),
+};
+
+vi.mock('@/application/tailoring/useTailoredMaterials', () => ({
+  useTailoredMaterials: () => tailoredMaterialsMock,
+}));
+
+const jobServiceMock = {
+  getFullJobDescription: vi.fn().mockResolvedValue({ id: 'job-1', title: 'Lead Engineer' }),
+};
+
+vi.mock('@/domain/job-description/JobDescriptionService', () => ({
+  JobDescriptionService: vi.fn().mockImplementation(() => jobServiceMock),
+}));
+
+const matchingSummaryMock = {
+  getByContext: vi.fn().mockResolvedValue({ id: 'summary-1' }),
+};
+
+vi.mock('@/domain/matching-summary/MatchingSummaryService', () => ({
+  MatchingSummaryService: vi.fn().mockImplementation(() => matchingSummaryMock),
+}));
+
 vi.mock('#app', () => ({
   useToast: () => mockToast,
 }));
@@ -112,9 +147,9 @@ const stubs = {
       '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" :placeholder="placeholder" :rows="rows" />',
   },
   UButton: {
-    props: ['variant', 'color', 'size', 'disabled', 'loading'],
+    props: ['label', 'variant', 'color', 'size', 'disabled', 'loading'],
     template:
-      '<button type="button" :disabled="disabled || loading" :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')" :class="[variant, color, size]"><slot /></button>',
+      '<button type="button" :disabled="disabled || loading" :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')" :class="[variant, color, size]"><slot />{{ $props.label }}</button>',
   },
   UCard: { template: '<div class="u-card"><slot /></div>' },
   USkeleton: { template: '<div class="u-skeleton"></div>' },
@@ -168,6 +203,9 @@ describe('Cover letter detail page', () => {
     generateMock.mockClear();
     generateMock.mockResolvedValue('New generated cover letter content...');
     mockToast.add.mockClear();
+    tailoredMaterialsMock.isGenerating.value = false;
+    tailoredMaterialsMock.error.value = null;
+    matchingSummaryMock.getByContext.mockResolvedValue({ id: 'summary-1' });
   });
 
   it('loads cover letter and renders view mode content', async () => {
@@ -198,6 +236,18 @@ describe('Cover letter detail page', () => {
       expect(textarea.exists()).toBe(true);
       expect((textarea.element as HTMLTextAreaElement).value).toBe(itemRef.value?.content);
     }
+  });
+
+  it('shows tailored regeneration banner when jobId exists', async () => {
+    itemRef.value = {
+      ...(itemRef.value as CoverLetter),
+      jobId: 'job-1',
+      name: 'Tailored cover letter',
+    };
+
+    const wrapper = await mountPage();
+    expect(wrapper.text()).toContain('Target job');
+    expect(wrapper.text()).toContain('Regenerate tailored cover letter');
   });
 
   // Note: Generate button has been removed from detail page to match CV pattern

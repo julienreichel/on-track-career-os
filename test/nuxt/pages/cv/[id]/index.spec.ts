@@ -32,6 +32,41 @@ vi.mock('marked', () => ({
   marked: vi.fn((content: string) => `<div>${content}</div>`),
 }));
 
+const authMock = {
+  userId: ref('user-1'),
+  loadUserId: vi.fn().mockResolvedValue(undefined),
+};
+
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => authMock,
+}));
+
+const tailoredMaterialsMock = {
+  isGenerating: ref(false),
+  error: ref<string | null>(null),
+  regenerateTailoredCvForJob: vi.fn(),
+};
+
+vi.mock('@/application/tailoring/useTailoredMaterials', () => ({
+  useTailoredMaterials: () => tailoredMaterialsMock,
+}));
+
+const jobServiceMock = {
+  getFullJobDescription: vi.fn().mockResolvedValue({ id: 'job-1', title: 'Lead Engineer' }),
+};
+
+vi.mock('@/domain/job-description/JobDescriptionService', () => ({
+  JobDescriptionService: vi.fn().mockImplementation(() => jobServiceMock),
+}));
+
+const matchingSummaryMock = {
+  getByContext: vi.fn().mockResolvedValue({ id: 'summary-1' }),
+};
+
+vi.mock('@/domain/matching-summary/MatchingSummaryService', () => ({
+  MatchingSummaryService: vi.fn().mockImplementation(() => matchingSummaryMock),
+}));
+
 // Create i18n instance for tests
 const i18n = createTestI18n();
 
