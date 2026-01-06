@@ -55,11 +55,13 @@ Each operation must conform to:
 
 ### Matching Engine (EPIC 5C)
 
-10. `ai.generateMatchingSummary`
+9. `ai.generateMatchingSummary`
 
 ### Application Materials (EPIC 6)
 
-12. `ai.generateCoverLetter`
+10. `ai.generateCv`
+11. `ai.generateCoverLetter`
+12. `ai.generateSpeech`
 
 ---
 
@@ -794,7 +796,8 @@ Generate a **job-tailored CV in Markdown format**, using:
 - User profile
 - Selected experiences (with stories / achievements / KPIs already available in the data layer)
 - Skills, languages, certifications, interests
-- An optional job description
+- Optional tailoring context (job description + matching summary)
+- Optional company summary (summary-level only)
 - A soft constraint that the CV should be **around 2 pages**
 
 This operation outputs **complete CV as Markdown text** that follows CV best practices and is ATS-optimized.
@@ -845,6 +848,9 @@ Start directly with the CV content.
 ```text
 Generate a professional CV in Markdown format. YOU MUST USE THE EXACT DATA PROVIDED BELOW - do not invent or substitute information.
 
+LANGUAGE:
+{{language}}
+
 ## USER PROFILE
 Name: {{fullName}}
 Professional Title: {{headline}}
@@ -878,6 +884,12 @@ Key Strengths:
 ## TARGET JOB DESCRIPTION (if provided)
 {{jobDescription}}
 
+## MATCHING SUMMARY (if provided)
+{{matchingSummary}}
+
+## COMPANY SUMMARY (if provided)
+{{company}}
+
 IMPORTANT: Tailor the CV to highlight experiences, skills, and achievements most relevant to this job description. Emphasize matching keywords and requirements.
 
 CRITICAL REMINDER: Use ONLY the information provided above. Do not use placeholder names like "John Doe" or invent any data. The CV MUST contain the exact names, titles, companies, and dates from the input data.
@@ -889,34 +901,74 @@ CRITICAL REMINDER: Use ONLY the information provided above. Do not use placehold
 
 ```typescript
 {
+  language: "en";
   userProfile: {
-    fullName: string;
+    fullName?: string;
     headline?: string;
     location?: string;
+    seniorityLevel?: string;
+    primaryEmail?: string;
+    primaryPhone?: string;
+    workPermitInfo?: string;
     goals?: string[];
     strengths?: string[];
+    socialLinks?: string[];
   };
   selectedExperiences: Array<{
-    id: string;
-    title: string;
-    company: string;
-    startDate: string;
+    id?: string;
+    title?: string;
+    companyName?: string;
+    startDate?: string;
     endDate?: string;
-    isCurrent?: boolean;
+    experienceType?: "work" | "education" | "volunteer" | "project";
     responsibilities?: string[];
     tasks?: string[];
   }>;
   stories?: Array<{
-    situation: string;
-    task: string;
-    action: string;
-    result: string;
+    situation?: string;
+    experienceId?: string;
+    task?: string;
+    action?: string;
+    result?: string;
+    achievements?: string[];
   }>;
   skills?: string[];
   languages?: string[];
   certifications?: string[];
   interests?: string[];
-  jobDescription?: string;
+  jobDescription?: {
+    title: string;
+    seniorityLevel?: string;
+    roleSummary?: string;
+    responsibilities?: string[];
+    requiredSkills?: string[];
+    behaviours?: string[];
+    successCriteria?: string[];
+    explicitPains?: string[];
+  };
+  matchingSummary?: {
+    overallScore: number;
+    scoreBreakdown: {
+      skillFit: number;
+      experienceFit: number;
+      interestFit: number;
+      edge: number;
+    };
+    recommendation: "apply" | "maybe" | "skip";
+    reasoningHighlights: string[];
+    strengthsForThisRole: string[];
+    skillMatch: string[];
+    riskyPoints: string[];
+    impactOpportunities: string[];
+    tailoringTips: string[];
+  };
+  company?: {
+    companyName: string;
+    industry?: string;
+    sizeRange?: string;
+    website?: string;
+    description?: string;
+  };
 }
 ```
 
@@ -942,6 +994,10 @@ The Markdown follows standard formatting conventions and is ready to be rendered
 
 #### Fallback Strategy
 
+- If tailoring context is invalid (missing jobDescription or matchingSummary):
+  - Drop tailoring inputs and generate generic output
+  - Log warning for monitoring
+
 - If the model returns invalid or empty content:
   - Retry once with simplified prompt
   - Log error for monitoring
@@ -965,8 +1021,9 @@ Generate a generic-first cover letter that can optionally be tailored when job c
 ```
 You generate a professional cover letter based on user identity data.
 
-If jobDescription is provided, tailor phrasing to the role and job needs without inventing facts.
-If jobDescription is absent, keep the letter generic (no job targeting).
+If tailoring context is provided (jobDescription + matchingSummary), tailor phrasing to the role and job needs without inventing facts.
+If tailoring context is absent, keep the letter generic (no job targeting).
+Use company context only when provided and only as summary-level framing.
 
 Output must be:
 - concise
@@ -981,6 +1038,9 @@ Output must be:
 
 ```
 Use the following data to create a cover letter:
+
+LANGUAGE:
+{{language}}
 
 PROFILE:
 {{profile}}
@@ -997,8 +1057,13 @@ PERSONAL CANVAS:
 TARGET JOB DESCRIPTION (optional):
 {{jobDescription}}
 
+MATCHING SUMMARY (optional):
+{{matchingSummary}}
+
+COMPANY SUMMARY (optional):
+{{company}}
+
 Return JSON with:
-- tone
 - content
 ```
 
@@ -1006,11 +1071,14 @@ Return JSON with:
 
 ```json
 {
+  "language": "en",
   "profile": {},
   "experiences": [],
   "stories": [],
   "personalCanvas": {},
-  "jobDescription?": {}
+  "jobDescription?": {},
+  "matchingSummary?": {},
+  "company?": {}
 }
 ```
 
@@ -1018,10 +1086,19 @@ Return JSON with:
 
 ```json
 {
-  "tone": "string",
   "content": "string"
 }
 ```
+
+**Fallback**
+
+- If tailoring context is invalid (missing jobDescription or matchingSummary):
+  - Drop tailoring inputs and generate generic output
+  - Log warning for monitoring
+
+- If JSON validation fails:
+  - Retry once with stricter JSON-only instruction
+  - Return safe empty fields on failure to keep UI stable
 
 ### `ai.generateSpeech`
 
@@ -1037,8 +1114,9 @@ Generate 3 high-level personal speech elements from user identity data:
 ```
 You generate personal narrative speech based on user identity data.
 
-If jobDescription is provided, tailor phrasing to the role and job needs without inventing facts.
-If jobDescription is absent, keep the speech generic (no job targeting).
+If tailoring context is provided (jobDescription + matchingSummary), tailor phrasing to the role and job needs without inventing facts.
+If tailoring context is absent, keep the speech generic (no job targeting).
+Use company context only when provided and only as summary-level framing.
 
 Output must be:
 - concise
@@ -1056,6 +1134,9 @@ Return ONLY valid JSON.
 ```
 Use the following data to create personal speech material:
 
+LANGUAGE:
+{{language}}
+
 PROFILE:
 {{profile}}
 
@@ -1071,6 +1152,12 @@ EXPERIENCE SUMMARY:
 ## TARGET JOB DESCRIPTION (optional)
 {{jobDescription}}
 
+## MATCHING SUMMARY (optional)
+{{matchingSummary}}
+
+## COMPANY SUMMARY (optional)
+{{company}}
+
 Return JSON with:
 - elevatorPitch (80 words max)
 - careerStory (160 words max)
@@ -1081,11 +1168,14 @@ Return JSON with:
 
 ```json
 {
+  "language": "en",
   "profile": {},
   "experiences": [],
   "stories": [],
   "personalCanvas": {},
-  "jobDescription?": {}
+  "jobDescription?": {},
+  "matchingSummary?": {},
+  "company?": {}
 }
 ```
 
@@ -1101,10 +1191,13 @@ Return JSON with:
 
 **Fallback**
 
-- remove unsupported claims
-- shorten if over length
-- if jobDescription is missing, remove job/company targeting
-- no opinionated emotional tone
+- If tailoring context is invalid (missing jobDescription or matchingSummary):
+  - Drop tailoring inputs and generate generic output
+  - Log warning for monitoring
+
+- If JSON validation fails:
+  - Retry once with stricter JSON-only instruction
+  - Return safe empty fields on failure to keep UI stable
 
 ---
 

@@ -507,15 +507,17 @@ Each page includes:
 - `<UTextarea>` (markdown editor)
 - `<UCard>` (rendered preview)
 - `<UToggle>` (profile photo)
+- Tailored job banner (when jobId exists)
 
 ### Components
 
-- None (inline editor + preview)
+- `TailoredJobBanner` - shows job backlink + regenerate tailored action
 
 ### Composables
 
 - `useCvDocuments()` - read, update
 - `ProfilePhotoService` - photo URL for preview
+- `useTailoredMaterials()` - regenerate tailored CV when jobId exists
 
 ### CDM Entities
 
@@ -643,18 +645,21 @@ Each page includes:
 - `<UTabs>` (5 sections)
 - `<UModal>` (reanalyse confirmation)
 - `<UButton>` (save, cancel, reanalyse)
+- Tailored application materials card (CV / Cover Letter / Speech)
 
 ### Components
 
 - `TagInput` - list field editing (responsibilities, skills, behaviours, etc.)
 - `CompanySelector` - dropdown for job-company linking
 - `LinkedCompanyBadge` - display linked company with navigation
+- `TailoredMaterialsCard` - generate or open tailored materials for this job
 
 ### Composables
 
 - `useJobAnalysis()` - CRUD and reanalysis
 - `useCompany()` - fetch companies for linking
 - `useBreadcrumbMapping()` - dynamic breadcrumb
+- `useTailoredMaterials()` - tailored CV/letter/speech actions
 
 ### CDM Entities
 
@@ -794,10 +799,12 @@ Each page includes:
 - `<UAlert>`
 - `<UBadge>`
 - Fit score visualization (score breakdown cards)
+- Tailored application materials card (CV / Cover Letter / Speech)
 
 ### Components
 
 - `MatchingSummaryCard`
+- `TailoredMaterialsCard`
 
 ### Composables
 
@@ -805,6 +812,7 @@ Each page includes:
 - `useUserProfile()` ✅
 - `useJobAnalysis()` ✅
 - `useCanvasEngine()` ✅
+- `useTailoredMaterials()` ✅
 
 ### CDM Entities
 
@@ -828,39 +836,41 @@ Each page includes:
 
 ---
 
-## **5.1 Tailored CV Generator** ❌
+## **5.1 Tailored Application Materials** ✅
 
-**Route:** `/applications/[jobId]/cv` (planned)
+**Route:** `/jobs/[jobId]`, `/jobs/[jobId]/match`
 
 ### UI
 
-- `<UEditor>`
-- `<USelect>`
-- `<UGrid>`
+- Tailored materials card with actions for CV / Cover Letter / Speech
+- Links to existing tailored documents when available
+- Generates tailored documents when matching summary exists
 
 ### Components
 
-- Tailored CV Builder Component (planned)
+- `TailoredMaterialsCard`
 
 ### Composables
 
-- `useTailoringEngine()` (not implemented)
-- `useCvGenerator()` ✅ (could be extended)
+- `useTailoredMaterials()` ✅ - tailored generation + navigation
 
 ### CDM Entities
 
-- **CVDocument** (create tailored version)
+- **CVDocument** (create/update with jobId)
+- **CoverLetter** (create/update with jobId)
+- **SpeechBlock** (create/update with jobId)
 - **JobDescription** (read)
 - **MatchingSummary** (read)
+- **Company** (optional summary)
 
 ### AI Ops
 
-- `ai.generateCv` (partially implemented)
+- `ai.generateCv`
+- `ai.generateCoverLetter`
+- `ai.generateSpeech`
 
-**Status:** ❌ Not Implemented  
-**Blocking:** EPIC 6 - AI operation and tailoring engine missing
-
-**Note:** Current `ai.generateCv` generates generic CVs. Tailored version requires job-specific optimization.
+**Status:** ✅ Implemented  
+**Behavior:** Generates tailored documents using matching summary; reuses existing documents when present.
 
 ---
 
@@ -874,16 +884,18 @@ Each page includes:
 - `<ItemCard>` for list view
 - `<UTextarea>` for Markdown editing
 - `<UButton>` for actions (Edit, Print, Regenerate)
+- Tailored job banner (when jobId exists)
 
 ### Components
 
-- None - uses existing ItemCard component pattern
+- `TailoredJobBanner` - shows job backlink + regenerate tailored action
 
 ### Composables
 
 - `useCoverLetterEngine()` - workflow orchestration with AI generation
 - `useCoverLetters()` - list management
 - `useCoverLetter()` - CRUD operations
+- `useTailoredMaterials()` - regenerate tailored cover letter when jobId exists
 
 ### CDM Entities
 
@@ -913,12 +925,14 @@ Each page includes:
 - `<UTextarea>` for text sections
 - `<UButton>` for generate/save/cancel actions
 - `<TagInput>` for key messages
+- Tailored job banner (when jobId exists)
 
 ### Components
 
 - **SpeechBlockEditorCard.vue** - Card layout for speech sections
 - **SpeechSectionEditor.vue** - Tag-based editor with character count
 - **SpeechGenerateButton.vue** - AI generation trigger
+- **TailoredJobBanner.vue** - job backlink + regenerate tailored action
 
 ### Composables
 
@@ -927,6 +941,7 @@ Each page includes:
 - `useSpeechEngine()` ✅ - Workflow orchestration
 - `useUserProfile()` ✅
 - `useJobAnalysis()` ✅ (for job targeting)
+- `useTailoredMaterials()` ✅ (for tailored regeneration)
 
 ### CDM Entities
 
@@ -988,7 +1003,7 @@ Each page includes:
 
 # 8. IMPLEMENTATION SUMMARY
 
-## 8.1 Implemented Pages (21 Routes)
+## 8.1 Implemented Pages (28 Routes)
 
 | Page                   | Route                                                 | Status | EPIC |
 | ---------------------- | ----------------------------------------------------- | ------ | ---- |
@@ -1021,16 +1036,15 @@ Each page includes:
 | Cover Letter Editor    | `/cover-letters/:id`                                  | ✅     | 4B   |
 | Cover Letter Print     | `/cover-letters/:id/print`                            | ✅     | 4B   |
 
-## 8.2 Planned Pages (4 Routes)
+## 8.2 Planned Pages (3 Routes)
 
 | Page                | Route                         | Status | EPIC | Blocker               |
 | ------------------- | ----------------------------- | ------ | ---- | --------------------- |
-| Tailored CV         | `/applications/:jobId/cv`     | ❌     | 6    | AI operation missing  |
 | Interview Prep      | `/interviews/:jobId/prep`     | ❌     | 7    | AI operation missing  |
 | Interview Simulator | `/interviews/:jobId/simulate` | ❌     | 7    | AI operations missing |
 | Settings            | `/settings`                   | ❌     | -    | Low priority          |
 
-## 8.3 Implemented Components (20 Core + 7 Company + 9 CV + 2 Job + 3 Speech)
+## 8.3 Implemented Components
 
 **Core Components (Domain):**
 
@@ -1065,6 +1079,11 @@ Each page includes:
 - `JobCard` - job display with status badge
 - `JobUploadStep` - file upload with status
 
+**Tailoring Components:**
+
+- `TailoredMaterialsCard` - generate/open tailored CV, cover letter, speech
+- `TailoredJobBanner` - job backlink + regenerate tailored action
+
 **Profile Components:**
 
 - `ProfileFullForm` - complete profile editor
@@ -1076,7 +1095,7 @@ Each page includes:
 - `SpeechSectionEditor` - tag-based editor with character count
 - `SpeechGenerateButton` - AI generation trigger
 
-## 8.4 Implemented Composables (23+)
+## 8.4 Implemented Composables
 
 **Application Layer (`src/application/`):**
 
@@ -1110,8 +1129,9 @@ Each page includes:
 - `useSpeechBlock(id)` - single speech CRUD with AI
 - `useSpeechBlocks()` - speech list operations
 - `useSpeechEngine()` - speech workflow orchestration
+- `useTailoredMaterials()` - tailored CV/letter/speech generation
 
-## 8.5 AI Operations Status (11/14 Implemented)
+## 8.5 AI Operations Status (12/12 Implemented)
 
 **✅ Implemented:**
 
@@ -1125,11 +1145,8 @@ Each page includes:
 8. `ai.analyzeCompanyInfo` - analyze company research notes
 9. `ai.generateCompanyCanvas` - generate company BMC
 10. `ai.generateMatchingSummary` - generate matching summary
-11. `ai.generateSpeech` - generate speech blocks (elevator pitch, career story, why me)
-
-**❌ Missing (1 operation):**
-
-1. `ai.generateCoverLetter` - EPIC 4B
+11. `ai.generateCoverLetter` - generate cover letter
+12. `ai.generateSpeech` - generate speech blocks (elevator pitch, career story, why me)
 
 ---
 

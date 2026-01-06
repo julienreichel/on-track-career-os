@@ -213,8 +213,8 @@ Create **one** E2E test that proves the whole EPIC:
 
 ## Phase 8 — Documentation updates (done last, but required)
 
-- [ ] Update **AI Interaction Contract** entries for the 3 ops to include tailoring inputs + fallback.
-- [ ] Update Component→Page mapping with:
+- [x] Update **AI Interaction Contract** entries for the 3 ops to include tailoring inputs + fallback.
+- [x] Update Component→Page mapping with:
   - new “Application Materials” card on job + match pages
   - job backlink banner on document pages
 
