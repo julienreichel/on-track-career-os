@@ -378,12 +378,12 @@ Added to `package.json`:
 
 **Complete Test Coverage: EPICs 1A, 1B, 2, 3, 3B, 4, 4B, 5A, 5B, 5C, 6**
 
-| Layer     | Framework       | Tests     | Status           |
-| --------- | --------------- | --------- | ---------------- |
-| Unit      | Vitest          | 360+      | ✅ Passing       |
-| Sandbox   | Vitest (AI Ops) | 12        | ✅ Passing       |
-| E2E       | Playwright      | 88        | ⚠️ 87 Passing    |
-| **Total** |                 | **460+**  | **99% Passing**  |
+| Layer     | Framework       | Tests    | Status          |
+| --------- | --------------- | -------- | --------------- |
+| Unit      | Vitest          | 360+     | ✅ Passing      |
+| Sandbox   | Vitest (AI Ops) | 12       | ✅ Passing      |
+| E2E       | Playwright      | 88       | ⚠️ 87 Passing   |
+| **Total** |                 | **460+** | **99% Passing** |
 
 **Coverage Breakdown by EPIC:**
 
@@ -535,26 +535,27 @@ Test Suites:
 
 ### Coverage by Feature Area
 
-| Feature Area        | Tests | Status      |
-| ------------------- | ----- | ----------- |
-| Profile & Identity  | 19    | ✅ 100%     |
-| Personal Canvas     | 11    | ✅ 100%     |
-| STAR Stories        | 29    | ✅ 100%     |
-| CV Management       | 24    | ✅ 100%     |
-| Job Analysis        | 1     | ✅ 100%     |
-| Speech Builder      | 7     | ✅ 100%     |
-| Cover Letters       | 8     | ✅ 100%     |
-| Company Analysis    | 5     | ⚠️ 80% (1 flaky) |
-| Job Matching        | 6     | ✅ 100%     |
-| Tailored Materials  | 4     | ✅ 100%     |
-| Infrastructure      | 5     | ✅ 100%     |
-| **Total**           | **88** | **⚠️ 99%** |
+| Feature Area       | Tests  | Status           |
+| ------------------ | ------ | ---------------- |
+| Profile & Identity | 19     | ✅ 100%          |
+| Personal Canvas    | 11     | ✅ 100%          |
+| STAR Stories       | 29     | ✅ 100%          |
+| CV Management      | 24     | ✅ 100%          |
+| Job Analysis       | 1      | ✅ 100%          |
+| Speech Builder     | 7      | ✅ 100%          |
+| Cover Letters      | 8      | ✅ 100%          |
+| Company Analysis   | 5      | ⚠️ 80% (1 flaky) |
+| Job Matching       | 6      | ✅ 100%          |
+| Tailored Materials | 4      | ✅ 100%          |
+| Infrastructure     | 5      | ✅ 100%          |
+| **Total**          | **88** | **⚠️ 99%**       |
 
 ## Next Steps
 
 ### For Current EPICs (Maintenance)
 
 1. **Fix Flaky Test**:
+
    ```bash
    # Known issue: Company AI analysis timeout
    # File: test/e2e/company-workflow.spec.ts
@@ -563,6 +564,7 @@ Test Suites:
    ```
 
 2. **Monitor Test Health**:
+
    ```bash
    # Run regularly to catch regressions
    npm run test:e2e

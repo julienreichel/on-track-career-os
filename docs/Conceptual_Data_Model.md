@@ -340,7 +340,8 @@ Captures user validation of AI-generated content to improve future recommendatio
 - N AIFeedback → 1 UserProfile
 - AIFeedback references any AI-generated entity via sourceEntityId
 
-**Intent:** 
+**Intent:**
+
 - Enable users to quickly signal satisfaction/dissatisfaction with AI outputs
 - Collect patterns to improve prompts and AI operations
 - Non-invasive: appears as simple thumbs up/down with optional details
@@ -366,13 +367,15 @@ Aggregated, privacy-preserving usage patterns to understand user behavior.
 - N UsageSignal → 1 UserProfile (via anonymized userId)
 
 **Intent:**
+
 - Understand which features drive value
-- Identify drop-off points in user journeys  
+- Identify drop-off points in user journeys
 - Measure feature adoption and success patterns
 - Guide product development priorities
 - All data aggregated and anonymized - no personal content stored
 
 **Privacy Safeguards:**
+
 - No personal information stored
 - UserIds are hashed/anonymized
 - Only behavioral patterns tracked, not content

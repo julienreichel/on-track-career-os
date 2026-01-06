@@ -88,6 +88,7 @@ The central hub of the app. Always accessible.
 **Nuxt UI:** `<UPage>`, `<UPageHeader>`, `<UPageBody>`, `<UPageGrid>`, `<UPageCard>`
 
 **Next Actions:**
+
 - Profile completion widget showing progress
 - Personal canvas status indicator
 - Recent activity feed for context
@@ -614,17 +615,15 @@ Actions:
 
 1. **Complete Profile** (`/profile`)
    - Add experiences → Generate stories → Build personal canvas
-   
 2. **Add Job** (`/jobs/new` or `/jobs`)
    - Upload/paste job description → Get AI analysis → Build company canvas
-   
 3. **Generate Materials** (`/cv/new`, `/cover-letters/new`, `/speech`)
    - Create tailored CV → Write cover letter → Prepare speech blocks
 
 ## Workflow 2: Continuous Profile Improvement
 
 1. **Add New Experience** (`/profile/experiences/new`)
-2. **Generate Related Stories** (AI-powered story building)  
+2. **Generate Related Stories** (AI-powered story building)
 3. **Update Personal Canvas** (evolving self-understanding)
 4. **Refresh Materials** (regenerate CV/letters with new insights)
 
@@ -711,7 +710,7 @@ Dashboard → Navigate to Profile/CV/Jobs
 ```
 🏠 Dashboard (/) ✅
 ├── My Profile Card → /profile
-├── Jobs & Companies Card → /jobs  
+├── Jobs & Companies Card → /jobs
 └── Applications Card → /cv (and /cover-letters, /speech)
 
 👤 My Profile (/profile) ✅
