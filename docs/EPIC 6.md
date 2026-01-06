@@ -106,7 +106,7 @@ Use this as the **one-page runbook** to implement EPIC 6 cleanly end-to-end (sch
   - company summary doesn’t break output
   - fallback behavior covered
 
-- [ ] Sandbox E2E AI tests (if existing pattern):
+- [x] Sandbox E2E AI tests (if existing pattern):
   - one invocation per op in tailored mode
 
 ---
