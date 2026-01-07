@@ -14,8 +14,6 @@ test.describe('Tailored materials workflow', () => {
   let coverLetterId: string | null = null;
 
   test('1. Setup: create analyzed job from fixture', async ({ page }) => {
-    test.setTimeout(120000);
-
     await page.goto('/jobs');
     await page.waitForLoadState('networkidle');
 
@@ -27,8 +25,9 @@ test.describe('Tailored materials workflow', () => {
     const fileInput = page.locator('input[type="file"]').first();
     await expect(fileInput).toBeVisible();
     await fileInput.setInputFiles(JOB_FIXTURE);
+    await page.waitForTimeout(500);
 
-    await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 60000 });
+    await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 20000 });
     await expect(async () => {
       const editButton = page.getByRole('button', { name: /^Edit$/ });
       await expect(editButton).toBeVisible({ timeout: 5000 });
@@ -40,9 +39,12 @@ test.describe('Tailored materials workflow', () => {
     }).toPass({ timeout: 20000 });
 
     const titleInput = page.locator('[data-testid="job-title-input"]');
+    await titleInput.scrollIntoViewIfNeeded();
 
     jobTitle = `E2E Tailored Job ${Date.now()}`;
     await titleInput.fill(jobTitle);
+    await page.waitForTimeout(500);
+
     await expect(async () => {
       const saveButton = page.locator('[data-testid="job-save-button"]');
       await expect(saveButton).toBeVisible({ timeout: 2000 });

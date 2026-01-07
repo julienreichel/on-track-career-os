@@ -130,7 +130,7 @@ test.describe('Company workflow', () => {
 
     const fileInput = page.locator('input[type="file"]').first();
     await fileInput.setInputFiles(JOB_FIXTURE);
-    await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 60000 });
+    await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 20000 });
     jobDetailUrl = page.url();
 
     await expect(async () => {
@@ -142,7 +142,10 @@ test.describe('Company workflow', () => {
     }).toPass({ timeout: 20000 });
 
     const jobTitleInput = page.getByLabel('Job title');
+    await jobTitleInput.scrollIntoViewIfNeeded();
     await jobTitleInput.fill(JOB_TITLE);
+    await page.waitForTimeout(500);
+
     await expect(async () => {
       const saveJobButton = page.getByRole('button', { name: /^Save$/i }).last();
       await expect(saveJobButton).toBeVisible({ timeout: 2000 });
