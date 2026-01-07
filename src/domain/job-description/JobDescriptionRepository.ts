@@ -55,6 +55,34 @@ export class JobDescriptionRepository {
     return res.data;
   }
 
+  async getWithRelations(id: string) {
+    const selectionSet = [
+      'id',
+      'rawText',
+      'owner',
+      'title',
+      'seniorityLevel',
+      'roleSummary',
+      'responsibilities',
+      'requiredSkills',
+      'behaviours',
+      'successCriteria',
+      'explicitPains',
+      'status',
+      'companyId',
+      'createdAt',
+      'updatedAt',
+      'company.*',
+      'matchingSummaries.*',
+      'cvs.*',
+      'coverLetters.*',
+      'speechBlocks.*',
+    ];
+
+    const res = await this.model.get({ id }, gqlOptions({ selectionSet }));
+    return res.data;
+  }
+
   async listByOwner(owner: string): Promise<JobDescription[]> {
     if (!owner) {
       return [];

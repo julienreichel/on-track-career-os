@@ -20,6 +20,7 @@ describe('useJobAnalysis', () => {
   let mockService: {
     listJobs: ReturnType<typeof vi.fn>;
     getFullJobDescription: ReturnType<typeof vi.fn>;
+    getJobWithRelations: ReturnType<typeof vi.fn>;
     createJobFromRawText: ReturnType<typeof vi.fn>;
     updateJob: ReturnType<typeof vi.fn>;
     reanalyseJob: ReturnType<typeof vi.fn>;
@@ -30,6 +31,7 @@ describe('useJobAnalysis', () => {
     mockService = {
       listJobs: vi.fn(),
       getFullJobDescription: vi.fn(),
+      getJobWithRelations: vi.fn(),
       createJobFromRawText: vi.fn(),
       updateJob: vi.fn(),
       reanalyseJob: vi.fn(),
@@ -74,6 +76,17 @@ describe('useJobAnalysis', () => {
 
     expect(selectedJob.value).toEqual(job);
     expect(mockService.getFullJobDescription).toHaveBeenCalledWith('job-1');
+  });
+
+  it('should load job with relations and set selected state', async () => {
+    const job = { id: 'job-1', title: 'Existing' } as JobDescription;
+    mockService.getJobWithRelations.mockResolvedValue(job);
+
+    const { selectedJob, loadJobWithRelations } = useJobAnalysis();
+    await loadJobWithRelations('job-1');
+
+    expect(selectedJob.value).toEqual(job);
+    expect(mockService.getJobWithRelations).toHaveBeenCalledWith('job-1');
   });
 
   it('should update job and reflect changes locally', async () => {

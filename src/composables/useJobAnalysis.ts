@@ -48,6 +48,12 @@ export function useJobAnalysis() {
     return result;
   };
 
+  const loadJobWithRelations = async (jobId: string) => {
+    const result = await handle(() => service.getJobWithRelations(jobId));
+    selectedJob.value = result;
+    return result;
+  };
+
   const createJobFromRawText = async (rawText: string) => {
     const created = await handle(() => service.createJobFromRawText(rawText));
     selectedJob.value = created;
@@ -91,6 +97,7 @@ export function useJobAnalysis() {
     error,
     listJobs,
     loadJob,
+    loadJobWithRelations,
     createJobFromRawText,
     updateJob,
     reanalyseJob,

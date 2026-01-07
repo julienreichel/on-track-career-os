@@ -9,6 +9,11 @@ import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary'
 type Props = {
   job: JobDescription | null;
   matchingSummary: MatchingSummary | null;
+  existingMaterials?: {
+    cv?: { id: string } | null;
+    coverLetter?: { id: string } | null;
+    speechBlock?: { id: string } | null;
+  } | null;
   matchLink?: string | null;
   summaryLoading?: boolean;
   summaryError?: string | null;
@@ -30,6 +35,7 @@ const hasMatchingSummary = computed(() => hasSummary.value);
 const hasExistingMaterials = computed(() =>
   Boolean(existingCv.value || existingCoverLetter.value || existingSpeech.value)
 );
+const shouldLoadExistingMaterials = computed(() => props.existingMaterials === undefined);
 
 const materialsLoading = computed(() => tailoredMaterials.materialsLoading.value);
 const materialsError = computed(() => tailoredMaterials.error.value);
@@ -65,6 +71,9 @@ const headerDescription = computed(() =>
 watch(
   () => props.job?.id,
   async (jobId) => {
+    if (!shouldLoadExistingMaterials.value) {
+      return;
+    }
     if (!jobId) {
       existingCv.value = null;
       existingCoverLetter.value = null;
@@ -83,6 +92,19 @@ watch(
     existingCv.value = null;
     existingCoverLetter.value = null;
     existingSpeech.value = null;
+  },
+  { immediate: true }
+);
+
+watch(
+  () => props.existingMaterials,
+  (materials) => {
+    if (materials === undefined) {
+      return;
+    }
+    existingCv.value = materials?.cv ?? null;
+    existingCoverLetter.value = materials?.coverLetter ?? null;
+    existingSpeech.value = materials?.speechBlock ?? null;
   },
   { immediate: true }
 );

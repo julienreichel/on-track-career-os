@@ -30,6 +30,7 @@ describe('JobDescriptionService', () => {
   beforeEach(() => {
     mockRepository = {
       get: vi.fn(),
+      getWithRelations: vi.fn(),
       listByOwner: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),

@@ -1,20 +1,22 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch, onMounted } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import TagInput from '@/components/TagInput.vue';
 import LinkedCompanyBadge from '@/components/company/LinkedCompanyBadge.vue';
-import { useAuthUser } from '@/composables/useAuthUser';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { useCompanies } from '@/composables/useCompanies';
 import TailoredMaterialsCard from '@/components/tailoring/TailoredMaterialsCard.vue';
-import { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
 import { formatDetailDate } from '@/utils/formatDetailDate';
 import type {
   JobDescription,
   JobDescriptionUpdateInput,
 } from '@/domain/job-description/JobDescription';
+import type { Company } from '@/domain/company/Company';
+import type { CVDocument } from '@/domain/cvdocument/CVDocument';
+import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
+import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 import type { PageHeaderLink } from '@/types/ui';
 
 type ScalarField = 'title' | 'seniorityLevel' | 'roleSummary';
@@ -45,17 +47,22 @@ const router = useRouter();
 const { t } = useI18n();
 const jobAnalysis = useJobAnalysis();
 const companyStore = useCompanies();
-const auth = useAuthUser();
-const matchingSummaryService = new MatchingSummaryService();
 
 const jobId = computed(() => route.params.jobId as string | undefined);
 const job = jobAnalysis.selectedJob;
 
+type JobWithRelations = JobDescription & {
+  company?: Company | null;
+  matchingSummaries?: MatchingSummary[] | null;
+  cvs?: CVDocument[] | null;
+  coverLetters?: CoverLetter[] | null;
+  speechBlocks?: SpeechBlock[] | null;
+};
+
+const jobWithRelations = computed(() => job.value as JobWithRelations | null);
+
 const loading = ref(false);
 const errorMessage = ref<string | null>(null);
-const matchingSummary = ref<MatchingSummary | null>(null);
-const matchingSummaryLoading = ref(false);
-const matchingSummaryError = ref<string | null>(null);
 const saving = ref(false);
 const isEditing = ref(false);
 const selectedCompanyId = ref<string | null>(null);
@@ -153,6 +160,12 @@ const viewListSections = computed(() =>
 const formattedCreatedAt = computed(() => formatDetailDate(job.value?.createdAt));
 const formattedUpdatedAt = computed(() => formatDetailDate(job.value?.updatedAt));
 const displayTitle = computed(() => form.title.trim() || t('jobList.card.noTitle'));
+const matchingSummary = computed(() => selectMatchingSummary(jobWithRelations.value));
+const existingMaterials = computed(() => ({
+  cv: pickMostRecent(jobWithRelations.value?.cvs ?? []),
+  coverLetter: pickMostRecent(jobWithRelations.value?.coverLetters ?? []),
+  speechBlock: pickMostRecent(jobWithRelations.value?.speechBlocks ?? []),
+}));
 
 watch(
   job,
@@ -182,18 +195,14 @@ watch(
 );
 
 watch(
-  [jobId, () => job.value?.companyId, () => auth.userId.value],
-  () => {
-    void loadMatchingSummary();
-  },
-  { immediate: true }
+  () => isEditing.value,
+  async (editing) => {
+    if (!editing || companyStore.rawCompanies.value.length > 0) {
+      return;
+    }
+    await loadCompanies();
+  }
 );
-
-
-onMounted(async () => {
-  await loadCompanies();
-  isEditing.value = false;
-});
 
 const isDirty = computed(() => {
   if (!job.value) {
@@ -220,10 +229,7 @@ const companySelectorDisabled = computed(
   () => loading.value || companyStore.loading.value || linkingCompany.value
 );
 const availableCompanies = computed(() => companyStore.rawCompanies.value);
-const linkedCompany = computed(
-  () =>
-    availableCompanies.value.find((company) => company.id === (job.value?.companyId ?? '')) ?? null
-);
+const linkedCompany = computed(() => jobWithRelations.value?.company ?? null);
 
 function hydrateForm(data: JobDescription) {
   form.title = data.title ?? '';
@@ -259,7 +265,7 @@ async function loadJob() {
   errorMessage.value = null;
 
   try {
-    const result = await jobAnalysis.loadJob(id);
+    const result = await jobAnalysis.loadJobWithRelations(id);
     if (!result) {
       throw new Error(t('jobDetail.errors.notFound'));
     }
@@ -283,48 +289,6 @@ async function loadCompanies() {
   }
 }
 
-async function loadMatchingSummary() {
-  const id = jobId.value;
-  if (!id) {
-    return;
-  }
-
-  if (!auth.userId.value) {
-    await auth.loadUserId();
-  }
-
-  const userId = auth.userId.value;
-  if (!userId) {
-    return;
-  }
-
-  matchingSummaryLoading.value = true;
-  matchingSummaryError.value = null;
-
-  try {
-    const companyId = job.value?.companyId ?? null;
-    let summary = await matchingSummaryService.getByContext({
-      userId,
-      jobId: id,
-      companyId,
-    });
-
-    if (!summary && companyId) {
-      summary = await matchingSummaryService.getByContext({ userId, jobId: id, companyId: null });
-    }
-
-    matchingSummary.value = summary;
-  } catch (error) {
-    console.error('[jobDetail] Failed to load matching summary', error);
-    matchingSummaryError.value =
-      error instanceof Error ? error.message : t('jobDetail.errors.generic');
-    matchingSummary.value = null;
-  } finally {
-    matchingSummaryLoading.value = false;
-  }
-}
-
-
 function arraysEqual(a: string[], b: string[]) {
   if (a.length !== b.length) {
     return false;
@@ -345,6 +309,50 @@ function updateListField(field: ListField, value: string[]) {
 
 function updateBreadcrumb(title?: string | null) {
   route.meta.breadcrumbLabel = title?.trim() || t('jobList.card.noTitle');
+}
+
+type DatedItem = {
+  updatedAt?: string | null;
+  createdAt?: string | null;
+  generatedAt?: string | null;
+};
+
+function pickMostRecent<T extends DatedItem>(items: T[]): T | null {
+  if (!items.length) {
+    return null;
+  }
+
+  return [...items].sort((a, b) => {
+    const dateA = new Date(a.updatedAt ?? a.generatedAt ?? a.createdAt ?? 0).getTime();
+    const dateB = new Date(b.updatedAt ?? b.generatedAt ?? b.createdAt ?? 0).getTime();
+    return dateB - dateA;
+  })[0]!;
+}
+
+function selectMatchingSummary(data: JobWithRelations | null) {
+  if (!data?.matchingSummaries?.length) {
+    return null;
+  }
+
+  const summaries = data.matchingSummaries.filter(
+    (summary): summary is MatchingSummary => Boolean(summary)
+  );
+  if (!summaries.length) {
+    return null;
+  }
+
+  const companyId = data.companyId ?? null;
+  const companyMatches = companyId
+    ? summaries.filter((summary) => summary.companyId === companyId)
+    : [];
+  const jobMatches = summaries.filter((summary) => !summary.companyId);
+  let candidates = summaries;
+  if (companyMatches.length) {
+    candidates = companyMatches;
+  } else if (jobMatches.length) {
+    candidates = jobMatches;
+  }
+  return pickMostRecent(candidates);
 }
 
 function buildUpdatePayload(): Partial<JobDescriptionUpdateInput> {
@@ -688,9 +696,10 @@ function redirectToCompanyCreate() {
           <TailoredMaterialsCard
             :job="job"
             :matching-summary="matchingSummary"
+            :existing-materials="existingMaterials"
             :match-link="matchLink"
-            :summary-loading="matchingSummaryLoading"
-            :summary-error="matchingSummaryError"
+            :summary-loading="loading"
+            :summary-error="null"
             description-key="description"
           />
         </template>

@@ -5,9 +5,14 @@ import { createRouter, createMemoryHistory } from 'vue-router';
 import JobDetailPage from '@/pages/jobs/[jobId]/index.vue';
 import { createTestI18n } from '../../../utils/createTestI18n';
 
-const mockLoadJob = vi.fn();
+const mockLoadJobWithRelations = vi.fn();
 const mockUpdateJob = vi.fn();
 const mockReanalyseJob = vi.fn();
+
+const baseCompany = {
+  id: 'company-1',
+  companyName: 'Acme Corp',
+};
 
 const baseJob = {
   id: 'job-1',
@@ -22,6 +27,7 @@ const baseJob = {
   status: 'analyzed',
   rawText: 'Job text',
   companyId: 'company-1',
+  company: baseCompany,
   owner: 'user-1',
   createdAt: '2024-01-01T00:00:00.000Z',
   updatedAt: '2024-01-02T00:00:00.000Z',
@@ -35,7 +41,8 @@ const jobAnalysisMock = {
   listJobs: vi.fn(),
   createJobFromRawText: vi.fn(),
   deleteJob: vi.fn(),
-  loadJob: mockLoadJob,
+  loadJob: vi.fn(),
+  loadJobWithRelations: mockLoadJobWithRelations,
   updateJob: mockUpdateJob,
   reanalyseJob: mockReanalyseJob,
   loading: ref(false),
@@ -72,14 +79,6 @@ const authMock = {
 
 vi.mock('@/composables/useAuthUser', () => ({
   useAuthUser: () => authMock,
-}));
-
-const matchingSummaryMock = {
-  getByContext: vi.fn().mockResolvedValue({ id: 'summary-1' }),
-};
-
-vi.mock('@/domain/matching-summary/MatchingSummaryService', () => ({
-  MatchingSummaryService: vi.fn().mockImplementation(() => matchingSummaryMock),
 }));
 
 const i18n = createTestI18n();
@@ -231,7 +230,14 @@ const stubs = {
     `,
   },
   TailoredMaterialsCard: {
-    props: ['job', 'matchingSummary', 'summaryLoading', 'summaryError', 'descriptionKey'],
+    props: [
+      'job',
+      'matchingSummary',
+      'existingMaterials',
+      'summaryLoading',
+      'summaryError',
+      'descriptionKey',
+    ],
     template: '<section class="tailored-materials-card"></section>',
   },
 };
@@ -257,7 +263,7 @@ describe('Job Detail Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     selectedJob.value = { ...baseJob };
-    mockLoadJob.mockImplementation(async () => {
+    mockLoadJobWithRelations.mockImplementation(async () => {
       selectedJob.value = { ...baseJob };
       return selectedJob.value;
     });
@@ -266,7 +272,6 @@ describe('Job Detail Page', () => {
       { id: 'company-2', companyName: 'Global Freight' },
     ];
     companyStoreMock.listCompanies.mockResolvedValue(companyStoreMock.rawCompanies.value);
-    matchingSummaryMock.getByContext.mockResolvedValue({ id: 'summary-1' });
   });
 
   it('renders job details', async () => {
@@ -368,9 +373,9 @@ describe('Job Detail Page', () => {
       companyId: 'company-2',
     });
 
-    selectedJob.value = { ...baseJob, companyId: null };
-    mockLoadJob.mockImplementationOnce(async () => {
-      selectedJob.value = { ...baseJob, companyId: null };
+    selectedJob.value = { ...baseJob, companyId: null, company: null };
+    mockLoadJobWithRelations.mockImplementationOnce(async () => {
+      selectedJob.value = { ...baseJob, companyId: null, company: null };
       return selectedJob.value;
     });
 

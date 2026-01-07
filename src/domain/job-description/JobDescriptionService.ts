@@ -43,6 +43,10 @@ export class JobDescriptionService {
     return this.repo.get(id);
   }
 
+  async getJobWithRelations(id: string): Promise<JobDescription | null> {
+    return this.repo.getWithRelations(id);
+  }
+
   async listJobs(ownerId: string): Promise<JobDescription[]> {
     return this.repo.listByOwner(ownerId);
   }

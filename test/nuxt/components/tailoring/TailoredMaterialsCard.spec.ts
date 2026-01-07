@@ -149,4 +149,25 @@ describe('TailoredMaterialsCard', () => {
     });
     expect(pushMock).toHaveBeenCalledWith('/applications/cv/cv-1');
   });
+
+  it('uses provided existing materials without loading', async () => {
+    const wrapper = mount(TailoredMaterialsCard, {
+      props: {
+        job: baseJob,
+        matchingSummary: baseSummary,
+        existingMaterials: {
+          cv: { id: 'cv-1' },
+          coverLetter: { id: 'cl-1' },
+          speechBlock: { id: 'sb-1' },
+        },
+      },
+      global: { plugins: [createTestI18n()], stubs },
+    });
+
+    await flushPromises();
+    expect(loadExistingMaterialsForJob).not.toHaveBeenCalled();
+    expect(wrapper.text()).toContain('View CV');
+    expect(wrapper.text()).toContain('View cover letter');
+    expect(wrapper.text()).toContain('View speech');
+  });
 });
