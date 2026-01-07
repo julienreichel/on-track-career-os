@@ -125,7 +125,7 @@
       "customerSegments": "Customer segments",
       "customerSegmentsHint": "Key buyer personas or accounts",
       "customerSegmentsPlaceholder": "Add a segment and press Enter",
-      "description": "Company summary",
+      "description": "Upload a company description or enter it manually.",
       "descriptionHint": "Optional short description for your context",
       "descriptionPlaceholder": "Describe what this company does...",
       "errors": {
