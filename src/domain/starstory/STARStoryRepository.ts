@@ -1,5 +1,6 @@
 import { gqlOptions } from '@/data/graphql/options';
-import { fetchAllListItems } from '@/data/graphql/pagination';
+import type { AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
+import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { AmplifyExperienceModel } from '@/domain/experience/ExperienceRepository';
 import type { STARStoryCreateInput, STARStoryUpdateInput, STARStory } from './STARStory';
 
@@ -8,9 +9,6 @@ export type AmplifySTARStoryModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: STARStory | null }>;
-  list: (
-    options?: Record<string, unknown>
-  ) => Promise<{ data: STARStory[]; nextToken?: string | null }>;
   create: (
     input: STARStoryCreateInput,
     options?: Record<string, unknown>
@@ -25,6 +23,15 @@ export type AmplifySTARStoryModel = {
   ) => Promise<{ data: STARStory | null }>;
 };
 
+type ExperienceWithStories = {
+  id: string;
+  stories?: (STARStory | null)[] | null;
+};
+
+type UserProfileWithExperiences = UserProfile & {
+  experiences?: (ExperienceWithStories | null)[] | null;
+};
+
 /**
  * Repository for STAR Story data access
  * Handles CRUD operations and filtering for STAR stories
@@ -32,21 +39,28 @@ export type AmplifySTARStoryModel = {
 export class STARStoryRepository {
   private readonly _model: AmplifySTARStoryModel;
   private readonly _experienceModel: AmplifyExperienceModel;
+  private readonly _userProfileModel: AmplifyUserProfileModel;
 
   /**
    * Constructor with optional dependency injection for testing
    * @param model - Optional Amplify model instance (for testing)
    */
-  constructor(model?: AmplifySTARStoryModel, experienceModel?: AmplifyExperienceModel) {
-    if (model && experienceModel) {
+  constructor(
+    model?: AmplifySTARStoryModel,
+    experienceModel?: AmplifyExperienceModel,
+    userProfileModel?: AmplifyUserProfileModel
+  ) {
+    if (model && experienceModel && userProfileModel) {
       // Use injected model (for tests)
       this._model = model;
       this._experienceModel = experienceModel;
+      this._userProfileModel = userProfileModel;
     } else {
       // Use Nuxt's auto-imported useNuxtApp (for production)
       const amplify = useNuxtApp().$Amplify.GraphQL.client;
       this._model = amplify.models.STARStory;
       this._experienceModel = amplify.models.Experience;
+      this._userProfileModel = amplify.models.UserProfile;
     }
   }
 
@@ -65,12 +79,28 @@ export class STARStoryRepository {
   }
 
   /**
-   * List all stories (optionally filtered)
-   * @param filter - Optional filter object
-   * @returns Array of stories
+   * Get all stories for a user using a single GraphQL query
+   * Fetches the user profile along with nested experiences and stories.
+   * @param userId - User ID to load stories for
+   * @returns Array of all stories for the user (flattened)
    */
-  async list(filter: Record<string, unknown> = {}): Promise<STARStory[]> {
-    return fetchAllListItems<STARStory>(this.model.list.bind(this.model), filter);
+  async getAllStoriesByUser(userId: string): Promise<STARStory[]> {
+    if (!userId) {
+      return [];
+    }
+
+    const selectionSet = ['id', 'experiences.id', 'experiences.stories.*'];
+
+    const { data } = await this._userProfileModel.get(
+      { id: userId },
+      gqlOptions({ selectionSet })
+    );
+
+    const profile = data as UserProfileWithExperiences | null;
+    const experiences = profile?.experiences ?? [];
+    const stories = experiences.flatMap((experience) => experience?.stories ?? []);
+
+    return stories.filter((story): story is STARStory => Boolean(story));
   }
 
   /**

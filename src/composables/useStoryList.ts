@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
+import { useAuthUser } from '@/composables/useAuthUser';
 import type { STARStory } from '@/domain/starstory/STARStory';
 import type { Experience } from '@/domain/experience/Experience';
 
@@ -34,6 +35,7 @@ export function useStoryList(service = new STARStoryService()) {
   const stories = ref<STARStory[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  const auth = useAuthUser();
 
   // Computed
   const hasStories = computed(() => stories.value.length > 0);
@@ -47,7 +49,8 @@ export function useStoryList(service = new STARStoryService()) {
     error.value = null;
 
     try {
-      stories.value = await service.getAllStories();
+      const userId = await resolveUserId(auth);
+      stories.value = await service.getAllStories(userId);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'storyList.errors.loadFailed';
       console.error('[useStoryList] Load error:', err);
@@ -209,4 +212,17 @@ export function useStoryList(service = new STARStoryService()) {
     refresh,
     reset,
   };
+}
+
+async function resolveUserId(auth: ReturnType<typeof useAuthUser>) {
+  if (auth.userId.value) {
+    return auth.userId.value;
+  }
+
+  await auth.loadUserId();
+  if (!auth.userId.value) {
+    throw new Error('storyList.errors.missingUserId');
+  }
+
+  return auth.userId.value;
 }

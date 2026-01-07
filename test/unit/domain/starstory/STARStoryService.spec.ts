@@ -18,7 +18,7 @@ describe('STARStoryService', () => {
   beforeEach(() => {
     mockRepository = {
       get: vi.fn(),
-      list: vi.fn(),
+      getAllStoriesByUser: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),

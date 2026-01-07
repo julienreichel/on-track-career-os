@@ -40,10 +40,11 @@ export class STARStoryService {
 
   /**
    * Get all stories for the current user (across all experiences)
+   * @param userId - User identifier
    * @returns Array of all stories
    */
-  async getAllStories(): Promise<STARStory[]> {
-    return await this.repo.list();
+  async getAllStories(userId: string): Promise<STARStory[]> {
+    return await this.repo.getAllStoriesByUser(userId);
   }
 
   /**

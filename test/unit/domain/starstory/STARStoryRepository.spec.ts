@@ -9,6 +9,7 @@ import type {
   STARStory,
 } from '@/domain/starstory/STARStory';
 import type { AmplifyExperienceModel } from '@/domain/experience/ExperienceRepository';
+import type { AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
 
 // Mock gqlOptions
 vi.mock('@/data/graphql/options', () => ({
@@ -22,7 +23,6 @@ describe('STARStoryRepository', () => {
   let repository: STARStoryRepository;
   let mockModel: {
     get: ReturnType<typeof vi.fn>;
-    list: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
@@ -30,12 +30,14 @@ describe('STARStoryRepository', () => {
   let mockExperienceModel: {
     get: ReturnType<typeof vi.fn>;
   };
+  let mockUserProfileModel: {
+    get: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     // Create fresh mocks for each test
     mockModel = {
       get: vi.fn(),
-      list: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -45,10 +47,15 @@ describe('STARStoryRepository', () => {
       get: vi.fn(),
     };
 
+    mockUserProfileModel = {
+      get: vi.fn(),
+    };
+
     // Inject the mocks via constructor (dependency injection)
     repository = new STARStoryRepository(
       mockModel as AmplifySTARStoryModel,
-      mockExperienceModel as AmplifyExperienceModel
+      mockExperienceModel as AmplifyExperienceModel,
+      mockUserProfileModel as AmplifyUserProfileModel
     );
   });
 
@@ -93,75 +100,72 @@ describe('STARStoryRepository', () => {
     });
   });
 
-  describe('list', () => {
-    it('should fetch a list of STAR stories', async () => {
-      const mockStories: STARStory[] = [
-        {
-          id: 'story-1',
-          userId: 'user-123',
-          experienceId: 'exp-123',
-          situation: 'Situation 1',
-          task: 'Task 1',
-          action: 'Action 1',
-          result: 'Result 1',
-          title: 'Story 1',
-          tags: ['tag1'],
-          createdAt: '2025-01-01T00:00:00Z',
-          updatedAt: '2025-01-01T00:00:00Z',
-        },
-        {
-          id: 'story-2',
-          userId: 'user-123',
-          experienceId: 'exp-123',
-          situation: 'Situation 2',
-          task: 'Task 2',
-          action: 'Action 2',
-          result: 'Result 2',
-          title: 'Story 2',
-          tags: ['tag2'],
-          createdAt: '2025-01-01T00:00:00Z',
-          updatedAt: '2025-01-01T00:00:00Z',
-        },
-      ] as unknown as STARStory[];
-
-      mockModel.list.mockResolvedValue({
-        data: mockStories,
-      });
-
-      const result = await repository.list();
-
-      expect(mockModel.list).toHaveBeenCalledWith(
-        expect.objectContaining({ authMode: 'userPool' })
-      );
-      expect(result).toEqual(mockStories);
-      expect(result).toHaveLength(2);
-    });
-
-    it('should apply filters when provided', async () => {
-      const mockFilter = { experienceId: 'exp-123' };
-
-      mockModel.list.mockResolvedValue({
-        data: [],
-      });
-
-      await repository.list(mockFilter);
-
-      expect(mockModel.list).toHaveBeenCalledWith(
-        expect.objectContaining({
-          authMode: 'userPool',
-          experienceId: 'exp-123',
-        })
-      );
-    });
-
-    it('should return empty array when no stories exist', async () => {
-      mockModel.list.mockResolvedValue({
-        data: [],
-      });
-
-      const result = await repository.list();
+  describe('getAllStoriesByUser', () => {
+    it('should return empty array when userId is missing', async () => {
+      const result = await repository.getAllStoriesByUser('');
 
       expect(result).toEqual([]);
+      expect(mockUserProfileModel.get).not.toHaveBeenCalled();
+    });
+
+    it('should fetch all STAR stories via user profile selection set', async () => {
+      const storyOne = {
+        id: 'story-1',
+        userId: 'user-123',
+        experienceId: 'exp-1',
+        situation: 'Situation 1',
+        task: 'Task 1',
+        action: 'Action 1',
+        result: 'Result 1',
+        title: 'Story 1',
+        tags: ['tag1'],
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z',
+      } as unknown as STARStory;
+      const storyTwo = {
+        id: 'story-2',
+        userId: 'user-123',
+        experienceId: 'exp-2',
+        situation: 'Situation 2',
+        task: 'Task 2',
+        action: 'Action 2',
+        result: 'Result 2',
+        title: 'Story 2',
+        tags: ['tag2'],
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z',
+      } as unknown as STARStory;
+
+      mockUserProfileModel.get.mockResolvedValue({
+        data: {
+          id: 'user-123',
+          experiences: [
+            {
+              id: 'exp-1',
+              stories: [storyOne, null],
+            },
+            null,
+            {
+              id: 'exp-2',
+              stories: [storyTwo],
+            },
+          ],
+        },
+      });
+
+      const result = await repository.getAllStoriesByUser('user-123');
+
+      expect(mockUserProfileModel.get).toHaveBeenCalledWith(
+        { id: 'user-123' },
+        expect.objectContaining({
+          selectionSet: expect.arrayContaining([
+            'id',
+            'experiences.id',
+            'experiences.stories.*',
+          ]),
+        })
+      );
+      expect(result).toEqual([storyOne, storyTwo]);
     });
   });
 

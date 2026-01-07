@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ref } from 'vue';
 import { useStoryList } from '@/composables/useStoryList';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { STARStory } from '@/domain/starstory/STARStory';
@@ -7,6 +8,14 @@ import type { Experience } from '@/domain/experience/Experience';
 // Mock services
 vi.mock('@/domain/starstory/STARStoryService', () => ({
   STARStoryService: vi.fn(),
+}));
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => ({
+    userId: ref('user-1'),
+    loading: ref(false),
+    error: ref(null),
+    loadUserId: vi.fn(),
+  }),
 }));
 describe('useStoryList', () => {
   let mockService: {
@@ -95,6 +104,7 @@ describe('useStoryList', () => {
       expect(hasStories.value).toBe(true);
       expect(storyCount.value).toBe(3);
       expect(mockService.getAllStories).toHaveBeenCalledTimes(1);
+      expect(mockService.getAllStories).toHaveBeenCalledWith('user-1');
     });
 
     it('should handle load errors', async () => {
