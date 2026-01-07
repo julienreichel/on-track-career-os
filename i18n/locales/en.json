@@ -302,7 +302,8 @@
     "errors": {
       "notFound": "Experience not found.",
       "loadFailed": "Failed to load experience.",
-      "saveFailed": "Failed to save experience."
+      "saveFailed": "Failed to save experience.",
+      "deleteFailed": "Failed to delete experience."
     },
     "present": "Present",
     "status": {

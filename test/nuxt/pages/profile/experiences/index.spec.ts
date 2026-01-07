@@ -408,6 +408,31 @@ describe('Experiences Page Integration', () => {
     expect(wrapper.text()).toContain(i18n.global.t('experiences.list.empty'));
   });
 
+  it('shows skeleton until experiences are loaded', async () => {
+    let resolveList: (value: Experience[]) => void;
+    const listPromise = new Promise<Experience[]>((resolve) => {
+      resolveList = resolve;
+    });
+    mockExperienceList.mockReturnValueOnce(listPromise);
+    mockStoryCount.mockResolvedValue([]);
+
+    const wrapper = mount(ExperiencesPage, {
+      global: {
+        plugins: [i18n, router],
+        stubs: pageComponentStubs,
+      },
+    });
+
+    await flushPromises();
+    expect(wrapper.find('.u-skeleton').exists()).toBe(true);
+
+    resolveList?.([]);
+    await flushPromises();
+
+    expect(wrapper.find('.u-skeleton').exists()).toBe(false);
+    expect(wrapper.text()).toContain(i18n.global.t('experiences.list.empty'));
+  });
+
   it('renders experience cards when repository returns data', async () => {
     mockExperienceList.mockResolvedValueOnce([
       {

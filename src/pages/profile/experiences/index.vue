@@ -25,6 +25,7 @@ function toTimestamp(dateString: string | null | undefined): number {
 const experiences = ref<Experience[]>([]);
 const storyCounts = ref<Record<string, number>>({});
 const loading = ref(false);
+const hasLoaded = ref(false);
 const errorMessage = ref<string | null>(null);
 const showDeleteModal = ref(false);
 const experienceToDelete = ref<string | null>(null);
@@ -64,6 +65,7 @@ async function loadExperiences() {
   }
 
   loading.value = true;
+  hasLoaded.value = false;
   errorMessage.value = null;
 
   try {
@@ -75,10 +77,12 @@ async function loadExperiences() {
     });
     await loadStoryCounts();
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : 'Failed to load experiences';
+    errorMessage.value =
+      error instanceof Error ? error.message : t('experiences.errors.loadFailed');
     console.error('[experiences] Error loading experiences:', error);
   } finally {
     loading.value = false;
+    hasLoaded.value = true;
   }
 }
 
@@ -128,7 +132,8 @@ async function confirmDelete() {
     showDeleteModal.value = false;
     experienceToDelete.value = null;
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : 'Failed to delete experience';
+    errorMessage.value =
+      error instanceof Error ? error.message : t('experiences.errors.deleteFailed');
     console.error('[experiences] Error deleting experience:', error);
   }
 }
@@ -166,7 +171,7 @@ function handleViewStories(id: string) {
         />
 
         <!-- Loading State -->
-        <UCard v-if="loading">
+        <UCard v-if="loading || !hasLoaded">
           <USkeleton class="h-8 w-full" />
         </UCard>
 
