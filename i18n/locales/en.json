@@ -299,6 +299,11 @@
     }
   },
   "experiences": {
+    "errors": {
+      "notFound": "Experience not found.",
+      "loadFailed": "Failed to load experience.",
+      "saveFailed": "Failed to save experience."
+    },
     "present": "Present",
     "status": {
       "draft": "Draft",
@@ -705,7 +710,8 @@
     "leave": "Leave",
     "discard": "Discard",
     "goBack": "Go back",
-    "backToList": "Back to list"
+    "backToList": "Back to list",
+    "notAvailable": "Not available"
   },
   "canvas": {
     "title": "Personal Business Model Canvas",

@@ -58,6 +58,9 @@ test.describe('Experience workflow', () => {
     await page.goto(`/profile/experiences/${manualExperienceId}`);
     await page.waitForLoadState('networkidle');
 
+    await page.getByRole('button', { name: /^Edit$/ }).click();
+    await expect(page.getByLabel(/Company Name/i)).toBeVisible({ timeout: 10000 });
+
     await page.getByLabel(/Company Name/i).fill(updatedCompanyName);
     await page
       .getByLabel(/Responsibilities/i)
@@ -69,10 +72,8 @@ test.describe('Experience workflow', () => {
     await page.getByRole('button', { name: /Save Experience/i }).click();
     await page.waitForLoadState('networkidle');
 
-    await expect(page).toHaveURL(/\/profile\/experiences$/);
-    await expect(
-      page.locator('[data-testid="experience-card"]').filter({ hasText: updatedCompanyName })
-    ).toBeVisible({ timeout: 20000 });
+    await expect(page).toHaveURL(new RegExp(`/profile/experiences/${manualExperienceId}$`));
+    await expect(page.getByText(updatedCompanyName)).toBeVisible({ timeout: 20000 });
   });
 
   test('opens the stories page for the manual experience and sees empty state', async ({ page }) => {

@@ -15,6 +15,7 @@ const experience = ref<Experience | null>(null);
 const loading = ref(false);
 const saving = ref(false);
 const errorMessage = ref<string | null>(null);
+const isEditing = ref(false);
 
 const experienceId = computed(() => {
   const id = route.params.id;
@@ -41,8 +42,10 @@ watch(
 onMounted(async () => {
   if (!isNewExperience.value && experienceId.value) {
     await loadExperience(experienceId.value);
+    isEditing.value = false;
   } else if (isNewExperience.value) {
     route.meta.breadcrumbLabel = t('navigation.new');
+    isEditing.value = true;
   }
 });
 
@@ -53,11 +56,12 @@ async function loadExperience(id: string) {
   try {
     const result = await experienceRepo.get(id);
     if (!result) {
-      throw new Error('Experience not found');
+      throw new Error(t('experiences.errors.notFound'));
     }
     experience.value = result;
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : 'Failed to load experience';
+    errorMessage.value =
+      error instanceof Error ? error.message : t('experiences.errors.loadFailed');
     console.error('[experience] Error loading experience:', error);
   } finally {
     loading.value = false;
@@ -79,18 +83,19 @@ async function handleSave(data: ExperienceCreateInput) {
         ...data,
         userId,
       });
+      router.push('/profile/experiences');
     } else if (experienceId.value) {
       // Update existing experience
       await experienceRepo.update({
         id: experienceId.value,
         ...data,
       });
+      await loadExperience(experienceId.value);
+      isEditing.value = false;
     }
-
-    // Navigate back to list
-    router.push('/profile/experiences');
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : 'Failed to save experience';
+    errorMessage.value =
+      error instanceof Error ? error.message : t('experiences.errors.saveFailed');
     console.error('[experience] Error saving experience:', error);
   } finally {
     saving.value = false;
@@ -98,8 +103,38 @@ async function handleSave(data: ExperienceCreateInput) {
 }
 
 function handleCancel() {
-  router.push('/profile/experiences');
+  if (isNewExperience.value) {
+    router.push('/profile/experiences');
+    return;
+  }
+  isEditing.value = false;
 }
+
+function handleEdit() {
+  isEditing.value = true;
+}
+
+const displayTitle = computed(() => experience.value?.title || t('experiences.card.noTitle'));
+const displayCompany = computed(
+  () => experience.value?.companyName || t('experiences.card.noCompany')
+);
+const displayType = computed(() => {
+  const type = experience.value?.experienceType || 'work';
+  return t(`experiences.types.${type}`, type);
+});
+const displayStatus = computed(() => {
+  const status = experience.value?.status;
+  return status ? t(`experiences.status.${status}`) : t('common.notAvailable');
+});
+const displayStartDate = computed(() => experience.value?.startDate || t('common.notAvailable'));
+const displayEndDate = computed(() => {
+  if (!experience.value?.startDate && !experience.value?.endDate) {
+    return t('common.notAvailable');
+  }
+  return experience.value?.endDate || t('experiences.present');
+});
+const responsibilitiesList = computed(() => experience.value?.responsibilities ?? []);
+const tasksList = computed(() => experience.value?.tasks ?? []);
 </script>
 
 <template>
@@ -136,14 +171,93 @@ function handleCancel() {
           <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin text-primary" />
         </div>
 
-        <!-- Experience Form -->
-        <ExperienceForm
-          v-else
-          :experience="experience"
-          :loading="saving"
-          @save="handleSave"
-          @cancel="handleCancel"
-        />
+        <template v-else>
+          <div v-if="!isEditing" class="space-y-6">
+            <UCard>
+              <div class="space-y-6">
+                <div>
+                  <p class="text-sm text-gray-500">{{ t('experiences.form.title') }}</p>
+                  <p class="text-base text-gray-900 dark:text-gray-100">{{ displayTitle }}</p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-500">{{ t('experiences.form.company') }}</p>
+                  <p class="text-base text-gray-900 dark:text-gray-100">{{ displayCompany }}</p>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <p class="text-sm text-gray-500">{{ t('experiences.form.type') }}</p>
+                    <p class="text-base text-gray-900 dark:text-gray-100">{{ displayType }}</p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">{{ t('experiences.form.status') }}</p>
+                    <p class="text-base text-gray-900 dark:text-gray-100">{{ displayStatus }}</p>
+                  </div>
+                </div>
+
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <p class="text-sm text-gray-500">{{ t('experiences.form.startDate') }}</p>
+                    <p class="text-base text-gray-900 dark:text-gray-100">
+                      {{ displayStartDate }}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">{{ t('experiences.form.endDate') }}</p>
+                    <p class="text-base text-gray-900 dark:text-gray-100">{{ displayEndDate }}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-500">
+                    {{ t('experiences.form.responsibilities') }}
+                  </p>
+                  <ul
+                    v-if="responsibilitiesList.length"
+                    class="mt-2 list-disc space-y-1 pl-4 text-gray-900 dark:text-gray-100"
+                  >
+                    <li v-for="(item, idx) in responsibilitiesList" :key="idx">{{ item }}</li>
+                  </ul>
+                  <p v-else class="mt-2 text-sm text-gray-500">
+                    {{ t('experiences.card.noSummary') }}
+                  </p>
+                </div>
+
+                <div>
+                  <p class="text-sm text-gray-500">{{ t('experiences.form.tasks') }}</p>
+                  <ul
+                    v-if="tasksList.length"
+                    class="mt-2 list-disc space-y-1 pl-4 text-gray-900 dark:text-gray-100"
+                  >
+                    <li v-for="(item, idx) in tasksList" :key="idx">{{ item }}</li>
+                  </ul>
+                  <p v-else class="mt-2 text-sm text-gray-500">
+                    {{ t('experiences.card.noSummary') }}
+                  </p>
+                </div>
+              </div>
+            </UCard>
+
+            <div class="flex justify-end">
+              <UButton
+                color="primary"
+                variant="outline"
+                icon="i-heroicons-pencil"
+                :label="t('common.edit')"
+                @click="handleEdit"
+              />
+            </div>
+          </div>
+
+          <ExperienceForm
+            v-else
+            :experience="experience"
+            :loading="saving"
+            @save="handleSave"
+            @cancel="handleCancel"
+          />
+        </template>
       </UPageBody>
     </UPage>
   </UContainer>
