@@ -19,19 +19,19 @@
             :title="t('cvList.title')"
             :description="t('cvList.subtitle')"
             icon="i-heroicons-document-text"
-            :to="{ name: 'cv' }"
+            :to="{ name: 'applications-cv' }"
           />
           <UPageCard
             :title="t('coverLetter.list.title')"
             :description="t('coverLetter.list.subtitle')"
             icon="i-heroicons-envelope"
-            :to="{ name: 'cover-letters' }"
+            :to="{ name: 'applications-cover-letters' }"
           />
           <UPageCard
             :title="t('speech.list.title')"
             :description="t('speech.list.subtitle')"
             icon="i-heroicons-chat-bubble-left-right"
-            :to="{ name: 'speech' }"
+            :to="{ name: 'applications-speech' }"
           />
         </UPageGrid>
       </UCard>

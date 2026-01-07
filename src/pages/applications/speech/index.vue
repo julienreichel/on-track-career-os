@@ -72,7 +72,7 @@
             :key="block.id"
             :title="resolveTitle(block)"
             :subtitle="formatUpdatedAt(block.updatedAt)"
-            @edit="navigateTo({ name: 'speech-id', params: { id: block.id } })"
+            @edit="navigateTo({ name: 'applications-speech-id', params: { id: block.id } })"
             @delete="confirmDelete(block)"
           >
             <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
@@ -174,7 +174,7 @@ const handleCreate = async () => {
       whyMe: result.whyMe ?? '',
     });
     if (created?.id) {
-      await navigateTo({ name: 'speech-id', params: { id: created.id } });
+      await navigateTo({ name: 'applications-speech-id', params: { id: created.id } });
     } else {
       toast.add({ title: t('speech.list.toast.createFailed'), color: 'error' });
     }

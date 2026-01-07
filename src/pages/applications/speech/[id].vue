@@ -82,7 +82,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
     {
       label: t('common.backToList'),
       icon: 'i-heroicons-arrow-left',
-      to: '/speech',
+      to: '/applications/speech',
     },
   ];
 
@@ -97,7 +97,6 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
       color: 'primary',
       disabled: loading.value || saving.value || isGenerating.value,
       onClick: handleGenerate,
-      'data-testid': 'generate-speech-button',
     });
   }
 
@@ -196,6 +195,7 @@ const handleRegenerateTailored = async () => {
     if (updated) {
       item.value = updated;
       formState.value = {
+        title: '',
         elevatorPitch: updated.elevatorPitch ?? '',
         careerStory: updated.careerStory ?? '',
         whyMe: updated.whyMe ?? '',

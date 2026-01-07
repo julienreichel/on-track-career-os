@@ -13,7 +13,7 @@
           {
             label: t('coverLetter.list.actions.create'),
             icon: 'i-heroicons-plus',
-            to: { name: 'cover-letters-new' },
+            to: { name: 'applications-cover-letters-new' },
           },
         ]"
       />
@@ -51,7 +51,7 @@
             <UButton
               icon="i-heroicons-plus"
               :label="t('coverLetter.list.emptyState.action')"
-              :to="{ name: 'cover-letters-new' }"
+              :to="{ name: 'applications-cover-letters-new' }"
             />
           </template>
         </UEmpty>
@@ -71,7 +71,7 @@
             :key="letter.id"
             :title="resolveTitle(letter)"
             :subtitle="resolveSubtitle(letter)"
-            @edit="navigateTo({ name: 'cover-letters-id', params: { id: letter.id } })"
+            @edit="navigateTo({ name: 'applications-cover-letters-id', params: { id: letter.id } })"
             @delete="confirmDelete(letter)"
           >
             <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
@@ -96,7 +96,9 @@
                 size="xs"
                 color="primary"
                 variant="soft"
-                @click="navigateTo({ name: 'cover-letters-id', params: { id: letter.id } })"
+                @click="
+                  navigateTo({ name: 'applications-cover-letters-id', params: { id: letter.id } })
+                "
               />
             </template>
           </ItemCard>
@@ -175,7 +177,7 @@ const confirmDelete = (letter: CoverLetter) => {
 };
 
 const handlePrint = (letter: CoverLetter) => {
-  const printUrl = `/cover-letters/${letter.id}/print`;
+  const printUrl = `/applications/cover-letters/${letter.id}/print`;
   window.open(printUrl, '_blank');
 };
 

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import { createTestI18n } from '../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
-import CvIndexPage from '@/pages/cv/index.vue';
+import CvIndexPage from '@/pages/applications/cv/index.vue';
 
 /**
  * Nuxt Component Tests: CV Listing Page
@@ -31,9 +31,21 @@ const i18n = createTestI18n();
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
-    { path: '/cv', name: 'cv', component: { template: '<div>CV List</div>' } },
-    { path: '/cv/new', name: 'cv-new', component: { template: '<div>New CV</div>' } },
-    { path: '/cv/:id', name: 'cv-id', component: { template: '<div>CV Detail</div>' } },
+    {
+      path: '/applications/cv',
+      name: 'applications-cv',
+      component: { template: '<div>CV List</div>' },
+    },
+    {
+      path: '/applications/cv/new',
+      name: 'applications-cv-new',
+      component: { template: '<div>New CV</div>' },
+    },
+    {
+      path: '/applications/cv/:id',
+      name: 'applications-cv-id',
+      component: { template: '<div>CV Detail</div>' },
+    },
   ],
 });
 

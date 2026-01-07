@@ -3,7 +3,7 @@ import { mount, flushPromises } from '@vue/test-utils';
 import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
-import SpeechDetailPage from '@/pages/speech/[id].vue';
+import SpeechDetailPage from '@/pages/applications/speech/[id].vue';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 
 // Mock the SpeechBlockRepository to avoid Amplify client instantiation
@@ -98,8 +98,16 @@ const i18n = createTestI18n();
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
-    { path: '/speech/:id', name: 'speech-id', component: SpeechDetailPage },
-    { path: '/speech', name: 'speech', component: { template: '<div>Speech list</div>' } },
+    {
+      path: '/applications/speech/:id',
+      name: 'applications-speech-id',
+      component: SpeechDetailPage,
+    },
+    {
+      path: '/applications/speech',
+      name: 'applications-speech',
+      component: { template: '<div>Speech list</div>' },
+    },
   ],
 });
 
@@ -157,7 +165,7 @@ const stubs = {
 };
 
 async function mountPage() {
-  await router.push('/speech/speech-1');
+  await router.push('/applications/speech/speech-1');
   await router.isReady();
   return mount(SpeechDetailPage, {
     global: {

@@ -26,7 +26,7 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ Matching workflow complete: generate summary → persist → reload
 - ✅ Matching summary page live at `/jobs/:jobId/match` with E2E coverage
 - ✅ Speech workflow complete: create → generate → edit → save
-- ✅ Speech pages live at `/speech` and `/speech/:id` with E2E coverage
+- ✅ Speech pages live at `/applications/speech` and `/applications/speech/:id` with E2E coverage
 - ✅ Tailored materials workflow complete: job/match entry points, tailored regeneration banners, and E2E coverage
 
 **MVP Readiness:** ~90% complete
@@ -192,10 +192,10 @@ The project has established a **strong backend and domain foundation** with comp
   - `useCvGenerator` (loads profile + experiences + STAR stories, builds AI payload)
   - `useCvDocuments` + `CVDocumentService` for CRUD + block helpers
 - ✅ CV Builder UI:
-  - `/cv` list view with deletion + print shortcuts (`src/pages/cv/index.vue`)
-  - `/cv/new` wizard with experience picker, options toggles, and job description tailoring (`src/pages/cv/new.vue`)
-  - `/cv/:id` Markdown editor + rendered preview + export button (`src/pages/cv/[id]/index.vue`)
-  - `/cv/:id/print` A4 layout with auto-print + CSS tuned for 2-page output (`src/pages/cv/[id]/print.vue`)
+  - `/applications/cv` list view with deletion + print shortcuts (`src/pages/applications/cv/index.vue`)
+  - `/applications/cv/new` wizard with experience picker, options toggles, and job description tailoring (`src/pages/applications/cv/new.vue`)
+  - `/applications/cv/:id` Markdown editor + rendered preview + export button (`src/pages/applications/cv/[id]/index.vue`)
+  - `/applications/cv/:id/print` A4 layout with auto-print + CSS tuned for 2-page output (`src/pages/applications/cv/[id]/print.vue`)
 - ✅ Markdown-based storage for clean editing plus print/export parity
 
 **Testing & Validation:**
@@ -205,7 +205,7 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ Note/disclaimer stripping edge cases (`test/unit/ai-operations/generateCv-notes-stripping.spec.ts`)
 - ✅ `useCvGenerator` composable (40+ tests across input building, error paths) — `test/unit/composables/useCvGenerator.spec.ts`
 - ✅ CVDocument domain/service repositories (existing 44 specs still pass)
-- ⚠️ Nuxt component specs for CV pages (`test/nuxt/pages/cv/*.spec.ts`, `test/nuxt/components/cv/*.spec.ts`) are checked in but `describe.skip` keeps them inactive → need to re-enable/UI-test coverage.
+- ⚠️ Nuxt component specs for CV pages (`test/nuxt/pages/applications/cv/*.spec.ts`, `test/nuxt/components/cv/*.spec.ts`) are checked in but `describe.skip` keeps them inactive → need to re-enable/UI-test coverage.
 
 **Next Improvements:**
 
@@ -232,7 +232,7 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ Manual upload flow verified against S3 PUT logs (403 resolved after identity scoping)
 - ✅ CV preview + print manually verified with and without the `showProfilePhoto` flag
 
-1. Add visual regression/E2E coverage for `/cv` flow (experience selection → Markdown save → print).
+1. Add visual regression/E2E coverage for `/applications/cv` flow (experience selection → Markdown save → print).
 2. Layer optional templates/themes + PDF export shortcuts if needed for V1.
 3. Turn the skipped Nuxt tests back on after fixing component mount issues.
 
@@ -281,8 +281,8 @@ The project has established a **strong backend and domain foundation** with comp
   - SpeechSectionEditor.vue - Tag-based editor with character count
   - SpeechGenerateButton.vue - AI generation trigger
 - ✅ Speech pages:
-  - `/speech` - List view with create action and empty state
-  - `/speech/:id` - Editor with 3 sections, save/generate actions
+  - `/applications/speech` - List view with create action and empty state
+  - `/applications/speech/:id` - Editor with 3 sections, save/generate actions
 - ✅ E2E test coverage (7 tests in 23.4s):
   - Navigation to speech page
   - Create new speech block
@@ -341,10 +341,10 @@ The project has established a **strong backend and domain foundation** with comp
   - Error handling and state management
   - Type-safe mapping functions with null filtering
 - ✅ Cover Letter UI pages:
-  - `/cover-letters` - List view with ItemCard pattern, print button, search, empty state
-  - `/cover-letters/new` - Creation wizard with job selection
-  - `/cover-letters/[id]` - Editor with Markdown display, Edit/Print buttons at bottom
-  - `/cover-letters/[id]/print` - Print layout with auto-print trigger
+  - `/applications/cover-letters` - List view with ItemCard pattern, print button, search, empty state
+  - `/applications/cover-letters/new` - Creation wizard with job selection
+  - `/applications/cover-letters/[id]` - Editor with Markdown display, Edit/Print buttons at bottom
+  - `/applications/cover-letters/[id]/print` - Print layout with auto-print trigger
 - ✅ Cover Letter detail page features:
   - Markdown preview with prose styling
   - Edit mode with UTextarea
@@ -354,7 +354,7 @@ The project has established a **strong backend and domain foundation** with comp
   - Dynamic breadcrumb with letter name
   - Match CV UI pattern (buttons at bottom, not header)
 - ✅ Print functionality:
-  - Dedicated print page at `/cover-letters/[id]/print`
+  - Dedicated print page at `/applications/cover-letters/[id]/print`
   - Auto-triggers window.print() after load
   - Print-optimized CSS with black text
   - Clean layout without duplicate titles
@@ -630,7 +630,7 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ AI ops accept tailoring inputs with fallback to generic on invalid context
 - ✅ `useTailoredMaterials` orchestration with generate/regenerate flows
 - ✅ Tailored entry points on `/jobs/:jobId` and `/jobs/:jobId/match`
-- ✅ Job backlink + regenerate banners on `/cv/:id`, `/cover-letters/:id`, `/speech/:id`
+- ✅ Job backlink + regenerate banners on `/applications/cv/:id`, `/applications/cover-letters/:id`, `/applications/speech/:id`
 - ✅ E2E happy path for tailored cover letter generation
 
 **Next Steps:**
@@ -726,10 +726,10 @@ The project has established a **strong backend and domain foundation** with comp
 
 **CV Generator (4 pages):**
 
-- ✅ `/cv` — List CVs
-- ✅ `/cv/new` — Create new CV
-- ✅ `/cv/:id` — Edit/view CV
-- ✅ `/cv/:id/print` — Print CV
+- ✅ `/applications/cv` — List CVs
+- ✅ `/applications/cv/new` — Create new CV
+- ✅ `/applications/cv/:id` — Edit/view CV
+- ✅ `/applications/cv/:id/print` — Print CV
 
 **Jobs (4 pages):**
 
@@ -746,15 +746,15 @@ The project has established a **strong backend and domain foundation** with comp
 
 **Speech Builder (2 pages):**
 
-- ✅ `/speech` — List speech blocks
-- ✅ `/speech/:id` — Edit speech block
+- ✅ `/applications/speech` — List speech blocks
+- ✅ `/applications/speech/:id` — Edit speech block
 
 **Cover Letters (4 pages):**
 
-- ✅ `/cover-letters` — List cover letters
-- ✅ `/cover-letters/new` — Create cover letter
-- ✅ `/cover-letters/:id` — Edit cover letter
-- ✅ `/cover-letters/:id/print` — Print cover letter
+- ✅ `/applications/cover-letters` — List cover letters
+- ✅ `/applications/cover-letters/new` — Create cover letter
+- ✅ `/applications/cover-letters/:id` — Edit cover letter
+- ✅ `/applications/cover-letters/:id/print` — Print cover letter
 
 ### Components (24+)
 
@@ -817,12 +817,12 @@ The project has established a **strong backend and domain foundation** with comp
 | Layer                   | Coverage | Status                                           |
 | ----------------------- | -------- | ------------------------------------------------ |
 | **AI Lambda Functions** | 100%     | 12/12 operations fully tested (35 sandbox tests) |
-| **Repository Layer**    | 98%      | Comprehensive unit tests                       |
-| **Service Layer**       | 98%      | Comprehensive unit tests                       |
-| **Composable Layer**    | 95%      | Comprehensive unit tests                       |
-| **Frontend Components** | 80%      | 20 components with comprehensive tests         |
-| **Pages**               | 85%      | 21+ pages with component tests                 |
-| **E2E User Flows**      | 50%      | 4 complete workflows tested                    |
+| **Repository Layer**    | 98%      | Comprehensive unit tests                         |
+| **Service Layer**       | 98%      | Comprehensive unit tests                         |
+| **Composable Layer**    | 95%      | Comprehensive unit tests                         |
+| **Frontend Components** | 80%      | 20 components with comprehensive tests           |
+| **Pages**               | 85%      | 21+ pages with component tests                   |
+| **E2E User Flows**      | 50%      | 4 complete workflows tested                      |
 
 **Test Quality:**
 

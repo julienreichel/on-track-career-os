@@ -234,7 +234,7 @@ _(Support EPIC 3, EPIC 4, EPIC 6)_
 
 **Implementation:**
 
-- Pages: `/cv`, `/cv/new`, `/cv/:id`, `/cv/:id/print`
+- Pages: `/applications/cv`, `/applications/cv/new`, `/applications/cv/:id`, `/applications/cv/:id/print`
 - Components: `CvExperiencePicker`, `CvGeneratingStep`, split-view markdown editor
 - Composables: `useCvGenerator()`, `useCVDocument()`, `useCvDocuments()`
 - AI Ops: `ai.generateCv`

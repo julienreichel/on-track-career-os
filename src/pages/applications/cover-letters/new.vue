@@ -141,7 +141,7 @@ const generateCoverLetter = async () => {
 
       // Navigate to the cover letter
       await router.push({
-        name: 'cover-letters-id',
+        name: 'applications-cover-letters-id',
         params: { id: coverLetter.id },
       });
     } else {

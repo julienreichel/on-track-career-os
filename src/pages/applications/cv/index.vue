@@ -13,12 +13,12 @@
           {
             label: $t('cvList.actions.create'),
             icon: 'i-heroicons-plus',
-            to: { name: 'cv-new' },
+            to: { name: 'applications-cv-new' },
           },
         ]"
       />
 
-    <UPageBody>
+      <UPageBody>
         <div v-if="!loading && items.length > 0" class="mb-6">
           <UInput
             v-model="searchQuery"
@@ -28,10 +28,10 @@
           />
         </div>
 
-      <!-- Error Alert -->
-      <UAlert
-        v-if="error"
-        color="error"
+        <!-- Error Alert -->
+        <UAlert
+          v-if="error"
+          color="error"
           icon="i-heroicons-exclamation-triangle"
           :title="$t('common.error')"
           :description="error"
@@ -51,7 +51,7 @@
           icon="i-heroicons-document-text"
         >
           <template #actions>
-            <UButton icon="i-heroicons-plus" :to="{ name: 'cv-new' }">
+            <UButton icon="i-heroicons-plus" :to="{ name: 'applications-cv-new' }">
               {{ $t('cvList.emptyState.action') }}
             </UButton>
           </template>
@@ -69,7 +69,7 @@
             v-for="cv in filteredItems"
             :key="cv.id"
             :title="cv.name || $t('cvList.untitled')"
-            @edit="navigateTo({ name: 'cv-id', params: { id: cv.id } })"
+            @edit="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
             @delete="confirmDelete(cv)"
           >
             <!-- CV Info Content -->
@@ -100,7 +100,7 @@
                 size="xs"
                 color="primary"
                 variant="soft"
-                @click="navigateTo({ name: 'cv-id', params: { id: cv.id } })"
+                @click="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
               />
             </template>
           </ItemCard>
@@ -114,7 +114,7 @@
         :description="t('cvList.confirmDeleteDescription')"
         :confirm-label="t('common.delete')"
         :cancel-label="t('common.cancel')"
-        confirm-color="red"
+        confirm-color="error"
         :loading="deleting"
         @confirm="handleDelete"
       />
@@ -199,7 +199,7 @@ const handleDelete = async () => {
 };
 
 const handlePrint = (cv: CVDocument) => {
-  const printUrl = `/cv/${cv.id}/print`;
+  const printUrl = `/applications/cv/${cv.id}/print`;
   window.open(printUrl, '_blank');
 };
 </script>

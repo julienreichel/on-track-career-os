@@ -3,7 +3,7 @@ import { mount, flushPromises } from '@vue/test-utils';
 import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
-import CoverLetterDetailPage from '@/pages/cover-letters/[id]/index.vue';
+import CoverLetterDetailPage from '@/pages/applications/cover-letters/[id]/index.vue';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 
 // Mock the CoverLetterRepository to avoid Amplify client instantiation
@@ -105,10 +105,14 @@ const i18n = createTestI18n();
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
-    { path: '/cover-letters/:id', name: 'cover-letter-id', component: CoverLetterDetailPage },
     {
-      path: '/cover-letters',
-      name: 'cover-letters',
+      path: '/applications/cover-letters/:id',
+      name: 'applications-cover-letters-id',
+      component: CoverLetterDetailPage,
+    },
+    {
+      path: '/applications/cover-letters',
+      name: 'applications-cover-letters',
       component: { template: '<div>Cover letter list</div>' },
     },
   ],
@@ -177,7 +181,7 @@ const stubs = {
 };
 
 async function mountPage() {
-  await router.push('/cover-letters/cl-1');
+  await router.push('/applications/cover-letters/cl-1');
   await router.isReady();
   return mount(CoverLetterDetailPage, {
     global: {

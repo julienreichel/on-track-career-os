@@ -19,7 +19,7 @@ test.describe('Speech Block E2E Flow', () => {
   let speechUrl: string | null = null;
 
   test('1. Navigate to speech list page', async ({ page }) => {
-    await page.goto('/speech');
+    await page.goto('/applications/speech');
     await page.waitForLoadState('networkidle');
 
     // Verify we're on the speech list page
@@ -31,7 +31,7 @@ test.describe('Speech Block E2E Flow', () => {
   });
 
   test('2. Create a new speech block', async ({ page }) => {
-    await page.goto('/speech');
+    await page.goto('/applications/speech');
     await page.waitForLoadState('networkidle');
 
     const createButton = page.getByRole('button', { name: /Create speech/i }).first();
@@ -148,7 +148,7 @@ test.describe('Speech Block E2E Flow', () => {
     });
 
     // Navigate away and back to verify persistence
-    await page.goto('/speech');
+    await page.goto('/applications/speech');
     await page.waitForLoadState('networkidle');
 
     await page.goto(speechUrl);

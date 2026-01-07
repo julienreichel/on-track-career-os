@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import { createTestI18n } from '../../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
-import CvPrintPage from '@/pages/cv/[id]/print.vue';
+import CvPrintPage from '@/pages/applications/cv/[id]/print.vue';
 
 /**
  * Nuxt Component Tests: CV Print Page
@@ -45,12 +45,16 @@ const i18n = createTestI18n();
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
-    { path: '/cv/:id/print', name: 'cv-id-print', component: { template: '<div>Print</div>' } },
+    {
+      path: '/applications/cv/:id/print',
+      name: 'applications-cv-id-print',
+      component: { template: '<div>Print</div>' },
+    },
   ],
 });
 
 beforeEach(async () => {
-  await router.push({ name: 'cv-id-print', params: { id: 'cv-print-123' } });
+  await router.push({ name: 'applications-cv-id-print', params: { id: 'cv-print-123' } });
   await router.isReady();
 });
 
@@ -97,7 +101,7 @@ describe.skip('CV Print Page - Loading and Content', () => {
   });
 
   it('should render CV content after loading', async () => {
-    const CvPrintPage = (await import('@/pages/cv/[id]/print.vue')).default;
+    const CvPrintPage = (await import('@/pages/applications/cv/[id]/print.vue')).default;
 
     const wrapper = mount(CvPrintPage, {
       global: {
@@ -117,7 +121,7 @@ describe.skip('CV Print Page - Loading and Content', () => {
   });
 
   it('should have print and close action buttons', async () => {
-    const CvPrintPage = (await import('@/pages/cv/[id]/print.vue')).default;
+    const CvPrintPage = (await import('@/pages/applications/cv/[id]/print.vue')).default;
 
     const wrapper = mount(CvPrintPage, {
       global: {
@@ -137,7 +141,7 @@ describe.skip('CV Print Page - Loading and Content', () => {
   });
 
   it('should auto-trigger print dialog on load', async () => {
-    const CvPrintPage = (await import('@/pages/cv/[id]/print.vue')).default;
+    const CvPrintPage = (await import('@/pages/applications/cv/[id]/print.vue')).default;
 
     mount(CvPrintPage, {
       global: {
@@ -173,7 +177,7 @@ describe.skip('CV Print Page - User Actions', () => {
   });
 
   it('should trigger print when Print button clicked', async () => {
-    const CvPrintPage = (await import('@/pages/cv/[id]/print.vue')).default;
+    const CvPrintPage = (await import('@/pages/applications/cv/[id]/print.vue')).default;
 
     const wrapper = mount(CvPrintPage, {
       global: {
@@ -193,7 +197,7 @@ describe.skip('CV Print Page - User Actions', () => {
   });
 
   it('should close window when Close button clicked', async () => {
-    const CvPrintPage = (await import('@/pages/cv/[id]/print.vue')).default;
+    const CvPrintPage = (await import('@/pages/applications/cv/[id]/print.vue')).default;
 
     const wrapper = mount(CvPrintPage, {
       global: {
@@ -223,7 +227,7 @@ describe.skip('CV Print Page - Error Handling', () => {
   it('should display error message when CV fails to load', async () => {
     mockGetFullCVDocument.mockRejectedValue(new Error('Failed to load CV'));
 
-    const CvPrintPage = (await import('@/pages/cv/[id]/print.vue')).default;
+    const CvPrintPage = (await import('@/pages/applications/cv/[id]/print.vue')).default;
 
     const wrapper = mount(CvPrintPage, {
       global: {
@@ -242,7 +246,7 @@ describe.skip('CV Print Page - Error Handling', () => {
   it('should show retry button on error', async () => {
     mockGetFullCVDocument.mockRejectedValue(new Error('Network error'));
 
-    const CvPrintPage = (await import('@/pages/cv/[id]/print.vue')).default;
+    const CvPrintPage = (await import('@/pages/applications/cv/[id]/print.vue')).default;
 
     const wrapper = mount(CvPrintPage, {
       global: {
@@ -262,7 +266,7 @@ describe.skip('CV Print Page - Error Handling', () => {
   it('should not auto-trigger print on error', async () => {
     mockGetFullCVDocument.mockRejectedValue(new Error('Load failed'));
 
-    const CvPrintPage = (await import('@/pages/cv/[id]/print.vue')).default;
+    const CvPrintPage = (await import('@/pages/applications/cv/[id]/print.vue')).default;
 
     mount(CvPrintPage, {
       global: {
@@ -299,7 +303,7 @@ describe.skip('CV Print Page - Layout', () => {
   });
 
   it('should render content with prose styling classes', async () => {
-    const CvPrintPage = (await import('@/pages/cv/[id]/print.vue')).default;
+    const CvPrintPage = (await import('@/pages/applications/cv/[id]/print.vue')).default;
 
     const wrapper = mount(CvPrintPage, {
       global: {

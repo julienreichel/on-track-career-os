@@ -19,7 +19,7 @@ test.describe('Cover Letter E2E Flow', () => {
   let coverLetterUrl: string | null = null;
 
   test('1. Navigate to cover letters list page', async ({ page }) => {
-    await page.goto('/cover-letters');
+    await page.goto('/applications/cover-letters');
     await page.waitForLoadState('networkidle');
 
     // Verify we're on the cover letters list page
@@ -31,7 +31,7 @@ test.describe('Cover Letter E2E Flow', () => {
   });
 
   test('2. Create a new cover letter through single form', async ({ page }) => {
-    await page.goto('/cover-letters');
+    await page.goto('/applications/cover-letters');
     await page.waitForLoadState('networkidle');
 
     const createButton = page.getByRole('link', { name: /Create cover letter/i }).first();
@@ -39,7 +39,7 @@ test.describe('Cover Letter E2E Flow', () => {
     await createButton.click();
 
     // Wait for navigation to the new cover letter form
-    await page.waitForURL('/cover-letters/new', { timeout: 10000 });
+    await page.waitForURL('/applications/cover-letters/new', { timeout: 10000 });
 
     // Fill in the name
     const nameInput = page.getByRole('textbox', { name: /Cover Letter Name/i });
@@ -65,11 +65,11 @@ test.describe('Cover Letter E2E Flow', () => {
     await generateButton.click();
 
     // Wait for generation to complete and navigation to the cover letter
-    await page.waitForURL(/\/cover-letters\/[0-9a-f-]+$/i, { timeout: 30000 });
+    await page.waitForURL(/\/applications\/cover-letters\/[0-9a-f-]+$/i, { timeout: 30000 });
 
     // Store the URL for later tests
     coverLetterUrl = page.url();
-    expect(coverLetterUrl).toMatch(/\/cover-letters\/[0-9a-f-]+$/i);
+    expect(coverLetterUrl).toMatch(/\/applications\/cover-letters\/[0-9a-f-]+$/i);
   });
 
   test('3. Verify cover letter has generated content', async ({ page }) => {
@@ -172,7 +172,7 @@ test.describe('Cover Letter E2E Flow', () => {
     }
 
     // Navigate away and back to verify persistence
-    await page.goto('/cover-letters');
+    await page.goto('/applications/cover-letters');
     await page.waitForLoadState('networkidle');
 
     await page.goto(coverLetterUrl);
@@ -194,7 +194,7 @@ test.describe('Cover Letter E2E Flow', () => {
 
     // Navigate back to the list
     await page.getByRole('link', { name: /Back to list/i }).click();
-    await page.waitForURL('/cover-letters');
+    await page.waitForURL('/applications/cover-letters');
 
     // Verify our cover letter appears in the list with correct name
     await expect(
@@ -209,7 +209,7 @@ test.describe('Cover Letter E2E Flow', () => {
     }
 
     // Go to the list page where delete functionality exists
-    await page.goto('/cover-letters');
+    await page.goto('/applications/cover-letters');
     await page.waitForLoadState('networkidle');
 
     // Verify our cover letter is visible

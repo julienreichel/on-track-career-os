@@ -11,14 +11,14 @@ import { test, expect } from '@playwright/test';
  * 5. Delete CV
  *
  * These tests complement:
- * - Component tests (test/nuxt/pages/cv/*.spec.ts) - UI rendering
+ * - Component tests (test/nuxt/pages/applications/cv/*.spec.ts) - UI rendering
  * - Sandbox tests (test/e2e-sandbox/ai-operations/generate-cv.spec.ts) - AI operation
  */
 
 test.describe('CV Generation Workflow', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to CV listing page
-    await page.goto('/cv', { waitUntil: 'networkidle' });
+    await page.goto('/applications/cv', { waitUntil: 'networkidle' });
   });
 
   test('should display CV listing page', async ({ page }) => {
@@ -35,7 +35,7 @@ test.describe('CV Generation Workflow', () => {
     await expect(createCvLink).toBeVisible();
     await createCvLink.click();
 
-    await expect(page).toHaveURL(/\/cv\/new/);
+    await expect(page).toHaveURL(/\/applications\/cv\/new/);
     const wizard = page.getByRole('heading', { name: /select your experiences/i });
     await expect(wizard).toBeVisible();
   });
@@ -47,7 +47,7 @@ test.describe('CV Generation Workflow', () => {
     await expect(createCvLink).toBeVisible();
     await createCvLink.click();
 
-    await expect(page).toHaveURL(/\/cv\/new/);
+    await expect(page).toHaveURL(/\/applications\/cv\/new/);
 
     // Step 1: Select experiences
     const experienceCheckboxes = page.locator('input[type="checkbox"]');
@@ -68,12 +68,12 @@ test.describe('CV Generation Workflow', () => {
 
     await page.getByRole('button', { name: /generate cv/i }).click();
 
-    await expect(page).toHaveURL(/\/cv\/[\w-]+/, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/applications\/cv\/[\w-]+/, { timeout: 15000 });
   });
 
   test('should show empty state when no experiences exist', async ({ page }) => {
     // Navigate to new CV page
-    await page.goto('/cv/new');
+    await page.goto('/applications/cv/new');
 
     // Should show empty state message
     await expect(page.getByText(/no experiences/i)).toBeVisible();
@@ -85,7 +85,7 @@ test.describe('CV Viewing and Editing', () => {
 
   test.beforeEach(async ({ page }) => {
     // Create a CV first (simplified - assumes CV creation works)
-    await page.goto('/cv');
+    await page.goto('/applications/cv');
     await page.waitForLoadState('networkidle');
 
     // Check if we have any CVs
@@ -95,11 +95,11 @@ test.describe('CV Viewing and Editing', () => {
     if (count > 0) {
       // Click first CV to get its detail page
       await cvCards.first().click();
-      await page.waitForURL(/\/cv\/[\w-]+/);
+      await page.waitForURL(/\/applications\/cv\/[\w-]+/);
 
       // Extract CV ID from URL
       const url = page.url();
-      const match = url.match(/\/cv\/([\w-]+)/);
+      const match = url.match(/\/applications\/cv\/([\w-]+)/);
       cvId = match ? match[1] : '';
     }
   });
@@ -110,7 +110,7 @@ test.describe('CV Viewing and Editing', () => {
       return;
     }
 
-    await page.goto(`/cv/${cvId}`);
+    await page.goto(`/applications/cv/${cvId}`);
     await page.waitForLoadState('networkidle');
 
     // Should show rendered CV content
@@ -129,7 +129,7 @@ test.describe('CV Viewing and Editing', () => {
       return;
     }
 
-    await page.goto(`/cv/${cvId}`);
+    await page.goto(`/applications/cv/${cvId}`);
     await page.waitForLoadState('networkidle');
 
     // Click Edit button
@@ -150,7 +150,7 @@ test.describe('CV Viewing and Editing', () => {
       return;
     }
 
-    await page.goto(`/cv/${cvId}`);
+    await page.goto(`/applications/cv/${cvId}`);
     await page.waitForLoadState('networkidle');
 
     // Enter edit mode
@@ -178,7 +178,7 @@ test.describe('CV Viewing and Editing', () => {
       return;
     }
 
-    await page.goto(`/cv/${cvId}`);
+    await page.goto(`/applications/cv/${cvId}`);
     await page.waitForLoadState('networkidle');
 
     // Get original content
@@ -208,7 +208,7 @@ test.describe('CV Viewing and Editing', () => {
       return;
     }
 
-    await page.goto(`/cv/${cvId}`);
+    await page.goto(`/applications/cv/${cvId}`);
     await page.waitForLoadState('networkidle');
 
     // Enter edit mode
@@ -230,7 +230,7 @@ test.describe('CV Viewing and Editing', () => {
 test.describe('CV Auto-Save Functionality', () => {
   test('should auto-save after delay when content changes', async ({ page }) => {
     // Navigate to a CV detail page
-    await page.goto('/cv');
+    await page.goto('/applications/cv');
     await page.waitForLoadState('networkidle');
 
     // Find and click first CV
@@ -268,7 +268,7 @@ test.describe('CV Auto-Save Functionality', () => {
 test.describe('PDF Export and Print', () => {
   test('should open print view in new tab', async ({ page }) => {
     // Navigate to CV listing
-    await page.goto('/cv');
+    await page.goto('/applications/cv');
     await page.waitForLoadState('networkidle');
 
     // Check if we have CVs
@@ -304,7 +304,7 @@ test.describe('PDF Export and Print', () => {
 
   test('should display print-optimized layout', async ({ page }) => {
     // Navigate directly to print page if we have a CV ID
-    await page.goto('/cv');
+    await page.goto('/applications/cv');
     await page.waitForLoadState('networkidle');
 
     const cvCards = page.locator('h3');
@@ -315,9 +315,9 @@ test.describe('PDF Export and Print', () => {
 
     // Get first CV and extract ID
     await cvCards.first().click();
-    await page.waitForURL(/\/cv\/[\w-]+/);
+    await page.waitForURL(/\/applications\/cv\/[\w-]+/);
     const url = page.url();
-    const match = url.match(/\/cv\/([\w-]+)/);
+    const match = url.match(/\/applications\/cv\/([\w-]+)/);
     const cvId = match ? match[1] : '';
 
     if (!cvId) {
@@ -326,7 +326,7 @@ test.describe('PDF Export and Print', () => {
     }
 
     // Navigate to print page
-    await page.goto(`/cv/${cvId}/print`);
+    await page.goto(`/applications/cv/${cvId}/print`);
     await page.waitForLoadState('networkidle');
 
     // Should show CV content
@@ -343,7 +343,7 @@ test.describe('PDF Export and Print', () => {
 
   test('should trigger print dialog when Print clicked', async ({ page }) => {
     // Navigate to print page
-    await page.goto('/cv');
+    await page.goto('/applications/cv');
     await page.waitForLoadState('networkidle');
 
     const cvCards = page.locator('h3');
@@ -353,9 +353,9 @@ test.describe('PDF Export and Print', () => {
     }
 
     await cvCards.first().click();
-    await page.waitForURL(/\/cv\/[\w-]+/);
+    await page.waitForURL(/\/applications\/cv\/[\w-]+/);
     const url = page.url();
-    const match = url.match(/\/cv\/([\w-]+)/);
+    const match = url.match(/\/applications\/cv\/([\w-]+)/);
     const cvId = match ? match[1] : '';
 
     if (!cvId) {
@@ -363,7 +363,7 @@ test.describe('PDF Export and Print', () => {
       return;
     }
 
-    await page.goto(`/cv/${cvId}/print`);
+    await page.goto(`/applications/cv/${cvId}/print`);
     await page.waitForLoadState('networkidle');
 
     // Note: window.print() cannot be fully tested in Playwright
@@ -376,7 +376,7 @@ test.describe('PDF Export and Print', () => {
 
 test.describe('CV Deletion', () => {
   test('should delete CV from list', async ({ page }) => {
-    await page.goto('/cv');
+    await page.goto('/applications/cv');
     await page.waitForLoadState('networkidle');
 
     // Get initial count

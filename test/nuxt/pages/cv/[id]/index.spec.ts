@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import { createTestI18n } from '../../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
-import CvDetailPage from '@/pages/cv/[id]/index.vue';
+import CvDetailPage from '@/pages/applications/cv/[id]/index.vue';
 
 /**
  * Nuxt Component Tests: CV Preview/Edit Page
@@ -77,13 +77,21 @@ const i18n = createTestI18n();
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
-    { path: '/cv', name: 'cv', component: { template: '<div>CV List</div>' } },
-    { path: '/cv/:id', name: 'cv-id', component: { template: '<div>CV Detail</div>' } },
+    {
+      path: '/applications/cv',
+      name: 'applications-cv',
+      component: { template: '<div>CV List</div>' },
+    },
+    {
+      path: '/applications/cv/:id',
+      name: 'applications-cv-id',
+      component: { template: '<div>CV Detail</div>' },
+    },
   ],
 });
 
 beforeEach(async () => {
-  await router.push({ name: 'cv-id', params: { id: 'cv-123' } });
+  await router.push({ name: 'applications-cv-id', params: { id: 'cv-123' } });
   await router.isReady();
 });
 
@@ -159,7 +167,7 @@ describe.skip('CV Preview/Edit Page - View Mode', () => {
   });
 
   it('should display Edit and Export buttons in view mode', async () => {
-    const CvDetailPage = (await import('@/pages/cv/[id]/index.vue')).default;
+    const CvDetailPage = (await import('@/pages/applications/cv/[id]/index.vue')).default;
 
     const wrapper = mount(CvDetailPage, {
       global: {
@@ -178,7 +186,7 @@ describe.skip('CV Preview/Edit Page - View Mode', () => {
   });
 
   it('should have back navigation button', async () => {
-    const CvDetailPage = (await import('@/pages/cv/[id]/index.vue')).default;
+    const CvDetailPage = (await import('@/pages/applications/cv/[id]/index.vue')).default;
 
     const wrapper = mount(CvDetailPage, {
       global: {
@@ -216,7 +224,7 @@ describe.skip('CV Preview/Edit Page - Edit Mode', () => {
   });
 
   it('should switch to edit mode when Edit button clicked', async () => {
-    const CvDetailPage = (await import('@/pages/cv/[id]/index.vue')).default;
+    const CvDetailPage = (await import('@/pages/applications/cv/[id]/index.vue')).default;
 
     const wrapper = mount(CvDetailPage, {
       global: {
@@ -244,7 +252,7 @@ describe.skip('CV Preview/Edit Page - Edit Mode', () => {
   });
 
   it('should display textarea with markdown content in edit mode', async () => {
-    const CvDetailPage = (await import('@/pages/cv/[id]/index.vue')).default;
+    const CvDetailPage = (await import('@/pages/applications/cv/[id]/index.vue')).default;
 
     const wrapper = mount(CvDetailPage, {
       global: {
@@ -267,7 +275,7 @@ describe.skip('CV Preview/Edit Page - Edit Mode', () => {
   });
 
   it('should call update service when Save button clicked', async () => {
-    const CvDetailPage = (await import('@/pages/cv/[id]/index.vue')).default;
+    const CvDetailPage = (await import('@/pages/applications/cv/[id]/index.vue')).default;
 
     const wrapper = mount(CvDetailPage, {
       global: {
@@ -303,7 +311,7 @@ describe.skip('CV Preview/Edit Page - Edit Mode', () => {
   });
 
   it('should return to view mode after saving', async () => {
-    const CvDetailPage = (await import('@/pages/cv/[id]/index.vue')).default;
+    const CvDetailPage = (await import('@/pages/applications/cv/[id]/index.vue')).default;
 
     const wrapper = mount(CvDetailPage, {
       global: {
@@ -335,7 +343,7 @@ describe.skip('CV Preview/Edit Page - Edit Mode', () => {
   });
 
   it('should return to view mode when Cancel button clicked', async () => {
-    const CvDetailPage = (await import('@/pages/cv/[id]/index.vue')).default;
+    const CvDetailPage = (await import('@/pages/applications/cv/[id]/index.vue')).default;
 
     const wrapper = mount(CvDetailPage, {
       global: {
@@ -373,7 +381,7 @@ describe.skip('CV Preview/Edit Page - Error States', () => {
   it('should display error message when CV not found', async () => {
     mockGetFullCVDocument.mockRejectedValue(new Error('CV not found'));
 
-    const CvDetailPage = (await import('@/pages/cv/[id]/index.vue')).default;
+    const CvDetailPage = (await import('@/pages/applications/cv/[id]/index.vue')).default;
 
     const wrapper = mount(CvDetailPage, {
       global: {
@@ -399,7 +407,7 @@ describe.skip('CV Preview/Edit Page - Error States', () => {
     });
     mockUpdateCVDocument.mockRejectedValue(new Error('Save failed'));
 
-    const CvDetailPage = (await import('@/pages/cv/[id]/index.vue')).default;
+    const CvDetailPage = (await import('@/pages/applications/cv/[id]/index.vue')).default;
 
     const wrapper = mount(CvDetailPage, {
       global: {

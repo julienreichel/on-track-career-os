@@ -76,9 +76,9 @@ test.describe('Tailored materials workflow', () => {
     await expect(generateCoverLetter).toBeVisible();
     await generateCoverLetter.click();
 
-    await page.waitForURL(/\/cover-letters\/[0-9a-f-]+$/i, { timeout: 60000 });
+    await page.waitForURL(/\/applications\/cover-letters\/[0-9a-f-]+$/i, { timeout: 60000 });
     const coverLetterUrl = page.url();
-    const coverLetterMatch = coverLetterUrl.match(/\/cover-letters\/([0-9a-f-]+)$/i);
+    const coverLetterMatch = coverLetterUrl.match(/\/applications\/cover-letters\/([0-9a-f-]+)$/i);
     if (!coverLetterMatch) {
       throw new Error('Expected cover letter ID in URL.');
     }
@@ -99,7 +99,7 @@ test.describe('Tailored materials workflow', () => {
       return;
     }
 
-    await page.goto('/cover-letters');
+    await page.goto('/applications/cover-letters');
     await page.waitForLoadState('networkidle');
 
     const coverLetterHeading = page.getByRole('heading', {

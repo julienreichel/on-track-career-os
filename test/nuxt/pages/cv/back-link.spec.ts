@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
-import CvIndexPage from '@/pages/cv/index.vue';
+import CvIndexPage from '@/pages/applications/cv/index.vue';
 
 const i18n = createTestI18n();
 
@@ -26,7 +26,7 @@ vi.mock('@/composables/useCvDocuments', () => ({
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
-    { path: '/cv', name: 'cv', component: CvIndexPage },
+    { path: '/applications/cv', name: 'applications-cv', component: CvIndexPage },
     { path: '/applications', name: 'applications', component: { template: '<div>Apps</div>' } },
   ],
 });
@@ -72,7 +72,7 @@ const stubs = {
 };
 
 async function mountPage() {
-  await router.push('/cv');
+  await router.push('/applications/cv');
   await router.isReady();
   return mount(CvIndexPage, {
     global: {

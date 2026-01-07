@@ -54,26 +54,26 @@ const contextErrorCode = computed(() => tailoredMaterials.contextError.value);
 const contextErrorMessage = computed(() =>
   contextErrorCode.value ? t(`tailoredMaterials.errors.${contextErrorCode.value}`) : null
 );
-const canRegenerate = computed(
-  () => Boolean(item.value?.id && targetJob.value && matchingSummary.value)
+const canRegenerate = computed(() =>
+  Boolean(item.value?.id && targetJob.value && matchingSummary.value)
 );
 const regenerateDisabled = computed(
   () => !canRegenerate.value || contextLoading.value || isRegenerating.value
 );
 const regenerateError = computed(() => tailoredMaterials.error.value);
-const missingSummary = computed(
-  () => Boolean(item.value?.jobId && targetJob.value && !matchingSummary.value)
+const missingSummary = computed(() =>
+  Boolean(item.value?.jobId && targetJob.value && !matchingSummary.value)
 );
 
 const headerLinks: PageHeaderLink[] = [
   {
     label: t('common.backToList'),
     icon: 'i-heroicons-arrow-left',
-    to: '/cover-letters',
+    to: '/applications/cover-letters',
   },
 ];
 const displayTitle = computed(() => {
-  const name = isEditing.value ? editTitle.value : item.value?.name ?? '';
+  const name = isEditing.value ? editTitle.value : (item.value?.name ?? '');
   return name.trim() || t('coverLetter.display.untitled');
 });
 
@@ -132,7 +132,7 @@ const handleDiscard = () => {
 
 const handlePrint = () => {
   // Open print view in new window
-  const printUrl = `/cover-letters/${coverLetterId.value}/print`;
+  const printUrl = `/applications/cover-letters/${coverLetterId.value}/print`;
   window.open(printUrl, '_blank');
 };
 
@@ -143,7 +143,7 @@ const handleDelete = async () => {
     const success = await remove();
     if (success) {
       toast.add({ title: t('coverLetter.display.toast.deleted'), color: 'primary' });
-      await router.push('/cover-letters');
+      await router.push('/applications/cover-letters');
     } else {
       toast.add({ title: t('coverLetter.display.toast.deleteFailed'), color: 'error' });
     }

@@ -135,7 +135,9 @@ describe('TailoredMaterialsCard', () => {
 
     await flushPromises();
     const buttons = wrapper.findAll('button');
-    const generateCvButton = buttons.find((button) => button.text().includes('Generate tailored CV'));
+    const generateCvButton = buttons.find((button) =>
+      button.text().includes('Generate tailored CV')
+    );
     if (!generateCvButton) {
       throw new Error('Expected generate CV button');
     }
@@ -145,6 +147,6 @@ describe('TailoredMaterialsCard', () => {
       job: baseJob,
       matchingSummary: baseSummary,
     });
-    expect(pushMock).toHaveBeenCalledWith('/cv/cv-1');
+    expect(pushMock).toHaveBeenCalledWith('/applications/cv/cv-1');
   });
 });

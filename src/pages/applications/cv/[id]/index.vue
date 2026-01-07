@@ -6,7 +6,7 @@
         :links="[
           {
             label: $t('common.backToList'),
-            to: '/cv',
+            to: '/applications/cv',
             icon: 'i-heroicons-arrow-left',
           },
         ]"
@@ -120,7 +120,7 @@
                     :src="profilePhotoUrl"
                     :alt="$t('cvDisplay.photoAlt')"
                     class="h-16 w-16 rounded-full object-cover border border-gray-200 dark:border-gray-700"
-                  >
+                  />
                   <p class="text-xs text-gray-500 dark:text-gray-400">
                     {{ $t('cvDisplay.photoPreviewHelp') }}
                   </p>
@@ -137,7 +137,7 @@
                   :src="profilePhotoUrl!"
                   :alt="$t('cvDisplay.photoAlt')"
                   class="cv-photo-image"
-                >
+                />
               </div>
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div class="prose prose-gray max-w-none" v-html="renderedHtml" />
@@ -378,7 +378,7 @@ const saveEdit = async () => {
 
 const handlePrint = () => {
   // Open print view in new window
-  const printUrl = `/cv/${cvId.value}/print`;
+  const printUrl = `/applications/cv/${cvId.value}/print`;
   window.open(printUrl, '_blank');
 };
 

@@ -231,7 +231,7 @@ const generateCV = async () => {
 
       // Navigate to editor
       await router.push({
-        name: 'cv-id',
+        name: 'applications-cv-id',
         params: { id: cvDocument.id },
       });
     } else {

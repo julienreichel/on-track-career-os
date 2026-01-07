@@ -431,7 +431,7 @@ Each page includes:
 
 ## **2.1 CV List** ✅
 
-**Route:** `/cv`
+**Route:** `/applications/cv`
 
 ### UI
 
@@ -462,7 +462,7 @@ Each page includes:
 
 ## **2.2 CV Generator Wizard** ✅
 
-**Route:** `/cv/new`
+**Route:** `/applications/cv/new`
 
 ### UI
 
@@ -499,7 +499,7 @@ Each page includes:
 
 ## **2.3 CV Editor** ✅
 
-**Route:** `/cv/:id`
+**Route:** `/applications/cv/:id`
 
 ### UI
 
@@ -535,7 +535,7 @@ Each page includes:
 
 ## **2.4 CV Print View** ✅
 
-**Route:** `/cv/:id/print`
+**Route:** `/applications/cv/:id/print`
 
 ### UI
 
@@ -659,7 +659,7 @@ Each page includes:
 - `useJobAnalysis()` - CRUD and reanalysis
 - `useCompany()` - fetch companies for linking
 - `useBreadcrumbMapping()` - dynamic breadcrumb
-- `useTailoredMaterials()` - tailored CV/letter/speech actions
+- `useTailoredMaterials()` - tailored CV/letter/applications/speech actions
 
 ### CDM Entities
 
@@ -876,7 +876,7 @@ Each page includes:
 
 ## **5.2 Cover Letter Builder** ✅
 
-**Route:** `/cover-letters`, `/cover-letters/new`, `/cover-letters/:id`, `/cover-letters/:id/print`
+**Route:** `/applications/cover-letters`, `/applications/cover-letters/new`, `/applications/cover-letters/:id`, `/applications/cover-letters/:id/print`
 
 ### UI
 
@@ -917,7 +917,7 @@ Each page includes:
 
 ## **5.3 Speech Builder** ✅
 
-**Route:** `/speech` and `/speech/:id` (implemented)
+**Route:** `/applications/speech` and `/applications/speech/:id` (implemented)
 
 ### UI
 
@@ -1018,10 +1018,10 @@ Each page includes:
 | Per-Experience Stories | `/profile/experiences/:experienceId/stories`          | ✅     | 2    |
 | Story Editor           | `/profile/experiences/:experienceId/stories/:storyId` | ✅     | 2    |
 | Personal Canvas        | `/profile/canvas`                                     | ✅     | 1B   |
-| CV List                | `/cv`                                                 | ✅     | 3    |
-| CV Generator           | `/cv/new`                                             | ✅     | 3    |
-| CV Editor              | `/cv/:id`                                             | ✅     | 3    |
-| CV Print               | `/cv/:id/print`                                       | ✅     | 3B   |
+| CV List                | `/applications/cv`                                                 | ✅     | 3    |
+| CV Generator           | `/applications/cv/new`                                             | ✅     | 3    |
+| CV Editor              | `/applications/cv/:id`                                             | ✅     | 3    |
+| CV Print               | `/applications/cv/:id/print`                                       | ✅     | 3B   |
 | Job List               | `/jobs`                                               | ✅     | 5A   |
 | Job Upload             | `/jobs/new`                                           | ✅     | 5A   |
 | Job Detail             | `/jobs/[jobId]`                                       | ✅     | 5A   |
@@ -1029,12 +1029,12 @@ Each page includes:
 | Company List           | `/companies`                                          | ✅     | 5B   |
 | Company New            | `/companies/new`                                      | ✅     | 5B   |
 | Company Detail         | `/companies/[companyId]`                              | ✅     | 5B   |
-| Speech List            | `/speech`                                             | ✅     | 4    |
-| Speech Editor          | `/speech/:id`                                         | ✅     | 4    |
-| Cover Letter List      | `/cover-letters`                                      | ✅     | 4B   |
-| Cover Letter New       | `/cover-letters/new`                                  | ✅     | 4B   |
-| Cover Letter Editor    | `/cover-letters/:id`                                  | ✅     | 4B   |
-| Cover Letter Print     | `/cover-letters/:id/print`                            | ✅     | 4B   |
+| Speech List            | `/applications/speech`                                             | ✅     | 4    |
+| Speech Editor          | `/applications/speech/:id`                                         | ✅     | 4    |
+| Cover Letter List      | `/applications/cover-letters`                                      | ✅     | 4B   |
+| Cover Letter New       | `/applications/cover-letters/new`                                  | ✅     | 4B   |
+| Cover Letter Editor    | `/applications/cover-letters/:id`                                  | ✅     | 4B   |
+| Cover Letter Print     | `/applications/cover-letters/:id/print`                            | ✅     | 4B   |
 
 ## 8.2 Planned Pages (3 Routes)
 
@@ -1129,7 +1129,7 @@ Each page includes:
 - `useSpeechBlock(id)` - single speech CRUD with AI
 - `useSpeechBlocks()` - speech list operations
 - `useSpeechEngine()` - speech workflow orchestration
-- `useTailoredMaterials()` - tailored CV/letter/speech generation
+- `useTailoredMaterials()` - tailored CV/letter/applications/speech generation
 
 ## 8.5 AI Operations Status (12/12 Implemented)
 
@@ -1192,9 +1192,9 @@ Each page includes:
 **Established Patterns:**
 
 1. **Hub Page**: `/profile` - navigation cards to features
-2. **List Page**: `/jobs`, `/cv` - searchable card grid + empty state + delete modal
+2. **List Page**: `/jobs`, `/applications/cv` - searchable card grid + empty state + delete modal
 3. **Form Page**: `/profile/full`, `/jobs/[jobId]` - edit/view modes, dirty tracking, save/cancel
-4. **Wizard Page**: `/cv/new`, `/profile/cv-upload` - multi-step with progress indicator
+4. **Wizard Page**: `/applications/cv/new`, `/profile/cv-upload` - multi-step with progress indicator
 5. **Detail Page**: `/jobs/[jobId]` - tabbed sections with TagInput
 
 **Consistency:** ✅ Patterns are emerging and reusable
@@ -1251,7 +1251,7 @@ Each page includes:
 **Recommendation:**
 
 - Extract `JobForm` component from `/jobs/[jobId].vue`
-- Extract `CvGeneratorForm` component from `/cv/new.vue`
+- Extract `CvGeneratorForm` component from `/applications/cv/new.vue`
 - Create `FormCard` wrapper component for common form+card pattern
 
 ### 3. Wizard Pattern
@@ -1334,7 +1334,7 @@ Each page includes:
 **Issue:** Some pages are very large
 
 - `/jobs/[jobId].vue` - 485 lines
-- `/cv/new.vue` - 256 lines
+- `/applications/cv/new.vue` - 256 lines
 - `/profile/experiences/[experienceId]/stories/[storyId].vue` - complex logic
 
 **Impact:** Moderate - harder to maintain and test
@@ -1436,12 +1436,12 @@ Each page includes:
 
 1. **Extract List Components**
    - [ ] Create `JobList.vue` from `/jobs/index.vue` inline logic
-   - [ ] Create `CvList.vue` from `/cv/index.vue` inline logic
+   - [ ] Create `CvList.vue` from `/applications/cv/index.vue` inline logic
    - [ ] Deprecate `ExperienceList.vue` table component (card pattern is better)
 
 2. **Extract Form Components**
    - [ ] Create `JobForm.vue` from `/jobs/[jobId].vue`
-   - [ ] Create `CvGeneratorForm.vue` from `/cv/new.vue`
+   - [ ] Create `CvGeneratorForm.vue` from `/applications/cv/new.vue`
    - [ ] Extract common form patterns into `FormCard.vue`
 
 3. **Standardize Modals**
@@ -1467,13 +1467,13 @@ Each page includes:
 
 1. **Reduce Page Complexity**
    - [ ] `/jobs/[jobId].vue` - extract `JobForm` component (485 → 150 lines)
-   - [ ] `/cv/new.vue` - extract wizard steps (256 → 100 lines)
+   - [ ] `/applications/cv/new.vue` - extract wizard steps (256 → 100 lines)
    - [ ] `/profile/experiences/[experienceId]/stories/[storyId].vue` - extract mode selection logic
 
 2. **Wizard Standardization**
    - [ ] Create `WizardContainer.vue` component
    - [ ] Create `WizardStep.vue` component
-   - [ ] Update `/cv/new.vue` to use wizard components
+   - [ ] Update `/applications/cv/new.vue` to use wizard components
    - [ ] Update `/profile/cv-upload.vue` to use wizard components
 
 3. **Loading & Error Standardization**

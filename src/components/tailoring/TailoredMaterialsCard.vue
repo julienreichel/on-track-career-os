@@ -27,8 +27,8 @@ const existingSpeech = ref<{ id: string } | null>(null);
 
 const hasSummary = computed(() => Boolean(props.matchingSummary));
 const hasMatchingSummary = computed(() => hasSummary.value);
-const hasExistingMaterials = computed(
-  () => Boolean(existingCv.value || existingCoverLetter.value || existingSpeech.value)
+const hasExistingMaterials = computed(() =>
+  Boolean(existingCv.value || existingCoverLetter.value || existingSpeech.value)
 );
 
 const materialsLoading = computed(() => tailoredMaterials.materialsLoading.value);
@@ -46,12 +46,16 @@ const materialsDisabled = computed(
     Boolean(props.summaryLoading)
 );
 
-const cvLink = computed(() => (existingCv.value?.id ? `/cv/${existingCv.value.id}` : null));
+const cvLink = computed(() =>
+  existingCv.value?.id ? `/applications/cv/${existingCv.value.id}` : null
+);
 const coverLetterLink = computed(() =>
-  existingCoverLetter.value?.id ? `/cover-letters/${existingCoverLetter.value.id}` : null
+  existingCoverLetter.value?.id
+    ? `/applications/cover-letters/${existingCoverLetter.value.id}`
+    : null
 );
 const speechLink = computed(() =>
-  existingSpeech.value?.id ? `/speech/${existingSpeech.value.id}` : null
+  existingSpeech.value?.id ? `/applications/speech/${existingSpeech.value.id}` : null
 );
 
 const headerDescription = computed(() =>
@@ -95,7 +99,7 @@ const handleGenerateCv = async () => {
       matchingSummary: props.matchingSummary,
     });
     if (created?.id) {
-      await router.push(`/cv/${created.id}`);
+      await router.push(`/applications/cv/${created.id}`);
     }
   } finally {
     activeMaterial.value = null;
@@ -114,7 +118,7 @@ const handleGenerateCoverLetter = async () => {
       matchingSummary: props.matchingSummary,
     });
     if (created?.id) {
-      await router.push(`/cover-letters/${created.id}`);
+      await router.push(`/applications/cover-letters/${created.id}`);
     }
   } finally {
     activeMaterial.value = null;
@@ -133,7 +137,7 @@ const handleGenerateSpeech = async () => {
       matchingSummary: props.matchingSummary,
     });
     if (created?.id) {
-      await router.push(`/speech/${created.id}`);
+      await router.push(`/applications/speech/${created.id}`);
     }
   } finally {
     activeMaterial.value = null;

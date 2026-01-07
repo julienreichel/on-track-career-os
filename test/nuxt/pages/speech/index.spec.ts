@@ -4,7 +4,7 @@ import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
-import SpeechIndexPage from '@/pages/speech/index.vue';
+import SpeechIndexPage from '@/pages/applications/speech/index.vue';
 
 // Mock the SpeechBlockRepository to avoid Amplify client instantiation
 vi.mock('@/domain/speech-block/SpeechBlockRepository', () => ({
@@ -68,10 +68,10 @@ const i18n = createTestI18n();
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
-    { path: '/speech', name: 'speech', component: SpeechIndexPage },
+    { path: '/applications/speech', name: 'applications-speech', component: SpeechIndexPage },
     {
-      path: '/speech/:id',
-      name: 'speech-id',
+      path: '/applications/speech/:id',
+      name: 'applications-speech-id',
       component: { template: '<div>Speech detail</div>' },
     },
   ],
@@ -135,7 +135,7 @@ const stubs = {
 };
 
 async function mountPage() {
-  await router.push('/speech');
+  await router.push('/applications/speech');
   await router.isReady();
   const wrapper = mount(SpeechIndexPage, {
     global: {
@@ -267,6 +267,7 @@ describe('Speech list page', () => {
     expect(createButton).toBeDefined();
 
     await createButton?.trigger('click');
+    await flushPromises();
 
     expect(generateMock).toHaveBeenCalled();
     expect(mockCreateSpeechBlock).toHaveBeenCalledWith({
