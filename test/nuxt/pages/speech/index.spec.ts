@@ -104,6 +104,9 @@ const stubs = {
     props: ['title', 'description'],
     template: '<div class="u-alert">{{ title }} {{ description }}</div>',
   },
+  ListSkeletonCards: {
+    template: '<div class="list-skeleton"><div class="u-skeleton"></div></div>',
+  },
   UEmpty: {
     props: ['title', 'description'],
     template: '<div class="u-empty">{{ title }}<slot name="actions" /></div>',
@@ -146,6 +149,7 @@ async function mountPage() {
       },
     },
   });
+  await flushPromises();
   return { wrapper, router };
 }
 

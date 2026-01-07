@@ -60,6 +60,9 @@ const stubs = {
     template: '<div @click="$emit(\'click\')"><slot /></div>',
   },
   UCard: { template: '<div><slot /></div>' },
+  ListSkeletonCards: {
+    template: '<div class="list-skeleton"><div class="u-skeleton"></div></div>',
+  },
   UButton: {
     props: ['label', 'icon', 'to'],
     template: '<button @click="$emit(\'click\')">{{ label }}</button>',

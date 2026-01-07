@@ -7,6 +7,7 @@ import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { Experience } from '@/domain/experience/Experience';
 import { useAuthUser } from '@/composables/useAuthUser';
 import type { PageHeaderLink } from '@/types/ui';
+import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -171,9 +172,7 @@ function handleViewStories(id: string) {
         />
 
         <!-- Loading State -->
-        <UCard v-if="loading || !hasLoaded">
-          <USkeleton class="h-8 w-full" />
-        </UCard>
+        <ListSkeletonCards v-if="loading || !hasLoaded" />
 
         <!-- Empty State -->
         <UCard v-else-if="experiences.length === 0">

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { ref } from 'vue';
 import JobsPage from '@/pages/jobs/index.vue';
@@ -66,6 +66,9 @@ const stubs = {
     template: '<div class="u-alert">{{ title }} {{ description }}<slot /></div>',
   },
   UCard: { template: '<div class="u-card"><slot /></div>' },
+  ListSkeletonCards: {
+    template: '<div class="list-skeleton"><div class="u-skeleton"></div></div>',
+  },
   UEmpty: {
     props: ['title', 'description', 'icon'],
     template: '<div class="u-empty">{{ title }}<slot name="actions" /></div>',
@@ -113,12 +116,14 @@ async function mountPage() {
   }
   await router.isReady();
 
-  return mount(JobsPage, {
+  const wrapper = mount(JobsPage, {
     global: {
       plugins: [i18n, router],
       stubs,
     },
   });
+  await flushPromises();
+  return wrapper;
 }
 
 describe('Jobs List Page', () => {

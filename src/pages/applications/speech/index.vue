@@ -21,7 +21,7 @@
       />
 
       <UPageBody>
-        <div v-if="!loading && items.length > 0" class="mb-6">
+        <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
           <UInput
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
@@ -39,9 +39,7 @@
           class="mb-6"
         />
 
-        <div v-if="loading" class="flex flex-col items-center py-12">
-          <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
-        </div>
+        <ListSkeletonCards v-if="loading || !hasLoaded" />
 
         <UEmpty
           v-else-if="items.length === 0"
@@ -103,6 +101,7 @@ import { onMounted, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ItemCard from '@/components/ItemCard.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
+import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 import { useSpeechBlocks } from '@/application/speech-block/useSpeechBlocks';
 import { SpeechBlockService } from '@/domain/speech-block/SpeechBlockService';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
@@ -121,6 +120,7 @@ const speechToDelete = ref<SpeechBlock | null>(null);
 const deleting = ref(false);
 const creating = ref(false);
 const searchQuery = ref('');
+const hasLoaded = ref(false);
 const TITLE_MAX_LENGTH = 72;
 const PREVIEW_MAX_LENGTH = 140;
 const toTimestamp = (value?: string | null): number => {
@@ -148,11 +148,17 @@ const filteredItems = computed(() => {
 });
 
 onMounted(async () => {
+  hasLoaded.value = false;
   await loadUserId();
   if (!userId.value) {
+    hasLoaded.value = true;
     return;
   }
-  await loadAll({ filter: { userId: { eq: userId.value } } });
+  try {
+    await loadAll({ filter: { userId: { eq: userId.value } } });
+  } finally {
+    hasLoaded.value = true;
+  }
 });
 
 const handleCreate = async () => {

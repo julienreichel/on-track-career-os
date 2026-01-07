@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
@@ -63,6 +63,9 @@ const stubs = {
     `,
   },
   UButton: { template: '<button type="button"></button>' },
+  ListSkeletonCards: {
+    template: '<div class="list-skeleton"><div class="u-skeleton"></div></div>',
+  },
   UIcon: { template: '<span class="u-icon"></span>' },
   ItemCard: {
     props: ['title'],
@@ -74,7 +77,7 @@ const stubs = {
 async function mountPage() {
   await router.push('/applications/cv');
   await router.isReady();
-  return mount(CvIndexPage, {
+  const wrapper = mount(CvIndexPage, {
     global: {
       plugins: [i18n, router],
       stubs,
@@ -83,6 +86,8 @@ async function mountPage() {
       },
     },
   });
+  await flushPromises();
+  return wrapper;
 }
 
 describe('CV list page', () => {

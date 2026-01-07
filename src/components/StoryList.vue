@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 import type { STARStory } from '@/domain/starstory/STARStory';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
 import type { Experience } from '@/domain/experience/Experience';
+import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 
 const props = defineProps<{
   stories: STARStory[];
@@ -93,12 +94,7 @@ onMounted(() => {
 <template>
   <div>
     <!-- Loading State -->
-    <div
-      v-if="loading || loadingExperiences"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-    >
-      <USkeleton v-for="i in 6" :key="i" class="h-64" />
-    </div>
+    <ListSkeletonCards v-if="loading || loadingExperiences" />
 
     <!-- Empty State -->
     <UEmpty

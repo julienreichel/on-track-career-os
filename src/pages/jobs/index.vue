@@ -4,12 +4,14 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import JobCard from '@/components/job/JobCard.vue';
+import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 
 const router = useRouter();
 const { t } = useI18n();
 const jobAnalysis = useJobAnalysis();
 
 const loading = ref(true);
+const hasLoaded = ref(false);
 const errorMessage = ref<string | null>(null);
 const showDeleteModal = ref(false);
 const jobToDelete = ref<string | null>(null);
@@ -55,6 +57,7 @@ const filteredJobs = computed(() => {
 
 async function loadJobs() {
   loading.value = true;
+  hasLoaded.value = false;
   errorMessage.value = null;
   try {
     await jobAnalysis.listJobs();
@@ -62,6 +65,7 @@ async function loadJobs() {
     errorMessage.value = error instanceof Error ? error.message : t('jobUpload.errors.generic');
   } finally {
     loading.value = false;
+    hasLoaded.value = true;
   }
 }
 
@@ -103,7 +107,7 @@ function cancelDelete() {
       />
 
       <UPageBody>
-        <div v-if="!loading && jobs.length > 0" class="mb-6">
+        <div v-if="hasLoaded && !loading && jobs.length > 0" class="mb-6">
           <UInput
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
@@ -124,9 +128,7 @@ function cancelDelete() {
           @close="errorMessage = null"
         />
 
-        <UCard v-if="loading">
-          <USkeleton class="h-8 w-full" />
-        </UCard>
+        <ListSkeletonCards v-if="loading || !hasLoaded" />
 
         <UCard v-else-if="jobs.length === 0">
           <UEmpty :title="t('jobList.empty.title')" icon="i-heroicons-briefcase">

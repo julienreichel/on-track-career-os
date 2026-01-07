@@ -19,7 +19,7 @@
       />
 
       <UPageBody>
-        <div v-if="!loading && items.length > 0" class="mb-6">
+        <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
           <UInput
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
@@ -39,9 +39,7 @@
         />
 
         <!-- Loading State -->
-        <div v-if="loading" class="flex flex-col items-center py-12">
-          <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
-        </div>
+        <ListSkeletonCards v-if="loading || !hasLoaded" />
 
         <!-- Empty State -->
         <UEmpty
@@ -126,12 +124,14 @@
 import { onMounted, ref, computed } from 'vue';
 import { useCvDocuments } from '@/composables/useCvDocuments';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
+import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 
 const { t } = useI18n();
 const toast = useToast();
 
 const { items, loading, error, loadAll, deleteDocument } = useCvDocuments();
 const searchQuery = ref('');
+const hasLoaded = ref(false);
 
 const deleteModalOpen = ref(false);
 const cvToDelete = ref<CVDocument | null>(null);
@@ -161,8 +161,13 @@ const filteredItems = computed(() => {
   });
 });
 
-onMounted(() => {
-  loadAll();
+onMounted(async () => {
+  hasLoaded.value = false;
+  try {
+    await loadAll();
+  } finally {
+    hasLoaded.value = true;
+  }
 });
 
 const formatDate = (date: string): string => {

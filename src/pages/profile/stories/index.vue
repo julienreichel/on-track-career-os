@@ -18,6 +18,7 @@ const { stories, loading, error, loadAll, search, deleteStory } = useStoryList()
 const searchQuery = ref('');
 const filteredStories = ref<STARStory[]>([]);
 const deleting = ref(false);
+const hasLoaded = ref(false);
 
 // Handle search
 const handleSearch = () => {
@@ -65,8 +66,13 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
 
 // Load data on mount
 onMounted(async () => {
-  await loadAll();
-  filteredStories.value = stories.value;
+  hasLoaded.value = false;
+  try {
+    await loadAll();
+    filteredStories.value = stories.value;
+  } finally {
+    hasLoaded.value = true;
+  }
 });
 </script>
 
@@ -103,7 +109,7 @@ onMounted(async () => {
       <!-- Story List Component -->
       <StoryList
         :stories="searchQuery ? filteredStories : stories"
-        :loading="loading || deleting"
+        :loading="loading || deleting || !hasLoaded"
         show-company-names
         @delete="handleDelete"
         @refresh="handleRefresh"

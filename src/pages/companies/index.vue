@@ -4,12 +4,14 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useCompanies } from '@/composables/useCompanies';
 import CompanyCard from '@/components/company/CompanyCard.vue';
+import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 
 const router = useRouter();
 const { t } = useI18n();
 const companyStore = useCompanies();
 
 const loading = ref(false);
+const hasLoaded = ref(false);
 const errorMessage = ref<string | null>(null);
 const showDeleteModal = ref(false);
 const companyToDelete = ref<string | null>(null);
@@ -34,6 +36,7 @@ const searchQuery = companyStore.searchQuery;
 
 async function loadCompanies() {
   loading.value = true;
+  hasLoaded.value = false;
   errorMessage.value = null;
   try {
     await companyStore.listCompanies();
@@ -42,6 +45,7 @@ async function loadCompanies() {
       error instanceof Error ? error.message : t('companies.list.errors.generic');
   } finally {
     loading.value = false;
+    hasLoaded.value = true;
   }
 }
 
@@ -84,7 +88,7 @@ function cancelDelete() {
       />
 
       <UPageBody>
-        <div v-if="!loading && rawCompanies.length > 0" class="mb-6">
+        <div v-if="hasLoaded && !loading && rawCompanies.length > 0" class="mb-6">
           <UInput
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
@@ -105,9 +109,7 @@ function cancelDelete() {
           @close="errorMessage = null"
         />
 
-        <UCard v-if="loading">
-          <USkeleton class="h-8 w-full" />
-        </UCard>
+        <ListSkeletonCards v-if="loading || !hasLoaded" />
 
         <UCard v-else-if="rawCompanies.length === 0">
           <UEmpty :title="t('companies.list.empty.title')" icon="i-heroicons-building-office-2">

@@ -7,6 +7,7 @@ import { ExperienceService } from '@/domain/experience/ExperienceService';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { STARStory } from '@/domain/starstory/STARStory';
 import type { Experience } from '@/domain/experience/Experience';
+import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 
 definePageMeta({
   breadcrumbLabel: 'Stories',
@@ -26,6 +27,7 @@ const experienceService = new ExperienceService();
 const storyService = new STARStoryService();
 const deleting = ref(false);
 const currentExperience = ref<Experience | null>(null);
+const hasLoaded = ref(false);
 
 // Auto-generation state
 const isGenerating = ref(false);
@@ -151,6 +153,7 @@ const handleAutoGenerate = async () => {
 
 // Load data
 onMounted(async () => {
+  hasLoaded.value = false;
   if (experienceId.value) {
     // Load experience details
     try {
@@ -168,6 +171,7 @@ onMounted(async () => {
       await loadByExperienceId(experienceId.value);
     }
   }
+  hasLoaded.value = true;
 });
 </script>
 
@@ -213,9 +217,9 @@ onMounted(async () => {
         />
 
         <!-- Loading State -->
-        <div v-if="loading || isGenerating" class="flex flex-col items-center py-12">
-          <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
-          <p v-if="isGenerating" class="text-center">
+        <div v-if="loading || isGenerating || !hasLoaded" class="space-y-4">
+          <ListSkeletonCards />
+          <p v-if="isGenerating" class="text-center text-sm text-gray-500">
             {{ t('stories.list.generating') }}
           </p>
         </div>

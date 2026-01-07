@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
@@ -85,6 +85,15 @@ const stubs = {
     props: ['title', 'description'],
     template: '<div class="u-alert">{{ title }} {{ description }}</div>',
   },
+  UCard: {
+    template: '<div class="u-card"><slot /></div>',
+  },
+  USkeleton: {
+    template: '<div class="u-skeleton" />',
+  },
+  ListSkeletonCards: {
+    template: '<div class="list-skeleton"><div class="u-skeleton"></div></div>',
+  },
   UEmpty: {
     props: ['title', 'description'],
     template: '<div class="u-empty">{{ title }}<slot name="actions" /></div>',
@@ -118,7 +127,7 @@ const stubs = {
 async function mountPage() {
   await router.push('/cover-letters');
   await router.isReady();
-  return mount(CoverLetterIndexPage, {
+  const wrapper = mount(CoverLetterIndexPage, {
     global: {
       plugins: [i18n, router],
       stubs,
@@ -127,6 +136,8 @@ async function mountPage() {
       },
     },
   });
+  await flushPromises();
+  return wrapper;
 }
 
 describe('Cover letter list page', () => {
@@ -148,6 +159,32 @@ describe('Cover letter list page', () => {
   it('renders empty state when no cover letters exist', async () => {
     const wrapper = await mountPage();
     expect(wrapper.text()).toContain(i18n.global.t('coverLetter.list.emptyState.title'));
+  });
+
+  it('shows skeleton until cover letters are loaded', async () => {
+    let resolveLoad: () => void;
+    const loadPromise = new Promise<void>((resolve) => {
+      resolveLoad = resolve;
+    });
+    mockLoadAll.mockReturnValueOnce(loadPromise);
+
+    const wrapper = mount(CoverLetterIndexPage, {
+      global: {
+        plugins: [i18n, router],
+        stubs,
+        mocks: {
+          useToast: () => mockToast,
+        },
+      },
+    });
+
+    await flushPromises();
+    expect(wrapper.find('.u-skeleton').exists()).toBe(true);
+
+    resolveLoad?.();
+    await flushPromises();
+
+    expect(wrapper.find('.u-skeleton').exists()).toBe(false);
   });
 
   it('renders cover letters when they exist', async () => {

@@ -94,6 +94,9 @@ const stubs = {
     template: '<div class="u-empty"><p>{{ title }}</p><p>{{ description }}</p><slot /></div>',
     props: ['title', 'description', 'icon'],
   },
+  ListSkeletonCards: {
+    template: '<div class="list-skeleton"><div class="u-skeleton"></div></div>',
+  },
   NuxtLink: {
     template: '<a :href="to" class="nuxt-link"><slot /></a>',
     props: ['to'],
@@ -120,6 +123,7 @@ const pageComponentStubs = {
   },
   UButton: stubs.UButton,
   UEmpty: stubs.UEmpty,
+  ListSkeletonCards: stubs.ListSkeletonCards,
   UModal: {
     template: '<div class="u-modal"><slot /></div>',
     props: ['title'],
