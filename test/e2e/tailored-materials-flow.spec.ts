@@ -29,18 +29,27 @@ test.describe('Tailored materials workflow', () => {
     await fileInput.setInputFiles(JOB_FIXTURE);
 
     await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 60000 });
-    const editButton = page.getByRole('button', { name: /^Edit$/ });
-    await expect(editButton).toBeVisible({ timeout: 60000 });
-    await editButton.scrollIntoViewIfNeeded();
-    await editButton.click();
+    await expect(async () => {
+      const editButton = page.getByRole('button', { name: /^Edit$/ });
+      await expect(editButton).toBeVisible({ timeout: 5000 });
+      await editButton.scrollIntoViewIfNeeded();
+      await editButton.click();
+      await expect(page.locator('[data-testid="job-title-input"]')).toBeVisible({
+        timeout: 2000,
+      });
+    }).toPass({ timeout: 20000 });
 
     const titleInput = page.locator('[data-testid="job-title-input"]');
-    await expect(titleInput).toBeVisible({ timeout: 10000 });
 
     jobTitle = `E2E Tailored Job ${Date.now()}`;
     await titleInput.fill(jobTitle);
-    const saveButton = page.locator('[data-testid="job-save-button"]');
-    await saveButton.click();
+    await expect(async () => {
+      const saveButton = page.locator('[data-testid="job-save-button"]');
+      await expect(saveButton).toBeVisible({ timeout: 2000 });
+      await expect(saveButton).toBeEnabled();
+      await saveButton.scrollIntoViewIfNeeded();
+      await saveButton.click();
+    }).toPass({ timeout: 10000 });
     await expect(page.getByRole('button', { name: /^Edit$/ })).toBeVisible({ timeout: 10000 });
 
     const jobDetailUrl = page.url();

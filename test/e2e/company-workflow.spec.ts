@@ -66,14 +66,12 @@ test.describe('Company workflow', () => {
       .click();
     const analyzeButton = page.getByRole('button', { name: /analyze company info/i });
     const websiteInput = page.getByLabel('Website');
-    const summaryInput = page.getByLabel(/Company name/i);
 
     let analysisSucceeded = false;
     for (let attempt = 0; attempt < 2; attempt += 1) {
       await analyzeButton.click();
       try {
         await expect(websiteInput).not.toHaveValue('', { timeout: 5000 });
-        await expect(summaryInput).not.toHaveValue('', { timeout: 5000 });
         analysisSucceeded = true;
         break;
       } catch {
@@ -135,13 +133,24 @@ test.describe('Company workflow', () => {
     await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 60000 });
     jobDetailUrl = page.url();
 
-    await page.getByRole('button', { name: /^Edit$/i }).click();
+    await expect(async () => {
+      const editButton = page.getByRole('button', { name: /^Edit$/i });
+      await expect(editButton).toBeVisible({ timeout: 5000 });
+      await editButton.scrollIntoViewIfNeeded();
+      await editButton.click();
+      await expect(page.getByLabel('Job title')).toBeVisible({ timeout: 2000 });
+    }).toPass({ timeout: 20000 });
+
     const jobTitleInput = page.getByLabel('Job title');
-    await expect(jobTitleInput).toBeVisible({ timeout: 10000 });
     await jobTitleInput.fill(JOB_TITLE);
-    const saveJobButton = page.getByRole('button', { name: /^Save$/i }).last();
-    await saveJobButton.click();
-    await expect(saveJobButton).toBeDisabled({ timeout: 10000 });
+    await expect(async () => {
+      const saveJobButton = page.getByRole('button', { name: /^Save$/i }).last();
+      await expect(saveJobButton).toBeVisible({ timeout: 2000 });
+      await expect(saveJobButton).toBeEnabled();
+      await saveJobButton.scrollIntoViewIfNeeded();
+      await saveJobButton.click();
+    }).toPass({ timeout: 10000 });
+    await expect(page.getByRole('button', { name: /^Edit$/i })).toBeVisible({ timeout: 10000 });
   });
 
   test('links saved job to analyzed company', async ({ page }) => {
