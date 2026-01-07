@@ -104,6 +104,10 @@ const stubs = {
       </div>
     `,
   },
+  UFormField: {
+    props: ['label'],
+    template: '<div class="u-form-field"><span class="label">{{ label }}</span><slot /></div>',
+  },
   UAlert: {
     props: ['title', 'description'],
     template: '<div class="u-alert">{{ title }} {{ description }}</div>',
@@ -188,6 +192,7 @@ describe('Company Detail Page', () => {
   it('saves company changes', async () => {
     const wrapper = await mountPage();
     await flushPromises();
+    await wrapper.find('[data-testid="company-edit-button"]').trigger('click');
     (wrapper.vm as any).form.companyName = 'Updated';
     await wrapper.vm.$nextTick();
     await flushPromises();
@@ -209,6 +214,7 @@ describe('Company Detail Page', () => {
   it('runs company analysis when analyze button clicked', async () => {
     const wrapper = await mountPage();
     await flushPromises();
+    await wrapper.find('[data-testid="company-edit-button"]').trigger('click');
     const analyzeButton = wrapper
       .findAll('.u-button')
       .find((button) => button.text().includes('Analyze company info'));

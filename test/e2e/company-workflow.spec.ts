@@ -42,9 +42,10 @@ test.describe('Company workflow', () => {
         ].join('\n')
       );
 
-    await page.getByRole('button', { name: /save company/i }).click();
+    await page.getByRole('button', { name: /^Save$/i }).click();
     await expect(page).toHaveURL(/\/companies\/[0-9a-f-]+$/i, { timeout: 60000 });
     await page.waitForLoadState('networkidle');
+    await page.getByRole('button', { name: /^Edit$/i }).click();
     await expect(page.getByRole('button', { name: /analyze company info/i })).toBeVisible({
       timeout: 60000,
     });
@@ -56,6 +57,7 @@ test.describe('Company workflow', () => {
     await page.goto(companyDetailUrl!);
     await page.waitForLoadState('networkidle');
 
+    await page.getByRole('button', { name: /^Edit$/i }).click();
     const analyzeButton = page.getByRole('button', { name: /analyze company info/i });
     const websiteInput = page.getByLabel('Website');
     const summaryInput = page.getByLabel(/Company name/i);

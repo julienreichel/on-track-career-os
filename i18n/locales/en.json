@@ -135,7 +135,7 @@
         "missingNotes": "Add research notes before running AI analysis."
       },
       "actions": {
-        "save": "Save company",
+        "save": "Save",
         "analyze": "Save & analyze"
       }
     },
@@ -157,9 +157,8 @@
       "lastUpdated": "Last updated {date}",
       "actions": {
         "back": "Back to Companies",
-        "reset": "Reset changes",
         "analyze": "Analyze company info",
-        "save": "Save company"
+        "save": "Save"
       },
       "errors": {
         "title": "Company error",

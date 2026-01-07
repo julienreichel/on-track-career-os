@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { useCompanies } from '@/composables/useCompanies';
 import CompanyCard from '@/components/company/CompanyCard.vue';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
+import type { PageHeaderLink } from '@/types/ui';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -16,7 +17,7 @@ const errorMessage = ref<string | null>(null);
 const showDeleteModal = ref(false);
 const companyToDelete = ref<string | null>(null);
 
-const headerLinks = computed(() => [
+const headerLinks = computed<PageHeaderLink[]>(() => [
   {
     label: t('companies.list.actions.viewJobs'),
     icon: 'i-heroicons-briefcase',

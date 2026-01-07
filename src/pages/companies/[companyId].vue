@@ -24,6 +24,7 @@ const loading = ref(true);
 const errorMessage = ref<string | null>(null);
 const savingCompany = ref(false);
 const analyzingCompany = ref(false);
+const isEditing = ref(false);
 
 const form = reactive<CompanyFormState>({
   companyName: '',
@@ -124,6 +125,7 @@ onMounted(async () => {
   await loadCompany();
   await canvasStore.load();
   await jobsStore.load();
+  isEditing.value = false;
 });
 
 async function loadCompany() {
@@ -178,6 +180,7 @@ async function saveCompany() {
     const updated = await companyStore.save(payload);
     if (updated) {
       hydrateCompany(updated);
+      isEditing.value = false;
     }
   } catch (error) {
     errorMessage.value =
@@ -213,10 +216,17 @@ async function analyzeCompanyInfo() {
   }
 }
 
-function resetCompanyForm() {
+function handleEdit() {
+  if (!company.value) return;
+  hydrateCompany(company.value);
+  isEditing.value = true;
+}
+
+function handleCancel() {
   if (company.value) {
     hydrateCompany(company.value);
   }
+  isEditing.value = false;
 }
 
 async function saveCanvas() {
@@ -283,50 +293,115 @@ function clearJobsError() {
 
         <div v-else class="space-y-8">
           <UCard>
-            <div class="mb-6">
-              <h2 class="text-xl font-semibold">
-                {{ t('companies.detail.sections.companyInfo') }}
-              </h2>
-              <p class="text-sm text-gray-500">
-                {{ t('companies.detail.sections.companyInfoDescription') }}
-              </p>
-              <p v-if="formattedMeta" class="mt-2 text-xs text-gray-400">
-                {{ t('companies.detail.lastUpdated', { date: formattedMeta }) }}
-              </p>
-            </div>
+            <template v-if="isEditing">
+              <div class="space-y-6">
+                <CompanyForm v-model="form" :disabled="disableActions" />
+                <CompanyNotesInput v-model="rawNotes" :disabled="disableActions" />
+              </div>
+            </template>
 
-            <div class="space-y-6">
-              <CompanyForm v-model="form" :disabled="disableActions" />
-              <CompanyNotesInput v-model="rawNotes" :disabled="disableActions" />
-            </div>
+            <template v-else>
+              <div class="grid gap-4 md:grid-cols-2">
+                <UFormField :label="t('companies.form.companyName')">
+                  <p>{{ form.companyName || t('common.notAvailable') }}</p>
+                </UFormField>
+                <UFormField :label="t('companies.form.industry')">
+                  <p>{{ form.industry || t('common.notAvailable') }}</p>
+                </UFormField>
+                <UFormField :label="t('companies.form.sizeRange')">
+                  <p>{{ form.sizeRange || t('common.notAvailable') }}</p>
+                </UFormField>
+                <UFormField :label="t('companies.form.website')">
+                  <NuxtLink
+                    v-if="form.website"
+                    :to="form.website"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {{ form.website }}
+                  </NuxtLink>
+                  <p v-else>{{ t('common.notAvailable') }}</p>
+                </UFormField>
+              </div>
+
+              <UFormField :label="t('companies.form.description')" class="mt-4">
+                <p>{{ form.description || t('common.notAvailable') }}</p>
+              </UFormField>
+
+              <div class="mt-4 grid gap-4 md:grid-cols-3">
+                <UFormField :label="t('companies.form.productsServices')">
+                  <ul v-if="form.productsServices.length" class="list-disc space-y-1 pl-4">
+                    <li v-for="item in form.productsServices" :key="item">
+                      {{ item }}
+                    </li>
+                  </ul>
+                  <p v-else>{{ t('common.notAvailable') }}</p>
+                </UFormField>
+                <UFormField :label="t('companies.form.targetMarkets')">
+                  <ul v-if="form.targetMarkets.length" class="list-disc space-y-1 pl-4">
+                    <li v-for="item in form.targetMarkets" :key="item">
+                      {{ item }}
+                    </li>
+                  </ul>
+                  <p v-else>{{ t('common.notAvailable') }}</p>
+                </UFormField>
+                <UFormField :label="t('companies.form.customerSegments')">
+                  <ul v-if="form.customerSegments.length" class="list-disc space-y-1 pl-4">
+                    <li v-for="item in form.customerSegments" :key="item">
+                      {{ item }}
+                    </li>
+                  </ul>
+                  <p v-else>{{ t('common.notAvailable') }}</p>
+                </UFormField>
+              </div>
+            </template>
 
             <template #footer>
-              <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  :label="t('companies.detail.actions.reset')"
-                  :disabled="!isDirty || disableActions"
-                  @click="resetCompanyForm"
-                />
-                <UButton
-                  color="secondary"
-                  icon="i-heroicons-sparkles"
-                  :label="t('companies.detail.actions.analyze')"
-                  :loading="analyzingCompany"
-                  :disabled="disableActions"
-                  data-testid="company-analyze-button"
-                  @click="analyzeCompanyInfo"
-                />
-                <UButton
-                  color="primary"
-                  icon="i-heroicons-check"
-                  :label="t('companies.detail.actions.save')"
-                  :loading="savingCompany"
-                  :disabled="!canSaveCompany"
-                  data-testid="company-save-button"
-                  @click="saveCompany"
-                />
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p v-if="formattedMeta" class="text-xs text-gray-400">
+                  {{ t('companies.detail.lastUpdated', { date: formattedMeta }) }}
+                </p>
+                <div
+                  v-if="isEditing"
+                  class="flex flex-col gap-3 sm:flex-row sm:justify-end"
+                >
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    :label="t('common.cancel')"
+                    :disabled="disableActions"
+                    data-testid="company-cancel-button"
+                    @click="handleCancel"
+                  />
+                  <UButton
+                    color="secondary"
+                    icon="i-heroicons-sparkles"
+                    :label="t('companies.detail.actions.analyze')"
+                    :loading="analyzingCompany"
+                    :disabled="disableActions"
+                    data-testid="company-analyze-button"
+                    @click="analyzeCompanyInfo"
+                  />
+                  <UButton
+                    color="primary"
+                    icon="i-heroicons-check"
+                    :label="t('companies.detail.actions.save')"
+                    :loading="savingCompany"
+                    :disabled="!canSaveCompany"
+                    data-testid="company-save-button"
+                    @click="saveCompany"
+                  />
+                </div>
+                <div v-else class="flex justify-end">
+                  <UButton
+                    color="primary"
+                    variant="outline"
+                    icon="i-heroicons-pencil"
+                    :label="t('common.edit')"
+                    data-testid="company-edit-button"
+                    @click="handleEdit"
+                  />
+                </div>
               </div>
             </template>
           </UCard>
