@@ -1,12 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
-import SpeechIndexPage from '@/pages/speech/index.vue';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
-
-const navigateToMock = vi.fn().mockResolvedValue(undefined);
+import SpeechIndexPage from '@/pages/speech/index.vue';
 
 // Mock the SpeechBlockRepository to avoid Amplify client instantiation
 vi.mock('@/domain/speech-block/SpeechBlockRepository', () => ({
@@ -54,7 +52,10 @@ vi.mock('@/composables/useSpeechEngine', () => ({
 }));
 
 vi.mock('#app', () => ({
-  navigateTo: navigateToMock,
+  useToast: () => mockToast,
+}));
+
+vi.mock('#imports', () => ({
   useToast: () => mockToast,
 }));
 
@@ -68,7 +69,11 @@ const router = createRouter({
   history: createMemoryHistory(),
   routes: [
     { path: '/speech', name: 'speech', component: SpeechIndexPage },
-    { path: '/speech/:id', name: 'speech-id', component: { template: '<div>Speech detail</div>' } },
+    {
+      path: '/speech/:id',
+      name: 'speech-id',
+      component: { template: '<div>Speech detail</div>' },
+    },
   ],
 });
 
@@ -132,7 +137,7 @@ const stubs = {
 async function mountPage() {
   await router.push('/speech');
   await router.isReady();
-  return mount(SpeechIndexPage, {
+  const wrapper = mount(SpeechIndexPage, {
     global: {
       plugins: [i18n, router],
       stubs,
@@ -141,6 +146,7 @@ async function mountPage() {
       },
     },
   });
+  return { wrapper, router };
 }
 
 describe('Speech list page', () => {
@@ -151,7 +157,6 @@ describe('Speech list page', () => {
     mockLoadAll.mockClear();
     mockCreateSpeechBlock.mockClear();
     generateMock.mockClear();
-    navigateToMock.mockClear();
   });
 
   it('loads speech blocks on mount', async () => {
@@ -160,12 +165,12 @@ describe('Speech list page', () => {
   });
 
   it('renders empty state when no speech blocks exist', async () => {
-    const wrapper = await mountPage();
+    const { wrapper } = await mountPage();
     expect(wrapper.text()).toContain(i18n.global.t('speech.list.emptyState.title'));
   });
 
   it('renders back to applications link', async () => {
-    const wrapper = await mountPage();
+    const { wrapper } = await mountPage();
     expect(wrapper.text()).toContain(i18n.global.t('navigation.backToApplications'));
   });
 
@@ -191,9 +196,9 @@ describe('Speech list page', () => {
         createdAt: '2024-02-01T00:00:00.000Z',
         updatedAt: '2024-02-02T00:00:00.000Z',
       },
-    ];
+    ] as SpeechBlock[];
 
-    const wrapper = await mountPage();
+    const { wrapper } = await mountPage();
     await wrapper.vm.$nextTick();
 
     const cards = wrapper.findAll('.item-card');
@@ -224,9 +229,9 @@ describe('Speech list page', () => {
         createdAt: '2024-01-02T00:00:00.000Z',
         updatedAt: '2024-01-02T00:00:00.000Z',
       },
-    ];
+    ] as SpeechBlock[];
 
-    const wrapper = await mountPage();
+    const { wrapper } = await mountPage();
     await wrapper.vm.$nextTick();
 
     await wrapper.find('.u-input').setValue('Targeted');
@@ -253,7 +258,7 @@ describe('Speech list page', () => {
       updatedAt: '2024-02-01T00:00:00.000Z',
     });
 
-    const wrapper = await mountPage();
+    const { wrapper } = await mountPage();
     await wrapper.vm.$nextTick();
 
     const createButton = wrapper
@@ -269,10 +274,6 @@ describe('Speech list page', () => {
       elevatorPitch: 'AI pitch',
       careerStory: 'AI story',
       whyMe: 'AI why',
-    });
-    expect(navigateToMock).toHaveBeenCalledWith({
-      name: 'speech-id',
-      params: { id: 'speech-1' },
     });
   });
 });

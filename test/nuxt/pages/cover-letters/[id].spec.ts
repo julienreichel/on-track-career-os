@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
@@ -219,6 +219,7 @@ describe('Cover letter detail page', () => {
 
   it('loads cover letter and renders view mode content', async () => {
     const wrapper = await mountPage();
+    await flushPromises();
     expect(mockLoad).toHaveBeenCalled();
     expect(engineMock.load).toHaveBeenCalled();
 
@@ -229,26 +230,32 @@ describe('Cover letter detail page', () => {
 
   it('displays content in view mode and edit mode', async () => {
     const wrapper = await mountPage();
+    await flushPromises();
 
     // First check view mode content
     const proseContent = wrapper.find('.prose');
     expect(proseContent.exists()).toBe(true);
     expect(proseContent.text()).toContain(itemRef.value?.content);
 
-    // Switch to edit mode by clicking edit button
-    const editButton = wrapper.find('[data-testid="edit-cover-letter-button"]');
-    if (editButton.exists()) {
-      await editButton.trigger('click');
+    const setupState = wrapper.vm.$.setupState as {
+      isEditing: boolean;
+      editTitle: string;
+      editContent: string;
+    };
+    setupState.editTitle = itemRef.value?.name ?? '';
+    setupState.editContent = itemRef.value?.content ?? '';
+    setupState.isEditing = true;
+    await wrapper.vm.$nextTick();
+    await flushPromises();
 
-      // Now check textarea appears
-      const textarea = wrapper.find('textarea');
-      expect(textarea.exists()).toBe(true);
-      expect((textarea.element as HTMLTextAreaElement).value).toBe(itemRef.value?.content);
+    // Now check textarea appears
+    const textarea = wrapper.find('textarea');
+    expect(textarea.exists()).toBe(true);
+    expect((textarea.element as HTMLTextAreaElement).value).toBe(itemRef.value?.content);
 
-      const titleInput = wrapper.find('input');
-      expect(titleInput.exists()).toBe(true);
-      expect((titleInput.element as HTMLInputElement).value).toBe(itemRef.value?.name);
-    }
+    const titleInput = wrapper.find('input');
+    expect(titleInput.exists()).toBe(true);
+    expect((titleInput.element as HTMLInputElement).value).toBe(itemRef.value?.name);
   });
 
   it('shows tailored regeneration banner when jobId exists', async () => {
@@ -268,36 +275,39 @@ describe('Cover letter detail page', () => {
 
   it('saves changes when save button is clicked', async () => {
     const wrapper = await mountPage();
+    await flushPromises();
 
-    // First switch to edit mode
-    const editButton = wrapper.find('[data-testid="edit-cover-letter-button"]');
-    if (editButton.exists()) {
-      await editButton.trigger('click');
+    const setupState = wrapper.vm.$.setupState as {
+      isEditing: boolean;
+      editTitle: string;
+      editContent: string;
+    };
+    setupState.editTitle = itemRef.value?.name ?? '';
+    setupState.editContent = itemRef.value?.content ?? '';
+    setupState.isEditing = true;
+    await wrapper.vm.$nextTick();
+    await flushPromises();
 
-      // Now modify title + content
-      const titleInput = wrapper.find('[data-testid="cover-letter-title-input"]');
-      expect(titleInput.exists()).toBe(true);
-      await titleInput.setValue('Updated cover letter');
+    // Now modify title + content
+    const titleInput = wrapper.find('[data-testid="cover-letter-title-input"]');
+    expect(titleInput.exists()).toBe(true);
+    await titleInput.setValue('Updated cover letter');
 
-      const textarea = wrapper.find('textarea');
-      expect(textarea.exists()).toBe(true);
+    const textarea = wrapper.find('textarea');
+    expect(textarea.exists()).toBe(true);
 
-      await textarea.setValue('Updated cover letter content');
-      await wrapper.vm.$nextTick();
+    await textarea.setValue('Updated cover letter content');
+    await wrapper.vm.$nextTick();
 
-      // Click save
-      const saveButton = wrapper.find('[data-testid="save-cover-letter-button"]');
-      await saveButton.trigger('click');
+    // Click save
+    const saveButton = wrapper.find('[data-testid="save-cover-letter-button"]');
+    await saveButton.trigger('click');
 
-      expect(mockSave).toHaveBeenCalledWith({
-        id: 'cl-1',
-        name: 'Updated cover letter',
-        content: 'Updated cover letter content',
-      });
-    } else {
-      // Skip test if edit button not found
-      console.warn('Edit button not found, skipping save test');
-    }
+    expect(mockSave).toHaveBeenCalledWith({
+      id: 'cl-1',
+      name: 'Updated cover letter',
+      content: 'Updated cover letter content',
+    });
   });
 
   // Note: Generate button and profile validation have been removed from detail page

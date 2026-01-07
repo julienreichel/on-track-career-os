@@ -16,7 +16,7 @@ const stubs = {
 };
 
 describe('SpeechSectionEditor', () => {
-  it('renders label, description, and char count', () => {
+  it('renders label, description, and word count', () => {
     const wrapper = mount(SpeechSectionEditor, {
       global: {
         plugins: [i18n],
@@ -26,13 +26,15 @@ describe('SpeechSectionEditor', () => {
         modelValue: 'Hello',
         label: 'Elevator pitch',
         description: 'Short summary',
-        maxLength: 100,
+        maxWords: 100,
       },
     });
 
     expect(wrapper.text()).toContain('Elevator pitch');
     expect(wrapper.text()).toContain('Short summary');
-    expect(wrapper.text()).toContain('5 / 100');
+    expect(wrapper.text()).toContain(
+      i18n.global.t('speech.editor.wordCount', { count: 1, max: 100 })
+    );
   });
 
   it('emits updates when textarea changes', async () => {

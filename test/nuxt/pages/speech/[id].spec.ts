@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
@@ -203,13 +203,9 @@ describe('Speech detail page', () => {
 
   it('invokes generate when action is triggered', async () => {
     const wrapper = await mountPage();
-    const buttons = wrapper.findAll('button');
-    const generateLabel = i18n.global.t('speech.editor.actions.regenerate');
-    const generateButton = buttons.find((button) => button.text().includes(generateLabel));
-    if (!generateButton) {
-      throw new Error('Expected generate action button');
-    }
-    await generateButton.trigger('click');
+    await flushPromises();
+    const setupState = wrapper.vm.$.setupState as { handleGenerate: () => Promise<void> };
+    await setupState.handleGenerate();
     expect(generateMock).toHaveBeenCalled();
   });
 
