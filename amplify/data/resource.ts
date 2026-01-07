@@ -225,6 +225,7 @@ export const schema = a
     JobDescription: a
       .model({
         rawText: a.string(),
+        owner: a.string().required(),
         title: a.string().required(),
         seniorityLevel: a.string(),
         roleSummary: a.string(), // short narrative
@@ -243,11 +244,13 @@ export const schema = a
         speechBlocks: a.hasMany('SpeechBlock', 'jobId'),
         matchingSummaries: a.hasMany('MatchingSummary', 'jobId'),
       })
+      .secondaryIndexes((index) => [index('owner')])
       .authorization((allow) => [allow.owner()]),
 
     Company: a
       .model({
         companyName: a.string().required(),
+        owner: a.string().required(),
         industry: a.string(),
         sizeRange: a.string(),
         website: a.string(),
@@ -261,6 +264,7 @@ export const schema = a
         jobs: a.hasMany('JobDescription', 'companyId'),
         matchingSummaries: a.hasMany('MatchingSummary', 'companyId'),
       })
+      .secondaryIndexes((index) => [index('owner')])
       .authorization((allow) => [allow.owner()]),
 
     CompanyCanvas: a
