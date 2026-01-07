@@ -32,7 +32,7 @@ const handleUpdate = (value: string[]) => {
 </script>
 
 <template>
-  <UCard variant="soft" class="w-full">
+  <UCard variant="soft" class="w-full" :data-testid="testId">
     <div v-if="readOnly" class="space-y-2">
       <div>
         <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">

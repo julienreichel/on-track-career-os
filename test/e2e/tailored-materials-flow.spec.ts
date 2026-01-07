@@ -31,6 +31,7 @@ test.describe('Tailored materials workflow', () => {
     await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 60000 });
     const editButton = page.getByRole('button', { name: /^Edit$/ });
     await expect(editButton).toBeVisible({ timeout: 60000 });
+    await editButton.scrollIntoViewIfNeeded();
     await editButton.click();
 
     const titleInput = page.locator('[data-testid="job-title-input"]');

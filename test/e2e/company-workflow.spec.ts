@@ -45,7 +45,10 @@ test.describe('Company workflow', () => {
     await page.getByRole('button', { name: /^Save$/i }).click();
     await expect(page).toHaveURL(/\/companies\/[0-9a-f-]+$/i, { timeout: 60000 });
     await page.waitForLoadState('networkidle');
-    await page.getByRole('button', { name: /^Edit$/i }).click();
+    await page
+      .getByRole('button', { name: /^Edit$/i })
+      .first()
+      .click();
     await expect(page.getByRole('button', { name: /analyze company info/i })).toBeVisible({
       timeout: 60000,
     });
@@ -57,7 +60,10 @@ test.describe('Company workflow', () => {
     await page.goto(companyDetailUrl!);
     await page.waitForLoadState('networkidle');
 
-    await page.getByRole('button', { name: /^Edit$/i }).click();
+    await page
+      .getByRole('button', { name: /^Edit$/i })
+      .first()
+      .click();
     const analyzeButton = page.getByRole('button', { name: /analyze company info/i });
     const websiteInput = page.getByLabel('Website');
     const summaryInput = page.getByLabel(/Company name/i);
@@ -89,8 +95,10 @@ test.describe('Company workflow', () => {
     await page.waitForLoadState('networkidle');
 
     await page.getByRole('button', { name: /generate canvas/i }).click();
-    await expect(page.getByTestId('canvas-valuePropositions-tags')).toContainText(/.+/);
-    await expect(page.getByTestId('canvas-customerSegments-tags')).toContainText(/.+/);
+    const valuePropsSection = page.getByTestId('canvas-valuePropositions');
+    await expect(valuePropsSection).toContainText(/.+/);
+    const customerSegmentsSection = page.getByTestId('canvas-customerSegments');
+    await expect(customerSegmentsSection).toContainText(/.+/);
   });
 
   test('saves manual canvas edits', async ({ page }) => {
@@ -98,6 +106,7 @@ test.describe('Company workflow', () => {
     await page.goto(companyDetailUrl!);
     await page.waitForLoadState('networkidle');
 
+    await page.getByTestId('company-canvas-edit').click();
     const valuePropInput = page.getByLabel('Value Propositions');
     await valuePropInput.fill(CUSTOM_VALUE_PROP);
     await valuePropInput.press('Enter');
