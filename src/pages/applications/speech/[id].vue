@@ -33,6 +33,7 @@ const formState = ref({
   whyMe: '',
 });
 const originalState = ref({ ...formState.value });
+const isEditing = ref(false);
 const saving = ref(false);
 const cancelModalOpen = ref(false);
 const isGenerating = computed(() => engine.isGenerating.value);
@@ -122,8 +123,22 @@ const resetForm = () => {
   originalState.value = { ...formState.value };
 };
 
+const formatSection = (value: string) => {
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : t('speech.detail.emptySection');
+};
+
+const handleEdit = () => {
+  resetForm();
+  isEditing.value = true;
+};
+
 const handleSave = async () => {
-  if (!item.value?.id || saving.value || !hasChanges.value) return;
+  if (!item.value?.id || saving.value) return;
+  if (!hasChanges.value) {
+    isEditing.value = false;
+    return;
+  }
   saving.value = true;
   try {
     const updated = await save({
@@ -136,6 +151,7 @@ const handleSave = async () => {
     if (updated) {
       toast.add({ title: t('speech.detail.toast.saved'), color: 'primary' });
       originalState.value = { ...formState.value };
+      isEditing.value = false;
     } else {
       toast.add({ title: t('speech.detail.toast.saveFailed'), color: 'error' });
     }
@@ -157,12 +173,15 @@ const handleGenerate = async () => {
 const handleCancel = () => {
   if (hasChanges.value) {
     cancelModalOpen.value = true;
+    return;
   }
+  isEditing.value = false;
 };
 
 const handleDiscard = () => {
   resetForm();
   cancelModalOpen.value = false;
+  isEditing.value = false;
 };
 
 const loadTailoringContext = async (jobId?: string | null) => {
@@ -212,12 +231,15 @@ const handleRegenerateTailored = async () => {
 onMounted(async () => {
   await load();
   resetForm();
+  isEditing.value = false;
   route.meta.breadcrumbLabel = detailTitle.value;
 });
 
 watch(item, (newValue) => {
-  if (newValue && !hasChanges.value) {
-    resetForm();
+  if (newValue) {
+    if (!hasChanges.value && !isEditing.value) {
+      resetForm();
+    }
     void loadTailoringContext(newValue.jobId);
   }
   if (newValue) {
@@ -294,36 +316,107 @@ watch(item, (newValue) => {
           </UCard>
 
           <template v-else-if="item">
-            <div class="mb-6">
-              <UFormField :label="t('speech.detail.titleLabel')">
-                <UInput
-                  v-model="formState.title"
-                  :placeholder="t('speech.detail.titlePlaceholder')"
-                  :disabled="loading || saving"
-                  data-testid="speech-title-input"
-                  class="w-full"
-                />
-              </UFormField>
-            </div>
+            <template v-if="isEditing">
+              <div class="mb-6">
+                <UFormField :label="t('speech.detail.titleLabel')">
+                  <UInput
+                    v-model="formState.title"
+                    :placeholder="t('speech.detail.titlePlaceholder')"
+                    :disabled="loading || saving"
+                    data-testid="speech-title-input"
+                    class="w-full"
+                  />
+                </UFormField>
+              </div>
 
-            <SpeechBlockEditorCard v-model="formState" :disabled="loading || saving" />
-            <div class="mt-6 flex flex-wrap justify-end gap-3">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                :label="t('common.cancel')"
-                :disabled="!hasChanges || loading || saving"
-                @click="handleCancel"
-              />
-              <UButton
-                color="primary"
-                :label="t('common.save')"
-                :disabled="!hasChanges || loading || saving"
-                :loading="saving"
-                data-testid="save-speech-button"
-                @click="handleSave"
-              />
-            </div>
+              <SpeechBlockEditorCard v-model="formState" :disabled="loading || saving" />
+              <div class="mt-6 flex flex-wrap justify-end gap-3">
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  :label="t('common.cancel')"
+                  :disabled="loading || saving"
+                  @click="handleCancel"
+                />
+                <UButton
+                  color="primary"
+                  :label="t('common.save')"
+                  :disabled="loading || saving"
+                  :loading="saving"
+                  data-testid="save-speech-button"
+                  @click="handleSave"
+                />
+              </div>
+            </template>
+
+            <template v-else>
+              <UCard class="mb-6">
+                <div>
+                  <p class="text-sm text-gray-500">{{ t('speech.detail.titleLabel') }}</p>
+                  <p class="text-base text-gray-900 dark:text-gray-100">
+                    {{ formState.title || t('speech.detail.untitled') }}
+                  </p>
+                </div>
+              </UCard>
+
+              <UCard>
+                <div class="space-y-2">
+                  <div>
+                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                      {{ t('speech.editor.sections.elevatorPitch.label') }}
+                    </h3>
+                    <p class="text-base text-gray-900 dark:text-gray-100">
+                      {{ formatSection(formState.elevatorPitch) }}
+                    </p>
+                  </div>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ t('speech.editor.sections.elevatorPitch.description') }}
+                  </p>
+                </div>
+              </UCard>
+
+              <UCard class="mt-6">
+                <div class="space-y-2">
+                  <div>
+                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                      {{ t('speech.editor.sections.careerStory.label') }}
+                    </h3>
+                    <p class="text-base text-gray-900 dark:text-gray-100">
+                      {{ formatSection(formState.careerStory) }}
+                    </p>
+                  </div>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ t('speech.editor.sections.careerStory.description') }}
+                  </p>
+                </div>
+              </UCard>
+
+              <UCard class="mt-6">
+                <div class="space-y-2">
+                  <div>
+                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                      {{ t('speech.editor.sections.whyMe.label') }}
+                    </h3>
+                    <p class="text-base text-gray-900 dark:text-gray-100">
+                      {{ formatSection(formState.whyMe) }}
+                    </p>
+                  </div>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ t('speech.editor.sections.whyMe.description') }}
+                  </p>
+                </div>
+              </UCard>
+
+              <div class="mt-6 flex justify-end">
+                <UButton
+                  color="primary"
+                  variant="outline"
+                  :label="t('common.edit')"
+                  icon="i-heroicons-pencil"
+                  @click="handleEdit"
+                />
+              </div>
+            </template>
           </template>
 
           <UAlert

@@ -93,6 +93,10 @@ test.describe('Speech Block E2E Flow', () => {
     // Wait for content to populate and UI to update
     await page.waitForTimeout(2000);
 
+    const editButton = page.getByRole('button', { name: /^Edit$/ });
+    await expect(editButton).toBeVisible();
+    await editButton.click();
+
     // Get all three textareas by their test ids (no proper labels on textareas)
     const elevatorPitchTextarea = page.getByTestId('speech-textarea-elevator-pitch');
     const careerStoryTextarea = page.getByTestId('speech-textarea-career-story');
@@ -103,12 +107,14 @@ test.describe('Speech Block E2E Flow', () => {
     await expect(careerStoryTextarea).not.toHaveValue('');
     await expect(whyMeTextarea).not.toHaveValue('');
 
-    // Save the generated content
+    // Save the generated content (ensure a change to enable Save)
     const saveButton = page.getByRole('button', { name: 'Save' });
+    const elevatorValue = await elevatorPitchTextarea.inputValue();
+    await elevatorPitchTextarea.fill(`${elevatorValue} ${Date.now()}`);
     await expect(saveButton).toBeEnabled();
     await saveButton.click();
-    await expect(saveButton).toBeDisabled({ timeout: 10000 });
     await expect(page.getByText('Speech saved', { exact: true })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole('button', { name: /^Edit$/ })).toBeVisible();
   });
 
   test('5. Edit content and verify persistence after reload', async ({ page }) => {
@@ -119,6 +125,10 @@ test.describe('Speech Block E2E Flow', () => {
 
     await page.goto(speechUrl);
     await page.waitForLoadState('networkidle');
+
+    const editButton = page.getByRole('button', { name: /^Edit$/ });
+    await expect(editButton).toBeVisible();
+    await editButton.click();
 
     const elevatorPitchTextarea = page.getByTestId('speech-textarea-elevator-pitch');
 
@@ -138,11 +148,9 @@ test.describe('Speech Block E2E Flow', () => {
     await expect(saveButton).toBeEnabled();
     await saveButton.click();
 
-    // Wait for save to complete with longer timeout
-    await expect(saveButton).toBeDisabled({ timeout: 15000 });
-
-    // Wait for success toast and let it disappear to ensure save completed
+    // Wait for success toast and view mode to return
     await expect(page.getByText('Speech saved', { exact: true })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('button', { name: /^Edit$/ })).toBeVisible();
     await expect(page.getByText('Speech saved', { exact: true })).not.toBeVisible({
       timeout: 10000,
     });
@@ -153,6 +161,10 @@ test.describe('Speech Block E2E Flow', () => {
 
     await page.goto(speechUrl);
     await page.waitForLoadState('networkidle');
+
+    const editAfterReload = page.getByRole('button', { name: /^Edit$/ });
+    await expect(editAfterReload).toBeVisible();
+    await editAfterReload.click();
 
     // Wait for form to fully load before checking content
     await expect(elevatorPitchTextarea).toBeVisible();

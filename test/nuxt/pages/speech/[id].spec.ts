@@ -203,9 +203,18 @@ describe('Speech detail page', () => {
     matchingSummaryMock.getByContext.mockResolvedValue({ id: 'summary-1' });
   });
 
-  it('loads speech block and renders editor', async () => {
+  it('loads speech block and renders view mode', async () => {
     const wrapper = await mountPage();
     expect(mockLoad).toHaveBeenCalled();
+    expect(wrapper.find('.speech-editor').exists()).toBe(false);
+
+    const editButton = wrapper.findAll('button').find((button) =>
+      button.text().includes(i18n.global.t('common.edit'))
+    );
+    expect(editButton).toBeDefined();
+
+    await editButton?.trigger('click');
+    await flushPromises();
     expect(wrapper.find('.speech-editor').exists()).toBe(true);
   });
 
@@ -240,6 +249,13 @@ describe('Speech detail page', () => {
 
   it('saves the speech title', async () => {
     const wrapper = await mountPage();
+
+    const editButton = wrapper.findAll('button').find((button) =>
+      button.text().includes(i18n.global.t('common.edit'))
+    );
+    expect(editButton).toBeDefined();
+    await editButton?.trigger('click');
+    await flushPromises();
 
     const titleInput = wrapper.find('[data-testid="speech-title-input"]');
     expect(titleInput.exists()).toBe(true);

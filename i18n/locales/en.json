@@ -1393,6 +1393,7 @@
       "untitled": "Untitled speech",
       "titleLabel": "Speech title",
       "titlePlaceholder": "e.g., Engineering leadership speech",
+      "emptySection": "No content yet.",
       "states": {
         "errorTitle": "Unable to load speech",
         "generateErrorTitle": "Unable to generate speech",
