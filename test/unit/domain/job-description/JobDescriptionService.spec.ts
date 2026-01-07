@@ -42,6 +42,7 @@ describe('JobDescriptionService', () => {
 
     mockCompanyRepo = {
       findByNormalizedName: vi.fn(),
+      getJobsByCompany: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<CompanyRepository>>;
@@ -113,9 +114,9 @@ describe('JobDescriptionService', () => {
 
   describe('listJobsByCompany', () => {
     it('returns empty array when companyId missing', async () => {
-      const result = await service.listJobsByCompany('', 'user-1::user-1');
+      const result = await service.listJobsByCompany('');
       expect(result).toEqual([]);
-      expect(mockRepository.listByOwner).not.toHaveBeenCalled();
+      expect(mockCompanyRepo.getJobsByCompany).not.toHaveBeenCalled();
     });
 
     it('fetches jobs filtered by companyId', async () => {
@@ -123,11 +124,11 @@ describe('JobDescriptionService', () => {
         { id: 'job-1', companyId: 'company-1' },
         { id: 'job-2', companyId: 'company-2' },
       ] as JobDescription[];
-      mockRepository.listByOwner.mockResolvedValue(mockJobs);
+      mockCompanyRepo.getJobsByCompany.mockResolvedValue([mockJobs[0]]);
 
-      const result = await service.listJobsByCompany('company-1', 'user-1::user-1');
+      const result = await service.listJobsByCompany('company-1');
 
-      expect(mockRepository.listByOwner).toHaveBeenCalledWith('user-1::user-1');
+      expect(mockCompanyRepo.getJobsByCompany).toHaveBeenCalledWith('company-1');
       expect(result).toEqual([mockJobs[0]]);
     });
   });

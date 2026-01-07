@@ -27,6 +27,12 @@ export function useCompany(companyId: string) {
     return result;
   };
 
+  const loadWithRelations = async () => {
+    const result = await run(() => service.getCompanyWithRelations(companyId));
+    company.value = result;
+    return result;
+  };
+
   const save = async (patch: Record<string, unknown>) => {
     const updated = await run(() => service.updateCompany(companyId, patch));
     company.value = updated;
@@ -44,6 +50,7 @@ export function useCompany(companyId: string) {
     loading,
     error,
     load,
+    loadWithRelations,
     save,
     analyze,
   };

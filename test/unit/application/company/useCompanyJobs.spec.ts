@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { ref } from 'vue';
 import { useCompanyJobs } from '@/application/company/useCompanyJobs';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 
@@ -9,13 +8,6 @@ vi.mock('@/domain/job-description/JobDescriptionService', () => ({
   JobDescriptionService: vi.fn().mockImplementation(() => ({
     listJobsByCompany: mockListJobsByCompany,
   })),
-}));
-vi.mock('@/composables/useAuthUser', () => ({
-  useAuthUser: () => ({
-    ownerId: ref('user-1::user-1'),
-    loadOwnerId: vi.fn().mockResolvedValue('user-1::user-1'),
-    getOwnerIdOrThrow: vi.fn().mockResolvedValue('user-1::user-1'),
-  }),
 }));
 
 describe('useCompanyJobs', () => {
@@ -32,7 +24,7 @@ describe('useCompanyJobs', () => {
     expect(loading.value).toBe(true);
     await promise;
 
-    expect(mockListJobsByCompany).toHaveBeenCalledWith('company-1', 'user-1::user-1');
+    expect(mockListJobsByCompany).toHaveBeenCalledWith('company-1');
     expect(jobsRef.value).toEqual(jobs);
     expect(error.value).toBeNull();
   });
@@ -45,5 +37,16 @@ describe('useCompanyJobs', () => {
 
     expect(error.value).toBe('Failed');
     expect(jobsRef.value).toEqual([]);
+  });
+
+  it('hydrates jobs without loading', () => {
+    const { jobs: jobsRef, hydrate, loading, error } = useCompanyJobs('company-1');
+    const items = [{ id: 'job-1' } as JobDescription];
+
+    hydrate(items);
+
+    expect(jobsRef.value).toEqual(items);
+    expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
   });
 });

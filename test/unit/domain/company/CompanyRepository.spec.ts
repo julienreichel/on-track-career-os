@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { CompanyRepository, type AmplifyCompanyModel } from '@/domain/company/CompanyRepository';
 import type { Company, CompanyCreateInput, CompanyUpdateInput } from '@/domain/company/Company';
+import type { JobDescription } from '@/domain/job-description/JobDescription';
 
 const { gqlOptionsMock } = vi.hoisted(() => ({
   gqlOptionsMock: vi.fn((custom?: Record<string, unknown>) => ({
@@ -64,6 +65,52 @@ describe('CompanyRepository', () => {
       const result = await repository.get('missing-id');
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe('getWithRelations', () => {
+    it('requests company with canvas and jobs', async () => {
+      const company = { id: 'company-1', companyName: 'Acme' } as Company;
+      mockModel.get.mockResolvedValue({ data: company });
+
+      const result = await repository.getWithRelations('company-1');
+
+      expect(mockModel.get).toHaveBeenCalledWith(
+        { id: 'company-1' },
+        expect.objectContaining({
+          selectionSet: expect.arrayContaining(['canvas.*', 'jobs.*']),
+        })
+      );
+      expect(result).toEqual(company);
+    });
+  });
+
+  describe('getJobsByCompany', () => {
+    it('returns jobs using selection set', async () => {
+      const jobs = [{ id: 'job-1' }, { id: 'job-2' }] as JobDescription[];
+      mockModel.get.mockResolvedValue({
+        data: {
+          id: 'company-1',
+          jobs,
+        },
+      });
+
+      const result = await repository.getJobsByCompany('company-1');
+
+      expect(mockModel.get).toHaveBeenCalledWith(
+        { id: 'company-1' },
+        expect.objectContaining({
+          selectionSet: ['id', 'jobs.*'],
+        })
+      );
+      expect(result).toEqual(jobs);
+    });
+
+    it('returns empty array when companyId is missing', async () => {
+      const result = await repository.getJobsByCompany('');
+
+      expect(result).toEqual([]);
+      expect(mockModel.get).not.toHaveBeenCalled();
     });
   });
 

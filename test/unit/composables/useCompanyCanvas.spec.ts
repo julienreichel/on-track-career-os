@@ -69,4 +69,27 @@ describe('useCompanyCanvas', () => {
     );
     expect(composable.dirty.value).toBe(false);
   });
+
+  it('hydrates state from provided canvas', () => {
+    const composable = useCompanyCanvas('c1');
+    const canvas = {
+      id: 'canvas-1',
+      companyId: 'c1',
+      customerSegments: ['Enterprise'],
+      valuePropositions: [],
+      channels: [],
+      customerRelationships: [],
+      revenueStreams: [],
+      keyResources: [],
+      keyActivities: [],
+      keyPartners: [],
+      costStructure: [],
+    } as CompanyCanvas;
+
+    composable.hydrate(canvas);
+
+    expect(composable.canvas.value).toEqual(canvas);
+    expect(composable.draftBlocks.value.customerSegments).toEqual(['Enterprise']);
+    expect(composable.dirty.value).toBe(false);
+  });
 });

@@ -45,6 +45,14 @@ export function useCompanyCanvas(companyId: string) {
     return result;
   };
 
+  const hydrate = (data: CompanyCanvas | null) => {
+    canvas.value = data;
+    hydrateDraft(data);
+    dirty.value = false;
+    loading.value = false;
+    error.value = null;
+  };
+
   const updateBlock = (block: CompanyCanvasBlockKey, values: string[]) => {
     draftBlocks.value[block] = values;
     dirty.value = true;
@@ -95,6 +103,7 @@ export function useCompanyCanvas(companyId: string) {
     loading,
     error,
     load,
+    hydrate,
     updateBlock,
     save,
     regenerate,

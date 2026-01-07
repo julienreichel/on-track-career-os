@@ -36,6 +36,10 @@ export class CompanyService {
     return this.repo.get(id);
   }
 
+  async getCompanyWithRelations(id: string) {
+    return this.repo.getWithRelations(id);
+  }
+
   async createCompany(input: CompanyInput, options?: { analyze?: boolean } & AnalyzeOptions) {
     if (!input.companyName?.trim()) {
       throw new Error('Company name is required');

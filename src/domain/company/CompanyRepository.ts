@@ -1,6 +1,7 @@
 import { gqlOptions } from '@/data/graphql/options';
 import { fetchAllListItems } from '@/data/graphql/pagination';
 import type { CompanyCreateInput, CompanyUpdateInput, Company } from './Company';
+import type { JobDescription } from '@/domain/job-description/JobDescription';
 import { normalizeCompanyName } from './companyMatching';
 
 export type AmplifyCompanyModel = {
@@ -50,6 +51,40 @@ export class CompanyRepository {
   async get(id: string) {
     const res = await this.model.get({ id }, gqlOptions());
     return res.data;
+  }
+
+  async getWithRelations(id: string) {
+    const selectionSet = [
+      'id',
+      'companyName',
+      'owner',
+      'industry',
+      'sizeRange',
+      'website',
+      'productsServices',
+      'targetMarkets',
+      'customerSegments',
+      'description',
+      'rawNotes',
+      'createdAt',
+      'updatedAt',
+      'canvas.*',
+      'jobs.*',
+    ];
+
+    const res = await this.model.get({ id }, gqlOptions({ selectionSet }));
+    return res.data;
+  }
+
+  async getJobsByCompany(companyId: string): Promise<JobDescription[]> {
+    if (!companyId) {
+      return [];
+    }
+
+    const selectionSet = ['id', 'jobs.*'];
+    const { data } = await this.model.get({ id: companyId }, gqlOptions({ selectionSet }));
+    const jobs = (data?.jobs ?? []) as JobDescription[];
+    return jobs.filter((job): job is JobDescription => Boolean(job));
   }
 
   async listByOwner(owner: string): Promise<Company[]> {

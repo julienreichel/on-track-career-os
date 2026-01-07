@@ -47,12 +47,12 @@ export class JobDescriptionService {
     return this.repo.listByOwner(ownerId);
   }
 
-  async listJobsByCompany(companyId: string, ownerId: string): Promise<JobDescription[]> {
-    if (!companyId || !ownerId) {
+  async listJobsByCompany(companyId: string): Promise<JobDescription[]> {
+    if (!companyId) {
       return [];
     }
-    const jobs = await this.repo.listByOwner(ownerId);
-    return jobs.filter((job) => job.companyId === companyId);
+
+    return this.companyRepo.getJobsByCompany(companyId);
   }
 
   async createJobFromRawText(rawText: string): Promise<JobDescription> {

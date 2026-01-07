@@ -11,6 +11,7 @@ describe('useCompany', () => {
   beforeEach(() => {
     service = {
       getCompany: vi.fn(),
+      getCompanyWithRelations: vi.fn(),
       updateCompany: vi.fn(),
       analyzeCompany: vi.fn(),
     } as unknown as vi.Mocked<CompanyService>;
@@ -33,5 +34,14 @@ describe('useCompany', () => {
 
     await composable.save({ companyName: 'Beta' });
     expect(composable.company.value).toEqual(updated);
+  });
+
+  it('loads company with relations', async () => {
+    const company = { id: 'c1', companyName: 'Acme' } as Company;
+    service.getCompanyWithRelations.mockResolvedValue(company);
+    const composable = useCompany('c1');
+
+    await composable.loadWithRelations();
+    expect(composable.company.value).toEqual(company);
   });
 });

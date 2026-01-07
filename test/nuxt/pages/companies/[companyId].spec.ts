@@ -24,17 +24,21 @@ const companyRef = ref<Company | null>({
 });
 
 const mockLoad = vi.fn().mockResolvedValue(companyRef.value);
+const mockLoadWithRelations = vi.fn();
 const mockSave = vi.fn().mockResolvedValue(companyRef.value);
 const mockAnalyze = vi.fn().mockResolvedValue(companyRef.value);
 const jobsRef = ref<JobDescription[]>([]);
 const jobsLoading = ref(false);
 const jobsError = ref<string | null>(null);
-const mockLoadJobs = vi.fn().mockResolvedValue([]);
+const mockHydrateJobs = vi.fn((items: JobDescription[]) => {
+  jobsRef.value = items;
+});
 
 vi.mock('@/application/company/useCompany', () => ({
   useCompany: () => ({
     company: companyRef,
     load: mockLoad,
+    loadWithRelations: mockLoadWithRelations,
     save: mockSave,
     analyze: mockAnalyze,
   }),
@@ -61,10 +65,17 @@ const canvasMock = {
   loading: ref(false),
   error: ref(null),
   load: vi.fn().mockResolvedValue(null),
+  hydrate: vi.fn(),
   updateBlock: vi.fn(),
   save: vi.fn().mockResolvedValue(null),
   regenerate: vi.fn().mockResolvedValue(null),
 };
+
+mockLoadWithRelations.mockResolvedValue({
+  ...companyRef.value,
+  canvas: canvasMock.canvas.value,
+  jobs: [],
+});
 
 vi.mock('@/application/company/useCompanyCanvas', () => ({
   useCompanyCanvas: () => canvasMock,
@@ -75,7 +86,7 @@ vi.mock('@/application/company/useCompanyJobs', () => ({
     jobs: jobsRef,
     loading: jobsLoading,
     error: jobsError,
-    load: mockLoadJobs,
+    hydrate: mockHydrateJobs,
   }),
 }));
 
@@ -185,8 +196,9 @@ describe('Company Detail Page', () => {
   it('loads company details on mount', async () => {
     await mountPage();
     await flushPromises();
-    expect(mockLoad).toHaveBeenCalled();
-    expect(mockLoadJobs).toHaveBeenCalled();
+    expect(mockLoadWithRelations).toHaveBeenCalled();
+    expect(canvasMock.hydrate).toHaveBeenCalled();
+    expect(mockHydrateJobs).toHaveBeenCalled();
   });
 
   it('saves company changes', async () => {
@@ -242,6 +254,11 @@ describe('Company Detail Page', () => {
         explicitPains: [],
       },
     ];
+    mockLoadWithRelations.mockResolvedValueOnce({
+      ...companyRef.value,
+      canvas: canvasMock.canvas.value,
+      jobs: jobsRef.value,
+    });
     const wrapper = await mountPage();
     await flushPromises();
 

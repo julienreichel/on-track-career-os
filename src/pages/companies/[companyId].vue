@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, computed, watch, onMounted } from 'vue';
+import { reactive, ref, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import CompanyForm, { type CompanyFormState } from '@/components/company/CompanyForm.vue';
@@ -115,27 +115,25 @@ watch(
   { immediate: true }
 );
 
-watch(companyId, async () => {
-  await loadCompany();
-  await canvasStore.load();
-  await jobsStore.load();
-});
-
-onMounted(async () => {
-  await loadCompany();
-  await canvasStore.load();
-  await jobsStore.load();
-  isEditing.value = false;
-});
+watch(
+  companyId,
+  async () => {
+    await loadCompany();
+  },
+  { immediate: true }
+);
 
 async function loadCompany() {
   loading.value = true;
   errorMessage.value = null;
   try {
-    const result = await companyStore.load();
+    const result = await companyStore.loadWithRelations();
     if (!result) {
       throw new Error(t('companies.detail.errors.notFound'));
     }
+    canvasStore.hydrate(result.canvas ?? null);
+    jobsStore.hydrate(result.jobs ?? []);
+    isEditing.value = false;
   } catch (error) {
     errorMessage.value =
       error instanceof Error ? error.message : t('companies.detail.errors.generic');

@@ -15,6 +15,7 @@ describe('CompanyService', () => {
   beforeEach(() => {
     repo = {
       get: vi.fn(),
+      getWithRelations: vi.fn(),
       listByOwner: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
@@ -140,6 +141,14 @@ describe('CompanyService', () => {
     expect(repo.get).toHaveBeenCalledWith('c1');
     expect(repo.delete).toHaveBeenCalledWith('c1');
     expect(company?.id).toBe('c1');
+  });
+
+  it('gets company with relations via repository', async () => {
+    repo.getWithRelations.mockResolvedValue({ id: 'c1' } as Company);
+    const result = await service.getCompanyWithRelations('c1');
+
+    expect(repo.getWithRelations).toHaveBeenCalledWith('c1');
+    expect(result?.id).toBe('c1');
   });
 
   it('triggers analyze step when requested during creation', async () => {
