@@ -10,6 +10,8 @@ import { useCompany } from '@/application/company/useCompany';
 import { useCompanyCanvas } from '@/application/company/useCompanyCanvas';
 import { useCompanyJobs } from '@/application/company/useCompanyJobs';
 import type { Company } from '@/domain/company/Company';
+import type { CompanyCanvas } from '@/domain/company-canvas/CompanyCanvas';
+import type { JobDescription } from '@/domain/job-description/JobDescription';
 
 const route = useRoute();
 const router = useRouter();
@@ -46,6 +48,11 @@ const jobsError = jobsStore.error;
 
 const toStringArray = (values?: (string | null)[] | null) =>
   (values ?? []).filter((entry): entry is string => typeof entry === 'string');
+
+type CompanyWithRelations = Company & {
+  canvas?: CompanyCanvas | null;
+  jobs?: JobDescription[] | null;
+};
 
 const headerLinks = computed(() => [
   {
@@ -131,8 +138,9 @@ async function loadCompany() {
     if (!result) {
       throw new Error(t('companies.detail.errors.notFound'));
     }
-    canvasStore.hydrate(result.canvas ?? null);
-    jobsStore.hydrate(result.jobs ?? []);
+    const hydrated = result as CompanyWithRelations;
+    canvasStore.hydrate(hydrated.canvas ?? null);
+    jobsStore.hydrate(hydrated.jobs ?? []);
     isEditing.value = false;
   } catch (error) {
     errorMessage.value =
