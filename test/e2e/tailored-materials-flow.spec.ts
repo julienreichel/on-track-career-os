@@ -39,7 +39,6 @@ test.describe('Tailored materials workflow', () => {
     }).toPass({ timeout: 20000 });
 
     const titleInput = page.locator('[data-testid="job-title-input"]');
-    await titleInput.scrollIntoViewIfNeeded();
 
     jobTitle = `E2E Tailored Job ${Date.now()}`;
     await titleInput.fill(jobTitle);

@@ -37,7 +37,6 @@ test.describe('Job analysis workflow', () => {
     }).toPass({ timeout: 20000 });
 
     const titleInput = page.locator('[data-testid="job-title-input"]');
-    await titleInput.scrollIntoViewIfNeeded();
 
     // Update the title and save
     const newTitle = `Head of Engineering Automation ${Date.now()}`;
