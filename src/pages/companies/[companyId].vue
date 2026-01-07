@@ -366,14 +366,6 @@ function clearJobsError() {
                   class="flex flex-col gap-3 sm:flex-row sm:justify-end"
                 >
                   <UButton
-                    color="neutral"
-                    variant="ghost"
-                    :label="t('common.cancel')"
-                    :disabled="disableActions"
-                    data-testid="company-cancel-button"
-                    @click="handleCancel"
-                  />
-                  <UButton
                     color="secondary"
                     icon="i-heroicons-sparkles"
                     :label="t('companies.detail.actions.analyze')"
@@ -381,6 +373,14 @@ function clearJobsError() {
                     :disabled="disableActions"
                     data-testid="company-analyze-button"
                     @click="analyzeCompanyInfo"
+                  />
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    :label="t('common.cancel')"
+                    :disabled="disableActions"
+                    data-testid="company-cancel-button"
+                    @click="handleCancel"
                   />
                   <UButton
                     color="primary"

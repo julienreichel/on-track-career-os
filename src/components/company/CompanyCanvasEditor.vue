@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import CanvasBlockSection from './CanvasBlockSection.vue';
 import type { CompanyCanvasBlockKey } from '@/domain/company-canvas/canvasBlocks';
@@ -28,6 +28,8 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const isEditing = ref(false);
+const disableEdit = computed(() => props.disabled || props.regenerating || props.saving);
 
 const formattedLastGeneratedAt = computed(() => {
   if (!props.lastGeneratedAt) {
@@ -67,9 +69,6 @@ const formattedLastGeneratedAt = computed(() => {
                 : t('companies.canvas.status.upToDate')
             }}
           </UBadge>
-          <span>
-            {{ t('companies.canvas.lastGeneratedAt', { date: formattedLastGeneratedAt }) }}
-          </span>
         </div>
       </div>
     </template>
@@ -84,6 +83,8 @@ const formattedLastGeneratedAt = computed(() => {
           :hint="t('companies.canvas.blocks.keyPartners.hint')"
           :model-value="blocks.keyPartners ?? []"
           :disabled="disabled || saving || regenerating"
+          :read-only="!isEditing"
+          :empty-label="t('common.notAvailable')"
           @update:model-value="(value) => emit('update:block', 'keyPartners', value)"
         />
 
@@ -95,6 +96,8 @@ const formattedLastGeneratedAt = computed(() => {
             :hint="t('companies.canvas.blocks.keyActivities.hint')"
             :model-value="blocks.keyActivities ?? []"
             :disabled="disabled || saving || regenerating"
+            :read-only="!isEditing"
+            :empty-label="t('common.notAvailable')"
             @update:model-value="(value) => emit('update:block', 'keyActivities', value)"
           />
           <CanvasBlockSection
@@ -103,6 +106,8 @@ const formattedLastGeneratedAt = computed(() => {
             :hint="t('companies.canvas.blocks.keyResources.hint')"
             :model-value="blocks.keyResources ?? []"
             :disabled="disabled || saving || regenerating"
+            :read-only="!isEditing"
+            :empty-label="t('common.notAvailable')"
             @update:model-value="(value) => emit('update:block', 'keyResources', value)"
           />
         </div>
@@ -114,6 +119,8 @@ const formattedLastGeneratedAt = computed(() => {
           :hint="t('companies.canvas.blocks.valuePropositions.hint')"
           :model-value="blocks.valuePropositions ?? []"
           :disabled="disabled || saving || regenerating"
+          :read-only="!isEditing"
+          :empty-label="t('common.notAvailable')"
           @update:model-value="(value) => emit('update:block', 'valuePropositions', value)"
         />
 
@@ -125,6 +132,8 @@ const formattedLastGeneratedAt = computed(() => {
             :hint="t('companies.canvas.blocks.customerRelationships.hint')"
             :model-value="blocks.customerRelationships ?? []"
             :disabled="disabled || saving || regenerating"
+            :read-only="!isEditing"
+            :empty-label="t('common.notAvailable')"
             @update:model-value="(value) => emit('update:block', 'customerRelationships', value)"
           />
           <CanvasBlockSection
@@ -133,6 +142,8 @@ const formattedLastGeneratedAt = computed(() => {
             :hint="t('companies.canvas.blocks.channels.hint')"
             :model-value="blocks.channels ?? []"
             :disabled="disabled || saving || regenerating"
+            :read-only="!isEditing"
+            :empty-label="t('common.notAvailable')"
             @update:model-value="(value) => emit('update:block', 'channels', value)"
           />
         </div>
@@ -144,6 +155,8 @@ const formattedLastGeneratedAt = computed(() => {
           :hint="t('companies.canvas.blocks.customerSegments.hint')"
           :model-value="blocks.customerSegments ?? []"
           :disabled="disabled || saving || regenerating"
+          :read-only="!isEditing"
+          :empty-label="t('common.notAvailable')"
           @update:model-value="(value) => emit('update:block', 'customerSegments', value)"
         />
       </div>
@@ -156,6 +169,8 @@ const formattedLastGeneratedAt = computed(() => {
           :hint="t('companies.canvas.blocks.costStructure.hint')"
           :model-value="blocks.costStructure ?? []"
           :disabled="disabled || saving || regenerating"
+          :read-only="!isEditing"
+          :empty-label="t('common.notAvailable')"
           @update:model-value="(value) => emit('update:block', 'costStructure', value)"
         />
         <CanvasBlockSection
@@ -164,29 +179,54 @@ const formattedLastGeneratedAt = computed(() => {
           :hint="t('companies.canvas.blocks.revenueStreams.hint')"
           :model-value="blocks.revenueStreams ?? []"
           :disabled="disabled || saving || regenerating"
+          :read-only="!isEditing"
+          :empty-label="t('common.notAvailable')"
           @update:model-value="(value) => emit('update:block', 'revenueStreams', value)"
         />
       </div>
     </div>
 
     <template #footer>
-      <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <UButton
-          color="secondary"
-          icon="i-heroicons-sparkles"
-          :label="t('companies.canvas.actions.generate')"
-          :loading="regenerating"
-          :disabled="saving"
-          @click="emit('regenerate')"
-        />
-        <UButton
-          color="primary"
-          icon="i-heroicons-document-check"
-          :label="t('companies.canvas.actions.save')"
-          :loading="saving"
-          :disabled="regenerating"
-          @click="emit('save')"
-        />
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-xs text-gray-400">
+          {{ t('companies.canvas.lastGeneratedAt', { date: formattedLastGeneratedAt }) }}
+        </p>
+        <div class="flex flex-wrap justify-end gap-3">
+          <UButton
+            color="secondary"
+            icon="i-heroicons-sparkles"
+            :label="t('companies.canvas.actions.generate')"
+            :loading="regenerating"
+            :disabled="saving"
+            @click="emit('regenerate')"
+          />
+          <template v-if="isEditing">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              :label="t('common.cancel')"
+              :disabled="disableEdit"
+              @click="isEditing = false"
+            />
+            <UButton
+              color="primary"
+              icon="i-heroicons-check"
+              :label="t('companies.canvas.actions.save')"
+              :loading="saving"
+              :disabled="regenerating"
+              @click="emit('save')"
+            />
+          </template>
+          <UButton
+            v-else
+            color="primary"
+            variant="outline"
+            icon="i-heroicons-pencil"
+            :label="t('common.edit')"
+            :disabled="disableEdit"
+            @click="isEditing = true"
+          />
+        </div>
       </div>
     </template>
   </UCard>
