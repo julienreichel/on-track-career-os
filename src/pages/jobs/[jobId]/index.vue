@@ -55,9 +55,8 @@ const errorMessage = ref<string | null>(null);
 const matchingSummary = ref<MatchingSummary | null>(null);
 const matchingSummaryLoading = ref(false);
 const matchingSummaryError = ref<string | null>(null);
-const showReanalyseModal = ref(false);
-const reanalysing = ref(false);
 const saving = ref(false);
+const isEditing = ref(false);
 const selectedCompanyId = ref<string | null>(null);
 const linkingCompany = ref(false);
 
@@ -130,12 +129,6 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     to: '/jobs',
   },
   {
-    label: t('jobDetail.actions.reanalyse'),
-    icon: 'i-heroicons-arrow-path',
-    onClick: () => (showReanalyseModal.value = true),
-    disabled: loading.value || reanalysing.value,
-  },
-  {
     label: t('jobDetail.match.view'),
     icon: 'i-heroicons-sparkles',
     to: matchLink.value,
@@ -149,6 +142,12 @@ const statusLabel = computed(() => {
   return t(`jobList.status.${status}`);
 });
 
+const viewListSections = computed(() =>
+  listSections.value.map((section) => ({
+    ...section,
+    items: form[section.key] as string[],
+  }))
+);
 
 const formattedCreatedAt = computed(() => formatDate(job.value?.createdAt));
 const formattedUpdatedAt = computed(() => formatDate(job.value?.updatedAt));
@@ -182,6 +181,7 @@ onMounted(async () => {
     await loadJob();
   }
   await loadCompanies();
+  isEditing.value = false;
 });
 
 const isDirty = computed(() => {
@@ -204,9 +204,7 @@ const isDirty = computed(() => {
   });
 });
 
-const disableActions = computed(() => saving.value || reanalysing.value);
-const canSave = computed(() => isDirty.value && !disableActions.value);
-const canCancel = computed(() => isDirty.value && !disableActions.value);
+const disableActions = computed(() => saving.value);
 const companySelectorDisabled = computed(
   () => loading.value || companyStore.loading.value || linkingCompany.value
 );
@@ -330,10 +328,6 @@ function formatDate(value?: string | null) {
   }
 }
 
-function closeReanalyseModal() {
-  showReanalyseModal.value = false;
-}
-
 function updateListField(field: ListField, value: string[]) {
   form[field] = [...value];
 }
@@ -357,7 +351,11 @@ function buildUpdatePayload(): Partial<JobDescriptionUpdateInput> {
 
 async function handleSave() {
   const id = jobId.value;
-  if (!id || !isDirty.value) {
+  if (!id) {
+    return;
+  }
+  if (!isDirty.value) {
+    isEditing.value = false;
     return;
   }
 
@@ -368,6 +366,7 @@ async function handleSave() {
     const payload = buildUpdatePayload();
     const updated = await jobAnalysis.updateJob(id, payload);
     hydrateForm(updated);
+    isEditing.value = false;
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : t('jobDetail.errors.generic');
   } finally {
@@ -376,9 +375,22 @@ async function handleSave() {
 }
 
 function handleCancel() {
+  if (!isDirty.value) {
+    isEditing.value = false;
+    return;
+  }
   if (job.value) {
     hydrateForm(job.value);
   }
+  isEditing.value = false;
+}
+
+function handleEdit() {
+  if (!job.value) {
+    return;
+  }
+  hydrateForm(job.value);
+  isEditing.value = true;
 }
 
 async function handleCompanyLinkChange(nextCompanyId: string | null) {
@@ -419,26 +431,6 @@ function redirectToCompanyCreate() {
   });
 }
 
-async function confirmReanalyse() {
-  const id = jobId.value;
-  if (!id) {
-    return;
-  }
-
-  reanalysing.value = true;
-  errorMessage.value = null;
-
-  try {
-    const updated = await jobAnalysis.reanalyseJob(id);
-    hydrateForm(updated);
-  } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : t('jobDetail.errors.generic');
-  } finally {
-    reanalysing.value = false;
-    closeReanalyseModal();
-  }
-}
-
 </script>
 
 <template>
@@ -470,145 +462,215 @@ async function confirmReanalyse() {
         </UCard>
 
         <template v-else-if="job">
-          <UCard class="mb-6">
-            <div class="flex flex-col gap-6">
-              <div class="grid gap-4 md:grid-cols-2">
-                <UFormField :label="t('jobDetail.fields.title')">
-                  <UInput
-                    v-model="form.title"
-                    :placeholder="t('jobDetail.placeholders.title')"
+          <template v-if="isEditing">
+            <UCard class="mb-6">
+              <div class="flex flex-col gap-6">
+                <div class="grid gap-4 md:grid-cols-2">
+                  <UFormField :label="t('jobDetail.fields.title')">
+                    <UInput
+                      v-model="form.title"
+                      :placeholder="t('jobDetail.placeholders.title')"
+                      :disabled="disableActions"
+                      class="w-full"
+                      data-testid="job-title-input"
+                    />
+                  </UFormField>
+
+                  <UFormField :label="t('jobDetail.fields.seniorityLevel')">
+                    <UInput
+                      v-model="form.seniorityLevel"
+                      :placeholder="t('jobDetail.placeholders.seniorityLevel')"
+                      :disabled="disableActions"
+                      data-testid="job-seniority-input"
+                    />
+                  </UFormField>
+                </div>
+
+                <UFormField :label="t('jobDetail.fields.roleSummary')">
+                  <UTextarea
+                    v-model="form.roleSummary"
+                    :placeholder="t('jobDetail.placeholders.roleSummary')"
                     :disabled="disableActions"
+                    :rows="4"
                     class="w-full"
-                    data-testid="job-title-input"
+                    data-testid="job-summary-input"
                   />
                 </UFormField>
 
-                <UFormField :label="t('jobDetail.fields.seniorityLevel')">
-                  <UInput
-                    v-model="form.seniorityLevel"
-                    :placeholder="t('jobDetail.placeholders.seniorityLevel')"
-                    :disabled="disableActions"
-                    data-testid="job-seniority-input"
-                  />
-                </UFormField>
-              </div>
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <p class="text-sm text-gray-500">
+                      {{ t('jobDetail.meta.status') }}
+                    </p>
+                    <UBadge color="primary" variant="soft" class="mt-1">
+                      {{ statusLabel }}
+                    </UBadge>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">
+                      {{ t('jobDetail.meta.updatedAt') }}
+                    </p>
+                    <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                      {{ formattedUpdatedAt || t('jobDetail.meta.notAvailable') }}
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">
+                      {{ t('jobDetail.meta.createdAt') }}
+                    </p>
+                    <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                      {{ formattedCreatedAt || t('jobDetail.meta.notAvailable') }}
+                    </p>
+                  </div>
+                  <div v-if="linkedCompany">
+                    <p class="text-sm text-gray-500">
+                      {{ t('jobDetail.meta.companyId') }}
+                    </p>
+                    <div class="mt-1 flex items-center gap-2">
+                      <LinkedCompanyBadge :company="linkedCompany" />
+                      <UButton
+                        size="xs"
+                        variant="ghost"
+                        color="neutral"
+                        icon="i-heroicons-x-mark-20-solid"
+                        :aria-label="t('jobDetail.companyLink.clear')"
+                        data-testid="job-company-clear"
+                        :disabled="linkingCompany"
+                        @click="handleCompanyLinkClear"
+                      />
+                    </div>
+                  </div>
+                </div>
 
-              <UFormField :label="t('jobDetail.fields.roleSummary')">
-                <UTextarea
-                  v-model="form.roleSummary"
-                  :placeholder="t('jobDetail.placeholders.roleSummary')"
-                  :disabled="disableActions"
-                  :rows="4"
-                  class="w-full"
-                  data-testid="job-summary-input"
-                />
-              </UFormField>
-
-              <div class="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <p class="text-sm text-gray-500">
-                    {{ t('jobDetail.meta.status') }}
-                  </p>
-                  <UBadge color="primary" variant="soft" class="mt-1">
-                    {{ statusLabel }}
-                  </UBadge>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500">
-                    {{ t('jobDetail.meta.updatedAt') }}
-                  </p>
-                  <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">
-                    {{ formattedUpdatedAt || t('jobDetail.meta.notAvailable') }}
-                  </p>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500">
-                    {{ t('jobDetail.meta.createdAt') }}
-                  </p>
-                  <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">
-                    {{ formattedCreatedAt || t('jobDetail.meta.notAvailable') }}
-                  </p>
-                </div>
-                <div v-if="linkedCompany">
-                  <p class="text-sm text-gray-500">
-                    {{ t('jobDetail.meta.companyId') }}
-                  </p>
-                  <div class="mt-1 flex items-center gap-2">
-                    <LinkedCompanyBadge :company="linkedCompany" />
-                    <UButton
-                      size="xs"
-                      variant="ghost"
-                      color="neutral"
-                      icon="i-heroicons-x-mark-20-solid"
-                      :aria-label="t('jobDetail.companyLink.clear')"
-                      data-testid="job-company-clear"
-                      :disabled="linkingCompany"
-                      @click="handleCompanyLinkClear"
+                <div v-if="!selectedCompanyId || !linkedCompany" class="mt-6">
+                  <div class="mt-3">
+                    <CompanySelector
+                      :model-value="selectedCompanyId"
+                      :companies="availableCompanies"
+                      :loading="companyStore.loading.value || linkingCompany"
+                      :disabled="companySelectorDisabled"
+                      @update:model-value="handleCompanyLinkChange"
+                      @clear="handleCompanyLinkClear"
+                      @create="redirectToCompanyCreate"
                     />
                   </div>
                 </div>
               </div>
+            </UCard>
 
-              <div v-if="!selectedCompanyId || !linkedCompany" class="mt-6">
-                <div class="mt-3">
-                  <CompanySelector
-                    :model-value="selectedCompanyId"
-                    :companies="availableCompanies"
-                    :loading="companyStore.loading.value || linkingCompany"
-                    :disabled="companySelectorDisabled"
-                    @update:model-value="handleCompanyLinkChange"
-                    @clear="handleCompanyLinkClear"
-                    @create="redirectToCompanyCreate"
+            <UCard>
+              <template #header>
+                <div>
+                  <h3 class="text-lg font-semibold">{{ t('jobDetail.sections.parsedData') }}</h3>
+                  <p class="text-sm text-gray-500">
+                    {{ t('jobDetail.sections.description') }}
+                  </p>
+                </div>
+              </template>
+
+              <UTabs :items="tabItems" class="mt-4">
+                <template v-for="section in listSections" :key="section.key" #[section.key]>
+                  <TagInput
+                    :model-value="form[section.key] as string[]"
+                    :label="section.label"
+                    color="primary"
+                    :placeholder="section.placeholder"
+                    :hint="section.hint"
+                    :disabled="disableActions"
+                    :data-testid="`job-tag-${section.key}`"
+                    @update:model-value="updateListField(section.key as ListField, $event)"
                   />
+                </template>
+              </UTabs>
+
+              <div class="mt-6 flex flex-wrap justify-end gap-3">
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  :label="t('common.cancel')"
+                  :disabled="disableActions"
+                  data-testid="job-cancel-button"
+                  @click="handleCancel"
+                />
+                <UButton
+                  color="primary"
+                  :label="t('common.save')"
+                  icon="i-heroicons-check"
+                  :disabled="disableActions"
+                  :loading="saving"
+                  data-testid="job-save-button"
+                  @click="handleSave"
+                />
+              </div>
+            </UCard>
+          </template>
+
+          <template v-else>
+            <UCard class="mb-6">
+              <div class="flex flex-col gap-6">
+                <div class="grid gap-4 md:grid-cols-2">
+                  <UFormField :label="t('jobDetail.fields.title')">
+                    <p>{{ form.title || t('jobDetail.meta.notAvailable') }}</p>
+                  </UFormField>
+                  <UFormField :label="t('jobDetail.fields.seniorityLevel')">
+                    <p>{{ form.seniorityLevel || t('jobDetail.meta.notAvailable') }}</p>
+                  </UFormField>
+                </div>
+                <UFormField :label="t('jobDetail.fields.roleSummary')">
+                  <p>{{ form.roleSummary || t('jobDetail.meta.notAvailable') }}</p>
+                </UFormField>
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <UFormField :label="t('jobDetail.meta.status')">
+                    <UBadge color="primary" variant="soft">
+                      {{ statusLabel }}
+                    </UBadge>
+                  </UFormField>
+                  <UFormField :label="t('jobDetail.meta.updatedAt')">
+                    <p>{{ formattedUpdatedAt || t('jobDetail.meta.notAvailable') }}</p>
+                  </UFormField>
+                  <UFormField :label="t('jobDetail.meta.createdAt')">
+                    <p>{{ formattedCreatedAt || t('jobDetail.meta.notAvailable') }}</p>
+                  </UFormField>
+                  <UFormField :label="t('jobDetail.meta.companyId')">
+                    <LinkedCompanyBadge v-if="linkedCompany" :company="linkedCompany" />
+                    <p v-else>{{ t('jobDetail.meta.notAvailable') }}</p>
+                  </UFormField>
                 </div>
               </div>
-            </div>
-          </UCard>
+            </UCard>
 
-          <UCard>
-            <template #header>
-              <div>
-                <h3 class="text-lg font-semibold">{{ t('jobDetail.sections.parsedData') }}</h3>
-                <p class="text-sm text-gray-500">
-                  {{ t('jobDetail.sections.description') }}
-                </p>
-              </div>
-            </template>
-
-            <UTabs :items="tabItems" class="mt-4">
-              <template v-for="section in listSections" :key="section.key" #[section.key]>
-                <TagInput
-                  :model-value="form[section.key] as string[]"
-                  :label="section.label"
-                  color="primary"
-                  :placeholder="section.placeholder"
-                  :hint="section.hint"
-                  :disabled="disableActions"
-                  :data-testid="`job-tag-${section.key}`"
-                  @update:model-value="updateListField(section.key as ListField, $event)"
-                />
+            <UCard>
+              <template #header>
+                <div>
+                  <h3 class="text-lg font-semibold">{{ t('jobDetail.sections.parsedData') }}</h3>
+                  <p class="text-sm text-gray-500">
+                    {{ t('jobDetail.sections.description') }}
+                  </p>
+                </div>
               </template>
-            </UTabs>
 
-            <div class="mt-6 flex flex-wrap justify-end gap-3">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                :label="t('common.cancel')"
-                :disabled="!canCancel"
-                data-testid="job-cancel-button"
-                @click="handleCancel"
-              />
-              <UButton
-                color="primary"
-                :label="t('common.save')"
-                :disabled="!canSave"
-                :loading="saving"
-                data-testid="job-save-button"
-                @click="handleSave"
-              />
-            </div>
-          </UCard>
+              <UTabs :items="tabItems" class="mt-4">
+                <template v-for="section in viewListSections" :key="section.key" #[section.key]>
+                  <ul v-if="section.items.length" class="list-disc space-y-1 pl-4">
+                    <li v-for="item in section.items" :key="item">
+                      {{ item }}
+                    </li>
+                  </ul>
+                  <p v-else>{{ t('jobDetail.meta.notAvailable') }}</p>
+                </template>
+              </UTabs>
+
+              <div class="mt-6 flex justify-end">
+                <UButton
+                  color="primary"
+                  variant="outline"
+                  :label="t('common.edit')"
+                  icon="i-heroicons-pencil"
+                  @click="handleEdit"
+                />
+              </div>
+            </UCard>
+          </template>
 
           <TailoredMaterialsCard
             :job="job"
@@ -630,25 +692,5 @@ async function confirmReanalyse() {
       </UPageBody>
     </UPage>
 
-    <UModal v-model:open="showReanalyseModal" :title="t('jobDetail.reanalyse.title')">
-      <template #body>
-        <p>{{ t('jobDetail.reanalyse.message') }}</p>
-      </template>
-      <template #footer>
-        <UButton
-          color="neutral"
-          variant="ghost"
-          :label="t('jobDetail.reanalyse.cancel')"
-          @click="closeReanalyseModal"
-        />
-        <UButton
-          color="primary"
-          :label="t('jobDetail.reanalyse.confirm')"
-          :loading="reanalysing"
-          data-testid="job-reanalyse-confirm"
-          @click="confirmReanalyse"
-        />
-      </template>
-    </UModal>
   </UContainer>
 </template>

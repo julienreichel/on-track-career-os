@@ -29,14 +29,18 @@ test.describe('Tailored materials workflow', () => {
     await fileInput.setInputFiles(JOB_FIXTURE);
 
     await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 60000 });
+    const editButton = page.getByRole('button', { name: /^Edit$/ });
+    await expect(editButton).toBeVisible({ timeout: 60000 });
+    await editButton.click();
+
     const titleInput = page.locator('[data-testid="job-title-input"]');
-    await expect(titleInput).toBeVisible({ timeout: 60000 });
+    await expect(titleInput).toBeVisible({ timeout: 10000 });
 
     jobTitle = `E2E Tailored Job ${Date.now()}`;
     await titleInput.fill(jobTitle);
     const saveButton = page.locator('[data-testid="job-save-button"]');
     await saveButton.click();
-    await expect(saveButton).toBeDisabled({ timeout: 10000 });
+    await expect(page.getByRole('button', { name: /^Edit$/ })).toBeVisible({ timeout: 10000 });
 
     const jobDetailUrl = page.url();
     const jobIdMatch = jobDetailUrl.match(/\/jobs\/([0-9a-f-]+)$/i);

@@ -26,15 +26,19 @@ test.describe('Job analysis workflow', () => {
 
     // Uploading triggers parsing + AI analysis, wait for redirect
     await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 60000 });
+    const editButton = page.getByRole('button', { name: /^Edit$/ });
+    await expect(editButton).toBeVisible({ timeout: 60000 });
+    await editButton.click();
+
     const titleInput = page.locator('[data-testid="job-title-input"]');
-    await expect(titleInput).toBeVisible({ timeout: 60000 });
+    await expect(titleInput).toBeVisible({ timeout: 10000 });
 
     // Update the title and save
     const newTitle = `Head of Engineering Automation ${Date.now()}`;
     await titleInput.fill(newTitle);
     const saveButton = page.locator('[data-testid="job-save-button"]');
     await saveButton.click();
-    await expect(saveButton).toBeDisabled({ timeout: 10000 });
+    await expect(page.getByRole('button', { name: /^Edit$/ })).toBeVisible({ timeout: 10000 });
 
     // Return to job list and verify the new job exists
     await page.goto('/jobs');
@@ -49,6 +53,7 @@ test.describe('Job analysis workflow', () => {
       .filter({ has: page.locator('h3', { hasText: newTitle }) });
     await newJobCard.getByRole('button', { name: /edit/i }).click();
     await expect(page).toHaveURL(/\/jobs\/[0-9a-f-]+$/i);
+    await page.getByRole('button', { name: /^Edit$/ }).click();
     await expect(page.locator('[data-testid="job-title-input"]')).toHaveValue(newTitle);
   });
 });

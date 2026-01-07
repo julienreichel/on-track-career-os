@@ -266,8 +266,7 @@ describe('Job Detail Page', () => {
 
   it('renders job details', async () => {
     const wrapper = await mountPage();
-    const titleInput = wrapper.find('[data-testid="job-title-input"]');
-    expect((titleInput.element as HTMLInputElement).value).toBe('Lead Engineer');
+    expect(wrapper.text()).toContain('Lead Engineer');
     expect(router.currentRoute.value.meta.breadcrumbLabel).toBe('Lead Engineer');
     expect(wrapper.find('.tailored-materials-card').exists()).toBe(true);
   });
@@ -279,6 +278,11 @@ describe('Job Detail Page', () => {
     });
 
     const wrapper = await mountPage();
+    const editButton = wrapper
+      .findAll('.u-button')
+      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+    await editButton?.trigger('click');
+
     const titleInput = wrapper.find('[data-testid="job-title-input"]');
     await titleInput.setValue('Director of Engineering');
     expect(mockUpdateJob).not.toHaveBeenCalled();
@@ -305,6 +309,11 @@ describe('Job Detail Page', () => {
     });
 
     const wrapper = await mountPage();
+    const editButton = wrapper
+      .findAll('.u-button')
+      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+    await editButton?.trigger('click');
+
     const tagInput = wrapper
       .findAllComponents({ name: 'TagInput' })
       .find((component) => component.attributes('data-testid') === 'job-tag-responsibilities');
@@ -330,27 +339,19 @@ describe('Job Detail Page', () => {
 
   it('resets changes when cancel is clicked', async () => {
     const wrapper = await mountPage();
+    const editButton = wrapper
+      .findAll('.u-button')
+      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+    await editButton?.trigger('click');
+
     const titleInput = wrapper.find('[data-testid="job-title-input"]');
     await titleInput.setValue('Changed Title');
 
     const cancelButton = wrapper.find('[data-testid="job-cancel-button"]');
     await cancelButton.trigger('click');
 
-    expect((titleInput.element as HTMLInputElement).value).toBe('Lead Engineer');
+    expect(wrapper.find('[data-testid="job-title-input"]').exists()).toBe(false);
     expect(mockUpdateJob).not.toHaveBeenCalled();
-  });
-
-  it('reanalyses job when confirmed', async () => {
-    mockReanalyseJob.mockResolvedValue(selectedJob.value);
-
-    const wrapper = await mountPage();
-    const reanalyseButton = wrapper.findAll('.header-link')[1];
-    await reanalyseButton.trigger('click');
-
-    const confirm = wrapper.find('[data-testid="job-reanalyse-confirm"]');
-    await confirm.trigger('click');
-
-    expect(mockReanalyseJob).toHaveBeenCalledWith('job-1');
   });
 
   it('links a company when selector emits an update', async () => {
@@ -362,6 +363,10 @@ describe('Job Detail Page', () => {
     selectedJob.value = { ...baseJob, companyId: null };
 
     const wrapper = await mountPage();
+    const editButton = wrapper
+      .findAll('.u-button')
+      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+    await editButton?.trigger('click');
     const linkButton = wrapper.find('.select-company');
     await linkButton.trigger('click');
 
@@ -375,6 +380,10 @@ describe('Job Detail Page', () => {
     });
 
     const wrapper = await mountPage();
+    const editButton = wrapper
+      .findAll('.u-button')
+      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+    await editButton?.trigger('click');
     const clearButton = wrapper.find('[data-testid="job-company-clear"]');
     await clearButton.trigger('click');
 

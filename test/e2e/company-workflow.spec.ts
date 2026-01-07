@@ -124,7 +124,9 @@ test.describe('Company workflow', () => {
     await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 60000 });
     jobDetailUrl = page.url();
 
+    await page.getByRole('button', { name: /^Edit$/i }).click();
     const jobTitleInput = page.getByLabel('Job title');
+    await expect(jobTitleInput).toBeVisible({ timeout: 10000 });
     await jobTitleInput.fill(JOB_TITLE);
     const saveJobButton = page.getByRole('button', { name: /^Save$/i }).last();
     await saveJobButton.click();
@@ -137,6 +139,8 @@ test.describe('Company workflow', () => {
 
     await page.goto(jobDetailUrl!);
     await page.waitForLoadState('networkidle');
+
+    await page.getByRole('button', { name: /^Edit$/i }).click();
 
     const clearLinkButton = page.getByRole('button', { name: /clear link/i });
     if (await clearLinkButton.isVisible()) {
