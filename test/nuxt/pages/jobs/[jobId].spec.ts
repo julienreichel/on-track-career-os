@@ -249,7 +249,7 @@ async function mountPage() {
     },
   });
 
-  await Promise.resolve();
+  await flushPromises();
   return wrapper;
 }
 
@@ -257,6 +257,10 @@ describe('Job Detail Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     selectedJob.value = { ...baseJob };
+    mockLoadJob.mockImplementation(async () => {
+      selectedJob.value = { ...baseJob };
+      return selectedJob.value;
+    });
     companyStoreMock.rawCompanies.value = [
       { id: 'company-1', companyName: 'Acme Corp' },
       { id: 'company-2', companyName: 'Global Freight' },
@@ -365,6 +369,10 @@ describe('Job Detail Page', () => {
     });
 
     selectedJob.value = { ...baseJob, companyId: null };
+    mockLoadJob.mockImplementationOnce(async () => {
+      selectedJob.value = { ...baseJob, companyId: null };
+      return selectedJob.value;
+    });
 
     const wrapper = await mountPage();
     const editButton = wrapper

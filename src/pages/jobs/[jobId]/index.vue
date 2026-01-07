@@ -165,9 +165,21 @@ watch(
   { immediate: true }
 );
 
-watch(jobId, () => {
-  loadJob();
-});
+watch(
+  jobId,
+  (nextJobId, previousJobId) => {
+    if (!nextJobId) {
+      return;
+    }
+    if (nextJobId !== previousJobId) {
+      job.value = null;
+      resetForm();
+      updateBreadcrumb(null);
+    }
+    loadJob();
+  },
+  { immediate: true }
+);
 
 watch(
   [jobId, () => job.value?.companyId, () => auth.userId.value],
@@ -179,9 +191,6 @@ watch(
 
 
 onMounted(async () => {
-  if (!job.value) {
-    await loadJob();
-  }
   await loadCompanies();
   isEditing.value = false;
 });
@@ -226,6 +235,18 @@ function hydrateForm(data: JobDescription) {
   form.successCriteria = toStringList(data.successCriteria);
   form.explicitPains = toStringList(data.explicitPains);
   selectedCompanyId.value = data.companyId ?? null;
+}
+
+function resetForm() {
+  form.title = '';
+  form.seniorityLevel = '';
+  form.roleSummary = '';
+  form.responsibilities = [];
+  form.requiredSkills = [];
+  form.behaviours = [];
+  form.successCriteria = [];
+  form.explicitPains = [];
+  selectedCompanyId.value = null;
 }
 
 async function loadJob() {
