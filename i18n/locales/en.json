@@ -100,7 +100,8 @@
       "updatedAt": "Updated {date}",
       "products": "{count} products/services",
       "markets": "{count} markets",
-      "view": "View company"
+      "view": "View company",
+      "edit": "Edit"
     },
     "form": {
       "title": "Add Company",
@@ -1073,7 +1074,7 @@
   "jobList": {
     "actions": {
       "add": "Add Job",
-      "edit": "Edit job",
+      "edit": "Edit",
       "view": "View job",
       "open": "Open job",
       "viewCompanies": "View companies",

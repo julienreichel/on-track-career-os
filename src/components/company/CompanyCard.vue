@@ -75,8 +75,8 @@ function handleDelete() {
 
     <template #actions>
       <UButton
-        :label="t('companies.card.view')"
-        icon="i-heroicons-eye"
+        :label="t('companies.card.edit')"
+        icon="i-heroicons-pencil"
         size="xs"
         color="primary"
         variant="soft"
