@@ -131,6 +131,16 @@ describe('useAuthUser', () => {
     expect(owner).toBe('user-123::user-123');
   });
 
+  it('should resolve owner id via getOwnerIdOrThrow', async () => {
+    vi.mocked(fetchUserAttributes).mockResolvedValue({ sub: 'user-123' } as never);
+
+    const { getOwnerIdOrThrow } = useAuthUser();
+
+    const owner = await getOwnerIdOrThrow();
+
+    expect(owner).toBe('user-123::user-123');
+  });
+
   it('should clear error on successful reload', async () => {
     vi.mocked(fetchUserAttributes)
       .mockRejectedValueOnce(new Error('Network error'))

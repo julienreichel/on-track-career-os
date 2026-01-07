@@ -14,6 +14,7 @@ vi.mock('@/composables/useAuthUser', () => ({
   useAuthUser: () => ({
     ownerId: ref('user-1::user-1'),
     loadOwnerId: vi.fn().mockResolvedValue('user-1::user-1'),
+    getOwnerIdOrThrow: vi.fn().mockResolvedValue('user-1::user-1'),
   }),
 }));
 

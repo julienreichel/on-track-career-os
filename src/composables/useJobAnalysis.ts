@@ -36,7 +36,7 @@ export function useJobAnalysis() {
   };
 
   const listJobs = async () => {
-    const ownerId = await resolveOwnerId(auth);
+    const ownerId = await auth.getOwnerIdOrThrow();
     const result = await handle(() => service.listJobs(ownerId));
     jobs.value = result;
     return result;
@@ -97,17 +97,4 @@ export function useJobAnalysis() {
     deleteJob,
     resetState,
   };
-}
-
-async function resolveOwnerId(auth: ReturnType<typeof useAuthUser>) {
-  if (auth.ownerId.value) {
-    return auth.ownerId.value;
-  }
-
-  const ownerId = await auth.loadOwnerId();
-  if (!ownerId) {
-    throw new Error('Missing owner information');
-  }
-
-  return ownerId;
 }

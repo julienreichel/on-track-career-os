@@ -39,6 +39,19 @@ export const useAuthUser = () => {
     return userId.value ? buildOwnerId(userId.value) : null;
   };
 
+  const getOwnerIdOrThrow = async () => {
+    if (ownerId.value) {
+      return ownerId.value;
+    }
+
+    const resolved = await loadOwnerId();
+    if (!resolved) {
+      throw new Error('Missing owner information');
+    }
+
+    return resolved;
+  };
+
   return {
     userId,
     loading,
@@ -47,5 +60,6 @@ export const useAuthUser = () => {
     ownerId,
     loadOwnerId,
     buildOwnerId,
+    getOwnerIdOrThrow,
   };
 };

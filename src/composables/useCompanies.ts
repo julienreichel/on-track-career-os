@@ -42,7 +42,7 @@ export function useCompanies() {
   });
 
   const listCompanies = async () => {
-    const ownerId = await resolveOwnerId(auth);
+    const ownerId = await auth.getOwnerIdOrThrow();
     const result = await run(() => service.listCompanies(ownerId));
     companies.value = result;
     return result;
@@ -82,17 +82,4 @@ export function useCompanies() {
     updateCompany,
     deleteCompany,
   };
-}
-
-async function resolveOwnerId(auth: ReturnType<typeof useAuthUser>) {
-  if (auth.ownerId.value) {
-    return auth.ownerId.value;
-  }
-
-  const ownerId = await auth.loadOwnerId();
-  if (!ownerId) {
-    throw new Error('Missing owner information');
-  }
-
-  return ownerId;
 }
