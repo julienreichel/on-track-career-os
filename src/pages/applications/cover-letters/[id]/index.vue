@@ -36,6 +36,7 @@ const saving = ref(false);
 const cancelModalOpen = ref(false);
 const deleteModalOpen = ref(false);
 const deleting = ref(false);
+const isInitializing = ref(true);
 
 const hasChanges = computed(
   () => editTitle.value !== originalTitle.value || editContent.value !== originalContent.value
@@ -198,8 +199,12 @@ const handleRegenerateTailored = async () => {
 };
 
 onMounted(async () => {
-  await engine.load();
-  await load();
+  isInitializing.value = true;
+  try {
+    await Promise.all([engine.load(), load()]);
+  } finally {
+    isInitializing.value = false;
+  }
 });
 
 watch(item, (newValue) => {
@@ -251,7 +256,7 @@ watch(item, (newValue) => {
           />
 
           <UAlert
-            v-if="error"
+            v-if="error && !isInitializing"
             icon="i-heroicons-exclamation-triangle"
             color="error"
             variant="soft"
@@ -263,7 +268,7 @@ watch(item, (newValue) => {
           />
 
           <UAlert
-            v-if="engine.error.value"
+            v-if="engine.error.value && !isInitializing"
             icon="i-heroicons-exclamation-triangle"
             color="warning"
             variant="soft"
@@ -279,7 +284,7 @@ watch(item, (newValue) => {
           />
 
           <UAlert
-            v-if="!engine.hasProfile.value && !engine.isLoading.value"
+            v-if="!engine.hasProfile.value && !engine.isLoading.value && !isInitializing"
             icon="i-heroicons-information-circle"
             color="info"
             variant="soft"
@@ -288,7 +293,7 @@ watch(item, (newValue) => {
             class="mb-6"
           />
 
-          <UCard v-if="loading">
+          <UCard v-if="loading || isInitializing">
             <USkeleton class="h-6 w-1/3" />
             <USkeleton class="mt-4 h-96 w-full" />
           </UCard>
