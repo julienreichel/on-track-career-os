@@ -67,6 +67,7 @@
             v-for="cv in filteredItems"
             :key="cv.id"
             :title="cv.name || $t('cvList.untitled')"
+            :subtitle="formatListDate(cv.updatedAt ?? cv.createdAt)"
             @edit="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
             @delete="confirmDelete(cv)"
           >
@@ -75,10 +76,6 @@
               <div v-if="cv.isTailored" class="flex items-center gap-1">
                 <UIcon name="i-heroicons-briefcase" class="flex-shrink-0" />
                 <span>{{ $t('cvList.tailored') }}</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <UIcon name="i-heroicons-calendar" class="flex-shrink-0" />
-                <span>{{ $t('cvList.updated') }}: {{ formatDate(cv.updatedAt) }}</span>
               </div>
             </div>
 
@@ -125,6 +122,7 @@ import { onMounted, ref, computed } from 'vue';
 import { useCvDocuments } from '@/composables/useCvDocuments';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
+import { formatListDate } from '@/utils/formatListDate';
 
 const { t } = useI18n();
 const toast = useToast();
@@ -169,10 +167,6 @@ onMounted(async () => {
     hasLoaded.value = true;
   }
 });
-
-const formatDate = (date: string): string => {
-  return new Date(date).toLocaleDateString();
-};
 
 const confirmDelete = (cv: CVDocument) => {
   cvToDelete.value = cv;

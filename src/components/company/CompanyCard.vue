@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ItemCard from '@/components/ItemCard.vue';
 import type { Company } from '@/domain/company/Company';
+import { formatListDate } from '@/utils/formatListDate';
 
 const PRODUCT_PREVIEW_COUNT = 3;
 
@@ -33,23 +34,9 @@ const description = computed(() => {
   return t('companies.card.emptyDescription');
 });
 
-const formattedCreatedAt = computed(() => formatDate(props.company.createdAt));
-const formattedUpdatedAt = computed(() => formatDate(props.company.updatedAt));
-
-function formatDate(value?: string | null) {
-  if (!value) {
-    return '';
-  }
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(date);
-}
+const lastUpdated = computed(() =>
+  formatListDate(props.company.updatedAt ?? props.company.createdAt)
+);
 
 function handleOpen() {
   emit('open', props.company.id);
@@ -72,13 +59,8 @@ function handleDelete() {
       <p class="line-clamp-3">
         {{ description }}
       </p>
-      <div class="flex flex-wrap gap-4 text-xs text-gray-500">
-        <span v-if="formattedCreatedAt">
-          {{ t('companies.card.createdAt', { date: formattedCreatedAt }) }}
-        </span>
-        <span v-if="formattedUpdatedAt">
-          {{ t('companies.card.updatedAt', { date: formattedUpdatedAt }) }}
-        </span>
+      <div v-if="lastUpdated" class="text-xs text-gray-500">
+        {{ lastUpdated }}
       </div>
     </div>
 

@@ -126,6 +126,7 @@ import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 import { useAuthUser } from '@/composables/useAuthUser';
+import { formatListDate } from '@/utils/formatListDate';
 
 const { t } = useI18n();
 const toast = useToast();
@@ -228,11 +229,8 @@ const resolveTitle = (letter: CoverLetter): string => {
 };
 
 const resolveSubtitle = (letter: CoverLetter): string => {
-  // Show if it's tailored to a specific job
-  if (letter.jobId) {
-    return t('coverLetter.list.tailored');
-  }
-  return t('coverLetter.list.generic');
+  const lastUpdated = formatListDate(letter.updatedAt ?? letter.createdAt);
+  return lastUpdated;
 };
 
 const resolvePreview = (letter: CoverLetter): string => {

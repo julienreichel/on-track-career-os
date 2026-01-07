@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ItemCard from '@/components/ItemCard.vue';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
+import { formatListDate } from '@/utils/formatListDate';
 
 const props = defineProps<{
   job: JobDescription;
@@ -19,21 +20,9 @@ const { t } = useI18n();
 const title = computed(() => props.job.title || t('jobList.card.noTitle'));
 const subtitle = computed(() => props.job.seniorityLevel || t('jobList.card.noSeniority'));
 
-const createdAt = computed(() => {
-  if (!props.job.createdAt) {
-    return '';
-  }
-  const date = new Date(props.job.createdAt);
-  if (Number.isNaN(date.getTime())) {
-    return props.job.createdAt;
-  }
-
-  return new Intl.DateTimeFormat(undefined, {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(date);
-});
+const lastUpdated = computed(() =>
+  formatListDate(props.job.updatedAt ?? props.job.createdAt)
+);
 
 const canViewMatch = computed(() => props.job.status === 'analyzed');
 const matchLink = computed(() => `/jobs/${props.job.id}/match`);
@@ -57,8 +46,8 @@ function handleDelete() {
     @delete="handleDelete"
   >
     <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
-      <p v-if="createdAt" class="font-medium text-gray-900 dark:text-gray-100">
-        {{ t('jobList.card.created', { date: createdAt }) }}
+      <p v-if="lastUpdated" class="font-medium text-gray-900 dark:text-gray-100">
+        {{ lastUpdated }}
       </p>
       <p v-if="job.roleSummary" class="line-clamp-4">
         {{ job.roleSummary }}

@@ -107,6 +107,7 @@ import { SpeechBlockService } from '@/domain/speech-block/SpeechBlockService';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useSpeechEngine } from '@/composables/useSpeechEngine';
+import { formatListDate } from '@/utils/formatListDate';
 
 const { t } = useI18n();
 const toast = useToast();
@@ -239,9 +240,6 @@ const resolvePreview = (block: SpeechBlock) => {
 };
 
 const formatUpdatedAt = (date?: string | null) => {
-  if (!date) {
-    return t('speech.list.updatedUnknown');
-  }
-  return t('speech.list.updated', { date: new Date(date).toLocaleDateString() });
+  return formatListDate(date);
 };
 </script>
