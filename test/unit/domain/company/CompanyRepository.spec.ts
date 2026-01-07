@@ -17,7 +17,7 @@ describe('CompanyRepository', () => {
   let repository: CompanyRepository;
   let mockModel: {
     get: ReturnType<typeof vi.fn>;
-    list: ReturnType<typeof vi.fn>;
+    listCompanyByOwner: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
@@ -26,7 +26,7 @@ describe('CompanyRepository', () => {
   beforeEach(() => {
     mockModel = {
       get: vi.fn(),
-      list: vi.fn(),
+      listCompanyByOwner: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -67,30 +67,26 @@ describe('CompanyRepository', () => {
     });
   });
 
-  describe('list', () => {
-    it('should return all companies when no filter is provided', async () => {
+  describe('listByOwner', () => {
+    it('should return all companies for the owner', async () => {
       const companies = [{ id: '1' }, { id: '2' }] as Company[];
-      mockModel.list.mockResolvedValue({ data: companies });
+      mockModel.listCompanyByOwner.mockResolvedValue({ data: companies });
 
-      const result = await repository.list();
+      const result = await repository.listByOwner('user-1::user-1');
 
-      expect(mockModel.list).toHaveBeenCalledWith(
+      expect(mockModel.listCompanyByOwner).toHaveBeenCalledWith(
+        { owner: 'user-1::user-1' },
         expect.objectContaining({ authMode: 'userPool' })
       );
-      expect(gqlOptionsMock).toHaveBeenCalledWith({});
+      expect(gqlOptionsMock).toHaveBeenCalled();
       expect(result).toEqual(companies);
     });
 
-    it('should pass filters to gqlOptions', async () => {
-      const filter = { industry: 'Technology' };
-      mockModel.list.mockResolvedValue({ data: [] });
+    it('should return empty array when owner is missing', async () => {
+      const result = await repository.listByOwner('');
 
-      await repository.list(filter);
-
-      expect(gqlOptionsMock).toHaveBeenCalledWith(filter);
-      expect(mockModel.list).toHaveBeenCalledWith(
-        expect.objectContaining({ authMode: 'userPool', industry: 'Technology' })
-      );
+      expect(result).toEqual([]);
+      expect(mockModel.listCompanyByOwner).not.toHaveBeenCalled();
     });
   });
 
@@ -148,15 +144,20 @@ describe('CompanyRepository', () => {
         { id: '1', companyName: 'Acme Inc.' },
         { id: '2', companyName: 'Global Freight' },
       ] as Company[];
-      mockModel.list.mockResolvedValue({ data: companies });
+      mockModel.listCompanyByOwner.mockResolvedValue({ data: companies });
 
-      const result = await repository.findByNormalizedName('  acme  ');
+      const result = await repository.findByNormalizedName('  acme  ', 'user-1::user-1');
 
       expect(result).toEqual(companies[0]);
     });
 
     it('returns null when name missing', async () => {
-      const result = await repository.findByNormalizedName('');
+      const result = await repository.findByNormalizedName('', 'user-1::user-1');
+      expect(result).toBeNull();
+    });
+
+    it('returns null when owner missing', async () => {
+      const result = await repository.findByNormalizedName('Acme', '');
       expect(result).toBeNull();
     });
   });

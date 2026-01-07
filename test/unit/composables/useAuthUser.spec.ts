@@ -35,13 +35,14 @@ describe('useAuthUser', () => {
     const mockAttributes = { sub: 'user-123' };
     vi.mocked(fetchUserAttributes).mockResolvedValue(mockAttributes as never);
 
-    const { userId, loading } = useAuthUser();
+    const { userId, ownerId, loading } = useAuthUser();
 
     // Wait for async operation
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(fetchUserAttributes).toHaveBeenCalled();
     expect(userId.value).toBe('user-123');
+    expect(ownerId.value).toBe('user-123::user-123');
     expect(loading.value).toBe(false);
   });
 
@@ -99,15 +100,35 @@ describe('useAuthUser', () => {
       .mockResolvedValueOnce({ sub: 'user-123' } as never)
       .mockResolvedValueOnce({ sub: 'user-456' } as never);
 
-    const { userId, loadUserId } = useAuthUser();
+    const { userId, ownerId, loadUserId } = useAuthUser();
 
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(userId.value).toBe('user-123');
+    expect(ownerId.value).toBe('user-123::user-123');
 
     // Manual reload
     await loadUserId();
     expect(userId.value).toBe('user-456');
+    expect(ownerId.value).toBe('user-456::user-456');
     expect(fetchUserAttributes).toHaveBeenCalledTimes(2);
+  });
+
+  it('should build owner id via helper', () => {
+    vi.mocked(fetchUserAttributes).mockResolvedValue({ sub: 'user-123' } as never);
+
+    const { buildOwnerId } = useAuthUser();
+
+    expect(buildOwnerId('user-1')).toBe('user-1::user-1');
+  });
+
+  it('should load owner id via loadOwnerId', async () => {
+    vi.mocked(fetchUserAttributes).mockResolvedValue({ sub: 'user-123' } as never);
+
+    const { loadOwnerId } = useAuthUser();
+
+    const owner = await loadOwnerId();
+
+    expect(owner).toBe('user-123::user-123');
   });
 
   it('should clear error on successful reload', async () => {

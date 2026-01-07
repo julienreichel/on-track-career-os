@@ -1,9 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ref } from 'vue';
 import { useCompanies } from '@/composables/useCompanies';
 import { CompanyService } from '@/domain/company/CompanyService';
 import type { Company } from '@/domain/company/Company';
 
 vi.mock('@/domain/company/CompanyService');
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => ({
+    ownerId: ref('user-1::user-1'),
+    loadOwnerId: vi.fn().mockResolvedValue('user-1::user-1'),
+  }),
+}));
 
 describe('useCompanies', () => {
   let service: vi.Mocked<CompanyService>;
@@ -29,6 +36,7 @@ describe('useCompanies', () => {
     const composable = useCompanies();
     await composable.listCompanies();
 
+    expect(service.listCompanies).toHaveBeenCalledWith('user-1::user-1');
     expect(composable.companies.value).toHaveLength(2);
 
     composable.searchQuery.value = 'acme';

@@ -11,7 +11,8 @@ export type AmplifyJobDescriptionModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: JobDescription | null }>;
-  list: (
+  listJobDescriptionByOwner: (
+    input: { owner: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: JobDescription[]; nextToken?: string | null }>;
   create: (
@@ -54,8 +55,14 @@ export class JobDescriptionRepository {
     return res.data;
   }
 
-  async list(filter: Record<string, unknown> = {}) {
-    return fetchAllListItems<JobDescription>(this.model.list.bind(this.model), filter);
+  async listByOwner(owner: string): Promise<JobDescription[]> {
+    if (!owner) {
+      return [];
+    }
+
+    return fetchAllListItems<JobDescription>((options) =>
+      this.model.listJobDescriptionByOwner({ owner }, options)
+    );
   }
 
   async create(input: JobDescriptionCreateInput) {

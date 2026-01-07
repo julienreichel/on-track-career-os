@@ -28,8 +28,8 @@ export class CompanyService {
     private aiService = new AiOperationsService()
   ) {}
 
-  async listCompanies(filter: Record<string, unknown> = {}) {
-    return this.repo.list(filter);
+  async listCompanies(ownerId: string) {
+    return this.repo.listByOwner(ownerId);
   }
 
   async getCompany(id: string) {

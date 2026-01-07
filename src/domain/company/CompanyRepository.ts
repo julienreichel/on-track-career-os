@@ -8,7 +8,8 @@ export type AmplifyCompanyModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: Company | null }>;
-  list: (
+  listCompanyByOwner: (
+    input: { owner: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: Company[]; nextToken?: string | null }>;
   create: (
@@ -51,8 +52,14 @@ export class CompanyRepository {
     return res.data;
   }
 
-  async list(filter: Record<string, unknown> = {}) {
-    return fetchAllListItems<Company>(this.model.list.bind(this.model), filter);
+  async listByOwner(owner: string): Promise<Company[]> {
+    if (!owner) {
+      return [];
+    }
+
+    return fetchAllListItems<Company>((options) =>
+      this.model.listCompanyByOwner({ owner }, options)
+    );
   }
 
   async create(input: CompanyCreateInput) {
@@ -69,12 +76,12 @@ export class CompanyRepository {
     await this.model.delete({ id }, gqlOptions());
   }
 
-  async findByNormalizedName(name: string) {
+  async findByNormalizedName(name: string, owner: string) {
     const normalized = normalizeCompanyName(name);
-    if (!normalized) {
+    if (!normalized || !owner) {
       return null;
     }
-    const companies = await this.list();
+    const companies = await this.listByOwner(owner);
     return (
       companies.find((company) => normalizeCompanyName(company.companyName) === normalized) ?? null
     );

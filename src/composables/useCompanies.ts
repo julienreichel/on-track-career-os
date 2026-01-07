@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue';
 import type { Company } from '@/domain/company/Company';
 import { CompanyService } from '@/domain/company/CompanyService';
+import { useAuthUser } from '@/composables/useAuthUser';
 
 export function useCompanies() {
   const companies = ref<Company[]>([]);
@@ -8,6 +9,7 @@ export function useCompanies() {
   const error = ref<string | null>(null);
   const searchQuery = ref('');
   const service = new CompanyService();
+  const auth = useAuthUser();
 
   const run = async <T>(cb: () => Promise<T>): Promise<T> => {
     loading.value = true;
@@ -40,7 +42,8 @@ export function useCompanies() {
   });
 
   const listCompanies = async () => {
-    const result = await run(() => service.listCompanies());
+    const ownerId = await resolveOwnerId(auth);
+    const result = await run(() => service.listCompanies(ownerId));
     companies.value = result;
     return result;
   };
@@ -79,4 +82,17 @@ export function useCompanies() {
     updateCompany,
     deleteCompany,
   };
+}
+
+async function resolveOwnerId(auth: ReturnType<typeof useAuthUser>) {
+  if (auth.ownerId.value) {
+    return auth.ownerId.value;
+  }
+
+  const ownerId = await auth.loadOwnerId();
+  if (!ownerId) {
+    throw new Error('Missing owner information');
+  }
+
+  return ownerId;
 }

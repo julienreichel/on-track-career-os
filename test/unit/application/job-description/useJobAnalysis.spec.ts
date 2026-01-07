@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ref } from 'vue';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
 import type {
@@ -7,6 +8,12 @@ import type {
 } from '@/domain/job-description/JobDescription';
 
 vi.mock('@/domain/job-description/JobDescriptionService');
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => ({
+    ownerId: ref('user-1::user-1'),
+    loadOwnerId: vi.fn().mockResolvedValue('user-1::user-1'),
+  }),
+}));
 
 describe('useJobAnalysis', () => {
   let mockService: {
@@ -40,6 +47,7 @@ describe('useJobAnalysis', () => {
     const { jobs, loading, error, listJobs } = useJobAnalysis();
     await listJobs();
 
+    expect(mockService.listJobs).toHaveBeenCalledWith('user-1::user-1');
     expect(loading.value).toBe(false);
     expect(error.value).toBeNull();
     expect(jobs.value).toEqual(mockJobs);

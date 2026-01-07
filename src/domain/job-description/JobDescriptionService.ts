@@ -43,19 +43,16 @@ export class JobDescriptionService {
     return this.repo.get(id);
   }
 
-  async listJobs(): Promise<JobDescription[]> {
-    return this.repo.list();
+  async listJobs(ownerId: string): Promise<JobDescription[]> {
+    return this.repo.listByOwner(ownerId);
   }
 
-  async listJobsByCompany(companyId: string): Promise<JobDescription[]> {
-    if (!companyId) {
+  async listJobsByCompany(companyId: string, ownerId: string): Promise<JobDescription[]> {
+    if (!companyId || !ownerId) {
       return [];
     }
-    return this.repo.list({
-      filter: {
-        companyId: { eq: companyId },
-      },
-    });
+    const jobs = await this.repo.listByOwner(ownerId);
+    return jobs.filter((job) => job.companyId === companyId);
   }
 
   async createJobFromRawText(rawText: string): Promise<JobDescription> {
@@ -187,7 +184,15 @@ export class JobDescriptionService {
       return job;
     }
 
-    let company = await this.companyRepo.findByNormalizedName(analysis.companyProfile.companyName);
+    const owner = (job as { owner?: string }).owner ?? '';
+    if (!owner) {
+      return job;
+    }
+
+    let company = await this.companyRepo.findByNormalizedName(
+      analysis.companyProfile.companyName,
+      owner
+    );
     if (company) {
       const merged = mergeCompanyProfile(company, analysis.companyProfile);
       if (Object.keys(merged).length > 0) {

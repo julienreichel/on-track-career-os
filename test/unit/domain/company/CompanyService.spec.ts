@@ -15,7 +15,7 @@ describe('CompanyService', () => {
   beforeEach(() => {
     repo = {
       get: vi.fn(),
-      list: vi.fn(),
+      listByOwner: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -123,11 +123,11 @@ describe('CompanyService', () => {
   });
 
   it('lists companies using repository filter', async () => {
-    repo.list.mockResolvedValue([{ id: 'c1' } as Company]);
+    repo.listByOwner.mockResolvedValue([{ id: 'c1' } as Company]);
 
-    const result = await service.listCompanies({ industry: 'AI' });
+    const result = await service.listCompanies('user-1::user-1');
 
-    expect(repo.list).toHaveBeenCalledWith({ industry: 'AI' });
+    expect(repo.listByOwner).toHaveBeenCalledWith('user-1::user-1');
     expect(result).toHaveLength(1);
   });
 

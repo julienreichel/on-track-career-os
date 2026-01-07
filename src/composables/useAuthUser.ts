@@ -1,4 +1,4 @@
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { fetchUserAttributes } from 'aws-amplify/auth';
 
 /**
@@ -31,10 +31,21 @@ export const useAuthUser = () => {
     loadUserId();
   });
 
+  const buildOwnerId = (id: string) => `${id}::${id}`;
+  const ownerId = computed(() => (userId.value ? buildOwnerId(userId.value) : null));
+
+  const loadOwnerId = async () => {
+    await loadUserId();
+    return userId.value ? buildOwnerId(userId.value) : null;
+  };
+
   return {
     userId,
     loading,
     error,
     loadUserId,
+    ownerId,
+    loadOwnerId,
+    buildOwnerId,
   };
 };

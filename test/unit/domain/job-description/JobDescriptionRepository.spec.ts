@@ -9,7 +9,7 @@ import type {
 describe('JobDescriptionRepository', () => {
   const mockModel = {
     get: vi.fn(),
-    list: vi.fn(),
+    listJobDescriptionByOwner: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
@@ -41,14 +41,17 @@ describe('JobDescriptionRepository', () => {
     expect(result).toBeNull();
   });
 
-  it('should list job descriptions', async () => {
+  it('should list job descriptions by owner', async () => {
     const mockData = [{ id: 'job-1' }] as JobDescription[];
-    mockModel.list.mockResolvedValue({ data: mockData });
+    mockModel.listJobDescriptionByOwner.mockResolvedValue({ data: mockData });
 
     const repo = buildRepository();
-    const result = await repo.list({ filter: 'value' });
+    const result = await repo.listByOwner('user-1::user-1');
 
-    expect(mockModel.list).toHaveBeenCalledWith(expect.any(Object));
+    expect(mockModel.listJobDescriptionByOwner).toHaveBeenCalledWith(
+      { owner: 'user-1::user-1' },
+      expect.any(Object)
+    );
     expect(result).toEqual(mockData);
   });
 

@@ -4,6 +4,7 @@ import type {
   JobDescriptionUpdateInput,
 } from '@/domain/job-description/JobDescription';
 import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
+import { useAuthUser } from '@/composables/useAuthUser';
 
 const jobs = ref<JobDescription[]>([]);
 const selectedJob = ref<JobDescription | null>(null);
@@ -12,6 +13,7 @@ const error = ref<string | null>(null);
 
 export function useJobAnalysis() {
   const service = new JobDescriptionService();
+  const auth = useAuthUser();
 
   const run = async <T>(operation: () => Promise<T>): Promise<T> => {
     loading.value = true;
@@ -34,7 +36,8 @@ export function useJobAnalysis() {
   };
 
   const listJobs = async () => {
-    const result = await handle(() => service.listJobs());
+    const ownerId = await resolveOwnerId(auth);
+    const result = await handle(() => service.listJobs(ownerId));
     jobs.value = result;
     return result;
   };
@@ -94,4 +97,17 @@ export function useJobAnalysis() {
     deleteJob,
     resetState,
   };
+}
+
+async function resolveOwnerId(auth: ReturnType<typeof useAuthUser>) {
+  if (auth.ownerId.value) {
+    return auth.ownerId.value;
+  }
+
+  const ownerId = await auth.loadOwnerId();
+  if (!ownerId) {
+    throw new Error('Missing owner information');
+  }
+
+  return ownerId;
 }

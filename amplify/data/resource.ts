@@ -225,7 +225,7 @@ export const schema = a
     JobDescription: a
       .model({
         rawText: a.string(),
-        owner: a.string().required(),
+        owner: a.string(),
         title: a.string().required(),
         seniorityLevel: a.string(),
         roleSummary: a.string(), // short narrative
@@ -250,7 +250,7 @@ export const schema = a
     Company: a
       .model({
         companyName: a.string().required(),
-        owner: a.string().required(),
+        owner: a.string(),
         industry: a.string(),
         sizeRange: a.string(),
         website: a.string(),

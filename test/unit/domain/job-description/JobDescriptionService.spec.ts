@@ -30,7 +30,7 @@ describe('JobDescriptionService', () => {
   beforeEach(() => {
     mockRepository = {
       get: vi.fn(),
-      list: vi.fn(),
+      listByOwner: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -102,34 +102,33 @@ describe('JobDescriptionService', () => {
         { id: '1', title: 'A' },
         { id: '2', title: 'B' },
       ] as JobDescription[];
-      mockRepository.list.mockResolvedValue(mockJobs);
+      mockRepository.listByOwner.mockResolvedValue(mockJobs);
 
-      const result = await service.listJobs();
+      const result = await service.listJobs('user-1::user-1');
 
-      expect(mockRepository.list).toHaveBeenCalled();
+      expect(mockRepository.listByOwner).toHaveBeenCalledWith('user-1::user-1');
       expect(result).toEqual(mockJobs);
     });
   });
 
   describe('listJobsByCompany', () => {
     it('returns empty array when companyId missing', async () => {
-      const result = await service.listJobsByCompany('');
+      const result = await service.listJobsByCompany('', 'user-1::user-1');
       expect(result).toEqual([]);
-      expect(mockRepository.list).not.toHaveBeenCalled();
+      expect(mockRepository.listByOwner).not.toHaveBeenCalled();
     });
 
     it('fetches jobs filtered by companyId', async () => {
-      const mockJobs = [{ id: 'job-1' }] as JobDescription[];
-      mockRepository.list.mockResolvedValue(mockJobs);
+      const mockJobs = [
+        { id: 'job-1', companyId: 'company-1' },
+        { id: 'job-2', companyId: 'company-2' },
+      ] as JobDescription[];
+      mockRepository.listByOwner.mockResolvedValue(mockJobs);
 
-      const result = await service.listJobsByCompany('company-1');
+      const result = await service.listJobsByCompany('company-1', 'user-1::user-1');
 
-      expect(mockRepository.list).toHaveBeenCalledWith({
-        filter: {
-          companyId: { eq: 'company-1' },
-        },
-      });
-      expect(result).toEqual(mockJobs);
+      expect(mockRepository.listByOwner).toHaveBeenCalledWith('user-1::user-1');
+      expect(result).toEqual([mockJobs[0]]);
     });
   });
 
@@ -263,7 +262,12 @@ describe('JobDescriptionService', () => {
     });
 
     it('links to existing company when analysis succeeds', async () => {
-      const job = { id: 'job-1', rawText: 'Job text', title: 'Engineer' } as JobDescription;
+      const job = {
+        id: 'job-1',
+        rawText: 'Job text',
+        title: 'Engineer',
+        owner: 'user-1::user-1',
+      } as JobDescription;
       const parsed = {
         title: 'Parsed',
         seniorityLevel: '',
@@ -317,7 +321,12 @@ describe('JobDescriptionService', () => {
     });
 
     it('creates company and canvas when none exists', async () => {
-      const job = { id: 'job-1', rawText: 'Job text', title: 'Engineer' } as JobDescription;
+      const job = {
+        id: 'job-1',
+        rawText: 'Job text',
+        title: 'Engineer',
+        owner: 'user-1::user-1',
+      } as JobDescription;
       const parsed = {
         title: 'Parsed',
         seniorityLevel: '',
