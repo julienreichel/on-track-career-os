@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { formatDetailDate } from '@/utils/formatDetailDate';
 import MatchingSummaryCard from '@/components/matching/MatchingSummaryCard.vue';
 import LinkedCompanyBadge from '@/components/company/LinkedCompanyBadge.vue';
 import TailoredMaterialsCard from '@/components/tailoring/TailoredMaterialsCard.vue';
@@ -56,7 +57,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
 
 const jobTitle = computed(() => job.value?.title?.trim() || t('jobList.card.noTitle'));
 const jobStatus = computed(() => t(`jobList.status.${job.value?.status ?? 'draft'}`));
-const formattedUpdatedAt = computed(() => formatDate(job.value?.updatedAt));
+const formattedUpdatedAt = computed(() => formatDetailDate(job.value?.updatedAt));
 const isLoading = computed(() => engine.isLoading.value);
 const isGenerating = computed(() => engine.isGenerating.value);
 const hasSummary = computed(() => engine.hasSummary.value);
@@ -136,17 +137,6 @@ onMounted(async () => {
   }
 });
 
-function formatDate(value?: string | null) {
-  if (!value) return '';
-  try {
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
-}
 </script>
 
 <template>

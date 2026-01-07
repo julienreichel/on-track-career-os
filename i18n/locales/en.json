@@ -712,7 +712,8 @@
     "discard": "Discard",
     "goBack": "Go back",
     "backToList": "Back to list",
-    "notAvailable": "Not available"
+    "notAvailable": "Not available",
+    "lastUpdated": "Last updated {date}"
   },
   "canvas": {
     "title": "Personal Business Model Canvas",
@@ -883,6 +884,7 @@
   },
   "cvDisplay": {
     "untitled": "Untitled CV",
+    "description": "Review and refine your CV details.",
     "backToCvs": "Back to CVs",
     "loading": "Loading CV...",
     "saving": "Saving changes...",

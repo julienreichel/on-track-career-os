@@ -9,6 +9,7 @@ import { useSpeechEngine } from '@/composables/useSpeechEngine';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import TailoredJobBanner from '@/components/tailoring/TailoredJobBanner.vue';
+import { formatDetailDate } from '@/utils/formatDetailDate';
 import type { SpeechResult } from '@/domain/ai-operations/SpeechResult';
 import type { PageHeaderLink } from '@/types/ui';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
@@ -39,6 +40,7 @@ const cancelModalOpen = ref(false);
 const isGenerating = computed(() => engine.isGenerating.value);
 const hasJobContext = computed(() => Boolean(item.value?.jobId));
 const detailTitle = computed(() => item.value?.name?.trim() || t('speech.detail.untitled'));
+const formattedUpdatedAt = computed(() => formatDetailDate(item.value?.updatedAt));
 const targetJobTitle = computed(
   () => targetJob.value?.title?.trim() || t('tailoredMaterials.unknownJobTitle')
 );
@@ -127,6 +129,7 @@ const formatSection = (value: string) => {
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : t('speech.detail.emptySection');
 };
+
 
 const handleEdit = () => {
   resetForm();
@@ -317,36 +320,45 @@ watch(item, (newValue) => {
 
           <template v-else-if="item">
             <template v-if="isEditing">
-              <div class="mb-6">
-                <UFormField :label="t('speech.detail.titleLabel')">
-                  <UInput
-                    v-model="formState.title"
-                    :placeholder="t('speech.detail.titlePlaceholder')"
-                    :disabled="loading || saving"
-                    data-testid="speech-title-input"
-                    class="w-full"
-                  />
-                </UFormField>
-              </div>
+              <UCard>
+                <div class="mb-6">
+                  <UFormField :label="t('speech.detail.titleLabel')">
+                    <UInput
+                      v-model="formState.title"
+                      :placeholder="t('speech.detail.titlePlaceholder')"
+                      :disabled="loading || saving"
+                      data-testid="speech-title-input"
+                      class="w-full"
+                    />
+                  </UFormField>
+                </div>
 
-              <SpeechBlockEditorCard v-model="formState" :disabled="loading || saving" />
-              <div class="mt-6 flex flex-wrap justify-end gap-3">
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  :label="t('common.cancel')"
-                  :disabled="loading || saving"
-                  @click="handleCancel"
-                />
-                <UButton
-                  color="primary"
-                  :label="t('common.save')"
-                  :disabled="loading || saving"
-                  :loading="saving"
-                  data-testid="save-speech-button"
-                  @click="handleSave"
-                />
-              </div>
+                <SpeechBlockEditorCard v-model="formState" :disabled="loading || saving" />
+                <template #footer>
+                  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                      {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                    </p>
+                    <div class="flex flex-wrap justify-end gap-3">
+                      <UButton
+                        color="neutral"
+                        variant="ghost"
+                        :label="t('common.cancel')"
+                        :disabled="loading || saving"
+                        @click="handleCancel"
+                      />
+                      <UButton
+                        color="primary"
+                        :label="t('common.save')"
+                        :disabled="loading || saving"
+                        :loading="saving"
+                        data-testid="save-speech-button"
+                        @click="handleSave"
+                      />
+                    </div>
+                  </div>
+                </template>
+              </UCard>
             </template>
 
             <template v-else>
@@ -405,17 +417,23 @@ watch(item, (newValue) => {
                     {{ t('speech.editor.sections.whyMe.description') }}
                   </p>
                 </div>
+                <template #footer>
+                  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                      {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                    </p>
+                    <div class="flex justify-end">
+                      <UButton
+                        color="primary"
+                        variant="outline"
+                        :label="t('common.edit')"
+                        icon="i-heroicons-pencil"
+                        @click="handleEdit"
+                      />
+                    </div>
+                  </div>
+                </template>
               </UCard>
-
-              <div class="mt-6 flex justify-end">
-                <UButton
-                  color="primary"
-                  variant="outline"
-                  :label="t('common.edit')"
-                  icon="i-heroicons-pencil"
-                  @click="handleEdit"
-                />
-              </div>
             </template>
           </template>
 

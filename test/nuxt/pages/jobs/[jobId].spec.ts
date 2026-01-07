@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import { ref, h } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import JobDetailPage from '@/pages/jobs/[jobId]/index.vue';
@@ -120,7 +120,8 @@ const stubs = {
     template: '<div class="u-page-body"><slot /></div>',
   },
   UCard: {
-    template: '<div class="u-card"><slot name="header" /><slot /></div>',
+    template:
+      '<div class="u-card"><slot name="header" /><div class="u-card-body"><slot /></div><div class="u-card-footer"><slot name="footer" /></div></div>',
   },
   UFormField: {
     props: ['label'],
@@ -282,6 +283,7 @@ describe('Job Detail Page', () => {
       .findAll('.u-button')
       .find((button) => button.text().includes(i18n.global.t('common.edit')));
     await editButton?.trigger('click');
+    await flushPromises();
 
     const titleInput = wrapper.find('[data-testid="job-title-input"]');
     await titleInput.setValue('Director of Engineering');
@@ -313,6 +315,7 @@ describe('Job Detail Page', () => {
       .findAll('.u-button')
       .find((button) => button.text().includes(i18n.global.t('common.edit')));
     await editButton?.trigger('click');
+    await flushPromises();
 
     const tagInput = wrapper
       .findAllComponents({ name: 'TagInput' })
@@ -343,6 +346,7 @@ describe('Job Detail Page', () => {
       .findAll('.u-button')
       .find((button) => button.text().includes(i18n.global.t('common.edit')));
     await editButton?.trigger('click');
+    await flushPromises();
 
     const titleInput = wrapper.find('[data-testid="job-title-input"]');
     await titleInput.setValue('Changed Title');
@@ -367,6 +371,7 @@ describe('Job Detail Page', () => {
       .findAll('.u-button')
       .find((button) => button.text().includes(i18n.global.t('common.edit')));
     await editButton?.trigger('click');
+    await flushPromises();
     const linkButton = wrapper.find('.select-company');
     await linkButton.trigger('click');
 
@@ -384,6 +389,7 @@ describe('Job Detail Page', () => {
       .findAll('.u-button')
       .find((button) => button.text().includes(i18n.global.t('common.edit')));
     await editButton?.trigger('click');
+    await flushPromises();
     const clearButton = wrapper.find('[data-testid="job-company-clear"]');
     await clearButton.trigger('click');
 

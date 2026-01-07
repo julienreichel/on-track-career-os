@@ -88,7 +88,11 @@
 
           <!-- CV Name -->
           <UFormField :label="$t('cvNew.step2.fields.name')" required>
-            <UInput v-model="cvName" :placeholder="$t('cvNew.step2.placeholders.name')" />
+            <UInput
+              v-model="cvName"
+              :placeholder="$t('cvNew.step2.placeholders.name')"
+              class="w-full"
+            />
           </UFormField>
 
           <!-- Optional Sections -->
@@ -122,6 +126,7 @@
               v-model="jobDescription"
               :placeholder="$t('cvNew.step2.placeholders.jobDescription')"
               :rows="4"
+              class="w-full"
             />
           </UFormField>
 

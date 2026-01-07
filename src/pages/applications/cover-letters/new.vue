@@ -22,6 +22,7 @@
               v-model="coverLetterName"
               :placeholder="$t('coverLetter.new.setup.namePlaceholder')"
               data-testid="cover-letter-name-input"
+              class="w-full"
             />
           </UFormField>
 
@@ -34,6 +35,7 @@
               :placeholder="$t('coverLetter.new.setup.jobPlaceholder')"
               :rows="6"
               data-testid="job-description-textarea"
+              class="w-full"
             />
           </UFormField>
 

@@ -3,6 +3,7 @@
     <UPage>
       <UPageHeader
         :title="document?.name || $t('cvDisplay.untitled')"
+        :description="$t('cvDisplay.description')"
         :links="[
           {
             label: $t('common.backToList'),
@@ -127,6 +128,23 @@
                 </div>
               </div>
             </div>
+            <template #footer>
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                  {{ $t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                </p>
+                <div class="flex justify-end gap-3">
+                  <UButton :label="$t('common.cancel')" variant="ghost" @click="handleCancel" />
+                  <UButton
+                    :label="$t('common.save')"
+                    icon="i-heroicons-check"
+                    :disabled="!hasChanges || saving"
+                    :loading="saving"
+                    @click="saveEdit"
+                  />
+                </div>
+              </div>
+            </template>
           </UCard>
 
           <!-- View Mode: Rendered HTML -->
@@ -142,33 +160,28 @@
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div class="prose prose-gray max-w-none" v-html="renderedHtml" />
             </div>
+            <template #footer>
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                  {{ $t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                </p>
+                <div class="flex justify-end gap-3">
+                  <UButton
+                    :label="$t('cvDisplay.actions.exportPdf')"
+                    icon="i-heroicons-arrow-down-tray"
+                    variant="outline"
+                    @click="handlePrint"
+                  />
+                  <UButton
+                    :label="$t('cvDisplay.actions.edit')"
+                    icon="i-heroicons-pencil"
+                    variant="outline"
+                    @click="toggleEdit"
+                  />
+                </div>
+              </div>
+            </template>
           </UCard>
-
-          <!-- Action Buttons -->
-          <div v-if="isEditing" class="flex justify-end gap-3">
-            <UButton :label="$t('common.cancel')" variant="ghost" @click="handleCancel" />
-            <UButton
-              :label="$t('common.save')"
-              icon="i-heroicons-check"
-              :disabled="!hasChanges || saving"
-              :loading="saving"
-              @click="saveEdit"
-            />
-          </div>
-          <div v-else class="flex justify-end gap-3">
-            <UButton
-              :label="$t('cvDisplay.actions.exportPdf')"
-              icon="i-heroicons-arrow-down-tray"
-              variant="outline"
-              @click="handlePrint"
-            />
-            <UButton
-              :label="$t('cvDisplay.actions.edit')"
-              icon="i-heroicons-pencil"
-              variant="outline"
-              @click="toggleEdit"
-            />
-          </div>
         </div>
 
         <!-- Not Found -->
@@ -197,6 +210,7 @@ import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import TailoredJobBanner from '@/components/tailoring/TailoredJobBanner.vue';
+import { formatDetailDate } from '@/utils/formatDetailDate';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
@@ -272,6 +286,8 @@ const hasChanges = computed(() => {
     showProfilePhotoSetting.value !== originalShowProfilePhoto.value
   );
 });
+
+const formattedUpdatedAt = computed(() => formatDetailDate(document.value?.updatedAt));
 
 const loadProfilePhoto = async (userId: string) => {
   profilePhotoLoading.value = true;

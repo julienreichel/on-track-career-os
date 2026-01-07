@@ -9,6 +9,7 @@ import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { useCompanies } from '@/composables/useCompanies';
 import TailoredMaterialsCard from '@/components/tailoring/TailoredMaterialsCard.vue';
 import { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
+import { formatDetailDate } from '@/utils/formatDetailDate';
 import type {
   JobDescription,
   JobDescriptionUpdateInput,
@@ -149,8 +150,9 @@ const viewListSections = computed(() =>
   }))
 );
 
-const formattedCreatedAt = computed(() => formatDate(job.value?.createdAt));
-const formattedUpdatedAt = computed(() => formatDate(job.value?.updatedAt));
+const formattedCreatedAt = computed(() => formatDetailDate(job.value?.createdAt));
+const formattedUpdatedAt = computed(() => formatDetailDate(job.value?.updatedAt));
+const displayTitle = computed(() => form.title.trim() || t('jobList.card.noTitle'));
 
 watch(
   job,
@@ -316,18 +318,6 @@ function toStringList(list?: Array<string | null | undefined> | null): string[] 
   return list.filter((value): value is string => typeof value === 'string');
 }
 
-function formatDate(value?: string | null) {
-  if (!value) return '';
-  try {
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
-}
-
 function updateListField(field: ListField, value: string[]) {
   form[field] = [...value];
 }
@@ -437,7 +427,7 @@ function redirectToCompanyCreate() {
   <UContainer>
     <UPage>
       <UPageHeader
-        :title="t('jobDetail.title')"
+        :title="displayTitle"
         :description="t('jobDetail.description')"
         :links="headerLinks"
       />
@@ -508,14 +498,6 @@ function redirectToCompanyCreate() {
                   </div>
                   <div>
                     <p class="text-sm text-gray-500">
-                      {{ t('jobDetail.meta.updatedAt') }}
-                    </p>
-                    <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">
-                      {{ formattedUpdatedAt || t('jobDetail.meta.notAvailable') }}
-                    </p>
-                  </div>
-                  <div>
-                    <p class="text-sm text-gray-500">
                       {{ t('jobDetail.meta.createdAt') }}
                     </p>
                     <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">
@@ -582,26 +564,32 @@ function redirectToCompanyCreate() {
                   />
                 </template>
               </UTabs>
-
-              <div class="mt-6 flex flex-wrap justify-end gap-3">
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  :label="t('common.cancel')"
-                  :disabled="disableActions"
-                  data-testid="job-cancel-button"
-                  @click="handleCancel"
-                />
-                <UButton
-                  color="primary"
-                  :label="t('common.save')"
-                  icon="i-heroicons-check"
-                  :disabled="disableActions"
-                  :loading="saving"
-                  data-testid="job-save-button"
-                  @click="handleSave"
-                />
-              </div>
+              <template #footer>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                    {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                  </p>
+                  <div class="flex flex-wrap justify-end gap-3">
+                    <UButton
+                      color="neutral"
+                      variant="ghost"
+                      :label="t('common.cancel')"
+                      :disabled="disableActions"
+                      data-testid="job-cancel-button"
+                      @click="handleCancel"
+                    />
+                    <UButton
+                      color="primary"
+                      :label="t('common.save')"
+                      icon="i-heroicons-check"
+                      :disabled="disableActions"
+                      :loading="saving"
+                      data-testid="job-save-button"
+                      @click="handleSave"
+                    />
+                  </div>
+                </div>
+              </template>
             </UCard>
           </template>
 
@@ -624,9 +612,6 @@ function redirectToCompanyCreate() {
                     <UBadge color="primary" variant="soft">
                       {{ statusLabel }}
                     </UBadge>
-                  </UFormField>
-                  <UFormField :label="t('jobDetail.meta.updatedAt')">
-                    <p>{{ formattedUpdatedAt || t('jobDetail.meta.notAvailable') }}</p>
                   </UFormField>
                   <UFormField :label="t('jobDetail.meta.createdAt')">
                     <p>{{ formattedCreatedAt || t('jobDetail.meta.notAvailable') }}</p>
@@ -660,15 +645,22 @@ function redirectToCompanyCreate() {
                 </template>
               </UTabs>
 
-              <div class="mt-6 flex justify-end">
-                <UButton
-                  color="primary"
-                  variant="outline"
-                  :label="t('common.edit')"
-                  icon="i-heroicons-pencil"
-                  @click="handleEdit"
-                />
-              </div>
+              <template #footer>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                    {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                  </p>
+                  <div class="flex justify-end">
+                    <UButton
+                      color="primary"
+                      variant="outline"
+                      :label="t('common.edit')"
+                      icon="i-heroicons-pencil"
+                      @click="handleEdit"
+                    />
+                  </div>
+                </div>
+              </template>
             </UCard>
           </template>
 

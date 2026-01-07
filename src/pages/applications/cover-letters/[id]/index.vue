@@ -9,6 +9,7 @@ import { useCoverLetterEngine } from '@/composables/useCoverLetterEngine';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import TailoredJobBanner from '@/components/tailoring/TailoredJobBanner.vue';
+import { formatDetailDate } from '@/utils/formatDetailDate';
 import type { PageHeaderLink } from '@/types/ui';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
@@ -77,6 +78,7 @@ const displayTitle = computed(() => {
   const name = isEditing.value ? editTitle.value : (item.value?.name ?? '');
   return name.trim() || t('coverLetter.display.untitled');
 });
+const formattedUpdatedAt = computed(() => formatDetailDate(item.value?.updatedAt));
 
 const toggleEdit = () => {
   if (isEditing.value) {
@@ -316,6 +318,7 @@ watch(item, (newValue) => {
                     v-model="editTitle"
                     :placeholder="t('coverLetter.display.titlePlaceholder')"
                     data-testid="cover-letter-title-input"
+                    class="w-full"
                   />
                 </UFormField>
 
@@ -329,26 +332,31 @@ watch(item, (newValue) => {
                   />
                 </UFormField>
               </div>
+              <template #footer>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                    {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                  </p>
+                  <div class="flex justify-end gap-3">
+                    <UButton
+                      color="neutral"
+                      variant="ghost"
+                      :label="t('common.cancel')"
+                      :disabled="loading || saving"
+                      @click="handleCancel"
+                    />
+                    <UButton
+                      color="primary"
+                      :label="t('common.save')"
+                      :disabled="!hasChanges || loading || saving"
+                      :loading="saving"
+                      data-testid="save-cover-letter-button"
+                      @click="handleSave"
+                    />
+                  </div>
+                </div>
+              </template>
             </UCard>
-
-            <!-- Edit Mode Actions -->
-            <div class="mt-6 flex justify-end gap-3">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                :label="t('common.cancel')"
-                :disabled="loading || saving"
-                @click="handleCancel"
-              />
-              <UButton
-                color="primary"
-                :label="t('common.save')"
-                :disabled="!hasChanges || loading || saving"
-                :loading="saving"
-                data-testid="save-cover-letter-button"
-                @click="handleSave"
-              />
-            </div>
           </template>
 
           <!-- View Mode -->
@@ -360,24 +368,29 @@ watch(item, (newValue) => {
                   {{ t('coverLetter.display.emptyContent') }}
                 </div>
               </div>
+              <template #footer>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                    {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                  </p>
+                  <div class="flex justify-end gap-3">
+                    <UButton
+                      :label="t('coverLetter.display.actions.print')"
+                      icon="i-heroicons-arrow-down-tray"
+                      variant="outline"
+                      @click="handlePrint"
+                    />
+                    <UButton
+                      :label="t('coverLetter.display.actions.edit')"
+                      icon="i-heroicons-pencil"
+                      variant="outline"
+                      data-testid="edit-cover-letter-button"
+                      @click="toggleEdit"
+                    />
+                  </div>
+                </div>
+              </template>
             </UCard>
-
-            <!-- View Mode Actions -->
-            <div class="mt-6 flex justify-end gap-3">
-              <UButton
-                :label="t('coverLetter.display.actions.print')"
-                icon="i-heroicons-arrow-down-tray"
-                variant="outline"
-                @click="handlePrint"
-              />
-              <UButton
-                :label="t('coverLetter.display.actions.edit')"
-                icon="i-heroicons-pencil"
-                variant="outline"
-                data-testid="edit-cover-letter-button"
-                @click="toggleEdit"
-              />
-            </div>
           </template>
 
           <UCard v-else-if="!loading && !item">

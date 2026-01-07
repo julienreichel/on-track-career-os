@@ -164,7 +164,10 @@ const stubs = {
     template:
       '<button type="button" :disabled="disabled || loading" :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')" :class="[variant, color, size]"><slot />{{ $props.label }}</button>',
   },
-  UCard: { template: '<div class="u-card"><slot /></div>' },
+  UCard: {
+    template:
+      '<div class="u-card"><div class="u-card-body"><slot /></div><div class="u-card-footer"><slot name="footer" /></div></div>',
+  },
   USkeleton: { template: '<div class="u-skeleton"></div>' },
   UFormField: {
     props: ['label', 'name'],

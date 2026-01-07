@@ -148,7 +148,10 @@ const stubs = {
     props: ['label'],
     template: '<label><span>{{ label }}</span><slot /></label>',
   },
-  UCard: { template: '<div class="u-card"><slot /></div>' },
+  UCard: {
+    template:
+      '<div class="u-card"><div class="u-card-body"><slot /></div><div class="u-card-footer"><slot name="footer" /></div></div>',
+  },
   USkeleton: { template: '<div class="u-skeleton"></div>' },
   UButton: {
     props: ['label', 'disabled'],
