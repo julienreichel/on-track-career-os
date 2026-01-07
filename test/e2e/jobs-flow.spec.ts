@@ -47,7 +47,7 @@ test.describe('Job analysis workflow', () => {
     const newJobCard = page
       .locator('[data-testid="job-card"]')
       .filter({ has: page.locator('h3', { hasText: newTitle }) });
-    await newJobCard.getByRole('button', { name: /view job/i }).click();
+    await newJobCard.getByRole('button', { name: /edit/i }).click();
     await expect(page).toHaveURL(/\/jobs\/[0-9a-f-]+$/i);
     await expect(page.locator('[data-testid="job-title-input"]')).toHaveValue(newTitle);
   });

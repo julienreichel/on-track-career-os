@@ -35,15 +35,6 @@ const createdAt = computed(() => {
   }).format(date);
 });
 
-const statusBadge = computed(() => {
-  const status = props.job.status || 'draft';
-  const color = status === 'complete' ? 'success' : status === 'analyzed' ? 'primary' : 'neutral';
-  return {
-    color,
-    label: t(`jobList.status.${status}`),
-  };
-});
-
 const canViewMatch = computed(() => props.job.status === 'analyzed');
 const matchLink = computed(() => `/jobs/${props.job.id}/match`);
 
@@ -77,16 +68,10 @@ function handleDelete() {
       </p>
     </div>
 
-    <template #badges>
-      <UBadge :color="statusBadge.color" variant="soft" size="xs">
-        {{ statusBadge.label }}
-      </UBadge>
-    </template>
-
     <template #actions>
       <UButton
-        :label="t('jobList.actions.view')"
-        icon="i-heroicons-eye"
+        :label="t('jobList.actions.edit')"
+        icon="i-heroicons-pencil"
         size="xs"
         color="primary"
         variant="soft"

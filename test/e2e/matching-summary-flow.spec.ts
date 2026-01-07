@@ -60,7 +60,7 @@ test.describe('Matching summary workflow', () => {
       .filter({ has: page.locator('h3', { hasText: jobTitle }) });
     await expect(jobCard).toBeVisible({ timeout: 20000 });
 
-    await jobCard.getByRole('button', { name: /view job/i }).click();
+    await jobCard.getByRole('button', { name: /edit/i }).click();
     await expect(page).toHaveURL(new RegExp(`/jobs/${jobId}$`, 'i'));
   });
 
@@ -109,10 +109,7 @@ test.describe('Matching summary workflow', () => {
     await expect(summaryHeading).toBeVisible({ timeout: 60000 });
     const reasoningSection = page.getByText('Key Assessment Points');
     await expect(reasoningSection).toBeVisible();
-    const reasoningItems = reasoningSection
-      .locator('..')
-      .locator('..')
-      .getByRole('listitem');
+    const reasoningItems = reasoningSection.locator('..').locator('..').getByRole('listitem');
     await expect(reasoningItems.first()).toBeVisible();
   });
 
@@ -132,10 +129,7 @@ test.describe('Matching summary workflow', () => {
     const summaryHeading = page.getByText('Overall Match Score');
     await expect(summaryHeading).toBeVisible();
     const reasoningSection = page.getByText('Key Assessment Points');
-    const reasoningItems = reasoningSection
-      .locator('..')
-      .locator('..')
-      .getByRole('listitem');
+    const reasoningItems = reasoningSection.locator('..').locator('..').getByRole('listitem');
     await expect(reasoningItems.first()).toBeVisible();
   });
 

@@ -1073,6 +1073,7 @@
   "jobList": {
     "actions": {
       "add": "Add Job",
+      "edit": "Edit job",
       "view": "View job",
       "open": "Open job",
       "viewCompanies": "View companies",
