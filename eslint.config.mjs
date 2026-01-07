@@ -63,6 +63,18 @@ export default withNuxt(
           ignores: ['/^U[A-Z]/', '/^u-/', 'authenticator'],
         },
       ],
+      'vue/html-self-closing': [
+        'error',
+        {
+          html: {
+            void: 'always',
+            normal: 'always',
+            component: 'always',
+          },
+          svg: 'always',
+          math: 'always',
+        },
+      ],
       'vue/require-default-prop': 'error',
       'vue/require-prop-types': 'error',
 
