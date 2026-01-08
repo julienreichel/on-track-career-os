@@ -218,7 +218,7 @@ describe('FullForm', () => {
     mockLoad.mockResolvedValue(undefined); // load() resolves but error is set
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const wrapper = mount(FullForm, {
+    mount(FullForm, {
       global: {
         plugins: [i18n, router],
         stubs,
