@@ -6,10 +6,16 @@ import { withMockedConsoleError } from '../../../utils/withMockedConsole';
 
 // Mock dependencies
 vi.mock('@/domain/cvdocument/CVDocumentRepository');
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => ({
+    userId: { value: 'user-1' },
+    loadUserId: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
 
 describe('useCvDocuments', () => {
   let mockRepository: {
-    list: ReturnType<typeof vi.fn>;
+    listByUser: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
@@ -20,7 +26,7 @@ describe('useCvDocuments', () => {
     vi.clearAllMocks();
 
     mockRepository = {
-      list: vi.fn(),
+      listByUser: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -37,7 +43,7 @@ describe('useCvDocuments', () => {
         { id: 'cv-2', name: 'CV 2', userId: 'user-1' },
       ] as CVDocument[];
 
-      mockRepository.list.mockResolvedValue(mockCVs);
+      mockRepository.listByUser.mockResolvedValue(mockCVs);
 
       const { items, loading, error, loadAll } = useCvDocuments();
 
@@ -45,30 +51,16 @@ describe('useCvDocuments', () => {
 
       await loadAll();
 
-      expect(mockRepository.list).toHaveBeenCalledWith(undefined);
+      expect(mockRepository.listByUser).toHaveBeenCalledWith('user-1');
       expect(items.value).toEqual(mockCVs);
       expect(loading.value).toBe(false);
       expect(error.value).toBeNull();
     });
 
-    it('should load CV documents with filter', async () => {
-      const mockFilter = { isTailored: { eq: true } };
-      const mockCVs = [{ id: 'cv-1', name: 'Tailored CV', isTailored: true }] as CVDocument[];
-
-      mockRepository.list.mockResolvedValue(mockCVs);
-
-      const { items, loadAll } = useCvDocuments();
-
-      await loadAll(mockFilter);
-
-      expect(mockRepository.list).toHaveBeenCalledWith(mockFilter);
-      expect(items.value).toEqual(mockCVs);
-    });
-
     it(
       'should handle errors during load',
       withMockedConsoleError(async () => {
-        mockRepository.list.mockRejectedValue(new Error('Load failed'));
+        mockRepository.listByUser.mockRejectedValue(new Error('Load failed'));
 
         const { items, error, loadAll } = useCvDocuments();
 
@@ -80,7 +72,7 @@ describe('useCvDocuments', () => {
     );
 
     it('should set loading state correctly', async () => {
-      mockRepository.list.mockImplementation(
+      mockRepository.listByUser.mockImplementation(
         () => new Promise((resolve) => setTimeout(() => resolve([]), 10))
       );
 
@@ -180,7 +172,7 @@ describe('useCvDocuments', () => {
       const mockCV = { id: 'cv-1', name: 'Old Name', userId: 'user-1' } as CVDocument;
       const mockUpdated = { ...mockCV, name: 'New Name' };
 
-      mockRepository.list.mockResolvedValue([mockCV]);
+      mockRepository.listByUser.mockResolvedValue([mockCV]);
       mockRepository.update.mockResolvedValue(mockUpdated);
 
       const { items, loadAll, updateDocument } = useCvDocuments();
@@ -206,7 +198,7 @@ describe('useCvDocuments', () => {
       const mockCV = { id: 'cv-2', name: 'Tailored CV', jobId: 'job-123' } as CVDocument;
       const mockUpdated = { ...mockCV, name: 'Updated CV' };
 
-      mockRepository.list.mockResolvedValue([mockCV]);
+      mockRepository.listByUser.mockResolvedValue([mockCV]);
       mockRepository.update.mockResolvedValue(mockUpdated);
 
       const { items, loadAll, updateDocument } = useCvDocuments();
@@ -249,7 +241,7 @@ describe('useCvDocuments', () => {
         { id: 'cv-2', name: 'CV 2' },
       ] as CVDocument[];
 
-      mockRepository.list.mockResolvedValue(mockCVs);
+      mockRepository.listByUser.mockResolvedValue(mockCVs);
       mockRepository.delete.mockResolvedValue(undefined);
 
       const { items, loadAll, deleteDocument } = useCvDocuments();

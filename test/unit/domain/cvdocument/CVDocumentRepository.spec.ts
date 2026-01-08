@@ -4,6 +4,7 @@ import {
   type AmplifyCVDocumentModel,
 } from '@/domain/cvdocument/CVDocumentRepository';
 import type { CVDocumentCreateInput, CVDocumentUpdateInput } from '@/domain/cvdocument/CVDocument';
+import type { AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
 
 // Mock gqlOptions
 vi.mock('@/data/graphql/options', () => ({
@@ -17,24 +18,31 @@ describe('CVDocumentRepository', () => {
   let repository: CVDocumentRepository;
   let mockModel: {
     get: ReturnType<typeof vi.fn>;
-    list: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
+  };
+  let mockUserProfileModel: {
+    get: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
     // Create fresh mocks for each test
     mockModel = {
       get: vi.fn(),
-      list: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
     };
+    mockUserProfileModel = {
+      get: vi.fn(),
+    };
 
     // Inject the mock via constructor (dependency injection)
-    repository = new CVDocumentRepository(mockModel as AmplifyCVDocumentModel);
+    repository = new CVDocumentRepository(
+      mockModel as AmplifyCVDocumentModel,
+      mockUserProfileModel as AmplifyUserProfileModel
+    );
   });
 
   describe('get', () => {
@@ -76,63 +84,54 @@ describe('CVDocumentRepository', () => {
     });
   });
 
-  describe('list', () => {
-    it('should fetch a list of CVDocument items', async () => {
+  describe('listByUser', () => {
+    it('should fetch CVDocument items for a user profile', async () => {
       const mockCVList = [
         { id: 'cv-1', name: 'CV 1', userId: 'user-1', isTailored: false },
         { id: 'cv-2', name: 'CV 2', userId: 'user-2', isTailored: true, jobId: 'job-1' },
       ];
 
-      mockModel.list.mockResolvedValue({
-        data: mockCVList,
+      mockUserProfileModel.get.mockResolvedValue({
+        data: { id: 'user-1', cvs: mockCVList },
       });
 
-      const result = await repository.list();
+      const result = await repository.listByUser('user-1');
 
-      expect(mockModel.list).toHaveBeenCalledWith(
-        expect.objectContaining({ authMode: 'userPool' })
+      expect(mockUserProfileModel.get).toHaveBeenCalledWith(
+        { id: 'user-1' },
+        expect.objectContaining({ authMode: 'userPool', selectionSet: ['id', 'cvs.*'] })
       );
       expect(result).toEqual(mockCVList);
     });
 
-    it('should apply filters when provided', async () => {
-      const mockFilter = { userId: { eq: 'user-123' } };
-      mockModel.list.mockResolvedValue({
-        data: [],
+    it('should handle empty results', async () => {
+      mockUserProfileModel.get.mockResolvedValue({
+        data: { id: 'user-1', cvs: [] },
       });
 
-      await repository.list(mockFilter);
-
-      expect(mockModel.list).toHaveBeenCalledWith(
-        expect.objectContaining({
-          authMode: 'userPool',
-          userId: { eq: 'user-123' },
-        })
-      );
-    });
-
-    it('should handle empty list results', async () => {
-      mockModel.list.mockResolvedValue({
-        data: [],
-      });
-
-      const result = await repository.list();
+      const result = await repository.listByUser('user-1');
 
       expect(result).toEqual([]);
     });
 
-    it('should filter tailored CVs', async () => {
-      const mockFilter = { isTailored: { eq: true } };
+    it('should return empty array when userId missing', async () => {
+      const result = await repository.listByUser('');
+
+      expect(result).toEqual([]);
+      expect(mockUserProfileModel.get).not.toHaveBeenCalled();
+    });
+
+    it('should filter tailored CVs client side', async () => {
       const tailoredCVs = [
         { id: 'cv-1', name: 'Tailored CV 1', isTailored: true, jobId: 'job-1' },
         { id: 'cv-2', name: 'Tailored CV 2', isTailored: true, jobId: 'job-2' },
       ];
 
-      mockModel.list.mockResolvedValue({
-        data: tailoredCVs,
+      mockUserProfileModel.get.mockResolvedValue({
+        data: { id: 'user-1', cvs: tailoredCVs },
       });
 
-      const result = await repository.list(mockFilter);
+      const result = await repository.listByUser('user-1');
 
       expect(result).toEqual(tailoredCVs);
       expect(result.every((cv) => cv.isTailored)).toBe(true);
@@ -379,13 +378,18 @@ describe('CVDocumentRepository', () => {
     it('should accept a custom model via dependency injection', () => {
       const customModel = {
         get: vi.fn(),
-        list: vi.fn(),
         create: vi.fn(),
         update: vi.fn(),
         delete: vi.fn(),
       };
+      const customUserProfileModel = {
+        get: vi.fn(),
+      };
 
-      const repoWithCustomModel = new CVDocumentRepository(customModel as AmplifyCVDocumentModel);
+      const repoWithCustomModel = new CVDocumentRepository(
+        customModel as AmplifyCVDocumentModel,
+        customUserProfileModel as AmplifyUserProfileModel
+      );
 
       expect(repoWithCustomModel).toBeInstanceOf(CVDocumentRepository);
     });

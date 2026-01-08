@@ -1,5 +1,6 @@
 import { gqlOptions } from '@/data/graphql/options';
-import { fetchAllListItems } from '@/data/graphql/pagination';
+import type { AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
+import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { CVDocumentCreateInput, CVDocumentUpdateInput, CVDocument } from './CVDocument';
 
 export type AmplifyCVDocumentModel = {
@@ -7,9 +8,6 @@ export type AmplifyCVDocumentModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: CVDocument | null }>;
-  list: (
-    options?: Record<string, unknown>
-  ) => Promise<{ data: CVDocument[]; nextToken?: string | null }>;
   create: (
     input: CVDocumentCreateInput,
     options?: Record<string, unknown>
@@ -24,20 +22,28 @@ export type AmplifyCVDocumentModel = {
   ) => Promise<{ data: CVDocument | null }>;
 };
 
+type UserProfileWithCvs = UserProfile & {
+  cvs?: (CVDocument | null)[] | null;
+};
+
 export class CVDocumentRepository {
   private readonly _model: AmplifyCVDocumentModel;
+  private readonly _userProfileModel: AmplifyUserProfileModel;
 
   /**
    * Constructor with optional dependency injection for testing
    * @param model - Optional Amplify model instance (for testing)
    */
-  constructor(model?: AmplifyCVDocumentModel) {
-    if (model) {
+  constructor(model?: AmplifyCVDocumentModel, userProfileModel?: AmplifyUserProfileModel) {
+    if (model && userProfileModel) {
       // Use injected model (for tests)
       this._model = model;
+      this._userProfileModel = userProfileModel;
     } else {
       // Use Nuxt's auto-imported useNuxtApp (for production)
-      this._model = useNuxtApp().$Amplify.GraphQL.client.models.CVDocument;
+      const amplify = useNuxtApp().$Amplify.GraphQL.client;
+      this._model = amplify.models.CVDocument;
+      this._userProfileModel = amplify.models.UserProfile;
     }
   }
 
@@ -50,8 +56,19 @@ export class CVDocumentRepository {
     return res.data;
   }
 
-  async list(filter: Record<string, unknown> = {}) {
-    return fetchAllListItems<CVDocument>(this.model.list.bind(this.model), filter);
+  async listByUser(userId: string): Promise<CVDocument[]> {
+    if (!userId) {
+      return [];
+    }
+
+    const selectionSet = ['id', 'cvs.*'];
+    const { data } = await this._userProfileModel.get(
+      { id: userId },
+      gqlOptions({ selectionSet })
+    );
+    const profile = data as UserProfileWithCvs | null;
+    const items = (profile?.cvs ?? []) as CVDocument[];
+    return items.filter((item): item is CVDocument => Boolean(item));
   }
 
   async create(input: CVDocumentCreateInput) {

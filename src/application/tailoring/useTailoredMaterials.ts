@@ -266,9 +266,10 @@ function createExistingMaterialsLoader({
     try {
       const userId = await resolveUserId();
       const [cvDocs, coverLetters, speechBlocks] = await Promise.all([
-        deps.cvRepository.list({
-          filter: { jobId: { eq: jobId }, userId: { eq: userId } },
-        }),
+        deps
+          .cvRepository
+          .listByUser(userId)
+          .then((items) => items.filter((item) => item.jobId === jobId)),
         deps.coverLetterService.listCoverLetters({
           filter: { jobId: { eq: jobId }, userId: { eq: userId } },
         }),

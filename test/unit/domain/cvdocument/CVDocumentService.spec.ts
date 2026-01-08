@@ -13,7 +13,7 @@ describe('CVDocumentService', () => {
   beforeEach(() => {
     mockRepository = {
       get: vi.fn(),
-      list: vi.fn(),
+      listByUser: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),

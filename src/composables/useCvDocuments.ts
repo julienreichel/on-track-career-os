@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
+import { useAuthUser } from '@/composables/useAuthUser';
 import type {
   CVDocument,
   CVDocumentCreateInput,
@@ -26,16 +27,23 @@ export function useCvDocuments() {
   const loading = ref(false);
   const error = ref<string | null>(null);
   const repository = new CVDocumentRepository();
+  const auth = useAuthUser();
 
   /**
-   * Load all CV documents with optional filters
+   * Load all CV documents for the current user
    */
-  const loadAll = async (filter?: Record<string, unknown>) => {
+  const loadAll = async () => {
     loading.value = true;
     error.value = null;
 
     try {
-      items.value = await repository.list(filter);
+      if (!auth.userId.value) {
+        await auth.loadUserId();
+      }
+      if (!auth.userId.value) {
+        throw new Error('Missing user information');
+      }
+      items.value = await repository.listByUser(auth.userId.value);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Unknown error occurred';
       console.error('[useCvDocuments] Error loading CV documents:', err);
