@@ -224,7 +224,7 @@ const handleGenerateSpeech = async () => {
 
       <USkeleton v-else-if="props.summaryLoading || materialsLoading" class="h-10 w-full" />
 
-      <div class="grid gap-3 sm:grid-cols-3">
+      <div v-else class="grid gap-3 sm:grid-cols-3">
         <UButton
           v-if="cvLink"
           color="neutral"

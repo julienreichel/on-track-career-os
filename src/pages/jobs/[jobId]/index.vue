@@ -235,15 +235,15 @@ const linkedCompany = computed(() => {
   if (!companyId) {
     return null;
   }
-  
+
   // Try to get from relationships first (populated after reload)
   const relationCompany = jobWithRelations.value?.company;
   if (relationCompany && relationCompany.id === companyId) {
     return relationCompany;
   }
-  
+
   // Fallback to availableCompanies if relationship is stale or not loaded yet
-  const company = availableCompanies.value.find(c => c.id === companyId);
+  const company = availableCompanies.value.find((c) => c.id === companyId);
   return company ?? null;
 });
 
