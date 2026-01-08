@@ -3,9 +3,10 @@
  * @see amplify/data/ai-operations/parseCvText.ts
  */
 
-import type { ParseCvTextOutput } from '@amplify/data/ai-operations/parseCvText';
+import type { ParseCvTextInput, ParseCvTextOutput } from '@amplify/data/ai-operations/parseCvText';
 
-// Re-export Lambda type with frontend-friendly name
+// Re-export Lambda types with frontend-friendly names
+export type ParseCvInput = ParseCvTextInput;
 export type ParsedCV = ParseCvTextOutput;
 
 /**

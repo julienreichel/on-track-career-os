@@ -3,9 +3,13 @@
  * @see amplify/data/ai-operations/generateAchievementsAndKpis.ts
  */
 
-import type { GenerateAchievementsAndKpisOutput } from '@amplify/data/ai-operations/generateAchievementsAndKpis';
+import type {
+  GenerateAchievementsAndKpisInput,
+  GenerateAchievementsAndKpisOutput,
+} from '@amplify/data/ai-operations/generateAchievementsAndKpis';
 
-// Re-export Lambda type with frontend-friendly name
+// Re-export Lambda types with frontend-friendly names
+export type GenerateAchievementsInput = GenerateAchievementsAndKpisInput;
 export type AchievementsAndKpis = GenerateAchievementsAndKpisOutput;
 
 /**

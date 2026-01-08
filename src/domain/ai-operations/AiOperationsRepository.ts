@@ -1,11 +1,11 @@
 import { gqlOptions } from '@/data/graphql/options';
-import type { ParsedCV } from './ParsedCV';
-import type { ExperiencesResult } from './Experience';
-import type { STARStory } from './STARStory';
-import type { AchievementsAndKpis } from './AchievementsAndKpis';
+import type { ParsedCV, ParseCvInput } from './ParsedCV';
+import type { ExperiencesResult, ExtractExperienceInput } from './Experience';
+import type { STARStory, GenerateStoryInput } from './STARStory';
+import type { AchievementsAndKpis, GenerateAchievementsInput } from './AchievementsAndKpis';
 import type { PersonalCanvas, PersonalCanvasInput } from './PersonalCanvas';
 import type { GenerateCvInput, GenerateCvResult } from './types/generateCv';
-import type { ParsedJobDescription } from './ParsedJobDescription';
+import type { ParsedJobDescription, ParseJobInput } from './ParsedJobDescription';
 import type { AnalyzeCompanyInfoInput, CompanyAnalysisResult } from './CompanyAnalysis';
 import type { GeneratedCompanyCanvas, GeneratedCompanyCanvasInput } from './CompanyCanvasResult';
 import type { MatchingSummaryInput, MatchingSummaryResult } from './MatchingSummaryResult';
@@ -95,29 +95,22 @@ export interface IAiOperationsRepository {
  */
 export type AmplifyAiOperations = {
   parseCvText: (
-    input: { cvText: string },
+    input: ParseCvInput,
     options?: Record<string, unknown>
   ) => Promise<{ data: string | null; errors?: unknown[] }>;
 
   extractExperienceBlocks: (
-    input: { experienceTextBlocks: string[] },
+    input: ExtractExperienceInput,
     options?: Record<string, unknown>
   ) => Promise<{ data: string | null; errors?: unknown[] }>;
 
   generateStarStory: (
-    input: { sourceText: string },
+    input: GenerateStoryInput,
     options?: Record<string, unknown>
   ) => Promise<{ data: string | null; errors?: unknown[] }>;
 
   generateAchievementsAndKpis: (
-    input: {
-      starStory: {
-        situation: string;
-        task: string;
-        action: string;
-        result: string;
-      };
-    },
+    input: GenerateAchievementsInput,
     options?: Record<string, unknown>
   ) => Promise<{ data: string | null; errors?: unknown[] }>;
 
@@ -131,29 +124,17 @@ export type AmplifyAiOperations = {
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 
   parseJobDescription: (
-    input: { jobText: string },
+    input: ParseJobInput,
     options?: Record<string, unknown>
   ) => Promise<{ data: string | null; errors?: unknown[] }>;
 
   analyzeCompanyInfo: (
-    input: {
-      companyName: string;
-      industry?: string;
-      size?: string;
-      rawText: string;
-      jobContext?: {
-        title?: string;
-        summary?: string;
-      };
-    },
+    input: AnalyzeCompanyInfoInput,
     options?: Record<string, unknown>
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 
   generateCompanyCanvas: (
-    input: {
-      companyProfile: string;
-      additionalNotes?: string[];
-    },
+    input: { companyProfile: string; additionalNotes?: string[] },
     options?: Record<string, unknown>
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 
@@ -167,17 +148,13 @@ export type AmplifyAiOperations = {
     options?: Record<string, unknown>
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 
+  generateCoverLetter: (
+    input: SpeechInput,
+    options?: Record<string, unknown>
+  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
+
   generateCv: (
-    input: {
-      userProfile: string;
-      selectedExperiences: string;
-      stories?: string;
-      skills?: string[];
-      languages?: string[];
-      certifications?: string[];
-      interests?: string[];
-      jobDescription?: string;
-    },
+    input: GenerateCvInput,
     options?: Record<string, unknown>
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 };
@@ -199,7 +176,8 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       this._client = client;
     } else {
       // Use Nuxt's auto-imported useNuxtApp (for production)
-      this._client = useNuxtApp().$Amplify.GraphQL.client.queries;
+      // Cast to AmplifyAiOperations since Amplify's generated types are complex
+      this._client = useNuxtApp().$Amplify.GraphQL.client.queries as unknown as AmplifyAiOperations;
     }
   }
 
@@ -310,6 +288,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
   }
 
   async generateCv(input: GenerateCvInput): Promise<GenerateCvResult> {
+    // Input structure matches GraphQL schema directly - a.ref() types need no transformation
     const { data, errors } = await this.client.generateCv(input, gqlOptions());
 
     if (errors && errors.length > 0) {
@@ -339,16 +318,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
   }
 
   async analyzeCompanyInfo(input: AnalyzeCompanyInfoInput): Promise<CompanyAnalysisResult> {
-    const { data, errors } = await this.client.analyzeCompanyInfo(
-      {
-        companyName: input.companyName,
-        industry: input.industry,
-        size: input.size,
-        rawText: input.rawText,
-        jobContext: input.jobContext,
-      },
-      gqlOptions()
-    );
+    const { data, errors } = await this.client.analyzeCompanyInfo(input, gqlOptions());
 
     if (errors && errors.length > 0) {
       throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
@@ -423,6 +393,6 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return data;
+    return data as string;
   }
 }

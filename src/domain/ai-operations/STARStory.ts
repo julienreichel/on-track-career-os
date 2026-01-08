@@ -3,9 +3,13 @@
  * @see amplify/data/ai-operations/generateStarStory.ts
  */
 
-import type { GenerateStarStoryOutput } from '@amplify/data/ai-operations/generateStarStory';
+import type {
+  GenerateStarStoryInput,
+  GenerateStarStoryOutput,
+} from '@amplify/data/ai-operations/generateStarStory';
 
-// Re-export Lambda type with frontend-friendly name
+// Re-export Lambda types with frontend-friendly names
+export type GenerateStoryInput = GenerateStarStoryInput;
 export type STARStory = GenerateStarStoryOutput;
 
 /**

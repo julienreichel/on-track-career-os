@@ -3,8 +3,12 @@
  * @see amplify/data/ai-operations/parseJobDescription.ts
  */
 
-import type { ParseJobDescriptionOutput } from '@amplify/data/ai-operations/parseJobDescription';
+import type {
+  ParseJobDescriptionInput,
+  ParseJobDescriptionOutput,
+} from '@amplify/data/ai-operations/parseJobDescription';
 
+export type ParseJobInput = ParseJobDescriptionInput;
 export type ParsedJobDescription = ParseJobDescriptionOutput;
 
 /**

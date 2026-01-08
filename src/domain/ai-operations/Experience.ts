@@ -5,10 +5,12 @@
 
 import type {
   ExperienceBlock,
+  ExtractExperienceBlocksInput,
   ExtractExperienceBlocksOutput,
 } from '@amplify/data/ai-operations/extractExperienceBlocks';
 
 // Re-export Lambda types with frontend-friendly names
+export type ExtractExperienceInput = ExtractExperienceBlocksInput;
 export type ExtractedExperience = ExperienceBlock;
 export type ExperiencesResult = ExtractExperienceBlocksOutput;
 
