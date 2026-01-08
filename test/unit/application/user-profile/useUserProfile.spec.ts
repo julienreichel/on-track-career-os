@@ -13,6 +13,7 @@ describe('useUserProfile', () => {
   beforeEach(() => {
     mockService = {
       getFullUserProfile: vi.fn(),
+      updateUserProfile: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<UserProfileService>>;
 
     // Mock the constructor to return our mock service
@@ -178,5 +179,89 @@ describe('useUserProfile', () => {
     await load();
 
     expect(mockService.getFullUserProfile).toHaveBeenCalledWith(userId);
+  });
+
+  describe('save', () => {
+    it('should save user profile successfully', async () => {
+      const mockUserProfile = {
+        id: 'user-123',
+        fullName: 'Jane Doe',
+        headline: 'Product Manager',
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-02T00:00:00Z',
+        owner: 'user-123::user-123',
+      } as UserProfile;
+
+      mockService.updateUserProfile.mockResolvedValue(mockUserProfile);
+
+      const { item, loading, save } = useUserProfile('user-123');
+
+      expect(loading.value).toBe(false);
+
+      const input = { id: 'user-123', fullName: 'Jane Doe', headline: 'Product Manager' };
+      const savePromise = save(input);
+
+      expect(loading.value).toBe(true);
+
+      const result = await savePromise;
+
+      expect(loading.value).toBe(false);
+      expect(result).toBe(true);
+      expect(item.value).toEqual(mockUserProfile);
+      expect(mockService.updateUserProfile).toHaveBeenCalledWith(input);
+    });
+
+    it(
+      'should handle save errors and return false',
+      withMockedConsoleError(async () => {
+        mockService.updateUserProfile.mockRejectedValue(new Error('Save failed'));
+
+        const { item, loading, error, save } = useUserProfile('user-123');
+
+        const input = { id: 'user-123', fullName: 'Jane Doe' };
+        const result = await save(input);
+
+        expect(loading.value).toBe(false);
+        expect(error.value).toBe('Save failed');
+        expect(result).toBe(false);
+        expect(item.value).toBeNull();
+      })
+    );
+
+    it(
+      'should handle non-Error save exceptions',
+      withMockedConsoleError(async () => {
+        mockService.updateUserProfile.mockRejectedValue('String error');
+
+        const { error, save } = useUserProfile('user-123');
+
+        const result = await save({ id: 'user-123', fullName: 'Test' });
+
+        expect(error.value).toBe('Unknown error occurred');
+        expect(result).toBe(false);
+      })
+    );
+
+    it('should clear error state on successful save', async () => {
+      const mockUserProfile = {
+        id: 'user-123',
+        fullName: 'Jane Doe',
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-02T00:00:00Z',
+        owner: 'user-123::user-123',
+      } as UserProfile;
+
+      mockService.updateUserProfile.mockResolvedValue(mockUserProfile);
+
+      const { error, save } = useUserProfile('user-123');
+
+      // Set error state
+      error.value = 'Previous error';
+
+      const result = await save({ id: 'user-123', fullName: 'Jane Doe' });
+
+      expect(result).toBe(true);
+      expect(error.value).toBeNull();
+    });
   });
 });

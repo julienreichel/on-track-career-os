@@ -356,4 +356,194 @@ Skills list`;
     expect(result).toContain('## Work History');
     expect(result).toContain('## Technical Skills');
   });
+
+  it('should include skills, languages, certifications, and interests in prompt', async () => {
+    const { InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime');
+
+    mockSend.mockResolvedValue({
+      body: Buffer.from(
+        JSON.stringify({
+          output: {
+            message: {
+              content: [{ text: '# CV' }],
+            },
+          },
+        })
+      ),
+    });
+
+    await handler({
+      arguments: {
+        language: 'en',
+        userProfile: { fullName: 'John Doe' },
+        selectedExperiences: [],
+        skills: ['TypeScript', 'Python', 'AWS'],
+        languages: ['English', 'Spanish'],
+        certifications: ['AWS Certified', 'PMP'],
+        interests: ['Open Source', 'Mentoring', 'Public Speaking'],
+      },
+    });
+
+    const calls = (InvokeModelCommand as unknown as ReturnType<typeof vi.fn>).mock.calls;
+    const commandInput = calls[0][0];
+    const payload = JSON.parse(commandInput.body);
+    const userPrompt = payload.messages[0].content[0].text as string;
+
+    expect(userPrompt).toContain('SKILLS (RAW LIST - SYNTHESIZE INTO CATEGORIES)');
+    expect(userPrompt).toContain('TypeScript, Python, AWS');
+    expect(userPrompt).toContain('## LANGUAGES');
+    expect(userPrompt).toContain('English, Spanish');
+    expect(userPrompt).toContain('## CERTIFICATIONS');
+    expect(userPrompt).toContain('AWS Certified');
+    expect(userPrompt).toContain('PMP');
+    expect(userPrompt).toContain('INTERESTS (RAW LIST - SELECT 3-5 MOST PROFESSIONAL)');
+    expect(userPrompt).toContain('Open Source, Mentoring, Public Speaking');
+  });
+
+  it('should strip trailing notes from AI response', async () => {
+    const mockMarkdown = `# Jane Smith
+
+## Professional Summary
+
+Great developer
+
+---
+Note: This CV was generated based on provided information.`;
+
+    mockSend.mockResolvedValue({
+      body: Buffer.from(
+        JSON.stringify({
+          output: {
+            message: {
+              content: [{ text: mockMarkdown }],
+            },
+          },
+        })
+      ),
+    });
+
+    const result = await handler({
+      arguments: {
+        language: 'en',
+        userProfile: { fullName: 'Jane Smith' },
+        selectedExperiences: [],
+      },
+    });
+
+    expect(result).toContain('Great developer');
+    expect(result).not.toContain('Note: This CV was generated');
+    expect(result).not.toContain('---');
+  });
+
+  it('should strip code fences from AI response', async () => {
+    const mockMarkdown = `\`\`\`markdown
+# Jane Smith
+
+## Professional Summary
+
+Great developer
+\`\`\``;
+
+    mockSend.mockResolvedValue({
+      body: Buffer.from(
+        JSON.stringify({
+          output: {
+            message: {
+              content: [{ text: mockMarkdown }],
+            },
+          },
+        })
+      ),
+    });
+
+    const result = await handler({
+      arguments: {
+        language: 'en',
+        userProfile: { fullName: 'Jane Smith' },
+        selectedExperiences: [],
+      },
+    });
+
+    expect(result).toContain('# Jane Smith');
+    expect(result).toContain('Great developer');
+    expect(result).not.toContain('```');
+  });
+
+  it('should strip leading and trailing code fences separately', async () => {
+    const mockMarkdown = `\`\`\`
+# Jane Smith
+
+Great developer
+\`\`\``;
+
+    mockSend.mockResolvedValue({
+      body: Buffer.from(
+        JSON.stringify({
+          output: {
+            message: {
+              content: [{ text: mockMarkdown }],
+            },
+          },
+        })
+      ),
+    });
+
+    const result = await handler({
+      arguments: {
+        language: 'en',
+        userProfile: { fullName: 'Jane Smith' },
+        selectedExperiences: [],
+      },
+    });
+
+    expect(result).toContain('# Jane Smith');
+    expect(result).not.toContain('```');
+  });
+
+  it('should include company summary only when jobDescription and matchingSummary both present', async () => {
+    const { InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime');
+
+    mockSend.mockResolvedValue({
+      body: Buffer.from(
+        JSON.stringify({
+          output: {
+            message: {
+              content: [{ text: '# CV' }],
+            },
+          },
+        })
+      ),
+    });
+
+    await handler({
+      arguments: {
+        language: 'en',
+        userProfile: { fullName: 'John Doe' },
+        selectedExperiences: [],
+        jobDescription: { title: 'Engineer' },
+        matchingSummary: {
+          overallScore: 80,
+          scoreBreakdown: { skillFit: 40, experienceFit: 20, interestFit: 10, edge: 10 },
+          recommendation: 'apply',
+          reasoningHighlights: ['Good fit'],
+          strengthsForThisRole: ['Leadership'],
+          skillMatch: ['Python'],
+          riskyPoints: [],
+          impactOpportunities: [],
+          tailoringTips: ['Focus on impact'],
+        },
+        company: { companyName: 'Acme Corp', industry: 'Tech' },
+      },
+    });
+
+    const calls = (InvokeModelCommand as unknown as ReturnType<typeof vi.fn>).mock.calls;
+    const commandInput = calls[0][0];
+    const payload = JSON.parse(commandInput.body);
+    const userPrompt = payload.messages[0].content[0].text as string;
+
+    expect(userPrompt).toContain('TARGET JOB DESCRIPTION');
+    expect(userPrompt).toContain('MATCHING SUMMARY');
+    expect(userPrompt).toContain('COMPANY SUMMARY');
+    expect(userPrompt).toContain('Acme Corp');
+  });
 });

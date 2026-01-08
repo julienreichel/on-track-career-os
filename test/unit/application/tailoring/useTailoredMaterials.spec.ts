@@ -225,4 +225,131 @@ describe('useTailoredMaterials', () => {
     );
     expect(deps.speechBlockService.createSpeechBlock).not.toHaveBeenCalled();
   });
+
+  it('generates cover letter without job companyId (no company context)', async () => {
+    const jobWithoutCompany = { ...job, companyId: null };
+    const deps = createDependencies();
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    const result = await engine.generateTailoredCoverLetterForJob({
+      job: jobWithoutCompany,
+      matchingSummary,
+    });
+
+    expect(result).toEqual(coverLetter);
+    expect(deps.companyService.getCompany).not.toHaveBeenCalled();
+    expect(deps.aiService.generateCoverLetter).toHaveBeenCalledWith(
+      expect.objectContaining({
+        jobDescription: expect.objectContaining({ title: job.title }),
+      })
+    );
+  });
+
+  it('generates speech without job companyId (no company context)', async () => {
+    const jobWithoutCompany = { ...job, companyId: null };
+    const deps = createDependencies();
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    const result = await engine.generateTailoredSpeechForJob({
+      job: jobWithoutCompany,
+      matchingSummary,
+    });
+
+    expect(result).toEqual(speechBlock);
+    expect(deps.companyService.getCompany).not.toHaveBeenCalled();
+    expect(deps.aiService.generateSpeech).toHaveBeenCalledWith(
+      expect.objectContaining({
+        jobDescription: expect.objectContaining({ title: job.title }),
+      })
+    );
+  });
+
+  it('handles company loading error gracefully', async () => {
+    const deps = createDependencies();
+    deps.companyService.getCompany = vi.fn().mockRejectedValue(new Error('Company not found'));
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    const result = await engine.generateTailoredCvForJob({ job, matchingSummary });
+
+    expect(result).toEqual(cvDocument);
+    expect(deps.aiService.generateCv).toHaveBeenCalledWith(
+      expect.objectContaining({
+        jobDescription: expect.objectContaining({ title: job.title }),
+        company: undefined,
+      })
+    );
+  });
+
+  it('generates cover letter and stores tone option', async () => {
+    const deps = createDependencies();
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    await engine.generateTailoredCoverLetterForJob({
+      job,
+      matchingSummary,
+      options: { tone: 'formal', name: 'Custom Cover Letter' },
+    });
+
+    expect(deps.coverLetterService.createCoverLetter).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tone: 'formal',
+        name: 'Custom Cover Letter',
+      })
+    );
+  });
+
+  it('regenerates cover letter and preserves tone option', async () => {
+    const deps = createDependencies();
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    await engine.regenerateTailoredCoverLetterForJob({
+      id: coverLetter.id,
+      job,
+      matchingSummary,
+      options: { tone: 'casual' },
+    });
+
+    expect(deps.coverLetterService.updateCoverLetter).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: coverLetter.id,
+        tone: 'casual',
+      })
+    );
+  });
+
+  it('generates speech and stores custom name', async () => {
+    const deps = createDependencies();
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    await engine.generateTailoredSpeechForJob({
+      job,
+      matchingSummary,
+      options: { name: 'Custom Speech' },
+    });
+
+    expect(deps.speechBlockService.createSpeechBlock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Custom Speech',
+      })
+    );
+  });
+
+  it('regenerates speech and updates custom name', async () => {
+    const deps = createDependencies();
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    await engine.regenerateTailoredSpeechForJob({
+      id: speechBlock.id,
+      job,
+      matchingSummary,
+      options: { name: 'Updated Speech' },
+    });
+
+    expect(deps.speechBlockService.updateSpeechBlock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: speechBlock.id,
+        name: 'Updated Speech',
+      })
+    );
+  });
 });

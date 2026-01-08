@@ -455,6 +455,50 @@ describe('AiOperationsService', () => {
         'Failed to generate CV: Network down'
       );
     });
+
+    it('rejects when input is null', async () => {
+      await expect(service.generateCv(null as any)).rejects.toThrow('Invalid input structure');
+    });
+
+    it('rejects when input is not an object', async () => {
+      await expect(service.generateCv('invalid' as any)).rejects.toThrow('Invalid input structure');
+    });
+
+    it('rejects when userProfile is missing', async () => {
+      await expect(service.generateCv({ ...baseInput, userProfile: null as any })).rejects.toThrow(
+        'User profile is required'
+      );
+    });
+
+    it('rejects when userProfile is not an object', async () => {
+      await expect(
+        service.generateCv({ ...baseInput, userProfile: 'invalid' as any })
+      ).rejects.toThrow('User profile is required');
+    });
+
+    it('rejects when fullName is missing', async () => {
+      await expect(
+        service.generateCv({
+          ...baseInput,
+          userProfile: { ...baseInput.userProfile, fullName: '' },
+        })
+      ).rejects.toThrow('User profile must have a fullName');
+    });
+
+    it('rejects when fullName is only whitespace', async () => {
+      await expect(
+        service.generateCv({
+          ...baseInput,
+          userProfile: { ...baseInput.userProfile, fullName: '   ' },
+        })
+      ).rejects.toThrow('User profile must have a fullName');
+    });
+
+    it('rejects when selectedExperiences is not an array', async () => {
+      await expect(
+        service.generateCv({ ...baseInput, selectedExperiences: 'invalid' as any })
+      ).rejects.toThrow('Selected experiences must be an array');
+    });
   });
 
   describe('analyzeCompanyInfo', () => {
@@ -742,6 +786,49 @@ describe('AiOperationsService', () => {
 
       await expect(service.generateSpeech(validInput as never)).rejects.toThrow(
         'Invalid speech generation result'
+      );
+    });
+  });
+
+  describe('generateCoverLetter', () => {
+    const validInput = {
+      language: 'en',
+      profile: { fullName: 'Casey Candidate' },
+      experiences: [],
+    };
+
+    it('should generate cover letter successfully', async () => {
+      mockRepo.generateCoverLetter = vi.fn().mockResolvedValue('Dear Hiring Manager...');
+
+      const result = await service.generateCoverLetter(validInput as never);
+
+      expect(result).toBe('Dear Hiring Manager...');
+      expect(mockRepo.generateCoverLetter).toHaveBeenCalledWith(validInput);
+    });
+
+    it('should throw if profile fullName missing', async () => {
+      mockRepo.generateCoverLetter = vi.fn();
+
+      await expect(
+        service.generateCoverLetter({ language: 'en', profile: {}, experiences: [] } as never)
+      ).rejects.toThrow('User profile with fullName is required');
+      expect(mockRepo.generateCoverLetter).not.toHaveBeenCalled();
+    });
+
+    it('should throw if language is not supported', async () => {
+      mockRepo.generateCoverLetter = vi.fn();
+
+      await expect(
+        service.generateCoverLetter({ ...validInput, language: 'fr' as 'en' } as never)
+      ).rejects.toThrow('Language must be "en"');
+      expect(mockRepo.generateCoverLetter).not.toHaveBeenCalled();
+    });
+
+    it('should throw if output is not a string', async () => {
+      mockRepo.generateCoverLetter = vi.fn().mockResolvedValue({ invalid: true });
+
+      await expect(service.generateCoverLetter(validInput as never)).rejects.toThrow(
+        'Invalid cover letter generation result'
       );
     });
   });

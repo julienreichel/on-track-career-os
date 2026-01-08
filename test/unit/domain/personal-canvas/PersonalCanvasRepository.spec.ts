@@ -335,4 +335,56 @@ describe('PersonalCanvasRepository', () => {
       expect(repoWithCustomModel).toBeInstanceOf(PersonalCanvasRepository);
     });
   });
+
+  describe('getByUserId', () => {
+    it('should fetch PersonalCanvas by userId', async () => {
+      const mockCanvas = {
+        id: 'canvas-123',
+        userId: 'user-123',
+        valueProposition: 'Test proposition',
+        needsUpdate: false,
+      };
+
+      mockModel.list.mockResolvedValue({
+        data: [mockCanvas],
+      });
+
+      const result = await repository.getByUserId('user-123');
+
+      expect(mockModel.list).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filter: {
+            userId: { eq: 'user-123' },
+          },
+          authMode: 'userPool',
+        })
+      );
+      expect(result).toEqual(mockCanvas);
+    });
+
+    it('should return null when no PersonalCanvas found for userId', async () => {
+      mockModel.list.mockResolvedValue({
+        data: [],
+      });
+
+      const result = await repository.getByUserId('user-456');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return first canvas when multiple exist for userId', async () => {
+      const mockCanvases = [
+        { id: 'canvas-1', userId: 'user-123', needsUpdate: false },
+        { id: 'canvas-2', userId: 'user-123', needsUpdate: true },
+      ];
+
+      mockModel.list.mockResolvedValue({
+        data: mockCanvases,
+      });
+
+      const result = await repository.getByUserId('user-123');
+
+      expect(result).toEqual(mockCanvases[0]);
+    });
+  });
 });

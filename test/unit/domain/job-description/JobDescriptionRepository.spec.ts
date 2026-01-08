@@ -87,4 +87,60 @@ describe('JobDescriptionRepository', () => {
 
     expect(mockModel.delete).toHaveBeenCalledWith({ id: 'job-delete' }, expect.any(Object));
   });
+
+  it('should get job with relations', async () => {
+    const mockJobWithRelations = {
+      id: 'job-123',
+      company: { id: 'company-1' },
+      matchingSummaries: [{ id: 'summary-1' }],
+      cvs: [{ id: 'cv-1' }],
+      coverLetters: [{ id: 'cl-1' }],
+      speechBlocks: [{ id: 'sb-1' }],
+    } as JobDescription;
+    mockModel.get.mockResolvedValue({ data: mockJobWithRelations });
+
+    const repo = buildRepository();
+    const result = await repo.getWithRelations('job-123');
+
+    expect(mockModel.get).toHaveBeenCalledWith(
+      { id: 'job-123' },
+      expect.objectContaining({
+        selectionSet: expect.arrayContaining([
+          'id',
+          'rawText',
+          'owner',
+          'title',
+          'company.*',
+          'matchingSummaries.*',
+          'cvs.*',
+          'coverLetters.*',
+          'speechBlocks.*',
+        ]),
+      })
+    );
+    expect(result).toEqual(mockJobWithRelations);
+  });
+
+  it('should return empty array when owner is empty', async () => {
+    const repo = buildRepository();
+    const result = await repo.listByOwner('');
+
+    expect(mockModel.listJobDescriptionByOwner).not.toHaveBeenCalled();
+    expect(result).toEqual([]);
+  });
+
+  it('should handle pagination when listing by owner', async () => {
+    const mockData1 = [{ id: 'job-1' }] as JobDescription[];
+    const mockData2 = [{ id: 'job-2' }] as JobDescription[];
+
+    mockModel.listJobDescriptionByOwner
+      .mockResolvedValueOnce({ data: mockData1, nextToken: 'token-1' })
+      .mockResolvedValueOnce({ data: mockData2, nextToken: null });
+
+    const repo = buildRepository();
+    const result = await repo.listByOwner('user-1::user-1');
+
+    expect(mockModel.listJobDescriptionByOwner).toHaveBeenCalledTimes(2);
+    expect(result).toEqual([...mockData1, ...mockData2]);
+  });
 });
