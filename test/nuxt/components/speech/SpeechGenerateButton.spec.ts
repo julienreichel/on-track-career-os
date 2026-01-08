@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestI18n } from '../../../utils/createTestI18n';
 import SpeechGenerateButton from '@/components/speech/SpeechGenerateButton.vue';

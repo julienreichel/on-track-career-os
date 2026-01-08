@@ -345,7 +345,7 @@ describe('CvExperiencePicker', () => {
   });
 
   it('should not load experiences if userId is null', async () => {
-    const wrapper = mount(CvExperiencePicker, {
+    mount(CvExperiencePicker, {
       global: {
         plugins: [i18n, router],
         stubs,
@@ -387,7 +387,7 @@ describe('CvExperiencePicker', () => {
     mockExperienceRepo.list.mockRejectedValue(new Error('API error'));
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const wrapper = mount(CvExperiencePicker, {
+    mount(CvExperiencePicker, {
       global: {
         plugins: [i18n, router],
         stubs,

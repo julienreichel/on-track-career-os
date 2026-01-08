@@ -84,8 +84,7 @@ const stubs = {
   ItemCard: {
     props: ['title', 'subtitle'],
     emits: ['edit', 'delete'],
-    template:
-      '<div><h3>{{ title }}</h3><p>{{ subtitle }}</p><slot name="actions" /><slot /></div>',
+    template: '<div><h3>{{ title }}</h3><p>{{ subtitle }}</p><slot name="actions" /><slot /></div>',
   },
   ConfirmModal: {
     props: ['open'],
@@ -240,4 +239,3 @@ describe('CV Listing Page - With CVs', () => {
     await flushPromises();
   });
 });
-
