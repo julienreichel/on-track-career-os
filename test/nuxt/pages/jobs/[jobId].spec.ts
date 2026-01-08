@@ -229,6 +229,14 @@ const stubs = {
       </div>
     `,
   },
+  LinkedCompanyBadge: {
+    props: ['company'],
+    template: `
+      <div class="linked-company-badge" data-testid="job-company-badge">
+        {{ company?.companyName || 'Untitled company' }}
+      </div>
+    `,
+  },
   TailoredMaterialsCard: {
     props: [
       'job',
@@ -407,5 +415,108 @@ describe('Job Detail Page', () => {
     await clearButton.trigger('click');
 
     expect(mockUpdateJob).toHaveBeenCalledWith('job-1', { companyId: null });
+  });
+
+  it('shows company badge immediately after selection even with stale relationship data', async () => {
+    // Start with no company
+    selectedJob.value = { ...baseJob, companyId: null, company: null };
+    mockLoadJobWithRelations.mockImplementationOnce(async () => {
+      selectedJob.value = { ...baseJob, companyId: null, company: null };
+      return selectedJob.value;
+    });
+
+    // Mock update to set companyId but leave company relationship null (simulating stale data)
+    mockUpdateJob.mockImplementation(async (id, updates) => {
+      selectedJob.value = {
+        ...selectedJob.value,
+        ...updates,
+        company: null, // Relationship data is stale
+      };
+      return selectedJob.value;
+    });
+
+    const wrapper = await mountPage();
+
+    // Verify no badge initially
+    expect(wrapper.find('[data-testid="job-company-badge"]').exists()).toBe(false);
+
+    // Enter edit mode and select company
+    const editButton = wrapper
+      .findAll('.u-button')
+      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+    await editButton?.trigger('click');
+    await flushPromises();
+
+    const linkButton = wrapper.find('.select-company');
+    await linkButton.trigger('click');
+    await flushPromises();
+
+    // Badge should appear immediately using availableCompanies fallback
+    expect(wrapper.find('[data-testid="job-company-badge"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="job-company-badge"]').text()).toContain('Global Freight');
+  });
+
+  it('hides company badge immediately after clearing', async () => {
+    // Start with linked company
+    selectedJob.value = { ...baseJob, companyId: 'company-1', company: baseCompany };
+    mockLoadJobWithRelations.mockImplementationOnce(async () => {
+      selectedJob.value = { ...baseJob, companyId: 'company-1', company: baseCompany };
+      return selectedJob.value;
+    });
+
+    // Mock update to clear companyId but leave stale company relationship
+    mockUpdateJob.mockImplementation(async (id, updates) => {
+      selectedJob.value = {
+        ...selectedJob.value,
+        ...updates,
+        company: baseCompany, // Relationship data is stale
+      };
+      return selectedJob.value;
+    });
+
+    const wrapper = await mountPage();
+
+    // Verify badge exists initially
+    expect(wrapper.find('[data-testid="job-company-badge"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="job-company-badge"]').text()).toContain('Acme Corp');
+
+    // Enter edit mode and clear company
+    const editButton = wrapper
+      .findAll('.u-button')
+      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+    await editButton?.trigger('click');
+    await flushPromises();
+
+    const clearButton = wrapper.find('[data-testid="job-company-clear"]');
+    await clearButton.trigger('click');
+    await flushPromises();
+
+    // Badge should disappear immediately even with stale relationship data
+    expect(wrapper.find('[data-testid="job-company-badge"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="job-company-clear"]').exists()).toBe(false);
+  });
+
+  it('uses companyId as source of truth over stale relationship data', async () => {
+    // Simulate stale data: companyId points to company-2 but relationship still has company-1
+    selectedJob.value = {
+      ...baseJob,
+      companyId: 'company-2',
+      company: baseCompany, // Stale: still points to company-1
+    };
+    mockLoadJobWithRelations.mockImplementationOnce(async () => {
+      selectedJob.value = {
+        ...baseJob,
+        companyId: 'company-2',
+        company: baseCompany,
+      };
+      return selectedJob.value;
+    });
+
+    const wrapper = await mountPage();
+
+    // Should show Global Freight (company-2) not Acme Corp (company-1)
+    expect(wrapper.find('[data-testid="job-company-badge"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="job-company-badge"]').text()).toContain('Global Freight');
+    expect(wrapper.find('[data-testid="job-company-badge"]').text()).not.toContain('Acme Corp');
   });
 });
