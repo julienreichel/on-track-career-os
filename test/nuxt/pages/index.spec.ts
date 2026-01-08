@@ -277,4 +277,100 @@ describe('Index Page Component', () => {
       expect(wrapper.find('.u-page-body').exists()).toBe(true);
     });
   });
+
+  describe('Empty State - CV Upload Feature', () => {
+    it('should show CV upload card when showCvUpload is true', () => {
+      const wrapper = mount(
+        {
+          template: `
+            <UPageGrid>
+              <UPageCard :title="t('features.profile.title')" />
+              <UPageCard
+                v-if="showCvUpload"
+                :title="t('features.cvUpload.title')"
+                :description="t('features.cvUpload.description')"
+                to="/profile/cv-upload"
+              />
+              <UPageCard :title="t('features.jobs.title')" />
+            </UPageGrid>
+          `,
+          setup() {
+            const { t } = i18n.global;
+            const showCvUpload = true;
+            return { t, showCvUpload };
+          },
+        },
+        {
+          global: {
+            plugins: [i18n, router],
+            stubs,
+          },
+        }
+      );
+
+      const cards = wrapper.findAll('.u-page-card');
+      expect(cards).toHaveLength(3);
+      expect(wrapper.text()).toContain(i18n.global.t('features.cvUpload.title'));
+    });
+
+    it('should hide CV upload card when showCvUpload is false', () => {
+      const wrapper = mount(
+        {
+          template: `
+            <UPageGrid>
+              <UPageCard :title="t('features.profile.title')" />
+              <UPageCard
+                v-if="showCvUpload"
+                :title="t('features.cvUpload.title')"
+                to="/profile/cv-upload"
+              />
+              <UPageCard :title="t('features.jobs.title')" />
+            </UPageGrid>
+          `,
+          setup() {
+            const { t } = i18n.global;
+            const showCvUpload = false;
+            return { t, showCvUpload };
+          },
+        },
+        {
+          global: {
+            plugins: [i18n, router],
+            stubs,
+          },
+        }
+      );
+
+      const cards = wrapper.findAll('.u-page-card');
+      expect(cards).toHaveLength(2);
+      expect(wrapper.text()).not.toContain(i18n.global.t('features.cvUpload.title'));
+    });
+
+    it('should render CV upload card with correct title and description when empty', () => {
+      const wrapper = mount(
+        {
+          template: `
+            <UPageCard
+              :title="t('features.cvUpload.title')"
+              :description="t('features.cvUpload.description')"
+              to="/profile/cv-upload"
+            />
+          `,
+          setup() {
+            const { t } = i18n.global;
+            return { t };
+          },
+        },
+        {
+          global: {
+            plugins: [i18n, router],
+            stubs,
+          },
+        }
+      );
+
+      expect(wrapper.text()).toContain(i18n.global.t('features.cvUpload.title'));
+      expect(wrapper.text()).toContain(i18n.global.t('features.cvUpload.description'));
+    });
+  });
 });

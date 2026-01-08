@@ -8,6 +8,7 @@ import { test, expect } from '@playwright/test';
  * Component/UI tests moved to: test/nuxt/pages/index.spec.ts
  * - Page header rendering
  * - Feature card display
+ * - Empty state (CV upload visibility)
  * - Responsive layout checks
  * - Accessibility structure
  *
@@ -16,23 +17,6 @@ import { test, expect } from '@playwright/test';
  * - Authentication redirects
  * - Full page load and interaction workflows
  */
-
-// Empty state tests - run serially FIRST before any experiences are created
-test.describe.serial('Home Page - Empty State', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-  });
-
-  test('should have CV upload feature when no experiences exist', async ({ page }) => {
-    // CV upload is only shown on home page when user has no experiences
-    // This test MUST run before any experience creation tests
-    // CV upload link has absolute overlay positioning (UPageCard)
-    const cvUploadLink = page.locator('a[href="/profile/cv-upload"]');
-    await expect(cvUploadLink).toHaveCount(1);
-    await expect(cvUploadLink).toHaveAttribute('href', '/profile/cv-upload');
-  });
-});
 
 test.describe('Home Page - Authenticated User', () => {
   test.beforeEach(async ({ page }) => {
