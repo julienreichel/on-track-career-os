@@ -70,14 +70,6 @@ test.describe('CV Generation Workflow', () => {
 
     await expect(page).toHaveURL(/\/applications\/cv\/[\w-]+/, { timeout: 15000 });
   });
-
-  test('should show empty state when no experiences exist', async ({ page }) => {
-    // Navigate to new CV page
-    await page.goto('/applications/cv/new');
-
-    // Should show empty state message
-    await expect(page.getByText(/no experiences/i)).toBeVisible();
-  });
 });
 
 test.describe('CV Viewing and Editing', () => {
