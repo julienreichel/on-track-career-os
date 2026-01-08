@@ -17,7 +17,7 @@ describe('CoverLetterService', () => {
   beforeEach(() => {
     mockRepository = {
       get: vi.fn(),
-      list: vi.fn(),
+      listByUser: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -54,13 +54,13 @@ describe('CoverLetterService', () => {
     });
   });
 
-  it('lists cover letters with filters', async () => {
+  it('lists cover letters by user', async () => {
     const letters = [{ id: 'cl-1' }] as CoverLetter[];
-    mockRepository.list.mockResolvedValue(letters);
+    mockRepository.listByUser.mockResolvedValue(letters);
 
-    const result = await service.listCoverLetters({ userId: { eq: 'user-1' } });
+    const result = await service.listCoverLettersByUser('user-1');
 
-    expect(mockRepository.list).toHaveBeenCalledWith({ userId: { eq: 'user-1' } });
+    expect(mockRepository.listByUser).toHaveBeenCalledWith('user-1');
     expect(result).toEqual(letters);
   });
 

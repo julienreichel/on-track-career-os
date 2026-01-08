@@ -270,9 +270,10 @@ function createExistingMaterialsLoader({
           .cvRepository
           .listByUser(userId)
           .then((items) => items.filter((item) => item.jobId === jobId)),
-        deps.coverLetterService.listCoverLetters({
-          filter: { jobId: { eq: jobId }, userId: { eq: userId } },
-        }),
+        deps
+          .coverLetterService
+          .listCoverLettersByUser(userId)
+          .then((items) => items.filter((item) => item.jobId === jobId)),
         deps.speechBlockService.listSpeechBlocks({
           filter: { jobId: { eq: jobId }, userId: { eq: userId } },
         }),

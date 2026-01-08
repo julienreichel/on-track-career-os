@@ -5,10 +5,16 @@ import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 import { withMockedConsoleError } from '../../../utils/withMockedConsole';
 
 vi.mock('@/domain/cover-letter/CoverLetterRepository');
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => ({
+    userId: { value: 'user-1' },
+    loadUserId: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
 
 describe('useCoverLetters', () => {
   let mockRepository: {
-    list: ReturnType<typeof vi.fn>;
+    listByUser: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
@@ -19,7 +25,7 @@ describe('useCoverLetters', () => {
     vi.clearAllMocks();
 
     mockRepository = {
-      list: vi.fn(),
+      listByUser: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -33,36 +39,22 @@ describe('useCoverLetters', () => {
     it('should load all cover letters', async () => {
       const mockLetters = [{ id: 'cl-1' }, { id: 'cl-2' }] as CoverLetter[];
 
-      mockRepository.list.mockResolvedValue(mockLetters);
+      mockRepository.listByUser.mockResolvedValue(mockLetters);
 
       const { items, loading, error, loadAll } = useCoverLetters();
 
       await loadAll();
 
-      expect(mockRepository.list).toHaveBeenCalledWith({});
+      expect(mockRepository.listByUser).toHaveBeenCalledWith('user-1');
       expect(items.value).toEqual(mockLetters);
       expect(loading.value).toBe(false);
       expect(error.value).toBeNull();
     });
 
-    it('should load cover letters with filter', async () => {
-      const mockFilter = { userId: { eq: 'user-1' } };
-      const mockLetters = [{ id: 'cl-1' }] as CoverLetter[];
-
-      mockRepository.list.mockResolvedValue(mockLetters);
-
-      const { items, loadAll } = useCoverLetters();
-
-      await loadAll(mockFilter);
-
-      expect(mockRepository.list).toHaveBeenCalledWith(mockFilter);
-      expect(items.value).toEqual(mockLetters);
-    });
-
     it(
       'should handle errors during load',
       withMockedConsoleError(async () => {
-        mockRepository.list.mockRejectedValue(new Error('Load failed'));
+        mockRepository.listByUser.mockRejectedValue(new Error('Load failed'));
 
         const { items, error, loadAll } = useCoverLetters();
 

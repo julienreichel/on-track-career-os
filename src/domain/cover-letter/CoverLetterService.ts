@@ -15,8 +15,8 @@ export class CoverLetterService {
     return item;
   }
 
-  async listCoverLetters(filter?: Record<string, unknown>): Promise<CoverLetter[]> {
-    return this.repo.list(filter);
+  async listCoverLettersByUser(userId: string): Promise<CoverLetter[]> {
+    return this.repo.listByUser(userId);
   }
 
   async createCoverLetter(input: CoverLetterCreateInput): Promise<CoverLetter | null> {

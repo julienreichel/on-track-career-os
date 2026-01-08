@@ -125,12 +125,10 @@ import ConfirmModal from '@/components/ConfirmModal.vue';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
-import { useAuthUser } from '@/composables/useAuthUser';
 import { formatListDate } from '@/utils/formatListDate';
 
 const { t } = useI18n();
 const toast = useToast();
-const { userId, loadUserId } = useAuthUser();
 const { items, loading, error, loadAll, deleteCoverLetter } = useCoverLetters();
 
 const deleteModalOpen = ref(false);
@@ -166,13 +164,8 @@ const filteredItems = computed(() => {
 
 onMounted(async () => {
   hasLoaded.value = false;
-  await loadUserId();
-  if (!userId.value) {
-    hasLoaded.value = true;
-    return;
-  }
   try {
-    await loadAll({ filter: { userId: { eq: userId.value } } });
+    await loadAll();
   } finally {
     hasLoaded.value = true;
   }

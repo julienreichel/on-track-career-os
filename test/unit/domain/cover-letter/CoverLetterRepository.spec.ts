@@ -4,47 +4,42 @@ import {
   type AmplifyCoverLetterModel,
 } from '@/domain/cover-letter/CoverLetterRepository';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
-
-const { gqlOptionsMock } = vi.hoisted(() => ({
-  gqlOptionsMock: vi.fn((custom?: Record<string, unknown>) => ({
-    authMode: 'userPool',
-    ...(custom ?? {}),
-  })),
-}));
-
-const { fetchAllListItemsMock } = vi.hoisted(() => ({
-  fetchAllListItemsMock: vi.fn(),
-}));
+import type { AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
 
 vi.mock('@/data/graphql/options', () => ({
-  gqlOptions: gqlOptionsMock,
-}));
-
-vi.mock('@/data/graphql/pagination', () => ({
-  fetchAllListItems: fetchAllListItemsMock,
+  gqlOptions: (custom?: Record<string, unknown>) => ({
+    authMode: 'userPool',
+    ...(custom ?? {}),
+  }),
 }));
 
 describe('CoverLetterRepository', () => {
   let repository: CoverLetterRepository;
   let mockModel: {
     get: ReturnType<typeof vi.fn>;
-    list: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
+  };
+  let mockUserProfileModel: {
+    get: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
     mockModel = {
       get: vi.fn(),
-      list: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
     };
+    mockUserProfileModel = {
+      get: vi.fn(),
+    };
 
-    repository = new CoverLetterRepository(mockModel as unknown as AmplifyCoverLetterModel);
-    fetchAllListItemsMock.mockResolvedValue([]);
+    repository = new CoverLetterRepository(
+      mockModel as unknown as AmplifyCoverLetterModel,
+      mockUserProfileModel as AmplifyUserProfileModel
+    );
   });
 
   afterEach(() => {
@@ -64,13 +59,26 @@ describe('CoverLetterRepository', () => {
     );
   });
 
-  it('lists cover letters with optional filter', async () => {
-    await repository.list({ userId: { eq: 'user-1' } });
+  it('lists cover letters by user', async () => {
+    const letters = [{ id: 'cl-1' }] as CoverLetter[];
+    mockUserProfileModel.get.mockResolvedValue({
+      data: { id: 'user-1', coverLetters: letters },
+    });
 
-    expect(fetchAllListItemsMock).toHaveBeenCalledTimes(1);
-    const [listFn, options] = fetchAllListItemsMock.mock.calls[0];
-    expect(typeof listFn).toBe('function');
-    expect(options).toEqual(expect.objectContaining({ userId: { eq: 'user-1' } }));
+    const result = await repository.listByUser('user-1');
+
+    expect(mockUserProfileModel.get).toHaveBeenCalledWith(
+      { id: 'user-1' },
+      expect.objectContaining({ authMode: 'userPool', selectionSet: ['id', 'coverLetters.*'] })
+    );
+    expect(result).toEqual(letters);
+  });
+
+  it('returns empty array when userId missing', async () => {
+    const result = await repository.listByUser('');
+
+    expect(result).toEqual([]);
+    expect(mockUserProfileModel.get).not.toHaveBeenCalled();
   });
 
   it('creates cover letters', async () => {

@@ -1,5 +1,6 @@
 import { gqlOptions } from '@/data/graphql/options';
-import { fetchAllListItems } from '@/data/graphql/pagination';
+import type { AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
+import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { CoverLetterCreateInput, CoverLetterUpdateInput, CoverLetter } from './CoverLetter';
 
 export type AmplifyCoverLetterModel = {
@@ -7,9 +8,6 @@ export type AmplifyCoverLetterModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: CoverLetter | null }>;
-  list: (
-    options?: Record<string, unknown>
-  ) => Promise<{ data: CoverLetter[]; nextToken?: string | null }>;
   create: (
     input: CoverLetterCreateInput,
     options?: Record<string, unknown>
@@ -24,20 +22,28 @@ export type AmplifyCoverLetterModel = {
   ) => Promise<{ data: CoverLetter | null }>;
 };
 
+type UserProfileWithCoverLetters = UserProfile & {
+  coverLetters?: (CoverLetter | null)[] | null;
+};
+
 export class CoverLetterRepository {
   private readonly _model: AmplifyCoverLetterModel;
+  private readonly _userProfileModel: AmplifyUserProfileModel;
 
   /**
    * Constructor with optional dependency injection for testing
    * @param model - Optional Amplify model instance (for testing)
    */
-  constructor(model?: AmplifyCoverLetterModel) {
-    if (model) {
+  constructor(model?: AmplifyCoverLetterModel, userProfileModel?: AmplifyUserProfileModel) {
+    if (model && userProfileModel) {
       // Use injected model (for tests)
       this._model = model;
+      this._userProfileModel = userProfileModel;
     } else {
       // Use Nuxt's auto-imported useNuxtApp (for production)
-      this._model = useNuxtApp().$Amplify.GraphQL.client.models.CoverLetter;
+      const amplify = useNuxtApp().$Amplify.GraphQL.client;
+      this._model = amplify.models.CoverLetter;
+      this._userProfileModel = amplify.models.UserProfile;
     }
   }
 
@@ -50,8 +56,19 @@ export class CoverLetterRepository {
     return res.data;
   }
 
-  async list(filter: Record<string, unknown> = {}) {
-    return fetchAllListItems<CoverLetter>(this.model.list.bind(this.model), filter);
+  async listByUser(userId: string): Promise<CoverLetter[]> {
+    if (!userId) {
+      return [];
+    }
+
+    const selectionSet = ['id', 'coverLetters.*'];
+    const { data } = await this._userProfileModel.get(
+      { id: userId },
+      gqlOptions({ selectionSet })
+    );
+    const profile = data as UserProfileWithCoverLetters | null;
+    const items = (profile?.coverLetters ?? []) as CoverLetter[];
+    return items.filter((item): item is CoverLetter => Boolean(item));
   }
 
   async create(input: CoverLetterCreateInput) {
