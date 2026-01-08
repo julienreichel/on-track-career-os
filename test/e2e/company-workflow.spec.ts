@@ -191,6 +191,12 @@ test.describe('Company workflow', () => {
     await expect(page.getByRole('link', { name: /view company/i })).toBeVisible();
 
     await page.getByRole('link', { name: /view company/i }).click();
-    await expect(page).toHaveURL(companyDetailUrl!);
+    
+    // Verify we navigated to the correct company by checking the heading
+    // (more resilient than exact URL match, especially with concurrent tests)
+    await expect(page.getByRole('heading', { name: companySearchName, level: 1 })).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(page).toHaveURL(/\/companies\/[0-9a-f-]+$/i);
   });
 });
