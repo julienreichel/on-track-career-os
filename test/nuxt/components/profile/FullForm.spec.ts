@@ -6,6 +6,14 @@ import { ref } from 'vue';
 import FullForm from '@/components/profile/FullForm.vue';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 
+// Mock UserProfileService to prevent Amplify client initialization
+vi.mock('@/domain/user-profile/UserProfileService', () => ({
+  UserProfileService: vi.fn(() => ({
+    getFullUserProfile: vi.fn(),
+    updateUserProfile: vi.fn(),
+  })),
+}));
+
 // Mock composables
 const mockProfile = ref<UserProfile | null>(null);
 const mockLoad = vi.fn();
