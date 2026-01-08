@@ -162,9 +162,9 @@ const formattedUpdatedAt = computed(() => formatDetailDate(job.value?.updatedAt)
 const displayTitle = computed(() => form.title.trim() || t('jobList.card.noTitle'));
 const matchingSummary = computed(() => selectMatchingSummary(jobWithRelations.value));
 const existingMaterials = computed(() => ({
-  cv: pickMostRecent(jobWithRelations.value?.cvs ?? []),
-  coverLetter: pickMostRecent(jobWithRelations.value?.coverLetters ?? []),
-  speechBlock: pickMostRecent(jobWithRelations.value?.speechBlocks ?? []),
+  cv: pickMostRecent((jobWithRelations.value?.cvs as CVDocument[]) ?? []),
+  coverLetter: pickMostRecent((jobWithRelations.value?.coverLetters as CoverLetter[]) ?? []),
+  speechBlock: pickMostRecent((jobWithRelations.value?.speechBlocks as SpeechBlock[]) ?? []),
 }));
 
 watch(
@@ -229,7 +229,14 @@ const companySelectorDisabled = computed(
   () => loading.value || companyStore.loading.value || linkingCompany.value
 );
 const availableCompanies = computed(() => companyStore.rawCompanies.value);
-const linkedCompany = computed(() => jobWithRelations.value?.company ?? null);
+const linkedCompany = computed(() => {
+  // Use job.value.companyId as source of truth, not the cached company object
+  const companyId = job.value?.companyId;
+  if (!companyId) {
+    return null;
+  }
+  return jobWithRelations.value?.company ?? null;
+});
 
 function hydrateForm(data: JobDescription) {
   form.title = data.title ?? '';
@@ -318,21 +325,15 @@ type DatedItem = {
 };
 
 function pickMostRecent<T extends DatedItem>(items: T[] | null | undefined): T | null {
-  // Handle various possible data structures from GraphQL
-  let itemArray: T[] = [];
-  
-  if (Array.isArray(items)) {
-    itemArray = items;
-  } else if (items && typeof items === 'object' && 'items' in items && Array.isArray((items as any).items)) {
-    // Handle GraphQL connection pattern { items: [...] }
-    itemArray = (items as any).items;
-  }
-  
-  if (!itemArray.length) {
+  if (!Array.isArray(items)) {
     return null;
   }
 
-  return [...itemArray].sort((a, b) => {
+  if (!items.length) {
+    return null;
+  }
+
+  return [...items].sort((a, b) => {
     const dateA = new Date(a.updatedAt ?? a.generatedAt ?? a.createdAt ?? 0).getTime();
     const dateB = new Date(b.updatedAt ?? b.generatedAt ?? b.createdAt ?? 0).getTime();
     return dateB - dateA;
@@ -343,19 +344,12 @@ function selectMatchingSummary(data: JobWithRelations | null) {
   if (!data) {
     return null;
   }
-
-  // Handle various possible data structures from GraphQL
-  let summariesArray: any[] = [];
-  
-  if (Array.isArray(data.matchingSummaries)) {
-    summariesArray = data.matchingSummaries;
-  } else if (data.matchingSummaries && typeof data.matchingSummaries === 'object' && 'items' in data.matchingSummaries) {
-    // Handle GraphQL connection pattern { items: [...] }
-    summariesArray = (data.matchingSummaries as any).items ?? [];
+  if (!Array.isArray(data.matchingSummaries)) {
+    return null;
   }
 
-  const summaries = summariesArray.filter(
-    (summary): summary is MatchingSummary => Boolean(summary)
+  const summaries = data.matchingSummaries.filter((summary): summary is MatchingSummary =>
+    Boolean(summary)
   );
   if (!summaries.length) {
     return null;
@@ -469,7 +463,6 @@ function redirectToCompanyCreate() {
     query: { returnTo: route.fullPath },
   });
 }
-
 </script>
 
 <template>
@@ -733,6 +726,5 @@ function redirectToCompanyCreate() {
         </UCard>
       </UPageBody>
     </UPage>
-
   </UContainer>
 </template>
