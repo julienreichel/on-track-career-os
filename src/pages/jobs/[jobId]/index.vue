@@ -230,12 +230,21 @@ const companySelectorDisabled = computed(
 );
 const availableCompanies = computed(() => companyStore.rawCompanies.value);
 const linkedCompany = computed(() => {
-  // Use job.value.companyId as source of truth, not the cached company object
+  // Use job.value.companyId as source of truth
   const companyId = job.value?.companyId;
   if (!companyId) {
     return null;
   }
-  return jobWithRelations.value?.company ?? null;
+  
+  // Try to get from relationships first (populated after reload)
+  const relationCompany = jobWithRelations.value?.company;
+  if (relationCompany && relationCompany.id === companyId) {
+    return relationCompany;
+  }
+  
+  // Fallback to availableCompanies if relationship is stale or not loaded yet
+  const company = availableCompanies.value.find(c => c.id === companyId);
+  return company ?? null;
 });
 
 function hydrateForm(data: JobDescription) {
