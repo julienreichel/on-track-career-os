@@ -15,8 +15,8 @@ export class SpeechBlockService {
     return item;
   }
 
-  async listSpeechBlocks(filter?: Record<string, unknown>): Promise<SpeechBlock[]> {
-    return this.repo.list(filter);
+  async listSpeechBlocksByUser(userId: string): Promise<SpeechBlock[]> {
+    return this.repo.listByUser(userId);
   }
 
   async createSpeechBlock(input: SpeechBlockCreateInput): Promise<SpeechBlock | null> {

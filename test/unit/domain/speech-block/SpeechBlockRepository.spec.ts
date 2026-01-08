@@ -3,6 +3,7 @@ import {
   SpeechBlockRepository,
   type AmplifySpeechBlockModel,
 } from '@/domain/speech-block/SpeechBlockRepository';
+import type { AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 
 const { gqlOptionsMock } = vi.hoisted(() => ({
@@ -12,39 +13,37 @@ const { gqlOptionsMock } = vi.hoisted(() => ({
   })),
 }));
 
-const { fetchAllListItemsMock } = vi.hoisted(() => ({
-  fetchAllListItemsMock: vi.fn(),
-}));
-
 vi.mock('@/data/graphql/options', () => ({
   gqlOptions: gqlOptionsMock,
-}));
-
-vi.mock('@/data/graphql/pagination', () => ({
-  fetchAllListItems: fetchAllListItemsMock,
 }));
 
 describe('SpeechBlockRepository', () => {
   let repository: SpeechBlockRepository;
   let mockModel: {
     get: ReturnType<typeof vi.fn>;
-    list: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
+  };
+  let mockUserProfileModel: {
+    get: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
     mockModel = {
       get: vi.fn(),
-      list: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
     };
+    mockUserProfileModel = {
+      get: vi.fn(),
+    };
 
-    repository = new SpeechBlockRepository(mockModel as unknown as AmplifySpeechBlockModel);
-    fetchAllListItemsMock.mockResolvedValue([]);
+    repository = new SpeechBlockRepository(
+      mockModel as unknown as AmplifySpeechBlockModel,
+      mockUserProfileModel as unknown as AmplifyUserProfileModel
+    );
   });
 
   afterEach(() => {
@@ -64,15 +63,26 @@ describe('SpeechBlockRepository', () => {
     );
   });
 
-  it('lists speech blocks with optional filter', async () => {
-    mockModel.list.mockResolvedValue({ data: [] });
+  it('lists speech blocks for a user', async () => {
+    const blocks = [{ id: 'sb-1' }] as SpeechBlock[];
+    mockUserProfileModel.get.mockResolvedValue({ data: { id: 'user-1', speechBlocks: blocks } });
 
-    await repository.list({ userId: { eq: 'user-1' } });
+    const result = await repository.listByUser('user-1');
 
-    expect(fetchAllListItemsMock).toHaveBeenCalledTimes(1);
-    const [listFn, options] = fetchAllListItemsMock.mock.calls[0];
-    expect(typeof listFn).toBe('function');
-    expect(options).toEqual(expect.objectContaining({ userId: { eq: 'user-1' } }));
+    expect(result).toEqual(blocks);
+    expect(mockUserProfileModel.get).toHaveBeenCalledWith(
+      { id: 'user-1' },
+      expect.objectContaining({
+        selectionSet: ['id', 'speechBlocks.*'],
+      })
+    );
+  });
+
+  it('returns empty array when userId is missing', async () => {
+    const result = await repository.listByUser('');
+
+    expect(result).toEqual([]);
+    expect(mockUserProfileModel.get).not.toHaveBeenCalled();
   });
 
   it('creates speech blocks', async () => {

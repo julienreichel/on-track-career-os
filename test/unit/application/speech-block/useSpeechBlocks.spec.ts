@@ -5,10 +5,16 @@ import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 import { withMockedConsoleError } from '../../../utils/withMockedConsole';
 
 vi.mock('@/domain/speech-block/SpeechBlockRepository');
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => ({
+    userId: { value: 'user-1' },
+    loadUserId: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
 
 describe('useSpeechBlocks', () => {
   let mockRepository: {
-    list: ReturnType<typeof vi.fn>;
+    listByUser: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
@@ -19,7 +25,7 @@ describe('useSpeechBlocks', () => {
     vi.clearAllMocks();
 
     mockRepository = {
-      list: vi.fn(),
+      listByUser: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -33,36 +39,22 @@ describe('useSpeechBlocks', () => {
     it('should load all speech blocks', async () => {
       const mockBlocks = [{ id: 'sb-1' }, { id: 'sb-2' }] as SpeechBlock[];
 
-      mockRepository.list.mockResolvedValue(mockBlocks);
+      mockRepository.listByUser.mockResolvedValue(mockBlocks);
 
       const { items, loading, error, loadAll } = useSpeechBlocks();
 
       await loadAll();
 
-      expect(mockRepository.list).toHaveBeenCalledWith({});
+      expect(mockRepository.listByUser).toHaveBeenCalledWith('user-1');
       expect(items.value).toEqual(mockBlocks);
       expect(loading.value).toBe(false);
       expect(error.value).toBeNull();
     });
 
-    it('should load speech blocks with filter', async () => {
-      const mockFilter = { userId: { eq: 'user-1' } };
-      const mockBlocks = [{ id: 'sb-1' }] as SpeechBlock[];
-
-      mockRepository.list.mockResolvedValue(mockBlocks);
-
-      const { items, loadAll } = useSpeechBlocks();
-
-      await loadAll(mockFilter);
-
-      expect(mockRepository.list).toHaveBeenCalledWith(mockFilter);
-      expect(items.value).toEqual(mockBlocks);
-    });
-
     it(
       'should handle errors during load',
       withMockedConsoleError(async () => {
-        mockRepository.list.mockRejectedValue(new Error('Load failed'));
+        mockRepository.listByUser.mockRejectedValue(new Error('Load failed'));
 
         const { items, error, loadAll } = useSpeechBlocks();
 

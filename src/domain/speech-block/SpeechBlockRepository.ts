@@ -1,5 +1,6 @@
 import { gqlOptions } from '@/data/graphql/options';
-import { fetchAllListItems } from '@/data/graphql/pagination';
+import type { AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
+import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { SpeechBlockCreateInput, SpeechBlockUpdateInput, SpeechBlock } from './SpeechBlock';
 
 export type AmplifySpeechBlockModel = {
@@ -7,9 +8,6 @@ export type AmplifySpeechBlockModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: SpeechBlock | null }>;
-  list: (
-    options?: Record<string, unknown>
-  ) => Promise<{ data: SpeechBlock[]; nextToken?: string | null }>;
   create: (
     input: SpeechBlockCreateInput,
     options?: Record<string, unknown>
@@ -24,20 +22,28 @@ export type AmplifySpeechBlockModel = {
   ) => Promise<{ data: SpeechBlock | null }>;
 };
 
+type UserProfileWithSpeechBlocks = UserProfile & {
+  speechBlocks?: (SpeechBlock | null)[] | null;
+};
+
 export class SpeechBlockRepository {
   private readonly _model: AmplifySpeechBlockModel;
+  private readonly _userProfileModel: AmplifyUserProfileModel;
 
   /**
    * Constructor with optional dependency injection for testing
    * @param model - Optional Amplify model instance (for testing)
    */
-  constructor(model?: AmplifySpeechBlockModel) {
-    if (model) {
+  constructor(model?: AmplifySpeechBlockModel, userProfileModel?: AmplifyUserProfileModel) {
+    if (model && userProfileModel) {
       // Use injected model (for tests)
       this._model = model;
+      this._userProfileModel = userProfileModel;
     } else {
       // Use Nuxt's auto-imported useNuxtApp (for production)
-      this._model = useNuxtApp().$Amplify.GraphQL.client.models.SpeechBlock;
+      const amplify = useNuxtApp().$Amplify.GraphQL.client;
+      this._model = amplify.models.SpeechBlock;
+      this._userProfileModel = amplify.models.UserProfile;
     }
   }
 
@@ -50,8 +56,19 @@ export class SpeechBlockRepository {
     return res.data;
   }
 
-  async list(filter: Record<string, unknown> = {}) {
-    return fetchAllListItems<SpeechBlock>(this.model.list.bind(this.model), filter);
+  async listByUser(userId: string): Promise<SpeechBlock[]> {
+    if (!userId) {
+      return [];
+    }
+
+    const selectionSet = ['id', 'speechBlocks.*'];
+    const { data } = await this._userProfileModel.get(
+      { id: userId },
+      gqlOptions({ selectionSet })
+    );
+    const profile = data as UserProfileWithSpeechBlocks | null;
+    const items = (profile?.speechBlocks ?? []) as SpeechBlock[];
+    return items.filter((item): item is SpeechBlock => Boolean(item));
   }
 
   async create(input: SpeechBlockCreateInput) {

@@ -150,13 +150,8 @@ const filteredItems = computed(() => {
 
 onMounted(async () => {
   hasLoaded.value = false;
-  await loadUserId();
-  if (!userId.value) {
-    hasLoaded.value = true;
-    return;
-  }
   try {
-    await loadAll({ filter: { userId: { eq: userId.value } } });
+    await loadAll();
   } finally {
     hasLoaded.value = true;
   }

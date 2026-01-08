@@ -274,9 +274,10 @@ function createExistingMaterialsLoader({
           .coverLetterService
           .listCoverLettersByUser(userId)
           .then((items) => items.filter((item) => item.jobId === jobId)),
-        deps.speechBlockService.listSpeechBlocks({
-          filter: { jobId: { eq: jobId }, userId: { eq: userId } },
-        }),
+        deps
+          .speechBlockService
+          .listSpeechBlocksByUser(userId)
+          .then((items) => items.filter((item) => item.jobId === jobId)),
       ]);
 
       return {

@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import { SpeechBlockRepository } from '@/domain/speech-block/SpeechBlockRepository';
+import { useAuthUser } from '@/composables/useAuthUser';
 import type {
   SpeechBlock,
   SpeechBlockCreateInput,
@@ -19,13 +20,20 @@ export function useSpeechBlocks() {
   const loading = ref(false);
   const error = ref<string | null>(null);
   const repository = new SpeechBlockRepository();
+  const auth = useAuthUser();
 
-  const loadAll = async (filter?: Record<string, unknown>) => {
+  const loadAll = async () => {
     loading.value = true;
     error.value = null;
 
     try {
-      items.value = await repository.list(filter ?? {});
+      if (!auth.userId.value) {
+        await auth.loadUserId();
+      }
+      if (!auth.userId.value) {
+        throw new Error('Missing user information');
+      }
+      items.value = await repository.listByUser(auth.userId.value);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Unknown error occurred';
       console.error('[useSpeechBlocks] Error loading speech blocks:', err);

@@ -17,7 +17,7 @@ describe('SpeechBlockService', () => {
   beforeEach(() => {
     mockRepository = {
       get: vi.fn(),
-      list: vi.fn(),
+      listByUser: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -54,13 +54,13 @@ describe('SpeechBlockService', () => {
     });
   });
 
-  it('lists speech blocks with filters', async () => {
+  it('lists speech blocks for a user', async () => {
     const blocks = [{ id: 'sb-1' }] as SpeechBlock[];
-    mockRepository.list.mockResolvedValue(blocks);
+    mockRepository.listByUser.mockResolvedValue(blocks);
 
-    const result = await service.listSpeechBlocks({ userId: { eq: 'user-1' } });
+    const result = await service.listSpeechBlocksByUser('user-1');
 
-    expect(mockRepository.list).toHaveBeenCalledWith({ userId: { eq: 'user-1' } });
+    expect(mockRepository.listByUser).toHaveBeenCalledWith('user-1');
     expect(result).toEqual(blocks);
   });
 
