@@ -317,8 +317,8 @@ type DatedItem = {
   generatedAt?: string | null;
 };
 
-function pickMostRecent<T extends DatedItem>(items: T[]): T | null {
-  if (!items.length) {
+function pickMostRecent<T extends DatedItem>(items: T[] | null | undefined): T | null {
+  if (!items?.length) {
     return null;
   }
 
@@ -334,7 +334,7 @@ function selectMatchingSummary(data: JobWithRelations | null) {
     return null;
   }
 
-  const summaries = data.matchingSummaries.filter(
+  const summaries = (data.matchingSummaries ?? []).filter(
     (summary): summary is MatchingSummary => Boolean(summary)
   );
   if (!summaries.length) {
