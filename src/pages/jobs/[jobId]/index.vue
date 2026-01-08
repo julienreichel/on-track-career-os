@@ -318,11 +318,21 @@ type DatedItem = {
 };
 
 function pickMostRecent<T extends DatedItem>(items: T[] | null | undefined): T | null {
-  if (!items?.length) {
+  // Handle various possible data structures from GraphQL
+  let itemArray: T[] = [];
+  
+  if (Array.isArray(items)) {
+    itemArray = items;
+  } else if (items && typeof items === 'object' && 'items' in items && Array.isArray((items as any).items)) {
+    // Handle GraphQL connection pattern { items: [...] }
+    itemArray = (items as any).items;
+  }
+  
+  if (!itemArray.length) {
     return null;
   }
 
-  return [...items].sort((a, b) => {
+  return [...itemArray].sort((a, b) => {
     const dateA = new Date(a.updatedAt ?? a.generatedAt ?? a.createdAt ?? 0).getTime();
     const dateB = new Date(b.updatedAt ?? b.generatedAt ?? b.createdAt ?? 0).getTime();
     return dateB - dateA;
@@ -330,11 +340,21 @@ function pickMostRecent<T extends DatedItem>(items: T[] | null | undefined): T |
 }
 
 function selectMatchingSummary(data: JobWithRelations | null) {
-  if (!data?.matchingSummaries?.length) {
+  if (!data) {
     return null;
   }
 
-  const summaries = (data.matchingSummaries ?? []).filter(
+  // Handle various possible data structures from GraphQL
+  let summariesArray: any[] = [];
+  
+  if (Array.isArray(data.matchingSummaries)) {
+    summariesArray = data.matchingSummaries;
+  } else if (data.matchingSummaries && typeof data.matchingSummaries === 'object' && 'items' in data.matchingSummaries) {
+    // Handle GraphQL connection pattern { items: [...] }
+    summariesArray = (data.matchingSummaries as any).items ?? [];
+  }
+
+  const summaries = summariesArray.filter(
     (summary): summary is MatchingSummary => Boolean(summary)
   );
   if (!summaries.length) {
