@@ -83,43 +83,6 @@ test.describe('CV Upload Flow', () => {
     await expect(page.getByText(/Tech Corporation/i).first()).toBeVisible();
   });
 
-  test.skip('should allow removing experiences before import', async ({ page }) => {
-    // TODO: Implement when remove button UI is added to preview page
-    // Currently the preview page doesn't have remove buttons based on actual UI
-
-    const testFilePath = join(__dirname, 'fixtures', 'test-cv.txt');
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(testFilePath);
-
-    // Wait for parsing
-    await page.waitForTimeout(5000);
-    await page.waitForLoadState('networkidle');
-
-    // Get initial count
-    const initialCountText = await page
-      .locator('span')
-      .filter({ hasText: /^[0-9]+$/ })
-      .first()
-      .textContent();
-    const initialCount = Number.parseInt(initialCountText || '0', 10);
-
-    // Click remove button on first experience (X icon button)
-    const removeButtons = page.locator('button:has(i[class*="i-lucide-x"])');
-    await removeButtons.first().click();
-
-    // Wait for UI update
-    await page.waitForTimeout(500);
-
-    // Should have one fewer experience
-    const newCountText = await page
-      .locator('span')
-      .filter({ hasText: /^[0-9]+$/ })
-      .first()
-      .textContent();
-    const newCount = Number.parseInt(newCountText || '0', 10);
-    expect(newCount).toBe(initialCount - 1);
-  });
-
   test('should show Import All button after parsing', async ({ page }) => {
     const testFilePath = join(__dirname, 'fixtures', 'test-cv.txt');
     const fileInput = page.locator('input[type="file"]');

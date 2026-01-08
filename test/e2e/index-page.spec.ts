@@ -24,7 +24,7 @@ test.describe.serial('Home Page - Empty State', () => {
     await page.waitForLoadState('networkidle');
   });
 
-  test.skip('should have CV upload feature when no experiences exist', async ({ page }) => {
+  test('should have CV upload feature when no experiences exist', async ({ page }) => {
     // CV upload is only shown on home page when user has no experiences
     // This test MUST run before any experience creation tests
     // CV upload link has absolute overlay positioning (UPageCard)
