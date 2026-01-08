@@ -211,9 +211,9 @@ describe('Speech detail page', () => {
     expect(mockLoad).toHaveBeenCalled();
     expect(wrapper.find('.speech-editor').exists()).toBe(false);
 
-    const editButton = wrapper.findAll('button').find((button) =>
-      button.text().includes(i18n.global.t('common.edit'))
-    );
+    const editButton = wrapper
+      .findAll('button')
+      .find((button) => button.text().includes(i18n.global.t('common.edit')));
     expect(editButton).toBeDefined();
 
     await editButton?.trigger('click');
@@ -253,9 +253,9 @@ describe('Speech detail page', () => {
   it('saves the speech title', async () => {
     const wrapper = await mountPage();
 
-    const editButton = wrapper.findAll('button').find((button) =>
-      button.text().includes(i18n.global.t('common.edit'))
-    );
+    const editButton = wrapper
+      .findAll('button')
+      .find((button) => button.text().includes(i18n.global.t('common.edit')));
     expect(editButton).toBeDefined();
     await editButton?.trigger('click');
     await flushPromises();

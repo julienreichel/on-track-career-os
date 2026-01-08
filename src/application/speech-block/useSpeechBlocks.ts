@@ -34,9 +34,7 @@ export function useSpeechBlocks() {
     }
   };
 
-  const createSpeechBlock = async (
-    input: SpeechBlockCreateInput
-  ): Promise<SpeechBlock | null> => {
+  const createSpeechBlock = async (input: SpeechBlockCreateInput): Promise<SpeechBlock | null> => {
     loading.value = true;
     error.value = null;
 
@@ -58,9 +56,7 @@ export function useSpeechBlocks() {
     }
   };
 
-  const updateSpeechBlock = async (
-    input: SpeechBlockUpdateInput
-  ): Promise<SpeechBlock | null> => {
+  const updateSpeechBlock = async (input: SpeechBlockUpdateInput): Promise<SpeechBlock | null> => {
     loading.value = true;
     error.value = null;
 

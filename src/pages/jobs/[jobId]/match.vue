@@ -128,7 +128,6 @@ const handleGenerate = async () => {
   }
 };
 
-
 onMounted(async () => {
   try {
     await engine.load();
@@ -136,7 +135,6 @@ onMounted(async () => {
     console.error('[matching] Failed to load matching data', error);
   }
 });
-
 </script>
 
 <template>

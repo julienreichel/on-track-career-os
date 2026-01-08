@@ -178,7 +178,9 @@ function resolveTailoringContext(args: GenerateCoverLetterInput) {
   }
 
   if (args.jobDescription || args.matchingSummary) {
-    console.warn('[generateCoverLetter] Invalid tailoring context detected. Falling back to generic.');
+    console.warn(
+      '[generateCoverLetter] Invalid tailoring context detected. Falling back to generic.'
+    );
   }
 
   return null;

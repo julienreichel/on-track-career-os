@@ -74,9 +74,7 @@ type BuildTailoringContextInput = {
   company?: Company | null;
 };
 
-export function buildTailoringContext(
-  input: BuildTailoringContextInput
-): TailoringContextResult {
+export function buildTailoringContext(input: BuildTailoringContextInput): TailoringContextResult {
   if (!input.userProfile) {
     return { ok: false, error: 'User profile is required for tailoring.' };
   }
@@ -130,13 +128,19 @@ function mapUserProfile(profile: UserProfile, fullName: string): TailoringUserPr
     ...(optionalStringArray(profile.personalValues) && {
       personalValues: optionalStringArray(profile.personalValues),
     }),
-    ...(optionalStringArray(profile.strengths) && { strengths: optionalStringArray(profile.strengths) }),
-    ...(optionalStringArray(profile.interests) && { interests: optionalStringArray(profile.interests) }),
+    ...(optionalStringArray(profile.strengths) && {
+      strengths: optionalStringArray(profile.strengths),
+    }),
+    ...(optionalStringArray(profile.interests) && {
+      interests: optionalStringArray(profile.interests),
+    }),
     ...(optionalStringArray(profile.skills) && { skills: optionalStringArray(profile.skills) }),
     ...(optionalStringArray(profile.certifications) && {
       certifications: optionalStringArray(profile.certifications),
     }),
-    ...(optionalStringArray(profile.languages) && { languages: optionalStringArray(profile.languages) }),
+    ...(optionalStringArray(profile.languages) && {
+      languages: optionalStringArray(profile.languages),
+    }),
   };
 }
 

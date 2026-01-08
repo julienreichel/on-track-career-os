@@ -91,10 +91,7 @@ export class STARStoryRepository {
 
     const selectionSet = ['id', 'experiences.id', 'experiences.stories.*'];
 
-    const { data } = await this._userProfileModel.get(
-      { id: userId },
-      gqlOptions({ selectionSet })
-    );
+    const { data } = await this._userProfileModel.get({ id: userId }, gqlOptions({ selectionSet }));
 
     const profile = data as UserProfileWithExperiences | null;
     const experiences = profile?.experiences ?? [];

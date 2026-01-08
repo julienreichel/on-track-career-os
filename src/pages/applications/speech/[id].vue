@@ -130,7 +130,6 @@ const formatSection = (value: string) => {
   return trimmed.length > 0 ? trimmed : t('speech.detail.emptySection');
 };
 
-
 const handleEdit = () => {
   resetForm();
   isEditing.value = true;

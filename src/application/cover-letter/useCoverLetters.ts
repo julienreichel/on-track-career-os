@@ -34,9 +34,7 @@ export function useCoverLetters() {
     }
   };
 
-  const createCoverLetter = async (
-    input: CoverLetterCreateInput
-  ): Promise<CoverLetter | null> => {
+  const createCoverLetter = async (input: CoverLetterCreateInput): Promise<CoverLetter | null> => {
     loading.value = true;
     error.value = null;
 
@@ -58,9 +56,7 @@ export function useCoverLetters() {
     }
   };
 
-  const updateCoverLetter = async (
-    input: CoverLetterUpdateInput
-  ): Promise<CoverLetter | null> => {
+  const updateCoverLetter = async (input: CoverLetterUpdateInput): Promise<CoverLetter | null> => {
     loading.value = true;
     error.value = null;
 

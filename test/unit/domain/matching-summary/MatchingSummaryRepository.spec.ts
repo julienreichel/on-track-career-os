@@ -47,9 +47,7 @@ describe('MatchingSummaryRepository', () => {
       delete: vi.fn(),
     };
 
-    repository = new MatchingSummaryRepository(
-      mockModel as unknown as AmplifyMatchingSummaryModel
-    );
+    repository = new MatchingSummaryRepository(mockModel as unknown as AmplifyMatchingSummaryModel);
 
     fetchAllListItemsMock.mockResolvedValue([]);
   });

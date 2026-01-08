@@ -125,8 +125,7 @@ describe('Profile Stories Page', () => {
           },
           // Stub StoryList to avoid router injection issues and prop type warnings
           StoryList: {
-            template:
-              '<div class="story-list" :data-count="stories?.length || 0"><slot /></div>',
+            template: '<div class="story-list" :data-count="stories?.length || 0"><slot /></div>',
             props: ['stories', 'loading', 'showCompanyNames'],
           },
         },

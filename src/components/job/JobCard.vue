@@ -20,9 +20,7 @@ const { t } = useI18n();
 const title = computed(() => props.job.title || t('jobList.card.noTitle'));
 const subtitle = computed(() => props.job.seniorityLevel || t('jobList.card.noSeniority'));
 
-const lastUpdated = computed(() =>
-  formatListDate(props.job.updatedAt ?? props.job.createdAt)
-);
+const lastUpdated = computed(() => formatListDate(props.job.updatedAt ?? props.job.createdAt));
 
 const canViewMatch = computed(() => props.job.status === 'analyzed');
 const matchLink = computed(() => `/jobs/${props.job.id}/match`);

@@ -158,11 +158,7 @@ describe('STARStoryRepository', () => {
       expect(mockUserProfileModel.get).toHaveBeenCalledWith(
         { id: 'user-123' },
         expect.objectContaining({
-          selectionSet: expect.arrayContaining([
-            'id',
-            'experiences.id',
-            'experiences.stories.*',
-          ]),
+          selectionSet: expect.arrayContaining(['id', 'experiences.id', 'experiences.stories.*']),
         })
       );
       expect(result).toEqual([storyOne, storyTwo]);

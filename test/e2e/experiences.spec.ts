@@ -76,7 +76,9 @@ test.describe('Experience workflow', () => {
     await expect(page.getByText(updatedCompanyName)).toBeVisible({ timeout: 20000 });
   });
 
-  test('opens the stories page for the manual experience and sees empty state', async ({ page }) => {
+  test('opens the stories page for the manual experience and sees empty state', async ({
+    page,
+  }) => {
     expect(manualExperienceId).toBeTruthy();
 
     await page.goto('/profile/experiences');

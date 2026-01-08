@@ -1018,10 +1018,10 @@ Each page includes:
 | Per-Experience Stories | `/profile/experiences/:experienceId/stories`          | ✅     | 2    |
 | Story Editor           | `/profile/experiences/:experienceId/stories/:storyId` | ✅     | 2    |
 | Personal Canvas        | `/profile/canvas`                                     | ✅     | 1B   |
-| CV List                | `/applications/cv`                                                 | ✅     | 3    |
-| CV Generator           | `/applications/cv/new`                                             | ✅     | 3    |
-| CV Editor              | `/applications/cv/:id`                                             | ✅     | 3    |
-| CV Print               | `/applications/cv/:id/print`                                       | ✅     | 3B   |
+| CV List                | `/applications/cv`                                    | ✅     | 3    |
+| CV Generator           | `/applications/cv/new`                                | ✅     | 3    |
+| CV Editor              | `/applications/cv/:id`                                | ✅     | 3    |
+| CV Print               | `/applications/cv/:id/print`                          | ✅     | 3B   |
 | Job List               | `/jobs`                                               | ✅     | 5A   |
 | Job Upload             | `/jobs/new`                                           | ✅     | 5A   |
 | Job Detail             | `/jobs/[jobId]`                                       | ✅     | 5A   |
@@ -1029,20 +1029,20 @@ Each page includes:
 | Company List           | `/companies`                                          | ✅     | 5B   |
 | Company New            | `/companies/new`                                      | ✅     | 5B   |
 | Company Detail         | `/companies/[companyId]`                              | ✅     | 5B   |
-| Speech List            | `/applications/speech`                                             | ✅     | 4    |
-| Speech Editor          | `/applications/speech/:id`                                         | ✅     | 4    |
-| Cover Letter List      | `/applications/cover-letters`                                      | ✅     | 4B   |
-| Cover Letter New       | `/applications/cover-letters/new`                                  | ✅     | 4B   |
-| Cover Letter Editor    | `/applications/cover-letters/:id`                                  | ✅     | 4B   |
-| Cover Letter Print     | `/applications/cover-letters/:id/print`                            | ✅     | 4B   |
+| Speech List            | `/applications/speech`                                | ✅     | 4    |
+| Speech Editor          | `/applications/speech/:id`                            | ✅     | 4    |
+| Cover Letter List      | `/applications/cover-letters`                         | ✅     | 4B   |
+| Cover Letter New       | `/applications/cover-letters/new`                     | ✅     | 4B   |
+| Cover Letter Editor    | `/applications/cover-letters/:id`                     | ✅     | 4B   |
+| Cover Letter Print     | `/applications/cover-letters/:id/print`               | ✅     | 4B   |
 
 ## 8.2 Planned Pages (3 Routes)
 
-| Page                | Route                         | Status | EPIC | Blocker               |
-| ------------------- | ----------------------------- | ------ | ---- | --------------------- |
-| Interview Prep      | `/interviews/:jobId/prep`     | ❌     | 7    | Planned               |
-| Interview Simulator | `/interviews/:jobId/simulate` | ❌     | 7    | Planned               |
-| Settings            | `/settings`                   | ❌     | -    | Low priority          |
+| Page                | Route                         | Status | EPIC | Blocker      |
+| ------------------- | ----------------------------- | ------ | ---- | ------------ |
+| Interview Prep      | `/interviews/:jobId/prep`     | ❌     | 7    | Planned      |
+| Interview Simulator | `/interviews/:jobId/simulate` | ❌     | 7    | Planned      |
+| Settings            | `/settings`                   | ❌     | -    | Low priority |
 
 ## 8.3 Implemented Components
 

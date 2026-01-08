@@ -367,10 +367,7 @@ function clearJobsError() {
                 <p v-if="formattedMeta" class="text-xs text-gray-400">
                   {{ t('companies.detail.lastUpdated', { date: formattedMeta }) }}
                 </p>
-                <div
-                  v-if="isEditing"
-                  class="flex flex-col gap-3 sm:flex-row sm:justify-end"
-                >
+                <div v-if="isEditing" class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                   <UButton
                     color="secondary"
                     icon="i-heroicons-sparkles"

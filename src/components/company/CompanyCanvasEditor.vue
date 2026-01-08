@@ -217,16 +217,16 @@ const formattedLastGeneratedAt = computed(() => {
               @click="emit('save')"
             />
           </template>
-        <UButton
-          v-else
-          color="primary"
-          variant="outline"
-          icon="i-heroicons-pencil"
-          :label="t('common.edit')"
-          :disabled="disableEdit"
-          data-testid="company-canvas-edit"
-          @click="isEditing = true"
-        />
+          <UButton
+            v-else
+            color="primary"
+            variant="outline"
+            icon="i-heroicons-pencil"
+            :label="t('common.edit')"
+            :disabled="disableEdit"
+            data-testid="company-canvas-edit"
+            @click="isEditing = true"
+          />
         </div>
       </div>
     </template>

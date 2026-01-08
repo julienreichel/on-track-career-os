@@ -1,9 +1,5 @@
 import { CoverLetterRepository } from './CoverLetterRepository';
-import type {
-  CoverLetter,
-  CoverLetterCreateInput,
-  CoverLetterUpdateInput,
-} from './CoverLetter';
+import type { CoverLetter, CoverLetterCreateInput, CoverLetterUpdateInput } from './CoverLetter';
 // import { loadLazy } from '@/data/graphql/lazy'
 
 export class CoverLetterService {
