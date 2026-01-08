@@ -10,11 +10,16 @@ import type { UserProfile } from '@/domain/user-profile/UserProfile';
 const mockProfile = ref<UserProfile | null>(null);
 const mockLoad = vi.fn();
 const mockSaveProfile = vi.fn();
+const mockLoading = ref(false);
+const mockError = ref<string | null>(null);
 
-vi.mock('@/composables/useUserProfile', () => ({
+vi.mock('@/application/user-profile/useUserProfile', () => ({
   useUserProfile: vi.fn(() => ({
     item: mockProfile,
+    loading: mockLoading,
+    error: mockError,
     load: mockLoad,
+    save: mockSaveProfile,
   })),
 }));
 
@@ -135,7 +140,7 @@ describe('FullForm', () => {
       certifications: ['Cert 1'],
       languages: ['English'],
       socialLinks: [{ url: 'https://linkedin.com/in/johndoe' }],
-    } as UserProfile;
+    } as unknown as UserProfile;
 
     mockLoad.mockResolvedValue(undefined);
     mockSaveProfile.mockResolvedValue(true);
@@ -208,10 +213,12 @@ describe('FullForm', () => {
   });
 
   it('should handle profile load error gracefully', async () => {
-    mockLoad.mockRejectedValue(new Error('Load error'));
+    // Set up error state in the composable mock instead of rejecting the promise
+    mockError.value = 'Load error';
+    mockLoad.mockResolvedValue(undefined); // load() resolves but error is set
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    mount(FullForm, {
+    const wrapper = mount(FullForm, {
       global: {
         plugins: [i18n, router],
         stubs,
