@@ -176,7 +176,7 @@ test.describe('Company workflow', () => {
     );
     await expect(selectorSearch).toBeEnabled({ timeout: 10000 });
     await selectorSearch.fill(companySearchName);
-    await page.getByRole('button', { name: new RegExp(companySearchName, 'i') }).click();
+    await page.getByRole('button', { name: new RegExp(companySearchName, 'i') }).first().click();
 
     await expect(page.getByRole('button', { name: /clear link/i })).toBeVisible({
       timeout: 10000,
