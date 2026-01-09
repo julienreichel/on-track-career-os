@@ -192,10 +192,10 @@ export const schemaLambdas = {
   generateCompanyCanvas: a
     .query()
     .arguments({
-      companyProfile: a.json().required(),
+      companyProfile: a.ref('CompanyCanvasProfileType').required(),
       additionalNotes: a.string().array(),
     })
-    .returns(a.json())
+    .returns(a.ref('GenerateCompanyCanvasOutputType'))
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(generateCompanyCanvasFunction)),
 

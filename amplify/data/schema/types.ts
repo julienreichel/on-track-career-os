@@ -172,4 +172,30 @@ export const schemaTypes = {
     website: a.string(),
     description: a.string(),
   }),
+
+  CompanyCanvasProfileType: a.customType({
+    companyName: a.string().required(),
+    industry: a.string(),
+    sizeRange: a.string(),
+    website: a.string(),
+    description: a.string(),
+    productsServices: a.string().array(),
+    targetMarkets: a.string().array(),
+    customerSegments: a.string().array(),
+    rawNotes: a.string(),
+  }),
+
+  GenerateCompanyCanvasOutputType: a.customType({
+    companyName: a.string().required(),
+    customerSegments: a.string().array().required(),
+    valuePropositions: a.string().array().required(),
+    channels: a.string().array().required(),
+    customerRelationships: a.string().array().required(),
+    revenueStreams: a.string().array().required(),
+    keyResources: a.string().array().required(),
+    keyActivities: a.string().array().required(),
+    keyPartners: a.string().array().required(),
+    costStructure: a.string().array().required(),
+    confidence: a.float().required(),
+  }),
 };

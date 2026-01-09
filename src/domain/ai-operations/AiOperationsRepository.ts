@@ -115,13 +115,9 @@ export type AmplifyAiOperations = {
   ) => Promise<{ data: AchievementsAndKpis | null; errors?: unknown[] }>;
 
   generatePersonalCanvas: (
-    input: {
-      profile: string;
-      experiences: string;
-      stories: string;
-    },
+    input: PersonalCanvasInput,
     options?: Record<string, unknown>
-  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
+  ) => Promise<{ data: PersonalCanvas | null; errors?: unknown[] }>;
 
   parseJobDescription: (
     input: ParseJobInput,
@@ -134,9 +130,9 @@ export type AmplifyAiOperations = {
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 
   generateCompanyCanvas: (
-    input: { companyProfile: string; additionalNotes?: string[] },
+    input: GeneratedCompanyCanvasInput,
     options?: Record<string, unknown>
-  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
+  ) => Promise<{ data: GeneratedCompanyCanvas | null; errors?: unknown[] }>;
 
   generateMatchingSummary: (
     input: MatchingSummaryInput,
@@ -307,13 +303,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
   }
 
   async generateCompanyCanvas(input: GeneratedCompanyCanvasInput): Promise<GeneratedCompanyCanvas> {
-    const { data, errors } = await this.client.generateCompanyCanvas(
-      {
-        companyProfile: JSON.stringify(input.companyProfile),
-        additionalNotes: input.additionalNotes,
-      },
-      gqlOptions()
-    );
+    const { data, errors } = await this.client.generateCompanyCanvas(input, gqlOptions());
 
     if (errors && errors.length > 0) {
       throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
@@ -323,8 +313,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-    return parsed as GeneratedCompanyCanvas;
+    return data as GeneratedCompanyCanvas;
   }
 
   async generateMatchingSummary(input: MatchingSummaryInput): Promise<MatchingSummaryResult> {

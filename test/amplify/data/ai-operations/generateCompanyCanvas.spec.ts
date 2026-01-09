@@ -14,7 +14,17 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => {
 describe('ai.generateCompanyCanvas', () => {
   type Handler = (event: {
     arguments: {
-      companyProfile: Record<string, unknown>;
+      companyProfile: {
+        companyName: string;
+        industry?: string;
+        sizeRange?: string;
+        website?: string;
+        description?: string;
+        productsServices?: string[];
+        targetMarkets?: string[];
+        customerSegments?: string[];
+        rawNotes?: string;
+      };
       additionalNotes?: string[];
     };
   }) => Promise<{

@@ -21,7 +21,17 @@ const OUTPUT_SCHEMA = `{
 }`;
 
 export interface GenerateCompanyCanvasInput {
-  companyProfile: Record<string, unknown>;
+  companyProfile: {
+    companyName: string;
+    industry?: string;
+    sizeRange?: string;
+    website?: string;
+    description?: string;
+    productsServices?: string[];
+    targetMarkets?: string[];
+    customerSegments?: string[];
+    rawNotes?: string;
+  };
   additionalNotes?: string[];
 }
 

@@ -456,7 +456,7 @@ describe('AiOperationsRepository', () => {
 
     it('returns generated canvas', async () => {
       mockClient.generateCompanyCanvas.mockResolvedValue({
-        data: JSON.stringify(canvasResponse),
+        data: canvasResponse,
         errors: undefined,
       });
 
@@ -466,9 +466,7 @@ describe('AiOperationsRepository', () => {
 
       expect(result).toEqual(canvasResponse);
       expect(mockClient.generateCompanyCanvas).toHaveBeenCalledWith(
-        expect.objectContaining({
-          companyProfile: JSON.stringify({ companyName: 'Acme' }),
-        }),
+        { companyProfile: { companyName: 'Acme' } },
         expect.objectContaining({ authMode: 'userPool' })
       );
     });
