@@ -97,22 +97,22 @@ export type AmplifyAiOperations = {
   parseCvText: (
     input: ParseCvInput,
     options?: Record<string, unknown>
-  ) => Promise<{ data: string | null; errors?: unknown[] }>;
+  ) => Promise<{ data: ParsedCV | null; errors?: unknown[] }>;
 
   extractExperienceBlocks: (
     input: ExtractExperienceInput,
     options?: Record<string, unknown>
-  ) => Promise<{ data: string | null; errors?: unknown[] }>;
+  ) => Promise<{ data: ExperiencesResult | null; errors?: unknown[] }>;
 
   generateStarStory: (
     input: GenerateStoryInput,
     options?: Record<string, unknown>
-  ) => Promise<{ data: string | null; errors?: unknown[] }>;
+  ) => Promise<{ data: STARStory[] | null; errors?: unknown[] }>;
 
   generateAchievementsAndKpis: (
     input: GenerateAchievementsInput,
     options?: Record<string, unknown>
-  ) => Promise<{ data: string | null; errors?: unknown[] }>;
+  ) => Promise<{ data: AchievementsAndKpis | null; errors?: unknown[] }>;
 
   generatePersonalCanvas: (
     input: {
@@ -196,10 +196,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    // Parse JSON response from Lambda
-    const parsed = JSON.parse(data) as ParsedCV;
-
-    return parsed;
+    return data as ParsedCV;
   }
 
   async extractExperienceBlocks(experienceTextBlocks: string[]): Promise<ExperiencesResult> {
@@ -216,10 +213,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    // Parse JSON response from Lambda
-    const parsed = JSON.parse(data) as ExperiencesResult;
-
-    return parsed;
+    return data as ExperiencesResult;
   }
 
   async generateStarStory(sourceText: string): Promise<STARStory[]> {
@@ -233,10 +227,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    // Parse JSON response from Lambda (now returns array)
-    const parsed = JSON.parse(data) as STARStory[];
-
-    return parsed;
+    return data as STARStory[];
   }
 
   async generateAchievementsAndKpis(starStory: STARStory): Promise<AchievementsAndKpis> {
@@ -253,10 +244,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    // Parse JSON response from Lambda
-    const parsed = JSON.parse(data) as AchievementsAndKpis;
-
-    return parsed;
+    return data as AchievementsAndKpis;
   }
 
   async generatePersonalCanvas(input: PersonalCanvasInput): Promise<PersonalCanvas> {

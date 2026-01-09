@@ -111,12 +111,15 @@ describe('AiOperationsRepository', () => {
           experiences: ['Experience 1', 'Experience 2'],
           education: ['Education 1'],
           skills: ['Skill 1', 'Skill 2'],
+          certifications: [],
+          rawBlocks: [],
         },
-        confidence_score: 0.95,
+        profile: {},
+        confidence: 0.95,
       };
 
       mockClient.parseCvText.mockResolvedValue({
-        data: JSON.stringify(mockParsedData),
+        data: mockParsedData,
         errors: undefined,
       });
 
@@ -177,7 +180,7 @@ describe('AiOperationsRepository', () => {
       };
 
       mockClient.extractExperienceBlocks.mockResolvedValue({
-        data: JSON.stringify(mockExperiencesResult),
+        data: mockExperiencesResult,
         errors: undefined,
       });
 
@@ -193,7 +196,7 @@ describe('AiOperationsRepository', () => {
 
     it('should handle empty experience blocks', async () => {
       mockClient.extractExperienceBlocks.mockResolvedValue({
-        data: JSON.stringify({ experiences: [] }),
+        data: { experiences: [] },
         errors: undefined,
       });
 
@@ -215,7 +218,7 @@ describe('AiOperationsRepository', () => {
       };
 
       mockClient.generateStarStory.mockResolvedValue({
-        data: JSON.stringify([mockStarStory]),
+        data: [mockStarStory],
         errors: undefined,
       });
 
@@ -247,11 +250,11 @@ describe('AiOperationsRepository', () => {
           'Successfully migrated system to new architecture',
           'Improved system performance by 40%',
         ],
-        kpi_suggestions: ['Response time reduction', 'System throughput increase'],
+        kpiSuggestions: ['Response time reduction', 'System throughput increase'],
       };
 
       mockClient.generateAchievementsAndKpis.mockResolvedValue({
-        data: JSON.stringify(mockAchievementsAndKpis),
+        data: mockAchievementsAndKpis,
         errors: undefined,
       });
 
