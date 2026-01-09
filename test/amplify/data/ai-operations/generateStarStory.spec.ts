@@ -17,7 +17,7 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => {
  * Tests the actual implementation with mocked Bedrock responses
  */
 describe('ai.generateStarStory', () => {
-  let handler: (event: { arguments: { sourceText: string } }) => Promise<string>;
+  let handler: (event: { arguments: { sourceText: string } }) => Promise<unknown>;
   let mockSend: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
@@ -108,7 +108,13 @@ Outcome achieved from the experience`;
         arguments: { sourceText: mockExperienceText },
       });
 
-      const parsed = JSON.parse(result);
+      const parsed = result as Array<{
+        title: string;
+        situation: string;
+        task: string;
+        action: string;
+        result: string;
+      }>;
       expect(Array.isArray(parsed)).toBe(true);
       expect(parsed.length).toBeGreaterThan(0);
 
@@ -154,7 +160,13 @@ Working on a project
         arguments: { sourceText: mockExperienceText },
       });
 
-      const parsed = JSON.parse(result);
+      const parsed = result as Array<{
+        title: string;
+        situation: string;
+        task: string;
+        action: string;
+        result: string;
+      }>;
       expect(Array.isArray(parsed)).toBe(true);
       const story = parsed[0];
       expect(story.title).toBe('Custom Story Title');
@@ -198,7 +210,13 @@ Increased user engagement`;
         arguments: { sourceText: shortText },
       });
 
-      const parsed = JSON.parse(result);
+      const parsed = result as Array<{
+        title: string;
+        situation: string;
+        task: string;
+        action: string;
+        result: string;
+      }>;
       expect(Array.isArray(parsed)).toBe(true);
       const story = parsed[0];
       expect(story.situation).toBeTruthy();
@@ -256,7 +274,13 @@ _I reduced_ incident volume by 40%, improving productivity and satisfaction.`;
         arguments: { sourceText: mockExperienceText },
       });
 
-      const parsed = JSON.parse(result);
+      const parsed = result as Array<{
+        title: string;
+        situation: string;
+        task: string;
+        action: string;
+        result: string;
+      }>;
       expect(parsed).toHaveLength(2);
       expect(parsed[0].title).toBe('Registration System Redesign Success');
       expect(parsed[1].title).toBe('Support Incident Volume Reduction');
@@ -293,7 +317,13 @@ _I reduced_ incident volume by 40%, improving productivity and satisfaction.`;
         arguments: { sourceText: 'Some text' },
       });
 
-      const parsed = JSON.parse(result);
+      const parsed = result as Array<{
+        title: string;
+        situation: string;
+        task: string;
+        action: string;
+        result: string;
+      }>;
       expect(Array.isArray(parsed)).toBe(true);
       const story = parsed[0];
       // When all fields are empty, the parser can't extract a valid story
@@ -334,7 +364,13 @@ Valid action
         arguments: { sourceText: 'Some text' },
       });
 
-      const parsed = JSON.parse(result);
+      const parsed = result as Array<{
+        title: string;
+        situation: string;
+        task: string;
+        action: string;
+        result: string;
+      }>;
       expect(Array.isArray(parsed)).toBe(true);
       const story = parsed[0];
       expect(story.title).toBe('Customer Support Win');
@@ -385,7 +421,13 @@ Second project results`;
         arguments: { sourceText: 'Multiple experiences text' },
       });
 
-      const parsed = JSON.parse(result);
+      const parsed = result as Array<{
+        title: string;
+        situation: string;
+        task: string;
+        action: string;
+        result: string;
+      }>;
       expect(Array.isArray(parsed)).toBe(true);
       expect(parsed.length).toBe(2);
 

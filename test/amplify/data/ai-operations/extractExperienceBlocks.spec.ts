@@ -147,7 +147,17 @@ describe('ai.extractExperienceBlocks', () => {
           experienceTextBlocks: inputBlocks,
         },
       });
-      const result = JSON.parse(resultString);
+      const result = resultString as {
+        experiences: Array<{
+          title: string;
+          company: string;
+          startDate: string;
+          endDate: string | null;
+          responsibilities: string[];
+          tasks: string[];
+          experienceType?: string;
+        }>;
+      };
 
       expect(result.experiences).toHaveLength(1);
       expect(result.experiences[0].title).toBe('Senior Software Engineer');
@@ -186,7 +196,17 @@ describe('ai.extractExperienceBlocks', () => {
           experienceTextBlocks: inputBlocks,
         },
       });
-      const result = JSON.parse(resultString);
+      const result = resultString as {
+        experiences: Array<{
+          title: string;
+          company: string;
+          startDate: string;
+          endDate: string | null;
+          responsibilities: string[];
+          tasks: string[];
+          experienceType?: string;
+        }>;
+      };
 
       expect(result.experiences).toHaveLength(2);
       expect(result.experiences[0].title).toBe('Senior Developer');
@@ -234,7 +254,17 @@ describe('ai.extractExperienceBlocks', () => {
           experienceTextBlocks: inputBlocks,
         },
       });
-      const result = JSON.parse(resultString);
+      const result = resultString as {
+        experiences: Array<{
+          title: string;
+          company: string;
+          startDate: string;
+          endDate: string | null;
+          responsibilities: string[];
+          tasks: string[];
+          experienceType?: string;
+        }>;
+      };
 
       expect(result.experiences).toHaveLength(1);
       expect(result.experiences[0].title).toBe('Experience 1'); // Fallback
@@ -269,7 +299,17 @@ describe('ai.extractExperienceBlocks', () => {
           experienceTextBlocks: ['Experience text'],
         },
       });
-      const result = JSON.parse(resultString);
+      const result = resultString as {
+        experiences: Array<{
+          title: string;
+          company: string;
+          startDate: string;
+          endDate: string | null;
+          responsibilities: string[];
+          tasks: string[];
+          experienceType?: string;
+        }>;
+      };
 
       // Should apply fallback for missing experiences field
       expect(result.experiences).toBeDefined();

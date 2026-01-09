@@ -1,5 +1,5 @@
 import { invokeAiWithRetry } from './utils/bedrock';
-import { truncateForLog, withAiOperationHandler } from './utils/common';
+import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 /**
  * AWS Lambda handler for ai.parseCvText
@@ -193,8 +193,10 @@ ${OUTPUT_SCHEMA}`;
 /**
  * Main Lambda handler
  */
-export const handler = async (event: { arguments: ParseCvTextInput }): Promise<string> => {
-  return withAiOperationHandler(
+export const handler = async (
+  event: { arguments: ParseCvTextInput }
+): Promise<ParseCvTextOutput> => {
+  return withAiOperationHandlerObject(
     'parseCvText',
     event,
     async (args) => {

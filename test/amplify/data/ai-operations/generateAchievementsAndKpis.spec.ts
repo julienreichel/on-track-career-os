@@ -92,7 +92,7 @@ describe('ai.generateAchievementsAndKpis', () => {
       const resultString = await handler({
         arguments: { starStory },
       });
-      const result = JSON.parse(resultString);
+      const result = resultString as { achievements: string[]; kpiSuggestions: string[] };
 
       // Verify input was used - result should contain data from input
       expect(result.achievements).toBeDefined();
@@ -137,7 +137,7 @@ describe('ai.generateAchievementsAndKpis', () => {
       const resultString = await handler({
         arguments: { starStory },
       });
-      const result = JSON.parse(resultString);
+      const result = resultString as { achievements: string[]; kpiSuggestions: string[] };
 
       expect(result.achievements).toBeDefined();
       expect(result.achievements.length).toBeGreaterThan(0);
@@ -182,7 +182,7 @@ describe('ai.generateAchievementsAndKpis', () => {
       const resultString = await handler({
         arguments: { starStory },
       });
-      const result = JSON.parse(resultString);
+      const result = resultString as { achievements: string[]; kpiSuggestions: string[] };
 
       expect(result.achievements).toBeDefined();
       expect(result.achievements).toHaveLength(1);
@@ -220,7 +220,7 @@ describe('ai.generateAchievementsAndKpis', () => {
       const resultString = await handler({
         arguments: { starStory },
       });
-      const result = JSON.parse(resultString);
+      const result = resultString as { achievements: string[]; kpiSuggestions: string[] };
 
       expect(result.achievements).toEqual(['Achievement 1', 'Achievement 2']);
       expect(result.kpiSuggestions).toBeDefined();
@@ -258,7 +258,7 @@ describe('ai.generateAchievementsAndKpis', () => {
       const resultString = await handler({
         arguments: { starStory },
       });
-      const result = JSON.parse(resultString);
+      const result = resultString as { achievements: string[]; kpiSuggestions: string[] };
 
       expect(result.achievements).toHaveLength(1);
       expect(result.achievements[0]).toBe('Successfully completed project');
@@ -296,7 +296,7 @@ describe('ai.generateAchievementsAndKpis', () => {
       const resultString = await handler({
         arguments: { starStory },
       });
-      const result = JSON.parse(resultString);
+      const result = resultString as { achievements: string[]; kpiSuggestions: string[] };
 
       expect(result.achievements).toHaveLength(2);
       expect(result.achievements).toEqual(['Valid achievement', 'Another achievement']);
@@ -334,7 +334,7 @@ describe('ai.generateAchievementsAndKpis', () => {
       const resultString = await handler({
         arguments: { starStory },
       });
-      const result = JSON.parse(resultString);
+      const result = resultString as { achievements: string[]; kpiSuggestions: string[] };
 
       expect(result.achievements).toEqual(['Achievement 1']);
       expect(result.kpiSuggestions).toEqual(['KPI 1', 'KPI 2']);

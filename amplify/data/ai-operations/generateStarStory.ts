@@ -1,5 +1,5 @@
 import { invokeBedrock } from './utils/bedrock';
-import { truncateForLog, withAiOperationHandler } from './utils/common';
+import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 /**
  * AWS Lambda handler for ai.generateStarStory
@@ -257,8 +257,10 @@ async function invokeAiForText(systemPrompt: string, userPrompt: string): Promis
 /**
  * Main Lambda handler
  */
-export const handler = async (event: { arguments: GenerateStarStoryInput }): Promise<string> => {
-  return withAiOperationHandler(
+export const handler = async (
+  event: { arguments: GenerateStarStoryInput }
+): Promise<GenerateStarStoryOutput[]> => {
+  return withAiOperationHandlerObject(
     'generateStarStory',
     event,
     async (args) => {
@@ -270,7 +272,7 @@ export const handler = async (event: { arguments: GenerateStarStoryInput }): Pro
       // Parse text into structured stories
       const stories = parseStarStoriesFromText(aiText);
 
-      // Return array directly (withAiOperationHandler will stringify it)
+      // Return array directly
       return stories;
     },
     (args) => ({

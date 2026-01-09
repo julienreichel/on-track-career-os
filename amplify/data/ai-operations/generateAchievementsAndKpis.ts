@@ -1,5 +1,5 @@
 import { invokeAiWithRetry } from './utils/bedrock';
-import { truncateForLog, withAiOperationHandler } from './utils/common';
+import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 /**
  * AWS Lambda handler for ai.generateAchievementsAndKpis
@@ -146,8 +146,8 @@ function validateOutput(output: unknown): GenerateAchievementsAndKpisOutput {
  */
 export const handler = async (event: {
   arguments: GenerateAchievementsAndKpisInput;
-}): Promise<string> => {
-  return withAiOperationHandler(
+}): Promise<GenerateAchievementsAndKpisOutput> => {
+  return withAiOperationHandlerObject(
     'generateAchievementsAndKpis',
     event,
     async (args: GenerateAchievementsAndKpisInput) => {

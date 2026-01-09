@@ -1,5 +1,5 @@
 import { invokeAiWithRetry } from './utils/bedrock';
-import { truncateForLog, withAiOperationHandler } from './utils/common';
+import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 /**
  * AWS Lambda handler for ai.extractExperienceBlocks
@@ -217,8 +217,8 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
  */
 export const handler = async (event: {
   arguments: ExtractExperienceBlocksInput;
-}): Promise<string> => {
-  return withAiOperationHandler(
+}): Promise<ExtractExperienceBlocksOutput> => {
+  return withAiOperationHandlerObject(
     'extractExperienceBlocks',
     event,
     async (args: ExtractExperienceBlocksInput) => {

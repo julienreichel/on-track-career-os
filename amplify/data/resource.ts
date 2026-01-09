@@ -375,36 +375,30 @@ export const schema = a
     parseCvText: a
       .query()
       .arguments({ cvText: a.string().required() })
-      .returns(a.string())
+      .returns(a.ref('ParseCvTextOutputType'))
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(parseCvTextFunction)),
 
     extractExperienceBlocks: a
       .query()
       .arguments({ experienceTextBlocks: a.string().array().required() })
-      .returns(a.string())
+      .returns(a.ref('ExtractExperienceBlocksOutputType'))
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(extractExperienceBlocksFunction)),
 
     generateStarStory: a
       .query()
       .arguments({ sourceText: a.string().required() })
-      .returns(a.string())
+      .returns(a.ref('StarStoryType').array())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateStarStoryFunction)),
 
     generateAchievementsAndKpis: a
       .query()
       .arguments({
-        starStory: a.customType({
-          title: a.string(),
-          situation: a.string().required(),
-          task: a.string().required(),
-          action: a.string().required(),
-          result: a.string().required(),
-        }),
+        starStory: a.ref('StarStoryType').required(),
       })
-      .returns(a.string())
+      .returns(a.ref('AchievementsAndKpisType'))
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateAchievementsAndKpisFunction)),
 
@@ -470,6 +464,60 @@ export const schema = a
       .returns(a.json())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(generateCompanyCanvasFunction)),
+
+    ParseCvTextSectionsType: a.customType({
+      experiences: a.string().array().required(),
+      education: a.string().array().required(),
+      skills: a.string().array().required(),
+      certifications: a.string().array().required(),
+      rawBlocks: a.string().array().required(),
+    }),
+
+    ParseCvTextProfileType: a.customType({
+      fullName: a.string(),
+      headline: a.string(),
+      location: a.string(),
+      seniorityLevel: a.string(),
+      goals: a.string().array(),
+      aspirations: a.string().array(),
+      personalValues: a.string().array(),
+      strengths: a.string().array(),
+      interests: a.string().array(),
+      languages: a.string().array(),
+    }),
+
+    ParseCvTextOutputType: a.customType({
+      sections: a.ref('ParseCvTextSectionsType').required(),
+      profile: a.ref('ParseCvTextProfileType').required(),
+      confidence: a.float().required(),
+    }),
+
+    ExperienceBlockType: a.customType({
+      title: a.string().required(),
+      company: a.string().required(),
+      startDate: a.string(),
+      endDate: a.string(),
+      responsibilities: a.string().array().required(),
+      tasks: a.string().array().required(),
+      experienceType: a.string().required(),
+    }),
+
+    ExtractExperienceBlocksOutputType: a.customType({
+      experiences: a.ref('ExperienceBlockType').array().required(),
+    }),
+
+    StarStoryType: a.customType({
+      title: a.string().required(),
+      situation: a.string().required(),
+      task: a.string().required(),
+      action: a.string().required(),
+      result: a.string().required(),
+    }),
+
+    AchievementsAndKpisType: a.customType({
+      achievements: a.string().array().required(),
+      kpiSuggestions: a.string().array().required(),
+    }),
 
     ProfileType: a.customType({
       fullName: a.string().required(),

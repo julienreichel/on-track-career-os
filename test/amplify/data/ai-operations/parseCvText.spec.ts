@@ -17,7 +17,7 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => {
  * Tests the actual implementation with mocked Bedrock responses
  */
 describe('ai.parseCvText', () => {
-  let handler: (event: { arguments: { cvText: string } }) => Promise<string>;
+  let handler: (event: { arguments: { cvText: string } }) => Promise<unknown>;
   let mockSend: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
@@ -196,7 +196,23 @@ GOALS
         arguments: { cvText: mockCvText },
       });
 
-      const parsed = JSON.parse(result);
+      const parsed = result as {
+        sections: {
+          experiences: string[];
+          education: string[];
+          skills: string[];
+          certifications: string[];
+        };
+        profile: {
+          fullName?: string;
+          headline?: string;
+          location?: string;
+          seniorityLevel?: string;
+          languages: string[];
+          goals: string[];
+        };
+        confidence: number;
+      };
       expect(parsed.sections.experiences).toHaveLength(1);
       expect(parsed.sections.experiences[0]).toContain('TechCorp');
       expect(parsed.sections.education).toHaveLength(1);
@@ -247,7 +263,25 @@ GOALS
         arguments: { cvText: mockCvText },
       });
 
-      const parsed = JSON.parse(result);
+      const parsed = result as {
+        sections: {
+          experiences: string[];
+          education: string[];
+          skills: string[];
+          certifications: string[];
+          rawBlocks: string[];
+        };
+        profile: {
+          fullName?: string;
+          goals: string[];
+          aspirations: string[];
+          personalValues: string[];
+          strengths: string[];
+          interests: string[];
+          languages: string[];
+        };
+        confidence: number;
+      };
       expect(parsed.sections.experiences).toEqual(['Some experience']);
       // Operation-specific validation fills missing fields
       expect(parsed.sections.education).toEqual([]);
@@ -288,7 +322,24 @@ GOALS
       const resultString = await handler({
         arguments: { cvText: mockCvText },
       });
-      const result = JSON.parse(resultString);
+      const result = resultString as {
+        sections: {
+          experiences: string[];
+          education: string[];
+          skills: string[];
+          certifications: string[];
+          rawBlocks: string[];
+        };
+        profile: {
+          goals: string[];
+          aspirations: string[];
+          personalValues: string[];
+          strengths: string[];
+          interests: string[];
+          languages: string[];
+        };
+        confidence: number;
+      };
 
       // Should apply fallback structure for missing sections
       expect(result.sections).toBeDefined();
