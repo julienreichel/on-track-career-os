@@ -82,6 +82,30 @@ export const schemaTypes = {
     revenueStreams: a.string().array(),
   }),
 
+  PersonalCanvasProfileType: a.customType({
+    fullName: a.string(),
+    headline: a.string(),
+    summary: a.string(),
+  }),
+
+  PersonalCanvasExperienceType: a.customType({
+    title: a.string(),
+    company: a.string(),
+    startDate: a.string(),
+    endDate: a.string(),
+    responsibilities: a.string().array(),
+    tasks: a.string().array(),
+  }),
+
+  PersonalCanvasStoryType: a.customType({
+    situation: a.string(),
+    task: a.string(),
+    action: a.string(),
+    result: a.string(),
+    achievements: a.string().array(),
+    kpiSuggestions: a.string().array(),
+  }),
+
   ExperienceType: a.customType({
     id: a.string(),
     title: a.string().required(),

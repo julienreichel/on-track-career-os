@@ -289,33 +289,26 @@ describe('AiOperationsRepository', () => {
         ],
       };
       const mockPersonalCanvas = {
-        valueProposition: 'Deliver high-performance solutions',
-        targetRoles: ['Engineering Manager', 'Principal Engineer'],
+        customerSegments: ['Tech companies', 'Startups'],
+        valueProposition: ['Deliver high-performance solutions'],
+        channels: ['LinkedIn', 'GitHub'],
+        customerRelationships: ['Professional networking'],
         keyActivities: ['System design', 'Team leadership'],
         keyResources: ['Technical expertise', 'Leadership skills'],
-        channels: ['LinkedIn', 'GitHub'],
-        customerSegments: ['Tech companies', 'Startups'],
+        keyPartners: ['Mentors', 'Recruiters'],
         costStructure: ['Time investment', 'Continuous learning'],
         revenueStreams: ['Salary', 'Consulting'],
-        strengthsAdvantage: 'Strong technical background',
-        careerDirection: 'Move into technical leadership',
       };
 
-      // GraphQL returns a.json() which is a JSON string
       mockClient.generatePersonalCanvas.mockResolvedValue({
-        data: JSON.stringify(mockPersonalCanvas),
+        data: mockPersonalCanvas,
         errors: undefined,
       });
 
       const result = await repository.generatePersonalCanvas(mockInput);
 
-      // GraphQL expects JSON strings as input, not objects
       expect(mockClient.generatePersonalCanvas).toHaveBeenCalledWith(
-        {
-          profile: JSON.stringify(mockInput.profile),
-          experiences: JSON.stringify(mockInput.experiences),
-          stories: JSON.stringify(mockInput.stories),
-        },
+        mockInput,
         expect.objectContaining({ authMode: 'userPool' })
       );
       expect(result).toEqual(mockPersonalCanvas);

@@ -139,11 +139,11 @@ export const schemaLambdas = {
   generatePersonalCanvas: a
     .query()
     .arguments({
-      profile: a.json().required(),
-      experiences: a.json().required(),
-      stories: a.json().required(),
+      profile: a.ref('PersonalCanvasProfileType').required(),
+      experiences: a.ref('PersonalCanvasExperienceType').array().required(),
+      stories: a.ref('PersonalCanvasStoryType').array().required(),
     })
-    .returns(a.json())
+    .returns(a.ref('PersonalCanvasType'))
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(generatePersonalCanvasFunction)),
 
