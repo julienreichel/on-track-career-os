@@ -81,6 +81,7 @@ describe('ai.generateAchievementsAndKpis - E2E Sandbox', () => {
 
   it('should generate achievements and KPIs from a detailed STAR story', async () => {
     const starStory = {
+      title: 'Infrastructure modernization',
       situation:
         'The team was struggling with deployment bottlenecks and scaling issues in a monolithic application at TechCorp.',
       task: 'Design and implement a solution to improve deployment efficiency and system scalability.',
@@ -122,6 +123,7 @@ describe('ai.generateAchievementsAndKpis - E2E Sandbox', () => {
 
   it('should handle qualitative STAR stories without numbers', async () => {
     const starStory = {
+      title: 'Team collaboration improvements',
       situation: 'Team morale was low due to unclear processes and lack of communication.',
       task: 'Improve team collaboration and communication effectiveness.',
       action:
@@ -149,6 +151,7 @@ describe('ai.generateAchievementsAndKpis - E2E Sandbox', () => {
 
   it('should extract multiple achievements from complex result', async () => {
     const starStory = {
+      title: 'Zero-downtime cloud migration',
       situation:
         'The company needed to modernize its legacy infrastructure while maintaining service availability.',
       task: 'Plan and execute a zero-downtime migration to cloud infrastructure.',
@@ -178,6 +181,7 @@ describe('ai.generateAchievementsAndKpis - E2E Sandbox', () => {
 
   it('should handle minimal STAR stories', async () => {
     const starStory = {
+      title: 'Deadline delivery',
       situation: 'Project deadline was approaching.',
       task: 'Deliver the feature on time.',
       action: 'Worked overtime and coordinated with the team.',
@@ -195,6 +199,7 @@ describe('ai.generateAchievementsAndKpis - E2E Sandbox', () => {
 
   it('should generate consistent output format', async () => {
     const starStory = {
+      title: 'Customer satisfaction turnaround',
       situation: 'Customer satisfaction scores were declining.',
       task: 'Identify and resolve customer pain points.',
       action:

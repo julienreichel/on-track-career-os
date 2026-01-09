@@ -39,19 +39,17 @@ RULES:
 - Return ONLY valid JSON with no markdown wrappers`;
 
 // Output schema for retry
-const OUTPUT_SCHEMA = `{
-  "experiences": [
-    {
-      "title": "string",
-      "company": "string",
-      "startDate": "YYYY-MM-DD or YYYY-MM",
-      "endDate": "YYYY-MM-DD or YYYY-MM or null",
-      "responsibilities": ["string"],
-      "tasks": ["string"],
-      "experienceType": "work | education | volunteer | project"
-    }
-  ]
-}`;
+const OUTPUT_SCHEMA = `[
+  {
+    "title": "string",
+    "company": "string",
+    "startDate": "YYYY-MM-DD or YYYY-MM",
+    "endDate": "YYYY-MM-DD or YYYY-MM or null",
+    "responsibilities": ["string"],
+    "tasks": ["string"],
+    "experienceType": "work | education | volunteer | project"
+  }
+]`;
 
 // Experience block interface (matches output schema)
 export interface ExperienceBlock {
@@ -62,10 +60,6 @@ export interface ExperienceBlock {
   responsibilities: string[];
   tasks: string[];
   experienceType: 'work' | 'education' | 'volunteer' | 'project';
-}
-
-export interface ExtractExperienceBlocksOutput {
-  experiences: ExperienceBlock[];
 }
 
 export interface ExtractExperienceBlocksInput {
@@ -88,7 +82,7 @@ IMPORTANT:
 - Responsibilities: High-level duties and roles
 - Tasks: Specific actions, deliverables, achievements, and measurable results (e.g., "Increased sales by 30%", "Managed team of 5", "Delivered project ahead of schedule")
 
-Return a JSON object with this exact structure:
+Return a JSON array with this exact structure:
 ${OUTPUT_SCHEMA}`;
 }
 
@@ -118,33 +112,23 @@ function normalizeDate(date: string | null): string | null {
 /**
  * Validate output and apply fallback rules per AIC
  */
-function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
-  if (!output || typeof output !== 'object') {
-    throw new Error('Output must be an object');
-  }
-
-  const outputObj = output as Record<string, unknown>;
-
-  // Apply fallback if experiences field is missing or invalid
-  if (!outputObj.experiences || !Array.isArray(outputObj.experiences)) {
-    return {
-      experiences: [
-        {
-          title: 'Experience 1',
-          company: 'Unknown Company',
-          startDate: '2020-01-01',
-          endDate: null,
-          responsibilities: [],
-          tasks: [],
-          experienceType: 'work' as const,
-        },
-      ],
-    };
+function validateOutput(output: unknown): ExperienceBlock[] {
+  if (!Array.isArray(output)) {
+    return [
+      {
+        title: 'Experience 1',
+        company: 'Unknown Company',
+        startDate: '2020-01-01',
+        endDate: null,
+        responsibilities: [],
+        tasks: [],
+        experienceType: 'work' as const,
+      },
+    ];
   }
 
   // Validate and clean each experience block
-  const validatedExperiences: ExperienceBlock[] = outputObj.experiences.map(
-    (exp: unknown, index: number) => {
+  const validatedExperiences: ExperienceBlock[] = output.map((exp: unknown, index: number) => {
       const expObj = exp as Record<string, unknown>;
 
       // Required fields with fallbacks
@@ -204,12 +188,23 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
         tasks: tasks.filter((t: unknown) => typeof t === 'string') as string[],
         experienceType,
       };
-    }
-  );
+  });
 
-  return {
-    experiences: validatedExperiences,
-  };
+  if (validatedExperiences.length === 0) {
+    return [
+      {
+        title: 'Experience 1',
+        company: 'Unknown Company',
+        startDate: '2020-01-01',
+        endDate: null,
+        responsibilities: [],
+        tasks: [],
+        experienceType: 'work' as const,
+      },
+    ];
+  }
+
+  return validatedExperiences;
 }
 
 /**
@@ -217,13 +212,13 @@ function validateOutput(output: unknown): ExtractExperienceBlocksOutput {
  */
 export const handler = async (event: {
   arguments: ExtractExperienceBlocksInput;
-}): Promise<ExtractExperienceBlocksOutput> => {
+}): Promise<ExperienceBlock[]> => {
   return withAiOperationHandlerObject(
     'extractExperienceBlocks',
     event,
     async (args: ExtractExperienceBlocksInput) => {
       const userPrompt = buildUserPrompt(args.experienceTextBlocks);
-      return invokeAiWithRetry<ExtractExperienceBlocksOutput>({
+      return invokeAiWithRetry<ExperienceBlock[]>({
         systemPrompt: SYSTEM_PROMPT,
         userPrompt,
         outputSchema: OUTPUT_SCHEMA,

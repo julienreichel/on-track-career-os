@@ -382,7 +382,7 @@ export const schema = a
     extractExperienceBlocks: a
       .query()
       .arguments({ experienceTextBlocks: a.string().array().required() })
-      .returns(a.ref('ExtractExperienceBlocksOutputType'))
+      .returns(a.ref('ExperienceBlockType').array())
       .authorization((allow) => [allow.authenticated()])
       .handler(a.handler.function(extractExperienceBlocksFunction)),
 
@@ -500,10 +500,6 @@ export const schema = a
       responsibilities: a.string().array().required(),
       tasks: a.string().array().required(),
       experienceType: a.string().required(),
-    }),
-
-    ExtractExperienceBlocksOutputType: a.customType({
-      experiences: a.ref('ExperienceBlockType').array().required(),
     }),
 
     StarStoryType: a.customType({

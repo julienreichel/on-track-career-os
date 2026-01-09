@@ -106,7 +106,7 @@ describe('ai.extractExperienceBlocks', () => {
       };
     });
 
-    return { experiences };
+    return experiences;
   };
 
   describe('Handler Integration Tests', () => {
@@ -147,25 +147,23 @@ describe('ai.extractExperienceBlocks', () => {
           experienceTextBlocks: inputBlocks,
         },
       });
-      const result = resultString as {
-        experiences: Array<{
-          title: string;
-          company: string;
-          startDate: string;
-          endDate: string | null;
-          responsibilities: string[];
-          tasks: string[];
-          experienceType?: string;
-        }>;
-      };
+      const result = resultString as Array<{
+        title: string;
+        company: string;
+        startDate: string;
+        endDate: string | null;
+        responsibilities: string[];
+        tasks: string[];
+        experienceType?: string;
+      }>;
 
-      expect(result.experiences).toHaveLength(1);
-      expect(result.experiences[0].title).toBe('Senior Software Engineer');
-      expect(result.experiences[0].company).toBe('TechCorp Inc.');
-      expect(result.experiences[0].startDate).toBe('2020-03-01');
-      expect(result.experiences[0].endDate).toBe('2023-12-01');
-      expect(result.experiences[0].responsibilities).toContain('Lead development team');
-      expect(result.experiences[0].tasks).toContain('Implemented microservices');
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe('Senior Software Engineer');
+      expect(result[0].company).toBe('TechCorp Inc.');
+      expect(result[0].startDate).toBe('2020-03-01');
+      expect(result[0].endDate).toBe('2023-12-01');
+      expect(result[0].responsibilities).toContain('Lead development team');
+      expect(result[0].tasks).toContain('Implemented microservices');
     });
 
     it('should handle multiple experience blocks', async () => {
@@ -196,26 +194,24 @@ describe('ai.extractExperienceBlocks', () => {
           experienceTextBlocks: inputBlocks,
         },
       });
-      const result = resultString as {
-        experiences: Array<{
-          title: string;
-          company: string;
-          startDate: string;
-          endDate: string | null;
-          responsibilities: string[];
-          tasks: string[];
-          experienceType?: string;
-        }>;
-      };
+      const result = resultString as Array<{
+        title: string;
+        company: string;
+        startDate: string;
+        endDate: string | null;
+        responsibilities: string[];
+        tasks: string[];
+        experienceType?: string;
+      }>;
 
-      expect(result.experiences).toHaveLength(2);
-      expect(result.experiences[0].title).toBe('Senior Developer');
-      expect(result.experiences[0].company).toBe('Company A');
-      expect(result.experiences[0].endDate).toBeNull();
-      expect(result.experiences[1].title).toBe('Junior Developer');
-      expect(result.experiences[1].company).toBe('Company B');
-      expect(result.experiences[1].startDate).toBe('2018-06-01');
-      expect(result.experiences[1].endDate).toBe('2019-12-01');
+      expect(result).toHaveLength(2);
+      expect(result[0].title).toBe('Senior Developer');
+      expect(result[0].company).toBe('Company A');
+      expect(result[0].endDate).toBeNull();
+      expect(result[1].title).toBe('Junior Developer');
+      expect(result[1].company).toBe('Company B');
+      expect(result[1].startDate).toBe('2018-06-01');
+      expect(result[1].endDate).toBe('2019-12-01');
     });
 
     it('should apply operation-specific validation fallbacks', async () => {
@@ -230,16 +226,14 @@ describe('ai.extractExperienceBlocks', () => {
                 message: {
                   content: [
                     {
-                      text: JSON.stringify({
-                        experiences: [
-                          {
-                            // Missing title and company - will use fallbacks
-                            startDate: '2020-01',
-                            endDate: null,
-                            // Missing responsibilities and tasks - will default to []
-                          },
-                        ],
-                      }),
+                      text: JSON.stringify([
+                        {
+                          // Missing title and company - will use fallbacks
+                          startDate: '2020-01',
+                          endDate: null,
+                          // Missing responsibilities and tasks - will default to []
+                        },
+                      ]),
                     },
                   ],
                 },
@@ -254,23 +248,21 @@ describe('ai.extractExperienceBlocks', () => {
           experienceTextBlocks: inputBlocks,
         },
       });
-      const result = resultString as {
-        experiences: Array<{
-          title: string;
-          company: string;
-          startDate: string;
-          endDate: string | null;
-          responsibilities: string[];
-          tasks: string[];
-          experienceType?: string;
-        }>;
-      };
+      const result = resultString as Array<{
+        title: string;
+        company: string;
+        startDate: string;
+        endDate: string | null;
+        responsibilities: string[];
+        tasks: string[];
+        experienceType?: string;
+      }>;
 
-      expect(result.experiences).toHaveLength(1);
-      expect(result.experiences[0].title).toBe('Experience 1'); // Fallback
-      expect(result.experiences[0].company).toBe('Unknown Company'); // Fallback
-      expect(result.experiences[0].responsibilities).toEqual([]); // Fallback
-      expect(result.experiences[0].tasks).toEqual([]); // Fallback
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe('Experience 1'); // Fallback
+      expect(result[0].company).toBe('Unknown Company'); // Fallback
+      expect(result[0].responsibilities).toEqual([]); // Fallback
+      expect(result[0].tasks).toEqual([]); // Fallback
     });
 
     it('should apply fallback for missing experiences field', async () => {
@@ -299,23 +291,21 @@ describe('ai.extractExperienceBlocks', () => {
           experienceTextBlocks: ['Experience text'],
         },
       });
-      const result = resultString as {
-        experiences: Array<{
-          title: string;
-          company: string;
-          startDate: string;
-          endDate: string | null;
-          responsibilities: string[];
-          tasks: string[];
-          experienceType?: string;
-        }>;
-      };
+      const result = resultString as Array<{
+        title: string;
+        company: string;
+        startDate: string;
+        endDate: string | null;
+        responsibilities: string[];
+        tasks: string[];
+        experienceType?: string;
+      }>;
 
       // Should apply fallback for missing experiences field
-      expect(result.experiences).toBeDefined();
-      expect(result.experiences).toHaveLength(1);
-      expect(result.experiences[0].title).toBe('Experience 1');
-      expect(result.experiences[0].company).toBe('Unknown Company');
+      expect(result).toBeDefined();
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe('Experience 1');
+      expect(result[0].company).toBe('Unknown Company');
     });
   });
 });

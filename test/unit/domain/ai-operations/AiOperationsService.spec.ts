@@ -169,19 +169,17 @@ describe('AiOperationsService', () => {
   describe('extractExperienceBlocks', () => {
     it('should successfully extract experience blocks', async () => {
       // Arrange
-      const mockExperiences: ExperiencesResult = {
-        experiences: [
-          {
-            title: 'Senior Developer',
-            company: 'TechCorp',
-            startDate: '2020-01',
-            endDate: '2023-12',
-            responsibilities: ['Lead team', 'Code review'],
-            tasks: ['Development', 'Mentoring'],
-            experienceType: 'work',
-          },
-        ],
-      };
+      const mockExperiences: ExperiencesResult = [
+        {
+          title: 'Senior Developer',
+          company: 'TechCorp',
+          startDate: '2020-01',
+          endDate: '2023-12',
+          responsibilities: ['Lead team', 'Code review'],
+          tasks: ['Development', 'Mentoring'],
+          experienceType: 'work',
+        },
+      ];
 
       mockRepo.extractExperienceBlocks.mockResolvedValue(mockExperiences);
 
@@ -224,7 +222,7 @@ describe('AiOperationsService', () => {
 
     it('should throw error when result structure is invalid', async () => {
       // Arrange
-      mockRepo.extractExperienceBlocks.mockResolvedValue({ invalid: 'structure' });
+      mockRepo.extractExperienceBlocks.mockResolvedValue({ invalid: 'structure' } as never);
 
       // Act & Assert
       await expect(service.extractExperienceBlocks(['Experience 1'])).rejects.toThrow(

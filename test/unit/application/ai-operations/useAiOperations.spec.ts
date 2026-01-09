@@ -116,19 +116,17 @@ describe('useAiOperations', () => {
 
   it('should successfully extract experiences', async () => {
     // Arrange
-    const mockExperiences: ExperiencesResult = {
-      experiences: [
-        {
-          title: 'Developer',
-          company: 'TechCorp',
-          startDate: '2020-01',
-          endDate: '2023-12',
-          responsibilities: [],
-          tasks: [],
-          experienceType: 'work',
-        },
-      ],
-    };
+    const mockExperiences: ExperiencesResult = [
+      {
+        title: 'Developer',
+        company: 'TechCorp',
+        startDate: '2020-01',
+        endDate: '2023-12',
+        responsibilities: [],
+        tasks: [],
+        experienceType: 'work',
+      },
+    ];
     mockService.extractExperienceBlocks.mockResolvedValue(mockExperiences);
 
     // Act
@@ -254,7 +252,7 @@ describe('useAiOperations', () => {
       successCriteria: [],
       explicitPains: [],
     };
-    experiences.value = { experiences: [] };
+    experiences.value = [];
     starStories.value = [
       {
         title: 'Test',

@@ -135,14 +135,13 @@ Tasks:
     const result = await repository.extractExperienceBlocks(experienceTextBlocks);
 
     // Validate structure (per AI Interaction Contract)
-    expect(result).toHaveProperty('experiences');
-    expect(Array.isArray(result.experiences)).toBe(true);
+    expect(Array.isArray(result)).toBe(true);
 
     // Should extract both experiences
-    expect(result.experiences.length).toBeGreaterThanOrEqual(1);
-    console.log(result.experiences);
+    expect(result.length).toBeGreaterThanOrEqual(1);
+    console.log(result);
     // Validate first experience structure
-    const firstExp = result.experiences[0];
+    const firstExp = result[0];
     expect(firstExp).toHaveProperty('title');
     expect(firstExp).toHaveProperty('company');
     expect(firstExp).toHaveProperty('startDate');
@@ -174,12 +173,11 @@ Tasks: AWS infrastructure, microservices development, DevOps automation.`,
     const result = await repository.extractExperienceBlocks(singleBlock);
 
     // Validate structure
-    expect(result).toHaveProperty('experiences');
-    expect(Array.isArray(result.experiences)).toBe(true);
-    expect(result.experiences.length).toBeGreaterThanOrEqual(1);
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBeGreaterThanOrEqual(1);
 
     // Validate basic fields are present
-    const exp = result.experiences[0];
+    const exp = result[0];
     expect(exp.title).toBeDefined();
     expect(exp.company).toBeDefined();
   }, 60000);
@@ -201,10 +199,10 @@ Worked with Python, Spark, Kafka`,
     const result = await repository.extractExperienceBlocks(mixedBlocks);
 
     // Should handle both formats
-    expect(result.experiences.length).toBeGreaterThanOrEqual(1);
+    expect(result.length).toBeGreaterThanOrEqual(1);
 
     // Each experience should have required fields
-    result.experiences.forEach((exp) => {
+    result.forEach((exp) => {
       expect(exp.title).toBeDefined();
       expect(exp.company).toBeDefined();
       expect(Array.isArray(exp.responsibilities)).toBe(true);
@@ -219,12 +217,11 @@ Worked with Python, Spark, Kafka`,
     const result = await repository.extractExperienceBlocks(minimalBlock);
 
     // Should still return valid structure even with minimal info
-    expect(result).toHaveProperty('experiences');
-    expect(Array.isArray(result.experiences)).toBe(true);
+    expect(Array.isArray(result)).toBe(true);
 
     // May have empty or placeholder values due to fallback rules
-    if (result.experiences.length > 0) {
-      const exp = result.experiences[0];
+    if (result.length > 0) {
+      const exp = result[0];
       expect(exp).toHaveProperty('title');
       expect(exp).toHaveProperty('company');
       expect(Array.isArray(exp.responsibilities)).toBe(true);

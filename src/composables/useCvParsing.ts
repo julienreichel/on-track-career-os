@@ -59,7 +59,7 @@ export function useCvParsing() {
       throw new Error(aiOps.error.value);
     }
 
-    return aiOps.experiences.value?.experiences || [];
+    return aiOps.experiences.value || [];
   }
 
   async function parseFile(file: File): Promise<void> {

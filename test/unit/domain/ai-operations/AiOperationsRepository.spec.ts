@@ -158,26 +158,24 @@ describe('AiOperationsRepository', () => {
         'Senior Software Engineer at Tech Corp (2020-2023)',
         'Software Engineer at StartupCo (2018-2020)',
       ];
-      const mockExperiencesResult = {
-        experiences: [
-          {
-            title: 'Senior Software Engineer',
-            company: 'Tech Corp',
-            startDate: '2020-01-01',
-            endDate: '2023-12-31',
-            responsibilities: ['Led team', 'Designed systems'],
-            tasks: ['Implemented features', 'Conducted reviews'],
-          },
-          {
-            title: 'Software Engineer',
-            company: 'StartupCo',
-            startDate: '2018-01-01',
-            endDate: '2020-12-31',
-            responsibilities: ['Developed features'],
-            tasks: ['Built APIs'],
-          },
-        ],
-      };
+      const mockExperiencesResult = [
+        {
+          title: 'Senior Software Engineer',
+          company: 'Tech Corp',
+          startDate: '2020-01-01',
+          endDate: '2023-12-31',
+          responsibilities: ['Led team', 'Designed systems'],
+          tasks: ['Implemented features', 'Conducted reviews'],
+        },
+        {
+          title: 'Software Engineer',
+          company: 'StartupCo',
+          startDate: '2018-01-01',
+          endDate: '2020-12-31',
+          responsibilities: ['Developed features'],
+          tasks: ['Built APIs'],
+        },
+      ];
 
       mockClient.extractExperienceBlocks.mockResolvedValue({
         data: mockExperiencesResult,
@@ -191,18 +189,18 @@ describe('AiOperationsRepository', () => {
         expect.objectContaining({ authMode: 'userPool' })
       );
       expect(result).toEqual(mockExperiencesResult);
-      expect(result.experiences).toHaveLength(2);
+      expect(result).toHaveLength(2);
     });
 
     it('should handle empty experience blocks', async () => {
       mockClient.extractExperienceBlocks.mockResolvedValue({
-        data: { experiences: [] },
+        data: [],
         errors: undefined,
       });
 
       const result = await repository.extractExperienceBlocks([]);
 
-      expect(result.experiences).toHaveLength(0);
+      expect(result).toHaveLength(0);
     });
   });
 

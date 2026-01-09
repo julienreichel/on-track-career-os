@@ -79,15 +79,20 @@ export interface GenerateAchievementsAndKpisOutput {
 function buildUserPrompt(starStory: GenerateAchievementsAndKpisInput['starStory']): string {
   return `Generate achievements and KPIs based on this STAR story:
 
-TITLE: ${starStory.title ?? 'Untitled STAR story'}
+TITLE: 
+${starStory.title ?? 'Untitled STAR story'}
 
-SITUATION: ${starStory.situation}
+SITUATION: 
+${starStory.situation}
 
-TASK: ${starStory.task}
+TASK: 
+${starStory.task}
 
-ACTION: ${starStory.action}
+ACTION: 
+${starStory.action}
 
-RESULT: ${starStory.result}
+RESULT: 
+${starStory.result}
 
 OUTPUT_SCHEMA:
 ${OUTPUT_SCHEMA}`;
