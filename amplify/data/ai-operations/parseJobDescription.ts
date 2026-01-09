@@ -1,5 +1,5 @@
 import { invokeAiWithRetry } from './utils/bedrock';
-import { truncateForLog, withAiOperationHandler } from './utils/common';
+import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 /**
  * AWS Lambda handler for ai.parseJobDescription
@@ -115,8 +115,10 @@ ${OUTPUT_SCHEMA}
 Remember: do not invent data and leave strings empty or arrays empty if not mentioned.`;
 }
 
-export const handler = async (event: { arguments: ParseJobDescriptionInput }): Promise<string> => {
-  return withAiOperationHandler(
+export const handler = async (
+  event: { arguments: ParseJobDescriptionInput }
+): Promise<ParseJobDescriptionOutput> => {
+  return withAiOperationHandlerObject(
     'parseJobDescription',
     event,
     async (args) => {

@@ -165,12 +165,39 @@ export const schemaTypes = {
     explicitPains: a.string().array(),
   }),
 
+  ParseJobDescriptionOutputType: a.customType({
+    title: a.string().required(),
+    seniorityLevel: a.string().required(),
+    roleSummary: a.string().required(),
+    responsibilities: a.string().array().required(),
+    requiredSkills: a.string().array().required(),
+    behaviours: a.string().array().required(),
+    successCriteria: a.string().array().required(),
+    explicitPains: a.string().array().required(),
+  }),
+
   CompanyType: a.customType({
     companyName: a.string().required(),
     industry: a.string(),
     sizeRange: a.string(),
     website: a.string(),
     description: a.string(),
+  }),
+
+  CompanyAnalysisProfileType: a.customType({
+    companyName: a.string().required(),
+    industry: a.string().required(),
+    sizeRange: a.string().required(),
+    website: a.string().required(),
+    productsServices: a.string().array().required(),
+    targetMarkets: a.string().array().required(),
+    customerSegments: a.string().array().required(),
+    description: a.string().required(),
+  }),
+
+  AnalyzeCompanyInfoOutputType: a.customType({
+    companyProfile: a.ref('CompanyAnalysisProfileType').required(),
+    confidence: a.float().required(),
   }),
 
   CompanyCanvasProfileType: a.customType({

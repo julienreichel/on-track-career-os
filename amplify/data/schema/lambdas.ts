@@ -169,7 +169,7 @@ export const schemaLambdas = {
   parseJobDescription: a
     .query()
     .arguments({ jobText: a.string().required() })
-    .returns(a.string())
+    .returns(a.ref('ParseJobDescriptionOutputType'))
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(parseJobDescriptionFunction)),
 
@@ -185,7 +185,7 @@ export const schemaLambdas = {
         summary: a.string(),
       }),
     })
-    .returns(a.json())
+    .returns(a.ref('AnalyzeCompanyInfoOutputType'))
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(analyzeCompanyInfoFunction)),
 

@@ -69,7 +69,7 @@ describe('AiOperationsRepository', () => {
       };
 
       mockClient.parseJobDescription.mockResolvedValue({
-        data: JSON.stringify(mockParsedJob),
+        data: mockParsedJob,
         errors: undefined,
       });
 
@@ -400,7 +400,7 @@ describe('AiOperationsRepository', () => {
 
     it('returns structured analysis data', async () => {
       mockClient.analyzeCompanyInfo.mockResolvedValue({
-        data: JSON.stringify(analysisResponse),
+        data: analysisResponse,
         errors: undefined,
       });
 

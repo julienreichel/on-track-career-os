@@ -122,12 +122,12 @@ export type AmplifyAiOperations = {
   parseJobDescription: (
     input: ParseJobInput,
     options?: Record<string, unknown>
-  ) => Promise<{ data: string | null; errors?: unknown[] }>;
+  ) => Promise<{ data: ParsedJobDescription | null; errors?: unknown[] }>;
 
   analyzeCompanyInfo: (
     input: AnalyzeCompanyInfoInput,
     options?: Record<string, unknown>
-  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
+  ) => Promise<{ data: CompanyAnalysisResult | null; errors?: unknown[] }>;
 
   generateCompanyCanvas: (
     input: GeneratedCompanyCanvasInput,
@@ -284,7 +284,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return JSON.parse(data) as ParsedJobDescription;
+    return data as ParsedJobDescription;
   }
 
   async analyzeCompanyInfo(input: AnalyzeCompanyInfoInput): Promise<CompanyAnalysisResult> {
@@ -298,8 +298,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    const parsed = typeof data === 'string' ? JSON.parse(data) : data;
-    return parsed as CompanyAnalysisResult;
+    return data as CompanyAnalysisResult;
   }
 
   async generateCompanyCanvas(input: GeneratedCompanyCanvasInput): Promise<GeneratedCompanyCanvas> {

@@ -13,7 +13,18 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => {
 });
 
 describe('ai.parseJobDescription', () => {
-  let handler: (event: { arguments: { jobText: string } }) => Promise<string>;
+  let handler: (event: {
+    arguments: { jobText: string };
+  }) => Promise<{
+    title: string;
+    seniorityLevel: string;
+    roleSummary: string;
+    responsibilities: string[];
+    requiredSkills: string[];
+    behaviours: string[];
+    successCriteria: string[];
+    explicitPains: string[];
+  }>;
   let mockSend: ReturnType<typeof vi.fn>;
 
   const buildBedrockResponse = (payload: unknown) => ({
@@ -61,10 +72,9 @@ describe('ai.parseJobDescription', () => {
       arguments: { jobText: 'We are hiring a Senior Product Manager...' },
     });
 
-    const parsed = JSON.parse(response);
-    expect(parsed.title).toBe('Senior Product Manager');
-    expect(parsed.responsibilities).toEqual(mockOutput.responsibilities);
-    expect(parsed.requiredSkills).toEqual(mockOutput.requiredSkills);
+    expect(response.title).toBe('Senior Product Manager');
+    expect(response.responsibilities).toEqual(mockOutput.responsibilities);
+    expect(response.requiredSkills).toEqual(mockOutput.requiredSkills);
   });
 
   it('should apply defaults for partial job descriptions', async () => {
@@ -79,14 +89,13 @@ describe('ai.parseJobDescription', () => {
       arguments: { jobText: 'Sales Director role description...' },
     });
 
-    const parsed = JSON.parse(response);
-    expect(parsed.title).toBe('Sales Director');
-    expect(parsed.seniorityLevel).toBe('');
-    expect(parsed.roleSummary).toBe('');
-    expect(parsed.requiredSkills).toEqual([]);
-    expect(parsed.behaviours).toEqual([]);
-    expect(parsed.successCriteria).toEqual([]);
-    expect(parsed.explicitPains).toEqual([]);
+    expect(response.title).toBe('Sales Director');
+    expect(response.seniorityLevel).toBe('');
+    expect(response.roleSummary).toBe('');
+    expect(response.requiredSkills).toEqual([]);
+    expect(response.behaviours).toEqual([]);
+    expect(response.successCriteria).toEqual([]);
+    expect(response.explicitPains).toEqual([]);
   });
 
   it('should sanitize poorly structured outputs', async () => {
@@ -107,14 +116,13 @@ describe('ai.parseJobDescription', () => {
       arguments: { jobText: 'Badly formatted JD' },
     });
 
-    const parsed = JSON.parse(response);
-    expect(parsed.title).toBe('');
-    expect(parsed.seniorityLevel).toBe('');
-    expect(parsed.roleSummary).toBe('');
-    expect(parsed.responsibilities).toEqual([]);
-    expect(parsed.requiredSkills).toEqual([]);
-    expect(parsed.behaviours).toEqual([]);
-    expect(parsed.successCriteria).toEqual([]);
-    expect(parsed.explicitPains).toEqual([]);
+    expect(response.title).toBe('');
+    expect(response.seniorityLevel).toBe('');
+    expect(response.roleSummary).toBe('');
+    expect(response.responsibilities).toEqual([]);
+    expect(response.requiredSkills).toEqual([]);
+    expect(response.behaviours).toEqual([]);
+    expect(response.successCriteria).toEqual([]);
+    expect(response.explicitPains).toEqual([]);
   });
 });
