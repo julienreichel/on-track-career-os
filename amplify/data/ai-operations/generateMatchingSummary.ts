@@ -115,6 +115,16 @@ export interface MatchingCompany {
   rawNotes: string;
 }
 
+export interface MatchingSpeechStory {
+  experienceId?: string;
+  title?: string;
+  situation?: string;
+  task?: string;
+  action?: string;
+  result?: string;
+  achievements?: string[];
+}
+
 export interface GenerateMatchingSummaryInput {
   profile: MatchingUserProfile;
   experiences?: MatchingExperienceSignal[];
