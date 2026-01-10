@@ -52,23 +52,19 @@ describe('ai.generateMatchingSummary', () => {
   });
 
   const validArguments = {
-    user: {
-      profile: {
-        fullName: 'Casey Candidate',
-        strengths: ['Mentorship'],
-        skills: ['Leadership', 'Strategic Planning'],
-      },
-      experienceSignals: {
-        experiences: [
-          {
-            title: 'Engineering Manager',
-            responsibilities: ['Grow team'],
-            achievements: ['Improved retention by 10%'],
-          },
-        ],
-      },
+    profile: {
+      fullName: 'Casey Candidate',
+      strengths: ['Mentorship'],
+      skills: ['Leadership', 'Strategic Planning'],
     },
-    job: {
+    experiences: [
+      {
+        title: 'Engineering Manager',
+        responsibilities: ['Grow team'],
+        achievements: ['Improved retention by 10%'],
+      },
+    ],
+    jobDescription: {
       title: 'Head of Engineering',
       responsibilities: ['Lead multi-team org'],
       requiredSkills: ['Strategic planning', 'Team building', 'Technical architecture'],

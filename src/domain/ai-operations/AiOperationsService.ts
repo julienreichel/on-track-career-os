@@ -393,10 +393,10 @@ export class AiOperationsService {
   }
 
   async generateMatchingSummary(input: MatchingSummaryInput): Promise<MatchingSummaryResult> {
-    if (!input?.user?.profile?.fullName) {
+    if (!input?.profile?.fullName) {
       throw new Error('User profile with fullName is required');
     }
-    if (!input?.job?.title) {
+    if (!input?.jobDescription?.title) {
       throw new Error('Job title is required to generate a matching summary');
     }
 

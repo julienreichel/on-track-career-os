@@ -199,8 +199,11 @@ export const schemaLambdas = {
   generateMatchingSummary: a
     .query()
     .arguments({
-      user: a.ref('UserType').required(),
-      job: a.ref('JobType').required(),
+      profile: a.ref('ProfileType').required(),
+      experiences: a.ref('ExperienceType').array().required(),
+      stories: a.ref('SpeechStoryType').array(),
+      personalCanvas: a.ref('PersonalCanvasType'),
+      jobDescription: a.ref('JobType'),
       company: a.ref('CompanyType'),
     })
     .returns(

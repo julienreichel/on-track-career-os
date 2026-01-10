@@ -59,29 +59,25 @@ describe('AI Operations - Generate Matching Summary (E2E Sandbox)', () => {
 
   it('generates a matching summary from structured inputs', async () => {
     const summary = await repository.generateMatchingSummary({
-      user: {
-        profile: {
-          fullName: 'Casey Candidate',
-          strengths: ['Mentorship', 'Systems thinking'],
-          skills: ['Leadership', 'Typescript'],
-        },
-        personalCanvas: {
-          valueProposition: ['Lead reliable delivery'],
-        },
-        experienceSignals: {
-          experiences: [
-            {
-              title: 'Engineering Manager',
-              companyName: 'Atlas Robotics',
-              experienceType: 'work',
-              responsibilities: ['Grow EMs', 'Drive strategy'],
-              tasks: ['Mentor managers', 'Set delivery cadence'],
-              achievements: ['Reduced incidents by 30%'],
-            },
-          ],
-        },
+      profile: {
+        fullName: 'Casey Candidate',
+        strengths: ['Mentorship', 'Systems thinking'],
+        skills: ['Leadership', 'Typescript'],
       },
-      job: {
+      personalCanvas: {
+        valueProposition: ['Lead reliable delivery'],
+      },
+      experiences: [
+        {
+          title: 'Engineering Manager',
+          companyName: 'Atlas Robotics',
+          experienceType: 'work',
+          responsibilities: ['Grow EMs', 'Drive strategy'],
+          tasks: ['Mentor managers', 'Set delivery cadence'],
+          achievements: ['Reduced incidents by 30%'],
+        },
+      ],
+      jobDescription: {
         title: 'Head of Engineering',
         seniorityLevel: 'Director',
         roleSummary: 'Lead a multi-team engineering org to deliver reliably.',

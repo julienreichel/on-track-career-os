@@ -120,12 +120,11 @@ export interface MatchingCompany {
 }
 
 export interface GenerateMatchingSummaryInput {
-  user: {
-    profile: MatchingUserProfile;
-    personalCanvas?: MatchingPersonalCanvas;
-    experienceSignals?: MatchingExperienceSignals;
-  };
-  job: MatchingJobDescription;
+  profile: MatchingUserProfile;
+  experiences: MatchingExperience[];
+  stories?: MatchingSpeechStory[];
+  personalCanvas?: MatchingPersonalCanvas;
+  jobDescription?: MatchingJobDescription;
   company?: MatchingCompany;
 }
 
@@ -401,8 +400,8 @@ function buildFallbackOutput(): GenerateMatchingSummaryOutput {
 }
 
 function buildUserPrompt(args: GenerateMatchingSummaryInput) {
-  const userSkills = args.user.profile.skills || [];
-  const jobSkills = args.job.requiredSkills || [];
+  const userSkills = args.profile.skills || [];
+  const jobSkills = args.jobDescription?.requiredSkills || [];
 
   return `Analyze this job-candidate match with skepticism and honesty.
 
@@ -459,11 +458,11 @@ export const handler = async (event: HandlerEvent) => {
       }
     },
     (args) => ({
-      userName: args.user?.profile?.fullName,
-      jobTitle: args.job?.title,
+      userName: args.profile?.fullName,
+      jobTitle: args.jobDescription?.title,
       hasCompany: Boolean(args.company),
-      experienceCount: args.user?.experienceSignals?.experiences?.length ?? 0,
-      jobSignalsPreview: truncateForLog(JSON.stringify(args.job)),
+      experienceCount: args.experiences?.length ?? 0,
+      jobSignalsPreview: truncateForLog(JSON.stringify(args.jobDescription)),
     })
   );
 };

@@ -282,18 +282,19 @@ function buildMatchingInput(args: {
   company?: NonNullable<MatchingSummaryInput['company']>;
 }): MatchingSummaryInput {
   const input: MatchingSummaryInput = {
-    user: {
-      profile: mapUserProfile(args.profile),
-    },
-    job: mapJob(args.job),
+    profile: mapUserProfile(args.profile),
+    jobDescription: mapJob(args.job),
   };
 
   if (args.personalCanvas) {
-    input.user.personalCanvas = mapPersonalCanvas(args.personalCanvas);
+    input.personalCanvas = mapPersonalCanvas(args.personalCanvas);
   }
 
   if (args.experienceSignals && args.experienceSignals.experiences.length > 0) {
-    input.user.experienceSignals = args.experienceSignals;
+    input.experiences = args.experienceSignals.experiences;
+    if (args.experienceSignals.stories && args.experienceSignals.stories.length > 0) {
+      input.stories = args.experienceSignals.stories;
+    }
   }
 
   if (args.company) {
