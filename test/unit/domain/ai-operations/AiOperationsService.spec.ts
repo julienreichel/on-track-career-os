@@ -731,13 +731,11 @@ describe('AiOperationsService', () => {
 
   describe('generateMatchingSummary', () => {
     const validInput = {
-      user: {
-        profile: {
-          fullName: 'Casey Candidate',
-          strengths: ['Leadership'],
-        },
+      profile: {
+        fullName: 'Casey Candidate',
+        strengths: ['Leadership'],
       },
-      job: {
+      jobDescription: {
         title: 'Head of Engineering',
         seniorityLevel: '',
         roleSummary: '',
@@ -781,7 +779,7 @@ describe('AiOperationsService', () => {
 
     it('throws when user profile is missing', async () => {
       await expect(
-        service.generateMatchingSummary({ user: {} as never, job: { title: 'x' } } as never)
+        service.generateMatchingSummary({ profile: {}, jobDescription: { title: 'x' } } as never)
       ).rejects.toThrow('User profile with fullName is required');
       expect(mockRepo.generateMatchingSummary).not.toHaveBeenCalled();
     });
@@ -789,8 +787,8 @@ describe('AiOperationsService', () => {
     it('throws when job title missing', async () => {
       await expect(
         service.generateMatchingSummary({
-          user: { profile: { fullName: 'Casey' } },
-          job: { title: '' },
+          profile: { fullName: 'Casey' },
+          jobDescription: { title: '' },
         } as never)
       ).rejects.toThrow('Job title is required to generate a matching summary');
       expect(mockRepo.generateMatchingSummary).not.toHaveBeenCalled();

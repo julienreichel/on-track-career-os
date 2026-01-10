@@ -236,8 +236,8 @@ describe('useMatchingEngine', () => {
 
     const aiGenerateMock = asMock(deps.aiService.generateMatchingSummary);
     const inputArg = aiGenerateMock.mock.calls[0][0] as MatchingSummaryInput;
-    expect(inputArg.user.profile.fullName).toBe('Casey Candidate');
-    expect(inputArg.job.title).toBe('Head of Engineering');
+    expect(inputArg.profile.fullName).toBe('Casey Candidate');
+    expect(inputArg.jobDescription.title).toBe('Head of Engineering');
     expect(inputArg.company?.companyName).toBe('Acme Corp');
     expect(engine.matchingSummary.value).toEqual(persistedSummary);
   });
@@ -288,7 +288,7 @@ describe('useMatchingEngine', () => {
 
     const aiGenerateMock = asMock(deps.aiService.generateMatchingSummary);
     const inputArg = aiGenerateMock.mock.calls[0][0] as MatchingSummaryInput;
-    expect(inputArg.user.personalCanvas).toBeUndefined();
+    expect(inputArg.personalCanvas).toBeUndefined();
   });
 
   it('captures AI errors without persisting', async () => {

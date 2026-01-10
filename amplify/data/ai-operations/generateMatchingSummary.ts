@@ -92,10 +92,6 @@ export interface MatchingPersonalCanvas {
   revenueStreams?: string[];
 }
 
-export interface MatchingExperienceSignals {
-  experiences: MatchingExperienceSignal[];
-}
-
 export interface MatchingJobDescription {
   title: string;
   seniorityLevel: string;
@@ -121,7 +117,7 @@ export interface MatchingCompany {
 
 export interface GenerateMatchingSummaryInput {
   profile: MatchingUserProfile;
-  experiences: MatchingExperience[];
+  experiences?: MatchingExperienceSignal[];
   stories?: MatchingSpeechStory[];
   personalCanvas?: MatchingPersonalCanvas;
   jobDescription?: MatchingJobDescription;

@@ -136,14 +136,6 @@ export const schemaTypes = {
     tailoringTips: a.string().array().required(),
   }),
 
-  UserType: a.customType({
-    profile: a.ref('ProfileType').required(),
-    personalCanvas: a.ref('PersonalCanvasType'),
-    experienceSignals: a.customType({
-      experiences: a.ref('ExperienceType').array().required(),
-    }),
-  }),
-
   JobType: a.customType({
     title: a.string().required(),
     seniorityLevel: a.string().required(),
