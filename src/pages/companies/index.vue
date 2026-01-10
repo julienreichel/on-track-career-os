@@ -50,10 +50,10 @@ async function loadCompanies() {
   }
 }
 
-onMounted(loadCompanies);
+onMounted(() => void loadCompanies());
 
 function handleOpen(companyId: string) {
-  router.push(`/companies/${companyId}`);
+  void router.push(`/companies/${companyId}`);
 }
 
 function requestDelete(companyId: string) {

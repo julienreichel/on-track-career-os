@@ -136,7 +136,7 @@ const handleClose = () => {
 };
 
 onMounted(() => {
-  load();
+  void load();
 });
 </script>
 

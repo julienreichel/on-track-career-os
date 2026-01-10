@@ -28,7 +28,7 @@ export const useAuthUser = () => {
 
   // Auto-load on mount
   onMounted(() => {
-    loadUserId();
+    void loadUserId();
   });
 
   const buildOwnerId = (id: string) => `${id}::${id}`;

@@ -9,7 +9,7 @@ const experienceId = computed(() => route.params.experienceId as string);
 
 // Redirect to stories page
 onMounted(() => {
-  router.replace(`/profile/experiences/${experienceId.value}/stories`);
+  void router.replace(`/profile/experiences/${experienceId.value}/stories`);
 });
 </script>
 

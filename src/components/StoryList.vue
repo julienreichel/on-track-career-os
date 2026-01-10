@@ -79,7 +79,7 @@ const handleEdit = (story: STARStory) => {
     console.error('[StoryList] Cannot edit story without experienceId');
     return;
   }
-  router.push(`/profile/experiences/${story.experienceId}/stories/${story.id}`);
+  void router.push(`/profile/experiences/${story.experienceId}/stories/${story.id}`);
 };
 
 const handleDelete = (story: STARStory) => {
@@ -87,7 +87,7 @@ const handleDelete = (story: STARStory) => {
 };
 
 onMounted(() => {
-  loadExperiences();
+  void loadExperiences();
 });
 </script>
 

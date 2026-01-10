@@ -454,7 +454,7 @@ watch(
 );
 
 onMounted(() => {
-  load();
+  void load();
 });
 </script>
 

@@ -189,7 +189,7 @@ watch(
       resetForm();
       updateBreadcrumb(null);
     }
-    loadJob();
+    void loadJob();
   },
   { immediate: true }
 );
@@ -200,7 +200,7 @@ watch(
     if (!editing || companyStore.rawCompanies.value.length > 0) {
       return;
     }
-    await loadCompanies();
+    void loadCompanies();
   }
 );
 
@@ -463,11 +463,11 @@ async function handleCompanyLinkChange(nextCompanyId: string | null) {
 }
 
 function handleCompanyLinkClear() {
-  handleCompanyLinkChange(null);
+  return handleCompanyLinkChange(null);
 }
 
 function redirectToCompanyCreate() {
-  router.push({
+  void router.push({
     path: '/companies/new',
     query: { returnTo: route.fullPath },
   });

@@ -69,11 +69,11 @@ function handleCancel() {
 }
 
 function viewProfile() {
-  router.push('/profile');
+  void router.push('/profile');
 }
 
 function viewExperiences() {
-  router.push('/profile/experiences');
+  void router.push('/profile/experiences');
 }
 </script>
 

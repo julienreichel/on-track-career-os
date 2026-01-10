@@ -160,7 +160,7 @@ const handleSave = async () => {
   try {
     const savedStory = await save(experienceId.value);
     if (savedStory) {
-      router.push(`/profile/experiences/${experienceId.value}/stories`);
+      void router.push(`/profile/experiences/${experienceId.value}/stories`);
     }
   } catch (err) {
     console.error('[StoryForm] Save error:', err);
@@ -173,13 +173,13 @@ const handleCancel = () => {
     showCancelConfirm.value = true;
     return;
   }
-  router.push(`/profile/experiences/${experienceId.value}/stories`);
+  void router.push(`/profile/experiences/${experienceId.value}/stories`);
 };
 
 // Handle confirm cancel
 const handleConfirmCancel = () => {
   showCancelConfirm.value = false;
-  router.push(`/profile/experiences/${experienceId.value}/stories`);
+  void router.push(`/profile/experiences/${experienceId.value}/stories`);
 };
 
 // Load experience and story (if editing) on mount

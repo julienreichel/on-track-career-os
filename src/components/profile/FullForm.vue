@@ -198,12 +198,12 @@ const initProfile = (id: string) => {
   loadError.value = composable.error.value;
   saveProfile = composable.save;
 
-  composable.load().then(() => {
+  void composable.load().then(() => {
     profile.value = composable.item.value;
     loadProfileToForm();
     if (route.query.mode === 'edit') {
       startEditing();
-      router.replace({ path: route.path, query: {} });
+      void router.replace({ path: route.path, query: {} });
     }
   });
 };
@@ -242,7 +242,7 @@ const loadProfileToForm = () => {
   };
 
   originalForm.value = JSON.parse(JSON.stringify(form.value));
-  loadPhotoPreview(form.value.profilePhotoKey);
+  void loadPhotoPreview(form.value.profilePhotoKey);
 };
 
 const loadPhotoPreview = async (key: string | null) => {
@@ -351,7 +351,7 @@ const cancelEditing = () => {
   saveSuccess.value = false;
   if (originalForm.value) {
     form.value = JSON.parse(JSON.stringify(originalForm.value));
-    loadPhotoPreview(form.value.profilePhotoKey);
+    void loadPhotoPreview(form.value.profilePhotoKey);
   }
 };
 

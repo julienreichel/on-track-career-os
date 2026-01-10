@@ -192,7 +192,7 @@ const previousStep = () => {
 };
 
 const cancel = () => {
-  router.push({ name: 'cv' });
+  void router.push({ name: 'cv' });
 };
 
 const generateCV = async () => {

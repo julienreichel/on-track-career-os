@@ -108,14 +108,14 @@ async function loadStoryCounts() {
 
 function handleEdit(id: string) {
   if (id) {
-    router.push(`/profile/experiences/${id}`);
+    void router.push(`/profile/experiences/${id}`);
   } else {
-    router.push('/profile/experiences/new');
+    void router.push('/profile/experiences/new');
   }
 }
 
 function handleNewExperience() {
-  router.push('/profile/experiences/new');
+  void router.push('/profile/experiences/new');
 }
 
 function handleDelete(id: string) {
@@ -145,7 +145,7 @@ function cancelDelete() {
 }
 
 function handleViewStories(id: string) {
-  router.push(`/profile/experiences/${id}/stories`);
+  void router.push(`/profile/experiences/${id}/stories`);
 }
 </script>
 

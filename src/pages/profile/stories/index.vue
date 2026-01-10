@@ -52,7 +52,7 @@ const handleRefresh = async () => {
 };
 
 const handleBackToProfile = () => {
-  router.push('/profile');
+  void router.push('/profile');
 };
 
 // Page header links

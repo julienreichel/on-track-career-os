@@ -149,7 +149,7 @@ export function useStoryEditor(storyId?: string) {
   };
 
   const updateField = (field: keyof StoryFormState, value: string | string[] | undefined) => {
-    (formState.value[field]) = value;
+    formState.value[field] = value;
     isDirty.value = true;
   };
 
@@ -247,7 +247,7 @@ export function useStoryEditor(storyId?: string) {
     );
   };
 
-  if (storyId) load(storyId);
+  if (storyId) void load(storyId);
 
   return {
     story,

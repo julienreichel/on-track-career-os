@@ -85,7 +85,7 @@ const handleClose = () => {
 };
 
 onMounted(() => {
-  loadPrint();
+  void loadPrint();
 });
 </script>
 

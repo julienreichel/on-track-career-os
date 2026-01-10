@@ -107,7 +107,7 @@ const generating = ref(false);
 const generationError = ref<string | null>(null);
 
 const cancel = () => {
-  router.push({ name: 'cover-letters' });
+  void router.push({ name: 'cover-letters' });
 };
 
 const generateCoverLetter = async () => {

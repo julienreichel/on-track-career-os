@@ -164,13 +164,13 @@ const loadExperiences = async () => {
 
 // Load experiences on mount and when userId changes
 onMounted(() => {
-  loadExperiences();
+  void loadExperiences();
 });
 
 watch(
   () => props.userId,
   () => {
-    loadExperiences();
+    void loadExperiences();
   }
 );
 </script>

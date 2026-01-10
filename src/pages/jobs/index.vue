@@ -69,10 +69,10 @@ async function loadJobs() {
   }
 }
 
-onMounted(loadJobs);
+onMounted(() => void loadJobs());
 
 function handleOpen(jobId: string) {
-  router.push(`/jobs/${jobId}`);
+  void router.push(`/jobs/${jobId}`);
 }
 
 function requestDelete(jobId: string) {

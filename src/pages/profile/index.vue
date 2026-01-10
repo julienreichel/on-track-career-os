@@ -113,7 +113,7 @@ const profilePhotoService = new ProfilePhotoService();
 const experienceRepo = new ExperienceRepository();
 
 const goToFullProfile = (mode?: 'edit') => {
-  router.push({
+  void router.push({
     path: '/profile/full',
     query: mode ? { mode } : undefined,
   });
@@ -157,7 +157,7 @@ watch(
       await profileComposable.load();
       profile.value = profileComposable.item.value;
       loading.value = false;
-      loadPhotoPreview(profile.value?.profilePhotoKey);
+      await loadPhotoPreview(profile.value?.profilePhotoKey);
     } catch (err) {
       console.error('[profile-summary] Failed to load profile:', err);
       error.value = t('profile.messages.loadError');

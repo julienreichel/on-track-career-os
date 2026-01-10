@@ -262,7 +262,7 @@ async function regenerateCanvas() {
 }
 
 function openJob(jobId: string) {
-  router.push(`/jobs/${jobId}`);
+  void router.push(`/jobs/${jobId}`);
 }
 
 function clearJobsError() {

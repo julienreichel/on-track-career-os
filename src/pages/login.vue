@@ -15,7 +15,7 @@ const router = useRouter();
 
 watch(auth, () => {
   if (auth.authStatus === 'authenticated') {
-    router.push('/');
+    void router.push('/');
   }
 });
 </script>

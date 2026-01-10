@@ -83,7 +83,7 @@ async function handleSave(data: ExperienceCreateInput) {
         ...data,
         userId,
       });
-      router.push('/profile/experiences');
+      void router.push('/profile/experiences');
     } else if (experienceId.value) {
       // Update existing experience
       await experienceRepo.update({
@@ -104,7 +104,7 @@ async function handleSave(data: ExperienceCreateInput) {
 
 function handleCancel() {
   if (isNewExperience.value) {
-    router.push('/profile/experiences');
+    void router.push('/profile/experiences');
     return;
   }
   isEditing.value = false;

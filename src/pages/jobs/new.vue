@@ -18,7 +18,7 @@ const {
 async function handleFileSelected(file: File | null | undefined) {
   const job = await processJobFile(file);
   if (job) {
-    router.push(`/jobs/${job.id}`);
+    void router.push(`/jobs/${job.id}`);
   }
 }
 </script>

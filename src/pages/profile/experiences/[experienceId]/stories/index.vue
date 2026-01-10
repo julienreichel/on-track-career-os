@@ -35,7 +35,7 @@ const generationError = ref<string | null>(null);
 
 // Navigation handlers
 const handleNewStory = () => {
-  router.push(`/profile/experiences/${experienceId.value}/stories/new`);
+  void router.push(`/profile/experiences/${experienceId.value}/stories/new`);
 };
 
 // Handle delete
