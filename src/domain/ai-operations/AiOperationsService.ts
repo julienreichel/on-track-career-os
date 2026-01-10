@@ -307,24 +307,24 @@ export class AiOperationsService {
       throw new Error('Language must be "en"');
     }
 
-    if (!input.userProfile || typeof input.userProfile !== 'object') {
-      throw new Error('User profile is required');
+    if (!input.profile || typeof input.profile !== 'object') {
+      throw new Error('Profile is required');
     }
 
-    if (!input.userProfile.fullName?.trim()) {
-      throw new Error('User profile must have a fullName');
+    if (!input.profile.fullName?.trim()) {
+      throw new Error('Profile must have a fullName');
     }
 
-    if (!Array.isArray(input.selectedExperiences)) {
-      throw new Error('Selected experiences must be an array');
+    if (!Array.isArray(input.experiences)) {
+      throw new Error('Experiences must be an array');
     }
 
-    if (input.selectedExperiences.length === 0) {
-      throw new Error('At least one experience must be selected');
+    if (input.experiences.length === 0) {
+      throw new Error('At least one experience must be provided');
     }
 
     // Validate each experience has required fields
-    for (const exp of input.selectedExperiences) {
+    for (const exp of input.experiences) {
       if (!exp.title || !exp.startDate) {
         throw new Error('Each experience must have title and startDate');
       }
@@ -333,7 +333,7 @@ export class AiOperationsService {
 
   /**
    * Generate complete CV in Markdown format with validation
-   * @param input - User profile, experiences, stories, skills, and optional job description
+   * @param input - Profile, experiences, stories, and optional tailoring context
    * @returns CV as plain Markdown text
    * @throws Error if generation fails or validation fails
    */

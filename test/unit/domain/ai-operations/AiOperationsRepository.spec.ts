@@ -338,8 +338,8 @@ describe('AiOperationsRepository', () => {
   describe('generateCv', () => {
     const baseInput: GenerateCvInput = {
       language: 'en',
-      userProfile: { fullName: 'Jane Doe' },
-      selectedExperiences: [
+      profile: { fullName: 'Jane Doe' },
+      experiences: [
         {
           id: 'exp-1',
           title: 'Engineer',

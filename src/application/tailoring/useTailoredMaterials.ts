@@ -735,7 +735,7 @@ function buildCvInput(args: {
 }): GenerateCvInput {
   const input: GenerateCvInput = {
     language: 'en',
-    userProfile: {
+    profile: {
       fullName: args.profile.fullName || '',
       headline: args.profile.headline || undefined,
       location: args.profile.location || undefined,
@@ -745,8 +745,11 @@ function buildCvInput(args: {
       socialLinks: filterStrings(args.profile.socialLinks),
       goals: filterStrings(args.profile.goals),
       strengths: filterStrings(args.profile.strengths),
+      seniorityLevel: args.profile.seniorityLevel || undefined,
+      aspirations: filterStrings(args.profile.aspirations),
+      personalValues: filterStrings(args.profile.personalValues),
     },
-    selectedExperiences: args.experiences.map((exp) => ({
+    experiences: args.experiences.map((exp) => ({
       id: exp.id,
       title: exp.title || '',
       companyName: exp.companyName ?? '',
@@ -768,21 +771,26 @@ function buildCvInput(args: {
     })),
   };
 
-  applyOptionalList(input, 'skills', args.profile.skills, args.options?.includeSkills ?? true);
   applyOptionalList(
-    input,
+    input.profile,
+    'skills',
+    args.profile.skills,
+    args.options?.includeSkills ?? true
+  );
+  applyOptionalList(
+    input.profile,
     'languages',
     args.profile.languages,
     args.options?.includeLanguages ?? true
   );
   applyOptionalList(
-    input,
+    input.profile,
     'certifications',
     args.profile.certifications,
     args.options?.includeCertifications ?? true
   );
   applyOptionalList(
-    input,
+    input.profile,
     'interests',
     args.profile.interests,
     args.options?.includeInterests ?? true
@@ -792,7 +800,7 @@ function buildCvInput(args: {
 }
 
 function applyOptionalList(
-  input: GenerateCvInput,
+  profile: GenerateCvInput['profile'],
   key: 'skills' | 'languages' | 'certifications' | 'interests',
   values: (string | null)[] | null | undefined,
   include: boolean
@@ -800,7 +808,7 @@ function applyOptionalList(
   if (!include) return;
   const filtered = filterStrings(values);
   if (filtered?.length) {
-    input[key] = filtered;
+    profile[key] = filtered;
   }
 }
 

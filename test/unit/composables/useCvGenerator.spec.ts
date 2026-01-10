@@ -187,10 +187,10 @@ describe('useCvGenerator', () => {
       expect(result).toBe('# John Doe\n\nSenior Software Engineer');
 
       const aiInput = mockAiService.generateCv.mock.calls[0][0];
-      expect(aiInput.skills).toEqual(['TypeScript', 'Vue.js', 'Node.js']);
-      expect(aiInput.languages).toEqual(['English', 'Spanish']);
-      expect(aiInput.certifications).toEqual(['AWS Certified']);
-      expect(aiInput.interests).toEqual(['Open source', 'Mentoring']);
+      expect(aiInput.profile.skills).toEqual(['TypeScript', 'Vue.js', 'Node.js']);
+      expect(aiInput.profile.languages).toEqual(['English', 'Spanish']);
+      expect(aiInput.profile.certifications).toEqual(['AWS Certified']);
+      expect(aiInput.profile.interests).toEqual(['Open source', 'Mentoring']);
     });
 
     it('should include job description when provided', async () => {
@@ -222,11 +222,11 @@ describe('useCvGenerator', () => {
       expect(mockStoryService.getStoriesByExperience).toHaveBeenCalledTimes(2);
 
       const aiInput = mockAiService.generateCv.mock.calls[0][0];
-      expect(aiInput.selectedExperiences).toHaveLength(2);
-      expect(aiInput.selectedExperiences[0].id).toBe('exp-1');
-      expect(aiInput.selectedExperiences[1].id).toBe('exp-2');
-      expect(aiInput.selectedExperiences[0].title).toBe('Senior Software Engineer');
-      expect(aiInput.selectedExperiences[1].title).toBe('Software Engineer');
+      expect(aiInput.experiences).toHaveLength(2);
+      expect(aiInput.experiences[0].id).toBe('exp-1');
+      expect(aiInput.experiences[1].id).toBe('exp-2');
+      expect(aiInput.experiences[0].title).toBe('Senior Software Engineer');
+      expect(aiInput.experiences[1].title).toBe('Software Engineer');
     });
 
     it('should filter null values from profile arrays', async () => {
@@ -243,10 +243,10 @@ describe('useCvGenerator', () => {
       await generateCv('user-123', ['exp-1'], { includeSkills: true });
 
       const aiInput = mockAiService.generateCv.mock.calls[0][0];
-      expect(aiInput.userProfile.goals).toEqual(['Goal 1', 'Goal 2']);
-      expect(aiInput.userProfile.strengths).toEqual(['Strength 1']);
-      expect(aiInput.skills).toEqual(['Skill 1']);
-      expect(aiInput.userProfile.socialLinks).toEqual(['https://example.com']);
+      expect(aiInput.profile.goals).toEqual(['Goal 1', 'Goal 2']);
+      expect(aiInput.profile.strengths).toEqual(['Strength 1']);
+      expect(aiInput.profile.skills).toEqual(['Skill 1']);
+      expect(aiInput.profile.socialLinks).toEqual(['https://example.com']);
     });
 
     it(
@@ -343,23 +343,23 @@ describe('useCvGenerator', () => {
 
       expect(input).not.toBeNull();
       expect(input?.language).toBe('en');
-      expect(input?.userProfile.fullName).toBe('John Doe');
-      expect(input?.userProfile.headline).toBe('Senior Software Engineer');
-      expect(input?.userProfile.location).toBe('San Francisco, CA');
-      expect(input?.userProfile.primaryEmail).toBe('john@example.com');
-      expect(input?.userProfile.primaryPhone).toBe('+1 555 0100');
-      expect(input?.userProfile.workPermitInfo).toBe('Eligible to work in EU & US');
-      expect(input?.userProfile.socialLinks).toEqual([
+      expect(input?.profile.fullName).toBe('John Doe');
+      expect(input?.profile.headline).toBe('Senior Software Engineer');
+      expect(input?.profile.location).toBe('San Francisco, CA');
+      expect(input?.profile.primaryEmail).toBe('john@example.com');
+      expect(input?.profile.primaryPhone).toBe('+1 555 0100');
+      expect(input?.profile.workPermitInfo).toBe('Eligible to work in EU & US');
+      expect(input?.profile.socialLinks).toEqual([
         'https://linkedin.com/in/johndoe',
         'https://github.com/johndoe',
       ]);
-      expect(input?.userProfile.goals).toEqual(['Lead technical teams', 'Build scalable systems']);
-      expect(input?.selectedExperiences).toHaveLength(1);
+      expect(input?.profile.goals).toEqual(['Lead technical teams', 'Build scalable systems']);
+      expect(input?.experiences).toHaveLength(1);
       expect(input?.stories).toHaveLength(2);
-      expect(input?.skills).toEqual(['TypeScript', 'Vue.js', 'Node.js']);
-      expect(input?.languages).toEqual(['English', 'Spanish']);
-      expect(input?.certifications).toEqual(['AWS Certified']);
-      expect(input?.interests).toEqual(['Open source', 'Mentoring']);
+      expect(input?.profile.skills).toEqual(['TypeScript', 'Vue.js', 'Node.js']);
+      expect(input?.profile.languages).toEqual(['English', 'Spanish']);
+      expect(input?.profile.certifications).toEqual(['AWS Certified']);
+      expect(input?.profile.interests).toEqual(['Open source', 'Mentoring']);
       expect(input?.jobDescription).toEqual({
         title: 'Target role',
         roleSummary: 'Test job description',
@@ -377,7 +377,7 @@ describe('useCvGenerator', () => {
 
       const input = await buildGenerationInput('user-123', ['exp-1']);
 
-      const experience = input?.selectedExperiences[0];
+      const experience = input?.experiences[0];
       expect(experience?.id).toBe('exp-1');
       expect(experience?.title).toBe('Senior Software Engineer');
       expect(experience?.companyName).toBe('Tech Corp');
@@ -411,7 +411,7 @@ describe('useCvGenerator', () => {
       const { buildGenerationInput } = useCvGenerator();
       const input = await buildGenerationInput('user-123', ['exp-1']);
 
-      expect(input?.selectedExperiences).toEqual([]);
+      expect(input?.experiences).toEqual([]);
       expect(input?.stories).toEqual([]);
     });
 
@@ -421,7 +421,7 @@ describe('useCvGenerator', () => {
       const { buildGenerationInput } = useCvGenerator();
       const input = await buildGenerationInput('user-123', ['exp-1']);
 
-      expect(input?.selectedExperiences).toHaveLength(1);
+      expect(input?.experiences).toHaveLength(1);
       expect(input?.stories).toEqual([]);
     });
 
@@ -438,10 +438,10 @@ describe('useCvGenerator', () => {
       const { buildGenerationInput } = useCvGenerator();
       const input = await buildGenerationInput('user-123', ['exp-1']);
 
-      expect(input?.userProfile.fullName).toBe('Jane Doe');
-      expect(input?.userProfile.headline).toBeUndefined();
-      expect(input?.userProfile.location).toBeUndefined();
-      expect(input?.userProfile.goals).toBeUndefined();
+      expect(input?.profile.fullName).toBe('Jane Doe');
+      expect(input?.profile.headline).toBeUndefined();
+      expect(input?.profile.location).toBeUndefined();
+      expect(input?.profile.goals).toBeUndefined();
     });
 
     it('should not include optional sections when options are false', async () => {
@@ -454,10 +454,10 @@ describe('useCvGenerator', () => {
         includeInterests: false,
       });
 
-      expect(input?.skills).toBeUndefined();
-      expect(input?.languages).toBeUndefined();
-      expect(input?.certifications).toBeUndefined();
-      expect(input?.interests).toBeUndefined();
+      expect(input?.profile.skills).toBeUndefined();
+      expect(input?.profile.languages).toBeUndefined();
+      expect(input?.profile.certifications).toBeUndefined();
+      expect(input?.profile.interests).toBeUndefined();
     });
 
     it(
@@ -494,7 +494,7 @@ describe('useCvGenerator', () => {
       const result = await generateCv('user-123', []);
 
       const aiInput = mockAiService.generateCv.mock.calls[0][0];
-      expect(aiInput.selectedExperiences).toEqual([]);
+      expect(aiInput.experiences).toEqual([]);
       expect(aiInput.stories).toEqual([]);
       expect(result).toBe('# John Doe\n\nSenior Software Engineer');
     });
@@ -505,7 +505,7 @@ describe('useCvGenerator', () => {
       const result = await generateCv('user-123', ['non-existent-id']);
 
       const aiInput = mockAiService.generateCv.mock.calls[0][0];
-      expect(aiInput.selectedExperiences).toEqual([]);
+      expect(aiInput.experiences).toEqual([]);
       expect(result).toBe('# John Doe\n\nSenior Software Engineer');
     });
 
@@ -532,8 +532,8 @@ describe('useCvGenerator', () => {
       const { buildGenerationInput } = useCvGenerator();
       const input = await buildGenerationInput('user-123', ['exp-1']);
 
-      expect(input?.selectedExperiences[0].responsibilities).toEqual(['Task 1', 'Task 2']);
-      expect(input?.selectedExperiences[0].tasks).toEqual(['Task 3']);
+      expect(input?.experiences[0].responsibilities).toEqual(['Task 1', 'Task 2']);
+      expect(input?.experiences[0].tasks).toEqual(['Task 3']);
     });
 
     it('should filter null values from story arrays', async () => {

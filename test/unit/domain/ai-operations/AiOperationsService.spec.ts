@@ -388,8 +388,8 @@ describe('AiOperationsService', () => {
   describe('generateCv', () => {
     const baseInput: GenerateCvInput = {
       language: 'en',
-      userProfile: { fullName: 'Jane Doe' },
-      selectedExperiences: [
+      profile: { fullName: 'Jane Doe' },
+      experiences: [
         {
           id: 'exp-1',
           title: 'Engineer',
@@ -412,8 +412,8 @@ describe('AiOperationsService', () => {
     });
 
     it('rejects when no experiences provided', async () => {
-      await expect(service.generateCv({ ...baseInput, selectedExperiences: [] })).rejects.toThrow(
-        'At least one experience must be selected'
+      await expect(service.generateCv({ ...baseInput, experiences: [] })).rejects.toThrow(
+        'At least one experience must be provided'
       );
       expect(mockRepo.generateCv).not.toHaveBeenCalled();
     });
@@ -422,7 +422,7 @@ describe('AiOperationsService', () => {
       await expect(
         service.generateCv({
           ...baseInput,
-          selectedExperiences: [
+          experiences: [
             {
               id: 'exp',
               title: '',
@@ -475,40 +475,40 @@ describe('AiOperationsService', () => {
       await expect(service.generateCv('invalid' as any)).rejects.toThrow('Invalid input structure');
     });
 
-    it('rejects when userProfile is missing', async () => {
-      await expect(service.generateCv({ ...baseInput, userProfile: null as any })).rejects.toThrow(
-        'User profile is required'
+    it('rejects when profile is missing', async () => {
+      await expect(service.generateCv({ ...baseInput, profile: null as any })).rejects.toThrow(
+        'Profile is required'
       );
     });
 
-    it('rejects when userProfile is not an object', async () => {
-      await expect(
-        service.generateCv({ ...baseInput, userProfile: 'invalid' as any })
-      ).rejects.toThrow('User profile is required');
+    it('rejects when profile is not an object', async () => {
+      await expect(service.generateCv({ ...baseInput, profile: 'invalid' as any })).rejects.toThrow(
+        'Profile is required'
+      );
     });
 
     it('rejects when fullName is missing', async () => {
       await expect(
         service.generateCv({
           ...baseInput,
-          userProfile: { ...baseInput.userProfile, fullName: '' },
+          profile: { ...baseInput.profile, fullName: '' },
         })
-      ).rejects.toThrow('User profile must have a fullName');
+      ).rejects.toThrow('Profile must have a fullName');
     });
 
     it('rejects when fullName is only whitespace', async () => {
       await expect(
         service.generateCv({
           ...baseInput,
-          userProfile: { ...baseInput.userProfile, fullName: '   ' },
+          profile: { ...baseInput.profile, fullName: '   ' },
         })
-      ).rejects.toThrow('User profile must have a fullName');
+      ).rejects.toThrow('Profile must have a fullName');
     });
 
-    it('rejects when selectedExperiences is not an array', async () => {
+    it('rejects when experiences is not an array', async () => {
       await expect(
-        service.generateCv({ ...baseInput, selectedExperiences: 'invalid' as any })
-      ).rejects.toThrow('Selected experiences must be an array');
+        service.generateCv({ ...baseInput, experiences: 'invalid' as any })
+      ).rejects.toThrow('Experiences must be an array');
     });
   });
 

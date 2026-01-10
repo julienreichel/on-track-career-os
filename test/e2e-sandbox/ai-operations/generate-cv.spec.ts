@@ -183,8 +183,8 @@ describe('AI Operations - Generate CV (E2E Sandbox)', () => {
     // Test basic CV generation without optional fields
     const result = await repository.generateCv({
       language: 'en',
-      userProfile: mockUserProfile,
-      selectedExperiences: mockExperiences,
+      profile: mockUserProfile,
+      experiences: mockExperiences,
     });
 
     console.log('Generated CV Markdown:', result.substring(0, 200) + '...');
@@ -214,12 +214,14 @@ describe('AI Operations - Generate CV (E2E Sandbox)', () => {
     // Test with stories, skills, languages, and certifications
     const result = await repository.generateCv({
       language: 'en',
-      userProfile: mockUserProfile,
-      selectedExperiences: mockExperiences,
+      profile: {
+        ...mockUserProfile,
+        skills: mockSkills,
+        languages: mockLanguages,
+        certifications: mockCertifications,
+      },
+      experiences: mockExperiences,
       stories: mockStories,
-      skills: mockSkills,
-      languages: mockLanguages,
-      certifications: mockCertifications,
     });
 
     console.log('Generated CV with all fields:', result.substring(0, 200) + '...');
@@ -257,10 +259,12 @@ Must have 5+ years of experience and strong communication skills.
 
     const result = await repository.generateCv({
       language: 'en',
-      userProfile: mockUserProfile,
-      selectedExperiences: mockExperiences,
+      profile: {
+        ...mockUserProfile,
+        skills: mockSkills,
+      },
+      experiences: mockExperiences,
       stories: mockStories,
-      skills: mockSkills,
       jobDescription: {
         title: 'Senior Software Engineer',
         seniorityLevel: '',
@@ -321,8 +325,8 @@ Must have 5+ years of experience and strong communication skills.
 
     const result = await repository.generateCv({
       language: 'en',
-      userProfile: minimalProfile,
-      selectedExperiences: minimalExperience,
+      profile: minimalProfile,
+      experiences: minimalExperience,
     });
 
     console.log('Minimal CV:', result.substring(0, 200) + '...');
@@ -344,11 +348,13 @@ Must have 5+ years of experience and strong communication skills.
   it('should generate comprehensive CV with multiple sections', async () => {
     const result = await repository.generateCv({
       language: 'en',
-      userProfile: mockUserProfile,
-      selectedExperiences: mockExperiences,
-      skills: mockSkills,
-      languages: mockLanguages,
-      certifications: mockCertifications,
+      profile: {
+        ...mockUserProfile,
+        skills: mockSkills,
+        languages: mockLanguages,
+        certifications: mockCertifications,
+      },
+      experiences: mockExperiences,
     });
 
     // Validate output is a non-empty string
@@ -392,8 +398,8 @@ Must have 5+ years of experience and strong communication skills.
     try {
       const result = await repository.generateCv({
         language: 'en',
-        userProfile: testProfile,
-        selectedExperiences: testExperience,
+        profile: testProfile,
+        experiences: testExperience,
       });
 
       // If we get here, the operation is deployed and accessible
@@ -439,8 +445,8 @@ Must have 5+ years of experience and strong communication skills.
     try {
       const result = await repository.generateCv({
         language: 'en',
-        userProfile: invalidProfile,
-        selectedExperiences: invalidExperience,
+        profile: invalidProfile,
+        experiences: invalidExperience,
       });
 
       // Even with invalid input, should return some markdown text

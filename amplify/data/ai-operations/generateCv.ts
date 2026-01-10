@@ -8,13 +8,10 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
  * Follows CV best practices and tailors content when a job description is provided.
  *
  * Input Schema:
- * - userProfile: Object containing user's profile information (fullName, headline, location, goals, strengths)
- * - selectedExperiences: Array of experience objects to include
+ * - profile: Object containing user's profile information
+ * - experiences: Array of experience objects to include
  * - stories: Optional array of STAR stories
- * - skills: Optional array of skills
- * - languages: Optional array of languages
- * - certifications: Optional array of certifications
- * - interests: Optional array of interests
+ * - personalCanvas: Optional personal canvas context
  * - jobDescription: Optional job description for tailoring
  * - matchingSummary: Optional matching summary for tailoring
  * - company: Optional company summary context
@@ -23,7 +20,7 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
  * - Returns complete CV as plain Markdown text
  */
 
-interface UserProfile {
+interface CvProfile {
   fullName?: string;
   headline?: string;
   location?: string;
@@ -32,7 +29,13 @@ interface UserProfile {
   primaryPhone?: string;
   workPermitInfo?: string;
   goals?: string[];
+  aspirations?: string[];
+  personalValues?: string[];
   strengths?: string[];
+  interests?: string[];
+  skills?: string[];
+  certifications?: string[];
+  languages?: string[];
   socialLinks?: string[];
 }
 
@@ -54,6 +57,18 @@ interface Story {
   action?: string;
   result?: string;
   achievements?: string[];
+}
+
+interface PersonalCanvas {
+  customerSegments?: string[];
+  valueProposition?: string[];
+  channels?: string[];
+  customerRelationships?: string[];
+  keyActivities?: string[];
+  keyResources?: string[];
+  keyPartners?: string[];
+  costStructure?: string[];
+  revenueStreams?: string[];
 }
 
 interface CvJobDescription {
@@ -98,13 +113,10 @@ interface CvCompanySummary {
 
 interface GenerateCvInput {
   language: 'en';
-  userProfile: UserProfile;
-  selectedExperiences: Experience[];
+  profile: CvProfile;
+  experiences: Experience[];
   stories?: Story[];
-  skills?: string[];
-  languages?: string[];
-  certifications?: string[];
-  interests?: string[];
+  personalCanvas?: PersonalCanvas;
   jobDescription?: CvJobDescription;
   matchingSummary?: CvMatchingSummary;
   company?: CvCompanySummary;
@@ -218,7 +230,7 @@ Target: 2 pages max of Markdown content, i,e, 70 lignes of text.
 /**
  * Format user profile section
  */
-function formatUserProfile(profile: UserProfile): string {
+function formatUserProfile(profile: CvProfile): string {
   let section = `## USER PROFILE\n`;
   section += `Name: ${profile.fullName || 'Not provided'}\n`;
   if (profile.headline) section += `Professional Title: ${profile.headline}\n`;
@@ -378,31 +390,37 @@ function buildUserPrompt(input: GenerateCvInput): string {
 
   prompt += `LANGUAGE:\n${input.language}\n\n`;
 
-  prompt += formatUserProfile(input.userProfile);
-  prompt += formatExperiencesWithStories(input.selectedExperiences, input.stories);
+  prompt += formatUserProfile(input.profile);
+  prompt += formatExperiencesWithStories(input.experiences, input.stories);
 
   // Add skills with guidance
-  if (input.skills?.length) {
+  if (input.profile.skills?.length) {
     prompt += `## SKILLS (RAW LIST - SYNTHESIZE INTO CATEGORIES)\n`;
-    prompt += `Available skills: ${input.skills.join(', ')}\n`;
+    prompt += `Available skills: ${input.profile.skills.join(', ')}\n`;
     prompt += `Instructions: Organize into 2-4 categories (e.g., Technical, Languages, Soft Skills). Select only relevant skills.\n\n`;
   }
 
   // Add languages
-  if (input.languages?.length) {
-    prompt += `## LANGUAGES\n${input.languages.join(', ')}\n\n`;
+  if (input.profile.languages?.length) {
+    prompt += `## LANGUAGES\n${input.profile.languages.join(', ')}\n\n`;
   }
 
   // Add certifications
-  if (input.certifications?.length) {
-    prompt += `## CERTIFICATIONS\n${input.certifications.map((c) => `- ${c}`).join('\n')}\n\n`;
+  if (input.profile.certifications?.length) {
+    prompt += `## CERTIFICATIONS\n${input.profile.certifications
+      .map((c) => `- ${c}`)
+      .join('\n')}\n\n`;
   }
 
   // Add interests with guidance
-  if (input.interests?.length) {
+  if (input.profile.interests?.length) {
     prompt += `## INTERESTS (RAW LIST - SELECT 3-5 MOST PROFESSIONAL)\n`;
-    prompt += `Available interests: ${input.interests.join(', ')}\n`;
+    prompt += `Available interests: ${input.profile.interests.join(', ')}\n`;
     prompt += `Instructions: Choose only 3-5 professional/relevant interests. Omit casual hobbies.\n\n`;
+  }
+
+  if (input.personalCanvas) {
+    prompt += `## PERSONAL CANVAS\n${JSON.stringify(input.personalCanvas, null, JSON_INDENT)}\n\n`;
   }
 
   // Add job description for tailoring
@@ -504,10 +522,11 @@ function prepareInputForLogging(input: GenerateCvInput) {
   const LOG_TRUNCATE_LENGTH = 100;
 
   return {
-    userProfile: input.userProfile,
-    experienceCount: input.selectedExperiences?.length || 0,
+    profile: input.profile,
+    experienceCount: input.experiences?.length || 0,
     storyCount: input.stories?.length || 0,
-    skillCount: input.skills?.length || 0,
+    skillCount: input.profile.skills?.length || 0,
+    hasPersonalCanvas: Boolean(input.personalCanvas),
     hasJobDescription: !!input.jobDescription,
     hasMatchingSummary: !!input.matchingSummary,
     jobDescriptionPreview: input.jobDescription

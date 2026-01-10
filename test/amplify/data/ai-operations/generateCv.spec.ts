@@ -43,7 +43,7 @@ describe('ai.generateCv', () => {
    * Mock AI response generator that creates CV Markdown from user profile
    */
   const generateMockCvMarkdown = (profile: any) => {
-    const profileData = profile.userProfile;
+    const profileData = profile.profile;
     return `# ${profileData.fullName || 'Professional'}
 
 **${profileData.headline || 'Professional'}** | ${profileData.location || 'Remote'}
@@ -73,7 +73,7 @@ Python, JavaScript, AWS, Docker, Kubernetes
 
   it('should generate CV with complete user data', async () => {
     const mockMarkdown = generateMockCvMarkdown({
-      userProfile: {
+      profile: {
         fullName: 'John Doe',
         headline: 'Senior Software Engineer',
         location: 'San Francisco, CA',
@@ -97,12 +97,12 @@ Python, JavaScript, AWS, Docker, Kubernetes
     const result = await handler({
       arguments: {
         language: 'en',
-        userProfile: {
+        profile: {
           fullName: 'John Doe',
           headline: 'Senior Software Engineer',
           location: 'San Francisco, CA',
         },
-        selectedExperiences: [],
+        experiences: [],
       },
     });
 
@@ -146,8 +146,8 @@ CS Degree`;
     const result = await handler({
       arguments: {
         language: 'en',
-        userProfile: { fullName: 'Jane Smith' },
-        selectedExperiences: [],
+        profile: { fullName: 'Jane Smith' },
+        experiences: [],
       },
     });
 
@@ -178,8 +178,8 @@ Some content without headers`;
     const result = await handler({
       arguments: {
         language: 'en',
-        userProfile: { fullName: 'Test User' },
-        selectedExperiences: [],
+        profile: { fullName: 'Test User' },
+        experiences: [],
       },
     });
 
@@ -210,8 +210,8 @@ Seeking opportunities`;
     const result = await handler({
       arguments: {
         language: 'en',
-        userProfile: { fullName: 'Professional' },
-        selectedExperiences: [],
+        profile: { fullName: 'Professional' },
+        experiences: [],
       },
     });
 
@@ -238,8 +238,8 @@ Seeking opportunities`;
     await handler({
       arguments: {
         language: 'en',
-        userProfile: { fullName: 'Taylor' },
-        selectedExperiences: [],
+        profile: { fullName: 'Taylor' },
+        experiences: [],
         jobDescription: {
           title: 'Staff Engineer',
           roleSummary: 'Build scalable systems',
@@ -274,8 +274,8 @@ Seeking opportunities`;
     await handler({
       arguments: {
         language: 'en',
-        userProfile: { fullName: 'Taylor' },
-        selectedExperiences: [],
+        profile: { fullName: 'Taylor' },
+        experiences: [],
         jobDescription: {
           title: 'Staff Engineer',
           roleSummary: 'Build scalable systems',
@@ -346,8 +346,8 @@ Skills list`;
     const result = await handler({
       arguments: {
         language: 'en',
-        userProfile: { fullName: 'Test' },
-        selectedExperiences: [],
+        profile: { fullName: 'Test' },
+        experiences: [],
       },
     });
 
@@ -375,12 +375,14 @@ Skills list`;
     await handler({
       arguments: {
         language: 'en',
-        userProfile: { fullName: 'John Doe' },
-        selectedExperiences: [],
-        skills: ['TypeScript', 'Python', 'AWS'],
-        languages: ['English', 'Spanish'],
-        certifications: ['AWS Certified', 'PMP'],
-        interests: ['Open Source', 'Mentoring', 'Public Speaking'],
+        profile: {
+          fullName: 'John Doe',
+          skills: ['TypeScript', 'Python', 'AWS'],
+          languages: ['English', 'Spanish'],
+          certifications: ['AWS Certified', 'PMP'],
+          interests: ['Open Source', 'Mentoring', 'Public Speaking'],
+        },
+        experiences: [],
       },
     });
 
@@ -425,8 +427,8 @@ Note: This CV was generated based on provided information.`;
     const result = await handler({
       arguments: {
         language: 'en',
-        userProfile: { fullName: 'Jane Smith' },
-        selectedExperiences: [],
+        profile: { fullName: 'Jane Smith' },
+        experiences: [],
       },
     });
 
@@ -459,8 +461,8 @@ Great developer
     const result = await handler({
       arguments: {
         language: 'en',
-        userProfile: { fullName: 'Jane Smith' },
-        selectedExperiences: [],
+        profile: { fullName: 'Jane Smith' },
+        experiences: [],
       },
     });
 
@@ -491,8 +493,8 @@ Great developer
     const result = await handler({
       arguments: {
         language: 'en',
-        userProfile: { fullName: 'Jane Smith' },
-        selectedExperiences: [],
+        profile: { fullName: 'Jane Smith' },
+        experiences: [],
       },
     });
 
@@ -518,8 +520,8 @@ Great developer
     await handler({
       arguments: {
         language: 'en',
-        userProfile: { fullName: 'John Doe' },
-        selectedExperiences: [],
+        profile: { fullName: 'John Doe' },
+        experiences: [],
         jobDescription: { title: 'Engineer' },
         matchingSummary: {
           overallScore: 80,

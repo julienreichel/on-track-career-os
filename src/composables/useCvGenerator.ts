@@ -31,18 +31,18 @@ export function useCvGenerator() {
   const loadExperiencesAndStories = async (
     userId: string,
     selectedExperienceIds: string[]
-  ): Promise<{ selectedExperiences: Experience[]; allStories: STARStory[] }> => {
+  ): Promise<{ experiences: Experience[]; allStories: STARStory[] }> => {
     if (!userId) {
-      return { selectedExperiences: [], allStories: [] };
+      return { experiences: [], allStories: [] };
     }
 
     const allExperiences = await experienceRepo.list(userId);
-    const selectedExperiences = allExperiences.filter((exp) =>
+    const experiences = allExperiences.filter((exp) =>
       selectedExperienceIds.includes(exp.id)
     );
 
     const storyResponses = await Promise.all(
-      selectedExperiences.map(async (exp) => {
+      experiences.map(async (exp) => {
         try {
           return await storyService.getStoriesByExperience(exp.id);
         } catch (err) {
@@ -54,7 +54,7 @@ export function useCvGenerator() {
 
     const allStories = storyResponses.flat();
 
-    return { selectedExperiences, allStories };
+    return { experiences, allStories };
   };
 
   /**
@@ -82,7 +82,7 @@ export function useCvGenerator() {
       }
 
       // Load selected experiences and stories
-      const { selectedExperiences, allStories } = await loadExperiencesAndStories(
+      const { experiences, allStories } = await loadExperiencesAndStories(
         profile.id,
         selectedExperienceIds
       );
@@ -90,10 +90,11 @@ export function useCvGenerator() {
       // Build input
       const input: GenerateCvInput = {
         language: 'en',
-        userProfile: {
+        profile: {
           fullName: profile.fullName || '',
           headline: profile.headline || undefined,
           location: profile.location || undefined,
+          seniorityLevel: profile.seniorityLevel || undefined,
           primaryEmail: profile.primaryEmail || undefined,
           primaryPhone: profile.primaryPhone || undefined,
           workPermitInfo: profile.workPermitInfo || undefined,
@@ -101,9 +102,11 @@ export function useCvGenerator() {
             ?.map((link) => (typeof link === 'string' ? link.trim() : ''))
             .filter((link): link is string => !!link),
           goals: profile.goals?.filter((g): g is string => g !== null),
+          aspirations: profile.aspirations?.filter((a): a is string => a !== null),
+          personalValues: profile.personalValues?.filter((p): p is string => p !== null),
           strengths: profile.strengths?.filter((s): s is string => s !== null),
         },
-        selectedExperiences: selectedExperiences.map((exp: Experience) => ({
+        experiences: experiences.map((exp: Experience) => ({
           id: exp.id,
           title: exp.title || '',
           companyName: exp.companyName ?? '',
@@ -127,16 +130,16 @@ export function useCvGenerator() {
 
       // Add optional profile fields
       if (options.includeSkills && profile.skills) {
-        input.skills = profile.skills.filter((s): s is string => s !== null);
+        input.profile.skills = profile.skills.filter((s): s is string => s !== null);
       }
       if (options.includeLanguages && profile.languages) {
-        input.languages = profile.languages.filter((l): l is string => l !== null);
+        input.profile.languages = profile.languages.filter((l): l is string => l !== null);
       }
       if (options.includeCertifications && profile.certifications) {
-        input.certifications = profile.certifications.filter((c): c is string => c !== null);
+        input.profile.certifications = profile.certifications.filter((c): c is string => c !== null);
       }
       if (options.includeInterests && profile.interests) {
-        input.interests = profile.interests.filter((i): i is string => i !== null);
+        input.profile.interests = profile.interests.filter((i): i is string => i !== null);
       }
 
       // Add optional generation options

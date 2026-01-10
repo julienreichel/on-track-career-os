@@ -151,13 +151,10 @@ export const schemaLambdas = {
     .query()
     .arguments({
       language: a.string().required(),
-      userProfile: a.ref('ProfileType').required(),
-      selectedExperiences: a.ref('ExperienceType').array().required(),
+      profile: a.ref('ProfileType').required(),
+      experiences: a.ref('ExperienceType').array().required(),
       stories: a.ref('SpeechStoryType').array(),
-      skills: a.string().array(),
-      languages: a.string().array(),
-      certifications: a.string().array(),
-      interests: a.string().array(),
+      personalCanvas: a.ref('PersonalCanvasType'),
       jobDescription: a.ref('JobType'),
       matchingSummary: a.ref('MatchingSummaryContextType'),
       company: a.ref('CompanyType'),

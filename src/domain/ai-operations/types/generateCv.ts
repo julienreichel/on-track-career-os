@@ -3,7 +3,7 @@
  */
 export interface GenerateCvInput {
   language: 'en';
-  userProfile: {
+  profile: {
     fullName: string;
     headline?: string;
     location?: string;
@@ -13,9 +13,15 @@ export interface GenerateCvInput {
     workPermitInfo?: string;
     socialLinks?: string[];
     goals?: string[];
+    aspirations?: string[];
+    personalValues?: string[];
     strengths?: string[];
+    interests?: string[];
+    skills?: string[];
+    certifications?: string[];
+    languages?: string[];
   };
-  selectedExperiences: Array<{
+  experiences: Array<{
     id?: string;
     title: string;
     companyName: string;
@@ -35,10 +41,17 @@ export interface GenerateCvInput {
     result: string;
     achievements?: string[];
   }>;
-  skills?: string[];
-  languages?: string[];
-  certifications?: string[];
-  interests?: string[];
+  personalCanvas?: {
+    customerSegments?: string[];
+    valueProposition?: string[];
+    channels?: string[];
+    customerRelationships?: string[];
+    keyActivities?: string[];
+    keyResources?: string[];
+    keyPartners?: string[];
+    costStructure?: string[];
+    revenueStreams?: string[];
+  };
   jobDescription?: {
     title: string;
     seniorityLevel: string;

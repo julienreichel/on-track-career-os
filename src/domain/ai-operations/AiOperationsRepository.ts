@@ -55,7 +55,7 @@ export interface IAiOperationsRepository {
 
   /**
    * Generate complete CV in Markdown format
-   * @param input - User profile, experiences, stories, skills, and optional job description
+   * @param input - Profile, experiences, stories, and optional tailoring context
    * @returns Complete CV as Markdown text
    */
   generateCv(input: GenerateCvInput): Promise<GenerateCvResult>;
