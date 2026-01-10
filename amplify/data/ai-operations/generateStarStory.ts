@@ -149,7 +149,7 @@ function getFirstSentence(text: string): string {
   if (!text) return '';
 
   const sentenceMatch = text.match(/(.+?[.?!])(\s|$)/s);
-  if (sentenceMatch && sentenceMatch[1]) {
+  if (sentenceMatch?.[1]) {
     return sentenceMatch[1].trim();
   }
 
@@ -257,9 +257,9 @@ async function invokeAiForText(systemPrompt: string, userPrompt: string): Promis
 /**
  * Main Lambda handler
  */
-export const handler = async (
-  event: { arguments: GenerateStarStoryInput }
-): Promise<GenerateStarStoryOutput[]> => {
+export const handler = async (event: {
+  arguments: GenerateStarStoryInput;
+}): Promise<GenerateStarStoryOutput[]> => {
   return withAiOperationHandlerObject(
     'generateStarStory',
     event,

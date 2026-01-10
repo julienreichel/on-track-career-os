@@ -266,16 +266,13 @@ function createExistingMaterialsLoader({
     try {
       const userId = await resolveUserId();
       const [cvDocs, coverLetters, speechBlocks] = await Promise.all([
-        deps
-          .cvRepository
+        deps.cvRepository
           .listByUser(userId)
           .then((items) => items.filter((item) => item.jobId === jobId)),
-        deps
-          .coverLetterService
+        deps.coverLetterService
           .listCoverLettersByUser(userId)
           .then((items) => items.filter((item) => item.jobId === jobId)),
-        deps
-          .speechBlockService
+        deps.speechBlockService
           .listSpeechBlocksByUser(userId)
           .then((items) => items.filter((item) => item.jobId === jobId)),
       ]);
@@ -814,6 +811,6 @@ function applyOptionalList(
 
 function filterStrings(values?: (string | null)[] | null): string[] | undefined {
   if (!values) return undefined;
-  const filtered = values.filter((value): value is string => Boolean(value && value.trim()));
+  const filtered = values.filter((value): value is string => Boolean(value?.trim()));
   return filtered.length ? filtered : undefined;
 }
