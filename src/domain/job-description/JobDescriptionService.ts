@@ -201,7 +201,7 @@ export class JobDescriptionService {
       const merged = mergeCompanyProfile(company, analysis.companyProfile);
       if (Object.keys(merged).length > 0) {
         const updatePayload: CompanyUpdateInput = {
-          ...(merged as Partial<CompanyUpdateInput>),
+          ...(merged),
           id: company.id,
         };
         const updated = await this.companyRepo.update(updatePayload);

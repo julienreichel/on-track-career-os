@@ -36,7 +36,7 @@ export function useBreadcrumbMapping() {
 
     // Fetch from API
     try {
-      const experience = await experienceService!.getFullExperience(experienceId);
+      const experience = await experienceService.getFullExperience(experienceId);
       const name = experience?.companyName || experience?.title;
       if (name) {
         mappingCache.value[experienceId] = name;
@@ -66,7 +66,7 @@ export function useBreadcrumbMapping() {
 
     // Fetch from API
     try {
-      const cvDocument = await cvDocumentService!.getFullCVDocument(cvId);
+      const cvDocument = await cvDocumentService.getFullCVDocument(cvId);
       const name = cvDocument?.name;
       if (name) {
         mappingCache.value[cvId] = name;
@@ -151,7 +151,7 @@ const getCompanyName = async (companyId: string): Promise<string> => {
   }
 
   try {
-    const company = await companyService!.getCompany(companyId);
+    const company = await companyService.getCompany(companyId);
     const name = company?.companyName;
     if (name) {
       mappingCache.value[companyId] = name;
@@ -174,7 +174,7 @@ const getJobName = async (jobId: string): Promise<string> => {
   }
 
   try {
-    const job = await jobService!.getFullJobDescription(jobId);
+    const job = await jobService.getFullJobDescription(jobId);
     const title = job?.title;
     if (title) {
       mappingCache.value[jobId] = title;

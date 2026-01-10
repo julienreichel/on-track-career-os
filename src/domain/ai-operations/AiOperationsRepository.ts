@@ -192,7 +192,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return data as ParsedCV;
+    return data;
   }
 
   async extractExperienceBlocks(experienceTextBlocks: string[]): Promise<ExperiencesResult> {
@@ -209,7 +209,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return data as ExperiencesResult;
+    return data;
   }
 
   async generateStarStory(sourceText: string): Promise<STARStory[]> {
@@ -223,7 +223,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return data as STARStory[];
+    return data;
   }
 
   async generateAchievementsAndKpis(starStory: STARStory): Promise<AchievementsAndKpis> {
@@ -240,7 +240,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return data as AchievementsAndKpis;
+    return data;
   }
 
   async generatePersonalCanvas(input: PersonalCanvasInput): Promise<PersonalCanvas> {
@@ -254,7 +254,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return data as PersonalCanvas;
+    return data;
   }
 
   async generateCv(input: GenerateCvInput): Promise<GenerateCvResult> {
@@ -284,7 +284,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return data as ParsedJobDescription;
+    return data;
   }
 
   async analyzeCompanyInfo(input: AnalyzeCompanyInfoInput): Promise<CompanyAnalysisResult> {
@@ -298,7 +298,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return data as CompanyAnalysisResult;
+    return data;
   }
 
   async generateCompanyCanvas(input: GeneratedCompanyCanvasInput): Promise<GeneratedCompanyCanvas> {
@@ -312,7 +312,7 @@ export class AiOperationsRepository implements IAiOperationsRepository {
       throw new Error('AI operation returned no data');
     }
 
-    return data as GeneratedCompanyCanvas;
+    return data;
   }
 
   async generateMatchingSummary(input: MatchingSummaryInput): Promise<MatchingSummaryResult> {

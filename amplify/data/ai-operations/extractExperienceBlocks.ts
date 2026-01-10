@@ -189,8 +189,8 @@ function validateOutput(output: unknown): ExperienceBlock[] {
         endDate,
         responsibilities: responsibilities.filter(
           (r: unknown) => typeof r === 'string'
-        ) as string[],
-        tasks: tasks.filter((t: unknown) => typeof t === 'string') as string[],
+        ),
+        tasks: tasks.filter((t: unknown) => typeof t === 'string'),
         experienceType,
       };
   });

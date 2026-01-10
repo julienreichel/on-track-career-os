@@ -58,7 +58,7 @@ const loadExperiences = async () => {
 
     // Load all experiences
     const loadedExperiences = await Promise.all(
-      experienceIds.map((id) => service.getFullExperience(id as string))
+      experienceIds.map((id) => service.getFullExperience(id))
     );
 
     experiences.value = loadedExperiences.filter((exp): exp is Experience => exp !== null);

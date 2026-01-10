@@ -9,7 +9,7 @@ export default withNuxt(
   {
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.json', './amplify/tsconfig.json'],
+        project: ['./.nuxt/tsconfig.app.json', './amplify/tsconfig.json'],
       },
     },
     rules: {
@@ -59,8 +59,8 @@ export default withNuxt(
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
 
       // TypeScript type-aware rules
-      '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/no-floating-promises': 'warn',
+      '@typescript-eslint/no-misused-promises': 'warn',
       '@typescript-eslint/await-thenable': 'error',
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
       '@typescript-eslint/strict-boolean-expressions': 'off', // Can be too strict

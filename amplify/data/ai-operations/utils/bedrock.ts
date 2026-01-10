@@ -100,7 +100,7 @@ export async function invokeBedrock(
     return responseBody.output.message.content[0].text;
   } else {
     // Claude format: { content: [{ text: "..." }] }
-    if (!responseBody.content || !responseBody.content[0]?.text) {
+    if (!responseBody.content?.[0]?.text) {
       throw new Error('Invalid response structure from Bedrock Claude');
     }
     return responseBody.content[0].text;

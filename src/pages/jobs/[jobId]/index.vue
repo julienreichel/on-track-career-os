@@ -153,7 +153,7 @@ const statusLabel = computed(() => {
 const viewListSections = computed(() =>
   listSections.value.map((section) => ({
     ...section,
-    items: form[section.key] as string[],
+    items: form[section.key],
   }))
 );
 

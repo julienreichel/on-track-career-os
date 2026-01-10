@@ -11,5 +11,10 @@
     "paths": {
       "$amplify/*": ["../.amplify/generated/*"]
     }
-  }
+  },
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "../test/**/*"
+  ]
 }
