@@ -40,7 +40,7 @@ const columns: TableColumn<Experience>[] = [
     accessorKey: 'experienceType',
     header: t('experiences.table.type'),
     cell: ({ row }) => {
-      const type = row.original.experienceType || 'work';
+      const type = row.original.experienceType ?? 'work';
       const badge = getTypeBadge(type);
       return h(UBadge, {
         color: badge?.color,
@@ -135,7 +135,7 @@ function formatDate(dateString: string | null | undefined): string {
 }
 
 function getStatusBadge(status: string | null | undefined) {
-  const statusValue = status || 'draft';
+  const statusValue = status ?? 'draft';
   return {
     draft: { color: 'neutral' as const, label: t('experiences.status.draft') },
     complete: { color: 'success' as const, label: t('experiences.status.complete') },

@@ -41,14 +41,14 @@ watch(
     if (experience) {
       form.value = {
         title: experience.title,
-        companyName: experience.companyName || '',
+        companyName: experience.companyName ?? '',
         startDate: experience.startDate,
-        endDate: experience.endDate || '',
-        responsibilities: experience.responsibilities || [],
-        tasks: experience.tasks || [],
-        rawText: experience.rawText || '',
-        status: experience.status || 'draft',
-        experienceType: experience.experienceType || 'work',
+        endDate: experience.endDate ?? '',
+        responsibilities: experience.responsibilities ?? [],
+        tasks: experience.tasks ?? [],
+        rawText: experience.rawText ?? '',
+        status: experience.status ?? 'draft',
+        experienceType: experience.experienceType ?? 'work',
         userId: experience.userId,
       };
     }
@@ -65,8 +65,8 @@ watch(
   () => props.experience,
   (experience) => {
     if (experience) {
-      responsibilitiesText.value = (experience.responsibilities || []).join('\n');
-      tasksText.value = (experience.tasks || []).join('\n');
+      responsibilitiesText.value = (experience.responsibilities ?? []).join('\n');
+      tasksText.value = (experience.tasks ?? []).join('\n');
     }
   },
   { immediate: true }
@@ -96,7 +96,7 @@ function handleSubmit() {
   // Convert empty date strings to null for GraphQL
   const dataToSave = {
     ...form.value,
-    endDate: form.value.endDate?.trim() || null,
+    endDate: form.value.endDate?.trim(),
   };
 
   emit('save', dataToSave);

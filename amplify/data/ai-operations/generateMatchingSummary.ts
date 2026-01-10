@@ -328,7 +328,7 @@ function finalizeOutput(
 
   // Apply recommendation guardrails
   const { recommendation, skillFit: cappedSkillFit } = applyRecommendationGuardrails(
-    raw.recommendation || 'maybe',
+    raw.recommendation ?? 'maybe',
     skillMatch,
     skillFit
   );
@@ -406,8 +406,8 @@ function buildFallbackOutput(): GenerateMatchingSummaryOutput {
 }
 
 function buildUserPrompt(args: GenerateMatchingSummaryInput) {
-  const userSkills = args.profile.skills || [];
-  const jobSkills = args.jobDescription?.requiredSkills || [];
+  const userSkills = args.profile.skills ?? [];
+  const jobSkills = args.jobDescription?.requiredSkills ?? [];
 
   return `Analyze this job-candidate match with skepticism and honesty.
 

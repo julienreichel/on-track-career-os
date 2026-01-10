@@ -288,20 +288,20 @@ async function generatePersonalCanvasCore(
 ): Promise<PersonalCanvasOutput> {
   // Generate user prompt with injected data
   const profileSummary = `
-Name: ${input.profile.fullName || 'N/A'}
-Headline: ${input.profile.headline || 'N/A'}
-Summary: ${input.profile.summary || 'N/A'}
+Name: ${input.profile.fullName ?? 'N/A'}
+Headline: ${input.profile.headline ?? 'N/A'}
+Summary: ${input.profile.summary ?? 'N/A'}
   `.trim();
 
   const experiencesSummary = input.experiences
     .map((exp, idx) =>
       `
 Experience ${idx + 1}:
-- Title: ${exp.title || 'N/A'}
-- Company: ${exp.company || 'N/A'}
-- Duration: ${exp.startDate || 'N/A'} to ${exp.endDate || 'Present'}
-- Responsibilities: ${exp.responsibilities?.join(', ') || 'N/A'}
-- Tasks: ${exp.tasks?.join(', ') || 'N/A'}
+- Title: ${exp.title ?? 'N/A'}
+- Company: ${exp.company ?? 'N/A'}
+- Duration: ${exp.startDate ?? 'N/A'} to ${exp.endDate ?? 'Present'}
+- Responsibilities: ${exp.responsibilities?.join(', ') ?? 'N/A'}
+- Tasks: ${exp.tasks?.join(', ') ?? 'N/A'}
     `.trim()
     )
     .join('\n\n');
@@ -310,12 +310,12 @@ Experience ${idx + 1}:
     .map((story, idx) =>
       `
 Story ${idx + 1}:
-- Situation: ${story.situation || 'N/A'}
-- Task: ${story.task || 'N/A'}
-- Action: ${story.action || 'N/A'}
-- Result: ${story.result || 'N/A'}
-- Achievements: ${story.achievements?.join('; ') || 'N/A'}
-- KPIs: ${story.kpiSuggestions?.join('; ') || 'N/A'}
+- Situation: ${story.situation ?? 'N/A'}
+- Task: ${story.task ?? 'N/A'}
+- Action: ${story.action ?? 'N/A'}
+- Result: ${story.result ?? 'N/A'}
+- Achievements: ${story.achievements?.join('; ') ?? 'N/A'}
+- KPIs: ${story.kpiSuggestions?.join('; ') ?? 'N/A'}
     `.trim()
     )
     .join('\n\n');

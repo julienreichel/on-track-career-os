@@ -132,8 +132,8 @@ const toggleAll = () => {
 const formatDateRange = (startDate?: string | null, endDate?: string | null): string => {
   if (!startDate && !endDate) return '';
 
-  const start = startDate || t('cvExperiencePicker.unknown');
-  const end = endDate || t('cvExperiencePicker.present');
+  const start = startDate ?? t('cvExperiencePicker.unknown');
+  const end = endDate ?? t('cvExperiencePicker.present');
 
   return `${start} - ${end}`;
 };

@@ -318,8 +318,8 @@ const load = async () => {
   try {
     document.value = await service.getFullCVDocument(cvId.value);
     if (document.value) {
-      editContent.value = document.value.content || '';
-      originalContent.value = document.value.content || '';
+      editContent.value = document.value.content ?? '';
+      originalContent.value = document.value.content ?? '';
       const shouldShow = document.value.showProfilePhoto ?? true;
       showProfilePhotoSetting.value = shouldShow;
       originalShowProfilePhoto.value = shouldShow;
@@ -336,8 +336,8 @@ const load = async () => {
 
 const toggleEdit = () => {
   isEditing.value = true;
-  editContent.value = document.value?.content || '';
-  originalContent.value = document.value?.content || '';
+  editContent.value = document.value?.content ?? '';
+  originalContent.value = document.value?.content ?? '';
   const shouldShow = document.value?.showProfilePhoto ?? true;
   showProfilePhotoSetting.value = shouldShow;
   originalShowProfilePhoto.value = shouldShow;
@@ -432,8 +432,8 @@ const handleRegenerateTailored = async () => {
       const reloadedDocument = await service.getFullCVDocument(updated.id);
       if (reloadedDocument) {
         document.value = reloadedDocument;
-        editContent.value = reloadedDocument.content || '';
-        originalContent.value = reloadedDocument.content || '';
+        editContent.value = reloadedDocument.content ?? '';
+        originalContent.value = reloadedDocument.content ?? '';
         const shouldShow = reloadedDocument.showProfilePhoto ?? true;
         showProfilePhotoSetting.value = shouldShow;
         originalShowProfilePhoto.value = shouldShow;

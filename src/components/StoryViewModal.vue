@@ -15,8 +15,8 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const hasAchievements = computed(() => (props.story.achievements?.length || 0) > 0);
-const hasKpis = computed(() => (props.story.kpiSuggestions?.length || 0) > 0);
+const hasAchievements = computed(() => (props.story.achievements?.length ?? 0) > 0);
+const hasKpis = computed(() => (props.story.kpiSuggestions?.length ?? 0) > 0);
 
 const close = () => {
   emit('update:open', false);

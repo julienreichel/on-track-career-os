@@ -19,7 +19,7 @@ const descriptionMaxLength = 180;
 
 const title = computed(() => props.experience.title || t('experiences.card.noTitle'));
 
-const subtitle = computed(() => props.experience.companyName || t('experiences.card.noCompany'));
+const subtitle = computed(() => props.experience.companyName ?? t('experiences.card.noCompany'));
 
 const dateRange = computed(() => {
   const start = formatDate(props.experience.startDate);
@@ -44,7 +44,7 @@ const description = computed(() => {
 });
 
 const statusBadge = computed(() => {
-  const status = props.experience.status || 'draft';
+  const status = props.experience.status ?? 'draft';
   return {
     color: status === 'complete' ? 'success' : 'neutral',
     label: status === 'complete' ? t('experiences.status.complete') : t('experiences.status.draft'),

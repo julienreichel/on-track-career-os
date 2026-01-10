@@ -191,7 +191,7 @@ function mapCompanySummary(company: Company): TailoringCompanySummary {
 
 function normalizeString(value?: string | null): string | undefined {
   const trimmed = value?.trim();
-  return trimmed ? trimmed : undefined;
+  return trimmed ?? undefined;
 }
 
 function normalizeRequiredString(value?: string | null): string {
@@ -200,13 +200,13 @@ function normalizeRequiredString(value?: string | null): string {
 
 function optionalStringArray(values?: (string | null)[] | null): string[] | undefined {
   if (!values) return undefined;
-  const filtered = values.filter((value): value is string => Boolean(value && value.trim()));
+  const filtered = values.filter((value): value is string => Boolean(value?.trim()));
   return filtered.length ? filtered : undefined;
 }
 
 function requiredStringArray(values?: (string | null)[] | null): string[] {
   if (!values) return [];
-  return values.filter((value): value is string => Boolean(value && value.trim()));
+  return values.filter((value): value is string => Boolean(value?.trim()));
 }
 
 function normalizeNumber(value: unknown): number {

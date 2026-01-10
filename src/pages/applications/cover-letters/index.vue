@@ -207,7 +207,7 @@ const resolveTitle = (letter: CoverLetter): string => {
   }
 
   // Fallback to old logic for letters created before name field
-  const content = letter.content || '';
+  const content = letter.content ?? '';
   if (content.length === 0) {
     return t('coverLetter.list.untitled');
   }
@@ -227,7 +227,7 @@ const resolveSubtitle = (letter: CoverLetter): string => {
 };
 
 const resolvePreview = (letter: CoverLetter): string => {
-  const content = letter.content || '';
+  const content = letter.content ?? '';
   if (content.length === 0) {
     return t('coverLetter.list.emptyContent');
   }

@@ -101,7 +101,7 @@ function validateSections(
     rawBlocks: [],
   };
 
-  const parsedSections = sections || fallbackSections;
+  const parsedSections = sections ?? fallbackSections;
 
   return {
     experiences: Array.isArray(parsedSections.experiences) ? parsedSections.experiences : [],
@@ -125,7 +125,7 @@ function validateSections(
 function validateProfile(
   profile: Partial<ParseCvTextOutput['profile']> | undefined
 ): ParseCvTextOutput['profile'] {
-  const parsedProfile = profile || {};
+  const parsedProfile = profile ?? {};
 
   return {
     fullName: typeof parsedProfile.fullName === 'string' ? parsedProfile.fullName : undefined,
@@ -193,9 +193,9 @@ ${OUTPUT_SCHEMA}`;
 /**
  * Main Lambda handler
  */
-export const handler = async (
-  event: { arguments: ParseCvTextInput }
-): Promise<ParseCvTextOutput> => {
+export const handler = async (event: {
+  arguments: ParseCvTextInput;
+}): Promise<ParseCvTextOutput> => {
   return withAiOperationHandlerObject(
     'parseCvText',
     event,

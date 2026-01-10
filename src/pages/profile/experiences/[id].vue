@@ -114,24 +114,24 @@ function handleEdit() {
   isEditing.value = true;
 }
 
-const displayTitle = computed(() => experience.value?.title || t('experiences.card.noTitle'));
+const displayTitle = computed(() => experience.value?.title ?? t('experiences.card.noTitle'));
 const displayCompany = computed(
-  () => experience.value?.companyName || t('experiences.card.noCompany')
+  () => experience.value?.companyName ?? t('experiences.card.noCompany')
 );
 const displayType = computed(() => {
-  const type = experience.value?.experienceType || 'work';
+  const type = experience.value?.experienceType ?? 'work';
   return t(`experiences.types.${type}`, type);
 });
 const displayStatus = computed(() => {
   const status = experience.value?.status;
   return status ? t(`experiences.status.${status}`) : t('common.notAvailable');
 });
-const displayStartDate = computed(() => experience.value?.startDate || t('common.notAvailable'));
+const displayStartDate = computed(() => experience.value?.startDate ?? t('common.notAvailable'));
 const displayEndDate = computed(() => {
   if (!experience.value?.startDate && !experience.value?.endDate) {
     return t('common.notAvailable');
   }
-  return experience.value?.endDate || t('experiences.present');
+  return experience.value?.endDate ?? t('experiences.present');
 });
 const responsibilitiesList = computed(() => experience.value?.responsibilities ?? []);
 const tasksList = computed(() => experience.value?.tasks ?? []);

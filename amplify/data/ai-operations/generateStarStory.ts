@@ -149,7 +149,7 @@ function getFirstSentence(text: string): string {
   if (!text) return '';
 
   const sentenceMatch = text.match(/(.+?[.?!])(\s|$)/s);
-  if (sentenceMatch && sentenceMatch[1]) {
+  if (sentenceMatch?.[1]) {
     return sentenceMatch[1].trim();
   }
 
@@ -164,7 +164,7 @@ function inferTitleFromStory(story: GenerateStarStoryOutput): string {
   ].filter((candidate) => candidate.length > 0);
 
   const preferred = candidates.find((candidate) => candidate.length >= MIN_TITLE_SENTENCE_LENGTH);
-  const fallback = preferred || candidates[0] || 'Untitled STAR story';
+  const fallback = preferred ?? candidates[0] ?? 'Untitled STAR story';
 
   return fallback.length > MAX_TITLE_LENGTH
     ? `${fallback.slice(0, TITLE_TRUNCATION_LENGTH)}${TITLE_ELLIPSIS}`
@@ -257,9 +257,9 @@ async function invokeAiForText(systemPrompt: string, userPrompt: string): Promis
 /**
  * Main Lambda handler
  */
-export const handler = async (
-  event: { arguments: GenerateStarStoryInput }
-): Promise<GenerateStarStoryOutput[]> => {
+export const handler = async (event: {
+  arguments: GenerateStarStoryInput;
+}): Promise<GenerateStarStoryOutput[]> => {
   return withAiOperationHandlerObject(
     'generateStarStory',
     event,

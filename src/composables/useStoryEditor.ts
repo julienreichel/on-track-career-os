@@ -38,13 +38,13 @@ function createEmptyFormState(): StoryFormState {
  */
 function storyToFormState(story: STARStory): StoryFormState {
   return {
-    title: story.title || '',
+    title: story.title ?? '',
     situation: story.situation,
     task: story.task,
     action: story.action,
     result: story.result,
-    achievements: (story.achievements || []).filter((a): a is string => a !== null),
-    kpiSuggestions: (story.kpiSuggestions || []).filter((k): k is string => k !== null),
+    achievements: (story.achievements ?? []).filter((a): a is string => a !== null),
+    kpiSuggestions: (story.kpiSuggestions ?? []).filter((k): k is string => k !== null),
     experienceId: story.experienceId,
   };
 }

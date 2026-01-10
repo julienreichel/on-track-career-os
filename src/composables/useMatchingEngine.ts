@@ -242,10 +242,10 @@ async function loadExperienceSignals(experiences: Experience[], storyService: ST
 
     return {
       title: exp.title || '',
-      companyName: exp.companyName || '',
+      companyName: exp.companyName ?? '',
       startDate: exp.startDate || undefined,
       endDate: exp.endDate || undefined,
-      experienceType: exp.experienceType || 'work',
+      experienceType: exp.experienceType ?? 'work',
       responsibilities: normalizeStringArray(exp.responsibilities),
       tasks: normalizeStringArray(exp.tasks),
       achievements,

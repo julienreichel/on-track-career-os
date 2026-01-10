@@ -37,10 +37,10 @@ const preview = computed(() => {
   return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 });
 
-const hasAchievements = computed(() => (props.story.achievements?.length || 0) > 0);
-const hasKpis = computed(() => (props.story.kpiSuggestions?.length || 0) > 0);
-const achievementCount = computed(() => props.story.achievements?.length || 0);
-const kpiCount = computed(() => props.story.kpiSuggestions?.length || 0);
+const hasAchievements = computed(() => (props.story.achievements?.length ?? 0) > 0);
+const hasKpis = computed(() => (props.story.kpiSuggestions?.length ?? 0) > 0);
+const achievementCount = computed(() => props.story.achievements?.length ?? 0);
+const kpiCount = computed(() => props.story.kpiSuggestions?.length ?? 0);
 
 const handleView = (event: Event) => {
   event.stopPropagation();

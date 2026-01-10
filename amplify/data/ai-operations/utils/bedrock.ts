@@ -16,7 +16,7 @@ import {
  * Provides consistent Bedrock invocation across all operations
  */
 
-const BEDROCK_MODEL_ID = process.env.MODEL_ID || 'amazon.nova-lite-v1:0';
+const BEDROCK_MODEL_ID = process.env.MODEL_ID ?? 'amazon.nova-lite-v1:0';
 
 // Singleton client instance
 let bedrockClient: BedrockRuntimeClient | null = null;
@@ -25,9 +25,8 @@ let bedrockClient: BedrockRuntimeClient | null = null;
  * Get or create Bedrock client instance
  */
 function getBedrockClient(): BedrockRuntimeClient {
-  if (!bedrockClient) {
-    bedrockClient = new BedrockRuntimeClient({ region: BEDROCK_REGION });
-  }
+  bedrockClient ??= new BedrockRuntimeClient({ region: BEDROCK_REGION });
+
   return bedrockClient;
 }
 

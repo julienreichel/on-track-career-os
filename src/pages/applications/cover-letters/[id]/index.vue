@@ -88,9 +88,9 @@ const toggleEdit = () => {
       isEditing.value = false;
     }
   } else {
-    editTitle.value = item.value?.name || '';
+    editTitle.value = item.value?.name ?? '';
     originalTitle.value = editTitle.value;
-    editContent.value = item.value?.content || '';
+    editContent.value = item.value?.content ?? '';
     originalContent.value = editContent.value;
     isEditing.value = true;
   }
@@ -189,7 +189,7 @@ const handleRegenerateTailored = async () => {
 
     if (updated) {
       item.value = updated;
-      editContent.value = updated.content || '';
+      editContent.value = updated.content ?? '';
       originalContent.value = editContent.value;
       isEditing.value = false;
       toast.add({ title: t('tailoredMaterials.toast.coverLetterRegenerated'), color: 'primary' });
@@ -218,7 +218,7 @@ watch(item, (newValue) => {
     editContent.value = content ? content : '';
     originalContent.value = editContent.value;
     // Update breadcrumb with cover letter name
-    route.meta.breadcrumbLabel = newValue.name || t('coverLetter.display.untitled');
+    route.meta.breadcrumbLabel = newValue.name ?? t('coverLetter.display.untitled');
     void loadTailoringContext(newValue.jobId);
   }
 });

@@ -55,15 +55,15 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
   // Helper to resolve experience ID
   const getExperienceId = (expId?: string) => {
     return (
-      expId ||
-      draftStory.value?.experienceId ||
+      expId ??
+      draftStory.value?.experienceId ??
       (typeof experienceId === 'string' ? experienceId : experienceId?.value)
     );
   };
 
   // Load stories for experience by ID
   const loadStoriesByExperienceId = async (expId?: string) => {
-    const targetId = expId || getExperienceId();
+    const targetId = expId ?? getExperienceId();
     if (!targetId) {
       error.value = 'Experience ID is required';
       return;
@@ -137,8 +137,8 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
     const sourceText = [
       experience.title,
       experience.companyName,
-      ...(experience.responsibilities || []),
-      ...(experience.tasks || []),
+      ...(experience.responsibilities ?? []),
+      ...(experience.tasks ?? []),
       experience.rawText,
     ]
       .filter(Boolean)
@@ -188,7 +188,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
 
       if (draftStory.value) {
         Object.assign(draftStory.value, {
-          title: aiStory.title || '',
+          title: aiStory.title ?? '',
           situation: aiStory.situation,
           task: aiStory.task,
           action: aiStory.action,
@@ -196,7 +196,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
         });
       } else {
         draftStory.value = {
-          title: aiStory.title || '',
+          title: aiStory.title ?? '',
           situation: aiStory.situation,
           task: aiStory.task,
           action: aiStory.action,
@@ -209,7 +209,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
       // Automatically generate achievements and KPIs for the generated story
       try {
         const aiStoryForAchievements: AiSTARStory = {
-          title: aiStory.title || 'Untitled STAR story',
+          title: aiStory.title ?? 'Untitled STAR story',
           situation: aiStory.situation,
           task: aiStory.task,
           action: aiStory.action,
@@ -239,7 +239,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
 
   // Generate achievements
   const generateAchievements = async (story?: STARStory | StoryDraft) => {
-    const sourceStory = story || draftStory.value || selectedStory.value;
+    const sourceStory = story ?? draftStory.value ?? selectedStory.value;
     if (!sourceStory) {
       error.value = 'No story available';
       return;
@@ -250,7 +250,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
 
     try {
       const aiStory: AiSTARStory = {
-        title: sourceStory.title || 'Untitled STAR story',
+        title: sourceStory.title ?? 'Untitled STAR story',
         situation: sourceStory.situation,
         task: sourceStory.task,
         action: sourceStory.action,
@@ -293,7 +293,7 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
 
     try {
       const aiStory: AiSTARStory = {
-        title: draftStory.value.title || 'Untitled STAR story',
+        title: draftStory.value.title ?? 'Untitled STAR story',
         situation: draftStory.value.situation,
         task: draftStory.value.task,
         action: draftStory.value.action,
