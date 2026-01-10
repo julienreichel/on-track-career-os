@@ -99,6 +99,7 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
     {
       title: 'Senior Software Engineer',
       companyName: 'TechCorp Inc',
+      experienceType: 'work',
       startDate: '2021-01-01',
       endDate: '2024-01-01',
       responsibilities: [
@@ -215,6 +216,7 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
         {
           title: 'Developer',
           companyName: 'Test Company',
+          experienceType: 'work',
           startDate: '2020-01-01',
           endDate: '2023-01-01',
           responsibilities: ['Code'],

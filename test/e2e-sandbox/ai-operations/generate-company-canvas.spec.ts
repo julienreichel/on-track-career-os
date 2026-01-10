@@ -60,9 +60,14 @@ describe('AI Operations - Generate Company Canvas (E2E Sandbox)', () => {
   it('generates BMC blocks from structured inputs', async () => {
     const companyProfile = {
       companyName: 'Atlas Robotics',
+      industry: 'Automation',
+      sizeRange: '51-200',
+      website: 'https://atlas-robotics.test',
+      description: 'Robotics company focused on automated inspections.',
       productsServices: ['Autonomous inspection drones'],
       targetMarkets: ['Energy utilities'],
       customerSegments: ['Grid operators'],
+      rawNotes: 'Prioritize safety compliance.',
     };
 
     const canvas = await repository.generateCompanyCanvas({

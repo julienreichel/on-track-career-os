@@ -28,16 +28,6 @@ export const schemaTypes = {
     confidence: a.float().required(),
   }),
 
-  ExperienceBlockType: a.customType({
-    title: a.string().required(),
-    company: a.string().required(),
-    startDate: a.string(),
-    endDate: a.string(),
-    responsibilities: a.string().array().required(),
-    tasks: a.string().array().required(),
-    experienceType: a.string().required(),
-  }),
-
   StarStoryType: a.customType({
     title: a.string().required(),
     situation: a.string().required(),
@@ -109,12 +99,12 @@ export const schemaTypes = {
   ExperienceType: a.customType({
     id: a.string(),
     title: a.string().required(),
-    companyName: a.string(),
+    companyName: a.string().required(),
     startDate: a.string(),
     endDate: a.string(),
-    experienceType: a.string(),
-    responsibilities: a.string().array(),
-    tasks: a.string().array(),
+    experienceType: a.string().required(),
+    responsibilities: a.string().array().required(),
+    tasks: a.string().array().required(),
     achievements: a.string().array(),
     kpiSuggestions: a.string().array(),
   }),
@@ -156,17 +146,6 @@ export const schemaTypes = {
 
   JobType: a.customType({
     title: a.string().required(),
-    seniorityLevel: a.string(),
-    roleSummary: a.string(),
-    responsibilities: a.string().array(),
-    requiredSkills: a.string().array(),
-    behaviours: a.string().array(),
-    successCriteria: a.string().array(),
-    explicitPains: a.string().array(),
-  }),
-
-  ParseJobDescriptionOutputType: a.customType({
-    title: a.string().required(),
     seniorityLevel: a.string().required(),
     roleSummary: a.string().required(),
     responsibilities: a.string().array().required(),
@@ -178,38 +157,19 @@ export const schemaTypes = {
 
   CompanyType: a.customType({
     companyName: a.string().required(),
-    industry: a.string(),
-    sizeRange: a.string(),
-    website: a.string(),
-    description: a.string(),
-  }),
-
-  CompanyAnalysisProfileType: a.customType({
-    companyName: a.string().required(),
     industry: a.string().required(),
     sizeRange: a.string().required(),
     website: a.string().required(),
+    description: a.string().required(),
     productsServices: a.string().array().required(),
     targetMarkets: a.string().array().required(),
     customerSegments: a.string().array().required(),
-    description: a.string().required(),
+    rawNotes: a.string().required(),
   }),
 
   AnalyzeCompanyInfoOutputType: a.customType({
-    companyProfile: a.ref('CompanyAnalysisProfileType').required(),
+    companyProfile: a.ref('CompanyType').required(),
     confidence: a.float().required(),
-  }),
-
-  CompanyCanvasProfileType: a.customType({
-    companyName: a.string().required(),
-    industry: a.string(),
-    sizeRange: a.string(),
-    website: a.string(),
-    description: a.string(),
-    productsServices: a.string().array(),
-    targetMarkets: a.string().array(),
-    customerSegments: a.string().array(),
-    rawNotes: a.string(),
   }),
 
   GenerateCompanyCanvasOutputType: a.customType({

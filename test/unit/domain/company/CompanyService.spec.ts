@@ -88,6 +88,7 @@ describe('CompanyService', () => {
         targetMarkets: ['EU'],
         customerSegments: ['Startups'],
         description: 'Test',
+        rawNotes: 'Sample text',
       },
       confidence: 0.82,
     });
@@ -213,6 +214,7 @@ describe('CompanyService', () => {
         targetMarkets: [],
         customerSegments: [],
         description: '',
+        rawNotes: 'Provided',
       },
       confidence: 0.5,
     });

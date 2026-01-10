@@ -40,11 +40,12 @@ export interface CoverLetterUserProfile {
 
 export interface CoverLetterExperience {
   title: string;
-  companyName?: string;
+  companyName: string;
   startDate?: string;
   endDate?: string;
-  responsibilities?: string[];
-  tasks?: string[];
+  experienceType: string;
+  responsibilities: string[];
+  tasks: string[];
   achievements?: string[];
   kpiSuggestions?: string[];
 }
@@ -72,13 +73,13 @@ export interface CoverLetterPersonalCanvas {
 
 export interface CoverLetterJobDescription {
   title: string;
-  seniorityLevel?: string;
-  roleSummary?: string;
-  responsibilities?: string[];
-  requiredSkills?: string[];
-  behaviours?: string[];
-  successCriteria?: string[];
-  explicitPains?: string[];
+  seniorityLevel: string;
+  roleSummary: string;
+  responsibilities: string[];
+  requiredSkills: string[];
+  behaviours: string[];
+  successCriteria: string[];
+  explicitPains: string[];
 }
 
 export interface CoverLetterMatchingSummary {
@@ -100,10 +101,14 @@ export interface CoverLetterMatchingSummary {
 
 export interface CoverLetterCompanySummary {
   companyName: string;
-  industry?: string;
-  sizeRange?: string;
-  website?: string;
-  description?: string;
+  industry: string;
+  sizeRange: string;
+  website: string;
+  description: string;
+  productsServices: string[];
+  targetMarkets: string[];
+  customerSegments: string[];
+  rawNotes: string;
 }
 
 export interface GenerateCoverLetterInput {

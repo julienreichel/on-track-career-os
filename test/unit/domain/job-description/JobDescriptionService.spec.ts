@@ -292,13 +292,14 @@ describe('JobDescriptionService', () => {
           industry: 'Software',
           sizeRange: '',
           website: '',
-          productsServices: ['Automation'],
-          targetMarkets: [],
-          customerSegments: [],
-          description: '',
-        },
-        confidence: 0.9,
-      });
+        productsServices: ['Automation'],
+        targetMarkets: [],
+        customerSegments: [],
+        description: '',
+        rawNotes: 'Job text',
+      },
+      confidence: 0.9,
+    });
       mockCompanyRepo.findByNormalizedName.mockResolvedValue({
         id: 'company-123',
         companyName: 'Acme Inc.',
@@ -351,13 +352,14 @@ describe('JobDescriptionService', () => {
           industry: '',
           sizeRange: '',
           website: '',
-          productsServices: [],
-          targetMarkets: [],
-          customerSegments: [],
-          description: '',
-        },
-        confidence: 0.7,
-      });
+        productsServices: [],
+        targetMarkets: [],
+        customerSegments: [],
+        description: '',
+        rawNotes: 'Job text',
+      },
+      confidence: 0.7,
+    });
       mockCompanyRepo.findByNormalizedName.mockResolvedValue(null);
       mockCompanyRepo.create.mockResolvedValue({
         id: 'company-999',

@@ -67,12 +67,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
 import { useCoverLetterEngine } from '@/composables/useCoverLetterEngine';
+import type { SpeechInput } from '@/domain/ai-operations/SpeechResult';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -87,11 +88,17 @@ const engine = useCoverLetterEngine();
 // Form state
 const coverLetterName = ref('');
 const jobDescription = ref('');
-const jobDescriptionObj = computed(() => {
+const jobDescriptionObj = computed<SpeechInput['jobDescription'] | undefined>(() => {
   if (!jobDescription.value) return undefined;
   return {
     title: coverLetterName.value.trim(),
+    seniorityLevel: '',
     roleSummary: jobDescription.value.trim(),
+    responsibilities: [],
+    requiredSkills: [],
+    behaviours: [],
+    successCriteria: [],
+    explicitPains: [],
   };
 });
 

@@ -21,13 +21,13 @@ export type TailoringUserProfile = {
 
 export type TailoringJobDescription = {
   title: string;
-  seniorityLevel?: string;
-  roleSummary?: string;
-  responsibilities?: string[];
-  requiredSkills?: string[];
-  behaviours?: string[];
-  successCriteria?: string[];
-  explicitPains?: string[];
+  seniorityLevel: string;
+  roleSummary: string;
+  responsibilities: string[];
+  requiredSkills: string[];
+  behaviours: string[];
+  successCriteria: string[];
+  explicitPains: string[];
 };
 
 export type TailoringMatchingSummary = {
@@ -49,10 +49,14 @@ export type TailoringMatchingSummary = {
 
 export type TailoringCompanySummary = {
   companyName: string;
-  industry?: string;
-  sizeRange?: string;
-  website?: string;
-  description?: string;
+  industry: string;
+  sizeRange: string;
+  website: string;
+  description: string;
+  productsServices: string[];
+  targetMarkets: string[];
+  customerSegments: string[];
+  rawNotes: string;
 };
 
 export type TailoringContext = {
@@ -145,28 +149,15 @@ function mapUserProfile(profile: UserProfile, fullName: string): TailoringUserPr
 }
 
 function mapJobDescription(job: JobDescription, title: string): TailoringJobDescription {
-  const seniorityLevel = normalizeString(job.seniorityLevel);
-  const roleSummary = normalizeString(job.roleSummary);
-
   return {
     title,
-    ...(seniorityLevel && { seniorityLevel }),
-    ...(roleSummary && { roleSummary }),
-    ...(optionalStringArray(job.responsibilities) && {
-      responsibilities: optionalStringArray(job.responsibilities),
-    }),
-    ...(optionalStringArray(job.requiredSkills) && {
-      requiredSkills: optionalStringArray(job.requiredSkills),
-    }),
-    ...(optionalStringArray(job.behaviours) && {
-      behaviours: optionalStringArray(job.behaviours),
-    }),
-    ...(optionalStringArray(job.successCriteria) && {
-      successCriteria: optionalStringArray(job.successCriteria),
-    }),
-    ...(optionalStringArray(job.explicitPains) && {
-      explicitPains: optionalStringArray(job.explicitPains),
-    }),
+    seniorityLevel: normalizeRequiredString(job.seniorityLevel),
+    roleSummary: normalizeRequiredString(job.roleSummary),
+    responsibilities: requiredStringArray(job.responsibilities),
+    requiredSkills: requiredStringArray(job.requiredSkills),
+    behaviours: requiredStringArray(job.behaviours),
+    successCriteria: requiredStringArray(job.successCriteria),
+    explicitPains: requiredStringArray(job.explicitPains),
   };
 }
 
@@ -185,23 +176,26 @@ function mapMatchingSummary(summary: MatchingSummary): TailoringMatchingSummary 
 }
 
 function mapCompanySummary(company: Company): TailoringCompanySummary {
-  const industry = normalizeString(company.industry);
-  const sizeRange = normalizeString(company.sizeRange);
-  const website = normalizeString(company.website);
-  const description = normalizeString(company.description);
-
   return {
     companyName: company.companyName,
-    ...(industry && { industry }),
-    ...(sizeRange && { sizeRange }),
-    ...(website && { website }),
-    ...(description && { description }),
+    industry: normalizeRequiredString(company.industry),
+    sizeRange: normalizeRequiredString(company.sizeRange),
+    website: normalizeRequiredString(company.website),
+    description: normalizeRequiredString(company.description),
+    productsServices: requiredStringArray(company.productsServices),
+    targetMarkets: requiredStringArray(company.targetMarkets),
+    customerSegments: requiredStringArray(company.customerSegments),
+    rawNotes: normalizeRequiredString(company.rawNotes),
   };
 }
 
 function normalizeString(value?: string | null): string | undefined {
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
+}
+
+function normalizeRequiredString(value?: string | null): string {
+  return normalizeString(value) ?? '';
 }
 
 function optionalStringArray(values?: (string | null)[] | null): string[] | undefined {

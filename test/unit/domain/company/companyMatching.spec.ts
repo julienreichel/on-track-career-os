@@ -27,6 +27,7 @@ describe('companyMatching helpers', () => {
       targetMarkets: [],
       customerSegments: [],
       description: '',
+      rawNotes: '',
     } as unknown as Company;
 
     const profile = {
@@ -38,6 +39,7 @@ describe('companyMatching helpers', () => {
       targetMarkets: ['Fintech'],
       customerSegments: ['Startups'],
       description: 'Platform company',
+      rawNotes: '',
     } as CompanyAnalysisResult['companyProfile'];
 
     it('fills empty scalar fields', () => {

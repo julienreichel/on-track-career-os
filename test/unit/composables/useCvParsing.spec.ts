@@ -136,7 +136,7 @@ describe('useCvParsing', () => {
       mockAiOps.experiences.value = [
         {
           title: 'Developer',
-          company: 'Tech Corp',
+          companyName: 'Tech Corp',
           startDate: '2020-01',
           endDate: null,
           responsibilities: [],
@@ -188,7 +188,7 @@ describe('useCvParsing', () => {
       mockAiOps.experiences.value = [
         {
           title: 'Software Engineer',
-          company: 'Tech Corp',
+          companyName: 'Tech Corp',
           experienceType: 'work',
           startDate: '2020-01',
           endDate: '2023-12',
@@ -290,19 +290,21 @@ describe('useCvParsing', () => {
       parsing.extractedExperiences.value = [
         {
           title: 'Job 1',
-          company: 'Company 1',
+          companyName: 'Company 1',
           startDate: '2020-01',
           endDate: null,
           responsibilities: [],
           tasks: [],
+          experienceType: 'work',
         },
         {
           title: 'Job 2',
-          company: 'Company 2',
+          companyName: 'Company 2',
           startDate: '2021-01',
           endDate: null,
           responsibilities: [],
           tasks: [],
+          experienceType: 'work',
         },
       ];
 
@@ -318,11 +320,12 @@ describe('useCvParsing', () => {
       parsing.extractedExperiences.value = [
         {
           title: 'Job 1',
-          company: 'Company 1',
+          companyName: 'Company 1',
           startDate: '2020-01',
           endDate: null,
           responsibilities: [],
           tasks: [],
+          experienceType: 'work',
         },
       ];
 
@@ -416,11 +419,12 @@ describe('useCvParsing', () => {
       parsing.extractedExperiences.value = [
         {
           title: 'Job',
-          company: 'Company',
+          companyName: 'Company',
           startDate: '2020-01',
           endDate: null,
           responsibilities: [],
           tasks: [],
+          experienceType: 'work',
         },
       ];
       parsing.extractedProfile.value = {
@@ -471,11 +475,12 @@ describe('useCvParsing', () => {
       mockAiOps.experiences.value = [
         {
           title: 'Developer',
-          company: 'Tech',
+          companyName: 'Tech',
           startDate: '2020-01',
           endDate: null,
           responsibilities: [],
           tasks: [],
+          experienceType: 'work',
         },
       ];
 
@@ -512,11 +517,12 @@ describe('useCvParsing', () => {
       mockAiOps.experiences.value = [
         {
           title: 'Developer',
-          company: 'Tech',
+          companyName: 'Tech',
           startDate: '2020-01',
           endDate: null,
           responsibilities: [],
           tasks: [],
+          experienceType: 'work',
         },
       ];
 

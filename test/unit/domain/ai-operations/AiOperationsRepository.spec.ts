@@ -161,19 +161,21 @@ describe('AiOperationsRepository', () => {
       const mockExperiencesResult = [
         {
           title: 'Senior Software Engineer',
-          company: 'Tech Corp',
+          companyName: 'Tech Corp',
           startDate: '2020-01-01',
           endDate: '2023-12-31',
           responsibilities: ['Led team', 'Designed systems'],
           tasks: ['Implemented features', 'Conducted reviews'],
+          experienceType: 'work',
         },
         {
           title: 'Software Engineer',
-          company: 'StartupCo',
+          companyName: 'StartupCo',
           startDate: '2018-01-01',
           endDate: '2020-12-31',
           responsibilities: ['Developed features'],
           tasks: ['Built APIs'],
+          experienceType: 'work',
         },
       ];
 
@@ -342,7 +344,10 @@ describe('AiOperationsRepository', () => {
           id: 'exp-1',
           title: 'Engineer',
           companyName: 'Acme',
+          experienceType: 'work',
           startDate: '2020-01-01',
+          responsibilities: [],
+          tasks: [],
         },
       ],
     };
@@ -394,6 +399,7 @@ describe('AiOperationsRepository', () => {
         targetMarkets: [],
         customerSegments: [],
         description: '',
+        rawNotes: '',
       },
       confidence: 0.8,
     };
@@ -461,12 +467,34 @@ describe('AiOperationsRepository', () => {
       });
 
       const result = await repository.generateCompanyCanvas({
-        companyProfile: { companyName: 'Acme' },
+        companyProfile: {
+          companyName: 'Acme',
+          industry: '',
+          sizeRange: '',
+          website: '',
+          description: '',
+          productsServices: [],
+          targetMarkets: [],
+          customerSegments: [],
+          rawNotes: '',
+        },
       });
 
       expect(result).toEqual(canvasResponse);
       expect(mockClient.generateCompanyCanvas).toHaveBeenCalledWith(
-        { companyProfile: { companyName: 'Acme' } },
+        {
+          companyProfile: {
+            companyName: 'Acme',
+            industry: '',
+            sizeRange: '',
+            website: '',
+            description: '',
+            productsServices: [],
+            targetMarkets: [],
+            customerSegments: [],
+            rawNotes: '',
+          },
+        },
         expect.objectContaining({ authMode: 'userPool' })
       );
     });
@@ -479,7 +507,17 @@ describe('AiOperationsRepository', () => {
 
       await expect(
         repository.generateCompanyCanvas({
-          companyProfile: { companyName: 'Acme' },
+          companyProfile: {
+            companyName: 'Acme',
+            industry: '',
+            sizeRange: '',
+            website: '',
+            description: '',
+            productsServices: [],
+            targetMarkets: [],
+            customerSegments: [],
+            rawNotes: '',
+          },
         })
       ).rejects.toThrow('AI operation failed');
     });
@@ -492,7 +530,17 @@ describe('AiOperationsRepository', () => {
 
       await expect(
         repository.generateCompanyCanvas({
-          companyProfile: { companyName: 'Acme' },
+          companyProfile: {
+            companyName: 'Acme',
+            industry: '',
+            sizeRange: '',
+            website: '',
+            description: '',
+            productsServices: [],
+            targetMarkets: [],
+            customerSegments: [],
+            rawNotes: '',
+          },
         })
       ).rejects.toThrow('AI operation returned no data');
     });
@@ -501,7 +549,16 @@ describe('AiOperationsRepository', () => {
   describe('generateMatchingSummary', () => {
     const matchingInput = {
       user: { profile: { fullName: 'Casey Candidate' } },
-      job: { title: 'Product Lead' },
+      job: {
+        title: 'Product Lead',
+        seniorityLevel: '',
+        roleSummary: '',
+        responsibilities: [],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
+      },
     };
 
     const summaryResponse = {

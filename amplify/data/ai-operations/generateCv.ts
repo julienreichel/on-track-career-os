@@ -38,13 +38,13 @@ interface UserProfile {
 
 interface Experience {
   id?: string;
-  title?: string;
-  companyName?: string;
+  title: string;
+  companyName: string;
   startDate?: string;
   endDate?: string;
-  experienceType?: 'work' | 'education' | 'volunteer' | 'project';
-  responsibilities?: string[];
-  tasks?: string[];
+  experienceType: 'work' | 'education' | 'volunteer' | 'project';
+  responsibilities: string[];
+  tasks: string[];
 }
 
 interface Story {
@@ -58,13 +58,13 @@ interface Story {
 
 interface CvJobDescription {
   title: string;
-  seniorityLevel?: string;
-  roleSummary?: string;
-  responsibilities?: string[];
-  requiredSkills?: string[];
-  behaviours?: string[];
-  successCriteria?: string[];
-  explicitPains?: string[];
+  seniorityLevel: string;
+  roleSummary: string;
+  responsibilities: string[];
+  requiredSkills: string[];
+  behaviours: string[];
+  successCriteria: string[];
+  explicitPains: string[];
 }
 
 interface CvMatchingSummary {
@@ -86,10 +86,14 @@ interface CvMatchingSummary {
 
 interface CvCompanySummary {
   companyName: string;
-  industry?: string;
-  sizeRange?: string;
-  website?: string;
-  description?: string;
+  industry: string;
+  sizeRange: string;
+  website: string;
+  description: string;
+  productsServices: string[];
+  targetMarkets: string[];
+  customerSegments: string[];
+  rawNotes: string;
 }
 
 interface GenerateCvInput {

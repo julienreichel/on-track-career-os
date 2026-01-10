@@ -749,17 +749,14 @@ function buildCvInput(args: {
     selectedExperiences: args.experiences.map((exp) => ({
       id: exp.id,
       title: exp.title || '',
-      companyName: exp.companyName || undefined,
+      companyName: exp.companyName ?? '',
       startDate: exp.startDate || '',
       endDate: exp.endDate || undefined,
-      experienceType: exp.experienceType as
-        | 'work'
-        | 'education'
-        | 'volunteer'
-        | 'project'
-        | undefined,
-      responsibilities: filterStrings(exp.responsibilities),
-      tasks: filterStrings(exp.tasks),
+      experienceType:
+        (exp.experienceType as 'work' | 'education' | 'volunteer' | 'project' | undefined) ??
+        'work',
+      responsibilities: filterStrings(exp.responsibilities) ?? [],
+      tasks: filterStrings(exp.tasks) ?? [],
     })),
     stories: args.stories.map((story) => ({
       experienceId: story.experienceId,

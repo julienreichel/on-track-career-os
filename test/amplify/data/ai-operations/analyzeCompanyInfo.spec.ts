@@ -73,6 +73,7 @@ describe('ai.analyzeCompanyInfo', () => {
 
     expect(response.companyProfile.companyName).toBe('Acme Robotics');
     expect(response.companyProfile.productsServices).toEqual(['Robotic arms']);
+    expect(response.companyProfile.rawNotes).toBe('Company info text');
     expect(response.confidence).toBe(0.9);
   });
 
@@ -93,6 +94,7 @@ describe('ai.analyzeCompanyInfo', () => {
 
     expect(response.companyProfile.companyName).toBe('');
     expect(response.companyProfile.productsServices).toEqual([]);
+    expect(response.companyProfile.rawNotes).toBe('Minimal text');
     expect(response.confidence).toBeGreaterThan(0);
   });
 
@@ -116,5 +118,6 @@ describe('ai.analyzeCompanyInfo', () => {
 
     expect(response.companyProfile.productsServices).toEqual(['Platform']);
     expect(response.companyProfile.targetMarkets).toEqual(['EU']);
+    expect(response.companyProfile.rawNotes).toBe('text');
   });
 });

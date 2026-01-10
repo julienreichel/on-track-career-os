@@ -6,7 +6,7 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
  *
  * PURPOSE:
  * Transform raw CV experience text into structured Experience entities.
- * Extract: title, company, dates, responsibilities, tasks.
+ * Extract: title, companyName, dates, responsibilities, tasks.
  *
  * CONTRACT:
  * - Never infer seniority or technologies not present in the text
@@ -18,7 +18,7 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 
 // System prompt - constant as per AIC
 const SYSTEM_PROMPT = `You transform experience text into structured experience blocks.
-Extract: title, company, dates, responsibilities, tasks & achievements, and experience type.
+Extract: title, companyName, dates, responsibilities, tasks & achievements, and experience type.
 Never infer seniority or technologies not present.
 Return JSON only.
 
@@ -42,7 +42,7 @@ RULES:
 const OUTPUT_SCHEMA = `[
   {
     "title": "string",
-    "company": "string",
+    "companyName": "string",
     "startDate": "YYYY-MM-DD or YYYY-MM",
     "endDate": "YYYY-MM-DD or YYYY-MM or null",
     "responsibilities": ["string"],
@@ -54,7 +54,7 @@ const OUTPUT_SCHEMA = `[
 // Experience block interface (matches output schema)
 export interface ExperienceBlock {
   title: string;
-  company: string;
+  companyName: string;
   startDate: string;
   endDate: string | null;
   responsibilities: string[];
@@ -117,7 +117,7 @@ function validateOutput(output: unknown): ExperienceBlock[] {
     return [
       {
         title: 'Experience 1',
-        company: 'Unknown Company',
+        companyName: 'Unknown Company',
         startDate: '2020-01-01',
         endDate: null,
         responsibilities: [],
@@ -133,7 +133,12 @@ function validateOutput(output: unknown): ExperienceBlock[] {
 
       // Required fields with fallbacks
       const title = typeof expObj.title === 'string' ? expObj.title : `Experience ${index + 1}`;
-      const company = typeof expObj.company === 'string' ? expObj.company : 'Unknown Company';
+      const companyName =
+        typeof expObj.companyName === 'string'
+          ? expObj.companyName
+          : typeof expObj.company === 'string'
+            ? expObj.company
+            : 'Unknown Company';
       // Support both camelCase and snake_case from AI response
       const rawStartDate =
         typeof expObj.startDate === 'string'
@@ -179,7 +184,7 @@ function validateOutput(output: unknown): ExperienceBlock[] {
 
       return {
         title,
-        company,
+        companyName,
         startDate,
         endDate,
         responsibilities: responsibilities.filter(
@@ -194,7 +199,7 @@ function validateOutput(output: unknown): ExperienceBlock[] {
     return [
       {
         title: 'Experience 1',
-        company: 'Unknown Company',
+        companyName: 'Unknown Company',
         startDate: '2020-01-01',
         endDate: null,
         responsibilities: [],

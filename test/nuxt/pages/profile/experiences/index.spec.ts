@@ -301,8 +301,8 @@ describe('Experiences Page Component', () => {
   describe('Experience List', () => {
     it('should render experiences table when experiences exist', () => {
       const experiences = [
-        { id: '1', title: 'Senior Engineer', company: 'Tech Corp' },
-        { id: '2', title: 'Developer', company: 'Startup' },
+        { id: '1', title: 'Senior Engineer', companyName: 'Tech Corp' },
+        { id: '2', title: 'Developer', companyName: 'Startup' },
       ];
 
       const wrapper = mount(

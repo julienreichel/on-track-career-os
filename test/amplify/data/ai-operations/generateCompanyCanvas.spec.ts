@@ -16,14 +16,14 @@ describe('ai.generateCompanyCanvas', () => {
     arguments: {
       companyProfile: {
         companyName: string;
-        industry?: string;
-        sizeRange?: string;
-        website?: string;
-        description?: string;
-        productsServices?: string[];
-        targetMarkets?: string[];
-        customerSegments?: string[];
-        rawNotes?: string;
+        industry: string;
+        sizeRange: string;
+        website: string;
+        description: string;
+        productsServices: string[];
+        targetMarkets: string[];
+        customerSegments: string[];
+        rawNotes: string;
       };
       additionalNotes?: string[];
     };
@@ -90,7 +90,17 @@ describe('ai.generateCompanyCanvas', () => {
 
     const response = await handler({
       arguments: {
-        companyProfile: { companyName: 'Acme' },
+        companyProfile: {
+          companyName: 'Acme',
+          industry: '',
+          sizeRange: '',
+          website: '',
+          description: '',
+          productsServices: [],
+          targetMarkets: [],
+          customerSegments: [],
+          rawNotes: '',
+        },
         additionalNotes: [],
       },
     });
@@ -120,7 +130,17 @@ describe('ai.generateCompanyCanvas', () => {
 
     const response = await handler({
       arguments: {
-        companyProfile: { companyName: 'Placeholder' },
+        companyProfile: {
+          companyName: 'Placeholder',
+          industry: '',
+          sizeRange: '',
+          website: '',
+          description: '',
+          productsServices: [],
+          targetMarkets: [],
+          customerSegments: [],
+          rawNotes: '',
+        },
       },
     });
 

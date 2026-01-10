@@ -172,7 +172,7 @@ describe('AiOperationsService', () => {
       const mockExperiences: ExperiencesResult = [
         {
           title: 'Senior Developer',
-          company: 'TechCorp',
+          companyName: 'TechCorp',
           startDate: '2020-01',
           endDate: '2023-12',
           responsibilities: ['Lead team', 'Code review'],
@@ -394,7 +394,10 @@ describe('AiOperationsService', () => {
           id: 'exp-1',
           title: 'Engineer',
           companyName: 'Acme',
+          experienceType: 'work',
           startDate: '2020-01-01',
+          responsibilities: [],
+          tasks: [],
         },
       ],
     };
@@ -419,7 +422,17 @@ describe('AiOperationsService', () => {
       await expect(
         service.generateCv({
           ...baseInput,
-          selectedExperiences: [{ id: 'exp', title: '', companyName: 'Acme', startDate: '' }],
+          selectedExperiences: [
+            {
+              id: 'exp',
+              title: '',
+              companyName: 'Acme',
+              experienceType: 'work',
+              startDate: '',
+              responsibilities: [],
+              tasks: [],
+            },
+          ],
         })
       ).rejects.toThrow('Each experience must have title and startDate');
     });
@@ -510,6 +523,7 @@ describe('AiOperationsService', () => {
         targetMarkets: [],
         customerSegments: [],
         description: '',
+        rawNotes: '',
       },
       confidence: 0.7,
     };
@@ -567,11 +581,31 @@ describe('AiOperationsService', () => {
       mockRepo.generateCompanyCanvas.mockResolvedValue(canvasResult);
 
       const result = await service.generateCompanyCanvas({
-        companyProfile: { companyName: 'Acme' },
+        companyProfile: {
+          companyName: 'Acme',
+          industry: '',
+          sizeRange: '',
+          website: '',
+          description: '',
+          productsServices: [],
+          targetMarkets: [],
+          customerSegments: [],
+          rawNotes: '',
+        },
       });
 
       expect(mockRepo.generateCompanyCanvas).toHaveBeenCalledWith({
-        companyProfile: { companyName: 'Acme' },
+        companyProfile: {
+          companyName: 'Acme',
+          industry: '',
+          sizeRange: '',
+          website: '',
+          description: '',
+          productsServices: [],
+          targetMarkets: [],
+          customerSegments: [],
+          rawNotes: '',
+        },
       });
       expect(result.companyName).toBe('Acme');
     });
@@ -593,7 +627,17 @@ describe('AiOperationsService', () => {
 
       await expect(
         service.generateCompanyCanvas({
-          companyProfile: { companyName: 'Acme' },
+          companyProfile: {
+            companyName: 'Acme',
+            industry: '',
+            sizeRange: '',
+            website: '',
+            description: '',
+            productsServices: [],
+            targetMarkets: [],
+            customerSegments: [],
+            rawNotes: '',
+          },
         })
       ).rejects.toThrow('Invalid company canvas result');
     });
@@ -625,6 +669,7 @@ describe('AiOperationsService', () => {
           targetMarkets: [],
           customerSegments: [],
           description: 'Test',
+          rawNotes: 'Mock notes',
         },
         confidence: 0.99,
       };
@@ -666,7 +711,17 @@ describe('AiOperationsService', () => {
       };
 
       const result = await service.generateCompanyCanvas({
-        companyProfile: { companyName: 'Ignored' },
+        companyProfile: {
+          companyName: 'Ignored',
+          industry: '',
+          sizeRange: '',
+          website: '',
+          description: '',
+          productsServices: [],
+          targetMarkets: [],
+          customerSegments: [],
+          rawNotes: '',
+        },
       });
 
       expect(result).toEqual(mockedCanvas);
@@ -684,7 +739,13 @@ describe('AiOperationsService', () => {
       },
       job: {
         title: 'Head of Engineering',
+        seniorityLevel: '',
+        roleSummary: '',
         responsibilities: ['Lead org'],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
       },
     };
 

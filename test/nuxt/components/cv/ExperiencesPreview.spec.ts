@@ -28,7 +28,7 @@ const stubs = {
 const mockExperiences: ExtractedExperience[] = [
   {
     title: 'Senior Software Engineer',
-    company: 'Tech Corp',
+    companyName: 'Tech Corp',
     experienceType: 'work',
     startDate: '2020-01',
     endDate: '2023-12',
@@ -37,7 +37,7 @@ const mockExperiences: ExtractedExperience[] = [
   },
   {
     title: 'Software Engineer',
-    company: 'StartUp Inc',
+    companyName: 'StartUp Inc',
     experienceType: 'work',
     startDate: '2018-06',
     endDate: null,
@@ -119,7 +119,7 @@ describe('ExperiencesPreview', () => {
     const experiencesWithoutResponsibilities: ExtractedExperience[] = [
       {
         title: 'Developer',
-        company: 'Company',
+        companyName: 'Company',
         experienceType: 'work',
         startDate: '2020-01',
         endDate: '2021-01',
@@ -136,7 +136,7 @@ describe('ExperiencesPreview', () => {
     const experiencesWithoutTasks: ExtractedExperience[] = [
       {
         title: 'Developer',
-        company: 'Company',
+        companyName: 'Company',
         experienceType: 'work',
         startDate: '2020-01',
         endDate: '2021-01',

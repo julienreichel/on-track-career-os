@@ -96,6 +96,7 @@ describe('useMatchingEngine', () => {
         title: 'Engineering Manager',
         companyName: 'Atlas Robotics',
         startDate: '2021-01-01',
+        experienceType: 'work',
         responsibilities: ['Scale teams'],
         tasks: ['Coach EMs'],
       },
@@ -119,6 +120,10 @@ describe('useMatchingEngine', () => {
       sizeRange: '51-200',
       website: 'https://example.com',
       description: 'AI robotics',
+      productsServices: ['Robotics platform'],
+      targetMarkets: ['Manufacturing'],
+      customerSegments: ['Enterprise'],
+      rawNotes: 'Research notes',
     } as Company;
 
     companyCanvas = {

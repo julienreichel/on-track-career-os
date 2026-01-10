@@ -23,7 +23,7 @@ export function isExperiencesResult(data: unknown): data is ExperiencesResult {
     const e = exp as Record<string, unknown>;
     return (
       typeof e.title === 'string' &&
-      typeof e.company === 'string' &&
+      typeof e.companyName === 'string' &&
       typeof e.startDate === 'string' &&
       Array.isArray(e.responsibilities) &&
       Array.isArray(e.tasks)

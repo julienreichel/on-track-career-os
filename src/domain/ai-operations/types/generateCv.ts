@@ -18,12 +18,12 @@ export interface GenerateCvInput {
   selectedExperiences: Array<{
     id?: string;
     title: string;
-    companyName?: string;
+    companyName: string;
     startDate: string;
     endDate?: string;
-    experienceType?: 'work' | 'education' | 'volunteer' | 'project';
-    responsibilities?: string[];
-    tasks?: string[];
+    experienceType: 'work' | 'education' | 'volunteer' | 'project';
+    responsibilities: string[];
+    tasks: string[];
     achievements?: string[];
     kpiSuggestions?: string[];
   }>;
@@ -41,13 +41,13 @@ export interface GenerateCvInput {
   interests?: string[];
   jobDescription?: {
     title: string;
-    seniorityLevel?: string;
-    roleSummary?: string;
-    responsibilities?: string[];
-    requiredSkills?: string[];
-    behaviours?: string[];
-    successCriteria?: string[];
-    explicitPains?: string[];
+    seniorityLevel: string;
+    roleSummary: string;
+    responsibilities: string[];
+    requiredSkills: string[];
+    behaviours: string[];
+    successCriteria: string[];
+    explicitPains: string[];
   };
   matchingSummary?: {
     overallScore: number;
@@ -67,10 +67,14 @@ export interface GenerateCvInput {
   };
   company?: {
     companyName: string;
-    industry?: string;
-    sizeRange?: string;
-    website?: string;
-    description?: string;
+    industry: string;
+    sizeRange: string;
+    website: string;
+    description: string;
+    productsServices: string[];
+    targetMarkets: string[];
+    customerSegments: string[];
+    rawNotes: string;
   };
 }
 

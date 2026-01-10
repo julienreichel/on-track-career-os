@@ -43,11 +43,12 @@ export interface SpeechUserProfile {
 
 export interface SpeechExperience {
   title: string;
-  companyName?: string;
+  companyName: string;
   startDate?: string;
   endDate?: string;
-  responsibilities?: string[];
-  tasks?: string[];
+  experienceType: string;
+  responsibilities: string[];
+  tasks: string[];
   achievements?: string[];
   kpiSuggestions?: string[];
 }
@@ -75,13 +76,13 @@ export interface SpeechPersonalCanvas {
 
 export interface SpeechJobDescription {
   title: string;
-  seniorityLevel?: string;
-  roleSummary?: string;
-  responsibilities?: string[];
-  requiredSkills?: string[];
-  behaviours?: string[];
-  successCriteria?: string[];
-  explicitPains?: string[];
+  seniorityLevel: string;
+  roleSummary: string;
+  responsibilities: string[];
+  requiredSkills: string[];
+  behaviours: string[];
+  successCriteria: string[];
+  explicitPains: string[];
 }
 
 export interface SpeechMatchingSummary {
@@ -103,10 +104,14 @@ export interface SpeechMatchingSummary {
 
 export interface SpeechCompanySummary {
   companyName: string;
-  industry?: string;
-  sizeRange?: string;
-  website?: string;
-  description?: string;
+  industry: string;
+  sizeRange: string;
+  website: string;
+  description: string;
+  productsServices: string[];
+  targetMarkets: string[];
+  customerSegments: string[];
+  rawNotes: string;
 }
 
 export interface GenerateSpeechInput {

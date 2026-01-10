@@ -266,9 +266,10 @@ function mapExperiences(experiences: Experience[]) {
 
       const mapped: SpeechExperienceInput = {
         title,
-        companyName: exp.companyName || undefined,
+        companyName: exp.companyName ?? '',
         startDate: exp.startDate || undefined,
         endDate: exp.endDate || undefined,
+        experienceType: exp.experienceType ?? 'work',
         responsibilities: normalizeStringArray(exp.responsibilities),
         tasks: normalizeStringArray(exp.tasks),
       };

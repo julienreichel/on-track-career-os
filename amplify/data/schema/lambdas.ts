@@ -116,7 +116,7 @@ export const schemaLambdas = {
   extractExperienceBlocks: a
     .query()
     .arguments({ experienceTextBlocks: a.string().array().required() })
-    .returns(a.ref('ExperienceBlockType').array())
+    .returns(a.ref('ExperienceType').array())
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(extractExperienceBlocksFunction)),
 
@@ -169,7 +169,7 @@ export const schemaLambdas = {
   parseJobDescription: a
     .query()
     .arguments({ jobText: a.string().required() })
-    .returns(a.ref('ParseJobDescriptionOutputType'))
+    .returns(a.ref('JobType'))
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(parseJobDescriptionFunction)),
 
@@ -192,7 +192,7 @@ export const schemaLambdas = {
   generateCompanyCanvas: a
     .query()
     .arguments({
-      companyProfile: a.ref('CompanyCanvasProfileType').required(),
+      companyProfile: a.ref('CompanyType').required(),
       additionalNotes: a.string().array(),
     })
     .returns(a.ref('GenerateCompanyCanvasOutputType'))

@@ -16,7 +16,7 @@ export function useExperienceImport() {
     const createPromises = experiences.map((exp) =>
       experienceRepo.create({
         title: exp.title,
-        companyName: exp.company,
+        companyName: exp.companyName,
         startDate: exp.startDate,
         endDate: exp.endDate || undefined,
         responsibilities: exp.responsibilities,

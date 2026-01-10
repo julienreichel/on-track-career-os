@@ -106,17 +106,14 @@ export function useCvGenerator() {
         selectedExperiences: selectedExperiences.map((exp: Experience) => ({
           id: exp.id,
           title: exp.title || '',
-          companyName: exp.companyName || undefined,
+          companyName: exp.companyName ?? '',
           startDate: exp.startDate || '',
           endDate: exp.endDate || undefined,
-          experienceType: exp.experienceType as
-            | 'work'
-            | 'education'
-            | 'volunteer'
-            | 'project'
-            | undefined,
-          responsibilities: exp.responsibilities?.filter((r): r is string => r !== null),
-          tasks: exp.tasks?.filter((t): t is string => t !== null),
+          experienceType:
+            (exp.experienceType as 'work' | 'education' | 'volunteer' | 'project' | undefined) ??
+            'work',
+          responsibilities: filterStringList(exp.responsibilities),
+          tasks: filterStringList(exp.tasks),
         })),
         stories: allStories.map((story) => ({
           experienceId: story.experienceId,
@@ -201,11 +198,33 @@ function normalizeJobDescription(
   input: GenerateCvInput['jobDescription'] | string
 ): GenerateCvInput['jobDescription'] {
   if (typeof input !== 'string') {
-    return input;
+    return {
+      title: input.title,
+      seniorityLevel: input.seniorityLevel ?? '',
+      roleSummary: input.roleSummary ?? '',
+      responsibilities: input.responsibilities ?? [],
+      requiredSkills: input.requiredSkills ?? [],
+      behaviours: input.behaviours ?? [],
+      successCriteria: input.successCriteria ?? [],
+      explicitPains: input.explicitPains ?? [],
+    };
   }
 
   return {
     title: 'Target role',
+    seniorityLevel: '',
     roleSummary: input.trim(),
+    responsibilities: [],
+    requiredSkills: [],
+    behaviours: [],
+    successCriteria: [],
+    explicitPains: [],
   };
+}
+
+function filterStringList(values?: (string | null)[] | null): string[] {
+  if (!values) {
+    return [];
+  }
+  return values.filter((value): value is string => Boolean(value && value.trim()));
 }

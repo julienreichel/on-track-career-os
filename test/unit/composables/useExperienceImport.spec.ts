@@ -26,7 +26,7 @@ describe('useExperienceImport', () => {
   const mockExperiences: ExtractedExperience[] = [
     {
       title: 'Senior Developer',
-      company: 'TechCorp',
+      companyName: 'TechCorp',
       startDate: '2020-01',
       endDate: '2023-12',
       responsibilities: ['Lead team', 'Architect solutions'],
@@ -34,7 +34,7 @@ describe('useExperienceImport', () => {
     },
     {
       title: 'Developer',
-      company: 'StartUp Inc',
+      companyName: 'StartUp Inc',
       startDate: '2018-06',
       endDate: null,
       responsibilities: ['Build features'],
@@ -93,7 +93,7 @@ describe('useExperienceImport', () => {
     const experiencesWithNullEnd: ExtractedExperience[] = [
       {
         title: 'Current Position',
-        company: 'Company',
+        companyName: 'Company',
         startDate: '2023-01',
         endDate: null,
         responsibilities: ['Responsibility'],
@@ -130,7 +130,7 @@ describe('useExperienceImport', () => {
     const experiences: ExtractedExperience[] = [
       {
         title: 'Job 1',
-        company: 'Company 1',
+        companyName: 'Company 1',
         startDate: '2020-01',
         endDate: '2021-01',
         responsibilities: [],
@@ -138,7 +138,7 @@ describe('useExperienceImport', () => {
       },
       {
         title: 'Job 2',
-        company: 'Company 2',
+        companyName: 'Company 2',
         startDate: '2021-01',
         endDate: '2022-01',
         responsibilities: [],
@@ -146,7 +146,7 @@ describe('useExperienceImport', () => {
       },
       {
         title: 'Job 3',
-        company: 'Company 3',
+        companyName: 'Company 3',
         startDate: '2022-01',
         endDate: null,
         responsibilities: [],
@@ -181,7 +181,7 @@ describe('useExperienceImport', () => {
     const minimalExperiences: ExtractedExperience[] = [
       {
         title: 'Job Title',
-        company: 'Company',
+        companyName: 'Company',
         startDate: '2020-01',
         endDate: '2021-01',
         responsibilities: [],

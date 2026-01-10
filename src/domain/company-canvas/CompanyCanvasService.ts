@@ -53,9 +53,12 @@ export class CompanyCanvasService {
         companyName: company.companyName,
         industry: company.industry ?? '',
         sizeRange: company.sizeRange ?? '',
+        website: company.website ?? '',
+        description: company.description ?? '',
         productsServices: company.productsServices ?? [],
         targetMarkets: company.targetMarkets ?? [],
         customerSegments: company.customerSegments ?? [],
+        rawNotes: company.rawNotes ?? '',
       },
       additionalNotes,
     };

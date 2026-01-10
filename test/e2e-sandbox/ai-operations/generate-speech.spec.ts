@@ -69,13 +69,21 @@ describe('AI Operations - Generate Speech (E2E Sandbox)', () => {
         {
           title: 'Engineering Manager',
           companyName: 'Atlas Robotics',
+          experienceType: 'work',
           responsibilities: ['Grow teams', 'Drive strategy'],
+          tasks: ['Mentor leads', 'Define roadmaps'],
           achievements: ['Reduced incidents by 30%'],
         },
       ],
       jobDescription: {
         title: 'Head of Engineering',
+        seniorityLevel: '',
         roleSummary: 'Scale teams with reliable delivery',
+        responsibilities: [],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
       },
       matchingSummary: {
         overallScore: 70,

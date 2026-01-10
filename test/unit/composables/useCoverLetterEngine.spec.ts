@@ -507,18 +507,19 @@ describe('useCoverLetterEngine', () => {
 
       expect(deps.aiService.generateCoverLetter).toHaveBeenCalledWith(
         expect.objectContaining({
-          experiences: [
-            {
+          experiences: expect.arrayContaining([
+            expect.objectContaining({
               title: 'Senior Software Engineer',
               companyName: 'TechCorp',
+              experienceType: 'work',
               startDate: '2020-01',
               endDate: '2023-12',
               responsibilities: ['Lead development team'],
               tasks: ['Code review', 'Architecture decisions'],
               achievements: [],
               kpiSuggestions: [],
-            },
-          ],
+            }),
+          ]),
         })
       );
     });

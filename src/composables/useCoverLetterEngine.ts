@@ -230,11 +230,12 @@ function mapProfileToSpeechProfile(profile: UserProfile) {
 function mapExperienceToSpeechExperience(exp: Experience) {
   return {
     title: exp.title,
-    companyName: exp.companyName ?? undefined,
+    companyName: exp.companyName ?? '',
     startDate: exp.startDate ?? undefined,
     endDate: exp.endDate ?? undefined,
-    responsibilities: filterNulls(exp.responsibilities),
-    tasks: filterNulls(exp.tasks),
+    experienceType: exp.experienceType ?? 'work',
+    responsibilities: filterNulls(exp.responsibilities) ?? [],
+    tasks: filterNulls(exp.tasks) ?? [],
     achievements: [],
     kpiSuggestions: [],
   };

@@ -205,6 +205,12 @@ describe('useCvGenerator', () => {
       expect(aiInput.jobDescription).toEqual({
         title: 'Target role',
         roleSummary: jobDescription,
+        seniorityLevel: '',
+        responsibilities: [],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
       });
     });
 
@@ -357,6 +363,12 @@ describe('useCvGenerator', () => {
       expect(input?.jobDescription).toEqual({
         title: 'Target role',
         roleSummary: 'Test job description',
+        seniorityLevel: '',
+        responsibilities: [],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
       });
     });
 

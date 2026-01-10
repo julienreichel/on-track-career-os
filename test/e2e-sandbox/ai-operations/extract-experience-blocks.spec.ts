@@ -143,21 +143,21 @@ Tasks:
     // Validate first experience structure
     const firstExp = result[0];
     expect(firstExp).toHaveProperty('title');
-    expect(firstExp).toHaveProperty('company');
+    expect(firstExp).toHaveProperty('companyName');
     expect(firstExp).toHaveProperty('startDate');
     expect(firstExp).toHaveProperty('responsibilities');
     expect(firstExp).toHaveProperty('tasks');
 
     // Validate field types
     expect(typeof firstExp.title).toBe('string');
-    expect(typeof firstExp.company).toBe('string');
+    expect(typeof firstExp.companyName).toBe('string');
     expect(typeof firstExp.startDate).toBe('string');
     expect(Array.isArray(firstExp.responsibilities)).toBe(true);
     expect(Array.isArray(firstExp.tasks)).toBe(true);
 
     // At least some content should be extracted
     expect(firstExp.title.length).toBeGreaterThan(0);
-    expect(firstExp.company.length).toBeGreaterThan(0);
+    expect(firstExp.companyName.length).toBeGreaterThan(0);
   }, 60000); // 60s timeout for AI operation
 
   it('should handle single experience block', async () => {
@@ -179,7 +179,7 @@ Tasks: AWS infrastructure, microservices development, DevOps automation.`,
     // Validate basic fields are present
     const exp = result[0];
     expect(exp.title).toBeDefined();
-    expect(exp.company).toBeDefined();
+    expect(exp.companyName).toBeDefined();
   }, 60000);
 
   it('should extract experiences with varying formats', async () => {
@@ -204,7 +204,7 @@ Worked with Python, Spark, Kafka`,
     // Each experience should have required fields
     result.forEach((exp) => {
       expect(exp.title).toBeDefined();
-      expect(exp.company).toBeDefined();
+      expect(exp.companyName).toBeDefined();
       expect(Array.isArray(exp.responsibilities)).toBe(true);
       expect(Array.isArray(exp.tasks)).toBe(true);
     });
@@ -223,7 +223,7 @@ Worked with Python, Spark, Kafka`,
     if (result.length > 0) {
       const exp = result[0];
       expect(exp).toHaveProperty('title');
-      expect(exp).toHaveProperty('company');
+      expect(exp).toHaveProperty('companyName');
       expect(Array.isArray(exp.responsibilities)).toBe(true);
       expect(Array.isArray(exp.tasks)).toBe(true);
     }

@@ -119,7 +119,7 @@ describe('useAiOperations', () => {
     const mockExperiences: ExperiencesResult = [
       {
         title: 'Developer',
-        company: 'TechCorp',
+        companyName: 'TechCorp',
         startDate: '2020-01',
         endDate: '2023-12',
         responsibilities: [],

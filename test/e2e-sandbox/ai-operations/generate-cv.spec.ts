@@ -263,7 +263,13 @@ Must have 5+ years of experience and strong communication skills.
       skills: mockSkills,
       jobDescription: {
         title: 'Senior Software Engineer',
+        seniorityLevel: '',
         roleSummary: jobDescription.trim(),
+        responsibilities: [],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
       },
       matchingSummary: {
         overallScore: 78,
@@ -306,7 +312,10 @@ Must have 5+ years of experience and strong communication skills.
         id: 'exp-1',
         title: 'Software Engineer',
         companyName: 'Tech Company',
+        experienceType: 'work',
         startDate: '2020-01-01',
+        responsibilities: [],
+        tasks: [],
       },
     ];
 
@@ -373,7 +382,10 @@ Must have 5+ years of experience and strong communication skills.
         id: 'test-1',
         title: 'Test Role',
         companyName: 'Test Company',
+        experienceType: 'work',
         startDate: '2020-01-01',
+        responsibilities: [],
+        tasks: [],
       },
     ];
 
@@ -417,7 +429,10 @@ Must have 5+ years of experience and strong communication skills.
         id: 'invalid-1',
         title: '',
         companyName: '',
+        experienceType: '',
         startDate: '',
+        responsibilities: [],
+        tasks: [],
       },
     ];
 

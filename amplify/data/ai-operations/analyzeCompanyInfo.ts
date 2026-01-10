@@ -40,6 +40,7 @@ export interface AnalyzeCompanyInfoOutput {
     targetMarkets: string[];
     customerSegments: string[];
     description: string;
+    rawNotes: string;
   };
   confidence: number;
 }
@@ -84,6 +85,7 @@ function validateOutput(raw: Record<string, unknown>): AnalyzeCompanyInfoOutput 
       targetMarkets: sanitizeArray(profile.targetMarkets),
       customerSegments: sanitizeArray(profile.customerSegments),
       description: sanitizeString(profile.description),
+      rawNotes: sanitizeString(profile.rawNotes),
     },
     confidence: clampConfidence(raw.confidence),
   };
@@ -116,18 +118,25 @@ export const handler = async (event: { arguments: AnalyzeCompanyInfoInput }) => 
   return withAiOperationHandlerObject(
     'analyzeCompanyInfo',
     event,
-    (args) => {
+    async (args) => {
       if (!args.rawText?.trim()) {
         throw new Error('rawText is required');
       }
       const userPrompt = buildUserPrompt(args);
-      return invokeAiWithRetry({
+      const output = await invokeAiWithRetry({
         systemPrompt: SYSTEM_PROMPT,
         userPrompt,
         outputSchema: OUTPUT_SCHEMA,
         validate: validateOutput,
         operationName: 'analyzeCompanyInfo',
       });
+      return {
+        ...output,
+        companyProfile: {
+          ...output.companyProfile,
+          rawNotes: sanitizeString(args.rawText),
+        },
+      };
     },
     (args) => ({
       companyName: args.companyName,

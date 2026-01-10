@@ -73,7 +73,9 @@ describe('AI Operations - Generate Matching Summary (E2E Sandbox)', () => {
             {
               title: 'Engineering Manager',
               companyName: 'Atlas Robotics',
+              experienceType: 'work',
               responsibilities: ['Grow EMs', 'Drive strategy'],
+              tasks: ['Mentor managers', 'Set delivery cadence'],
               achievements: ['Reduced incidents by 30%'],
             },
           ],
@@ -82,8 +84,11 @@ describe('AI Operations - Generate Matching Summary (E2E Sandbox)', () => {
       job: {
         title: 'Head of Engineering',
         seniorityLevel: 'Director',
+        roleSummary: 'Lead a multi-team engineering org to deliver reliably.',
         responsibilities: ['Lead multi-team org', 'Drive strategy'],
         requiredSkills: ['Strategic planning', 'Cross-functional leadership'],
+        behaviours: [],
+        successCriteria: [],
         explicitPains: ['Need predictable delivery'],
       },
     });

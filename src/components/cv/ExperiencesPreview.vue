@@ -41,7 +41,7 @@ function formatDateRange(start?: string, end?: string | null): string {
             <div>
               <h4 class="font-semibold">{{ exp.title }}</h4>
               <p class="text-sm text-muted-foreground">
-                {{ exp.company }}
+                {{ exp.companyName }}
               </p>
             </div>
             <UButton

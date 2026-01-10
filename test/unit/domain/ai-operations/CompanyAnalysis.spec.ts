@@ -13,6 +13,7 @@ describe('CompanyAnalysis type guards', () => {
         targetMarkets: [],
         customerSegments: [],
         description: '',
+        rawNotes: '',
       },
       confidence: 0.8,
     };

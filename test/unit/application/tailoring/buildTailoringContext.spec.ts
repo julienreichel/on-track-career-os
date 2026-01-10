@@ -48,7 +48,16 @@ describe('buildTailoringContext', () => {
 
     expect(result.value.language).toBe('en');
     expect(result.value.userProfile).toEqual({ fullName: 'Jane Doe' });
-    expect(result.value.jobDescription).toEqual({ title: 'Product Manager' });
+    expect(result.value.jobDescription).toEqual({
+      title: 'Product Manager',
+      seniorityLevel: '',
+      roleSummary: '',
+      responsibilities: [],
+      requiredSkills: [],
+      behaviours: [],
+      successCriteria: [],
+      explicitPains: [],
+    });
     expect(result.value.matchingSummary.overallScore).toBe(78);
     expect(result.value.matchingSummary.recommendation).toBe('maybe');
   });
@@ -84,10 +93,11 @@ describe('buildTailoringContext', () => {
       sizeRange: '201-500',
       website: 'https://acme.example',
       description: 'Supply chain software',
+      productsServices: ['Platform'],
+      targetMarkets: ['Retail'],
+      customerSegments: ['Enterprise'],
+      rawNotes: 'Confidential notes',
     });
-    expect(result.value.company).not.toHaveProperty('rawNotes');
-    expect(result.value.company).not.toHaveProperty('canvas');
-    expect(result.value.company).not.toHaveProperty('productsServices');
   });
 
   it('returns an error when job is missing', () => {
@@ -161,13 +171,16 @@ describe('buildTailoringContext', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
-    expect(result.value.jobDescription.seniorityLevel).toBe('Senior');
-    expect(result.value.jobDescription.roleSummary).toBe('Lead product initiatives');
-    expect(result.value.jobDescription.responsibilities).toEqual(['Define roadmap', 'Lead team']);
-    expect(result.value.jobDescription.requiredSkills).toEqual(['Strategy', 'Analytics']);
-    expect(result.value.jobDescription.behaviours).toEqual(['Data-driven']);
-    expect(result.value.jobDescription.successCriteria).toEqual(['Ship features']);
-    expect(result.value.jobDescription.explicitPains).toEqual(['Legacy systems']);
+    expect(result.value.jobDescription).toEqual({
+      title: 'Product Manager',
+      seniorityLevel: 'Senior',
+      roleSummary: 'Lead product initiatives',
+      responsibilities: ['Define roadmap', 'Lead team'],
+      requiredSkills: ['Strategy', 'Analytics'],
+      behaviours: ['Data-driven'],
+      successCriteria: ['Ship features'],
+      explicitPains: ['Legacy systems'],
+    });
   });
 
   it('handles normalizeRecommendation edge cases', () => {

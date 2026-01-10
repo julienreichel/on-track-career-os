@@ -242,9 +242,10 @@ async function loadExperienceSignals(experiences: Experience[], storyService: ST
 
     return {
       title: exp.title || '',
-      companyName: exp.companyName || undefined,
+      companyName: exp.companyName || '',
       startDate: exp.startDate || undefined,
       endDate: exp.endDate || undefined,
+      experienceType: exp.experienceType || 'work',
       responsibilities: normalizeStringArray(exp.responsibilities),
       tasks: normalizeStringArray(exp.tasks),
       achievements,
@@ -337,8 +338,8 @@ function mapPersonalCanvas(canvas: PersonalCanvas) {
 function mapJob(job: JobDescription) {
   return {
     title: job.title,
-    seniorityLevel: job.seniorityLevel || undefined,
-    roleSummary: job.roleSummary || undefined,
+    seniorityLevel: job.seniorityLevel ?? '',
+    roleSummary: job.roleSummary ?? '',
     responsibilities: normalizeStringArray(job.responsibilities),
     requiredSkills: normalizeStringArray(job.requiredSkills),
     behaviours: normalizeStringArray(job.behaviours),
@@ -350,10 +351,14 @@ function mapJob(job: JobDescription) {
 function mapCompanyProfile(company: Company) {
   return {
     companyName: company.companyName,
-    industry: company.industry || undefined,
-    sizeRange: company.sizeRange || undefined,
-    website: company.website || undefined,
-    description: company.description || undefined,
+    industry: company.industry ?? '',
+    sizeRange: company.sizeRange ?? '',
+    website: company.website ?? '',
+    description: company.description ?? '',
+    productsServices: normalizeStringArray(company.productsServices),
+    targetMarkets: normalizeStringArray(company.targetMarkets),
+    customerSegments: normalizeStringArray(company.customerSegments),
+    rawNotes: company.rawNotes ?? '',
   };
 }
 
