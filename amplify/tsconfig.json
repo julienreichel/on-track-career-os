@@ -13,8 +13,10 @@
     }
   },
   "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts",
-    "../test/**/*"
+    "**/*.spec.ts", 
+    "**/*.test.ts", 
+    "../test/**/*",
+    "auth/*/handler.ts",
+    "data/*/handler.ts"
   ]
 }

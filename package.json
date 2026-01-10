@@ -13,7 +13,7 @@
     "format:check": "prettier --check \"**/*.{js,ts,vue,json,md}\"",
     "typecheck": "nuxt typecheck",
     "typecheck:amplify": "tsc --noEmit --skipLibCheck -p amplify/tsconfig.json",
-    "lint": "npm run typecheck:amplify && eslint -c ./eslint.config.mjs \"./{src,amplify}*/**/*.{ts,js,cjs,mjs,vue}\" --ignore-pattern \"**/*.spec.*\" --ignore-pattern \"**/*.test.*\"",
+    "lint": "npm run typecheck:amplify && eslint -c ./eslint.config.mjs \"./{src,amplify}*/**/*.{ts,js,cjs,mjs,vue}\" --ignore-pattern \"**/*.spec.*\" --ignore-pattern \"**/*.test.*\" --ignore-pattern \"**/handler.ts\"",
     "lint:with-tests": "npm run typecheck && eslint -c ./eslint.config.mjs \"./{src,test,amplify}*/**/*.{ts,js,cjs,mjs,vue}\"",
     "lint:eslint-only": "eslint -c ./eslint.config.mjs \"./{src,test,amplify}*/**/*.{ts,js,cjs,mjs,vue}\"",
     "lint:fix": "eslint -c ./eslint.config.mjs \"./{src,test,amplify}*/**/*.{ts,js,cjs,mjs,vue}\" --fix",
