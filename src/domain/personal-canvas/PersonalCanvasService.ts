@@ -26,6 +26,7 @@ export class PersonalCanvasService {
    * @returns Generated PersonalCanvas from AI
    */
   async regenerateCanvas(input: PersonalCanvasInput): Promise<PersonalCanvas> {
-    return await this.aiRepo.generatePersonalCanvas(input);
+    const result = await this.aiRepo.generatePersonalCanvas(input);
+    return result as PersonalCanvas;
   }
 }

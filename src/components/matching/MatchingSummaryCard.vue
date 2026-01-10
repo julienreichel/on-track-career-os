@@ -234,14 +234,14 @@ const recommendationLabel = computed(() => {
 
 function getSkillTag(item: string): string {
   const match = item.match(/^\[(\w+)\]/);
-  return match ? match[1] : '';
+  return match?.[1] ?? '';
 }
 
 function getSkillText(item: string): string {
   return item.replace(/^\[\w+\]\s*/, '');
 }
 
-function getSkillTagColor(item: string): string {
+function getSkillTagColor(item: string): 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral' {
   if (item.startsWith('[MATCH]')) return 'success';
   if (item.startsWith('[PARTIAL]')) return 'warning';
   if (item.startsWith('[MISSING]')) return 'error';
@@ -251,11 +251,11 @@ function getSkillTagColor(item: string): string {
 
 function getRiskPart(item: string): string {
   const match = item.match(/^Risk:\s*([^.]+)/i);
-  return match ? `⚠️ ${match[1].trim()}` : item;
+  return match?.[1] ? `⚠️ ${match[1].trim()}` : item;
 }
 
 function getMitigationPart(item: string): string {
   const match = item.match(/Mitigation:\s*(.+)/i);
-  return match ? `💡 ${match[1].trim()}` : '';
+  return match?.[1] ? `💡 ${match[1].trim()}` : '';
 }
 </script>

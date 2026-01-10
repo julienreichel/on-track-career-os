@@ -140,6 +140,7 @@ function createEmptyAnswers() {
  *
  * @param sourceText - Optional initial context (experience text)
  */
+// eslint-disable-next-line max-lines-per-function
 export function useStarInterview(sourceText?: string) {
   // State
   const currentStepIndex = ref(0);
@@ -168,6 +169,7 @@ export function useStarInterview(sourceText?: string) {
    * Initialize interview with welcome message
    */
   const initialize = () => {
+    if (!currentStep.value) return;
     chatHistory.value = initializeChatHistory(currentStep.value.question, sourceText);
   };
 
@@ -180,6 +182,7 @@ export function useStarInterview(sourceText?: string) {
       return false;
     }
 
+    if (!currentStep.value) return false;
     const stepKey = currentStep.value.key;
     interviewAnswers.value[stepKey] = answer;
     addChatMessage(chatHistory.value, 'user', answer);
@@ -191,9 +194,11 @@ export function useStarInterview(sourceText?: string) {
    * Move to next step
    */
   const nextStep = () => {
-    if (!canProceed.value || isLastStep.value) return false;
+    if (!canProceed.value || isLastStep.value || !currentStep.value) return false;
     currentStepIndex.value++;
-    addChatMessage(chatHistory.value, 'assistant', currentStep.value.question);
+    if (currentStep.value) {
+      addChatMessage(chatHistory.value, 'assistant', currentStep.value.question);
+    }
     return true;
   };
 
@@ -224,7 +229,22 @@ export function useStarInterview(sourceText?: string) {
 
       // Pick random story (AI may generate multiple options)
       const randomIndex = Math.floor(Math.random() * aiStories.length);
-      generatedStory.value = aiStories[randomIndex];
+      const selectedStory = aiStories[randomIndex];
+      if (
+        selectedStory?.title &&
+        selectedStory.situation &&
+        selectedStory.task &&
+        selectedStory.action &&
+        selectedStory.result
+      ) {
+        generatedStory.value = {
+          title: selectedStory.title,
+          situation: selectedStory.situation,
+          task: selectedStory.task,
+          action: selectedStory.action,
+          result: selectedStory.result,
+        };
+      }
 
       chatHistory.value.push({
         role: 'assistant',

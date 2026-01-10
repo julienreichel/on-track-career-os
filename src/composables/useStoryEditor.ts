@@ -149,7 +149,11 @@ export function useStoryEditor(storyId?: string) {
   };
 
   const updateField = (field: keyof StoryFormState, value: string | string[] | undefined) => {
-    formState.value[field] = value;
+    if (field === 'achievements' || field === 'kpiSuggestions') {
+      formState.value[field] = (value as string[] | undefined) ?? [];
+    } else {
+      formState.value[field] = (value as string | undefined) ?? '';
+    }
     isDirty.value = true;
   };
 

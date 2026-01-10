@@ -39,7 +39,7 @@ const experienceMap = computed(() => {
 
 const getCompanyName = (story: STARStory): string | undefined => {
   if (!story.experienceId || !props.showCompanyNames) return undefined;
-  return experienceMap.value[story.experienceId]?.companyName;
+  return experienceMap.value[story.experienceId]?.companyName ?? undefined;
 };
 
 const getExperienceName = (story: STARStory): string | undefined => {

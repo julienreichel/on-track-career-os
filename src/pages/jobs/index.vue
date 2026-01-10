@@ -22,7 +22,7 @@ const headerLinks = computed(() => [
     label: t('jobList.actions.viewCompanies'),
     icon: 'i-heroicons-building-office-2',
     to: '/companies',
-    variant: 'ghost',
+    variant: 'ghost' as const,
   },
   {
     label: t('jobList.actions.add'),

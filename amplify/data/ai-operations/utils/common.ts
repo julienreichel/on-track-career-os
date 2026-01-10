@@ -21,7 +21,7 @@ export const RETRY_TEMPERATURE = 0.1; // Even more deterministic on retry
 export function extractJson(text: string): string {
   // Remove markdown JSON wrapper if present
   const jsonMatch = text.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
-  if (jsonMatch) {
+  if (jsonMatch?.[1]) {
     return jsonMatch[1];
   }
   return text.trim();

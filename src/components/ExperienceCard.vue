@@ -29,9 +29,8 @@ const dateRange = computed(() => {
 
 const description = computed(() => {
   const summary =
-    getTextContent(props.experience.summary) ||
-    getTextContent(props.experience.responsibilities) ||
-    getTextContent(props.experience.tasks);
+    getTextContent(props.experience.responsibilities?.filter((r): r is string => r !== null)) ||
+    getTextContent(props.experience.tasks?.filter((t): t is string => t !== null));
 
   if (!summary) {
     return t('experiences.card.noSummary');

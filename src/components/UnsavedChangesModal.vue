@@ -35,7 +35,7 @@ const handleDiscard = () => {
   >
     <template #footer>
       <UButton :label="t('common.goBack')" variant="ghost" @click="handleGoBack" />
-      <UButton :label="t('common.discard')" color="red" @click="handleDiscard" />
+      <UButton :label="t('common.discard')" color="error" @click="handleDiscard" />
     </template>
   </UModal>
 </template>

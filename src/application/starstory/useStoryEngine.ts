@@ -108,7 +108,9 @@ export function useStoryEngine(experienceId?: Ref<string> | string) {
     error.value = null;
 
     try {
-      stories.value = await service.getAllStories();
+      const { userId } = useAuthUser();
+      if (!userId.value) throw new Error('User not authenticated');
+      stories.value = await service.getAllStories(userId.value);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load stories';
       console.error('[useStoryEngine] Error loading all stories:', err);

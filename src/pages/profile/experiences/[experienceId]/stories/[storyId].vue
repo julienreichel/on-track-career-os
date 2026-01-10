@@ -7,7 +7,6 @@ import { useStarInterview } from '@/composables/useStarInterview';
 import { useStoryEnhancer } from '@/composables/useStoryEnhancer';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
-import type { STARStory } from '@/domain/starstory/STARStory';
 
 defineOptions({
   name: 'StoryFormPage',
@@ -94,11 +93,11 @@ const handleSubmitFreeText = async () => {
     if (aiStories && aiStories.length > 0) {
       const story = aiStories[0];
       // Populate form state with generated story
-      updateField('title', story?.title);
-      updateField('situation', story?.situation);
-      updateField('task', story?.task);
-      updateField('action', story?.action);
-      updateField('result', story?.result);
+      updateField('title', story?.title ?? '');
+      updateField('situation', story?.situation ?? '');
+      updateField('task', story?.task ?? '');
+      updateField('action', story?.action ?? '');
+      updateField('result', story?.result ?? '');
 
       // Switch to manual mode to show the form
       selectedMode.value = 'manual';
@@ -118,12 +117,12 @@ const handleGenerateAchievements = async () => {
   showAchievementsPanel.value = true;
   // Create a story object from form state for generation
   const storyForGeneration = {
-    title: formState.value.title,
-    situation: formState.value.situation,
-    task: formState.value.task,
-    action: formState.value.action,
-    result: formState.value.result,
-  } as STARStory;
+    title: formState.value.title ?? '',
+    situation: formState.value.situation ?? '',
+    task: formState.value.task ?? '',
+    action: formState.value.action ?? '',
+    result: formState.value.result ?? '',
+  };
 
   await generateEnhancements(storyForGeneration);
 

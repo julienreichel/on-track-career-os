@@ -103,6 +103,7 @@ const formatExperienceAsText = (experience: Experience): string => {
 /**
  * Auto-generate STAR stories from experience data
  */
+// eslint-disable-next-line complexity
 const handleAutoGenerate = async () => {
   isGenerating.value = true;
   generationError.value = null;
@@ -127,7 +128,14 @@ const handleAutoGenerate = async () => {
       let kpiSuggestions: string[] = [];
 
       try {
-        const achievementsData = await storyService.generateAchievements(story);
+        const storyForGeneration = {
+          title: story.title ?? '',
+          situation: story.situation ?? '',
+          task: story.task ?? '',
+          action: story.action ?? '',
+          result: story.result ?? '',
+        };
+        const achievementsData = await storyService.generateAchievements(storyForGeneration);
         achievements = achievementsData.achievements || [];
         kpiSuggestions = achievementsData.kpiSuggestions || [];
       } catch (achievementsErr) {
@@ -135,7 +143,15 @@ const handleAutoGenerate = async () => {
         // Continue without achievements - story can still be saved
       }
 
-      await storyService.createAndLinkStory(story, experienceId.value, {
+      const storyToSave = {
+        title: story.title ?? '',
+        situation: story.situation ?? '',
+        task: story.task ?? '',
+        action: story.action ?? '',
+        result: story.result ?? '',
+      };
+
+      await storyService.createAndLinkStory(storyToSave, experienceId.value, {
         achievements,
         kpiSuggestions,
       });
