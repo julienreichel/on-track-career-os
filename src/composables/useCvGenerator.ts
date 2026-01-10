@@ -199,7 +199,8 @@ export function useCvGenerator() {
 
 function normalizeJobDescription(
   input: GenerateCvInput['jobDescription'] | string
-): GenerateCvInput['jobDescription'] {
+): GenerateCvInput['jobDescription'] | undefined {
+  if (!input) return;
   if (typeof input !== 'string') {
     return {
       title: input.title,

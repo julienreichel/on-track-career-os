@@ -235,6 +235,7 @@ async function loadExperienceSignals(experiences: Experience[], storyService: ST
     })
   );
 
+  const allStories = storySets.flat();
   const signals = limited.map((exp, index) => {
     const stories = storySets[index] ?? [];
     const achievements = flattenStrings(stories.flatMap((story) => story.achievements ?? []));
@@ -253,8 +254,17 @@ async function loadExperienceSignals(experiences: Experience[], storyService: ST
     };
   });
 
+  const storySignals = allStories.map((story) => ({
+    situation: story.situation || '',
+    task: story.task || '',
+    action: story.action || '',
+    result: story.result || '',
+    experienceId: story.experienceId || undefined,
+  }));
+
   return {
     experiences: signals,
+    stories: storySignals,
   };
 }
 

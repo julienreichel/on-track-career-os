@@ -7,6 +7,8 @@ const MAX_FUNCTION_PARAMETERS = 4;
 
 export default withNuxt(
   {
+    files: ['src/**/*.{ts,js,vue}', 'amplify/**/*.{ts,js,cjs,mjs}'],
+    ignores: ['**/*.spec.*', '**/*.test.*', '**/handler.ts', 'amplify/auth/**/*'],
     languageOptions: {
       parserOptions: {
         project: ['./.nuxt/tsconfig.app.json', './amplify/tsconfig.json'],
