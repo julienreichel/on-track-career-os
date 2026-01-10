@@ -12,6 +12,7 @@
     "format": "prettier --write \"**/*.{js,ts,vue,json,md}\"",
     "format:check": "prettier --check \"**/*.{js,ts,vue,json,md}\"",
     "typecheck": "nuxt typecheck && tsc --noEmit --skipLibCheck -p amplify/tsconfig.json",
+    "typecheck:test": "tsc --noEmit --skipLibCheck -p test/tsconfig.json",
     "lint": "npm run typecheck && npm run lint:eslint",
     "lint:eslint": "eslint",
     "lint:fix": "eslint --fix",
