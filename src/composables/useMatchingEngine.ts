@@ -284,17 +284,15 @@ function buildMatchingInput(args: {
   const input: MatchingSummaryInput = {
     profile: mapUserProfile(args.profile),
     jobDescription: mapJob(args.job),
+    experiences: args.experienceSignals?.experiences ?? [],
   };
 
   if (args.personalCanvas) {
     input.personalCanvas = mapPersonalCanvas(args.personalCanvas);
   }
 
-  if (args.experienceSignals && args.experienceSignals.experiences.length > 0) {
-    input.experiences = args.experienceSignals.experiences;
-    if (args.experienceSignals.stories && args.experienceSignals.stories.length > 0) {
-      input.stories = args.experienceSignals.stories;
-    }
+  if (args.experienceSignals?.stories && args.experienceSignals.stories.length > 0) {
+    input.stories = args.experienceSignals.stories;
   }
 
   if (args.company) {

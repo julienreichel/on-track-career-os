@@ -99,7 +99,9 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
       icon: 'i-heroicons-sparkles',
       color: 'primary',
       disabled: loading.value || saving.value || isGenerating.value,
-      onClick: void handleGenerate,
+      onClick: () => {
+        void handleGenerate();
+      },
     });
   }
 
