@@ -9,7 +9,7 @@ export const LOG_PREFIX_BASE = 'AI Operation';
 export const LOG_ERROR_PREFIX_BASE = 'AI Operation Error';
 
 // Bedrock configuration
-export const BEDROCK_REGION = process.env.AWS_REGION ?? 'us-east-1';
+export const BEDROCK_REGION = process.env.AWS_REGION || 'us-east-1';
 export const MAX_TOKENS = 4000;
 export const INITIAL_TEMPERATURE = 0.3; // Deterministic parsing
 export const RETRY_TEMPERATURE = 0.1; // Even more deterministic on retry

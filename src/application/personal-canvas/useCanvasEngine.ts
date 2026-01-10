@@ -23,25 +23,25 @@ function buildCanvasInput(
 ): PersonalCanvasInput {
   return {
     profile: {
-      fullName: profile?.fullName ?? undefined,
-      headline: profile?.headline ?? undefined,
-      summary: profile?.summary ?? undefined,
+      fullName: profile?.fullName || undefined,
+      headline: profile?.headline || undefined,
+      summary: profile?.summary || undefined,
     },
     experiences: experiences.map((exp) => ({
       title: exp.title || undefined,
-      company: exp.companyName ?? undefined,
+      company: exp.companyName || undefined,
       startDate: exp.startDate || undefined,
-      endDate: exp.endDate ?? undefined,
+      endDate: exp.endDate || undefined,
       responsibilities: exp.responsibilities?.filter((r): r is string => r !== null) || undefined,
-      tasks: exp.tasks?.filter((t): t is string => t !== null) ?? undefined,
+      tasks: exp.tasks?.filter((t): t is string => t !== null) || undefined,
     })),
     stories: stories.map((story) => ({
       situation: story.situation || undefined,
       task: story.task || undefined,
       action: story.action || undefined,
       result: story.result || undefined,
-      achievements: story.achievements?.filter((a): a is string => a !== null) ?? undefined,
-      kpiSuggestions: story.kpiSuggestions?.filter((k): k is string => k !== null) ?? undefined,
+      achievements: story.achievements?.filter((a): a is string => a !== null) || undefined,
+      kpiSuggestions: story.kpiSuggestions?.filter((k): k is string => k !== null) || undefined,
     })),
   };
 }

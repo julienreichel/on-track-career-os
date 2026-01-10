@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
 const { t } = useI18n();
 
 const hasCompany = computed(() => !!props.company);
-const label = computed(() => props.company?.companyName ?? t('companies.card.noName'));
+const label = computed(() => props.company?.companyName || t('companies.card.noName'));
 const companyLink = computed(() => (props.company ? `/companies/${props.company.id}` : '#'));
 </script>
 

@@ -266,13 +266,16 @@ function createExistingMaterialsLoader({
     try {
       const userId = await resolveUserId();
       const [cvDocs, coverLetters, speechBlocks] = await Promise.all([
-        deps.cvRepository
+        deps
+          .cvRepository
           .listByUser(userId)
           .then((items) => items.filter((item) => item.jobId === jobId)),
-        deps.coverLetterService
+        deps
+          .coverLetterService
           .listCoverLettersByUser(userId)
           .then((items) => items.filter((item) => item.jobId === jobId)),
-        deps.speechBlockService
+        deps
+          .speechBlockService
           .listSpeechBlocksByUser(userId)
           .then((items) => items.filter((item) => item.jobId === jobId)),
       ]);
@@ -734,15 +737,15 @@ function buildCvInput(args: {
     language: 'en',
     profile: {
       fullName: args.profile.fullName || '',
-      headline: args.profile.headline ?? undefined,
-      location: args.profile.location ?? undefined,
-      primaryEmail: args.profile.primaryEmail ?? undefined,
-      primaryPhone: args.profile.primaryPhone ?? undefined,
-      workPermitInfo: args.profile.workPermitInfo ?? undefined,
+      headline: args.profile.headline || undefined,
+      location: args.profile.location || undefined,
+      primaryEmail: args.profile.primaryEmail || undefined,
+      primaryPhone: args.profile.primaryPhone || undefined,
+      workPermitInfo: args.profile.workPermitInfo || undefined,
       socialLinks: filterStrings(args.profile.socialLinks),
       goals: filterStrings(args.profile.goals),
       strengths: filterStrings(args.profile.strengths),
-      seniorityLevel: args.profile.seniorityLevel ?? undefined,
+      seniorityLevel: args.profile.seniorityLevel || undefined,
       aspirations: filterStrings(args.profile.aspirations),
       personalValues: filterStrings(args.profile.personalValues),
     },
@@ -751,7 +754,7 @@ function buildCvInput(args: {
       title: exp.title || '',
       companyName: exp.companyName ?? '',
       startDate: exp.startDate || '',
-      endDate: exp.endDate ?? undefined,
+      endDate: exp.endDate || undefined,
       experienceType:
         (exp.experienceType as 'work' | 'education' | 'volunteer' | 'project' | undefined) ??
         'work',
@@ -811,6 +814,6 @@ function applyOptionalList(
 
 function filterStrings(values?: (string | null)[] | null): string[] | undefined {
   if (!values) return undefined;
-  const filtered = values.filter((value): value is string => Boolean(value?.trim()));
+  const filtered = values.filter((value): value is string => Boolean(value && value.trim()));
   return filtered.length ? filtered : undefined;
 }

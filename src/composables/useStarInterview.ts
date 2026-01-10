@@ -158,7 +158,7 @@ export function useStarInterview(sourceText?: string) {
   const currentStep = computed(() => steps.value[currentStepIndex.value]);
   const isFirstStep = computed(() => currentStepIndex.value === 0);
   const isLastStep = computed(() => currentStepIndex.value === steps.value.length - 1);
-  const canProceed = computed(() => currentStep.value?.completed ?? false);
+  const canProceed = computed(() => currentStep.value?.completed || false);
   const allStepsCompleted = computed(() => steps.value.every((s) => s.completed));
   const progress = computed(
     () => (currentStepIndex.value / steps.value.length) * PROGRESS_PERCENTAGE

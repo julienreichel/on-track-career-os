@@ -59,8 +59,8 @@ const { t } = useI18n();
 const CAREER_DIRECTION_LIMIT = 3;
 
 const careerDirectionSummary = computed(() => {
-  const goals = props.profile?.goals ?? [];
-  const aspirations = props.profile?.aspirations ?? [];
+  const goals = props.profile?.goals || [];
+  const aspirations = props.profile?.aspirations || [];
   return [...goals, ...aspirations].slice(0, CAREER_DIRECTION_LIMIT);
 });
 </script>

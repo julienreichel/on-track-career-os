@@ -37,7 +37,9 @@ export function useCvGenerator() {
     }
 
     const allExperiences = await experienceRepo.list(userId);
-    const experiences = allExperiences.filter((exp) => selectedExperienceIds.includes(exp.id));
+    const experiences = allExperiences.filter((exp) =>
+      selectedExperienceIds.includes(exp.id)
+    );
 
     const storyResponses = await Promise.all(
       experiences.map(async (exp) => {
@@ -134,9 +136,7 @@ export function useCvGenerator() {
         input.profile.languages = profile.languages.filter((l): l is string => l !== null);
       }
       if (options.includeCertifications && profile.certifications) {
-        input.profile.certifications = profile.certifications.filter(
-          (c): c is string => c !== null
-        );
+        input.profile.certifications = profile.certifications.filter((c): c is string => c !== null);
       }
       if (options.includeInterests && profile.interests) {
         input.profile.interests = profile.interests.filter((i): i is string => i !== null);
@@ -229,5 +229,5 @@ function filterStringList(values?: (string | null)[] | null): string[] {
   if (!values) {
     return [];
   }
-  return values.filter((value): value is string => Boolean(value?.trim()));
+  return values.filter((value): value is string => Boolean(value && value.trim()));
 }

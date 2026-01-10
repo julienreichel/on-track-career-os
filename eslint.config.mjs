@@ -64,7 +64,7 @@ export default withNuxt(
       '@typescript-eslint/await-thenable': 'error',
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
       '@typescript-eslint/strict-boolean-expressions': 'off', // Can be too strict
-      '@typescript-eslint/prefer-nullish-coalescing': 'off', // Allow || operator usage
+      '@typescript-eslint/prefer-nullish-coalescing': 'warn',
       '@typescript-eslint/prefer-optional-chain': 'warn',
 
       // Vue specific rules

@@ -18,7 +18,7 @@ const emit = defineEmits<{
 const { t } = useI18n();
 
 const title = computed(() => props.job.title || t('jobList.card.noTitle'));
-const subtitle = computed(() => props.job.seniorityLevel ?? t('jobList.card.noSeniority'));
+const subtitle = computed(() => props.job.seniorityLevel || t('jobList.card.noSeniority'));
 
 const lastUpdated = computed(() => formatListDate(props.job.updatedAt ?? props.job.createdAt));
 

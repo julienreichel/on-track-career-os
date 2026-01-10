@@ -52,13 +52,13 @@ watch(
   () => props.story,
   (newStory) => {
     if (newStory) {
-      title.value = newStory.title ?? '';
+      title.value = newStory.title || '';
       situation.value = newStory.situation || '';
       task.value = newStory.task || '';
       action.value = newStory.action || '';
       result.value = newStory.result || '';
       achievements.value =
-        newStory.achievements?.filter((entry): entry is string => typeof entry === 'string') ?? [];
+        newStory.achievements?.filter((entry): entry is string => typeof entry === 'string') || [];
       kpiSuggestions.value =
         newStory.kpiSuggestions?.filter((entry): entry is string => typeof entry === 'string') ||
         [];

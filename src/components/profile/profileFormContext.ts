@@ -18,8 +18,8 @@ export interface ProfileFormContext {
   emailError: ComputedRef<string | undefined>;
   phoneError: ComputedRef<string | undefined>;
   triggerPhotoPicker: () => void;
-  handlePhotoSelected: (event: Event) => Promise<void>;
-  handleRemovePhoto: () => Promise<void>;
+  handlePhotoSelected: (event: Event) => void;
+  handleRemovePhoto: () => void;
   formatSocialLink: (link: string) => string;
 }
 

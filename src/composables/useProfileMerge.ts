@@ -17,8 +17,8 @@ export function useProfileMerge() {
     existing: (T | null)[] | null | undefined,
     incoming: (T | null)[] | T[] | undefined
   ): T[] {
-    const existingFiltered = (existing ?? []).filter((item): item is T => item !== null);
-    const incomingFiltered = (incoming ?? []).filter((item): item is T => item !== null);
+    const existingFiltered = (existing || []).filter((item): item is T => item !== null);
+    const incomingFiltered = (incoming || []).filter((item): item is T => item !== null);
     const resultSet = new Set<T>(existingFiltered);
     incomingFiltered.forEach((item) => resultSet.add(item));
     return Array.from(resultSet);
