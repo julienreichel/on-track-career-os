@@ -54,10 +54,7 @@ describe('CVDocumentRepository', () => {
         templateId: 'template-modern',
         isTailored: true,
         jobId: 'job-456',
-        contentJSON: {
-          header: { name: 'John Doe', title: 'Senior Engineer' },
-          sections: { experience: [], education: [] },
-        },
+        content: '# John Doe\n\n## Senior Engineer\n\n**Experience**\n\n**Education**',
       };
 
       mockModel.get.mockResolvedValue({
@@ -140,16 +137,13 @@ describe('CVDocumentRepository', () => {
 
   describe('create', () => {
     it('should create a new CVDocument', async () => {
-      const input = {
+      const input: CVDocumentCreateInput = {
         name: 'New CV',
         userId: 'user-123',
         templateId: 'template-modern',
         isTailored: false,
-        contentJSON: {
-          header: { name: 'John Doe', title: 'Engineer' },
-          sections: { experience: [], education: [] },
-        },
-      } as unknown as CVDocumentCreateInput;
+        content: '# John Doe\n\n## Experience\n...',
+      };
 
       const mockCreatedCV = {
         ...input,
@@ -165,10 +159,7 @@ describe('CVDocumentRepository', () => {
       const result = await repository.create(input);
 
       expect(mockModel.create).toHaveBeenCalledWith(
-        {
-          ...input,
-          contentJSON: JSON.stringify(input.contentJSON),
-        },
+        input,
         expect.objectContaining({ authMode: 'userPool' })
       );
       expect(result).toEqual(mockCreatedCV);
@@ -181,10 +172,7 @@ describe('CVDocumentRepository', () => {
         jobId: 'job-456',
         templateId: 'template-professional',
         isTailored: true,
-        contentJSON: {
-          tailored: true,
-          jobSpecific: ['AWS expertise', 'Leadership'],
-        },
+        content: '# Tailored CV\n\n- AWS expertise\n- Leadership',
       } as unknown as CVDocumentCreateInput;
 
       const mockCreatedCV = {
@@ -226,12 +214,12 @@ describe('CVDocumentRepository', () => {
       expect(result).toEqual(mockCreatedCV);
     });
 
-    it('should handle creating CV with null contentJSON', async () => {
+    it('should handle creating CV with null content', async () => {
       const input: CVDocumentCreateInput = {
         name: 'Empty CV',
         userId: 'user-123',
         templateId: 'template-blank',
-        contentJSON: null,
+        content: null,
       } as unknown as CVDocumentCreateInput;
 
       mockModel.create.mockResolvedValue({
@@ -240,7 +228,7 @@ describe('CVDocumentRepository', () => {
 
       const result = await repository.create(input);
 
-      expect(result?.contentJSON).toBeNull();
+      expect(result?.content).toBeNull();
     });
   });
 
@@ -291,15 +279,10 @@ describe('CVDocumentRepository', () => {
       expect(result).toEqual(input);
     });
 
-    it('should handle updating contentJSON', async () => {
+    it('should handle updating content', async () => {
       const input = {
         id: 'cv-123',
-        contentJSON: {
-          header: { name: 'Jane Doe', title: 'Senior Engineer' },
-          sections: {
-            experience: [{ company: 'Tech Corp', title: 'Lead Engineer', years: 5 }],
-          },
-        },
+        content: '# Jane Doe\n\n## Senior Engineer\n\n**Tech Corp** - Lead Engineer (5 years)',
       } as unknown as CVDocumentUpdateInput;
 
       mockModel.update.mockResolvedValue({
@@ -308,8 +291,8 @@ describe('CVDocumentRepository', () => {
 
       const result = await repository.update(input);
 
-      expect(result?.contentJSON).toBeDefined();
-      expect(result?.contentJSON).toEqual(input.contentJSON);
+      expect(result?.content).toBeDefined();
+      expect(result?.content).toEqual(input.content);
     });
 
     it('should handle updating template', async () => {

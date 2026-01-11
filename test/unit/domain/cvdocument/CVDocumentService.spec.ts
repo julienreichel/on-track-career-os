@@ -31,13 +31,7 @@ describe('CVDocumentService', () => {
         templateId: 'template-modern',
         isTailored: true,
         jobId: 'job-456',
-        contentJSON: {
-          header: { name: 'John Doe', title: 'Senior Engineer' },
-          sections: {
-            experience: [{ company: 'Tech Corp', title: 'Senior Engineer' }],
-            education: [{ degree: 'BS Computer Science', school: 'Tech University' }],
-          },
-        },
+        content: '# John Doe\n\n## Senior Engineer\n\n**Tech Corp** - Senior Engineer\n\n**Education**: BS Computer Science, Tech University',
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-15T00:00:00Z',
         owner: 'user-123::user-123',
@@ -91,10 +85,7 @@ describe('CVDocumentService', () => {
         jobId: 'job-456',
         isTailored: true,
         templateId: 'template-professional',
-        contentJSON: {
-          tailored: true,
-          highlights: ['AWS expertise', 'Leadership experience'],
-        },
+        content: '# Tailored CV\n\n## Highlights\n\n- AWS expertise\n- Leadership experience',
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-15T00:00:00Z',
         owner: 'user-123::user-123',
@@ -116,9 +107,7 @@ describe('CVDocumentService', () => {
         userId: 'user-123',
         isTailored: false,
         templateId: 'template-classic',
-        contentJSON: {
-          sections: ['experience', 'education', 'skills'],
-        },
+        content: '# Generic CV\n\n## Experience\n\n## Education\n\n## Skills',
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-01T00:00:00Z',
         owner: 'user-123::user-123',
@@ -133,7 +122,7 @@ describe('CVDocumentService', () => {
       expect(result).toEqual(genericCV);
     });
 
-    it('should handle CV with complex contentJSON', async () => {
+    it('should handle CV with complex content', async () => {
       const complexCV = {
         id: 'cvdocument-123',
         name: 'Comprehensive CV',
@@ -141,29 +130,7 @@ describe('CVDocumentService', () => {
         templateId: 'template-modern',
         isTailored: true,
         jobId: 'job-789',
-        contentJSON: {
-          header: {
-            name: 'Jane Smith',
-            title: 'Technical Lead',
-            contact: {
-              email: 'jane@example.com',
-              phone: '+1234567890',
-            },
-          },
-          sections: {
-            summary: 'Experienced technical leader...',
-            experience: [
-              {
-                company: 'Tech Corp',
-                title: 'Senior Engineer',
-                dates: '2020-2024',
-                achievements: ['Led team of 5', 'Increased efficiency by 40%'],
-              },
-            ],
-            education: [{ degree: 'MS Computer Science', school: 'Tech University' }],
-            skills: ['TypeScript', 'AWS', 'Leadership'],
-          },
-        },
+        content: '# Jane Smith\n\n## Technical Lead\n\n**Contact**: jane@example.com | +1234567890\n\n## Summary\n\nExperienced technical leader...\n\n## Experience\n\n**Tech Corp** - Senior Engineer (2020-2024)\n\n- Led team of 5\n- Increased efficiency by 40%\n\n## Education\n\nMS Computer Science, Tech University\n\n## Skills\n\nTypeScript, AWS, Leadership',
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-15T00:00:00Z',
         owner: 'user-123::user-123',
@@ -173,18 +140,18 @@ describe('CVDocumentService', () => {
 
       const result = await service.getFullCVDocument('cvdocument-123');
 
-      expect(result?.contentJSON).toBeDefined();
+      expect(result?.content).toBeDefined();
       expect(result).toEqual(complexCV);
     });
 
-    it('should handle CV with null contentJSON', async () => {
+    it('should handle CV with null content', async () => {
       const cvWithNullContent = {
         id: 'cvdocument-123',
         name: 'Empty CV',
         userId: 'user-123',
         templateId: 'template-blank',
         isTailored: false,
-        contentJSON: null,
+        content: null,
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-01T00:00:00Z',
         owner: 'user-123::user-123',
@@ -194,7 +161,7 @@ describe('CVDocumentService', () => {
 
       const result = await service.getFullCVDocument('cvdocument-123');
 
-      expect(result?.contentJSON).toBeNull();
+      expect(result?.content).toBeNull();
       expect(result).toEqual(cvWithNullContent);
     });
   });

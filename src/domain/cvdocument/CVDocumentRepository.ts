@@ -69,28 +69,12 @@ export class CVDocumentRepository {
   }
 
   async create(input: CVDocumentCreateInput) {
-    const { data } = await this.model.create(
-      {
-        ...input,
-        contentJSON: (input as any).contentJSON // eslint-disable-line @typescript-eslint/no-explicit-any
-          ? JSON.stringify((input as any).contentJSON) // eslint-disable-line @typescript-eslint/no-explicit-any
-          : undefined,
-      } as CVDocumentCreateInput,
-      gqlOptions()
-    );
+    const { data } = await this.model.create(input, gqlOptions());
     return data;
   }
 
   async update(input: CVDocumentUpdateInput) {
-    const { data } = await this.model.update(
-      {
-        ...input,
-        contentJSON: (input as any).contentJSON // eslint-disable-line @typescript-eslint/no-explicit-any
-          ? JSON.stringify((input as any).contentJSON) // eslint-disable-line @typescript-eslint/no-explicit-any
-          : undefined,
-      } as CVDocumentUpdateInput,
-      gqlOptions()
-    );
+    const { data } = await this.model.update(input, gqlOptions());
     return data;
   }
 

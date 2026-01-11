@@ -35,10 +35,7 @@ describe('useCVDocument', () => {
       templateId: 'template-modern',
       isTailored: true,
       jobId: 'job-456',
-      contentJSON: {
-        header: { name: 'John Doe', title: 'Senior Engineer' },
-        sections: { experience: [], education: [] },
-      },
+      content: '# John Doe\n\n## Senior Engineer\n\n**Experience**: Tech Corp\n\n**Education**: BS CS',
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       owner: 'user-123::user-123',
@@ -202,7 +199,7 @@ describe('useCVDocument', () => {
       jobId: 'job-789',
       isTailored: true,
       templateId: 'template-professional',
-      contentJSON: { tailored: true },
+      content: '# Tailored CV',
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-15T00:00:00Z',
       owner: 'user-123::user-123',
@@ -218,20 +215,14 @@ describe('useCVDocument', () => {
     expect(item.value?.jobId).toBe('job-789');
   });
 
-  it('should handle CV with complex contentJSON', async () => {
+  it('should handle CV with complex content', async () => {
     const cvWithContent = {
       id: 'cvdocument-123',
       name: 'Comprehensive CV',
       userId: 'user-123',
       templateId: 'template-modern',
       isTailored: false,
-      contentJSON: {
-        header: { name: 'Jane Doe', title: 'Engineer' },
-        sections: {
-          experience: [{ company: 'Tech Corp' }],
-          education: [{ degree: 'BS CS' }],
-        },
-      },
+      content: '# Jane Doe\n\n## Engineer\n\n**Tech Corp**\n\n**Education**: BS CS',
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       owner: 'user-123::user-123',
@@ -243,16 +234,16 @@ describe('useCVDocument', () => {
 
     await load();
 
-    expect(item.value?.contentJSON).toBeDefined();
-    expect(item.value?.contentJSON).toEqual(cvWithContent.contentJSON);
+    expect(item.value?.content).toBeDefined();
+    expect(item.value?.content).toEqual(cvWithContent.content);
   });
 
-  it('should handle CV with null contentJSON', async () => {
+  it('should handle CV with null content', async () => {
     const cvWithNullContent = {
       id: 'cvdocument-123',
       name: 'Empty CV',
       userId: 'user-123',
-      contentJSON: null,
+      content: null,
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       owner: 'user-123::user-123',
@@ -264,6 +255,6 @@ describe('useCVDocument', () => {
 
     await load();
 
-    expect(item.value?.contentJSON).toBeNull();
+    expect(item.value?.content).toBeNull();
   });
 });
