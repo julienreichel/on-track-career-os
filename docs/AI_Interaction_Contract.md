@@ -609,90 +609,108 @@ The output is **strict JSON only**, validated against a schema, and is persisted
 
 ## Input Schema (JSON)
 
-> Guiding principle: **maximize user signal**, keep company signal **minimal**.
+> GraphQL schema uses strongly-typed custom types from `amplify/data/schema/types.ts`.
 
 ```ts
 {
-  user: {
-    profile: {
-      fullName: string
-      headline?: string
-      location?: string
-      seniorityLevel?: string
-      workPermitInfo?: string
+  profile: ProfileType         // Required: Full user profile
+  experiences: ExperienceType[] // Required: Array of experiences
+  stories?: SpeechStoryType[]   // Optional: STAR stories for context
+  personalCanvas?: PersonalCanvasType // Optional: Business Model Canvas
+  jobDescription?: JobType      // Optional: Analyzed job description
+  company?: CompanyType         // Optional: Company profile
+}
+```
 
-      goals?: string[]
-      aspirations?: string[]
-      personalValues?: string[]
-      strengths?: string[]
-      interests?: string[]
-      skills?: string[]
-      certifications?: string[]
-      languages?: string[]
-    }
+**Type Definitions** (from GraphQL schema):
 
-    personalCanvas?: {
-      // PersonalCanvas (Business Model Canvas style)
-      customerSegments?: string[]
-      valueProposition?: string[]
-      channels?: string[]
-      customerRelationships?: string[]
-      keyActivities?: string[]
-      keyResources?: string[]
-      keyPartners?: string[]
-      costStructure?: string[]
-      revenueStreams?: string[]
-    }
+```ts
+ProfileType: {
+  fullName: string (required)
+  headline?: string
+  location?: string
+  seniorityLevel?: string
+  primaryEmail?: string
+  primaryPhone?: string
+  workPermitInfo?: string
+  socialLinks?: string[]
+  goals?: string[]
+  aspirations?: string[]
+  personalValues?: string[]
+  strengths?: string[]
+  interests?: string[]
+  skills?: string[]
+  certifications?: string[]
+  languages?: string[]
+}
 
-    experienceSignals?: {
-      // Lightweight, high-signal subset of Experience + STARStory,
-      // meant to improve matching without sending full stories.
-      experiences: Array<{
-        title: string
-        companyName?: string
-        startDate?: string // ISO date
-        endDate?: string   // ISO date or undefined
-        responsibilities?: string[]
-        tasks?: string[]
-        achievements?: string[]        // from STARStory.achievements (if available)
-        kpiSuggestions?: string[]      // from STARStory.kpiSuggestions (if available)
-      }>
-    }
-  }
+ExperienceType: {
+  id?: string
+  title: string (required)
+  companyName: string (required)
+  startDate?: string
+  endDate?: string
+  experienceType: string (required) // "work" | "education" | "volunteer" | "project"
+  responsibilities: string[] (required)
+  tasks: string[] (required)
+  achievements?: string[]
+  kpiSuggestions?: string[]
+}
 
-  job: {
-    // JobDescription (analyzed)
-    title: string
-    seniorityLevel?: string
-    roleSummary?: string
-    responsibilities?: string[]
-    requiredSkills?: string[]
-    behaviours?: string[]
-    successCriteria?: string[]
-    explicitPains?: string[]
-  }
+SpeechStoryType: {
+  experienceId?: string
+  title?: string
+  situation?: string
+  task?: string
+  action?: string
+  result?: string
+  achievements?: string[]
+}
 
-  company?: {
-    // MINIMAL company context (avoid overwhelming the AI)
-    // Flat structure - no nested objects
-    companyName: string
-    industry?: string
-    sizeRange?: string
-    website?: string
-    description?: string
-  }
+PersonalCanvasType: {
+  customerSegments?: string[]
+  valueProposition?: string[]
+  channels?: string[]
+  customerRelationships?: string[]
+  keyActivities?: string[]
+  keyResources?: string[]
+  keyPartners?: string[]
+  costStructure?: string[]
+  revenueStreams?: string[]
+}
+
+JobType: {
+  title: string (required)
+  seniorityLevel: string (required)
+  roleSummary: string (required)
+  responsibilities: string[] (required)
+  requiredSkills: string[] (required)
+  behaviours: string[] (required)
+  successCriteria: string[] (required)
+  explicitPains: string[] (required)
+}
+
+CompanyType: {
+  companyName: string (required)
+  industry: string (required)
+  sizeRange: string (required)
+  website: string (required)
+  description: string (required)
+  productsServices: string[] (required)
+  targetMarkets: string[] (required)
+  customerSegments: string[] (required)
+  rawNotes: string (required)
 }
 ```
 
 ### Input Rules
 
-- Inputs must be **structured JSON only**.
-- No raw CV text, no raw job posting text, no free-form notes blobs.
-- `company` is optional (because `MatchingSummary.companyId` is optional in DB).
-- `company` is a **flat object** - GraphQL schema uses `a.ref('CompanyType')` which maps directly to the structure above.
-- Lambda handler receives this structure **as-is** - no transformation layer needed.
-- `experienceSignals.experiences` should include the **most relevant experiences** for the job (selection happens outside this operation).
-- If `experienceSignals` is missing, the operation must still return valid output, but quality may degrade (still deterministic + safe).
+- Inputs must be **structured JSON only** matching GraphQL schema types
+- No raw CV text, no raw job posting text, no free-form notes blobs
+- `profile` and `experiences` are required; all others optional
+- `company`, `jobDescription`, `personalCanvas`, and `stories` are optional for tailoring context
+- Lambda handler receives these types **as-is** from GraphQL - no transformation layer
+- If optional tailoring fields are missing, operation generates generic (non-tailored) output
 
 ---
 
@@ -700,30 +718,43 @@ The output is **strict JSON only**, validated against a schema, and is persisted
 
 ```ts
 {
-  // Optional in V1, maps to MatchingSummary.userFitScore
-  userFitScore?: number
+  // Core scoring
+  overallScore: number // Required: 0-100 integer score
+  scoreBreakdown: {
+    skillFit: number      // 0-100 integer
+    experienceFit: number // 0-100 integer
+    interestFit: number   // 0-100 integer
+    edge: number          // 0-100 integer
+  }
+  recommendation: string // Required: "apply" | "maybe" | "skip"
 
   // Core structured outputs
-  impactAreas: string[]
-  contributionMap: string[]
-  riskMitigationPoints: string[]
-  summaryParagraph: string
+  reasoningHighlights: string[]    // Why this recommendation
+  strengthsForThisRole: string[]   // Key strengths that match
+  skillMatch: string[]             // Skills tagged as [MATCH], [PARTIAL], [MISSING], [OVER]
+  riskyPoints: string[]            // Risks + mitigation strategies
+  impactOpportunities: string[]    // Where user can create value
+  tailoringTips: string[]          // Specific tips for tailoring materials
 
   // Metadata
   generatedAt: string // ISO datetime
-  needsUpdate: boolean
+  needsUpdate: boolean // Set to false on successful generation
 }
 ```
 
 ### Output Semantics
 
-- `summaryParagraph`: concise narrative of fit (neutral tone, grounded in inputs)
-- `impactAreas`: where the user can create value quickly (3–7 items recommended)
-- `contributionMap`: explicit mappings from user signals → job needs (3–8 items recommended)
-- `riskMitigationPoints`: risks/gaps + mitigation actions (3–8 items recommended)
-- `userFitScore` (optional): only if the operation can compute it deterministically from inputs; must be `0..100`
-- `generatedAt`: timestamp set at generation time (UTC ISO string)
-- `needsUpdate`: set to `false` on successful generation (true only for fallback/partial cases)
+- `overallScore`: Aggregate match score 0-100 (weighted from breakdown)
+- `scoreBreakdown`: Detailed scoring across 4 dimensions (each 0-100)
+- `recommendation`: Clear action recommendation ("apply", "maybe", "skip")
+- `reasoningHighlights`: Key reasoning points for the recommendation (3-7 items)
+- `strengthsForThisRole`: User's strengths relevant to this specific role (3-8 items)
+- `skillMatch`: Skills tagged with match status: [MATCH], [PARTIAL], [MISSING], [OVER] (3-12 items)
+- `riskyPoints`: Gaps/risks with mitigation strategies (2-6 items)
+- `impactOpportunities`: Where user can create immediate value (3-7 items)
+- `tailoringTips`: Specific guidance for CV/cover letter/speech tailoring (3-8 items)
+- `generatedAt`: Timestamp set at generation time (UTC ISO string)
+- `needsUpdate`: Set to `false` on successful generation (true only for fallback/partial cases)
 
 ---
 
@@ -901,8 +932,9 @@ CRITICAL REMINDER: Use ONLY the information provided above. Do not use placehold
 
 ```typescript
 {
-  language: "en";
-  userProfile: {
+  language: string; // e.g., "en", "fr", "de"
+  profile: {
+    // ProfileType from schema
     fullName?: string;
     headline?: string;
     location?: string;
@@ -911,10 +943,17 @@ CRITICAL REMINDER: Use ONLY the information provided above. Do not use placehold
     primaryPhone?: string;
     workPermitInfo?: string;
     goals?: string[];
+    aspirations?: string[];
+    personalValues?: string[];
     strengths?: string[];
+    interests?: string[];
+    skills?: string[];
+    certifications?: string[];
+    languages?: string[];
     socialLinks?: string[];
   };
-  selectedExperiences: Array<{
+  experiences: Array<{
+    // ExperienceType from schema
     id?: string;
     title?: string;
     companyName?: string;
@@ -923,21 +962,32 @@ CRITICAL REMINDER: Use ONLY the information provided above. Do not use placehold
     experienceType?: "work" | "education" | "volunteer" | "project";
     responsibilities?: string[];
     tasks?: string[];
+    achievements?: string[];
+    kpiSuggestions?: string[];
   }>;
   stories?: Array<{
+    // SpeechStoryType from schema (simplified STARStory)
     situation?: string;
-    experienceId?: string;
     task?: string;
     action?: string;
     result?: string;
     achievements?: string[];
   }>;
-  skills?: string[];
-  languages?: string[];
-  certifications?: string[];
-  interests?: string[];
+  personalCanvas?: {
+    // PersonalCanvasType from schema
+    customerSegments?: string[];
+    valueProposition?: string[];
+    channels?: string[];
+    customerRelationships?: string[];
+    keyActivities?: string[];
+    keyResources?: string[];
+    keyPartners?: string[];
+    costStructure?: string[];
+    revenueStreams?: string[];
+  };
   jobDescription?: {
-    title: string;
+    // JobType from schema
+    title?: string;
     seniorityLevel?: string;
     roleSummary?: string;
     responsibilities?: string[];
@@ -947,27 +997,32 @@ CRITICAL REMINDER: Use ONLY the information provided above. Do not use placehold
     explicitPains?: string[];
   };
   matchingSummary?: {
-    overallScore: number;
-    scoreBreakdown: {
-      skillFit: number;
-      experienceFit: number;
-      interestFit: number;
-      edge: number;
+    // MatchingSummaryContextType from schema
+    overallScore?: number;
+    scoreBreakdown?: {
+      skillFit?: number;
+      experienceFit?: number;
+      interestFit?: number;
+      edge?: number;
     };
-    recommendation: "apply" | "maybe" | "skip";
-    reasoningHighlights: string[];
-    strengthsForThisRole: string[];
-    skillMatch: string[];
-    riskyPoints: string[];
-    impactOpportunities: string[];
-    tailoringTips: string[];
+    recommendation?: string;
+    reasoningHighlights?: string[];
+    strengthsForThisRole?: string[];
+    skillMatch?: string[];
+    riskyPoints?: string[];
+    impactOpportunities?: string[];
+    tailoringTips?: string[];
   };
   company?: {
-    companyName: string;
+    // CompanyType from schema
+    companyName?: string;
     industry?: string;
     sizeRange?: string;
     website?: string;
     description?: string;
+    productsServices?: string[];
+    targetMarkets?: string[];
+    customerSegments?: string[];
   };
 }
 ```
@@ -1014,30 +1069,30 @@ The Markdown follows standard formatting conventions and is ready to be rendered
 ### `ai.generateCoverLetter`
 
 **Purpose**  
-Generate a generic-first cover letter that can optionally be tailored when job context is provided.
+Generate a professional cover letter in Markdown format that can be tailored when job context is provided.
 
 **System Prompt**
 
 ```
-You generate a professional cover letter based on user identity data.
+You are a professional cover letter writer. Generate a compelling cover letter in Markdown format.
 
-If tailoring context is provided (jobDescription + matchingSummary), tailor phrasing to the role and job needs without inventing facts.
-If tailoring context is absent, keep the letter generic (no job targeting).
-Use company context only when provided and only as summary-level framing.
+If tailoring context is provided (jobDescription + matchingSummary), tailor the letter to the role and company without inventing facts.
+If tailoring context is absent, create a strong generic letter showcasing the user's value.
+Use company context only when provided for relevant framing.
 
 Output must be:
-- concise
-- professional
-- first-person voice
-- aligned to the user's experience
-- no invented work history or skills
-- JSON only
+- Professional Markdown format
+- First-person voice
+- Concise (3-4 paragraphs)
+- Grounded in user's actual experience
+- No invented work history or skills
+- No markdown code blocks or JSON wrappers
 ```
 
 **User Prompt**
 
 ```
-Use the following data to create a cover letter:
+Generate a professional cover letter in Markdown format.
 
 LANGUAGE:
 {{language}}
@@ -1063,42 +1118,43 @@ MATCHING SUMMARY (optional):
 COMPANY SUMMARY (optional):
 {{company}}
 
-Return JSON with:
-- content
+Return ONLY Markdown text - no code blocks, no JSON.
 ```
 
 **Input schema**
 
-```json
+```typescript
 {
-  "language": "en",
-  "profile": {},
-  "experiences": [],
-  "stories": [],
-  "personalCanvas": {},
-  "jobDescription?": {},
-  "matchingSummary?": {},
-  "company?": {}
+  language: string;
+  profile: ProfileType;          // Full profile from schema
+  experiences: ExperienceType[]; // Array of experiences
+  stories?: SpeechStoryType[];   // Optional STAR stories
+  personalCanvas?: PersonalCanvasType; // Optional canvas
+  jobDescription?: JobType;      // Optional job context
+  matchingSummary?: MatchingSummaryContextType; // Optional matching
+  company?: CompanyType;         // Optional company context
 }
 ```
 
 **Output schema**
 
-```json
-{
-  "content": "string"
-}
+```typescript
+string // Complete cover letter as Markdown text
 ```
 
 **Fallback**
 
-- If tailoring context is invalid (missing jobDescription or matchingSummary):
-  - Drop tailoring inputs and generate generic output
-  - Log warning for monitoring
+- If tailoring context is incomplete:
+  - Generate generic cover letter without job targeting
+  - Log info for monitoring
 
-- If JSON validation fails:
-  - Retry once with stricter JSON-only instruction
-  - Return safe empty fields on failure to keep UI stable
+- If output is empty or malformed:
+  - Retry once with simplified prompt
+  - Log error for monitoring
+
+- Markdown validation:
+  - Ensure minimum length (>200 characters)
+  - Verify professional tone markers present
 
 ### `ai.generateSpeech`
 
