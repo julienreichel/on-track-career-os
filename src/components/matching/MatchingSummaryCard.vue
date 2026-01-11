@@ -241,7 +241,9 @@ function getSkillText(item: string): string {
   return item.replace(/^\[\w+\]\s*/, '');
 }
 
-function getSkillTagColor(item: string): 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral' {
+function getSkillTagColor(
+  item: string
+): 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral' {
   if (item.startsWith('[MATCH]')) return 'success';
   if (item.startsWith('[PARTIAL]')) return 'warning';
   if (item.startsWith('[MISSING]')) return 'error';

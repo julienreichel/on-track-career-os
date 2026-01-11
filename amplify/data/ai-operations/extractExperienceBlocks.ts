@@ -129,70 +129,66 @@ function validateOutput(output: unknown): ExperienceBlock[] {
 
   // Validate and clean each experience block
   const validatedExperiences: ExperienceBlock[] = output.map((exp: unknown, index: number) => {
-      const expObj = exp as Record<string, unknown>;
+    const expObj = exp as Record<string, unknown>;
 
-      // Required fields with fallbacks
-      const title = typeof expObj.title === 'string' ? expObj.title : `Experience ${index + 1}`;
-      const companyName =
-        typeof expObj.companyName === 'string'
-          ? expObj.companyName
-          : typeof expObj.company === 'string'
-            ? expObj.company
-            : 'Unknown Company';
-      // Support both camelCase and snake_case from AI response
-      const rawStartDate =
-        typeof expObj.startDate === 'string'
-          ? expObj.startDate
-          : typeof expObj.start_date === 'string'
-            ? expObj.start_date
-            : '';
-      const rawEndDate =
-        expObj.endDate === null || typeof expObj.endDate === 'string'
-          ? expObj.endDate
-          : expObj.end_date === null || typeof expObj.end_date === 'string'
-            ? expObj.end_date
-            : null;
+    // Required fields with fallbacks
+    const title = typeof expObj.title === 'string' ? expObj.title : `Experience ${index + 1}`;
+    const companyName =
+      typeof expObj.companyName === 'string'
+        ? expObj.companyName
+        : typeof expObj.company === 'string'
+          ? expObj.company
+          : 'Unknown Company';
+    // Support both camelCase and snake_case from AI response
+    const rawStartDate =
+      typeof expObj.startDate === 'string'
+        ? expObj.startDate
+        : typeof expObj.start_date === 'string'
+          ? expObj.start_date
+          : '';
+    const rawEndDate =
+      expObj.endDate === null || typeof expObj.endDate === 'string'
+        ? expObj.endDate
+        : expObj.end_date === null || typeof expObj.end_date === 'string'
+          ? expObj.end_date
+          : null;
 
-      // Normalize dates to YYYY-MM-DD format
-      const startDate = normalizeDate(rawStartDate) || '';
-      const endDate = normalizeDate(rawEndDate);
+    // Normalize dates to YYYY-MM-DD format
+    const startDate = normalizeDate(rawStartDate) || '';
+    const endDate = normalizeDate(rawEndDate);
 
-      // Array fields with fallbacks
-      const responsibilities = Array.isArray(expObj.responsibilities)
-        ? expObj.responsibilities
-        : [];
-      const tasks = Array.isArray(expObj.tasks) ? expObj.tasks : [];
+    // Array fields with fallbacks
+    const responsibilities = Array.isArray(expObj.responsibilities) ? expObj.responsibilities : [];
+    const tasks = Array.isArray(expObj.tasks) ? expObj.tasks : [];
 
-      // experienceType field with validation and fallback
-      const expType =
-        typeof expObj.experienceType === 'string'
-          ? expObj.experienceType
-          : typeof expObj.experience_type === 'string'
-            ? expObj.experience_type
-            : 'work';
-      const validTypes: Array<'work' | 'education' | 'volunteer' | 'project'> = [
-        'work',
-        'education',
-        'volunteer',
-        'project',
-      ];
-      const experienceType = validTypes.includes(
-        expType as 'work' | 'education' | 'volunteer' | 'project'
-      )
-        ? (expType as 'work' | 'education' | 'volunteer' | 'project')
-        : 'work';
+    // experienceType field with validation and fallback
+    const expType =
+      typeof expObj.experienceType === 'string'
+        ? expObj.experienceType
+        : typeof expObj.experience_type === 'string'
+          ? expObj.experience_type
+          : 'work';
+    const validTypes: Array<'work' | 'education' | 'volunteer' | 'project'> = [
+      'work',
+      'education',
+      'volunteer',
+      'project',
+    ];
+    const experienceType = validTypes.includes(
+      expType as 'work' | 'education' | 'volunteer' | 'project'
+    )
+      ? (expType as 'work' | 'education' | 'volunteer' | 'project')
+      : 'work';
 
-      return {
-        title,
-        companyName,
-        startDate,
-        endDate,
-        responsibilities: responsibilities.filter(
-          (r: unknown) => typeof r === 'string'
-        ),
-        tasks: tasks.filter((t: unknown) => typeof t === 'string'),
-        experienceType,
-      };
+    return {
+      title,
+      companyName,
+      startDate,
+      endDate,
+      responsibilities: responsibilities.filter((r: unknown) => typeof r === 'string'),
+      tasks: tasks.filter((t: unknown) => typeof t === 'string'),
+      experienceType,
+    };
   });
 
   if (validatedExperiences.length === 0) {

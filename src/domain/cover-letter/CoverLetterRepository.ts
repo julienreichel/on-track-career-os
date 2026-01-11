@@ -62,10 +62,7 @@ export class CoverLetterRepository {
     }
 
     const selectionSet = ['id', 'coverLetters.*'];
-    const { data } = await this._userProfileModel.get(
-      { id: userId },
-      gqlOptions({ selectionSet })
-    );
+    const { data } = await this._userProfileModel.get({ id: userId }, gqlOptions({ selectionSet }));
     const profile = data as UserProfileWithCoverLetters | null;
     const items = (profile?.coverLetters ?? []) as CoverLetter[];
     return items.filter((item): item is CoverLetter => Boolean(item));

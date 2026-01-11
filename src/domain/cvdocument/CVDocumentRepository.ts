@@ -62,10 +62,7 @@ export class CVDocumentRepository {
     }
 
     const selectionSet = ['id', 'cvs.*'];
-    const { data } = await this._userProfileModel.get(
-      { id: userId },
-      gqlOptions({ selectionSet })
-    );
+    const { data } = await this._userProfileModel.get({ id: userId }, gqlOptions({ selectionSet }));
     const profile = data as UserProfileWithCvs | null;
     const items = (profile?.cvs ?? []) as CVDocument[];
     return items.filter((item): item is CVDocument => Boolean(item));

@@ -62,10 +62,7 @@ export class SpeechBlockRepository {
     }
 
     const selectionSet = ['id', 'speechBlocks.*'];
-    const { data } = await this._userProfileModel.get(
-      { id: userId },
-      gqlOptions({ selectionSet })
-    );
+    const { data } = await this._userProfileModel.get({ id: userId }, gqlOptions({ selectionSet }));
     const profile = data as UserProfileWithSpeechBlocks | null;
     const items = (profile?.speechBlocks ?? []) as SpeechBlock[];
     return items.filter((item): item is SpeechBlock => Boolean(item));

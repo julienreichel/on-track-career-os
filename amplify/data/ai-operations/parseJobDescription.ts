@@ -115,9 +115,9 @@ ${OUTPUT_SCHEMA}
 Remember: do not invent data and leave strings empty or arrays empty if not mentioned.`;
 }
 
-export const handler = async (
-  event: { arguments: ParseJobDescriptionInput }
-): Promise<ParseJobDescriptionOutput> => {
+export const handler = async (event: {
+  arguments: ParseJobDescriptionInput;
+}): Promise<ParseJobDescriptionOutput> => {
   return withAiOperationHandlerObject(
     'parseJobDescription',
     event,

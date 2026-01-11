@@ -30,9 +30,7 @@ describe('ai.extractExperienceBlocks', () => {
       // Extract title and company name: "Title at Company (dates)"
       const titleCompanyMatch = block.match(/^(.*?)\s+at\s+(.*?)\s*\(/);
       const title = titleCompanyMatch ? titleCompanyMatch[1].trim() : `Experience ${index + 1}`;
-      const companyName = titleCompanyMatch
-        ? titleCompanyMatch[2].trim()
-        : 'Unknown Company';
+      const companyName = titleCompanyMatch ? titleCompanyMatch[2].trim() : 'Unknown Company';
 
       // Extract dates: "(Month Year - Month Year)" or "(Year-present)"
       const datesMatch = block.match(/\((.*?)\)/);

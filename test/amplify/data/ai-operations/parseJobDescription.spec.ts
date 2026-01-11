@@ -13,9 +13,7 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => {
 });
 
 describe('ai.parseJobDescription', () => {
-  let handler: (event: {
-    arguments: { jobText: string };
-  }) => Promise<{
+  let handler: (event: { arguments: { jobText: string } }) => Promise<{
     title: string;
     seniorityLevel: string;
     roleSummary: string;

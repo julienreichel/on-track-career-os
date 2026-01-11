@@ -193,9 +193,9 @@ ${OUTPUT_SCHEMA}`;
 /**
  * Main Lambda handler
  */
-export const handler = async (
-  event: { arguments: ParseCvTextInput }
-): Promise<ParseCvTextOutput> => {
+export const handler = async (event: {
+  arguments: ParseCvTextInput;
+}): Promise<ParseCvTextOutput> => {
   return withAiOperationHandlerObject(
     'parseCvText',
     event,
