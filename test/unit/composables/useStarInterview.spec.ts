@@ -15,6 +15,7 @@ describe('useStarInterview', () => {
 
   const mockGeneratedStories: AiSTARStory[] = [
     {
+      title: 'Complex System Migration',
       situation: 'Led a complex migration',
       task: 'Migrate entire system',
       action: 'Planned and executed migration',
@@ -343,9 +344,9 @@ describe('useStarInterview', () => {
 
     it('should randomly select from multiple generated stories', async () => {
       const multipleStories: AiSTARStory[] = [
-        { situation: 'S1', task: 'T1', action: 'A1', result: 'R1' },
-        { situation: 'S2', task: 'T2', action: 'A2', result: 'R2' },
-        { situation: 'S3', task: 'T3', action: 'A3', result: 'R3' },
+        { title: 'Story 1', situation: 'S1', task: 'T1', action: 'A1', result: 'R1' },
+        { title: 'Story 2', situation: 'S2', task: 'T2', action: 'A2', result: 'R2' },
+        { title: 'Story 3', situation: 'S3', task: 'T3', action: 'A3', result: 'R3' },
       ];
       mockService.generateStar.mockResolvedValue(multipleStories);
 

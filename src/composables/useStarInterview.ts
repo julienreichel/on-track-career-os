@@ -231,19 +231,12 @@ export function useStarInterview(sourceText?: string) {
       const randomIndex = Math.floor(Math.random() * aiStories.length);
       const selectedStory = aiStories[randomIndex];
       if (
-        selectedStory?.title &&
-        selectedStory.situation &&
+        selectedStory?.situation &&
         selectedStory.task &&
         selectedStory.action &&
         selectedStory.result
       ) {
-        generatedStory.value = {
-          title: selectedStory.title,
-          situation: selectedStory.situation,
-          task: selectedStory.task,
-          action: selectedStory.action,
-          result: selectedStory.result,
-        };
+        generatedStory.value = selectedStory as AiSTARStory;
       }
 
       chatHistory.value.push({
