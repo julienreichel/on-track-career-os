@@ -20,31 +20,24 @@ const DEFAULT_CONFIDENCE = 0.5;
 const LOW_CONFIDENCE_THRESHOLD = 0.3; // Applied when no content extracted
 
 // System prompt - constant as per AIC
-const SYSTEM_PROMPT = `You are a CV TEXT EXTRACTOR, not a summarizer.
+const SYSTEM_PROMPT = `You are a CV text parser that extracts structured sections and profile information from CV text.
 
-Goal:
-- Extract the CV into structured JSON sections while preserving the original wording and content.
-- When you identify a section, keep its full text content.
+Extract experiencesBlocks, educationBlocks, skills, certifications, rawBlocks, and personal profile information.
+Never invent information not present in the text.
+Return ONLY valid JSON with no markdown wrappers.
 
-Critical rules (MUST follow):
-1) DO NOT summarize, DO NOT rewrite, DO NOT compress.
-2) Preserve content as-is as much as possible (near-verbatim).
-3) For each section you detect (Summary, Experience, Education, Skills, etc.), keep ALL lines that belong to that section.
-4) For Experience:
-   - Each role entry MUST include the header line(s) (company/title/location/dates) AND all subsequent lines that belong to that role until the next role or next section.
-   - Keep subheadings like "Responsibilities:", "Key Achievements:", "Projects:", etc. inside the same role text.
-   - Keep every bullet line. Do not remove “generic” bullets.
-5) If you are unsure whether a line belongs to a role/section, INCLUDE it rather than dropping it.
-6) Output ONLY valid JSON. No markdown. No explanations.
-
-Output format:
-- Return a JSON object that matches the provided schema exactly.
-- For sections.experiencesBlocks: each array item should be the FULL RAW TEXT BLOCK for one role (multi-line string), including bullets and subheadings.
-- If a section has no content, return empty array or omit the field
-
-Quality check before returning:
-- Every detected role must contain more than just the header line if the input text contains bullets/subcontent for that role.
-- Never return an experience item that is only “Title at Company | dates” if the source contains additional lines for that role.
+RULES:
+- Extract only information explicitly stated in the CV (do not infer or invent).
+- Categorize text into appropriate sections.
+- experiencesBlocks MUST contain ONE string per role/position (split by role). Do not merge multiple roles into a single string.
+- Each experiencesBlocks item must include the full text for that role (header + bullets + subheadings like "Key Achievements").
+- When extracting experiencesBlocks, treat the entire text between a role header and the next role header as a single block, regardless of internal subheadings.
+- educationBlocks MUST contain ONE string per education item (split by education entry).
+- Skills must be extracted into sections.skills as an array of strings. If none found, return [].
+- Certifications must be extracted into sections.certifications as an array of strings. If none found, return [].
+- If a section has no content, return [] (empty array).
+- Never output the literal string "null" anywhere. Use "" for missing string fields and [] for missing arrays.
+- Return ONLY valid JSON matching the specified schema.
 `;
 
 // Output schema for retry
@@ -203,7 +196,13 @@ function buildUserPrompt(cvText: string): string {
 ${cvText}
 
 Return a JSON object with this exact structure:
-${OUTPUT_SCHEMA}`;
+${OUTPUT_SCHEMA}
+
+Important:
+- experiencesBlocks: one entry per role (do not merge roles)
+- educationBlocks: one entry per education item
+- If not found: arrays must be [] and strings must be ""
+- Never output "null" as a string`;
 }
 
 /**
