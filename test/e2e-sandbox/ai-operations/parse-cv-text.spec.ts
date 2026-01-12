@@ -152,7 +152,6 @@ French (Basic)
     // Validate structure (per AI Interaction Contract)
     expect(parsedCv).toHaveProperty('sections');
     expect(parsedCv).toHaveProperty('profile');
-    expect(parsedCv).toHaveProperty('confidence');
 
     // Validate sections
     expect(parsedCv.sections).toHaveProperty('experiences');
@@ -180,10 +179,6 @@ French (Basic)
     expect(Array.isArray(parsedCv.profile.interests)).toBe(true);
     expect(Array.isArray(parsedCv.profile.languages)).toBe(true);
 
-    // Validate confidence score
-    expect(typeof parsedCv.confidence).toBe('number');
-    expect(parsedCv.confidence).toBeGreaterThanOrEqual(0);
-    expect(parsedCv.confidence).toBeLessThanOrEqual(1);
     console.log(parsedCv);
     // At least some content should be parsed
     const totalParsedItems =
@@ -218,7 +213,6 @@ French (Basic)
     // Validate structure is returned (even if empty)
     expect(parsedCv).toHaveProperty('sections');
     expect(parsedCv).toHaveProperty('profile');
-    expect(parsedCv).toHaveProperty('confidence');
 
     // All section fields should be arrays (even if empty)
     expect(Array.isArray(parsedCv.sections.experiencesBlocks)).toBe(true);
@@ -235,9 +229,6 @@ French (Basic)
     expect(Array.isArray(parsedCv.profile.strengths)).toBe(true);
     expect(Array.isArray(parsedCv.profile.interests)).toBe(true);
     expect(Array.isArray(parsedCv.profile.languages)).toBe(true);
-
-    // Confidence should indicate low quality
-    expect(parsedCv.confidence).toBeLessThan(0.5);
   }, 30000);
 
   it('should parse minimal CV with partial information', async () => {
@@ -253,7 +244,6 @@ Skills: JavaScript, Python
     // Validate structure
     expect(parsedCv).toHaveProperty('sections');
     expect(parsedCv).toHaveProperty('profile');
-    expect(parsedCv).toHaveProperty('confidence');
 
     // Should extract at least some information
     const hasContent =

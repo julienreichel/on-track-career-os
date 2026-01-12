@@ -67,7 +67,6 @@ describe('useAiOperations', () => {
         certifications: [],
         rawBlocks: [],
       },
-      confidence: 0.95,
     } as ParsedCV;
     mockService.parseCvText.mockResolvedValue(mockParsedCv);
 
@@ -240,7 +239,6 @@ describe('useAiOperations', () => {
         certifications: [],
         rawBlocks: [],
       },
-      confidence: 0.9,
     } as ParsedCV;
     parsedJobDescription.value = {
       title: 'Example',

@@ -31,7 +31,8 @@ describe('CVDocumentService', () => {
         templateId: 'template-modern',
         isTailored: true,
         jobId: 'job-456',
-        content: '# John Doe\n\n## Senior Engineer\n\n**Tech Corp** - Senior Engineer\n\n**Education**: BS Computer Science, Tech University',
+        content:
+          '# John Doe\n\n## Senior Engineer\n\n**Tech Corp** - Senior Engineer\n\n**Education**: BS Computer Science, Tech University',
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-15T00:00:00Z',
         owner: 'user-123::user-123',
@@ -130,7 +131,8 @@ describe('CVDocumentService', () => {
         templateId: 'template-modern',
         isTailored: true,
         jobId: 'job-789',
-        content: '# Jane Smith\n\n## Technical Lead\n\n**Contact**: jane@example.com | +1234567890\n\n## Summary\n\nExperienced technical leader...\n\n## Experience\n\n**Tech Corp** - Senior Engineer (2020-2024)\n\n- Led team of 5\n- Increased efficiency by 40%\n\n## Education\n\nMS Computer Science, Tech University\n\n## Skills\n\nTypeScript, AWS, Leadership',
+        content:
+          '# Jane Smith\n\n## Technical Lead\n\n**Contact**: jane@example.com | +1234567890\n\n## Summary\n\nExperienced technical leader...\n\n## Experience\n\n**Tech Corp** - Senior Engineer (2020-2024)\n\n- Led team of 5\n- Increased efficiency by 40%\n\n## Education\n\nMS Computer Science, Tech University\n\n## Skills\n\nTypeScript, AWS, Leadership',
         createdAt: '2025-01-01T00:00:00Z',
         updatedAt: '2025-01-15T00:00:00Z',
         owner: 'user-123::user-123',

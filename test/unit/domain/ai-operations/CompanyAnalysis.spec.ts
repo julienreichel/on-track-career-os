@@ -15,7 +15,6 @@ describe('CompanyAnalysis type guards', () => {
         description: '',
         rawNotes: '',
       },
-      confidence: 0.8,
     };
 
     expect(isCompanyAnalysisResult(valid)).toBe(true);
@@ -27,7 +26,6 @@ describe('CompanyAnalysis type guards', () => {
     expect(
       isCompanyAnalysisResult({
         companyProfile: { companyName: 123, productsServices: [] },
-        confidence: 'high',
       })
     ).toBe(false);
   });

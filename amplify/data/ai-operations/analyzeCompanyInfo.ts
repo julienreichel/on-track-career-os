@@ -15,8 +15,7 @@ const OUTPUT_SCHEMA = `{
     "targetMarkets": ["string"],
     "customerSegments": ["string"],
     "description": "string"
-  },
-  "confidence": 0.8
+  }
 }`;
 
 export interface AnalyzeCompanyInfoInput {
@@ -42,10 +41,7 @@ export interface AnalyzeCompanyInfoOutput {
     description: string;
     rawNotes: string;
   };
-  confidence: number;
 }
-
-const CONFIDENCE_FALLBACK = 0.55;
 
 function sanitizeString(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
@@ -65,13 +61,6 @@ function sanitizeArray(value: unknown) {
   return list;
 }
 
-function clampConfidence(value: unknown) {
-  if (typeof value !== 'number' || Number.isNaN(value)) {
-    return CONFIDENCE_FALLBACK;
-  }
-  return Math.max(0, Math.min(1, value));
-}
-
 function validateOutput(raw: Record<string, unknown>): AnalyzeCompanyInfoOutput {
   const profile = (raw.companyProfile ?? {}) as Record<string, unknown>;
 
@@ -87,7 +76,6 @@ function validateOutput(raw: Record<string, unknown>): AnalyzeCompanyInfoOutput 
       description: sanitizeString(profile.description),
       rawNotes: sanitizeString(profile.rawNotes),
     },
-    confidence: clampConfidence(raw.confidence),
   };
 }
 

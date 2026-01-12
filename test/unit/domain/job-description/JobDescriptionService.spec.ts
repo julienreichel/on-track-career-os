@@ -298,7 +298,6 @@ describe('JobDescriptionService', () => {
           description: '',
           rawNotes: 'Job text',
         },
-        confidence: 0.9,
       });
       mockCompanyRepo.findByNormalizedName.mockResolvedValue({
         id: 'company-123',
@@ -358,7 +357,6 @@ describe('JobDescriptionService', () => {
           description: '',
           rawNotes: 'Job text',
         },
-        confidence: 0.7,
       });
       mockCompanyRepo.findByNormalizedName.mockResolvedValue(null);
       mockCompanyRepo.create.mockResolvedValue({

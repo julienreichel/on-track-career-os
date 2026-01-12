@@ -73,7 +73,6 @@ describe('AiOperationsService', () => {
           interests: ['AI'],
           languages: ['English'],
         },
-        confidence: 0.95,
       };
 
       mockRepo.parseCvText.mockResolvedValue(mockParsedCv);
@@ -540,7 +539,6 @@ describe('AiOperationsService', () => {
         companyName: 'Acme',
         rawText: 'Research text',
       });
-      expect(result.confidence).toBe(0.7);
     });
 
     it('rejects empty research text', async () => {

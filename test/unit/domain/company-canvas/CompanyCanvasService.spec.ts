@@ -86,7 +86,6 @@ describe('CompanyCanvasService', () => {
       keyActivities: [],
       keyPartners: [],
       costStructure: [],
-      confidence: 0.9,
     });
     canvasRepo.update.mockResolvedValue({
       ...canvas,
@@ -176,7 +175,6 @@ describe('CompanyCanvasService', () => {
       keyActivities: [],
       keyPartners: [],
       costStructure: [],
-      confidence: 0.7,
     });
     canvasRepo.update.mockResolvedValue(canvas);
 

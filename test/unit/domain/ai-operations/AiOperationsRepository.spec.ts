@@ -115,7 +115,6 @@ describe('AiOperationsRepository', () => {
           rawBlocks: [],
         },
         profile: {},
-        confidence: 0.95,
       };
 
       mockClient.parseCvText.mockResolvedValue({
@@ -401,7 +400,6 @@ describe('AiOperationsRepository', () => {
         description: '',
         rawNotes: '',
       },
-      confidence: 0.8,
     };
 
     it('returns structured analysis data', async () => {
@@ -457,7 +455,6 @@ describe('AiOperationsRepository', () => {
       keyActivities: [],
       keyPartners: [],
       costStructure: [],
-      confidence: 0.7,
     };
 
     it('returns generated canvas', async () => {

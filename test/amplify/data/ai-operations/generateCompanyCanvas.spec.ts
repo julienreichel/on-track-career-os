@@ -38,7 +38,6 @@ describe('ai.generateCompanyCanvas', () => {
     keyActivities: string[];
     keyPartners: string[];
     costStructure: string[];
-    confidence: number;
   }>;
 
   let handler: Handler;
@@ -83,7 +82,6 @@ describe('ai.generateCompanyCanvas', () => {
       keyActivities: ['Product dev'],
       keyPartners: ['Cloud vendor'],
       costStructure: ['R&D'],
-      confidence: 0.8,
     };
 
     mockSend.mockResolvedValue(buildBedrockResponse(mockOutput));
@@ -123,7 +121,6 @@ describe('ai.generateCompanyCanvas', () => {
       keyActivities: [],
       keyPartners: [],
       costStructure: [],
-      confidence: undefined,
     };
 
     mockSend.mockResolvedValue(buildBedrockResponse(mockOutput));
@@ -147,6 +144,5 @@ describe('ai.generateCompanyCanvas', () => {
     expect(response.customerSegments.length).toBe(8);
     expect(response.valuePropositions).toEqual(['Value']);
     expect(response.channels).toEqual([]);
-    expect(response.confidence).toBeGreaterThan(0);
   });
 });

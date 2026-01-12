@@ -19,7 +19,6 @@ export function isCompanyAnalysisResult(value: unknown): value is CompanyAnalysi
   const candidate = value as CompanyAnalysisResult;
   return (
     typeof candidate.companyProfile?.companyName === 'string' &&
-    Array.isArray(candidate.companyProfile?.productsServices) &&
-    typeof candidate.confidence === 'number'
+    Array.isArray(candidate.companyProfile?.productsServices)
   );
 }

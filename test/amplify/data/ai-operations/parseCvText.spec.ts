@@ -158,7 +158,6 @@ GOALS
         interests: [],
         languages,
       },
-      confidence: 0.95,
     };
   };
 
@@ -211,7 +210,6 @@ GOALS
           languages: string[];
           goals: string[];
         };
-        confidence: number;
       };
       expect(parsed.sections.experiencesBlocks).toHaveLength(1);
       expect(parsed.sections.experiencesBlocks[0]).toContain('TechCorp');
@@ -232,8 +230,6 @@ GOALS
       expect(parsed.profile.languages).toContain('Spanish');
       expect(parsed.profile.goals).toHaveLength(2);
       expect(parsed.profile.goals[0]).toContain('distributed engineering team');
-
-      expect(parsed.confidence).toBe(0.95);
     });
     it('should validate output structure and apply operation-specific fallbacks', async () => {
       const mockBedrockResponse = {
@@ -280,7 +276,6 @@ GOALS
           interests: string[];
           languages: string[];
         };
-        confidence: number;
       };
       expect(parsed.sections.experiencesBlocks).toEqual(['Some experience']);
       // Operation-specific validation fills missing fields
@@ -296,7 +291,6 @@ GOALS
       expect(parsed.profile.aspirations).toEqual([]);
       expect(parsed.profile.languages).toEqual([]);
 
-      expect(parsed.confidence).toBe(0.5); // DEFAULT_CONFIDENCE fallback
     });
 
     it('should apply fallback when sections field is missing', async () => {
@@ -309,7 +303,6 @@ GOALS
                   {
                     text: JSON.stringify({
                       // Missing required sections field
-                      confidence: 0.5,
                     }),
                   },
                 ],
@@ -338,7 +331,6 @@ GOALS
           interests: string[];
           languages: string[];
         };
-        confidence: number;
       };
 
       // Should apply fallback structure for missing sections
@@ -357,8 +349,6 @@ GOALS
       expect(result.profile.strengths).toEqual([]);
       expect(result.profile.interests).toEqual([]);
       expect(result.profile.languages).toEqual([]);
-
-      expect(result.confidence).toBe(0.3); // Low confidence due to no content
     });
   });
 });

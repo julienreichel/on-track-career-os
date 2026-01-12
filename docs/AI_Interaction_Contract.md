@@ -1139,7 +1139,7 @@ Return ONLY Markdown text - no code blocks, no JSON.
 **Output schema**
 
 ```typescript
-string // Complete cover letter as Markdown text
+string; // Complete cover letter as Markdown text
 ```
 
 **Fallback**

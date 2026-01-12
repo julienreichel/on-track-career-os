@@ -27,7 +27,6 @@ export function isParsedCV(data: unknown): data is ParsedCV {
     Array.isArray(sections.educationBlocks) &&
     Array.isArray(sections.skills) &&
     Array.isArray(sections.certifications) &&
-    Array.isArray(sections.rawBlocks) &&
-    typeof cv.confidence === 'number'
+    Array.isArray(sections.rawBlocks)
   );
 }

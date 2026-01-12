@@ -130,7 +130,6 @@ describe('useCvParsing', () => {
         profile: {
           fullName: 'John Doe',
         },
-        confidence: 0.9,
       };
 
       mockAiOps.experiences.value = [
@@ -182,7 +181,6 @@ describe('useCvParsing', () => {
           rawBlocks: [],
         },
         profile: {},
-        confidence: 0.9,
       };
 
       mockAiOps.experiences.value = [
@@ -234,7 +232,6 @@ describe('useCvParsing', () => {
           rawBlocks: [],
         },
         profile: {},
-        confidence: 0.9,
       };
 
       await expect(parsing.parseFile(textFile)).rejects.toThrow('cvUpload.errors.parsingFailed');
@@ -253,7 +250,6 @@ describe('useCvParsing', () => {
           rawBlocks: [],
         },
         profile: {},
-        confidence: 0.9,
       };
 
       mockAiOps.error.value = 'Extraction error';
@@ -274,7 +270,6 @@ describe('useCvParsing', () => {
           rawBlocks: [],
         },
         profile: {},
-        confidence: 0.9,
       };
 
       mockAiOps.experiences.value = null;
@@ -469,7 +464,6 @@ describe('useCvParsing', () => {
           interests: [],
           languages: [],
         },
-        confidence: 0.9,
       };
 
       mockAiOps.experiences.value = [
@@ -511,7 +505,6 @@ describe('useCvParsing', () => {
           rawBlocks: [],
         },
         profile: undefined,
-        confidence: 0.9,
       };
 
       mockAiOps.experiences.value = [

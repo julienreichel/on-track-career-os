@@ -58,7 +58,6 @@ describe('useProfileMerge', () => {
       rawBlocks: [],
     },
     profile: mockExtractedProfile,
-    confidence: 0.95,
   };
 
   it('should skip update if profile does not exist', async () => {

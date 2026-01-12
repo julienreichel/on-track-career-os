@@ -16,8 +16,7 @@ const OUTPUT_SCHEMA = `{
   "keyResources": ["string"],
   "keyActivities": ["string"],
   "keyPartners": ["string"],
-  "costStructure": ["string"],
-  "confidence": 0.8
+  "costStructure": ["string"]
 }`;
 
 export interface GenerateCompanyCanvasInput {
@@ -46,11 +45,9 @@ export interface GenerateCompanyCanvasOutput {
   keyActivities: string[];
   keyPartners: string[];
   costStructure: string[];
-  confidence: number;
 }
 
 const MAX_BLOCK_ENTRIES = 8;
-const DEFAULT_CONFIDENCE = 0.6;
 const JSON_INDENT_SPACES = 2;
 
 const BLOCK_KEYS = [
@@ -85,13 +82,6 @@ function sanitizeArray(value: unknown) {
   return items.slice(0, MAX_BLOCK_ENTRIES);
 }
 
-function clampConfidence(value: unknown) {
-  if (typeof value !== 'number' || Number.isNaN(value)) {
-    return DEFAULT_CONFIDENCE;
-  }
-  return Math.max(0, Math.min(1, value));
-}
-
 function validateOutput(raw: Record<string, unknown>): GenerateCompanyCanvasOutput {
   const normalized: Record<string, unknown> = {};
   BLOCK_KEYS.forEach((key) => {
@@ -101,7 +91,6 @@ function validateOutput(raw: Record<string, unknown>): GenerateCompanyCanvasOutp
   return {
     companyName: sanitizeString(raw.companyName),
     ...(normalized as Record<BlockKey, string[]>),
-    confidence: clampConfidence(raw.confidence),
   };
 }
 

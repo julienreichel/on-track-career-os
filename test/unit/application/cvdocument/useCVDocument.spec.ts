@@ -35,7 +35,8 @@ describe('useCVDocument', () => {
       templateId: 'template-modern',
       isTailored: true,
       jobId: 'job-456',
-      content: '# John Doe\n\n## Senior Engineer\n\n**Experience**: Tech Corp\n\n**Education**: BS CS',
+      content:
+        '# John Doe\n\n## Senior Engineer\n\n**Experience**: Tech Corp\n\n**Education**: BS CS',
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       owner: 'user-123::user-123',

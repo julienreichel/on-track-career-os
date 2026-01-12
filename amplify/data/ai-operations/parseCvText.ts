@@ -15,10 +15,6 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
  * @see docs/AI_Interaction_Contract.md - Operation 1
  */
 
-// Configuration
-const DEFAULT_CONFIDENCE = 0.5;
-const LOW_CONFIDENCE_THRESHOLD = 0.3; // Applied when no content extracted
-
 // System prompt - constant as per AIC
 const SYSTEM_PROMPT = `You are a CV text parser that extracts structured sections and profile information from CV text.
 
@@ -60,8 +56,7 @@ const OUTPUT_SCHEMA = `{
     "strengths": ["string"],
     "interests": ["string"],
     "languages": ["string"]
-  },
-  "confidence": 0.95
+  }
 }`;
 
 // Type definitions matching AI Interaction Contract
@@ -85,7 +80,6 @@ export interface ParseCvTextOutput {
     interests?: string[];
     languages?: string[];
   };
-  confidence: number;
 }
 
 export interface ParseCvTextInput {
@@ -152,38 +146,15 @@ function validateProfile(
 }
 
 /**
- * Calculate confidence score based on extracted content
- */
-function calculateConfidence(
-  sections: ParseCvTextOutput['sections'],
-  providedConfidence: number | undefined
-): number {
-  const totalItems =
-    sections.experiencesBlocks.length +
-    sections.educationBlocks.length +
-    sections.skills.length +
-    sections.certifications.length +
-    sections.rawBlocks.length;
-
-  const confidence =
-    typeof providedConfidence === 'number' ? providedConfidence : DEFAULT_CONFIDENCE;
-
-  // Override confidence to low if no content was extracted
-  return totalItems === 0 ? Math.min(confidence, LOW_CONFIDENCE_THRESHOLD) : confidence;
-}
-
-/**
  * Validate and apply fallback rules from AIC
  */
 function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOutput {
   const validatedSections = validateSections(parsedOutput.sections);
   const validatedProfile = validateProfile(parsedOutput.profile);
-  const confidence = calculateConfidence(validatedSections, parsedOutput.confidence);
 
   return {
     sections: validatedSections,
     profile: validatedProfile,
-    confidence,
   };
 }
 

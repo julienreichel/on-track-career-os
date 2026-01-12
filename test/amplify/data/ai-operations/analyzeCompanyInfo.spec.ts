@@ -14,7 +14,6 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => {
 describe('ai.analyzeCompanyInfo', () => {
   type Handler = (event: { arguments: { companyName: string; rawText: string } }) => Promise<{
     companyProfile: Record<string, unknown>;
-    confidence: number;
   }>;
 
   let handler: Handler;
@@ -59,7 +58,6 @@ describe('ai.analyzeCompanyInfo', () => {
         customerSegments: ['OEMs'],
         description: 'Industrial automation hardware',
       },
-      confidence: 0.9,
     };
 
     mockSend.mockResolvedValue(buildBedrockResponse(mockOutput));
@@ -74,13 +72,11 @@ describe('ai.analyzeCompanyInfo', () => {
     expect(response.companyProfile.companyName).toBe('Acme Robotics');
     expect(response.companyProfile.productsServices).toEqual(['Robotic arms']);
     expect(response.companyProfile.rawNotes).toBe('Company info text');
-    expect(response.confidence).toBe(0.9);
   });
 
   it('applies defaults for missing fields', async () => {
     const mockOutput = {
       companyProfile: {},
-      confidence: undefined,
     };
 
     mockSend.mockResolvedValue(buildBedrockResponse(mockOutput));
@@ -95,7 +91,6 @@ describe('ai.analyzeCompanyInfo', () => {
     expect(response.companyProfile.companyName).toBe('');
     expect(response.companyProfile.productsServices).toEqual([]);
     expect(response.companyProfile.rawNotes).toBe('Minimal text');
-    expect(response.confidence).toBeGreaterThan(0);
   });
 
   it('dedupes arrays and trims values', async () => {
@@ -104,7 +99,6 @@ describe('ai.analyzeCompanyInfo', () => {
         productsServices: [' Platform ', 'Platform'],
         targetMarkets: [' EU ', 'EU'],
       },
-      confidence: 0.3,
     };
 
     mockSend.mockResolvedValue(buildBedrockResponse(mockOutput));

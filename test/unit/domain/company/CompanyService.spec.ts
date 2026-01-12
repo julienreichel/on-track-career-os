@@ -90,7 +90,6 @@ describe('CompanyService', () => {
         description: 'Test',
         rawNotes: 'Sample text',
       },
-      confidence: 0.82,
     });
     repo.update.mockResolvedValue({
       id: 'c1',
@@ -216,7 +215,6 @@ describe('CompanyService', () => {
         description: '',
         rawNotes: 'Provided',
       },
-      confidence: 0.5,
     });
     repo.update.mockResolvedValue({ id: 'c1' } as Company);
 

@@ -14,7 +14,6 @@ describe('CompanyCanvasResult type guard', () => {
       keyActivities: [],
       keyPartners: [],
       costStructure: [],
-      confidence: 0.6,
     };
 
     expect(isGeneratedCompanyCanvas(valid)).toBe(true);
@@ -26,7 +25,6 @@ describe('CompanyCanvasResult type guard', () => {
       isGeneratedCompanyCanvas({
         companyName: 'Acme',
         customerSegments: {},
-        confidence: 'high',
       })
     ).toBe(false);
   });

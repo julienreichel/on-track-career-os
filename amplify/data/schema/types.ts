@@ -25,7 +25,6 @@ export const schemaTypes = {
   ParseCvTextOutputType: a.customType({
     sections: a.ref('ParseCvTextSectionsType').required(),
     profile: a.ref('ParseCvTextProfileType').required(),
-    confidence: a.float().required(),
   }),
 
   StarStoryType: a.customType({
@@ -161,7 +160,6 @@ export const schemaTypes = {
 
   AnalyzeCompanyInfoOutputType: a.customType({
     companyProfile: a.ref('CompanyType').required(),
-    confidence: a.float().required(),
   }),
 
   GenerateCompanyCanvasOutputType: a.customType({
@@ -175,6 +173,5 @@ export const schemaTypes = {
     keyActivities: a.string().array().required(),
     keyPartners: a.string().array().required(),
     costStructure: a.string().array().required(),
-    confidence: a.float().required(),
   }),
 };
