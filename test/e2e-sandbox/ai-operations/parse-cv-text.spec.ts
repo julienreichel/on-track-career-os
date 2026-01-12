@@ -154,8 +154,8 @@ French (Basic)
     expect(parsedCv).toHaveProperty('profile');
 
     // Validate sections
-    expect(parsedCv.sections).toHaveProperty('experiences');
-    expect(parsedCv.sections).toHaveProperty('education');
+    expect(parsedCv.sections).toHaveProperty('experiencesBlocks');
+    expect(parsedCv.sections).toHaveProperty('educationBlocks');
     expect(parsedCv.sections).toHaveProperty('skills');
     expect(parsedCv.sections).toHaveProperty('certifications');
     expect(parsedCv.sections).toHaveProperty('rawBlocks');
