@@ -290,7 +290,6 @@ GOALS
       expect(parsed.profile.goals).toEqual([]);
       expect(parsed.profile.aspirations).toEqual([]);
       expect(parsed.profile.languages).toEqual([]);
-
     });
 
     it('should apply fallback when sections field is missing', async () => {

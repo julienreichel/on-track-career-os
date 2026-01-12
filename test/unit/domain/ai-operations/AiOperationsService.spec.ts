@@ -524,13 +524,12 @@ describe('AiOperationsService', () => {
         description: '',
         rawNotes: '',
       },
-      confidence: 0.7,
     };
 
     it('returns validated analysis result', async () => {
       mockRepo.analyzeCompanyInfo.mockResolvedValue(analysisResult);
 
-      const result = await service.analyzeCompanyInfo({
+      await service.analyzeCompanyInfo({
         companyName: 'Acme',
         rawText: 'Research text',
       });
@@ -551,7 +550,6 @@ describe('AiOperationsService', () => {
     it('rejects invalid structures', async () => {
       mockRepo.analyzeCompanyInfo.mockResolvedValue({
         companyProfile: {},
-        confidence: 0.5,
       } as CompanyAnalysisResult);
 
       await expect(
@@ -572,7 +570,6 @@ describe('AiOperationsService', () => {
       keyActivities: [],
       keyPartners: [],
       costStructure: [],
-      confidence: 0.65,
     };
 
     it('returns generated canvas when repo succeeds', async () => {
@@ -669,7 +666,6 @@ describe('AiOperationsService', () => {
           description: 'Test',
           rawNotes: 'Mock notes',
         },
-        confidence: 0.99,
       };
 
       (globalThis as any).window = {

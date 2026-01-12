@@ -17,8 +17,5 @@ export function isGeneratedCompanyCanvas(value: unknown): value is GeneratedComp
   }
 
   const candidate = value as GeneratedCompanyCanvas;
-  return (
-    typeof candidate.companyName === 'string' &&
-    Array.isArray(candidate.customerSegments)
-  );
+  return typeof candidate.companyName === 'string' && Array.isArray(candidate.customerSegments);
 }
