@@ -121,8 +121,8 @@ describe('useCvParsing', () => {
 
       mockAiOps.parsedCv.value = {
         sections: {
-          experiences: ['Experience 1'],
-          education: [],
+          experiencesBlocks: ['Experience 1'],
+          educationBlocks: [],
           skills: [],
           certifications: [],
           rawBlocks: [],
@@ -175,8 +175,8 @@ describe('useCvParsing', () => {
 
       mockAiOps.parsedCv.value = {
         sections: {
-          experiences: ['Experience 1'],
-          education: [],
+          experiencesBlocks: ['Experience 1'],
+          educationBlocks: [],
           skills: [],
           certifications: [],
           rawBlocks: [],
@@ -227,8 +227,8 @@ describe('useCvParsing', () => {
 
       mockAiOps.parsedCv.value = {
         sections: {
-          experiences: [],
-          education: [],
+          experiencesBlocks: [],
+          educationBlocks: [],
           skills: [],
           certifications: [],
           rawBlocks: [],
@@ -246,8 +246,8 @@ describe('useCvParsing', () => {
 
       mockAiOps.parsedCv.value = {
         sections: {
-          experiences: ['Experience 1'],
-          education: [],
+          experiencesBlocks: ['Experience 1'],
+          educationBlocks: [],
           skills: [],
           certifications: [],
           rawBlocks: [],
@@ -267,8 +267,8 @@ describe('useCvParsing', () => {
 
       mockAiOps.parsedCv.value = {
         sections: {
-          experiences: ['Experience 1'],
-          education: [],
+          experiencesBlocks: ['Experience 1'],
+          educationBlocks: [],
           skills: [],
           certifications: [],
           rawBlocks: [],
@@ -453,8 +453,8 @@ describe('useCvParsing', () => {
 
       mockAiOps.parsedCv.value = {
         sections: {
-          experiences: ['Experience 1'],
-          education: [],
+          experiencesBlocks: ['Experience 1'],
+          educationBlocks: [],
           skills: [],
           certifications: [],
           rawBlocks: [],
@@ -504,8 +504,8 @@ describe('useCvParsing', () => {
 
       mockAiOps.parsedCv.value = {
         sections: {
-          experiences: ['Experience 1'],
-          education: [],
+          experiencesBlocks: ['Experience 1'],
+          educationBlocks: [],
           skills: [],
           certifications: [],
           rawBlocks: [],

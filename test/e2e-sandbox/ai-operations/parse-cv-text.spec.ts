@@ -162,8 +162,8 @@ French (Basic)
     expect(parsedCv.sections).toHaveProperty('rawBlocks');
 
     // All fields should be arrays
-    expect(Array.isArray(parsedCv.sections.experiences)).toBe(true);
-    expect(Array.isArray(parsedCv.sections.education)).toBe(true);
+    expect(Array.isArray(parsedCv.sections.experiencesBlocks)).toBe(true);
+    expect(Array.isArray(parsedCv.sections.educationBlocks)).toBe(true);
     expect(Array.isArray(parsedCv.sections.skills)).toBe(true);
     expect(Array.isArray(parsedCv.sections.certifications)).toBe(true);
     expect(Array.isArray(parsedCv.sections.rawBlocks)).toBe(true);
@@ -187,8 +187,8 @@ French (Basic)
     console.log(parsedCv);
     // At least some content should be parsed
     const totalParsedItems =
-      parsedCv.sections.experiences.length +
-      parsedCv.sections.education.length +
+      parsedCv.sections.experiencesBlocks.length +
+      parsedCv.sections.educationBlocks.length +
       parsedCv.sections.skills.length +
       parsedCv.sections.certifications.length;
     expect(totalParsedItems).toBeGreaterThan(0);
@@ -221,8 +221,8 @@ French (Basic)
     expect(parsedCv).toHaveProperty('confidence');
 
     // All section fields should be arrays (even if empty)
-    expect(Array.isArray(parsedCv.sections.experiences)).toBe(true);
-    expect(Array.isArray(parsedCv.sections.education)).toBe(true);
+    expect(Array.isArray(parsedCv.sections.experiencesBlocks)).toBe(true);
+    expect(Array.isArray(parsedCv.sections.educationBlocks)).toBe(true);
     expect(Array.isArray(parsedCv.sections.skills)).toBe(true);
     expect(Array.isArray(parsedCv.sections.certifications)).toBe(true);
     expect(Array.isArray(parsedCv.sections.rawBlocks)).toBe(true);
@@ -257,7 +257,7 @@ Skills: JavaScript, Python
 
     // Should extract at least some information
     const hasContent =
-      parsedCv.sections.experiences.length > 0 ||
+      parsedCv.sections.experiencesBlocks.length > 0 ||
       parsedCv.sections.skills.length > 0 ||
       parsedCv.sections.rawBlocks.length > 0;
     expect(hasContent).toBe(true);

@@ -83,8 +83,8 @@ export function useCvParsing() {
     }
 
     if (
-      !aiOps.parsedCv.value?.sections?.experiences ||
-      aiOps.parsedCv.value.sections.experiences.length === 0
+      !aiOps.parsedCv.value?.sections?.experiencesBlocks ||
+      aiOps.parsedCv.value.sections.experiencesBlocks.length === 0
     ) {
       throw new Error(t('cvUpload.errors.parsingFailed'));
     }
@@ -96,10 +96,10 @@ export function useCvParsing() {
 
     // Extract experiences from both work and education sections
     const workExperiences = await extractExperiencesFromSection(
-      aiOps.parsedCv.value.sections.experiences
+      aiOps.parsedCv.value.sections.experiencesBlocks
     );
     const educationExperiences = await extractExperiencesFromSection(
-      aiOps.parsedCv.value.sections.education || []
+      aiOps.parsedCv.value.sections.educationBlocks || []
     );
 
     const allExperiences = [...workExperiences, ...educationExperiences];

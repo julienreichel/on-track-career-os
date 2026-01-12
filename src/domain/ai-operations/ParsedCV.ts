@@ -23,8 +23,8 @@ export function isParsedCV(data: unknown): data is ParsedCV {
   const sections = cv.sections as Record<string, unknown>;
 
   return (
-    Array.isArray(sections.experiences) &&
-    Array.isArray(sections.education) &&
+    Array.isArray(sections.experiencesBlocks) &&
+    Array.isArray(sections.educationBlocks) &&
     Array.isArray(sections.skills) &&
     Array.isArray(sections.certifications) &&
     Array.isArray(sections.rawBlocks) &&

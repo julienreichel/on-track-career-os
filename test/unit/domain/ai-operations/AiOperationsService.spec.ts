@@ -55,8 +55,8 @@ describe('AiOperationsService', () => {
       // Arrange
       const mockParsedCv: ParsedCV = {
         sections: {
-          experiences: ['Senior Developer at TechCorp (2020-2023)'],
-          education: ['BSc Computer Science from MIT (2019)'],
+          experiencesBlocks: ['Senior Developer at TechCorp (2020-2023)'],
+          educationBlocks: ['BSc Computer Science from MIT (2019)'],
           skills: ['Python'],
           certifications: ['AWS Certified'],
           rawBlocks: ['Experience section...'],

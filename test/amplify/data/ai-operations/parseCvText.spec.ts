@@ -140,8 +140,8 @@ GOALS
 
     return {
       sections: {
-        experiences,
-        education,
+        experiencesBlocks: experiences,
+        educationBlocks: education,
         skills,
         certifications,
         rawBlocks: [],
@@ -213,10 +213,10 @@ GOALS
         };
         confidence: number;
       };
-      expect(parsed.sections.experiences).toHaveLength(1);
-      expect(parsed.sections.experiences[0]).toContain('TechCorp');
-      expect(parsed.sections.education).toHaveLength(1);
-      expect(parsed.sections.education[0]).toContain('MIT');
+      expect(parsed.sections.experiencesBlocks).toHaveLength(1);
+      expect(parsed.sections.experiencesBlocks[0]).toContain('TechCorp');
+      expect(parsed.sections.educationBlocks).toHaveLength(1);
+      expect(parsed.sections.educationBlocks[0]).toContain('MIT');
       expect(parsed.sections.skills).toHaveLength(3);
       expect(parsed.sections.skills).toContain('JavaScript');
       expect(parsed.sections.certifications).toHaveLength(1);
@@ -238,7 +238,7 @@ GOALS
     it('should validate output structure and apply operation-specific fallbacks', async () => {
       const mockBedrockResponse = {
         sections: {
-          experiences: ['Some experience'],
+          experiencesBlocks: ['Some experience'],
           // Missing fields will be filled by operation-specific validation
         },
         profile: {
@@ -282,9 +282,9 @@ GOALS
         };
         confidence: number;
       };
-      expect(parsed.sections.experiences).toEqual(['Some experience']);
+      expect(parsed.sections.experiencesBlocks).toEqual(['Some experience']);
       // Operation-specific validation fills missing fields
-      expect(parsed.sections.education).toEqual([]);
+      expect(parsed.sections.educationBlocks).toEqual([]);
       expect(parsed.sections.skills).toEqual([]);
       expect(parsed.sections.certifications).toEqual([]);
       expect(parsed.sections.rawBlocks).toEqual([]);
@@ -343,8 +343,8 @@ GOALS
 
       // Should apply fallback structure for missing sections
       expect(result.sections).toBeDefined();
-      expect(result.sections.experiences).toEqual([]);
-      expect(result.sections.education).toEqual([]);
+      expect(result.sections.experiencesBlocks).toEqual([]);
+      expect(result.sections.educationBlocks).toEqual([]);
       expect(result.sections.skills).toEqual([]);
       expect(result.sections.certifications).toEqual([]);
       expect(result.sections.rawBlocks).toEqual([]);

@@ -2,8 +2,8 @@ import { a } from '@aws-amplify/backend';
 
 export const schemaTypes = {
   ParseCvTextSectionsType: a.customType({
-    experiences: a.string().array().required(),
-    education: a.string().array().required(),
+    experiencesBlocks: a.string().array().required(),
+    educationBlocks: a.string().array().required(),
     skills: a.string().array().required(),
     certifications: a.string().array().required(),
     rawBlocks: a.string().array().required(),

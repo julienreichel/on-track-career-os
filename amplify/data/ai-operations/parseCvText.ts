@@ -20,26 +20,38 @@ const DEFAULT_CONFIDENCE = 0.5;
 const LOW_CONFIDENCE_THRESHOLD = 0.3; // Applied when no content extracted
 
 // System prompt - constant as per AIC
-const SYSTEM_PROMPT = `You are a CV text parser that extracts structured sections and profile information from CV text.
-Extract experiences, education, skills, certifications, and personal profile information.
-Never invent information not present in the text.
-Return ONLY valid JSON with no markdown wrappers.
+const SYSTEM_PROMPT = `You are a CV TEXT EXTRACTOR, not a summarizer.
 
-RULES:
-- Extract only information explicitly stated in the CV
-- Do not infer or invent missing details
-- Categorize text into appropriate sections
-- Extract profile information: full name, headline/title, location, seniority level, goals, aspirations, values, strengths, interests, languages
-- Skills should be extracted into the sections.skills array
-- Certifications should be extracted into the sections.certifications array
+Goal:
+- Extract the CV into structured JSON sections while preserving the original wording and content.
+- When you identify a section, keep its full text content.
+
+Critical rules (MUST follow):
+1) DO NOT summarize, DO NOT rewrite, DO NOT compress.
+2) Preserve content as-is as much as possible (near-verbatim).
+3) For each section you detect (Summary, Experience, Education, Skills, etc.), keep ALL lines that belong to that section.
+4) For Experience:
+   - Each role entry MUST include the header line(s) (company/title/location/dates) AND all subsequent lines that belong to that role until the next role or next section.
+   - Keep subheadings like "Responsibilities:", "Key Achievements:", "Projects:", etc. inside the same role text.
+   - Keep every bullet line. Do not remove “generic” bullets.
+5) If you are unsure whether a line belongs to a role/section, INCLUDE it rather than dropping it.
+6) Output ONLY valid JSON. No markdown. No explanations.
+
+Output format:
+- Return a JSON object that matches the provided schema exactly.
+- For sections.experiencesBlocks: each array item should be the FULL RAW TEXT BLOCK for one role (multi-line string), including bullets and subheadings.
 - If a section has no content, return empty array or omit the field
-- Return ONLY valid JSON matching the specified schema`;
+
+Quality check before returning:
+- Every detected role must contain more than just the header line if the input text contains bullets/subcontent for that role.
+- Never return an experience item that is only “Title at Company | dates” if the source contains additional lines for that role.
+`;
 
 // Output schema for retry
 const OUTPUT_SCHEMA = `{
   "sections": {
-    "experiences": ["string"],
-    "education": ["string"],
+    "experiencesBlocks": ["string"],
+    "educationBlocks": ["string"],
     "skills": ["string"],
     "certifications": ["string"],
     "rawBlocks": ["string"]
@@ -62,8 +74,8 @@ const OUTPUT_SCHEMA = `{
 // Type definitions matching AI Interaction Contract
 export interface ParseCvTextOutput {
   sections: {
-    experiences: string[];
-    education: string[];
+    experiencesBlocks: string[];
+    educationBlocks: string[];
     skills: string[];
     certifications: string[];
     rawBlocks: string[];
@@ -94,8 +106,8 @@ function validateSections(
   sections: Partial<ParseCvTextOutput['sections']> | undefined
 ): ParseCvTextOutput['sections'] {
   const fallbackSections = {
-    experiences: [],
-    education: [],
+    experiencesBlocks: [],
+    educationBlocks: [],
     skills: [],
     certifications: [],
     rawBlocks: [],
@@ -104,8 +116,12 @@ function validateSections(
   const parsedSections = sections || fallbackSections;
 
   return {
-    experiences: Array.isArray(parsedSections.experiences) ? parsedSections.experiences : [],
-    education: Array.isArray(parsedSections.education) ? parsedSections.education : [],
+    experiencesBlocks: Array.isArray(parsedSections.experiencesBlocks)
+      ? parsedSections.experiencesBlocks
+      : [],
+    educationBlocks: Array.isArray(parsedSections.educationBlocks)
+      ? parsedSections.educationBlocks
+      : [],
     skills: Array.isArray(parsedSections.skills) ? parsedSections.skills : [],
     certifications: Array.isArray(parsedSections.certifications)
       ? parsedSections.certifications
@@ -150,8 +166,8 @@ function calculateConfidence(
   providedConfidence: number | undefined
 ): number {
   const totalItems =
-    sections.experiences.length +
-    sections.education.length +
+    sections.experiencesBlocks.length +
+    sections.educationBlocks.length +
     sections.skills.length +
     sections.certifications.length +
     sections.rawBlocks.length;
