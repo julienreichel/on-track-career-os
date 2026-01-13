@@ -107,3 +107,7 @@ The Nuxt MCP is already configured in `.vscode/mcp.json` and provides these tool
 ## Secrets & Environment
 
 AI keys: Amplify env vars (dev/prod) | CI: GitHub Secrets | Testing: fake AI provider
+
+## Refactoring
+
+When refactoring this code following Martin Fowler’s techniques
