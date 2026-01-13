@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
+import { allowConsoleOutput } from '../../../setup/console-guard';
 import type { JobDescriptionRepository } from '@/domain/job-description/JobDescriptionRepository';
 import type {
   JobDescription,
@@ -256,11 +257,13 @@ describe('JobDescriptionService', () => {
       mockAiService.parseJobDescription.mockResolvedValue(parsed);
       mockRepository.update.mockResolvedValue(updatedJob);
 
-      const result = await service.reanalyseJob('job-1');
+      await allowConsoleOutput(async () => {
+        const result = await service.reanalyseJob('job-1');
+        expect(result).toEqual(updatedJob);
+      });
 
       expect(mockAiService.parseJobDescription).toHaveBeenCalledWith('Job text');
       expect(mockRepository.update).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(updatedJob);
     });
 
     it('links to existing company when analysis succeeds', async () => {
@@ -395,9 +398,10 @@ describe('JobDescriptionService', () => {
       mockRepository.update.mockResolvedValue(updatedJob);
       mockAiService.analyzeCompanyInfo.mockRejectedValue(new Error('AI failed'));
 
-      const result = await service.reanalyseJob('job-1');
-
-      expect(result.companyId).toBeUndefined();
+      await allowConsoleOutput(async () => {
+        const result = await service.reanalyseJob('job-1');
+        expect(result.companyId).toBeUndefined();
+      });
     });
   });
 

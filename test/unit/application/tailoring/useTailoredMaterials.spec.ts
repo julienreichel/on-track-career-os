@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
+import { allowConsoleOutput } from '../../../setup/console-guard';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
@@ -269,9 +270,11 @@ describe('useTailoredMaterials', () => {
     deps.companyService.getCompany = vi.fn().mockRejectedValue(new Error('Company not found'));
     const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
 
-    const result = await engine.generateTailoredCvForJob({ job, matchingSummary });
+    await allowConsoleOutput(async () => {
+      const result = await engine.generateTailoredCvForJob({ job, matchingSummary });
+      expect(result).toEqual(cvDocument);
+    });
 
-    expect(result).toEqual(cvDocument);
     expect(deps.aiService.generateCv).toHaveBeenCalledWith(
       expect.objectContaining({
         jobDescription: expect.objectContaining({ title: job.title }),

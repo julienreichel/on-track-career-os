@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { useCoverLetterEngine } from '@/composables/useCoverLetterEngine';
+import { allowConsoleOutput } from '../../setup/console-guard';
 import type { CoverLetterResult } from '@/domain/ai-operations/CoverLetterResult';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
@@ -125,10 +126,12 @@ describe('useCoverLetterEngine', () => {
 
     it('should accept a userId parameter', () => {
       const deps = createDeps();
-      const engine = useCoverLetterEngine({ userId: 'user-123', dependencies: deps });
-
-      expect(engine).toBeDefined();
-      expect(engine.load).toBeDefined();
+      
+      allowConsoleOutput(() => {
+        const engine = useCoverLetterEngine({ userId: 'user-123', dependencies: deps });
+        expect(engine).toBeDefined();
+        expect(engine.load).toBeDefined();
+      });
     });
   });
 
@@ -180,11 +183,13 @@ describe('useCoverLetterEngine', () => {
       const auth = buildAuthStub();
       const engine = useCoverLetterEngine({ auth, dependencies: deps });
 
-      const result = await engine.load();
+      await allowConsoleOutput(async () => {
+        const result = await engine.load();
+        expect(result).toBeUndefined();
+      });
 
       expect(engine.isLoading.value).toBe(false);
       expect(engine.error.value).toBe(errorMessage);
-      expect(result).toBeUndefined();
     });
 
     it('should load canvas even if it does not exist (returns null)', async () => {
@@ -312,10 +317,12 @@ describe('useCoverLetterEngine', () => {
 
       const engine = useCoverLetterEngine({ auth, dependencies: deps });
 
-      const result = await engine.load();
+      await allowConsoleOutput(async () => {
+        const result = await engine.load();
+        expect(result).toBeUndefined();
+      });
 
       expect(engine.error.value).toBe('User not authenticated');
-      expect(result).toBeUndefined();
     });
 
     it('should throw error if profile is not found', async () => {
@@ -327,10 +334,12 @@ describe('useCoverLetterEngine', () => {
       const auth = buildAuthStub();
       const engine = useCoverLetterEngine({ auth, dependencies: deps });
 
-      const result = await engine.load();
+      await allowConsoleOutput(async () => {
+        const result = await engine.load();
+        expect(result).toBeUndefined();
+      });
 
       expect(engine.error.value).toBe('User profile not found');
-      expect(result).toBeUndefined();
     });
 
     it('should throw error if profile fullName is missing', async () => {
@@ -343,10 +352,12 @@ describe('useCoverLetterEngine', () => {
       const auth = buildAuthStub();
       const engine = useCoverLetterEngine({ auth, dependencies: deps });
 
-      const result = await engine.load();
+      await allowConsoleOutput(async () => {
+        const result = await engine.load();
+        expect(result).toBeUndefined();
+      });
 
       expect(engine.error.value).toBe('Profile fullName is required to generate cover letter');
-      expect(result).toBeUndefined();
     });
   });
 
@@ -446,11 +457,13 @@ describe('useCoverLetterEngine', () => {
       const auth = buildAuthStub();
       const engine = useCoverLetterEngine({ auth, dependencies: deps });
 
-      const result = await engine.generate();
+      await allowConsoleOutput(async () => {
+        const result = await engine.generate();
+        expect(result).toBeUndefined();
+      });
 
       expect(engine.isGenerating.value).toBe(false);
       expect(engine.error.value).toBe(errorMessage);
-      expect(result).toBeUndefined();
     });
 
     it('should fail if profile fullName is missing', async () => {
@@ -463,11 +476,13 @@ describe('useCoverLetterEngine', () => {
       const auth = buildAuthStub();
       const engine = useCoverLetterEngine({ auth, dependencies: deps });
 
-      const result = await engine.generate();
+      await allowConsoleOutput(async () => {
+        const result = await engine.generate();
+        expect(result).toBeUndefined();
+      });
 
       // Error message depends on which check fails first (load or generate)
       expect(engine.error.value).toMatch(/fullName is required/);
-      expect(result).toBeUndefined();
     });
 
     it('should map profile data correctly for AI input', async () => {

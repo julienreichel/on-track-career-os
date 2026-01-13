@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useSpeechBlock } from '@/application/speech-block/useSpeechBlock';
 import { SpeechBlockService } from '@/domain/speech-block/SpeechBlockService';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
+import { allowConsoleOutput } from '../../../setup/console-guard';
 
 // Mock the SpeechBlockService
 vi.mock('@/domain/speech-block/SpeechBlockService');
@@ -87,7 +88,9 @@ describe('useSpeechBlock', () => {
 
     const { item, loading, error, load } = useSpeechBlock('speechblock-123');
 
-    await load();
+    await allowConsoleOutput(async () => {
+      await load();
+    });
 
     expect(loading.value).toBe(false);
     expect(error.value).toBe('Service failed');
@@ -115,9 +118,11 @@ describe('useSpeechBlock', () => {
 
     const { error, save } = useSpeechBlock('speechblock-123');
 
-    const result = await save({ id: 'speechblock-123', whyMe: 'Updated' } as never);
+    await allowConsoleOutput(async () => {
+      const result = await save({ id: 'speechblock-123', whyMe: 'Updated' } as never);
+      expect(result).toBeNull();
+    });
 
-    expect(result).toBeNull();
     expect(error.value).toBe('Save failed');
   });
 
@@ -139,9 +144,11 @@ describe('useSpeechBlock', () => {
     item.value = { id: 'speechblock-123' } as SpeechBlock;
     mockService.deleteSpeechBlock.mockRejectedValue(new Error('Delete failed'));
 
-    const result = await remove();
+    await allowConsoleOutput(async () => {
+      const result = await remove();
+      expect(result).toBe(false);
+    });
 
-    expect(result).toBe(false);
     expect(error.value).toBe('Delete failed');
   });
 

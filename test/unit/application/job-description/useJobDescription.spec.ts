@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useJobDescription } from '@/application/job-description/useJobDescription';
 import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
+import { allowConsoleOutput } from '../../../setup/console-guard';
 
 // Mock the JobDescriptionService
 vi.mock('@/domain/job-description/JobDescriptionService');
@@ -86,7 +87,9 @@ describe('useJobDescription', () => {
 
     const { item, loading, error, load } = useJobDescription('jobdescription-123');
 
-    await load();
+    await allowConsoleOutput(async () => {
+      await load();
+    });
 
     expect(loading.value).toBe(false);
     expect(error.value).toBe('Service failed');

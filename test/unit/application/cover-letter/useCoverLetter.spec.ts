@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useCoverLetter } from '@/application/cover-letter/useCoverLetter';
 import { CoverLetterService } from '@/domain/cover-letter/CoverLetterService';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
+import { allowConsoleOutput } from '../../../setup/console-guard';
 
 // Mock the CoverLetterService
 vi.mock('@/domain/cover-letter/CoverLetterService');
@@ -87,7 +88,9 @@ describe('useCoverLetter', () => {
 
     const { item, loading, error, load } = useCoverLetter('coverletter-123');
 
-    await load();
+    await allowConsoleOutput(async () => {
+      await load();
+    });
 
     expect(loading.value).toBe(false);
     expect(error.value).toBe('Service failed');
@@ -115,9 +118,11 @@ describe('useCoverLetter', () => {
 
     const { error, save } = useCoverLetter('coverletter-123');
 
-    const result = await save({ id: 'coverletter-123', content: 'Updated' } as never);
+    await allowConsoleOutput(async () => {
+      const result = await save({ id: 'coverletter-123', content: 'Updated' } as never);
+      expect(result).toBeNull();
+    });
 
-    expect(result).toBeNull();
     expect(error.value).toBe('Save failed');
   });
 
@@ -139,9 +144,11 @@ describe('useCoverLetter', () => {
     item.value = { id: 'coverletter-123' } as CoverLetter;
     mockService.deleteCoverLetter.mockRejectedValue(new Error('Delete failed'));
 
-    const result = await remove();
+    await allowConsoleOutput(async () => {
+      const result = await remove();
+      expect(result).toBe(false);
+    });
 
-    expect(result).toBe(false);
     expect(error.value).toBe('Delete failed');
   });
 });
