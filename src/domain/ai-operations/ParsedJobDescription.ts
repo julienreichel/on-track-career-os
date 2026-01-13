@@ -27,6 +27,7 @@ export function isParsedJobDescription(data: unknown): data is ParsedJobDescript
     'behaviours',
     'successCriteria',
     'explicitPains',
+    'atsKeywords',
   ];
 
   return (

@@ -22,6 +22,7 @@ describe('ai.parseJobDescription', () => {
     behaviours: string[];
     successCriteria: string[];
     explicitPains: string[];
+    atsKeywords: string[];
   }>;
   let mockSend: ReturnType<typeof vi.fn>;
 
@@ -62,6 +63,7 @@ describe('ai.parseJobDescription', () => {
       behaviours: ['Bias for action'],
       successCriteria: ['Adoption increases 20%'],
       explicitPains: ['Fragmented analytics tooling'],
+      atsKeywords: ['Product Manager', 'Analytics', 'SaaS', 'Stakeholder Management'],
     };
 
     mockSend.mockResolvedValue(buildBedrockResponse(mockOutput));
@@ -94,6 +96,7 @@ describe('ai.parseJobDescription', () => {
     expect(response.behaviours).toEqual([]);
     expect(response.successCriteria).toEqual([]);
     expect(response.explicitPains).toEqual([]);
+    expect(response.atsKeywords).toEqual([]);
   });
 
   it('should sanitize poorly structured outputs', async () => {
@@ -106,6 +109,7 @@ describe('ai.parseJobDescription', () => {
       behaviours: {},
       successCriteria: null,
       explicitPains: null,
+      atsKeywords: 'keywords',
     };
 
     mockSend.mockResolvedValue(buildBedrockResponse(malformedOutput));
@@ -122,5 +126,6 @@ describe('ai.parseJobDescription', () => {
     expect(response.behaviours).toEqual([]);
     expect(response.successCriteria).toEqual([]);
     expect(response.explicitPains).toEqual([]);
+    expect(response.atsKeywords).toEqual([]);
   });
 });

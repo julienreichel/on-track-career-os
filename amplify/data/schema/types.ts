@@ -144,6 +144,7 @@ export const schemaTypes = {
     behaviours: a.string().array().required(),
     successCriteria: a.string().array().required(),
     explicitPains: a.string().array().required(),
+    atsKeywords: a.string().array().required(),
   }),
 
   CompanyType: a.customType({

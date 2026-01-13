@@ -129,6 +129,7 @@ describe('AiOperationsService', () => {
         behaviours: ['Ownership'],
         successCriteria: ['Adoption'],
         explicitPains: ['Fragmented tooling'],
+        atsKeywords: ['Product Manager', 'SaaS', 'Analytics'],
       };
 
       mockRepo.parseJobDescription.mockResolvedValue(mockParsedJob);

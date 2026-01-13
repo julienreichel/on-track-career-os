@@ -131,6 +131,7 @@ export const schemaModels = {
       behaviours: a.string().array(),
       successCriteria: a.string().array(),
       explicitPains: a.string().array(),
+      atsKeywords: a.string().array(),
       status: a.enum(['draft', 'analyzed', 'complete']),
 
       companyId: a.id(),

@@ -28,6 +28,7 @@ MANDATORY FIELDS:
 - behaviours (string[])
 - successCriteria (string[])
 - explicitPains (string[])
+- atsKeywords (string[])
 
 RULES:
 - Extract ONLY information explicitly present in the job description.
@@ -39,6 +40,7 @@ RULES:
 - behaviours = attitudes/mindsets explicitly requested (e.g., ownership, collaboration, curiosity).
 - successCriteria = measurable outcomes or expectations.
 - explicitPains = problems or challenges the company is trying to solve.
+- atsKeywords = important keywords and phrases that ATS (Applicant Tracking Systems) would look for (skills, tools, technologies, certifications, industry terms).
 - No markdown, explanations, or additional commentary.`;
 
 const OUTPUT_SCHEMA = `{
@@ -49,7 +51,8 @@ const OUTPUT_SCHEMA = `{
   "requiredSkills": ["string"],
   "behaviours": ["string"],
   "successCriteria": ["string"],
-  "explicitPains": ["string"]
+  "explicitPains": ["string"],
+  "atsKeywords": ["string"]
 }`;
 
 export interface ParseJobDescriptionInput {
@@ -65,6 +68,7 @@ export interface ParseJobDescriptionOutput {
   behaviours: string[];
   successCriteria: string[];
   explicitPains: string[];
+  atsKeywords: string[];
 }
 
 function sanitizeString(value: unknown): string {
@@ -90,6 +94,7 @@ function validateOutput(parsed: Partial<ParseJobDescriptionOutput>): ParseJobDes
   const behaviours = sanitizeStringArray(parsed.behaviours);
   const successCriteria = sanitizeStringArray(parsed.successCriteria);
   const explicitPains = sanitizeStringArray(parsed.explicitPains);
+  const atsKeywords = sanitizeStringArray(parsed.atsKeywords);
 
   return {
     title,
@@ -100,6 +105,7 @@ function validateOutput(parsed: Partial<ParseJobDescriptionOutput>): ParseJobDes
     behaviours,
     successCriteria,
     explicitPains,
+    atsKeywords,
   };
 }
 

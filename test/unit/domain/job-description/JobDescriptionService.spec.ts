@@ -250,6 +250,7 @@ describe('JobDescriptionService', () => {
         behaviours: [],
         successCriteria: [],
         explicitPains: [],
+        atsKeywords: [],
       } as ParsedJobDescription;
       const updatedJob = { ...job, title: 'Parsed' } as JobDescription;
 
@@ -282,6 +283,7 @@ describe('JobDescriptionService', () => {
         behaviours: [],
         successCriteria: [],
         explicitPains: [],
+        atsKeywords: [],
       } as ParsedJobDescription;
       const updatedJob = { ...job, title: 'Parsed' } as JobDescription;
       const jobWithCompany = { ...updatedJob, companyId: 'company-123' } as JobDescription;
@@ -341,6 +343,7 @@ describe('JobDescriptionService', () => {
         behaviours: [],
         successCriteria: [],
         explicitPains: [],
+        atsKeywords: [],
       } as ParsedJobDescription;
       const updatedJob = { ...job, title: 'Parsed' } as JobDescription;
       const jobWithCompany = { ...updatedJob, companyId: 'company-999' } as JobDescription;
@@ -390,6 +393,7 @@ describe('JobDescriptionService', () => {
         behaviours: [],
         successCriteria: [],
         explicitPains: [],
+        atsKeywords: [],
       } as ParsedJobDescription;
       const updatedJob = { ...job, title: 'Parsed' } as JobDescription;
 
