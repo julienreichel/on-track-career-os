@@ -154,6 +154,7 @@ export class JobDescriptionService {
       behaviours: parsed.behaviours,
       successCriteria: parsed.successCriteria,
       explicitPains: parsed.explicitPains,
+      atsKeywords: parsed.atsKeywords,
       status: 'analyzed',
     };
   }

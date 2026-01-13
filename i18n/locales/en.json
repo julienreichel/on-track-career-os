@@ -1126,21 +1126,24 @@
       "requiredSkills": "Add a required skill and press Enter",
       "behaviours": "Add a behaviour and press Enter",
       "successCriteria": "Add success criteria and press Enter",
-      "explicitPains": "Add explicit pain points and press Enter"
+      "explicitPains": "Add explicit pain points and press Enter",
+      "atsKeywords": "Add ATS keywords and press Enter"
     },
     "hints": {
       "responsibilities": "Key responsibilities highlighted in the job description",
       "requiredSkills": "Skills and capabilities explicitly mentioned",
       "behaviours": "Behavioural traits and expectations",
       "successCriteria": "How success is measured for the role",
-      "explicitPains": "Challenges or pain points the employer wants to solve"
+      "explicitPains": "Challenges or pain points the employer wants to solve",
+      "atsKeywords": "Important keywords and phrases that Applicant Tracking Systems look for"
     },
     "tabs": {
       "responsibilities": "Responsibilities",
       "requiredSkills": "Required skills",
       "behaviours": "Behaviours",
       "successCriteria": "Success criteria",
-      "explicitPains": "Explicit pains"
+      "explicitPains": "Explicit pains",
+      "atsKeywords": "ATS Keywords"
     },
     "sections": {
       "parsedData": "AI parsed details",

@@ -31,16 +31,18 @@ MANDATORY FIELDS:
 - atsKeywords (string[])
 
 RULES:
-- Extract ONLY information explicitly present in the job description.
+- Extract Only items that are clearly stated OR unambiguously implied by stated responsibilities
 - If a value is missing, return "" for strings or [] for arrays.
 - Seniority level MUST be taken from explicit wording (e.g., "Senior", "Lead", "Director").
 - roleSummary is a short 1-2 sentence synthesis of what the job focuses on (using only present info).
 - responsibilities = day-to-day tasks or ownership areas.
-- requiredSkills = hard or soft skills explicitly mentioned.
+- requiredSkills = hard or soft skills explicitly mentioned OR clearly implied by responsibilities (e.g., "own release process" => "release management", "CI/CD").
 - behaviours = attitudes/mindsets explicitly requested (e.g., ownership, collaboration, curiosity).
-- successCriteria = measurable outcomes or expectations.
-- explicitPains = problems or challenges the company is trying to solve.
+- successCriteria = explicit expectations OR implied outcomes where the job uses outcome language (e.g., "ensure high quality" => "improve quality", "reduce defects" only if defects are mentioned; otherwise keep generic).
+- explicitPains: explicit challenges OR strongly implied pains stated as improvement/optimization goals (e.g., "optimize operating model" => "operating model inefficiency", "delivery predictability" if delivery issues are mentioned).
 - atsKeywords = important keywords and phrases that ATS (Applicant Tracking Systems) would look for (skills, tools, technologies, certifications, industry terms).
+- You MAY infer keywords that a reasonable ATS/resume screener would expect based on the job text.
+- Inference must be conservative: infer only when strongly supported by the text.   
 - No markdown, explanations, or additional commentary.`;
 
 const OUTPUT_SCHEMA = `{

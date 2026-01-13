@@ -84,6 +84,7 @@ describe('AI Operations - Generate Speech (E2E Sandbox)', () => {
         behaviours: [],
         successCriteria: [],
         explicitPains: [],
+        atsKeywords: [],
       },
       matchingSummary: {
         overallScore: 70,

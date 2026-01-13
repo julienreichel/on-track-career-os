@@ -160,6 +160,7 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
       behaviours: ['Collaborative', 'Innovative'],
       successCriteria: ['Technical excellence', 'Team growth'],
       explicitPains: ['Scaling challenges', 'Technical debt'],
+      atsKeywords: [],
     };
 
     const result = await repository.generateCoverLetter({

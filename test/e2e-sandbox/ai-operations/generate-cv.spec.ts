@@ -274,6 +274,7 @@ Must have 5+ years of experience and strong communication skills.
         behaviours: [],
         successCriteria: [],
         explicitPains: [],
+        atsKeywords: [],
       },
       matchingSummary: {
         overallScore: 78,

@@ -86,6 +86,7 @@ describe('AI Operations - Generate Matching Summary (E2E Sandbox)', () => {
         behaviours: [],
         successCriteria: [],
         explicitPains: ['Need predictable delivery'],
+        atsKeywords: [],
       },
     });
 

@@ -25,7 +25,8 @@ type ListField =
   | 'requiredSkills'
   | 'behaviours'
   | 'successCriteria'
-  | 'explicitPains';
+  | 'explicitPains'
+  | 'atsKeywords';
 
 const scalarFields: ScalarField[] = ['title', 'seniorityLevel', 'roleSummary'];
 const listFields: ListField[] = [
@@ -34,6 +35,7 @@ const listFields: ListField[] = [
   'behaviours',
   'successCriteria',
   'explicitPains',
+  'atsKeywords',
 ];
 
 type JobFormState = {
@@ -77,6 +79,7 @@ const form = reactive<JobFormState>({
   behaviours: [],
   successCriteria: [],
   explicitPains: [],
+  atsKeywords: [],
 });
 
 const listSections = computed(
@@ -111,6 +114,12 @@ const listSections = computed(
         label: t('jobDetail.tabs.explicitPains'),
         placeholder: t('jobDetail.placeholders.explicitPains'),
         hint: t('jobDetail.hints.explicitPains'),
+      },
+      {
+        key: 'atsKeywords',
+        label: t('jobDetail.tabs.atsKeywords'),
+        placeholder: t('jobDetail.placeholders.atsKeywords'),
+        hint: t('jobDetail.hints.atsKeywords'),
       },
     ] satisfies Array<{
       key: ListField;
@@ -256,6 +265,7 @@ function hydrateForm(data: JobDescription) {
   form.behaviours = toStringList(data.behaviours);
   form.successCriteria = toStringList(data.successCriteria);
   form.explicitPains = toStringList(data.explicitPains);
+  form.atsKeywords = toStringList(data.atsKeywords);
   selectedCompanyId.value = data.companyId ?? null;
 }
 
@@ -268,6 +278,7 @@ function resetForm() {
   form.behaviours = [];
   form.successCriteria = [];
   form.explicitPains = [];
+  form.atsKeywords = [];
   selectedCompanyId.value = null;
 }
 
@@ -388,6 +399,7 @@ function buildUpdatePayload(): Partial<JobDescriptionUpdateInput> {
     behaviours: [...form.behaviours],
     successCriteria: [...form.successCriteria],
     explicitPains: [...form.explicitPains],
+    atsKeywords: [...form.atsKeywords],
   };
 }
 
