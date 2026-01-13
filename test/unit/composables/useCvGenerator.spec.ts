@@ -211,6 +211,7 @@ describe('useCvGenerator', () => {
         behaviours: [],
         successCriteria: [],
         explicitPains: [],
+        atsKeywords: [],
       });
     });
 
@@ -369,6 +370,7 @@ describe('useCvGenerator', () => {
         behaviours: [],
         successCriteria: [],
         explicitPains: [],
+        atsKeywords: [],
       });
     });
 

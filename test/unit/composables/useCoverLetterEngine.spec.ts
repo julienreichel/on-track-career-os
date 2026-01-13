@@ -401,9 +401,15 @@ describe('useCoverLetterEngine', () => {
 
     it('should generate cover letter with job description', async () => {
       const jobDescription = {
-        rawText: 'We are looking for a Senior Engineer...',
-        companyName: 'TargetCorp',
         title: 'Senior Engineer',
+        seniorityLevel: 'Senior',
+        roleSummary: 'We are looking for a Senior Engineer...',
+        responsibilities: ['Lead team', 'Code review'],
+        requiredSkills: ['TypeScript', 'Leadership'],
+        behaviours: ['Collaborative'],
+        successCriteria: ['Deliver on time'],
+        explicitPains: ['Technical debt'],
+        atsKeywords: ['Senior', 'Engineer', 'Leadership'],
       };
 
       const deps = createDeps();

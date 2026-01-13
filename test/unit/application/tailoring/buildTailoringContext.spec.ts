@@ -57,6 +57,7 @@ describe('buildTailoringContext', () => {
       behaviours: [],
       successCriteria: [],
       explicitPains: [],
+      atsKeywords: [],
     });
     expect(result.value.matchingSummary.overallScore).toBe(78);
     expect(result.value.matchingSummary.recommendation).toBe('maybe');
@@ -180,6 +181,7 @@ describe('buildTailoringContext', () => {
       behaviours: ['Data-driven'],
       successCriteria: ['Ship features'],
       explicitPains: ['Legacy systems'],
+      atsKeywords: [],
     });
   });
 
