@@ -68,6 +68,7 @@ export class JobDescriptionRepository {
       'behaviours',
       'successCriteria',
       'explicitPains',
+      'atsKeywords',
       'status',
       'companyId',
       'createdAt',

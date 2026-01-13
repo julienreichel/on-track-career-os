@@ -354,6 +354,7 @@ function mapJob(job: JobDescription) {
     behaviours: normalizeStringArray(job.behaviours),
     successCriteria: normalizeStringArray(job.successCriteria),
     explicitPains: normalizeStringArray(job.explicitPains),
+    atsKeywords: normalizeStringArray(job.atsKeywords),
   };
 }
 

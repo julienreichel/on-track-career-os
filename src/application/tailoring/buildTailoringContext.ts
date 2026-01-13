@@ -158,6 +158,7 @@ function mapJobDescription(job: JobDescription, title: string): TailoringJobDesc
     behaviours: requiredStringArray(job.behaviours),
     successCriteria: requiredStringArray(job.successCriteria),
     explicitPains: requiredStringArray(job.explicitPains),
+    atsKeywords: requiredStringArray(job.atsKeywords),
   };
 }
 

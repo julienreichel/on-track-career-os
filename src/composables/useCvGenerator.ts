@@ -211,6 +211,7 @@ function normalizeJobDescription(
       behaviours: input.behaviours ?? [],
       successCriteria: input.successCriteria ?? [],
       explicitPains: input.explicitPains ?? [],
+      atsKeywords: input.atsKeywords ?? [],
     };
   }
 
