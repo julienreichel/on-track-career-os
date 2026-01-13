@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useSpeechBlocks } from '@/application/speech-block/useSpeechBlocks';
 import { SpeechBlockRepository } from '@/domain/speech-block/SpeechBlockRepository';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
-import { withMockedConsoleError } from '../../../utils/withMockedConsole';
+import { allowConsoleOutput } from '../../../setup/console-guard';
 
 vi.mock('@/domain/speech-block/SpeechBlockRepository');
 vi.mock('@/composables/useAuthUser', () => ({
@@ -51,19 +51,18 @@ describe('useSpeechBlocks', () => {
       expect(error.value).toBeNull();
     });
 
-    it(
-      'should handle errors during load',
-      withMockedConsoleError(async () => {
-        mockRepository.listByUser.mockRejectedValue(new Error('Load failed'));
+    it('should handle errors during load', async () => {
+      mockRepository.listByUser.mockRejectedValue(new Error('Load failed'));
 
-        const { items, error, loadAll } = useSpeechBlocks();
+      const { items, error, loadAll } = useSpeechBlocks();
 
+      await allowConsoleOutput(async () => {
         await loadAll();
+      });
 
-        expect(items.value).toEqual([]);
-        expect(error.value).toBe('Load failed');
-      })
-    );
+      expect(items.value).toEqual([]);
+      expect(error.value).toBe('Load failed');
+    });
   });
 
   describe('createSpeechBlock', () => {
@@ -116,19 +115,18 @@ describe('useSpeechBlocks', () => {
       expect(items.value).toHaveLength(1);
     });
 
-    it(
-      'should handle creation errors',
-      withMockedConsoleError(async () => {
-        mockRepository.create.mockRejectedValue(new Error('Creation failed'));
+    it('should handle creation errors', async () => {
+      mockRepository.create.mockRejectedValue(new Error('Creation failed'));
 
-        const { error, createSpeechBlock } = useSpeechBlocks();
+      const { error, createSpeechBlock } = useSpeechBlocks();
 
+      await allowConsoleOutput(async () => {
         const result = await createSpeechBlock({ userId: 'user-1' } as never);
-
         expect(result).toBeNull();
-        expect(error.value).toBe('Creation failed');
-      })
-    );
+      });
+
+      expect(error.value).toBe('Creation failed');
+    });
   });
 
   describe('updateSpeechBlock', () => {
@@ -177,19 +175,18 @@ describe('useSpeechBlocks', () => {
       });
     });
 
-    it(
-      'should handle update errors',
-      withMockedConsoleError(async () => {
-        mockRepository.update.mockRejectedValue(new Error('Update failed'));
+    it('should handle update errors', async () => {
+      mockRepository.update.mockRejectedValue(new Error('Update failed'));
 
-        const { error, updateSpeechBlock } = useSpeechBlocks();
+      const { error, updateSpeechBlock } = useSpeechBlocks();
 
+      await allowConsoleOutput(async () => {
         const result = await updateSpeechBlock({ id: 'sb-1', whyMe: 'New' } as never);
-
         expect(result).toBeNull();
-        expect(error.value).toBe('Update failed');
-      })
-    );
+      });
+
+      expect(error.value).toBe('Update failed');
+    });
   });
 
   describe('deleteSpeechBlock', () => {
@@ -207,18 +204,17 @@ describe('useSpeechBlocks', () => {
       expect(items.value[0].id).toBe('sb-2');
     });
 
-    it(
-      'should handle deletion errors',
-      withMockedConsoleError(async () => {
-        mockRepository.delete.mockRejectedValue(new Error('Deletion failed'));
+    it('should handle deletion errors', async () => {
+      mockRepository.delete.mockRejectedValue(new Error('Deletion failed'));
 
-        const { error, deleteSpeechBlock } = useSpeechBlocks();
+      const { error, deleteSpeechBlock } = useSpeechBlocks();
 
+      await allowConsoleOutput(async () => {
         const result = await deleteSpeechBlock('sb-1');
-
         expect(result).toBe(false);
-        expect(error.value).toBe('Deletion failed');
-      })
-    );
+      });
+
+      expect(error.value).toBe('Deletion failed');
+    });
   });
 });

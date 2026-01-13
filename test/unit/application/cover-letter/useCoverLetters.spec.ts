@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
 import { CoverLetterRepository } from '@/domain/cover-letter/CoverLetterRepository';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
-import { withMockedConsoleError } from '../../../utils/withMockedConsole';
+import { allowConsoleOutput } from '../../../setup/console-guard';
 
 vi.mock('@/domain/cover-letter/CoverLetterRepository');
 vi.mock('@/composables/useAuthUser', () => ({
@@ -51,19 +51,18 @@ describe('useCoverLetters', () => {
       expect(error.value).toBeNull();
     });
 
-    it(
-      'should handle errors during load',
-      withMockedConsoleError(async () => {
-        mockRepository.listByUser.mockRejectedValue(new Error('Load failed'));
+    it('should handle errors during load', async () => {
+      mockRepository.listByUser.mockRejectedValue(new Error('Load failed'));
 
-        const { items, error, loadAll } = useCoverLetters();
+      const { items, error, loadAll } = useCoverLetters();
 
+      await allowConsoleOutput(async () => {
         await loadAll();
+      });
 
-        expect(items.value).toEqual([]);
-        expect(error.value).toBe('Load failed');
-      })
-    );
+      expect(items.value).toEqual([]);
+      expect(error.value).toBe('Load failed');
+    });
   });
 
   describe('createCoverLetter', () => {
@@ -113,19 +112,18 @@ describe('useCoverLetters', () => {
       expect(items.value).toHaveLength(1);
     });
 
-    it(
-      'should handle creation errors',
-      withMockedConsoleError(async () => {
-        mockRepository.create.mockRejectedValue(new Error('Creation failed'));
+    it('should handle creation errors', async () => {
+      mockRepository.create.mockRejectedValue(new Error('Creation failed'));
 
-        const { error, createCoverLetter } = useCoverLetters();
+      const { error, createCoverLetter } = useCoverLetters();
 
+      await allowConsoleOutput(async () => {
         const result = await createCoverLetter({ userId: 'user-1' } as never);
-
         expect(result).toBeNull();
-        expect(error.value).toBe('Creation failed');
-      })
-    );
+      });
+
+      expect(error.value).toBe('Creation failed');
+    });
   });
 
   describe('updateCoverLetter', () => {
@@ -178,19 +176,18 @@ describe('useCoverLetters', () => {
       });
     });
 
-    it(
-      'should handle update errors',
-      withMockedConsoleError(async () => {
-        mockRepository.update.mockRejectedValue(new Error('Update failed'));
+    it('should handle update errors', async () => {
+      mockRepository.update.mockRejectedValue(new Error('Update failed'));
 
-        const { error, updateCoverLetter } = useCoverLetters();
+      const { error, updateCoverLetter } = useCoverLetters();
 
+      await allowConsoleOutput(async () => {
         const result = await updateCoverLetter({ id: 'cl-1', content: 'New' } as never);
-
         expect(result).toBeNull();
-        expect(error.value).toBe('Update failed');
-      })
-    );
+      });
+
+      expect(error.value).toBe('Update failed');
+    });
   });
 
   describe('deleteCoverLetter', () => {
@@ -208,18 +205,17 @@ describe('useCoverLetters', () => {
       expect(items.value[0].id).toBe('cl-2');
     });
 
-    it(
-      'should handle deletion errors',
-      withMockedConsoleError(async () => {
-        mockRepository.delete.mockRejectedValue(new Error('Deletion failed'));
+    it('should handle deletion errors', async () => {
+      mockRepository.delete.mockRejectedValue(new Error('Deletion failed'));
 
-        const { error, deleteCoverLetter } = useCoverLetters();
+      const { error, deleteCoverLetter } = useCoverLetters();
 
+      await allowConsoleOutput(async () => {
         const result = await deleteCoverLetter('cl-1');
-
         expect(result).toBe(false);
-        expect(error.value).toBe('Deletion failed');
-      })
-    );
+      });
+
+      expect(error.value).toBe('Deletion failed');
+    });
   });
 });

@@ -1,21 +1,17 @@
 import { vi } from 'vitest';
+import { allowConsoleOutput } from '../setup/console-guard';
 
-type ConsoleMethod = 'log' | 'warn' | 'error';
 type MaybePromise<T> = T | Promise<T>;
 
-export function withMockedConsole<T extends () => MaybePromise<unknown>>(
-  method: ConsoleMethod,
-  fn: T
-) {
+/**
+ * @deprecated Use allowConsoleOutput from console-guard instead.
+ * This function delegates to allowConsoleOutput but wraps it to maintain compatibility.
+ * The new approach uses the console guard system which properly tracks console calls.
+ */
+export const withMockedConsoleError = <T extends () => MaybePromise<unknown>>(fn: T) => {
+  // Delegate to the new allowConsoleOutput by wrapping it in the same pattern
   return async () => {
-    const spy = vi.spyOn(console, method).mockImplementation(() => {});
-    try {
-      return await fn();
-    } finally {
-      spy.mockRestore();
-    }
+    // Use allowConsoleOutput which properly handles the console guard
+    return await allowConsoleOutput(fn);
   };
-}
-
-export const withMockedConsoleError = <T extends () => MaybePromise<unknown>>(fn: T) =>
-  withMockedConsole('error', fn);
+};

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useExperience } from '@/application/experience/useExperience';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
 import type { Experience } from '@/domain/experience/Experience';
-import { withMockedConsoleError } from '../../../utils/withMockedConsole';
+import { allowConsoleOutput } from '../../../setup/console-guard';
 
 // Mock the ExperienceService
 vi.mock('@/domain/experience/ExperienceService');
@@ -88,20 +88,19 @@ describe('useExperience', () => {
     expect(mockService.getFullExperience).toHaveBeenCalledWith('non-existent-id');
   });
 
-  it(
-    'should handle service errors and set error state',
-    withMockedConsoleError(async () => {
-      mockService.getFullExperience.mockRejectedValue(new Error('Service error'));
+  it('should handle service errors', async () => {
+    mockService.getFullExperience.mockRejectedValue(new Error('Service error'));
 
-      const { item, loading, error, load } = useExperience('experience-123');
+    const { item, loading, error, load } = useExperience('experience-123');
 
+    await allowConsoleOutput(async () => {
       await load();
+    });
 
-      expect(loading.value).toBe(false);
-      expect(error.value).toBe('Service error');
-      expect(item.value).toBeNull();
-    })
-  );
+    expect(loading.value).toBe(false);
+    expect(error.value).toBe('Service error');
+    expect(item.value).toBeNull();
+  });
 
   it('should handle experiences with null endDate (current position)', async () => {
     const currentExperience = {

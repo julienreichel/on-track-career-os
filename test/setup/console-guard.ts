@@ -37,7 +37,7 @@ interface ConsoleCall {
 // State for current test
 let consoleCalls: ConsoleCall[] = [];
 let consoleAllowedInTest = false; // Track if this test allowed console
-let consoleSpies: Map<ConsoleMethod, ReturnType<typeof vi.spyOn>> = new Map();
+const consoleSpies: Map<ConsoleMethod, ReturnType<typeof vi.spyOn>> = new Map();
 
 /**
  * Allows console output for a specific code block.

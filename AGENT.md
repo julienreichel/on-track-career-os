@@ -41,3 +41,7 @@ status and technical foundation references.
 ## Implementation Order
 
 Data models -> composables -> components -> pages -> AI lambdas -> tests.
+
+## Refactoring
+
+When refactoring this code following Martin Fowler’s techniques
