@@ -1,71 +1,20 @@
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
-import type { JobDescription } from '@/domain/job-description/JobDescription';
+import type { JobDescription as DomainJobDescription } from '@/domain/job-description/JobDescription';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
 import type { Company } from '@/domain/company/Company';
-
-export type TailoringUserProfile = {
-  fullName: string;
-  headline?: string;
-  location?: string;
-  seniorityLevel?: string;
-  workPermitInfo?: string;
-  goals?: string[];
-  aspirations?: string[];
-  personalValues?: string[];
-  strengths?: string[];
-  interests?: string[];
-  skills?: string[];
-  certifications?: string[];
-  languages?: string[];
-};
-
-export type TailoringJobDescription = {
-  title: string;
-  seniorityLevel: string;
-  roleSummary: string;
-  responsibilities: string[];
-  requiredSkills: string[];
-  behaviours: string[];
-  successCriteria: string[];
-  explicitPains: string[];
-  atsKeywords: string[];
-};
-
-export type TailoringMatchingSummary = {
-  overallScore: number;
-  scoreBreakdown: {
-    skillFit: number;
-    experienceFit: number;
-    interestFit: number;
-    edge: number;
-  };
-  recommendation: 'apply' | 'maybe' | 'skip';
-  reasoningHighlights: string[];
-  strengthsForThisRole: string[];
-  skillMatch: string[];
-  riskyPoints: string[];
-  impactOpportunities: string[];
-  tailoringTips: string[];
-};
-
-export type TailoringCompanySummary = {
-  companyName: string;
-  industry: string;
-  sizeRange: string;
-  website: string;
-  description: string;
-  productsServices: string[];
-  targetMarkets: string[];
-  customerSegments: string[];
-  rawNotes: string;
-};
+import type {
+  Profile,
+  JobDescription,
+  MatchingSummaryContext,
+  CompanyProfile,
+} from '@amplify/data/ai-operations/types/schema-types';
 
 export type TailoringContext = {
   language: 'en';
-  userProfile: TailoringUserProfile;
-  jobDescription: TailoringJobDescription;
-  matchingSummary: TailoringMatchingSummary;
-  company?: TailoringCompanySummary;
+  userProfile: Profile;
+  jobDescription: JobDescription;
+  matchingSummary: MatchingSummaryContext;
+  company?: CompanyProfile;
 };
 
 export type TailoringContextResult =
@@ -74,7 +23,7 @@ export type TailoringContextResult =
 
 type BuildTailoringContextInput = {
   userProfile?: UserProfile | null;
-  job?: JobDescription | null;
+  job?: DomainJobDescription | null;
   matchingSummary?: MatchingSummary | null;
   company?: Company | null;
 };
@@ -114,7 +63,7 @@ export function buildTailoringContext(input: BuildTailoringContextInput): Tailor
   return { ok: true, value: context };
 }
 
-function mapUserProfile(profile: UserProfile, fullName: string): TailoringUserProfile {
+function mapUserProfile(profile: UserProfile, fullName: string): Profile {
   const headline = normalizeString(profile.headline);
   const location = normalizeString(profile.location);
   const seniorityLevel = normalizeString(profile.seniorityLevel);
@@ -149,7 +98,7 @@ function mapUserProfile(profile: UserProfile, fullName: string): TailoringUserPr
   };
 }
 
-function mapJobDescription(job: JobDescription, title: string): TailoringJobDescription {
+function mapJobDescription(job: DomainJobDescription, title: string): JobDescription {
   return {
     title,
     seniorityLevel: normalizeRequiredString(job.seniorityLevel),
@@ -163,7 +112,7 @@ function mapJobDescription(job: JobDescription, title: string): TailoringJobDesc
   };
 }
 
-function mapMatchingSummary(summary: MatchingSummary): TailoringMatchingSummary {
+function mapMatchingSummary(summary: MatchingSummary): MatchingSummaryContext {
   return {
     overallScore: normalizeNumber(summary.overallScore),
     scoreBreakdown: normalizeScoreBreakdown(summary.scoreBreakdown),
@@ -177,7 +126,7 @@ function mapMatchingSummary(summary: MatchingSummary): TailoringMatchingSummary 
   };
 }
 
-function mapCompanySummary(company: Company): TailoringCompanySummary {
+function mapCompanySummary(company: Company): CompanyProfile {
   return {
     companyName: company.companyName,
     industry: normalizeRequiredString(company.industry),
@@ -232,7 +181,7 @@ function normalizeScoreBreakdown(value: unknown): ScoreBreakdown {
   };
 }
 
-function normalizeRecommendation(value: unknown): TailoringMatchingSummary['recommendation'] {
+function normalizeRecommendation(value: unknown): 'apply' | 'maybe' | 'skip' {
   if (value === 'apply' || value === 'maybe' || value === 'skip') {
     return value;
   }

@@ -40,7 +40,7 @@ export type MatchingSummaryContext = {
     interestFit: number;
     edge: number;
   };
-  recommendation: string;
+  recommendation: 'apply' | 'maybe' | 'skip';
   reasoningHighlights: string[];
   strengthsForThisRole: string[];
   skillMatch: string[];
