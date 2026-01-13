@@ -1,5 +1,14 @@
 import { invokeBedrock } from './utils/bedrock';
 import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
+import type {
+  JobDescription,
+  MatchingSummaryContext,
+  CompanyProfile,
+  PersonalCanvas,
+  Experience,
+  Profile,
+  SpeechStory,
+} from './types/schema-types';
 
 /**
  * AI Operation: generateCv
@@ -18,108 +27,20 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
  *
  * Output Schema:
  * - Returns complete CV as plain Markdown text
+ *
+ * NOTE: Types are imported from types/schema-types.ts to maintain DRY principle
+ * and ensure consistency with GraphQL schema definitions.
  */
-
-interface CvProfile {
-  fullName?: string;
-  headline?: string;
-  location?: string;
-  seniorityLevel?: string;
-  primaryEmail?: string;
-  primaryPhone?: string;
-  workPermitInfo?: string;
-  goals?: string[];
-  aspirations?: string[];
-  personalValues?: string[];
-  strengths?: string[];
-  interests?: string[];
-  skills?: string[];
-  certifications?: string[];
-  languages?: string[];
-  socialLinks?: string[];
-}
-
-interface Experience {
-  id?: string;
-  title: string;
-  companyName: string;
-  startDate?: string;
-  endDate?: string;
-  experienceType: 'work' | 'education' | 'volunteer' | 'project';
-  responsibilities: string[];
-  tasks: string[];
-}
-
-interface Story {
-  situation?: string;
-  experienceId?: string;
-  task?: string;
-  action?: string;
-  result?: string;
-  achievements?: string[];
-}
-
-interface PersonalCanvas {
-  customerSegments?: string[];
-  valueProposition?: string[];
-  channels?: string[];
-  customerRelationships?: string[];
-  keyActivities?: string[];
-  keyResources?: string[];
-  keyPartners?: string[];
-  costStructure?: string[];
-  revenueStreams?: string[];
-}
-
-interface CvJobDescription {
-  title: string;
-  seniorityLevel: string;
-  roleSummary: string;
-  responsibilities: string[];
-  requiredSkills: string[];
-  behaviours: string[];
-  successCriteria: string[];
-  explicitPains: string[];
-}
-
-interface CvMatchingSummary {
-  overallScore: number;
-  scoreBreakdown: {
-    skillFit: number;
-    experienceFit: number;
-    interestFit: number;
-    edge: number;
-  };
-  recommendation: 'apply' | 'maybe' | 'skip';
-  reasoningHighlights: string[];
-  strengthsForThisRole: string[];
-  skillMatch: string[];
-  riskyPoints: string[];
-  impactOpportunities: string[];
-  tailoringTips: string[];
-}
-
-interface CvCompanySummary {
-  companyName: string;
-  industry: string;
-  sizeRange: string;
-  website: string;
-  description: string;
-  productsServices: string[];
-  targetMarkets: string[];
-  customerSegments: string[];
-  rawNotes: string;
-}
 
 interface GenerateCvInput {
   language: 'en';
-  profile: CvProfile;
+  profile: Profile;
   experiences: Experience[];
-  stories?: Story[];
+  stories?: SpeechStory[];
   personalCanvas?: PersonalCanvas;
-  jobDescription?: CvJobDescription;
-  matchingSummary?: CvMatchingSummary;
-  company?: CvCompanySummary;
+  jobDescription?: JobDescription;
+  matchingSummary?: MatchingSummaryContext;
+  company?: CompanyProfile;
 }
 
 /**
@@ -230,7 +151,7 @@ Target: 2 pages max of Markdown content, i,e, 70 lignes of text.
 /**
  * Format user profile section
  */
-function formatUserProfile(profile: CvProfile): string {
+function formatUserProfile(profile: Profile): string {
   let section = `## USER PROFILE\n`;
   section += `Name: ${profile.fullName || 'Not provided'}\n`;
   if (profile.headline) section += `Professional Title: ${profile.headline}\n`;
@@ -240,14 +161,14 @@ function formatUserProfile(profile: CvProfile): string {
   if (profile.primaryPhone) section += `Phone: ${profile.primaryPhone}\n`;
 
   if (profile.goals && profile.goals.length > 0) {
-    section += `\nCareer Goals:\n${profile.goals.map((g) => `- ${g}`).join('\n')}\n`;
+    section += `\nCareer Goals:\n${profile.goals.map((g: string) => `- ${g}`).join('\n')}\n`;
   }
   if (profile.strengths && profile.strengths.length > 0) {
-    section += `\nKey Strengths:\n${profile.strengths.map((s) => `- ${s}`).join('\n')}\n`;
+    section += `\nKey Strengths:\n${profile.strengths.map((s: string) => `- ${s}`).join('\n')}\n`;
   }
   if (profile.socialLinks && profile.socialLinks.length > 0) {
     section += `\nSocial Links:\n`;
-    section += profile.socialLinks.map((link) => `- ${link}`).join('\n');
+    section += profile.socialLinks.map((link: string) => `- ${link}`).join('\n');
     section += '\n';
   }
   if (profile.workPermitInfo) {
@@ -259,7 +180,7 @@ function formatUserProfile(profile: CvProfile): string {
 /**
  * Format a single experience with its related stories
  */
-function formatSingleExperience(exp: Experience, stories: Story[] | undefined): string {
+function formatSingleExperience(exp: Experience, stories: SpeechStory[] | undefined): string {
   let output = `\n### ${exp.title || 'Position'}\n`;
   const companyName = exp.companyName;
   if (companyName) output += `**${companyName}**\n`;
@@ -315,7 +236,7 @@ function sortExperiencesByDate(experiences: Experience[]): Experience[] {
  */
 function formatExperiencesWithStories(
   experiences: Experience[],
-  stories: Story[] | undefined
+  stories: SpeechStory[] | undefined
 ): string {
   if (experiences.length === 0) return '';
 
@@ -465,11 +386,11 @@ function resolveTailoringContext(input: GenerateCvInput) {
   return null;
 }
 
-function isValidJobDescription(value?: CvJobDescription | null): value is CvJobDescription {
+function isValidJobDescription(value?: JobDescription | null): value is JobDescription {
   return Boolean(value?.title);
 }
 
-function isValidMatchingSummary(value?: CvMatchingSummary | null): value is CvMatchingSummary {
+function isValidMatchingSummary(value?: MatchingSummaryContext | null): value is MatchingSummaryContext {
   if (!value) return false;
   return (
     typeof value.overallScore === 'number' &&

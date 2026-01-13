@@ -1,5 +1,14 @@
 import { invokeAiWithRetry } from './utils/bedrock';
 import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
+import type {
+  JobDescription,
+  MatchingSummaryContext,
+  CompanyProfile,
+  PersonalCanvas,
+  Experience,
+  Profile,
+  SpeechStory,
+} from './types/schema-types';
 
 const SYSTEM_PROMPT = `You generate personal narrative speech based on user identity data.
 
@@ -25,104 +34,22 @@ const OUTPUT_SCHEMA = `{
 
 const PROMPT_INDENT_SPACES = 2;
 
-export interface SpeechUserProfile {
-  fullName: string;
-  headline?: string;
-  location?: string;
-  seniorityLevel?: string;
-  workPermitInfo?: string;
-  goals?: string[];
-  aspirations?: string[];
-  personalValues?: string[];
-  strengths?: string[];
-  interests?: string[];
-  skills?: string[];
-  certifications?: string[];
-  languages?: string[];
-}
 
-export interface SpeechExperience {
-  title: string;
-  companyName: string;
-  startDate?: string;
-  endDate?: string;
-  experienceType: string;
-  responsibilities: string[];
-  tasks: string[];
-  achievements?: string[];
-  kpiSuggestions?: string[];
-}
 
-export interface SpeechStory {
-  title?: string;
-  situation?: string;
-  task?: string;
-  action?: string;
-  result?: string;
-  achievements?: string[];
-}
 
-export interface SpeechPersonalCanvas {
-  customerSegments?: string[];
-  valueProposition?: string[];
-  channels?: string[];
-  customerRelationships?: string[];
-  keyActivities?: string[];
-  keyResources?: string[];
-  keyPartners?: string[];
-  costStructure?: string[];
-  revenueStreams?: string[];
-}
 
-export interface SpeechJobDescription {
-  title: string;
-  seniorityLevel: string;
-  roleSummary: string;
-  responsibilities: string[];
-  requiredSkills: string[];
-  behaviours: string[];
-  successCriteria: string[];
-  explicitPains: string[];
-}
 
-export interface SpeechMatchingSummary {
-  overallScore: number;
-  scoreBreakdown: {
-    skillFit: number;
-    experienceFit: number;
-    interestFit: number;
-    edge: number;
-  };
-  recommendation: 'apply' | 'maybe' | 'skip';
-  reasoningHighlights: string[];
-  strengthsForThisRole: string[];
-  skillMatch: string[];
-  riskyPoints: string[];
-  impactOpportunities: string[];
-  tailoringTips: string[];
-}
 
-export interface SpeechCompanySummary {
-  companyName: string;
-  industry: string;
-  sizeRange: string;
-  website: string;
-  description: string;
-  productsServices: string[];
-  targetMarkets: string[];
-  customerSegments: string[];
-  rawNotes: string;
-}
 
 export interface GenerateSpeechInput {
   language: 'en';
-  profile: SpeechUserProfile;
-  experiences: SpeechExperience[];
+  profile: Profile;
+  experiences: Experience[];
   stories?: SpeechStory[];
-  personalCanvas?: SpeechPersonalCanvas;
-  jobDescription?: SpeechJobDescription;
-  matchingSummary?: SpeechMatchingSummary;
-  company?: SpeechCompanySummary;
+  personalCanvas?: PersonalCanvas;
+  jobDescription?: JobDescription;
+  matchingSummary?: MatchingSummaryContext;
+  company?: CompanyProfile;
 }
 
 export interface GenerateSpeechOutput {
@@ -225,13 +152,13 @@ function resolveTailoringContext(args: GenerateSpeechInput) {
   return null;
 }
 
-function isValidJobDescription(value?: SpeechJobDescription | null): value is SpeechJobDescription {
+function isValidJobDescription(value?: JobDescription | null): value is JobDescription {
   return Boolean(value?.title);
 }
 
 function isValidMatchingSummary(
-  value?: SpeechMatchingSummary | null
-): value is SpeechMatchingSummary {
+  value?: MatchingSummaryContext | null
+): value is MatchingSummaryContext {
   if (!value) return false;
   return (
     typeof value.overallScore === 'number' &&

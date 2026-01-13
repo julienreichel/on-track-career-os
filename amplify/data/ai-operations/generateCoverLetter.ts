@@ -1,5 +1,14 @@
 import { invokeBedrock } from './utils/bedrock';
 import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
+import type {
+  JobDescription,
+  MatchingSummaryContext,
+  CompanyProfile,
+  PersonalCanvas,
+  Experience,
+  Profile,
+  SpeechStory,
+} from './types/schema-types';
 
 const SYSTEM_PROMPT = `You generate professional cover letters based on user identity data.
 
@@ -23,103 +32,22 @@ const OUTPUT_SCHEMA = `{
 
 const PROMPT_INDENT_SPACES = 2;
 
-export interface CoverLetterUserProfile {
-  fullName: string;
-  headline?: string;
-  location?: string;
-  seniorityLevel?: string;
-  goals?: string[];
-  aspirations?: string[];
-  personalValues?: string[];
-  strengths?: string[];
-  interests?: string[];
-  skills?: string[];
-  certifications?: string[];
-  languages?: string[];
-}
 
-export interface CoverLetterExperience {
-  title: string;
-  companyName: string;
-  startDate?: string;
-  endDate?: string;
-  experienceType: string;
-  responsibilities: string[];
-  tasks: string[];
-  achievements?: string[];
-  kpiSuggestions?: string[];
-}
 
-export interface CoverLetterStory {
-  title?: string;
-  situation?: string;
-  task?: string;
-  action?: string;
-  result?: string;
-  achievements?: string[];
-}
 
-export interface CoverLetterPersonalCanvas {
-  customerSegments?: string[];
-  valueProposition?: string[];
-  channels?: string[];
-  customerRelationships?: string[];
-  keyActivities?: string[];
-  keyResources?: string[];
-  keyPartners?: string[];
-  costStructure?: string[];
-  revenueStreams?: string[];
-}
 
-export interface CoverLetterJobDescription {
-  title: string;
-  seniorityLevel: string;
-  roleSummary: string;
-  responsibilities: string[];
-  requiredSkills: string[];
-  behaviours: string[];
-  successCriteria: string[];
-  explicitPains: string[];
-}
 
-export interface CoverLetterMatchingSummary {
-  overallScore: number;
-  scoreBreakdown: {
-    skillFit: number;
-    experienceFit: number;
-    interestFit: number;
-    edge: number;
-  };
-  recommendation: 'apply' | 'maybe' | 'skip';
-  reasoningHighlights: string[];
-  strengthsForThisRole: string[];
-  skillMatch: string[];
-  riskyPoints: string[];
-  impactOpportunities: string[];
-  tailoringTips: string[];
-}
 
-export interface CoverLetterCompanySummary {
-  companyName: string;
-  industry: string;
-  sizeRange: string;
-  website: string;
-  description: string;
-  productsServices: string[];
-  targetMarkets: string[];
-  customerSegments: string[];
-  rawNotes: string;
-}
 
 export interface GenerateCoverLetterInput {
   language: 'en';
-  profile: CoverLetterUserProfile;
-  experiences: CoverLetterExperience[];
-  stories?: CoverLetterStory[];
-  personalCanvas?: CoverLetterPersonalCanvas;
-  jobDescription?: CoverLetterJobDescription;
-  matchingSummary?: CoverLetterMatchingSummary;
-  company?: CoverLetterCompanySummary;
+  profile: Profile;
+  experiences: Experience[];
+  stories?: SpeechStory[];
+  personalCanvas?: PersonalCanvas;
+  jobDescription?: JobDescription;
+  matchingSummary?: MatchingSummaryContext;
+  company?: CompanyProfile;
 }
 
 function buildUserPrompt(args: GenerateCoverLetterInput): string {
@@ -192,14 +120,14 @@ function resolveTailoringContext(args: GenerateCoverLetterInput) {
 }
 
 function isValidJobDescription(
-  value?: CoverLetterJobDescription | null
-): value is CoverLetterJobDescription {
+  value?: JobDescription | null
+): value is JobDescription {
   return Boolean(value?.title);
 }
 
 function isValidMatchingSummary(
-  value?: CoverLetterMatchingSummary | null
-): value is CoverLetterMatchingSummary {
+  value?: MatchingSummaryContext | null
+): value is MatchingSummaryContext {
   if (!value) return false;
   return (
     typeof value.overallScore === 'number' &&
