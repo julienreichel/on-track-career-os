@@ -222,7 +222,7 @@ export function buildSpeechInput(args: {
   }
 
   if (args.tailoring?.jobDescription) {
-    input.jobDescription = args.tailoring.jobDescription;
+    input.jobDescription = mapJobDescription(args.tailoring.jobDescription);
   }
 
   if (args.tailoring?.matchingSummary) {
@@ -300,6 +300,23 @@ function mapPersonalCanvas(canvas: PersonalCanvas) {
     keyPartners: normalizeStringArray(canvas.keyPartners),
     costStructure: normalizeStringArray(canvas.costStructure),
     revenueStreams: normalizeStringArray(canvas.revenueStreams),
+  };
+}
+
+function mapJobDescription(job: SpeechInput['jobDescription']): SpeechInput['jobDescription'] {
+  if (!job || typeof job === 'string') {
+    return job;
+  }
+  return {
+    title: job.title,
+    seniorityLevel: job.seniorityLevel ?? '',
+    roleSummary: job.roleSummary ?? '',
+    responsibilities: normalizeStringArray(job.responsibilities),
+    requiredSkills: normalizeStringArray(job.requiredSkills),
+    behaviours: normalizeStringArray(job.behaviours),
+    successCriteria: normalizeStringArray(job.successCriteria),
+    explicitPains: normalizeStringArray(job.explicitPains),
+    atsKeywords: normalizeStringArray(job.atsKeywords),
   };
 }
 

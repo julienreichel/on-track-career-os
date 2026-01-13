@@ -99,6 +99,7 @@ const jobDescriptionObj = computed<SpeechInput['jobDescription'] | undefined>(()
     behaviours: [],
     successCriteria: [],
     explicitPains: [],
+    atsKeywords: [],
   };
 });
 

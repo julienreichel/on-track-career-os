@@ -28,6 +28,7 @@ export type TailoringJobDescription = {
   behaviours: string[];
   successCriteria: string[];
   explicitPains: string[];
+  atsKeywords: string[];
 };
 
 export type TailoringMatchingSummary = {

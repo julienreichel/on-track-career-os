@@ -206,12 +206,12 @@ function normalizeJobDescription(
       title: input.title,
       seniorityLevel: input.seniorityLevel ?? '',
       roleSummary: input.roleSummary ?? '',
-      responsibilities: input.responsibilities ?? [],
-      requiredSkills: input.requiredSkills ?? [],
-      behaviours: input.behaviours ?? [],
-      successCriteria: input.successCriteria ?? [],
-      explicitPains: input.explicitPains ?? [],
-      atsKeywords: input.atsKeywords ?? [],
+      responsibilities: filterStringList(input.responsibilities),
+      requiredSkills: filterStringList(input.requiredSkills),
+      behaviours: filterStringList(input.behaviours),
+      successCriteria: filterStringList(input.successCriteria),
+      explicitPains: filterStringList(input.explicitPains),
+      atsKeywords: filterStringList(input.atsKeywords),
     };
   }
 
@@ -224,6 +224,7 @@ function normalizeJobDescription(
     behaviours: [],
     successCriteria: [],
     explicitPains: [],
+    atsKeywords: [],
   };
 }
 

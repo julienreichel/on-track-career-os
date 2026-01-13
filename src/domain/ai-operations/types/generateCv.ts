@@ -61,6 +61,7 @@ export interface GenerateCvInput {
     behaviours: string[];
     successCriteria: string[];
     explicitPains: string[];
+    atsKeywords: string[];
   };
   matchingSummary?: {
     overallScore: number;

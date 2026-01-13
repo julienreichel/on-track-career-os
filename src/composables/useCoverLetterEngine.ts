@@ -106,7 +106,7 @@ function createCoverLetterEngineState({ providedUserId, deps, auth }: EngineStat
         personalCanvas: personalCanvas.value
           ? mapCanvasToSpeechCanvas(personalCanvas.value)
           : undefined,
-        jobDescription: jobDescription || undefined,
+        jobDescription: jobDescription ? mapJobDescription(jobDescription) : undefined,
       };
 
       return await deps.aiService.generateCoverLetter(input);
@@ -263,5 +263,22 @@ function mapCanvasToSpeechCanvas(canvas: PersonalCanvas) {
     keyPartners: filterNulls(canvas.keyPartners),
     costStructure: filterNulls(canvas.costStructure),
     revenueStreams: filterNulls(canvas.revenueStreams),
+  };
+}
+
+function mapJobDescription(job: SpeechInput['jobDescription']): SpeechInput['jobDescription'] {
+  if (!job || typeof job === 'string') {
+    return job;
+  }
+  return {
+    title: job.title,
+    seniorityLevel: job.seniorityLevel ?? '',
+    roleSummary: job.roleSummary ?? '',
+    responsibilities: filterNulls(job.responsibilities) ?? [],
+    requiredSkills: filterNulls(job.requiredSkills) ?? [],
+    behaviours: filterNulls(job.behaviours) ?? [],
+    successCriteria: filterNulls(job.successCriteria) ?? [],
+    explicitPains: filterNulls(job.explicitPains) ?? [],
+    atsKeywords: filterNulls(job.atsKeywords) ?? [],
   };
 }
