@@ -9,9 +9,7 @@ import { resolve } from 'node:path';
  */
 export default defineConfig({
   test: {
-    // Global test configuration
-    setupFiles: [resolve(__dirname, './test/setup/console-guard.ts')],
-    // Suppress any console output that leaks through
+    // Global console suppression - prevents any leaked output
     onConsoleLog: () => false,
     projects: [
       // Unit tests - run in Node environment for speed
@@ -20,6 +18,7 @@ export default defineConfig({
           name: 'unit',
           include: ['test/unit/**/*.spec.ts'],
           environment: 'node',
+          setupFiles: [resolve(__dirname, './test/setup/console-guard.ts')],
           coverage: {
             provider: 'v8',
             include: ['src/**/*.{ts,vue}'],
@@ -46,6 +45,7 @@ export default defineConfig({
           name: 'amplify',
           include: ['test/amplify/**/*.spec.ts'],
           environment: 'node',
+          setupFiles: [resolve(__dirname, './test/setup/console-guard.ts')],
           coverage: {
             provider: 'v8',
             include: ['amplify/**/*.ts'],
@@ -70,7 +70,10 @@ export default defineConfig({
           name: 'nuxt',
           include: ['test/nuxt/**/*.spec.ts'],
           environment: 'nuxt',
-          setupFiles: [resolve(__dirname, './test/nuxt/setup/global-stubs.ts')],
+          setupFiles: [
+            resolve(__dirname, './test/setup/console-guard.ts'),
+            resolve(__dirname, './test/nuxt/setup/global-stubs.ts'),
+          ],
           environmentOptions: {
             nuxt: {
               domEnvironment: 'happy-dom',
@@ -85,12 +88,12 @@ export default defineConfig({
       {
         test: {
           name: 'e2e-sandbox',
+          // E2E tests allow console output for debugging
+          setupFiles: [],
+          onConsoleLog: undefined,
           include: ['test/e2e-sandbox/**/*.spec.ts'],
           environment: 'node',
           testTimeout: 60000, // 60s for AWS operations
-          // Allow console output in E2E tests for debugging
-          setupFiles: [],
-          onConsoleLog: undefined, // Override global suppression
         },
         // Configure path aliases for sandbox tests
         resolve: {
