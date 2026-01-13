@@ -1,20 +1,20 @@
 /**
  * Shared type definitions extracted from Amplify Data Schema
- * 
+ *
  * PURPOSE:
  * - Provide DRY type definitions for Lambda functions
  * - Ensure Lambda input types stay in sync with GraphQL schema
  * - Eliminate duplicate type definitions across AI operations
- * 
+ *
  * USAGE:
  * Import these types in Lambda handlers instead of redefining them:
  * ```typescript
  * import type { JobDescription, MatchingSummaryContext } from './types/schema-types';
  * ```
- * 
+ *
  * MAINTENANCE:
  * These types must be manually kept in sync with amplify/data/schema/types.ts
- * When schema changes, update these types accordingly and TypeScript will catch 
+ * When schema changes, update these types accordingly and TypeScript will catch
  * any mismatches in Lambda code that uses them.
  */
 

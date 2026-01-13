@@ -24,7 +24,7 @@ const baseJob = {
   behaviours: [],
   successCriteria: [],
   explicitPains: [],
-      atsKeywords: [],
+  atsKeywords: [],
   status: 'analyzed',
   rawText: 'Job text',
   companyId: 'company-1',
@@ -319,7 +319,6 @@ describe('Job Detail Page', () => {
       behaviours: [],
       successCriteria: [],
       explicitPains: [],
-      atsKeywords: [],
       atsKeywords: [],
     });
   });

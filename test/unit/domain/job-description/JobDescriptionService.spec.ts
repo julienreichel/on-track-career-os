@@ -316,7 +316,10 @@ describe('JobDescriptionService', () => {
         companyName: 'Acme Inc.',
       } as Company);
 
-      const result = await service.reanalyseJob('job-1');
+      let result: JobDescription;
+      await allowConsoleOutput(async () => {
+        result = await service.reanalyseJob('job-1', 'user-1::user-1');
+      });
 
       expect(mockRepository.update).toHaveBeenCalledTimes(2);
       expect(mockCompanyRepo.update).toHaveBeenCalledWith(
@@ -324,6 +327,7 @@ describe('JobDescriptionService', () => {
           id: 'company-123',
         })
       );
+      expect(result.companyId).toBe('company-123');
       expect(result.companyId).toBe('company-123');
     });
 
@@ -370,7 +374,10 @@ describe('JobDescriptionService', () => {
         companyName: 'NewCo',
       } as Company);
 
-      const result = await service.reanalyseJob('job-1');
+      let result: JobDescription;
+      await allowConsoleOutput(async () => {
+        result = await service.reanalyseJob('job-1', 'user-1::user-1');
+      });
 
       expect(mockCompanyRepo.create).toHaveBeenCalled();
       expect(mockCanvasRepo.create).toHaveBeenCalledWith(
@@ -379,6 +386,7 @@ describe('JobDescriptionService', () => {
           needsUpdate: true,
         })
       );
+      expect(result.companyId).toBe('company-999');
       expect(result.companyId).toBe('company-999');
     });
 

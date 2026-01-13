@@ -390,7 +390,9 @@ function isValidJobDescription(value?: JobDescription | null): value is JobDescr
   return Boolean(value?.title);
 }
 
-function isValidMatchingSummary(value?: MatchingSummaryContext | null): value is MatchingSummaryContext {
+function isValidMatchingSummary(
+  value?: MatchingSummaryContext | null
+): value is MatchingSummaryContext {
   if (!value) return false;
   return (
     typeof value.overallScore === 'number' &&

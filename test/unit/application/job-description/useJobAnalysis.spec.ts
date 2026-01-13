@@ -112,7 +112,7 @@ describe('useJobAnalysis', () => {
 
     await reanalyseJob('job-1');
 
-    expect(mockService.reanalyseJob).toHaveBeenCalledWith('job-1');
+    expect(mockService.reanalyseJob).toHaveBeenCalledWith('job-1', 'user-1::user-1');
     expect(selectedJob.value).toEqual(updated);
     expect(jobs.value[0]).toEqual(updated);
   });

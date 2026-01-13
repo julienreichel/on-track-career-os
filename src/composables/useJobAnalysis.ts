@@ -13,7 +13,7 @@ const error = ref<string | null>(null);
 
 export function useJobAnalysis() {
   const service = new JobDescriptionService();
-  const auth = useAuthUser();
+  const auth = useAuthUser(); // Move this to top level
 
   const run = async <T>(operation: () => Promise<T>): Promise<T> => {
     loading.value = true;
@@ -69,7 +69,8 @@ export function useJobAnalysis() {
   };
 
   const reanalyseJob = async (jobId: string) => {
-    const updated = await handle(() => service.reanalyseJob(jobId));
+    const ownerId = await auth.getOwnerIdOrThrow();
+    const updated = await handle(() => service.reanalyseJob(jobId, ownerId));
     selectedJob.value = updated;
     jobs.value = jobs.value.map((job) => (job.id === updated.id ? updated : job));
     return updated;

@@ -110,7 +110,7 @@ export class JobDescriptionService {
     return this.updateJob(jobId, this.buildParsedUpdatePayload(parsed));
   }
 
-  async reanalyseJob(jobId: string): Promise<JobDescription> {
+  async reanalyseJob(jobId: string, ownerId?: string): Promise<JobDescription> {
     const job = await this.repo.get(jobId);
     if (!job) {
       throw new Error('Job description not found');
@@ -124,7 +124,13 @@ export class JobDescriptionService {
     const parsed = await this.aiService.parseJobDescription(jobText);
     const updated = await this.attachParsedJobDescription(jobId, parsed);
     const enrichedJob = { ...updated, rawText: job.rawText };
-    return this.autoLinkCompany(enrichedJob);
+
+    // Only auto-link company if ownerId is provided
+    if (ownerId) {
+      return this.autoLinkCompany(enrichedJob, ownerId);
+    }
+
+    return enrichedJob;
   }
 
   async deleteJob(jobId: string): Promise<void> {
@@ -159,7 +165,7 @@ export class JobDescriptionService {
     };
   }
 
-  private async autoLinkCompany(job: JobDescription): Promise<JobDescription> {
+  private async autoLinkCompany(job: JobDescription, ownerId: string): Promise<JobDescription> {
     if (job.companyId || !job.rawText?.trim()) {
       return job;
     }
@@ -173,7 +179,7 @@ export class JobDescriptionService {
           summary: job.roleSummary ?? '',
         },
       });
-      return this.processCompanyLink(job, analysis);
+      return this.processCompanyLink(job, analysis, ownerId);
     } catch (error) {
       console.warn('[JobDescriptionService] Failed to link company from job upload', error);
       return job;
@@ -182,22 +188,19 @@ export class JobDescriptionService {
 
   private async processCompanyLink(
     job: JobDescription,
-    analysis: CompanyAnalysisResult
+    analysis: CompanyAnalysisResult,
+    ownerId: string
   ): Promise<JobDescription> {
     const normalizedName = normalizeCompanyName(analysis.companyProfile.companyName);
     if (!normalizedName) {
       return job;
     }
 
-    const owner = (job as { owner?: string }).owner ?? '';
-    if (!owner) {
-      return job;
-    }
-
     let company = await this.companyRepo.findByNormalizedName(
       analysis.companyProfile.companyName,
-      owner
+      ownerId
     );
+
     if (company) {
       const merged = mergeCompanyProfile(company, analysis.companyProfile);
       if (Object.keys(merged).length > 0) {
@@ -211,7 +214,8 @@ export class JobDescriptionService {
     } else {
       const createInput: CompanyCreateInput = {
         companyName: analysis.companyProfile.companyName || 'Unknown Company',
-        industry: analysis.companyProfile.industry || undefined,
+        owner: ownerId,
+        // Don't set owner - let Amplify handle it automatically ry: analysis.companyProfile.industry || undefined,
         sizeRange: analysis.companyProfile.sizeRange || undefined,
         website: analysis.companyProfile.website || undefined,
         productsServices: normalizeStringArray(analysis.companyProfile.productsServices),
@@ -220,7 +224,10 @@ export class JobDescriptionService {
         description: analysis.companyProfile.description || undefined,
         rawNotes: job.rawText,
       };
+
       company = await this.companyRepo.create(createInput);
+
+      // Initialize canvas for newly created company
       if (company) {
         await this.initializeCompanyCanvas(company.id);
       }
@@ -237,19 +244,23 @@ export class JobDescriptionService {
     return updatedJob ?? { ...job, companyId: company.id };
   }
 
-  private async initializeCompanyCanvas(companyId: string) {
-    await this.companyCanvasRepo.create({
-      companyId,
-      customerSegments: [],
-      valuePropositions: [],
-      channels: [],
-      customerRelationships: [],
-      revenueStreams: [],
-      keyResources: [],
-      keyActivities: [],
-      keyPartners: [],
-      costStructure: [],
-      needsUpdate: true,
-    });
+  private async initializeCompanyCanvas(companyId: string): Promise<void> {
+    try {
+      await this.companyCanvasRepo.create({
+        companyId,
+        needsUpdate: true,
+        customerSegments: [],
+        valuePropositions: [],
+        channels: [],
+        customerRelationships: [],
+        revenueStreams: [],
+        keyResources: [],
+        keyActivities: [],
+        keyPartners: [],
+        costStructure: [],
+      });
+    } catch (error) {
+      console.warn('[JobDescriptionService] Failed to initialize company canvas', error);
+    }
   }
 }
