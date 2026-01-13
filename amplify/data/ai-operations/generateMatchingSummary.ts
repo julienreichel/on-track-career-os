@@ -1,5 +1,13 @@
 import { invokeAiWithRetry } from './utils/bedrock';
 import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
+import type {
+  JobDescription,
+  CompanyProfile,
+  PersonalCanvas,
+  Experience,
+  Profile,
+  SpeechStory,
+} from './types/schema-types';
 
 const SYSTEM_PROMPT = `You are a skeptical talent-matching analyst evaluating job-candidate fit.
 
@@ -52,86 +60,13 @@ const OUTPUT_SCHEMA = `{
 
 const PROMPT_INDENT_SPACES = 2;
 
-export interface MatchingExperienceSignal {
-  title: string;
-  companyName: string;
-  startDate?: string;
-  endDate?: string;
-  experienceType: string;
-  responsibilities: string[];
-  tasks: string[];
-  achievements?: string[];
-  kpiSuggestions?: string[];
-}
-
-export interface MatchingUserProfile {
-  fullName: string;
-  headline?: string;
-  location?: string;
-  seniorityLevel?: string;
-  workPermitInfo?: string;
-  goals?: string[];
-  aspirations?: string[];
-  personalValues?: string[];
-  strengths?: string[];
-  interests?: string[];
-  skills?: string[];
-  certifications?: string[];
-  languages?: string[];
-}
-
-export interface MatchingPersonalCanvas {
-  customerSegments?: string[];
-  valueProposition?: string[];
-  channels?: string[];
-  customerRelationships?: string[];
-  keyActivities?: string[];
-  keyResources?: string[];
-  keyPartners?: string[];
-  costStructure?: string[];
-  revenueStreams?: string[];
-}
-
-export interface MatchingJobDescription {
-  title: string;
-  seniorityLevel: string;
-  roleSummary: string;
-  responsibilities: string[];
-  requiredSkills: string[];
-  behaviours: string[];
-  successCriteria: string[];
-  explicitPains: string[];
-}
-
-export interface MatchingCompany {
-  companyName: string;
-  industry: string;
-  sizeRange: string;
-  website: string;
-  description: string;
-  productsServices: string[];
-  targetMarkets: string[];
-  customerSegments: string[];
-  rawNotes: string;
-}
-
-export interface MatchingSpeechStory {
-  experienceId?: string;
-  title?: string;
-  situation?: string;
-  task?: string;
-  action?: string;
-  result?: string;
-  achievements?: string[];
-}
-
 export interface GenerateMatchingSummaryInput {
-  profile: MatchingUserProfile;
-  experiences?: MatchingExperienceSignal[];
-  stories?: MatchingSpeechStory[];
-  personalCanvas?: MatchingPersonalCanvas;
-  jobDescription?: MatchingJobDescription;
-  company?: MatchingCompany;
+  profile: Profile;
+  experiences?: Experience[];
+  stories?: SpeechStory[];
+  personalCanvas?: PersonalCanvas;
+  jobDescription?: JobDescription;
+  company?: CompanyProfile;
 }
 
 export interface GenerateMatchingSummaryOutput {
