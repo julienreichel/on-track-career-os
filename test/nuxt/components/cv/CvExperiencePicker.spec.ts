@@ -16,6 +16,11 @@ const router = createRouter({
   history: createMemoryHistory(),
   routes: [
     {
+      path: '/',
+      name: 'home',
+      component: { template: '<div>Home</div>' },
+    },
+    {
       path: '/profile/experiences',
       name: 'profile-experiences',
       component: { template: '<div>Experiences</div>' },

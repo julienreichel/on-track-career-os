@@ -10,7 +10,7 @@ import { resolve } from 'node:path';
 export default defineConfig({
   test: {
     // Global console suppression - prevents any leaked output
-    onConsoleLog: () => false,
+
     projects: [
       // Unit tests - run in Node environment for speed
       {
@@ -69,7 +69,10 @@ export default defineConfig({
           name: 'nuxt',
           include: ['test/nuxt/**/*.spec.ts'],
           environment: 'nuxt',
-          setupFiles: [resolve(__dirname, './test/nuxt/setup/global-stubs.ts')],
+          setupFiles: [
+            resolve(__dirname, './test/nuxt/setup/global-stubs.ts'),
+            resolve(__dirname, './test/setup/console-guard.ts'),
+          ],
           environmentOptions: {
             nuxt: {
               domEnvironment: 'happy-dom',

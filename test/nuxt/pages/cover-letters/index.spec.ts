@@ -49,6 +49,8 @@ const i18n = createTestI18n();
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
+    { path: '/', name: 'home', component: { template: '<div>Home</div>' } },
+    { path: '/cover-letters', redirect: '/applications/cover-letters' },
     { path: '/applications/cover-letters', name: 'cover-letters', component: CoverLetterIndexPage },
     {
       path: '/applications/cover-letters/:id',

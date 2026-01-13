@@ -71,6 +71,7 @@ describe('Profile Stories Page', () => {
     history: createMemoryHistory(),
     routes: [
       { path: '/', component: { template: '<div>Home</div>' } },
+      { path: '/profile', name: 'profile', component: { template: '<div>Profile</div>' } },
       { path: '/profile/stories', component: StoriesPage },
     ],
   });
