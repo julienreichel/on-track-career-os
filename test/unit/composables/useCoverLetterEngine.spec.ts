@@ -18,6 +18,7 @@ const buildAuthStub = () => ({
   loadUserId: vi.fn().mockResolvedValue(undefined),
 });
 
+// eslint-disable-next-line max-lines-per-function
 describe('useCoverLetterEngine', () => {
   const userId = 'user-1';
   let profile: UserProfile;
@@ -126,7 +127,7 @@ describe('useCoverLetterEngine', () => {
 
     it('should accept a userId parameter', () => {
       const deps = createDeps();
-      
+
       allowConsoleOutput(() => {
         const engine = useCoverLetterEngine({ userId: 'user-123', dependencies: deps });
         expect(engine).toBeDefined();

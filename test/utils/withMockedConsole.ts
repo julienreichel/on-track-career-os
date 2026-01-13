@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 import { allowConsoleOutput } from '../setup/console-guard';
 
 type MaybePromise<T> = T | Promise<T>;
