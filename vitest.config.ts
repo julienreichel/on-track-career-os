@@ -9,6 +9,10 @@ import { resolve } from 'node:path';
  */
 export default defineConfig({
   test: {
+    // Global test configuration
+    setupFiles: [resolve(__dirname, './test/setup/console-guard.ts')],
+    // Suppress any console output that leaks through
+    onConsoleLog: () => false,
     projects: [
       // Unit tests - run in Node environment for speed
       {
@@ -42,7 +46,6 @@ export default defineConfig({
           name: 'amplify',
           include: ['test/amplify/**/*.spec.ts'],
           environment: 'node',
-          setupFiles: ['test/amplify/setup/silenceConsole.ts'],
           coverage: {
             provider: 'v8',
             include: ['amplify/**/*.ts'],
@@ -85,6 +88,9 @@ export default defineConfig({
           include: ['test/e2e-sandbox/**/*.spec.ts'],
           environment: 'node',
           testTimeout: 60000, // 60s for AWS operations
+          // Allow console output in E2E tests for debugging
+          setupFiles: [],
+          onConsoleLog: undefined, // Override global suppression
         },
         // Configure path aliases for sandbox tests
         resolve: {
