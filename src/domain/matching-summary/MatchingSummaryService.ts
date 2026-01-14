@@ -5,6 +5,7 @@ import type {
 } from './MatchingSummary';
 import { MatchingSummaryRepository } from './MatchingSummaryRepository';
 import type { MatchingSummaryResult } from '@/domain/ai-operations/MatchingSummaryResult';
+import { JobDescriptionRepository } from '@/domain/job-description/JobDescriptionRepository';
 
 export interface MatchingSummaryContext {
   userId: string;
@@ -28,6 +29,44 @@ function sanitizeArray(value: unknown) {
   return value
     .map((entry) => (typeof entry === 'string' ? entry.trim() : ''))
     .filter((entry) => Boolean(entry));
+}
+
+type DatedSummary = MatchingSummary & {
+  updatedAt?: string | null;
+  createdAt?: string | null;
+  generatedAt?: string | null;
+};
+
+function pickMostRecent(items: DatedSummary[]) {
+  return [...items].sort((a, b) => {
+    const dateA = new Date(a.updatedAt ?? a.generatedAt ?? a.createdAt ?? 0).getTime();
+    const dateB = new Date(b.updatedAt ?? b.generatedAt ?? b.createdAt ?? 0).getTime();
+    return dateB - dateA;
+  })[0] ?? null;
+}
+
+function selectMatchingSummary(
+  summaries: MatchingSummary[],
+  context: MatchingSummaryContext
+): MatchingSummary | null {
+  const userSummaries = summaries.filter((summary) => summary.userId === context.userId);
+  if (!userSummaries.length) {
+    return null;
+  }
+
+  const companyId = context.companyId ?? null;
+  const companyMatches = companyId
+    ? userSummaries.filter((summary) => summary.companyId === companyId)
+    : [];
+  const jobMatches = userSummaries.filter((summary) => !summary.companyId);
+  let candidates = userSummaries;
+  if (companyMatches.length) {
+    candidates = companyMatches;
+  } else if (jobMatches.length) {
+    candidates = jobMatches;
+  }
+
+  return pickMostRecent(candidates as DatedSummary[]);
 }
 
 export function mapMatchingSummaryResult(
@@ -58,7 +97,10 @@ export function mapMatchingSummaryResult(
 }
 
 export class MatchingSummaryService {
-  constructor(private repo = new MatchingSummaryRepository()) {}
+  constructor(
+    private repo: MatchingSummaryRepository = new MatchingSummaryRepository(),
+    private jobRepo: JobDescriptionRepository = new JobDescriptionRepository()
+  ) {}
 
   async getById(id: string) {
     return this.repo.get(id);
@@ -68,14 +110,15 @@ export class MatchingSummaryService {
     if (!context.userId || !context.jobId) {
       throw new Error('userId and jobId are required');
     }
-    return this.repo.findByContext(context.userId, context.jobId, context.companyId);
+    const summaries = await this.jobRepo.getMatchingSummaries(context.jobId);
+    return selectMatchingSummary(summaries, context);
   }
 
   async listByJob(jobId: string) {
     if (!jobId) {
       throw new Error('jobId is required');
     }
-    return this.repo.listByJob(jobId);
+    return this.jobRepo.getMatchingSummaries(jobId);
   }
 
   async upsertSummary(params: UpsertMatchingSummaryInput): Promise<MatchingSummary> {
@@ -84,7 +127,7 @@ export class MatchingSummaryService {
       throw new Error('userId and jobId are required to upsert matching summary');
     }
 
-    const existing = await this.repo.findByContext(userId, jobId, companyId);
+    const existing = await this.getByContext({ userId, jobId, companyId });
     const mapped = mapMatchingSummaryResult(summary);
 
     if (existing) {

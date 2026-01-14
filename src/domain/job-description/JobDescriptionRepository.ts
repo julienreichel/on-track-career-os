@@ -5,6 +5,7 @@ import type {
   JobDescriptionUpdateInput,
   JobDescription,
 } from './JobDescription';
+import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
 
 export type AmplifyJobDescriptionModel = {
   get: (
@@ -82,6 +83,16 @@ export class JobDescriptionRepository {
 
     const res = await this.model.get({ id }, gqlOptions({ selectionSet }));
     return res.data;
+  }
+
+  async getMatchingSummaries(id: string): Promise<MatchingSummary[]> {
+    const selectionSet = ['id', 'matchingSummaries.*'];
+    const res = await this.model.get({ id }, gqlOptions({ selectionSet }));
+    const data = res.data as (JobDescription & {
+      matchingSummaries?: (MatchingSummary | null)[] | null;
+    }) | null;
+    const summaries = (data?.matchingSummaries ?? []) as MatchingSummary[];
+    return summaries.filter((summary): summary is MatchingSummary => Boolean(summary));
   }
 
   async listByOwner(owner: string): Promise<JobDescription[]> {

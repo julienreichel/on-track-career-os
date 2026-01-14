@@ -4,10 +4,12 @@ import {
   mapMatchingSummaryResult,
 } from '@/domain/matching-summary/MatchingSummaryService';
 import { MatchingSummaryRepository } from '@/domain/matching-summary/MatchingSummaryRepository';
+import { JobDescriptionRepository } from '@/domain/job-description/JobDescriptionRepository';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
 import type { MatchingSummaryResult } from '@/domain/ai-operations/MatchingSummaryResult';
 
 vi.mock('@/domain/matching-summary/MatchingSummaryRepository');
+vi.mock('@/domain/job-description/JobDescriptionRepository');
 
 const buildSummary = (): MatchingSummaryResult => ({
   overallScore: 78,
@@ -38,6 +40,9 @@ describe('MatchingSummaryService', () => {
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
   };
+  let mockJobRepo: {
+    getMatchingSummaries: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     mockRepo = {
@@ -48,17 +53,33 @@ describe('MatchingSummaryService', () => {
       update: vi.fn(),
       delete: vi.fn(),
     } as unknown as typeof mockRepo;
+    mockJobRepo = {
+      getMatchingSummaries: vi.fn(),
+    };
 
     vi.mocked(MatchingSummaryRepository).mockImplementation(
       () => mockRepo as unknown as MatchingSummaryRepository
     );
+    vi.mocked(JobDescriptionRepository).mockImplementation(
+      () => mockJobRepo as unknown as JobDescriptionRepository
+    );
 
-    service = new MatchingSummaryService(mockRepo as unknown as MatchingSummaryRepository);
+    service = new MatchingSummaryService(
+      mockRepo as unknown as MatchingSummaryRepository,
+      mockJobRepo as unknown as JobDescriptionRepository
+    );
   });
 
   it('gets summaries by id and context', async () => {
     mockRepo.get.mockResolvedValue({ id: 'ms-1' } as MatchingSummary);
-    mockRepo.findByContext.mockResolvedValue({ id: 'ms-ctx' } as MatchingSummary);
+    mockJobRepo.getMatchingSummaries.mockResolvedValue([
+      {
+        id: 'ms-ctx',
+        userId: 'user-1',
+        jobId: 'job-1',
+        companyId: 'comp-1',
+      } as MatchingSummary,
+    ]);
 
     expect(await service.getById('ms-1')).toEqual({ id: 'ms-1' });
     expect(
@@ -67,14 +88,14 @@ describe('MatchingSummaryService', () => {
   });
 
   it('lists summaries by job', async () => {
-    mockRepo.listByJob.mockResolvedValue([{ id: 'ms-2' }] as MatchingSummary[]);
+    mockJobRepo.getMatchingSummaries.mockResolvedValue([{ id: 'ms-2' }] as MatchingSummary[]);
     const list = await service.listByJob('job-1');
     expect(list).toHaveLength(1);
   });
 
   it('upserts summaries by creating when none exist', async () => {
     const summary = buildSummary();
-    mockRepo.findByContext.mockResolvedValue(null);
+    mockJobRepo.getMatchingSummaries.mockResolvedValue([]);
     mockRepo.create.mockResolvedValue({ id: 'created' } as MatchingSummary);
 
     const created = await service.upsertSummary({
@@ -98,7 +119,14 @@ describe('MatchingSummaryService', () => {
 
   it('upserts summaries by updating when one exists', async () => {
     const summary = buildSummary();
-    mockRepo.findByContext.mockResolvedValue({ id: 'existing' } as MatchingSummary);
+    mockJobRepo.getMatchingSummaries.mockResolvedValue([
+      {
+        id: 'existing',
+        userId: 'user-1',
+        jobId: 'job-1',
+        companyId: null,
+      } as MatchingSummary,
+    ]);
     mockRepo.update.mockResolvedValue({ id: 'existing', overallScore: 78 } as MatchingSummary);
 
     const updated = await service.upsertSummary({
