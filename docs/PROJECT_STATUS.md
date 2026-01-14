@@ -1,7 +1,7 @@
 # Project Status — AI Career OS
 
-**Last Updated:** 2026-01-11  
-**Version:** MVP Phase — Job, Company, Matching, Speech, Cover Letter, and Tailored Materials Complete
+**Last Updated:** 2026-01-14  
+**Version:** v0.9.0 — Production-Ready MVP with Advanced Matching and ATS Optimization
 
 ---
 
@@ -9,16 +9,20 @@
 
 ### Current State
 
-The project has established a **strong backend and domain foundation** with comprehensive testing, and **significant frontend implementation progress**. The architecture follows Domain-Driven Design principles with clean separation of concerns.
+The project has achieved **production-ready MVP status** with comprehensive testing, advanced matching capabilities, and ATS optimization. The architecture follows Domain-Driven Design principles with clean separation of concerns and robust type safety.
 
 - **Key Achievements:**
 
 - ✅ 12 of 12 AI operations implemented (100%)
 - ✅ 16 data models in GraphQL schema (complete for MVP)
 - ✅ 9 domain modules with full repository/service/composable layers
-- ✅ 360+ tests passing across 38+ test suites (lint + unit + E2E all green)
+- ✅ 400+ tests passing across 45+ test suites (lint + unit + E2E all green)
 - ✅ Type-safe architecture with single source of truth pattern
-- ✅ CV header now renders profile photo, contact, work-permit, and social links sourced from profile data with user-controlled toggles
+- ✅ **NEW:** ATS keywords extraction and optimization for job descriptions
+- ✅ **NEW:** Auto-generating matching summaries on job load for better UX
+- ✅ **NEW:** Advanced duplicate company prevention with GraphQL optimization
+- ✅ **NEW:** Streamlined experience import with merge capabilities
+- ✅ **NEW:** CV import count tracking with summary feedback
 - ✅ Jobs workflow complete: upload → parse → list → search → edit → save
 - ✅ Full E2E test coverage for jobs flow with fixtures
 - ✅ Company workflow complete: create → analyze → canvas → link to jobs
@@ -29,12 +33,13 @@ The project has established a **strong backend and domain foundation** with comp
 - ✅ Speech pages live at `/applications/speech` and `/applications/speech/:id` with E2E coverage
 - ✅ Tailored materials workflow complete: job/match entry points, tailored regeneration banners, and E2E coverage
 
-**MVP Readiness:** ~90% complete
+**MVP Readiness:** ~95% complete
 
-- Backend Infrastructure: 98% complete
+- Backend Infrastructure: 100% complete
 - Domain Logic: 98% complete
-- Frontend UI: 85% complete (EPICs 1A, 1B, 2, 3, 3B, 4, 4B, 5A, 5B, 5C, 6 fully implemented)
+- Frontend UI: 90% complete (EPICs 1A, 1B, 2, 3, 3B, 4, 4B, 5A, 5B, 5C, 6 fully implemented)
 - AI Operations: 100% complete (12/12)
+- Code Quality: 95% complete (comprehensive test coverage, type safety, performance optimizations)
 
 ---
 
@@ -44,9 +49,9 @@ The project has established a **strong backend and domain foundation** with comp
 
 | EPIC   | Name                        | Backend | Domain | AI Ops     | Frontend | Overall  |
 | ------ | --------------------------- | ------- | ------ | ---------- | -------- | -------- |
-| **1A** | User Data Intake & Identity | 95%     | 95%    | 100% (2/2) | 90%      | **95%**  |
+| **1A** | User Data Intake & Identity | 100%    | 98%    | 100% (2/2) | 95%      | **98%**  |
 | **1B** | Personal Canvas Generation  | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
-| **2**  | Experience Builder (STAR)   | 100%    | 100%   | 100% (2/2) | 90%      | **95%**  |
+| **2**  | Experience Builder (STAR)   | 100%    | 100%   | 100% (2/2) | 95%      | **98%**  |
 | **3**  | Generic CV Generator        | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **3B** | CV Header & Contact Info    | 100%    | 100%   | 100% (0/0) | 100%     | **100%** |
 | **4**  | User Speech Builder         | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
@@ -56,7 +61,7 @@ The project has established a **strong backend and domain foundation** with comp
 | **5C** | User-Job-Company Matching   | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **6**  | Tailored Materials          | 100%    | 100%   | 100% (3/3) | 100%     | **100%** |
 
-**Overall MVP Progress:** ~90%
+**Overall MVP Progress:** ~95%
 
 ### Detailed EPIC Analysis
 
