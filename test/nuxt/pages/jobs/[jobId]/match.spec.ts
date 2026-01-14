@@ -182,12 +182,13 @@ describe('Job match page', () => {
     expect(wrapper.find('.tailored-materials-card').exists()).toBe(true);
   });
 
-  it('shows an empty state when no summary exists', async () => {
+  it('triggers generation when no summary exists', async () => {
     engineMock.hasSummary.value = false;
     engineMock.matchingSummary.value = null;
     const wrapper = await mountPage();
 
-    expect(wrapper.text()).toContain('No matching summary yet');
+    expect(engineMock.regenerate).toHaveBeenCalled();
+    expect(wrapper.find('.tailored-materials-card').exists()).toBe(true);
   });
 
   it('displays errors from the matching engine', async () => {

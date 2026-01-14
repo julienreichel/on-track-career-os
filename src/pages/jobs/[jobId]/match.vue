@@ -133,6 +133,9 @@ const handleGenerate = async () => {
 onMounted(async () => {
   try {
     await engine.load();
+    if (!engine.hasSummary.value && !engine.isGenerating.value) {
+      await handleGenerate();
+    }
   } catch (error) {
     console.error('[matching] Failed to load matching data', error);
   }
