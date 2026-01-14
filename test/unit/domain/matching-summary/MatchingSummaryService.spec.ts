@@ -84,7 +84,14 @@ describe('MatchingSummaryService', () => {
     expect(await service.getById('ms-1')).toEqual({ id: 'ms-1' });
     expect(
       await service.getByContext({ userId: 'user-1', jobId: 'job-1', companyId: 'comp-1' })
-    ).toEqual({ id: 'ms-ctx' });
+    ).toEqual(
+      expect.objectContaining({
+        id: 'ms-ctx',
+        userId: 'user-1',
+        jobId: 'job-1',
+        companyId: 'comp-1',
+      })
+    );
   });
 
   it('lists summaries by job', async () => {

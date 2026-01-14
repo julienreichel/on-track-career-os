@@ -38,6 +38,7 @@ const engineMock = {
   isGenerating: ref(false),
   error: ref<string | null>(null),
   hasSummary: ref(true),
+  existingMaterials: ref({ cv: null, coverLetter: null, speechBlock: null }),
   load: vi.fn(),
   regenerate: vi.fn(),
 };
@@ -130,7 +131,14 @@ const stubs = {
     template: '<div class="matching-card">Score: {{ overallScore }}</div>',
   },
   TailoredMaterialsCard: {
-    props: ['job', 'matchingSummary', 'summaryLoading', 'summaryError', 'descriptionKey'],
+    props: [
+      'job',
+      'matchingSummary',
+      'existingMaterials',
+      'summaryLoading',
+      'summaryError',
+      'descriptionKey',
+    ],
     template: '<section class="tailored-materials-card"></section>',
   },
 };

@@ -237,6 +237,7 @@ onMounted(async () => {
           <TailoredMaterialsCard
             :job="job"
             :matching-summary="summary"
+            :existing-materials="engine.existingMaterials.value"
             :summary-loading="isLoading"
             :summary-error="errorMessage"
             description-key="matchDescription"

@@ -179,11 +179,10 @@ describe('useMatchingEngine', () => {
         generateMatchingSummary: vi.fn().mockResolvedValue(aiResult),
       } as unknown as AiOperationsService,
       matchingSummaryService: {
-        getByContext: vi.fn().mockResolvedValue(null),
         upsertSummary: vi.fn().mockResolvedValue(persistedSummary),
       } as unknown as MatchingSummaryService,
       jobService: {
-        getFullJobDescription: vi.fn().mockResolvedValue(job),
+        getJobWithRelations: vi.fn().mockResolvedValue(job),
       } as unknown as JobDescriptionService,
       userProfileService: {
         getFullUserProfile: vi.fn().mockResolvedValue(userProfile),
@@ -216,13 +215,8 @@ describe('useMatchingEngine', () => {
     });
 
     await engine.load();
-    expect(deps.jobService.getFullJobDescription).toHaveBeenCalledWith(jobId);
+    expect(deps.jobService.getJobWithRelations).toHaveBeenCalledWith(jobId);
     expect(deps.userProfileService.getFullUserProfile).toHaveBeenCalledWith(userId);
-    expect(deps.matchingSummaryService.getByContext).toHaveBeenCalledWith({
-      userId,
-      jobId,
-      companyId: 'company-1',
-    });
 
     await engine.regenerate();
 
@@ -245,7 +239,7 @@ describe('useMatchingEngine', () => {
   it('handles missing company context gracefully', async () => {
     const deps = createDeps({
       jobService: {
-        getFullJobDescription: vi.fn().mockResolvedValue({ ...job, companyId: null }),
+        getJobWithRelations: vi.fn().mockResolvedValue({ ...job, companyId: null }),
       } as unknown as JobDescriptionService,
       companyService: {
         getCompany: vi.fn(),
@@ -308,8 +302,14 @@ describe('useMatchingEngine', () => {
   });
 
   it('reflects existing summaries returned by the service', async () => {
-    const deps = createDeps();
-    asMock(deps.matchingSummaryService.getByContext).mockResolvedValue(persistedSummary);
+    const deps = createDeps({
+      jobService: {
+        getJobWithRelations: vi.fn().mockResolvedValue({
+          ...job,
+          matchingSummaries: [persistedSummary],
+        }),
+      } as unknown as JobDescriptionService,
+    });
     const auth = buildAuthStub();
     const engine = useMatchingEngine(jobId, {
       userId,

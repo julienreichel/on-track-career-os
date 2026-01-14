@@ -16,6 +16,9 @@ import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import { CompanyService } from '@/domain/company/CompanyService';
 import type { Company } from '@/domain/company/Company';
 import { CompanyCanvasService } from '@/domain/company-canvas/CompanyCanvasService';
+import type { CVDocument } from '@/domain/cvdocument/CVDocument';
+import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
+import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 
 const MAX_EXPERIENCE_SIGNALS = 8;
 
@@ -29,6 +32,13 @@ type MatchingEngineDependencies = {
   storyService: STARStoryService;
   companyService: CompanyService;
   companyCanvasService: CompanyCanvasService;
+};
+
+type JobWithRelations = JobDescription & {
+  matchingSummaries?: (MatchingSummary | null)[] | null;
+  cvs?: (CVDocument | null)[] | null;
+  coverLetters?: (CoverLetter | null)[] | null;
+  speechBlocks?: (SpeechBlock | null)[] | null;
 };
 
 type AuthComposable = {
@@ -85,6 +95,14 @@ function createMatchingEngineState({ jobId, providedUserId, deps, auth }: Engine
   const error = ref<string | null>(null);
   const currentUserId = ref<string | null>(providedUserId);
   const hasSummary = computed(() => Boolean(matchingSummary.value));
+  const existingMaterials = computed(() => {
+    const jobRecord = job.value as JobWithRelations | null;
+    return {
+      cv: pickMostRecent(jobRecord?.cvs ?? null),
+      coverLetter: pickMostRecent(jobRecord?.coverLetters ?? null),
+      speechBlock: pickMostRecent(jobRecord?.speechBlocks ?? null),
+    };
+  });
 
   const resolveUserId = createUserResolver({ providedUserId, currentUserId, auth });
   const runWithState = createStateRunner(error);
@@ -98,11 +116,7 @@ function createMatchingEngineState({ jobId, providedUserId, deps, auth }: Engine
       const profile = await ensureProfile(userId, deps.userProfileService);
       userProfile.value = profile;
 
-      const existing = await deps.matchingSummaryService.getByContext({
-        userId,
-        jobId,
-        companyId: loadedJob.companyId ?? null,
-      });
+      const existing = selectMatchingSummaryFromJob(loadedJob, userId);
       matchingSummary.value = existing;
       return existing;
     });
@@ -153,6 +167,7 @@ function createMatchingEngineState({ jobId, providedUserId, deps, auth }: Engine
     isGenerating,
     error,
     hasSummary,
+    existingMaterials,
     load,
     regenerate,
   };
@@ -202,8 +217,65 @@ function createStateRunner(errorRef: Ref<string | null>) {
   };
 }
 
+type DatedItem = {
+  id: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+  generatedAt?: string | null;
+};
+
+function pickMostRecent<T extends DatedItem>(
+  items: Array<T | null> | null | undefined
+): T | null {
+  if (!Array.isArray(items) || items.length === 0) {
+    return null;
+  }
+
+  const validItems = items.filter((item): item is T => Boolean(item));
+  if (!validItems.length) {
+    return null;
+  }
+
+  return [...validItems].sort((a, b) => {
+    const dateA = new Date(a.updatedAt ?? a.generatedAt ?? a.createdAt ?? 0).getTime();
+    const dateB = new Date(b.updatedAt ?? b.generatedAt ?? b.createdAt ?? 0).getTime();
+    return dateB - dateA;
+  })[0] ?? null;
+}
+
+function selectMatchingSummaryFromJob(
+  jobRecord: JobWithRelations,
+  userId: string
+): MatchingSummary | null {
+  const summaries = (jobRecord.matchingSummaries ?? []).filter(
+    (summary): summary is MatchingSummary => Boolean(summary)
+  );
+  if (!summaries.length) {
+    return null;
+  }
+
+  const userSummaries = summaries.filter((summary) => summary.userId === userId);
+  if (!userSummaries.length) {
+    return null;
+  }
+
+  const companyId = jobRecord.companyId ?? null;
+  const companyMatches = companyId
+    ? userSummaries.filter((summary) => summary.companyId === companyId)
+    : [];
+  const jobMatches = userSummaries.filter((summary) => !summary.companyId);
+  let candidates = userSummaries;
+  if (companyMatches.length) {
+    candidates = companyMatches;
+  } else if (jobMatches.length) {
+    candidates = jobMatches;
+  }
+
+  return pickMostRecent(candidates);
+}
+
 async function ensureJob(jobId: string, service: JobDescriptionService) {
-  const job = await service.getFullJobDescription(jobId);
+  const job = (await service.getJobWithRelations(jobId)) as JobWithRelations | null;
   if (!job) {
     throw new Error('Job description not found');
   }
