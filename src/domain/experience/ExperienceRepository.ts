@@ -2,6 +2,8 @@ import { gqlOptions } from '@/data/graphql/options';
 import type { AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { ExperienceCreateInput, ExperienceUpdateInput, Experience } from './Experience';
+import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
+import type { STARStory } from '@/domain/starstory/STARStory';
 
 export type AmplifyExperienceModel = {
   get: (
@@ -25,6 +27,15 @@ export type AmplifyExperienceModel = {
 
 type UserProfileWithExperiences = UserProfile & {
   experiences?: (Experience | null)[] | null;
+};
+
+type ExperienceWithStories = Experience & {
+  stories?: (STARStory | null)[] | null;
+};
+
+type UserProfileExperienceContext = UserProfile & {
+  experiences?: (ExperienceWithStories | null)[] | null;
+  canvas?: PersonalCanvas | null;
 };
 
 export class ExperienceRepository {
@@ -75,6 +86,27 @@ export class ExperienceRepository {
     const profile = data as UserProfileWithExperiences | null;
     const items = (profile?.experiences ?? []) as Experience[];
     return items.filter((item): item is Experience => Boolean(item));
+  }
+
+  async getExperienceContext(userId: string): Promise<{
+    experiences: ExperienceWithStories[];
+    personalCanvas: PersonalCanvas | null;
+  }> {
+    if (!userId) {
+      return { experiences: [], personalCanvas: null };
+    }
+
+    const selectionSet = ['id', 'experiences.*', 'experiences.stories.*', 'canvas.*'];
+
+    const { data } = await this._userProfileModel.get({ id: userId }, gqlOptions({ selectionSet }));
+    const profile = data as UserProfileExperienceContext | null;
+    const experiences = (profile?.experiences ?? []) as ExperienceWithStories[];
+    const personalCanvas = (profile?.canvas ?? null) as PersonalCanvas | null;
+
+    return {
+      experiences: experiences.filter((item): item is ExperienceWithStories => Boolean(item)),
+      personalCanvas,
+    };
   }
 
   async create(input: ExperienceCreateInput) {

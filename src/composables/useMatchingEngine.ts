@@ -8,11 +8,10 @@ import { JobDescriptionService } from '@/domain/job-description/JobDescriptionSe
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
-import { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
-import { STARStoryService } from '@/domain/starstory/STARStoryService';
+import type { STARStory } from '@/domain/starstory/STARStory';
 import { CompanyService } from '@/domain/company/CompanyService';
 import type { Company } from '@/domain/company/Company';
 import { CompanyCanvasService } from '@/domain/company-canvas/CompanyCanvasService';
@@ -27,9 +26,7 @@ type MatchingEngineDependencies = {
   matchingSummaryService: MatchingSummaryService;
   jobService: JobDescriptionService;
   userProfileService: UserProfileService;
-  personalCanvasRepo: PersonalCanvasRepository;
   experienceRepo: ExperienceRepository;
-  storyService: STARStoryService;
   companyService: CompanyService;
   companyCanvasService: CompanyCanvasService;
 };
@@ -60,9 +57,7 @@ function createDependencies(
     matchingSummaryService: overrides.matchingSummaryService ?? new MatchingSummaryService(),
     jobService: overrides.jobService ?? new JobDescriptionService(),
     userProfileService: overrides.userProfileService ?? new UserProfileService(),
-    personalCanvasRepo: overrides.personalCanvasRepo ?? new PersonalCanvasRepository(),
     experienceRepo: overrides.experienceRepo ?? new ExperienceRepository(),
-    storyService: overrides.storyService ?? new STARStoryService(),
     companyService: overrides.companyService ?? new CompanyService(),
     companyCanvasService: overrides.companyCanvasService ?? new CompanyCanvasService(),
   };
@@ -130,12 +125,8 @@ function createMatchingEngineState({ jobId, providedUserId, deps, auth }: Engine
       const profile = cachedProfile ?? (await ensureProfile(userId, deps.userProfileService));
       cachedProfile = profile;
 
-      const [personalCanvas] = await deps.personalCanvasRepo.list({
-        filter: { userId: { eq: userId } },
-      });
-
-      const experiences = await deps.experienceRepo.list(userId);
-      const experienceSignals = await loadExperienceSignals(experiences, deps.storyService);
+      const { experiences, personalCanvas } = await deps.experienceRepo.getExperienceContext(userId);
+      const experienceSignals = loadExperienceSignals(experiences);
       const companyPayload = jobRecord.companyId
         ? await loadCompanyPayload(jobRecord.companyId, deps.companyService)
         : undefined;
@@ -289,26 +280,19 @@ async function ensureProfile(userId: string, service: UserProfileService) {
   return profile;
 }
 
-async function loadExperienceSignals(experiences: Experience[], storyService: STARStoryService) {
+type ExperienceWithStories = Experience & {
+  stories?: (STARStory | null)[] | null;
+};
+
+function loadExperienceSignals(experiences: ExperienceWithStories[]) {
   if (!experiences.length) {
     return undefined;
   }
 
   const limited = experiences.slice(0, MAX_EXPERIENCE_SIGNALS);
-  const storySets = await Promise.all(
-    limited.map(async (exp) => {
-      try {
-        return await storyService.getStoriesByExperience(exp.id);
-      } catch (err) {
-        console.error('[useMatchingEngine] Failed to load stories', exp.id, err);
-        return [];
-      }
-    })
-  );
 
-  const allStories = storySets.flat();
-  const signals = limited.map((exp, index) => {
-    const stories = storySets[index] ?? [];
+  const signals = limited.map((exp) => {
+    const stories = (exp.stories ?? []).filter((story): story is STARStory => Boolean(story));
     const achievements = flattenStrings(stories.flatMap((story) => story.achievements ?? []));
     const kpiSuggestions = flattenStrings(stories.flatMap((story) => story.kpiSuggestions ?? []));
 
@@ -324,6 +308,10 @@ async function loadExperienceSignals(experiences: Experience[], storyService: ST
       kpiSuggestions,
     };
   });
+
+  const allStories = limited.flatMap((exp) =>
+    (exp.stories ?? []).filter((story): story is STARStory => Boolean(story))
+  );
 
   const storySignals = allStories.map((story) => ({
     situation: story.situation || '',

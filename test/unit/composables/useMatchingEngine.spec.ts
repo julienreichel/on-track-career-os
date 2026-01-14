@@ -18,9 +18,7 @@ import type { AiOperationsService } from '@/domain/ai-operations/AiOperationsSer
 import type { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
 import type { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
 import type { UserProfileService } from '@/domain/user-profile/UserProfileService';
-import type { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
 import type { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import type { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { CompanyService } from '@/domain/company/CompanyService';
 import type { CompanyCanvasService } from '@/domain/company-canvas/CompanyCanvasService';
 
@@ -99,6 +97,7 @@ describe('useMatchingEngine', () => {
         experienceType: 'work',
         responsibilities: ['Scale teams'],
         tasks: ['Coach EMs'],
+        stories: [],
       },
     ] as Experience[];
 
@@ -112,6 +111,7 @@ describe('useMatchingEngine', () => {
       achievements: ['Reduced attrition by 30%'],
       kpiSuggestions: ['Attrition down 30%'],
     } as STARStory;
+    experiences[0] = { ...experiences[0], stories: [story] } as Experience;
 
     company = {
       id: 'company-1',
@@ -187,15 +187,12 @@ describe('useMatchingEngine', () => {
       userProfileService: {
         getFullUserProfile: vi.fn().mockResolvedValue(userProfile),
       } as unknown as UserProfileService,
-      personalCanvasRepo: {
-        list: vi.fn().mockResolvedValue([personalCanvas]),
-      } as unknown as PersonalCanvasRepository,
       experienceRepo: {
-        list: vi.fn().mockResolvedValue(experiences),
+        getExperienceContext: vi.fn().mockResolvedValue({
+          experiences,
+          personalCanvas,
+        }),
       } as unknown as ExperienceRepository,
-      storyService: {
-        getStoriesByExperience: vi.fn().mockResolvedValue([story]),
-      } as unknown as STARStoryService,
       companyService: {
         getCompany: vi.fn().mockResolvedValue(company),
       } as unknown as CompanyService,
@@ -266,9 +263,12 @@ describe('useMatchingEngine', () => {
 
   it('omits personal canvas when not found', async () => {
     const deps = createDeps({
-      personalCanvasRepo: {
-        list: vi.fn().mockResolvedValue([]),
-      } as unknown as PersonalCanvasRepository,
+      experienceRepo: {
+        getExperienceContext: vi.fn().mockResolvedValue({
+          experiences,
+          personalCanvas: null,
+        }),
+      } as unknown as ExperienceRepository,
     });
     const auth = buildAuthStub();
     const engine = useMatchingEngine(jobId, {
