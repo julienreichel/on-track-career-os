@@ -7,18 +7,24 @@ import type { ExtractedExperience } from '@/domain/ai-operations/Experience';
 vi.mock('@/domain/experience/ExperienceRepository', () => ({
   ExperienceRepository: vi.fn().mockImplementation(() => ({
     create: vi.fn(),
+    list: vi.fn(),
+    update: vi.fn(),
   })),
 }));
 
 describe('useExperienceImport', () => {
   let mockRepo: {
     create: ReturnType<typeof vi.fn>;
+    list: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
     mockRepo = {
       create: vi.fn(),
+      list: vi.fn().mockResolvedValue([]),
+      update: vi.fn(),
     };
     vi.mocked(ExperienceRepository).mockImplementation(() => mockRepo as never);
   });
@@ -46,10 +52,12 @@ describe('useExperienceImport', () => {
     const { importExperiences } = useExperienceImport();
 
     mockRepo.create.mockResolvedValue({ id: '1' });
+    mockRepo.list.mockResolvedValue([]);
 
     const count = await importExperiences(mockExperiences, 'raw CV text', 'user-123');
 
     expect(count).toBe(2);
+    expect(mockRepo.list).toHaveBeenCalledWith('user-123');
     expect(mockRepo.create).toHaveBeenCalledTimes(2);
   });
 
@@ -57,6 +65,7 @@ describe('useExperienceImport', () => {
     const { importExperiences } = useExperienceImport();
 
     mockRepo.create.mockResolvedValue({ id: '1' });
+    mockRepo.list.mockResolvedValue([]);
 
     await importExperiences(mockExperiences, 'raw CV text', 'user-123');
 
@@ -89,6 +98,7 @@ describe('useExperienceImport', () => {
     const { importExperiences } = useExperienceImport();
 
     mockRepo.create.mockResolvedValue({ id: '1' });
+    mockRepo.list.mockResolvedValue([]);
 
     const experiencesWithNullEnd: ExtractedExperience[] = [
       {
@@ -116,6 +126,7 @@ describe('useExperienceImport', () => {
     const count = await importExperiences([], 'raw text', 'user-123');
 
     expect(count).toBe(0);
+    expect(mockRepo.list).toHaveBeenCalledWith('user-123');
     expect(mockRepo.create).not.toHaveBeenCalled();
   });
 
@@ -126,6 +137,7 @@ describe('useExperienceImport', () => {
       .mockResolvedValueOnce({ id: '1' })
       .mockResolvedValueOnce(null)
       .mockResolvedValueOnce({ id: '3' });
+    mockRepo.list.mockResolvedValue([]);
 
     const experiences: ExtractedExperience[] = [
       {
@@ -164,6 +176,7 @@ describe('useExperienceImport', () => {
     const { importExperiences } = useExperienceImport();
 
     mockRepo.create.mockResolvedValue({ id: '1' });
+    mockRepo.list.mockResolvedValue([]);
 
     await importExperiences(mockExperiences, 'raw text', 'user-123');
 
@@ -177,6 +190,7 @@ describe('useExperienceImport', () => {
     const { importExperiences } = useExperienceImport();
 
     mockRepo.create.mockResolvedValue({ id: '1' });
+    mockRepo.list.mockResolvedValue([]);
 
     const minimalExperiences: ExtractedExperience[] = [
       {
@@ -204,6 +218,7 @@ describe('useExperienceImport', () => {
     const { importExperiences } = useExperienceImport();
 
     mockRepo.create.mockResolvedValue({ id: '1' });
+    mockRepo.list.mockResolvedValue([]);
 
     const rawText = 'This is the original CV text content';
     await importExperiences(mockExperiences, rawText, 'user-123');
@@ -211,6 +226,106 @@ describe('useExperienceImport', () => {
     const calls = mockRepo.create.mock.calls;
     calls.forEach((call) => {
       expect(call[0].rawText).toBe(rawText);
+    });
+  });
+
+  it('should merge matching experiences and avoid redundant responsibilities', async () => {
+    const { importExperiences } = useExperienceImport();
+
+    mockRepo.list.mockResolvedValue([
+      {
+        id: 'exp-1',
+        title: 'Senior Developer',
+        companyName: 'TechCorp',
+        startDate: '2020-01',
+        endDate: '2023-12',
+        responsibilities: ['Designed scalable payment processing system for international clients'],
+        tasks: ['Automated deployment pipelines with terraform scripts'],
+        rawText: 'existing text',
+        status: 'draft',
+        userId: 'user-123',
+      },
+    ]);
+    mockRepo.update.mockResolvedValue({ id: 'exp-1' });
+
+    const count = await importExperiences(
+      [
+        {
+          title: 'Senior Developer',
+          companyName: 'TechCorp',
+          startDate: '2020-01',
+          endDate: '2023-12',
+          responsibilities: [
+            'Led scalable payment processing system for international clients',
+            'Mentored junior developers',
+          ],
+          tasks: [
+            'Automated deployment pipelines with terraform scripts',
+            'Reviewed pull requests',
+          ],
+        },
+      ],
+      'raw text',
+      'user-123'
+    );
+
+    expect(count).toBe(1);
+    expect(mockRepo.create).not.toHaveBeenCalled();
+    expect(mockRepo.update).toHaveBeenCalledWith({
+      id: 'exp-1',
+      responsibilities: [
+        'Designed scalable payment processing system for international clients',
+        'Mentored junior developers',
+      ],
+      tasks: [
+        'Automated deployment pipelines with terraform scripts',
+        'Reviewed pull requests',
+      ],
+    });
+  });
+
+  it('should add responsibilities when keyword overlap is three or fewer', async () => {
+    const { importExperiences } = useExperienceImport();
+
+    mockRepo.list.mockResolvedValue([
+      {
+        id: 'exp-2',
+        title: 'Product Manager',
+        companyName: 'Visionary Labs',
+        startDate: '2021-02',
+        endDate: null,
+        responsibilities: ['Managed project roadmap with stakeholder alignment'],
+        tasks: [],
+        rawText: 'existing text',
+        status: 'draft',
+        userId: 'user-123',
+      },
+    ]);
+    mockRepo.update.mockResolvedValue({ id: 'exp-2' });
+
+    const count = await importExperiences(
+      [
+        {
+          title: 'Product Manager',
+          companyName: 'Visionary Labs',
+          startDate: '2021-02',
+          endDate: null,
+          responsibilities: ['Owned project roadmap and team alignment'],
+          tasks: [],
+        },
+      ],
+      'raw text',
+      'user-123'
+    );
+
+    expect(count).toBe(1);
+    expect(mockRepo.update).toHaveBeenCalledWith({
+      id: 'exp-2',
+      responsibilities: [
+        'Managed project roadmap with stakeholder alignment',
+        'Owned project roadmap and team alignment',
+      ],
+      tasks: [],
     });
   });
 });
