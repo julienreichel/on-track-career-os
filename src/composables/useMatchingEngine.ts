@@ -89,12 +89,12 @@ type EngineStateArgs = {
 function createMatchingEngineState({ jobId, providedUserId, deps, auth }: EngineStateArgs) {
   const matchingSummary = ref<MatchingSummary | null>(null);
   const job = ref<JobDescription | null>(null);
-  const userProfile = ref<UserProfile | null>(null);
   const isLoading = ref(false);
   const isGenerating = ref(false);
   const error = ref<string | null>(null);
   const currentUserId = ref<string | null>(providedUserId);
   const hasSummary = computed(() => Boolean(matchingSummary.value));
+  let cachedProfile: UserProfile | null = null;
   const existingMaterials = computed(() => {
     const jobRecord = job.value as JobWithRelations | null;
     return {
@@ -114,7 +114,7 @@ function createMatchingEngineState({ jobId, providedUserId, deps, auth }: Engine
       job.value = loadedJob;
 
       const profile = await ensureProfile(userId, deps.userProfileService);
-      userProfile.value = profile;
+      cachedProfile = profile;
 
       const existing = selectMatchingSummaryFromJob(loadedJob, userId);
       matchingSummary.value = existing;
@@ -127,8 +127,8 @@ function createMatchingEngineState({ jobId, providedUserId, deps, auth }: Engine
       const jobRecord = job.value ?? (await ensureJob(jobId, deps.jobService));
       job.value = jobRecord;
 
-      const profile = userProfile.value ?? (await ensureProfile(userId, deps.userProfileService));
-      userProfile.value = profile;
+      const profile = cachedProfile ?? (await ensureProfile(userId, deps.userProfileService));
+      cachedProfile = profile;
 
       const [personalCanvas] = await deps.personalCanvasRepo.list({
         filter: { userId: { eq: userId } },
@@ -161,7 +161,6 @@ function createMatchingEngineState({ jobId, providedUserId, deps, auth }: Engine
 
   return {
     job,
-    userProfile,
     matchingSummary,
     isLoading,
     isGenerating,
