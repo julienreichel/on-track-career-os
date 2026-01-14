@@ -33,7 +33,8 @@ describe('ImportSuccess', () => {
   const createWrapper = (props = {}) => {
     return mount(ImportSuccess, {
       props: {
-        importCount: 3,
+        createdCount: 3,
+        updatedCount: 1,
         ...props,
       },
       global: {
@@ -49,18 +50,18 @@ describe('ImportSuccess', () => {
   });
 
   it('displays success message with count', () => {
-    const wrapper = createWrapper({ importCount: 5 });
-    expect(wrapper.text()).toContain('Successfully imported 5 experience(s)');
+    const wrapper = createWrapper({ createdCount: 5, updatedCount: 2 });
+    expect(wrapper.text()).toContain('Imported 5 experience(s), updated 2 experience(s)');
   });
 
   it('displays correct count for single experience', () => {
-    const wrapper = createWrapper({ importCount: 1 });
-    expect(wrapper.text()).toContain('Successfully imported 1 experience(s)');
+    const wrapper = createWrapper({ createdCount: 1, updatedCount: 0 });
+    expect(wrapper.text()).toContain('Imported 1 experience(s), updated 0 experience(s)');
   });
 
   it('displays correct count for multiple experiences', () => {
-    const wrapper = createWrapper({ importCount: 10 });
-    expect(wrapper.text()).toContain('Successfully imported 10 experience(s)');
+    const wrapper = createWrapper({ createdCount: 10, updatedCount: 4 });
+    expect(wrapper.text()).toContain('Imported 10 experience(s), updated 4 experience(s)');
   });
 
   it('renders view profile button', () => {
@@ -97,8 +98,8 @@ describe('ImportSuccess', () => {
   });
 
   it('handles zero import count', () => {
-    const wrapper = createWrapper({ importCount: 0 });
-    expect(wrapper.text()).toContain('Successfully imported 0 experience(s)');
+    const wrapper = createWrapper({ createdCount: 0, updatedCount: 0 });
+    expect(wrapper.text()).toContain('Imported 0 experience(s), updated 0 experience(s)');
   });
 
   it('displays success alert', () => {

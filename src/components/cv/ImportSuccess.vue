@@ -4,7 +4,8 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
 interface Props {
-  importCount: number;
+  createdCount: number;
+  updatedCount: number;
 }
 
 defineProps<Props>();
@@ -27,7 +28,15 @@ const emit = defineEmits<{
     </template>
 
     <div class="space-y-4">
-      <UAlert color="primary" :title="t('cvUpload.success', { count: importCount })" />
+      <UAlert
+        color="primary"
+        :title="
+          t('cvUpload.successSummary', {
+            created: createdCount,
+            updated: updatedCount,
+          })
+        "
+      />
 
       <div class="flex flex-col sm:flex-row gap-3">
         <UButton

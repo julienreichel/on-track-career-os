@@ -39,12 +39,12 @@ async function handleImport() {
     const userId = (await user).userId;
 
     // Import experiences
-    const count = await importing.importExperiences(
+    const { createdCount, updatedCount } = await importing.importExperiences(
       parsing.extractedExperiences.value,
       parsing.extractedText.value,
       userId
     );
-    workflow.setImportCount(count);
+    workflow.setImportSummary(createdCount, updatedCount);
 
     // Merge profile data
     if (parsing.extractedProfile.value) {
@@ -146,7 +146,8 @@ function viewExperiences() {
         <!-- Complete Step -->
         <CvImportSuccess
           v-if="workflow.currentStep.value === 'complete'"
-          :import-count="workflow.importCount.value"
+          :created-count="workflow.importSummary.value.createdCount"
+          :updated-count="workflow.importSummary.value.updatedCount"
           @view-profile="viewProfile"
           @view-experiences="viewExperiences"
         />

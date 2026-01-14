@@ -9,7 +9,7 @@ describe('useCvUploadWorkflow', () => {
     expect(workflow.currentStep.value).toBe('upload');
     expect(workflow.errorMessage.value).toBeNull();
     expect(workflow.uploadedFile.value).toBeNull();
-    expect(workflow.importCount.value).toBe(0);
+    expect(workflow.importSummary.value).toEqual({ createdCount: 0, updatedCount: 0 });
   });
 
   describe('setStep', () => {
@@ -94,30 +94,30 @@ describe('useCvUploadWorkflow', () => {
     });
   });
 
-  describe('import count', () => {
-    it('should set import count', () => {
+  describe('import summary', () => {
+    it('should set import summary', () => {
       const workflow = useCvUploadWorkflow();
 
-      workflow.setImportCount(5);
-      expect(workflow.importCount.value).toBe(5);
+      workflow.setImportSummary(5, 2);
+      expect(workflow.importSummary.value).toEqual({ createdCount: 5, updatedCount: 2 });
     });
 
-    it('should update import count', () => {
+    it('should update import summary', () => {
       const workflow = useCvUploadWorkflow();
 
-      workflow.setImportCount(3);
-      expect(workflow.importCount.value).toBe(3);
+      workflow.setImportSummary(3, 1);
+      expect(workflow.importSummary.value).toEqual({ createdCount: 3, updatedCount: 1 });
 
-      workflow.setImportCount(7);
-      expect(workflow.importCount.value).toBe(7);
+      workflow.setImportSummary(7, 4);
+      expect(workflow.importSummary.value).toEqual({ createdCount: 7, updatedCount: 4 });
     });
 
-    it('should handle zero import count', () => {
+    it('should handle zero import summary', () => {
       const workflow = useCvUploadWorkflow();
 
-      workflow.setImportCount(5);
-      workflow.setImportCount(0);
-      expect(workflow.importCount.value).toBe(0);
+      workflow.setImportSummary(5, 2);
+      workflow.setImportSummary(0, 0);
+      expect(workflow.importSummary.value).toEqual({ createdCount: 0, updatedCount: 0 });
     });
   });
 
@@ -130,7 +130,7 @@ describe('useCvUploadWorkflow', () => {
       workflow.setStep('complete');
       workflow.setError('Error message');
       workflow.setUploadedFile(mockFile);
-      workflow.setImportCount(10);
+      workflow.setImportSummary(10, 4);
 
       // Reset
       workflow.reset();
@@ -138,7 +138,7 @@ describe('useCvUploadWorkflow', () => {
       expect(workflow.currentStep.value).toBe('upload');
       expect(workflow.errorMessage.value).toBeNull();
       expect(workflow.uploadedFile.value).toBeNull();
-      expect(workflow.importCount.value).toBe(0);
+      expect(workflow.importSummary.value).toEqual({ createdCount: 0, updatedCount: 0 });
     });
 
     it('should allow reusing workflow after reset', () => {
@@ -174,10 +174,10 @@ describe('useCvUploadWorkflow', () => {
       expect(workflow.currentStep.value).toBe('importing');
 
       // Complete
-      workflow.setImportCount(5);
+      workflow.setImportSummary(5, 3);
       workflow.setStep('complete');
       expect(workflow.currentStep.value).toBe('complete');
-      expect(workflow.importCount.value).toBe(5);
+      expect(workflow.importSummary.value).toEqual({ createdCount: 5, updatedCount: 3 });
     });
 
     it('should handle error during workflow', () => {

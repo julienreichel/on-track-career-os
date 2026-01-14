@@ -5,6 +5,11 @@ import type { ExtractedExperience } from '@/domain/ai-operations/Experience';
 const KEYWORD_MIN_LENGTH = 5;
 const KEYWORD_OVERLAP_THRESHOLD = 3;
 
+export type ExperienceImportResult = {
+  createdCount: number;
+  updatedCount: number;
+};
+
 function normalizeValue(value: string | null | undefined): string {
   return (value ?? '').trim().toLowerCase();
 }
@@ -77,11 +82,13 @@ export function useExperienceImport() {
     experiences: ExtractedExperience[],
     rawText: string,
     userId: string
-  ): Promise<number> {
+  ): Promise<ExperienceImportResult> {
     const existingExperiences = await experienceRepo.list(userId);
     const workingExperiences = [...existingExperiences];
+    let createdCount = 0;
+    let updatedCount = 0;
 
-    const results = await Promise.all(
+    await Promise.all(
       experiences.map(async (exp) => {
         const match = workingExperiences.find((existing) => isMatchingExperience(existing, exp));
 
@@ -99,6 +106,7 @@ export function useExperienceImport() {
           });
 
           if (updated) {
+            updatedCount += 1;
             const index = workingExperiences.findIndex((item) => item.id === match.id);
             if (index >= 0) {
               workingExperiences[index] = {
@@ -125,6 +133,7 @@ export function useExperienceImport() {
         });
 
         if (created) {
+          createdCount += 1;
           workingExperiences.push(created);
         }
 
@@ -132,7 +141,10 @@ export function useExperienceImport() {
       })
     );
 
-    return results.filter((result) => result !== null).length;
+    return {
+      createdCount,
+      updatedCount,
+    };
   }
 
   return {

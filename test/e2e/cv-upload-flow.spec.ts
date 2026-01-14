@@ -113,7 +113,9 @@ test.describe('CV Upload Flow', () => {
     await importButton.click();
 
     // Assert success state (don’t rely on networkidle)
-    await expect(page.getByText(/successfully imported.*experience/i)).toBeVisible({
+    await expect(
+      page.getByText(/imported \d+ experience\(s\), updated \d+ experience\(s\)/i)
+    ).toBeVisible({
       timeout: 15000,
     });
 

@@ -10,7 +10,7 @@ export function useCvUploadWorkflow() {
   const currentStep = ref<WorkflowStep>('upload');
   const errorMessage = ref<string | null>(null);
   const uploadedFile = ref<File | null>(null);
-  const importCount = ref(0);
+  const importSummary = ref({ createdCount: 0, updatedCount: 0 });
 
   function setStep(step: WorkflowStep) {
     currentStep.value = step;
@@ -29,27 +29,27 @@ export function useCvUploadWorkflow() {
     uploadedFile.value = file;
   }
 
-  function setImportCount(count: number) {
-    importCount.value = count;
+  function setImportSummary(createdCount: number, updatedCount: number) {
+    importSummary.value = { createdCount, updatedCount };
   }
 
   function reset() {
     currentStep.value = 'upload';
     errorMessage.value = null;
     uploadedFile.value = null;
-    importCount.value = 0;
+    importSummary.value = { createdCount: 0, updatedCount: 0 };
   }
 
   return {
     currentStep,
     errorMessage,
     uploadedFile,
-    importCount,
+    importSummary,
     setStep,
     setError,
     clearError,
     setUploadedFile,
-    setImportCount,
+    setImportSummary,
     reset,
   };
 }

@@ -29,7 +29,9 @@ test.describe('Experience workflow', () => {
     await expect(importButton).toBeVisible({ timeout: 30000 });
     await importButton.click();
 
-    await expect(page.getByText(/Successfully imported/i)).toBeVisible({ timeout: 20000 });
+    await expect(
+      page.getByText(/imported \d+ experience\(s\), updated \d+ experience\(s\)/i)
+    ).toBeVisible({ timeout: 20000 });
     await page.getByRole('button', { name: /View Experiences/i }).click();
 
     await expect(page).toHaveURL(/\/profile\/experiences$/);

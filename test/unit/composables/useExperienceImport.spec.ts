@@ -54,9 +54,9 @@ describe('useExperienceImport', () => {
     mockRepo.create.mockResolvedValue({ id: '1' });
     mockRepo.list.mockResolvedValue([]);
 
-    const count = await importExperiences(mockExperiences, 'raw CV text', 'user-123');
+    const result = await importExperiences(mockExperiences, 'raw CV text', 'user-123');
 
-    expect(count).toBe(2);
+    expect(result).toEqual({ createdCount: 2, updatedCount: 0 });
     expect(mockRepo.list).toHaveBeenCalledWith('user-123');
     expect(mockRepo.create).toHaveBeenCalledTimes(2);
   });
@@ -123,9 +123,9 @@ describe('useExperienceImport', () => {
   it('should return zero for empty experiences array', async () => {
     const { importExperiences } = useExperienceImport();
 
-    const count = await importExperiences([], 'raw text', 'user-123');
+    const result = await importExperiences([], 'raw text', 'user-123');
 
-    expect(count).toBe(0);
+    expect(result).toEqual({ createdCount: 0, updatedCount: 0 });
     expect(mockRepo.list).toHaveBeenCalledWith('user-123');
     expect(mockRepo.create).not.toHaveBeenCalled();
   });
@@ -166,9 +166,9 @@ describe('useExperienceImport', () => {
       },
     ];
 
-    const count = await importExperiences(experiences, 'raw text', 'user-123');
+    const result = await importExperiences(experiences, 'raw text', 'user-123');
 
-    expect(count).toBe(2);
+    expect(result).toEqual({ createdCount: 2, updatedCount: 0 });
     expect(mockRepo.create).toHaveBeenCalledTimes(3);
   });
 
@@ -203,9 +203,9 @@ describe('useExperienceImport', () => {
       },
     ];
 
-    const count = await importExperiences(minimalExperiences, 'raw text', 'user-123');
+    const result = await importExperiences(minimalExperiences, 'raw text', 'user-123');
 
-    expect(count).toBe(1);
+    expect(result).toEqual({ createdCount: 1, updatedCount: 0 });
     expect(mockRepo.create).toHaveBeenCalledWith(
       expect.objectContaining({
         responsibilities: [],
@@ -248,7 +248,7 @@ describe('useExperienceImport', () => {
     ]);
     mockRepo.update.mockResolvedValue({ id: 'exp-1' });
 
-    const count = await importExperiences(
+    const result = await importExperiences(
       [
         {
           title: 'Senior Developer',
@@ -269,7 +269,7 @@ describe('useExperienceImport', () => {
       'user-123'
     );
 
-    expect(count).toBe(1);
+    expect(result).toEqual({ createdCount: 0, updatedCount: 1 });
     expect(mockRepo.create).not.toHaveBeenCalled();
     expect(mockRepo.update).toHaveBeenCalledWith({
       id: 'exp-1',
@@ -303,7 +303,7 @@ describe('useExperienceImport', () => {
     ]);
     mockRepo.update.mockResolvedValue({ id: 'exp-2' });
 
-    const count = await importExperiences(
+    const result = await importExperiences(
       [
         {
           title: 'Product Manager',
@@ -318,7 +318,7 @@ describe('useExperienceImport', () => {
       'user-123'
     );
 
-    expect(count).toBe(1);
+    expect(result).toEqual({ createdCount: 0, updatedCount: 1 });
     expect(mockRepo.update).toHaveBeenCalledWith({
       id: 'exp-2',
       responsibilities: [
