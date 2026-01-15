@@ -162,15 +162,6 @@ const phoneError = computed(() => {
   return isValidPhone(form.value.primaryPhone) ? undefined : t('profile.validation.invalidPhone');
 });
 
-const hasBasics = computed(
-  () =>
-    Boolean(form.value.fullName?.trim()) &&
-    hasContactInfo.value &&
-    hasWorkPermit.value &&
-    hasSocialLinks.value &&
-    hasProfessionalAttributes.value
-);
-
 const hasValidationErrors = computed(() => Boolean(emailError.value || phoneError.value));
 
 const triggerPhotoPicker = () => {
@@ -233,6 +224,14 @@ const handleRemovePhoto = async () => {
 };
 
 const handleSave = async () => {
+  if (!form.value.fullName?.trim()) {
+    error.value = t('onboarding.errors.fullNameRequired');
+    return;
+  }
+  if (hasValidationErrors.value) {
+    error.value = t('onboarding.errors.validationFailed');
+    return;
+  }
   if (!userId.value || !saveProfile) {
     error.value = t('onboarding.errors.missingUser');
     return;
@@ -328,7 +327,7 @@ provide(profileFormContextKey, {
         color="primary"
         :label="t('onboarding.actions.continue')"
         :loading="loading"
-        :disabled="!hasBasics || hasValidationErrors || loading"
+        :disabled="loading"
         @click="handleSave"
       />
     </div>

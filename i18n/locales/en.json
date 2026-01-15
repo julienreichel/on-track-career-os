@@ -1567,7 +1567,9 @@
       "parseFailed": "We couldn't parse your CV. Try another file.",
       "importFailed": "We couldn't import your experiences. Please try again.",
       "missingUser": "We couldn't identify your account. Please sign in again.",
-      "saveFailed": "We couldn't save your profile basics."
+      "saveFailed": "We couldn't save your profile basics.",
+      "fullNameRequired": "Please add your full name to continue.",
+      "validationFailed": "Please fix the highlighted fields before continuing."
     }
   }
 }
