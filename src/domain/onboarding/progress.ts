@@ -28,7 +28,7 @@ function hasProfileDepth(profile: ProgressInputs['profile']): boolean {
 }
 
 function computePhase1(input: ProgressInputs): ProgressCheckResult {
-  const cvUploaded = input.cvCount > 0;
+  const cvUploaded = input.experiencesCount > 0;
   const hasExperiences = input.experiencesCount >= MIN_EXPERIENCE_COUNT;
   const basicsComplete =
     Boolean(input.profile?.fullName?.trim()) &&

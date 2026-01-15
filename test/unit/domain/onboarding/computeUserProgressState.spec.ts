@@ -37,7 +37,7 @@ const baseInputs = (overrides: Partial<ProgressInputs> = {}): ProgressInputs => 
 
 describe('computeUserProgressState', () => {
   it('flags phase 1 when CV is missing', () => {
-    const state = computeUserProgressState(baseInputs({ cvCount: 0 }));
+    const state = computeUserProgressState(baseInputs({ cvCount: 1, experiencesCount: 0 }));
     expect(state.phase).toBe('phase1');
     expect(state.phase1.isComplete).toBe(false);
     expect(state.phase1.missing).toContain('cvUploaded');
