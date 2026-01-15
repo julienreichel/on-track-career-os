@@ -1568,9 +1568,6 @@
       "importFailed": "We couldn't import your experiences. Please try again.",
       "missingUser": "We couldn't identify your account. Please sign in again.",
       "saveFailed": "We couldn't save your profile basics."
-    },
-    "profile": {
-      "photoDisabled": "Photo upload is disabled during onboarding."
     }
   }
 }

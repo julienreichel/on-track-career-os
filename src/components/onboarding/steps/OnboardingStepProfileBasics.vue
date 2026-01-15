@@ -3,6 +3,8 @@ import { computed, provide, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useUserProfile } from '@/application/user-profile/useUserProfile';
+import { UserProfileService } from '@/domain/user-profile/UserProfileService';
+import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import { isValidEmail, isValidPhone } from '@/domain/user-profile/contactValidation';
 import type { ProfileForm } from '@/components/profile/types';
 import type { UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
@@ -49,6 +51,14 @@ const uploadingPhoto = ref(false);
 const photoError = ref<string | null>(null);
 const photoInputRef = ref<HTMLInputElement | null>(null);
 
+const profilePhotoService = new ProfilePhotoService();
+const directProfileService = new UserProfileService();
+const BYTES_PER_KILOBYTE = 1024;
+const BYTES_PER_MEGABYTE = BYTES_PER_KILOBYTE * 1024; // eslint-disable-line no-magic-numbers
+const MAX_PHOTO_SIZE_MB = 5;
+const MAX_PHOTO_BYTES = MAX_PHOTO_SIZE_MB * BYTES_PER_MEGABYTE;
+const ACCEPTED_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
 let saveProfile: ((input: UserProfileUpdateInput) => Promise<boolean>) | null = null;
 
 const normalizeList = (items: Array<string | null> | null | undefined): string[] =>
@@ -80,6 +90,37 @@ const loadProfile = async (id: string) => {
       languages: normalizeList(profile.languages),
       socialLinks: normalizeList(profile.socialLinks),
     };
+    await loadPhotoPreview(form.value.profilePhotoKey);
+  }
+};
+
+const loadPhotoPreview = async (key: string | null) => {
+  if (!key) {
+    photoPreviewUrl.value = null;
+    return;
+  }
+  try {
+    const url = await profilePhotoService.getSignedUrl(key);
+    photoPreviewUrl.value = url || null;
+  } catch (err) {
+    console.error('[onboarding] Failed to load photo preview:', err);
+    photoPreviewUrl.value = null;
+  }
+};
+
+const persistProfilePhotoKey = async (key: string | null) => {
+  if (!userId.value) return;
+  try {
+    const updated = await directProfileService.updateUserProfile({
+      id: userId.value,
+      profilePhotoKey: key,
+    });
+    if (updated) {
+      form.value.profilePhotoKey = updated.profilePhotoKey || null;
+    }
+  } catch (err) {
+    console.error('[onboarding] Failed to persist photo key:', err);
+    photoError.value = t('profile.validation.photoPersistFailed');
   }
 };
 
@@ -100,7 +141,9 @@ const formatSocialLink = (link: string): string =>
   /^https?:\/\//i.test(link) ? link : `https://${link}`;
 
 const hasCoreIdentity = computed(() =>
-  Boolean(form.value.fullName || form.value.headline || form.value.location || form.value.seniorityLevel)
+  Boolean(
+    form.value.fullName || form.value.headline || form.value.location || form.value.seniorityLevel
+  )
 );
 const hasWorkPermit = computed(() => Boolean(form.value.workPermitInfo));
 const hasContactInfo = computed(() => Boolean(form.value.primaryEmail || form.value.primaryPhone));
@@ -131,15 +174,62 @@ const hasBasics = computed(
 const hasValidationErrors = computed(() => Boolean(emailError.value || phoneError.value));
 
 const triggerPhotoPicker = () => {
-  photoError.value = t('onboarding.profile.photoDisabled');
+  photoInputRef.value?.click();
 };
 
-const handlePhotoSelected = async () => {
-  photoError.value = t('onboarding.profile.photoDisabled');
+const handlePhotoSelected = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  target.value = '';
+  if (!file) return;
+  photoError.value = null;
+
+  if (!ACCEPTED_PHOTO_TYPES.includes(file.type)) {
+    photoError.value = t('profile.validation.photoUnsupported');
+    return;
+  }
+
+  if (file.size > MAX_PHOTO_BYTES) {
+    photoError.value = t('profile.validation.photoTooLarge');
+    return;
+  }
+
+  if (!userId.value) {
+    photoError.value = t('profile.validation.photoUserMissing');
+    return;
+  }
+
+  uploadingPhoto.value = true;
+  const previousKey = form.value.profilePhotoKey;
+  try {
+    const key = await profilePhotoService.upload(userId.value, file);
+    await persistProfilePhotoKey(key);
+    await loadPhotoPreview(key);
+    if (previousKey && previousKey !== key) {
+      await profilePhotoService.delete(previousKey);
+    }
+  } catch (err) {
+    console.error('[onboarding] Photo upload failed:', err);
+    photoError.value = t('profile.validation.photoUploadFailed');
+  } finally {
+    uploadingPhoto.value = false;
+  }
 };
 
 const handleRemovePhoto = async () => {
-  photoError.value = t('onboarding.profile.photoDisabled');
+  if (!form.value.profilePhotoKey) return;
+  uploadingPhoto.value = true;
+  photoError.value = null;
+  try {
+    await profilePhotoService.delete(form.value.profilePhotoKey);
+    await persistProfilePhotoKey(null);
+    await loadPhotoPreview(null);
+  } catch (err) {
+    console.error('[onboarding] Photo removal failed:', err);
+    photoError.value = t('profile.validation.photoRemoveFailed');
+  } finally {
+    uploadingPhoto.value = false;
+  }
 };
 
 const handleSave = async () => {
@@ -233,12 +323,7 @@ provide(profileFormContextKey, {
     <ProfileSectionProfessionalAttributes />
 
     <div class="flex flex-col gap-3 sm:flex-row sm:justify-between">
-      <UButton
-        variant="ghost"
-        color="neutral"
-        :label="t('common.back')"
-        @click="emit('back')"
-      />
+      <UButton variant="ghost" color="neutral" :label="t('common.back')" @click="emit('back')" />
       <UButton
         color="primary"
         :label="t('onboarding.actions.continue')"
