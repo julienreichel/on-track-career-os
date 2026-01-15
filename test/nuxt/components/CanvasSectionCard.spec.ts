@@ -24,6 +24,35 @@ describe('CanvasSectionCard', () => {
       },
       global: {
         plugins: [i18n],
+        stubs: {
+          UIcon: {
+            name: 'UIcon',
+            props: ['name'],
+            template: '<span class="u-icon"></span>',
+          },
+          UBadge: {
+            name: 'UBadge',
+            template: '<span class="u-badge"><slot /></span>',
+          },
+          UButton: {
+            name: 'UButton',
+            props: ['icon', 'label'],
+            template: '<button type="button"><slot />{{ label }}</button>',
+          },
+          UInput: {
+            name: 'UInput',
+            props: ['modelValue', 'placeholder'],
+            emits: ['update:modelValue', 'keydown'],
+            template: `
+              <input
+                :value="modelValue"
+                :placeholder="placeholder"
+                @input="$emit('update:modelValue', $event.target.value)"
+                @keydown="$emit('keydown', $event)"
+              />
+            `,
+          },
+        },
       },
     });
   };

@@ -2,7 +2,24 @@
   <UPage>
     <UPageHeader :title="t('home.title')" :description="t('home.description')" />
 
-  <UPageBody>
+    <UPageBody>
+      <UCard class="mb-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="space-y-1">
+            <h2 class="text-lg font-semibold">{{ t('onboarding.actionBox.title') }}</h2>
+            <p class="text-sm text-dimmed">
+              {{ t('onboarding.actionBox.description') }}
+            </p>
+          </div>
+          <UButton
+            color="primary"
+            icon="i-heroicons-arrow-right"
+            :label="t('onboarding.actionBox.cta')"
+            :to="{ name: 'onboarding' }"
+          />
+        </div>
+      </UCard>
+
       <ProgressGuidanceSection class="mb-6" />
 
       <UCard>

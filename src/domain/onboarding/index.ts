@@ -11,3 +11,10 @@ export type {
 export { computeUserProgressState } from './progress';
 export { getNextAction } from './nextAction';
 export { getUnlockableFeatures } from './unlocks';
+export {
+  onboardingSteps,
+  getOnboardingStepIndex,
+  getRequiredOnboardingStep,
+  clampOnboardingStep,
+} from './onboardingWizard';
+export type { OnboardingStep, OnboardingStepId } from './onboardingWizard';

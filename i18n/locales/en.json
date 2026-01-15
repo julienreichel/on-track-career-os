@@ -1518,5 +1518,59 @@
       "tailoredCoverLetter": "progress.checklist.tailoredCoverLetter",
       "tailoredSpeech": "progress.checklist.tailoredSpeech"
     }
+  },
+  "onboarding": {
+    "title": "Welcome to your onboarding",
+    "description": "Complete the essentials to unlock your next actions.",
+    "actionBox": {
+      "title": "Onboarding",
+      "description": "Walk through the essentials to unlock your next actions.",
+      "cta": "Start onboarding"
+    },
+    "steps": {
+      "cvUpload": {
+        "title": "Upload your CV",
+        "description": "Parse your CV to bootstrap your profile.",
+        "hint": "We use your CV to extract experiences and profile basics."
+      },
+      "experienceReview": {
+        "title": "Review experiences",
+        "description": "Confirm your experiences and import them.",
+        "hint": "Ensure at least three experiences for a strong foundation.",
+        "count": "{count} experience(s) detected",
+        "needsMore": "Add at least 3 experiences to continue.",
+        "needsMoreHint": "You can add missing experiences manually.",
+        "addManual": "Add experience manually",
+        "import": "Import experiences"
+      },
+      "profileBasics": {
+        "title": "Confirm profile basics",
+        "description": "Verify your essential profile information.",
+        "hint": "These basics unlock your personalized guidance."
+      },
+      "complete": {
+        "title": "Complete onboarding",
+        "description": "Choose your next path."
+      }
+    },
+    "complete": {
+      "title": "You're ready to move forward",
+      "description": "Pick your next focus area to keep building momentum.",
+      "identityPath": "Strengthen my profile",
+      "jobPath": "Analyze a job"
+    },
+    "actions": {
+      "continue": "Continue"
+    },
+    "errors": {
+      "title": "Onboarding issue",
+      "parseFailed": "We couldn't parse your CV. Try another file.",
+      "importFailed": "We couldn't import your experiences. Please try again.",
+      "missingUser": "We couldn't identify your account. Please sign in again.",
+      "saveFailed": "We couldn't save your profile basics."
+    },
+    "profile": {
+      "photoDisabled": "Photo upload is disabled during onboarding."
+    }
   }
 }

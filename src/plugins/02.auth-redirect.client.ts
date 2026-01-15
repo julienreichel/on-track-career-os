@@ -23,8 +23,10 @@ export default defineNuxtPlugin({
             return navigateTo('/login');
           }
 
-          if (session.tokens !== undefined && to.path === '/login') {
-            return navigateTo('/');
+          if (session.tokens !== undefined) {
+            if (to.path === '/login') {
+              return navigateTo('/');
+            }
           }
         } catch (e) {
           console.error(e);
