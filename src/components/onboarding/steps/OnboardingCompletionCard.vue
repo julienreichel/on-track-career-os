@@ -1,16 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { NextAction } from '@/domain/onboarding';
 
-type Props = {
-  nextAction: NextAction | null;
-};
-
-const props = defineProps<Props>();
 const { t } = useI18n();
-
-const primary = computed(() => props.nextAction?.primary ?? null);
 </script>
 
 <template>
@@ -28,21 +19,14 @@ const primary = computed(() => props.nextAction?.primary ?? null);
       <UButton
         color="primary"
         icon="i-heroicons-arrow-right"
-        :label="t('onboarding.complete.identityPath')"
-        to="/profile"
-      />
-      <UButton
-        variant="outline"
-        color="neutral"
         :label="t('onboarding.complete.jobPath')"
         to="/jobs/new"
       />
       <UButton
-        v-if="primary"
-        variant="ghost"
+        variant="outline"
         color="neutral"
-        :label="t(primary.labelKey)"
-        :to="primary.to"
+        :label="t('onboarding.complete.identityPath')"
+        to="/profile"
       />
     </div>
   </UCard>

@@ -64,7 +64,6 @@ const stepItems = computed(() =>
 
         <OnboardingCompletionCard
           v-else
-          :next-action="wizard.progress.nextAction.value"
         />
       </UPageBody>
     </UPage>
