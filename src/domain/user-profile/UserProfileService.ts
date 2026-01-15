@@ -15,6 +15,10 @@ export class UserProfileService {
     return item;
   }
 
+  async getProgressSnapshot(id: string) {
+    return this.repo.getProgressSnapshot(id);
+  }
+
   async updateUserProfile(input: UserProfileUpdateInput): Promise<UserProfile | null> {
     return await this.repo.update(input);
   }

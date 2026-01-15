@@ -10,4 +10,8 @@ config.global.stubs = {
   ...config.global.stubs,
   RouterLink: routerLinkStub,
   NuxtLink: routerLinkStub,
+  ProgressGuidanceSection: {
+    name: 'ProgressGuidanceSection',
+    template: '<div class="progress-guidance-stub" />',
+  },
 };

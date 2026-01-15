@@ -1444,5 +1444,79 @@
         }
       }
     }
+  },
+  "progress": {
+    "phaseLabel": "Current phase",
+    "nextActionLabel": "Next action",
+    "phaseLabels": {
+      "phase1": "Phase 1 — Ground me",
+      "phase2": "Phase 2 — Growing up",
+      "phase2A": "Phase 2A — Make sense of myself",
+      "phase2B": "Phase 2B — Understand the job",
+      "phase3": "Phase 3 — Position myself",
+      "bonus": "Bonus — Advanced"
+    },
+    "phaseChecklistTitles": {
+      "phase1": "Phase 1 checklist",
+      "phase2": "Phase 2 checklist",
+      "phase3": "Phase 3 checklist",
+      "bonus": "Advanced checklist"
+    },
+    "checklistHint": "Complete the items below to unlock the next phase.",
+    "bonusHint": "You are application-ready. Explore advanced options to sharpen your edge.",
+    "checklist": {
+      "cvUploaded": "Upload a CV to get started",
+      "experienceCount": "Add at least 3 experiences",
+      "profileBasics": "Complete profile basics (contact, work permit, social links, skills, languages)",
+      "profileDepth": "Add goals, aspirations, and personal values",
+      "stories": "Create at least one STAR story",
+      "personalCanvas": "Build your personal canvas",
+      "jobUploaded": "Upload your first job description",
+      "matchingSummary": "Generate a matching summary",
+      "tailoredCv": "Create a job-specific CV",
+      "tailoredCoverLetter": "Create a job-specific cover letter",
+      "tailoredSpeech": "Create a speech/pitch"
+    },
+    "actions": {
+      "uploadCv": "Upload your CV",
+      "addExperiences": "Add experiences",
+      "completeProfile": "Complete your profile",
+      "profileDepth": "Deepen your profile",
+      "addStories": "Create STAR stories",
+      "buildCanvas": "Build personal canvas",
+      "uploadJob": "Upload a job",
+      "generateMatch": "Generate a match",
+      "tailorMaterials": "Create tailored materials",
+      "optimizeMaterials": "Refine your materials"
+    },
+    "rationale": {
+      "cvUpload": "Uploading your CV unlocks your foundational data.",
+      "experiences": "Three experiences are the minimum to build reliable guidance.",
+      "profileBasics": "Complete basics so the system can tailor your guidance.",
+      "profileDepth": "Your goals and values power better positioning later.",
+      "stories": "Stories make your impact tangible in applications.",
+      "personalCanvas": "Your canvas clarifies your professional narrative.",
+      "jobUpload": "A job description gives the system context to match against.",
+      "matchingSummary": "The matching summary reveals fit, gaps, and priorities.",
+      "tailoredMaterials": "Tailored materials turn insight into applications.",
+      "bonus": "Fine-tune your assets to stand out."
+    },
+    "errors": {
+      "title": "Progress unavailable",
+      "loadFailed": "We couldn't load your progress right now. Please refresh."
+    },
+    "gates": {
+      "cvUploaded": "progress.checklist.cvUploaded",
+      "experienceCount": "progress.checklist.experienceCount",
+      "profileBasics": "progress.checklist.profileBasics",
+      "profileDepth": "progress.checklist.profileDepth",
+      "stories": "progress.checklist.stories",
+      "personalCanvas": "progress.checklist.personalCanvas",
+      "jobUploaded": "progress.checklist.jobUploaded",
+      "matchingSummary": "progress.checklist.matchingSummary",
+      "tailoredCv": "progress.checklist.tailoredCv",
+      "tailoredCoverLetter": "progress.checklist.tailoredCoverLetter",
+      "tailoredSpeech": "progress.checklist.tailoredSpeech"
+    }
   }
 }

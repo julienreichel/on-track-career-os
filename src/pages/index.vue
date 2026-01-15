@@ -2,7 +2,9 @@
   <UPage>
     <UPageHeader :title="t('home.title')" :description="t('home.description')" />
 
-    <UPageBody>
+  <UPageBody>
+      <ProgressGuidanceSection class="mb-6" />
+
       <UCard>
         <UPageGrid>
           <UPageCard
@@ -41,6 +43,7 @@ import { ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import { useAuthUser } from '@/composables/useAuthUser';
+import ProgressGuidanceSection from '@/components/onboarding/ProgressGuidanceSection.vue';
 
 // Home page - requires authentication
 const { t } = useI18n();
