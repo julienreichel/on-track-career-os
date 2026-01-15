@@ -3,7 +3,7 @@
     <UPageHeader :title="t('home.title')" :description="t('home.description')" />
 
     <UPageBody>
-      <UCard class="mb-6">
+      <UCard v-if="showOnboarding" class="mb-6">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div class="space-y-1">
             <h2 class="text-lg font-semibold">{{ t('onboarding.actionBox.title') }}</h2>
@@ -20,7 +20,7 @@
         </div>
       </UCard>
 
-      <ProgressGuidanceSection class="mb-6" />
+      <ProgressGuidanceSection v-if="!showOnboarding" class="mb-6" />
 
       <UCard>
         <UPageGrid>
@@ -67,6 +67,7 @@ const { t } = useI18n();
 const { userId } = useAuthUser();
 
 const showCvUpload = ref(false);
+const showOnboarding = ref(false);
 const experienceRepo = new ExperienceRepository();
 
 // Check if user has any experiences when userId is available
@@ -75,12 +76,14 @@ watch(userId, async (newUserId) => {
 
   try {
     const experiences = await experienceRepo.list(newUserId);
+    showOnboarding.value = !experiences || experiences.length === 0;
     // Show CV upload only if user has no experiences
     showCvUpload.value = !experiences || experiences.length === 0;
   } catch (error) {
     console.error('Error checking experiences:', error);
     // Show CV upload on error (better UX to show than hide)
     showCvUpload.value = true;
+    showOnboarding.value = true;
   }
 });
 </script>
