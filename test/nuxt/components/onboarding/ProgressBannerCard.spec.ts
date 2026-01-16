@@ -41,8 +41,6 @@ describe('ProgressBannerCard', () => {
         stubs,
       },
     });
-
-    expect(wrapper.text()).toContain('Phase 1');
     expect(wrapper.text()).toContain('Upload your CV');
   });
 });

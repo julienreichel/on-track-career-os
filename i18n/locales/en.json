@@ -507,6 +507,14 @@
       "goToExperience": "Go to Experience",
       "unknownExperience": "Unknown Experience"
     },
+    "new": {
+      "title": "Generate stories",
+      "description": "Select an experience to auto-generate STAR stories.",
+      "selectTitle": "Choose an experience",
+      "selectDescription": "We'll generate STAR stories based on the responsibilities and tasks.",
+      "cancel": "Cancel",
+      "generate": "Generate stories"
+    },
     "table": {
       "preview": "Preview",
       "hasAchievements": "Achievements",
@@ -656,6 +664,7 @@
     "emptyTitle": "No Stories Yet",
     "emptyDescription": "Create your first STAR story to document your achievements",
     "createFirst": "Create Your First Story",
+    "create": "Create Stories",
     "errors": {
       "deleteFailed": "Failed to delete story"
     }

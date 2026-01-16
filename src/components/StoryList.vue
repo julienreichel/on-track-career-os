@@ -104,7 +104,11 @@ onMounted(() => {
       icon="i-heroicons-document-text"
     >
       <template #actions>
-        <UButton :label="t('storyList.createFirst')" icon="i-heroicons-plus" to="/stories/new" />
+        <UButton
+          :label="t('storyList.createFirst')"
+          icon="i-heroicons-plus"
+          to="/profile/stories/new"
+        />
       </template>
     </UEmpty>
 

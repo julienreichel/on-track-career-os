@@ -62,6 +62,11 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     icon: 'i-heroicons-arrow-left',
     onClick: handleBackToProfile,
   },
+  {
+    label: t('storyList.create'),
+    icon: 'i-heroicons-sparkles',
+    to: '/profile/stories/new',
+  },
 ]);
 
 // Load data on mount
