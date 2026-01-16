@@ -4,10 +4,10 @@ import type { UserProgressState } from '@/domain/onboarding';
 
 const baseState = (overrides: Partial<UserProgressState> = {}): UserProgressState => ({
   phase: 'phase1',
-  phase1: { isComplete: false, missing: ['cvUploaded'], reasonKeys: [] },
-  phase2B: { isComplete: false, missing: ['profileDepth'], reasonKeys: [] },
-  phase2A: { isComplete: false, missing: ['jobUploaded'], reasonKeys: [] },
-  phase3: { isComplete: false, missing: ['tailoredCv'], reasonKeys: [] },
+  phase1: { isComplete: false, missing: ['cvUploaded'] },
+  phase2B: { isComplete: false, missing: ['profileDepth'] },
+  phase2A: { isComplete: false, missing: ['jobUploaded'] },
+  phase3: { isComplete: false, missing: ['tailoredCv'] },
   ...overrides,
 });
 
@@ -21,9 +21,9 @@ describe('getNextAction', () => {
   it('returns profile depth when phase 2A is incomplete', () => {
     const state = baseState({
       phase: 'phase2',
-      phase1: { isComplete: true, missing: [], reasonKeys: [] },
-      phase2B: { isComplete: false, missing: ['profileDepth'], reasonKeys: [] },
-      phase2A: { isComplete: true, missing: [], reasonKeys: [] },
+      phase1: { isComplete: true, missing: [] },
+      phase2B: { isComplete: false, missing: ['profileDepth'] },
+      phase2A: { isComplete: true, missing: [] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('profile-depth');
@@ -32,9 +32,9 @@ describe('getNextAction', () => {
   it('returns job upload when phase 2B is incomplete', () => {
     const state = baseState({
       phase: 'phase2',
-      phase1: { isComplete: true, missing: [], reasonKeys: [] },
-      phase2B: { isComplete: true, missing: [], reasonKeys: [] },
-      phase2A: { isComplete: false, missing: ['jobUploaded'], reasonKeys: [] },
+      phase1: { isComplete: true, missing: [] },
+      phase2B: { isComplete: true, missing: [] },
+      phase2A: { isComplete: false, missing: ['jobUploaded'] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('upload-job');
@@ -43,10 +43,10 @@ describe('getNextAction', () => {
   it('returns tailored materials CTA for phase 3', () => {
     const state = baseState({
       phase: 'phase3',
-      phase1: { isComplete: true, missing: [], reasonKeys: [] },
-      phase2B: { isComplete: true, missing: [], reasonKeys: [] },
-      phase2A: { isComplete: true, missing: [], reasonKeys: [] },
-      phase3: { isComplete: false, missing: ['tailoredCv'], reasonKeys: [] },
+      phase1: { isComplete: true, missing: [] },
+      phase2B: { isComplete: true, missing: [] },
+      phase2A: { isComplete: true, missing: [] },
+      phase3: { isComplete: false, missing: ['tailoredCv'] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('tailor-materials');
@@ -55,10 +55,10 @@ describe('getNextAction', () => {
   it('returns bonus CTA when all phases complete', () => {
     const state = baseState({
       phase: 'bonus',
-      phase1: { isComplete: true, missing: [], reasonKeys: [] },
-      phase2B: { isComplete: true, missing: [], reasonKeys: [] },
-      phase2A: { isComplete: true, missing: [], reasonKeys: [] },
-      phase3: { isComplete: true, missing: [], reasonKeys: [] },
+      phase1: { isComplete: true, missing: [] },
+      phase2B: { isComplete: true, missing: [] },
+      phase2A: { isComplete: true, missing: [] },
+      phase3: { isComplete: true, missing: [] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('optimize-materials');

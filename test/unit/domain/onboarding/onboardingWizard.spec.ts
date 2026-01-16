@@ -9,7 +9,6 @@ import type { ProgressCheckResult, UserProgressState } from '@/domain/onboarding
 const buildCheck = (missing: ProgressCheckResult['missing']): ProgressCheckResult => ({
   isComplete: missing.length === 0,
   missing,
-  reasonKeys: [],
 });
 
 const buildState = (phase1Missing: ProgressCheckResult['missing']): UserProgressState => ({

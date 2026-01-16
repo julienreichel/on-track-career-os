@@ -1,10 +1,9 @@
 import type { ProgressCheckResult, ProgressGate, ProgressInputs, UserProgressState } from './types';
 
-function buildCheck(missing: ProgressGate[], reasonKeys: string[]): ProgressCheckResult {
+function buildCheck(missing: ProgressGate[]): ProgressCheckResult {
   return {
     isComplete: missing.length === 0,
     missing,
-    reasonKeys,
   };
 }
 
@@ -38,21 +37,17 @@ function computePhase1(input: ProgressInputs): ProgressCheckResult {
     hasProfessionalAttributes(input.profile);
 
   const phase1Missing: ProgressGate[] = [];
-  const phase1Reasons: string[] = [];
   if (!cvUploaded) {
     phase1Missing.push('cvUploaded');
-    phase1Reasons.push('progress.gates.cvUploaded');
   }
   if (!hasExperiences) {
     phase1Missing.push('experienceCount');
-    phase1Reasons.push('progress.gates.experienceCount');
   }
   if (!basicsComplete) {
     phase1Missing.push('profileBasics');
-    phase1Reasons.push('progress.gates.profileBasics');
   }
 
-  return buildCheck(phase1Missing, phase1Reasons);
+  return buildCheck(phase1Missing);
 }
 
 function computePhase2A(input: ProgressInputs): ProgressCheckResult {
@@ -61,21 +56,17 @@ function computePhase2A(input: ProgressInputs): ProgressCheckResult {
   const hasCanvas = input.personalCanvasCount > 0;
 
   const phase2BMissing: ProgressGate[] = [];
-  const phase2BReasons: string[] = [];
   if (!profileDepthComplete) {
     phase2BMissing.push('profileDepth');
-    phase2BReasons.push('progress.gates.profileDepth');
   }
   if (!hasStories) {
     phase2BMissing.push('stories');
-    phase2BReasons.push('progress.gates.stories');
   }
   if (!hasCanvas) {
     phase2BMissing.push('personalCanvas');
-    phase2BReasons.push('progress.gates.personalCanvas');
   }
 
-  return buildCheck(phase2BMissing, phase2BReasons);
+  return buildCheck(phase2BMissing);
 }
 
 function computePhase2B(input: ProgressInputs): ProgressCheckResult {
@@ -83,17 +74,14 @@ function computePhase2B(input: ProgressInputs): ProgressCheckResult {
   const hasMatchingSummary = input.matchingSummaryCount > 0;
 
   const phase2AMissing: ProgressGate[] = [];
-  const phase2AReasons: string[] = [];
   if (!hasJobs) {
     phase2AMissing.push('jobUploaded');
-    phase2AReasons.push('progress.gates.jobUploaded');
   }
   if (!hasMatchingSummary) {
     phase2AMissing.push('matchingSummary');
-    phase2AReasons.push('progress.gates.matchingSummary');
   }
 
-  return buildCheck(phase2AMissing, phase2AReasons);
+  return buildCheck(phase2AMissing);
 }
 
 function computePhase3(input: ProgressInputs): ProgressCheckResult {
@@ -102,21 +90,17 @@ function computePhase3(input: ProgressInputs): ProgressCheckResult {
   const hasTailoredSpeech = input.tailoredSpeechCount > 0;
 
   const phase3Missing: ProgressGate[] = [];
-  const phase3Reasons: string[] = [];
   if (!hasTailoredCv) {
     phase3Missing.push('tailoredCv');
-    phase3Reasons.push('progress.gates.tailoredCv');
   }
   if (!hasTailoredCoverLetter) {
     phase3Missing.push('tailoredCoverLetter');
-    phase3Reasons.push('progress.gates.tailoredCoverLetter');
   }
   if (!hasTailoredSpeech) {
     phase3Missing.push('tailoredSpeech');
-    phase3Reasons.push('progress.gates.tailoredSpeech');
   }
 
-  return buildCheck(phase3Missing, phase3Reasons);
+  return buildCheck(phase3Missing);
 }
 
 function resolvePhase(

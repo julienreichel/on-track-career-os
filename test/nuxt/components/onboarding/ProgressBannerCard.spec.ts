@@ -20,10 +20,10 @@ describe('ProgressBannerCard', () => {
       props: {
         state: {
           phase: 'phase1',
-          phase1: { isComplete: false, missing: ['cvUploaded'], reasonKeys: [] },
-          phase2B: { isComplete: false, missing: ['profileDepth'], reasonKeys: [] },
-          phase2A: { isComplete: false, missing: ['jobUploaded'], reasonKeys: [] },
-          phase3: { isComplete: false, missing: ['tailoredCv'], reasonKeys: [] },
+          phase1: { isComplete: false, missing: ['cvUploaded'] },
+          phase2B: { isComplete: false, missing: ['profileDepth'] },
+          phase2A: { isComplete: false, missing: ['jobUploaded'] },
+          phase3: { isComplete: false, missing: ['tailoredCv'] },
         },
         nextAction: {
           phase: 'phase1',
@@ -34,7 +34,6 @@ describe('ProgressBannerCard', () => {
             to: '/profile/cv-upload',
           },
           missingPrerequisites: ['cvUploaded'],
-          gateReasonKeys: [],
         },
       },
       global: {

@@ -18,7 +18,6 @@ export type ProgressGate =
 export type ProgressCheckResult = {
   isComplete: boolean;
   missing: ProgressGate[];
-  reasonKeys: string[];
 };
 
 export type UserProgressState = {
@@ -54,7 +53,6 @@ export type NextAction = {
   phase: ProgressPhase;
   primary: NextActionItem;
   missingPrerequisites: ProgressGate[];
-  gateReasonKeys: string[];
 };
 
 export type FeatureUnlocks = {
