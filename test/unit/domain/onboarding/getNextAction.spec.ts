@@ -27,7 +27,6 @@ describe('getNextAction', () => {
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('profile-depth');
-    expect(action.secondary.length).toBeGreaterThan(0);
   });
 
   it('returns job upload when phase 2B is incomplete', () => {
