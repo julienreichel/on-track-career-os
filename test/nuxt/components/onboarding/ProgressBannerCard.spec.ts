@@ -33,7 +33,6 @@ describe('ProgressBannerCard', () => {
             rationaleKey: 'progress.rationale.cvUpload',
             to: '/profile/cv-upload',
           },
-          secondary: [],
           missingPrerequisites: ['cvUploaded'],
           gateReasonKeys: [],
         },

@@ -53,7 +53,6 @@ export type NextActionItem = {
 export type NextAction = {
   phase: ProgressPhase;
   primary: NextActionItem;
-  secondary: NextActionItem[];
   missingPrerequisites: ProgressGate[];
   gateReasonKeys: string[];
 };

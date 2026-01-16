@@ -11,10 +11,8 @@ type Props = {
 const props = defineProps<Props>();
 const { t } = useI18n();
 
-const SECONDARY_CTA_LIMIT = 2;
 const phaseLabel = computed(() => t(`progress.phaseLabels.${props.state.phase}`));
 const primary = computed(() => props.nextAction.primary);
-const secondary = computed(() => props.nextAction.secondary.slice(0, SECONDARY_CTA_LIMIT));
 </script>
 
 <template>
@@ -44,15 +42,6 @@ const secondary = computed(() => props.nextAction.secondary.slice(0, SECONDARY_C
           :label="t(primary.labelKey)"
           :to="primary.to"
           data-testid="progress-primary-cta"
-        />
-        <UButton
-          v-for="action in secondary"
-          :key="action.id"
-          variant="outline"
-          color="neutral"
-          :label="t(action.labelKey)"
-          :to="action.to"
-          data-testid="progress-secondary-cta"
         />
       </div>
     </div>

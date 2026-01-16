@@ -94,7 +94,6 @@ export function getNextAction(state: UserProgressState): NextAction {
     return {
       phase: 'phase1',
       primary: phase1Primary(state),
-      secondary: [],
       missingPrerequisites: state.phase1.missing,
       gateReasonKeys: state.phase1.reasonKeys,
     };
@@ -104,7 +103,6 @@ export function getNextAction(state: UserProgressState): NextAction {
     return {
       phase: 'phase2',
       primary: phase2Primary(state),
-      secondary: [],
       missingPrerequisites: [...state.phase2B.missing, ...state.phase2A.missing],
       gateReasonKeys: [...state.phase2B.reasonKeys, ...state.phase2A.reasonKeys],
     };
@@ -114,7 +112,6 @@ export function getNextAction(state: UserProgressState): NextAction {
     return {
       phase: 'phase3',
       primary: phase3Primary(),
-      secondary: [],
       missingPrerequisites: state.phase3.missing,
       gateReasonKeys: state.phase3.reasonKeys,
     };
@@ -123,7 +120,6 @@ export function getNextAction(state: UserProgressState): NextAction {
   return {
     phase: 'bonus',
     primary: bonusPrimary(),
-    secondary: [],
     missingPrerequisites: [],
     gateReasonKeys: [],
   };
