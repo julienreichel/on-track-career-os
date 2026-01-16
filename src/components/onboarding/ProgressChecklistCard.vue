@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ProgressCheckResult, ProgressGate, UserProgressState } from '@/domain/onboarding';
+import ProgressChecklistItems from '@/components/onboarding/ProgressChecklistItems.vue';
 
 type Props = {
   state: UserProgressState;
@@ -58,56 +59,24 @@ const activePhaseTitle = computed(() => t(`progress.phaseChecklistTitles.${props
       <p class="text-sm text-dimmed">{{ t('progress.checklistHint') }}</p>
     </div>
 
-    <div v-if="state.phase === 'phase1'" class="space-y-2">
-      <div v-for="item in phase1Items" :key="item.gate" class="flex items-start gap-2">
-        <UIcon
-          :name="item.complete ? 'i-heroicons-check-circle' : 'i-heroicons-minus-circle'"
-          :class="item.complete ? 'text-success' : 'text-dimmed'"
-        />
-        <span class="text-sm text-default">{{ item.label }}</span>
-      </div>
-    </div>
+    <ProgressChecklistItems v-if="state.phase === 'phase1'" :items="phase1Items" />
 
     <div v-else-if="state.phase === 'phase2'" class="space-y-4">
       <div>
         <p class="text-xs font-semibold uppercase text-dimmed">
           {{ t('progress.phaseLabels.phase2A') }}
         </p>
-        <div class="mt-2 space-y-2">
-          <div v-for="item in phase2AItems" :key="item.gate" class="flex items-start gap-2">
-            <UIcon
-              :name="item.complete ? 'i-heroicons-check-circle' : 'i-heroicons-minus-circle'"
-              :class="item.complete ? 'text-success' : 'text-dimmed'"
-            />
-            <span class="text-sm text-default">{{ item.label }}</span>
-          </div>
-        </div>
+        <ProgressChecklistItems class="mt-2" :items="phase2AItems" />
       </div>
       <div>
         <p class="text-xs font-semibold uppercase text-dimmed">
           {{ t('progress.phaseLabels.phase2B') }}
         </p>
-        <div class="mt-2 space-y-2">
-          <div v-for="item in phase2BItems" :key="item.gate" class="flex items-start gap-2">
-            <UIcon
-              :name="item.complete ? 'i-heroicons-check-circle' : 'i-heroicons-minus-circle'"
-              :class="item.complete ? 'text-success' : 'text-dimmed'"
-            />
-            <span class="text-sm text-default">{{ item.label }}</span>
-          </div>
-        </div>
+        <ProgressChecklistItems class="mt-2" :items="phase2BItems" />
       </div>
     </div>
 
-    <div v-else-if="state.phase === 'phase3'" class="space-y-2">
-      <div v-for="item in phase3Items" :key="item.gate" class="flex items-start gap-2">
-        <UIcon
-          :name="item.complete ? 'i-heroicons-check-circle' : 'i-heroicons-minus-circle'"
-          :class="item.complete ? 'text-success' : 'text-dimmed'"
-        />
-        <span class="text-sm text-default">{{ item.label }}</span>
-      </div>
-    </div>
+    <ProgressChecklistItems v-else-if="state.phase === 'phase3'" :items="phase3Items" />
 
     <div v-else class="space-y-2">
       <p class="text-sm text-dimmed">
