@@ -60,6 +60,7 @@ const handleRemove = (index: number) => {
         v-model="inputValue"
         :placeholder="placeholder"
         :disabled="disabled"
+        class="w-xs"
         :data-testid="inputTestId"
         @keydown="handleKeydown"
       />

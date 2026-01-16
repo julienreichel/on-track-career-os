@@ -104,22 +104,32 @@
         <UInput
           v-model="form.fullName"
           :placeholder="t('profile.fields.fullNamePlaceholder')"
+          class="w-xs"
           required
         />
       </UFormField>
 
       <UFormField :label="t('profile.fields.headline')">
-        <UInput v-model="form.headline" :placeholder="t('profile.fields.headlinePlaceholder')" />
+        <UInput
+          v-model="form.headline"
+          :placeholder="t('profile.fields.headlinePlaceholder')"
+          class="w-xs"
+        />
       </UFormField>
 
       <UFormField :label="t('profile.fields.location')">
-        <UInput v-model="form.location" :placeholder="t('profile.fields.locationPlaceholder')" />
+        <UInput
+          v-model="form.location"
+          :placeholder="t('profile.fields.locationPlaceholder')"
+          class="w-xs"
+        />
       </UFormField>
 
       <UFormField :label="t('profile.fields.seniorityLevel')">
         <UInput
           v-model="form.seniorityLevel"
           :placeholder="t('profile.fields.seniorityLevelPlaceholder')"
+          class="w-xs"
         />
       </UFormField>
     </div>

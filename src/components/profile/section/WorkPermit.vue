@@ -21,6 +21,7 @@
           v-model="form.workPermitInfo"
           :rows="3"
           :placeholder="t('profile.fields.workPermitPlaceholder')"
+          class="w-xs"
         />
       </UFormField>
     </div>

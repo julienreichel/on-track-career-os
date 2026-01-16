@@ -31,11 +31,16 @@
           v-model="form.primaryEmail"
           type="email"
           :placeholder="t('profile.fields.emailPlaceholder')"
+          class="w-xs"
         />
       </UFormField>
 
       <UFormField :label="t('profile.fields.primaryPhone')" :error="phoneError">
-        <UInput v-model="form.primaryPhone" :placeholder="t('profile.fields.phonePlaceholder')" />
+        <UInput
+          v-model="form.primaryPhone"
+          :placeholder="t('profile.fields.phonePlaceholder')"
+          class="w-xs"
+        />
       </UFormField>
     </div>
   </UCard>
