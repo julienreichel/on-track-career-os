@@ -14,7 +14,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div v-if="progress.state.value?.phase !== 'bonus'" class="space-y-4">
     <UAlert
       v-if="progress.error.value"
       icon="i-heroicons-exclamation-triangle"
@@ -25,10 +25,7 @@ onMounted(() => {
     />
 
     <template v-if="progress.state.value && progress.nextAction.value">
-      <ProgressBannerCard
-        :state="progress.state.value"
-        :next-action="progress.nextAction.value"
-      />
+      <ProgressBannerCard :state="progress.state.value" :next-action="progress.nextAction.value" />
       <ProgressChecklistCard :state="progress.state.value" />
     </template>
   </div>

@@ -5,8 +5,8 @@ import type { UserProgressState } from '@/domain/onboarding';
 const baseState = (overrides: Partial<UserProgressState> = {}): UserProgressState => ({
   phase: 'phase1',
   phase1: { isComplete: false, missing: ['cvUploaded'], reasonKeys: [] },
-  phase2A: { isComplete: false, missing: ['profileDepth'], reasonKeys: [] },
-  phase2B: { isComplete: false, missing: ['jobUploaded'], reasonKeys: [] },
+  phase2B: { isComplete: false, missing: ['profileDepth'], reasonKeys: [] },
+  phase2A: { isComplete: false, missing: ['jobUploaded'], reasonKeys: [] },
   phase3: { isComplete: false, missing: ['tailoredCv'], reasonKeys: [] },
   ...overrides,
 });
@@ -22,8 +22,8 @@ describe('getNextAction', () => {
     const state = baseState({
       phase: 'phase2',
       phase1: { isComplete: true, missing: [], reasonKeys: [] },
-      phase2A: { isComplete: false, missing: ['profileDepth'], reasonKeys: [] },
-      phase2B: { isComplete: true, missing: [], reasonKeys: [] },
+      phase2B: { isComplete: false, missing: ['profileDepth'], reasonKeys: [] },
+      phase2A: { isComplete: true, missing: [], reasonKeys: [] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('profile-depth');
@@ -34,8 +34,8 @@ describe('getNextAction', () => {
     const state = baseState({
       phase: 'phase2',
       phase1: { isComplete: true, missing: [], reasonKeys: [] },
-      phase2A: { isComplete: true, missing: [], reasonKeys: [] },
-      phase2B: { isComplete: false, missing: ['jobUploaded'], reasonKeys: [] },
+      phase2B: { isComplete: true, missing: [], reasonKeys: [] },
+      phase2A: { isComplete: false, missing: ['jobUploaded'], reasonKeys: [] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('upload-job');
@@ -45,8 +45,8 @@ describe('getNextAction', () => {
     const state = baseState({
       phase: 'phase3',
       phase1: { isComplete: true, missing: [], reasonKeys: [] },
-      phase2A: { isComplete: true, missing: [], reasonKeys: [] },
       phase2B: { isComplete: true, missing: [], reasonKeys: [] },
+      phase2A: { isComplete: true, missing: [], reasonKeys: [] },
       phase3: { isComplete: false, missing: ['tailoredCv'], reasonKeys: [] },
     });
     const action = getNextAction(state);
@@ -57,8 +57,8 @@ describe('getNextAction', () => {
     const state = baseState({
       phase: 'bonus',
       phase1: { isComplete: true, missing: [], reasonKeys: [] },
-      phase2A: { isComplete: true, missing: [], reasonKeys: [] },
       phase2B: { isComplete: true, missing: [], reasonKeys: [] },
+      phase2A: { isComplete: true, missing: [], reasonKeys: [] },
       phase3: { isComplete: true, missing: [], reasonKeys: [] },
     });
     const action = getNextAction(state);

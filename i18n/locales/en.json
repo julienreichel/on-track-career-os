@@ -1451,8 +1451,8 @@
     "phaseLabels": {
       "phase1": "Phase 1 — Ground me",
       "phase2": "Phase 2 — Growing up",
-      "phase2A": "Phase 2A — Make sense of myself",
-      "phase2B": "Phase 2B — Understand the job",
+      "phase2B": "Phase 2B — Make sense of myself",
+      "phase2A": "Phase 2A — Understand the job",
       "phase3": "Phase 3 — Position myself",
       "bonus": "Bonus — Advanced"
     },
@@ -1496,7 +1496,7 @@
       "profileDepth": "Your goals and values power better positioning later.",
       "stories": "Stories make your impact tangible in applications.",
       "personalCanvas": "Your canvas clarifies your professional narrative.",
-      "jobUpload": "A job description gives the system context to match against.",
+      "jobUpload": "Upload a job description to see if this is a good match.",
       "matchingSummary": "The matching summary reveals fit, gaps, and priorities.",
       "tailoredMaterials": "Tailored materials turn insight into applications.",
       "bonus": "Fine-tune your assets to stand out."

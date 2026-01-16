@@ -60,40 +60,40 @@ function computePhase2A(input: ProgressInputs): ProgressCheckResult {
   const hasStories = input.storiesCount > 0;
   const hasCanvas = input.personalCanvasCount > 0;
 
-  const phase2AMissing: ProgressGate[] = [];
-  const phase2AReasons: string[] = [];
+  const phase2BMissing: ProgressGate[] = [];
+  const phase2BReasons: string[] = [];
   if (!profileDepthComplete) {
-    phase2AMissing.push('profileDepth');
-    phase2AReasons.push('progress.gates.profileDepth');
+    phase2BMissing.push('profileDepth');
+    phase2BReasons.push('progress.gates.profileDepth');
   }
   if (!hasStories) {
-    phase2AMissing.push('stories');
-    phase2AReasons.push('progress.gates.stories');
+    phase2BMissing.push('stories');
+    phase2BReasons.push('progress.gates.stories');
   }
   if (!hasCanvas) {
-    phase2AMissing.push('personalCanvas');
-    phase2AReasons.push('progress.gates.personalCanvas');
+    phase2BMissing.push('personalCanvas');
+    phase2BReasons.push('progress.gates.personalCanvas');
   }
 
-  return buildCheck(phase2AMissing, phase2AReasons);
+  return buildCheck(phase2BMissing, phase2BReasons);
 }
 
 function computePhase2B(input: ProgressInputs): ProgressCheckResult {
   const hasJobs = input.jobsCount > 0;
   const hasMatchingSummary = input.matchingSummaryCount > 0;
 
-  const phase2BMissing: ProgressGate[] = [];
-  const phase2BReasons: string[] = [];
+  const phase2AMissing: ProgressGate[] = [];
+  const phase2AReasons: string[] = [];
   if (!hasJobs) {
-    phase2BMissing.push('jobUploaded');
-    phase2BReasons.push('progress.gates.jobUploaded');
+    phase2AMissing.push('jobUploaded');
+    phase2AReasons.push('progress.gates.jobUploaded');
   }
   if (!hasMatchingSummary) {
-    phase2BMissing.push('matchingSummary');
-    phase2BReasons.push('progress.gates.matchingSummary');
+    phase2AMissing.push('matchingSummary');
+    phase2AReasons.push('progress.gates.matchingSummary');
   }
 
-  return buildCheck(phase2BMissing, phase2BReasons);
+  return buildCheck(phase2AMissing, phase2AReasons);
 }
 
 function computePhase3(input: ProgressInputs): ProgressCheckResult {
@@ -121,14 +121,14 @@ function computePhase3(input: ProgressInputs): ProgressCheckResult {
 
 function resolvePhase(
   phase1: ProgressCheckResult,
-  phase2A: ProgressCheckResult,
   phase2B: ProgressCheckResult,
+  phase2A: ProgressCheckResult,
   phase3: ProgressCheckResult
 ): UserProgressState['phase'] {
   if (!phase1.isComplete) {
     return 'phase1';
   }
-  if (!phase2A.isComplete || !phase2B.isComplete) {
+  if (!phase2B.isComplete || !phase2A.isComplete) {
     return 'phase2';
   }
   if (!phase3.isComplete) {
@@ -139,16 +139,16 @@ function resolvePhase(
 
 export function computeUserProgressState(input: ProgressInputs): UserProgressState {
   const phase1 = computePhase1(input);
-  const phase2A = computePhase2A(input);
-  const phase2B = computePhase2B(input);
+  const phase2B = computePhase2A(input);
+  const phase2A = computePhase2B(input);
   const phase3 = computePhase3(input);
-  const phase = resolvePhase(phase1, phase2A, phase2B, phase3);
+  const phase = resolvePhase(phase1, phase2B, phase2A, phase3);
 
   return {
     phase,
     phase1,
-    phase2A,
     phase2B,
+    phase2A,
     phase3,
   };
 }

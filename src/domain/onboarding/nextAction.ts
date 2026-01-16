@@ -25,102 +25,50 @@ function phase1Primary(state: UserProgressState): NextActionItem {
     'complete-profile',
     'progress.actions.completeProfile',
     'progress.rationale.profileBasics',
-    '/profile'
+    '/profile/full?mode=edit'
   );
 }
 
 function phase2Primary(state: UserProgressState): NextActionItem {
   if (!state.phase2A.isComplete) {
-    if (state.phase2A.missing.includes('profileDepth')) {
+    if (state.phase2A.missing.includes('jobUploaded')) {
       return action(
-        'profile-depth',
-        'progress.actions.profileDepth',
-        'progress.rationale.profileDepth',
-        '/profile'
-      );
-    }
-    if (state.phase2A.missing.includes('stories')) {
-      return action(
-        'add-stories',
-        'progress.actions.addStories',
-        'progress.rationale.stories',
-        '/profile/stories'
-      );
-    }
-    return action(
-      'build-canvas',
-      'progress.actions.buildCanvas',
-      'progress.rationale.personalCanvas',
-      '/profile/canvas'
-    );
-  }
-
-  if (state.phase2B.missing.includes('jobUploaded')) {
-    return action(
-      'upload-job',
-      'progress.actions.uploadJob',
-      'progress.rationale.jobUpload',
-      '/jobs/new'
-    );
-  }
-
-  return action(
-    'generate-match',
-    'progress.actions.generateMatch',
-    'progress.rationale.matchingSummary',
-    '/jobs'
-  );
-}
-
-function phase2Secondary(state: UserProgressState): NextActionItem[] {
-  if (!state.phase2A.isComplete && state.phase2B.isComplete) {
-    return [
-      action(
-        'profile-depth',
-        'progress.actions.profileDepth',
-        'progress.rationale.profileDepth',
-        '/profile'
-      ),
-      action(
-        'add-stories',
-        'progress.actions.addStories',
-        'progress.rationale.stories',
-        '/profile/stories'
-      ),
-    ];
-  }
-
-  if (state.phase2A.isComplete && !state.phase2B.isComplete) {
-    return [
-      action(
         'upload-job',
         'progress.actions.uploadJob',
         'progress.rationale.jobUpload',
         '/jobs/new'
-      ),
-      action(
-        'generate-match',
-        'progress.actions.generateMatch',
-        'progress.rationale.matchingSummary',
-        '/jobs'
-      ),
-    ];
-  }
+      );
+    }
 
-  return [
-    action(
+    return action(
+      'generate-match',
+      'progress.actions.generateMatch',
+      'progress.rationale.matchingSummary',
+      '/jobs'
+    );
+  }
+  if (state.phase2B.missing.includes('profileDepth')) {
+    return action(
       'profile-depth',
       'progress.actions.profileDepth',
       'progress.rationale.profileDepth',
-      '/profile'
-    ),
-    action(
-      'upload-job',
-      'progress.actions.uploadJob',
-      'progress.rationale.jobUpload',
-      '/jobs/new'
-    ),
-  ];
+      '/profile/full?mode=edit'
+    );
+  }
+  if (state.phase2B.missing.includes('stories')) {
+    return action(
+      'add-stories',
+      'progress.actions.addStories',
+      'progress.rationale.stories',
+      '/profile/stories'
+    );
+  }
+  return action(
+    'build-canvas',
+    'progress.actions.buildCanvas',
+    'progress.rationale.personalCanvas',
+    '/profile/canvas'
+  );
 }
 
 function phase3Primary(): NextActionItem {
@@ -152,13 +100,13 @@ export function getNextAction(state: UserProgressState): NextAction {
     };
   }
 
-  if (!state.phase2A.isComplete || !state.phase2B.isComplete) {
+  if (!state.phase2B.isComplete || !state.phase2A.isComplete) {
     return {
       phase: 'phase2',
       primary: phase2Primary(state),
-      secondary: phase2Secondary(state),
-      missingPrerequisites: [...state.phase2A.missing, ...state.phase2B.missing],
-      gateReasonKeys: [...state.phase2A.reasonKeys, ...state.phase2B.reasonKeys],
+      secondary: [],
+      missingPrerequisites: [...state.phase2B.missing, ...state.phase2A.missing],
+      gateReasonKeys: [...state.phase2B.reasonKeys, ...state.phase2A.reasonKeys],
     };
   }
 

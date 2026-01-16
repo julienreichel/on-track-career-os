@@ -36,21 +36,19 @@ const phase1Items = computed(() =>
   buildItems(props.state.phase1, ['cvUploaded', 'experienceCount', 'profileBasics'])
 );
 
-const phase2AItems = computed(() =>
-  buildItems(props.state.phase2A, ['profileDepth', 'stories', 'personalCanvas'])
+const phase2BItems = computed(() =>
+  buildItems(props.state.phase2B, ['profileDepth', 'stories', 'personalCanvas'])
 );
 
-const phase2BItems = computed(() =>
-  buildItems(props.state.phase2B, ['jobUploaded', 'matchingSummary'])
+const phase2AItems = computed(() =>
+  buildItems(props.state.phase2A, ['jobUploaded', 'matchingSummary'])
 );
 
 const phase3Items = computed(() =>
   buildItems(props.state.phase3, ['tailoredCv', 'tailoredCoverLetter', 'tailoredSpeech'])
 );
 
-const activePhaseTitle = computed(() =>
-  t(`progress.phaseChecklistTitles.${props.state.phase}`)
-);
+const activePhaseTitle = computed(() => t(`progress.phaseChecklistTitles.${props.state.phase}`));
 </script>
 
 <template>
@@ -85,7 +83,6 @@ const activePhaseTitle = computed(() =>
           </div>
         </div>
       </div>
-
       <div>
         <p class="text-xs font-semibold uppercase text-dimmed">
           {{ t('progress.phaseLabels.phase2B') }}

@@ -62,14 +62,14 @@ describe('computeUserProgressState', () => {
       })
     );
     expect(state.phase).toBe('phase2');
-    expect(state.phase2A.isComplete).toBe(false);
-    expect(state.phase2B.isComplete).toBe(true);
+    expect(state.phase2B.isComplete).toBe(false);
+    expect(state.phase2A.isComplete).toBe(true);
   });
 
   it('flags phase 2 when job path is incomplete', () => {
     const state = computeUserProgressState(baseInputs({ jobsCount: 0, matchingSummaryCount: 0 }));
     expect(state.phase).toBe('phase2');
-    expect(state.phase2B.isComplete).toBe(false);
+    expect(state.phase2A.isComplete).toBe(false);
   });
 
   it('flags phase 3 when tailored materials are missing', () => {

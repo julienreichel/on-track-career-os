@@ -15,8 +15,8 @@ const buildCheck = (missing: ProgressCheckResult['missing']): ProgressCheckResul
 const buildState = (phase1Missing: ProgressCheckResult['missing']): UserProgressState => ({
   phase: phase1Missing.length === 0 ? 'phase2' : 'phase1',
   phase1: buildCheck(phase1Missing),
-  phase2A: buildCheck([]),
   phase2B: buildCheck([]),
+  phase2A: buildCheck([]),
   phase3: buildCheck([]),
 });
 

@@ -24,8 +24,8 @@ export type ProgressCheckResult = {
 export type UserProgressState = {
   phase: ProgressPhase;
   phase1: ProgressCheckResult;
-  phase2A: ProgressCheckResult;
   phase2B: ProgressCheckResult;
+  phase2A: ProgressCheckResult;
   phase3: ProgressCheckResult;
 };
 
