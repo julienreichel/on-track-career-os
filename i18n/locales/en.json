@@ -1449,18 +1449,18 @@
     "phaseLabel": "Current phase",
     "nextActionLabel": "Next action",
     "phaseLabels": {
-      "phase1": "Phase 1 — Ground me",
-      "phase2": "Phase 2 — Growing up",
-      "phase2B": "Phase 2B — Make sense of myself",
-      "phase2A": "Phase 2A — Understand the job",
-      "phase3": "Phase 3 — Position myself",
-      "bonus": "Bonus — Advanced"
+      "phase1": "Ground me",
+      "phase2": "Growing up",
+      "phase2B": "Make sense of myself",
+      "phase2A": "Understand the job",
+      "phase3": "Position myself",
+      "bonus": "Advanced"
     },
     "phaseChecklistTitles": {
-      "phase1": "Phase 1 checklist",
-      "phase2": "Phase 2 checklist",
-      "phase3": "Phase 3 checklist",
-      "bonus": "Advanced checklist"
+      "phase1": "Checklist",
+      "phase2": "Checklist",
+      "phase3": "Checklist",
+      "bonus": "Checklist"
     },
     "checklistHint": "Complete the items below to unlock the next phase.",
     "bonusHint": "You are application-ready. Explore advanced options to sharpen your edge.",
