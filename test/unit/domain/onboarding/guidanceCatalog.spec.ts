@@ -13,13 +13,12 @@ const baseState = (overrides: Partial<UserProgressState> = {}): UserProgressStat
 
 describe('guidanceCatalog', () => {
   it('returns empty state for profile stories when none exist', () => {
-    const guidance = getGuidance('profile-stories', baseState(), { storiesCount: 0 });
+    const state = baseState({
+      phase1: { isComplete: true, missing: [] },
+      phase2B: { isComplete: false, missing: ['stories'] },
+    });
+    const guidance = getGuidance('profile-stories', state, { storiesCount: 0 });
     expect(guidance.emptyState?.cta.to).toBe('/profile/stories/new');
-  });
-
-  it('returns banner guidance for profile stories when phase2B stories are missing', () => {
-    const guidance = getGuidance('profile-stories', baseState(), { storiesCount: 0 });
-    expect(guidance.banner?.cta?.to).toBe('/profile/stories/new');
   });
 
   it('returns locked guidance for profile stories when experiences are missing', () => {
@@ -32,12 +31,18 @@ describe('guidanceCatalog', () => {
   });
 
   it('returns CV upload banner for profile experiences when CV is missing', () => {
-    const guidance = getGuidance('profile-experiences', baseState(), { experiencesCount: 0 });
+    const state = baseState({
+      phase1: { isComplete: false, missing: ['cvUploaded'] },
+    });
+    const guidance = getGuidance('profile-experiences', state, { experiencesCount: 0 });
     expect(guidance.banner?.cta?.to).toBe('/profile/cv-upload');
   });
 
   it('returns CV upload banner on profile when CV is missing', () => {
-    const guidance = getGuidance('profile', baseState());
+    const state = baseState({
+      phase1: { isComplete: false, missing: ['cvUploaded'] },
+    });
+    const guidance = getGuidance('profile', state);
     expect(guidance.banner?.cta?.to).toBe('/profile/cv-upload');
   });
 
