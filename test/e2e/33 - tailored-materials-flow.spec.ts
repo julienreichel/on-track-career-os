@@ -122,7 +122,7 @@ test.describe('Tailored materials workflow', () => {
     });
     await expect(coverLetterHeading).toBeVisible();
 
-    const deleteButton = page.getByRole('button', { name: 'Delete', exact: true });
+    const deleteButton = page.getByRole('button', { name: 'Delete', exact: true }).first();
     await expect(deleteButton).toBeVisible();
     await deleteButton.click();
 

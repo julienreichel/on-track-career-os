@@ -218,7 +218,7 @@ test.describe('Cover Letter E2E Flow', () => {
     ).toBeVisible();
 
     // Find the delete button directly (it's visible in the page snapshot)
-    const deleteButton = page.getByRole('button', { name: 'Delete', exact: true });
+    const deleteButton = page.getByRole('button', { name: 'Delete', exact: true }).first();
     await expect(deleteButton).toBeVisible();
     await deleteButton.click();
 
