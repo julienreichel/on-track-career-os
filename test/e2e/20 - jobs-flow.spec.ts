@@ -11,6 +11,9 @@ test.describe('Job analysis workflow', () => {
     await page.goto('/jobs');
     await page.waitForLoadState('networkidle');
 
+    const guidanceEmptyState = page.getByTestId('guidance-empty-state');
+    await expect(guidanceEmptyState).toBeVisible({ timeout: 10000 });
+
     // Ensure jobs list header and breadcrumb link exist
     await expect(page.getByRole('link', { name: 'Jobs' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Jobs', level: 1 })).toBeVisible();
@@ -58,6 +61,7 @@ test.describe('Job analysis workflow', () => {
     await expect(page.locator('[data-testid="job-card"] h3', { hasText: newTitle })).toBeVisible({
       timeout: 20000,
     });
+    await expect(page.getByTestId('guidance-empty-state')).toHaveCount(0);
 
     // Open the job from the list to confirm navigation
     const newJobCard = page

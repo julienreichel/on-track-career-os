@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
 import CoverLetterIndexPage from '@/pages/applications/cover-letters/index.vue';
+import type { GuidanceModel } from '@/domain/onboarding';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 
 // Mock the CoverLetterRepository to avoid Amplify client instantiation
@@ -21,6 +22,7 @@ const errorRef = ref<string | null>(null);
 const mockLoadAll = vi.fn();
 const mockDeleteCoverLetter = vi.fn();
 const mockCreateCoverLetter = vi.fn();
+const guidanceRef = ref<GuidanceModel>({});
 
 vi.mock('@/application/cover-letter/useCoverLetters', () => ({
   useCoverLetters: () => ({
@@ -37,6 +39,12 @@ vi.mock('@/composables/useAuthUser', () => ({
   useAuthUser: () => ({
     userId: ref('user-1'),
     loadUserId: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
+vi.mock('@/composables/useGuidance', () => ({
+  useGuidance: () => ({
+    guidance: guidanceRef,
   }),
 }));
 
@@ -147,6 +155,16 @@ describe('Cover letter list page', () => {
     itemsRef.value = [];
     loadingRef.value = false;
     errorRef.value = null;
+    guidanceRef.value = {
+      emptyState: {
+        titleKey: 'guidance.applications.coverLetters.empty.title',
+        descriptionKey: 'guidance.applications.coverLetters.empty.description',
+        cta: {
+          labelKey: 'guidance.applications.coverLetters.empty.cta',
+          to: '/applications/cover-letters/new',
+        },
+      },
+    };
     mockLoadAll.mockClear();
     mockCreateCoverLetter.mockClear();
     mockDeleteCoverLetter.mockClear();
@@ -160,7 +178,7 @@ describe('Cover letter list page', () => {
 
   it('renders empty state when no cover letters exist', async () => {
     const wrapper = await mountPage();
-    expect(wrapper.text()).toContain(i18n.global.t('coverLetter.list.emptyState.title'));
+    expect(wrapper.find('.guidance-empty-state-stub').exists()).toBe(true);
   });
 
   it('shows skeleton until cover letters are loaded', async () => {
@@ -208,6 +226,7 @@ describe('Cover letter list page', () => {
         updatedAt: new Date('2024-01-21').toISOString(),
       },
     ];
+    guidanceRef.value = {};
     loadingRef.value = false;
 
     const wrapper = await mountPage();
@@ -241,6 +260,7 @@ describe('Cover letter list page', () => {
         updatedAt: '2024-02-02T00:00:00.000Z',
       },
     ];
+    guidanceRef.value = {};
 
     const wrapper = await mountPage();
     await wrapper.vm.$nextTick();
@@ -270,6 +290,7 @@ describe('Cover letter list page', () => {
         updatedAt: '2024-01-02T00:00:00.000Z',
       },
     ];
+    guidanceRef.value = {};
 
     const wrapper = await mountPage();
     await wrapper.vm.$nextTick();

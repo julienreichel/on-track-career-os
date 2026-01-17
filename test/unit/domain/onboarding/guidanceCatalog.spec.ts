@@ -17,6 +17,20 @@ describe('guidanceCatalog', () => {
     expect(guidance.emptyState?.cta.to).toBe('/profile/stories/new');
   });
 
+  it('returns banner guidance for profile stories when phase2B stories are missing', () => {
+    const guidance = getGuidance('profile-stories', baseState(), { storiesCount: 0 });
+    expect(guidance.banner?.cta?.to).toBe('/profile/stories/new');
+  });
+
+  it('returns locked guidance for profile stories when experiences are missing', () => {
+    const state = baseState({
+      phase1: { isComplete: false, missing: ['experienceCount'] },
+      phase2B: { isComplete: false, missing: ['stories'] },
+    });
+    const guidance = getGuidance('profile-stories', state, { storiesCount: 0 });
+    expect(guidance.lockedFeatures?.[0]?.id).toBe('stories-locked');
+  });
+
   it('returns CV upload banner for profile experiences when CV is missing', () => {
     const guidance = getGuidance('profile-experiences', baseState(), { experiencesCount: 0 });
     expect(guidance.banner?.cta?.to).toBe('/profile/cv-upload');
@@ -40,6 +54,17 @@ describe('guidanceCatalog', () => {
     });
     const guidance = getGuidance('applications-cv', state, { cvCount: 0 });
     expect(guidance.lockedFeatures?.[0]?.id).toBe('cv-locked');
+    expect(guidance.lockedFeatures?.[0]?.cta.to).toBe('/profile/full?mode=edit');
+  });
+
+  it('prioritizes missing stories for applications lock', () => {
+    const state = baseState({
+      phase1: { isComplete: true, missing: [] },
+      phase2A: { isComplete: false, missing: [] },
+      phase2B: { isComplete: false, missing: ['stories'] },
+    });
+    const guidance = getGuidance('applications-cover-letters', state, { coverLetterCount: 0 });
+    expect(guidance.lockedFeatures?.[0]?.cta.to).toBe('/profile/stories');
   });
 
   it('returns empty jobs guidance when no jobs exist', () => {

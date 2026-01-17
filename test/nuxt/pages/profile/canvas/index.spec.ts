@@ -3,6 +3,7 @@ import { mount, flushPromises } from '@vue/test-utils';
 import { createTestI18n } from '../../../../utils/createTestI18n';
 import CanvasIndexPage from '~/pages/profile/canvas/index.vue';
 import type { PersonalCanvas } from '~/domain/personal-canvas/PersonalCanvas';
+import type { GuidanceModel } from '~/domain/onboarding';
 import { ref } from 'vue';
 
 // Mock composables
@@ -21,6 +22,8 @@ const mockAuthUser = {
   userId: ref('test-user-123'),
 };
 
+const guidanceRef = ref<GuidanceModel>({});
+
 const mockToast = {
   add: vi.fn(),
 };
@@ -33,12 +36,19 @@ vi.mock('~/composables/useAuthUser', () => ({
   useAuthUser: () => mockAuthUser,
 }));
 
+vi.mock('~/composables/useGuidance', () => ({
+  useGuidance: () => ({
+    guidance: guidanceRef,
+  }),
+}));
+
 // Create i18n instance
 const i18n = createTestI18n();
 
 describe('Canvas Index Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    guidanceRef.value = {};
     mockCanvasEngine.canvas.value = null;
     mockCanvasEngine.loading.value = false;
     mockCanvasEngine.error.value = null;
@@ -74,6 +84,48 @@ describe('Canvas Index Page', () => {
       expect(wrapper.find('.u-container').exists()).toBe(true);
       expect(wrapper.find('.u-page').exists()).toBe(true);
       expect(wrapper.find('[data-testid="canvas-component"]').exists()).toBe(true);
+    });
+
+    it('renders locked guidance when prerequisites are missing', () => {
+      guidanceRef.value = {
+        lockedFeatures: [
+          {
+            id: 'canvas',
+            titleKey: 'guidance.profileCanvas.locked.title',
+            descriptionKey: 'guidance.profileCanvas.locked.descriptionDefault',
+            cta: { labelKey: 'guidance.profileCanvas.locked.ctaProfileDepth', to: '/profile/full' },
+          },
+        ],
+      };
+
+      const wrapper = mount(CanvasIndexPage, {
+        global: {
+          plugins: [i18n],
+          mocks: {
+            useI18n: () => ({
+              t: (key: string) => key,
+            }),
+            useToast: () => mockToast,
+          },
+          stubs: {
+            UContainer: { template: '<div class="u-container"><slot /></div>' },
+            UPage: { template: '<div class="u-page"><slot /></div>' },
+            UPageHeader: { template: '<div class="u-page-header"><slot /></div>' },
+            UPageBody: { template: '<div class="u-page-body"><slot /></div>' },
+            UAlert: { template: '<div class="u-alert"><slot /></div>' },
+            LockedFeatureCard: {
+              template: '<div class="guidance-locked-stub"></div>',
+              props: ['feature'],
+            },
+            PersonalCanvasComponent: {
+              template: '<div class="canvas-component" data-testid="canvas-component"></div>',
+            },
+          },
+        },
+      });
+
+      expect(wrapper.find('.guidance-locked-stub').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="canvas-component"]').exists()).toBe(false);
     });
 
     it('renders page with existing canvas', () => {

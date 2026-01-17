@@ -5,10 +5,12 @@ import { ref } from 'vue';
 import JobsPage from '@/pages/jobs/index.vue';
 import { createTestI18n } from '../../../utils/createTestI18n';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
+import type { GuidanceModel } from '@/domain/onboarding';
 
 const jobsRef = ref<JobDescription[]>([]);
 const mockListJobs = vi.fn();
 const mockDeleteJob = vi.fn();
+const guidanceRef = ref<GuidanceModel>({});
 
 vi.mock('@/composables/useJobAnalysis', () => ({
   useJobAnalysis: () => ({
@@ -23,6 +25,12 @@ vi.mock('@/composables/useJobAnalysis', () => ({
     updateJob: vi.fn(),
     reanalyseJob: vi.fn(),
     resetState: vi.fn(),
+  }),
+}));
+
+vi.mock('@/composables/useGuidance', () => ({
+  useGuidance: () => ({
+    guidance: guidanceRef,
   }),
 }));
 
@@ -130,6 +138,13 @@ describe('Jobs List Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     jobsRef.value = [];
+    guidanceRef.value = {
+      emptyState: {
+        titleKey: 'guidance.jobs.empty.title',
+        descriptionKey: 'guidance.jobs.empty.description',
+        cta: { labelKey: 'guidance.jobs.empty.cta', to: '/jobs/new' },
+      },
+    };
   });
 
   it('renders page header with navigation links', async () => {
@@ -147,8 +162,7 @@ describe('Jobs List Page', () => {
   it('shows empty state when there are no jobs', async () => {
     const wrapper = await mountPage();
     await wrapper.vm.$nextTick();
-    expect(wrapper.find('.u-empty').exists()).toBe(true);
-    expect(wrapper.text()).toContain(i18n.global.t('jobList.empty.title'));
+    expect(wrapper.find('.guidance-empty-state-stub').exists()).toBe(true);
   });
 
   it('displays search input and job cards when jobs exist', async () => {
@@ -171,6 +185,7 @@ describe('Jobs List Page', () => {
         updatedAt: '2024-01-01T00:00:00.000Z',
       },
     ];
+    guidanceRef.value = {};
 
     const wrapper = await mountPage();
     await wrapper.vm.$nextTick();
@@ -217,6 +232,7 @@ describe('Jobs List Page', () => {
         updatedAt: '2024-02-02T00:00:00.000Z',
       },
     ];
+    guidanceRef.value = {};
 
     const wrapper = await mountPage();
     await wrapper.vm.$nextTick();

@@ -18,3 +18,13 @@ export {
   clampOnboardingStep,
 } from './onboardingWizard';
 export type { OnboardingStep, OnboardingStepId } from './onboardingWizard';
+export type {
+  GuidanceBanner,
+  GuidanceCTA,
+  GuidanceContext,
+  GuidanceEmptyState,
+  GuidanceModel,
+  GuidanceRouteKey,
+  LockedFeature,
+} from './guidanceCatalog';
+export { getGuidance } from './guidanceCatalog';

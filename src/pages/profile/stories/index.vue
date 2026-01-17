@@ -3,8 +3,12 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStoryList } from '@/composables/useStoryList';
+import { useGuidance } from '@/composables/useGuidance';
 import type { STARStory } from '@/domain/starstory/STARStory';
 import type { PageHeaderLink } from '@/types/ui';
+import EmptyStateActionCard from '@/components/guidance/EmptyStateActionCard.vue';
+import LockedFeatureCard from '@/components/guidance/LockedFeatureCard.vue';
+import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
 
 definePageMeta({
   breadcrumbLabel: 'All Stories',
@@ -19,6 +23,9 @@ const searchQuery = ref('');
 const filteredStories = ref<STARStory[]>([]);
 const deleting = ref(false);
 const hasLoaded = ref(false);
+const { guidance } = useGuidance('profile-stories', () => ({
+  storiesCount: stories.value.length,
+}));
 
 // Handle search
 const handleSearch = () => {
@@ -90,8 +97,23 @@ onMounted(async () => {
     />
 
     <UPageBody>
+      <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
+
+      <LockedFeatureCard
+        v-for="feature in guidance.lockedFeatures"
+        :key="feature.id"
+        :feature="feature"
+        class="mb-6"
+      />
+
+      <EmptyStateActionCard
+        v-if="guidance.emptyState && !guidance.lockedFeatures?.length && !loading && hasLoaded"
+        class="mb-6"
+        :empty-state="guidance.emptyState"
+      />
+
       <!-- Search Bar -->
-      <div class="mb-6">
+      <div v-if="!guidance.emptyState && !guidance.lockedFeatures?.length" class="mb-6">
         <UInput
           v-model="searchQuery"
           icon="i-heroicons-magnifying-glass"
@@ -113,6 +135,7 @@ onMounted(async () => {
 
       <!-- Story List Component -->
       <StoryList
+        v-if="!guidance.emptyState && !guidance.lockedFeatures?.length"
         :stories="searchQuery ? filteredStories : stories"
         :loading="loading || deleting || !hasLoaded"
         show-company-names

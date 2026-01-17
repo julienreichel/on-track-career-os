@@ -7,6 +7,8 @@
     />
 
     <UPageBody>
+      <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
+
       <UAlert
         v-if="error"
         icon="i-heroicons-exclamation-triangle"
@@ -94,10 +96,12 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useUserProfile } from '@/application/user-profile/useUserProfile';
+import { useGuidance } from '@/composables/useGuidance';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { PageHeaderLink } from '@/types/ui';
+import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -111,6 +115,7 @@ const showCvUpload = ref(false);
 
 const profilePhotoService = new ProfilePhotoService();
 const experienceRepo = new ExperienceRepository();
+const { guidance } = useGuidance('profile');
 
 const goToFullProfile = (mode?: 'edit') => {
   void router.push({

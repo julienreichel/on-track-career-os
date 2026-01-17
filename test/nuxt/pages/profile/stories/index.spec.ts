@@ -5,7 +5,9 @@ import { createRouter, createMemoryHistory } from 'vue-router';
 import StoriesPage from '@/pages/profile/stories/index.vue';
 import type { STARStory } from '@/domain/starstory/STARStory';
 import type { Experience } from '@/domain/experience/Experience';
+import { ref } from 'vue';
 import type { ComponentPublicInstance, Ref } from 'vue';
+import type { GuidanceModel } from '@/domain/onboarding';
 
 // Mock Nuxt composables
 const pushMock = vi.fn();
@@ -53,6 +55,14 @@ vi.mock('@/application/experience/useExperience', () => ({
   })),
 }));
 
+const guidanceRef = ref<GuidanceModel>({});
+
+vi.mock('@/composables/useGuidance', () => ({
+  useGuidance: () => ({
+    guidance: guidanceRef,
+  }),
+}));
+
 const i18n = createTestI18n();
 type StoriesPageExposed = {
   stories: Ref<STARStory[]>;
@@ -64,6 +74,7 @@ describe('Profile Stories Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     pushMock.mockReset();
+    guidanceRef.value = {};
   });
 
   // Create a real router instance for testing
@@ -118,11 +129,23 @@ describe('Profile Stories Page', () => {
             template: '<div class="u-alert">{{ description }}</div>',
             props: ['title', 'description', 'color'],
           },
+          GuidanceBanner: {
+            template: '<div class="guidance-banner-stub"></div>',
+            props: ['banner'],
+          },
           UIcon: { template: '<i class="u-icon" />', props: ['name'] },
           UInput: {
             template:
               '<input class="u-input" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value); $emit(\'input\', $event.target.value)" />',
             props: ['modelValue', 'placeholder', 'icon', 'size'],
+          },
+          LockedFeatureCard: {
+            template: '<div class="guidance-locked-stub"></div>',
+            props: ['feature'],
+          },
+          EmptyStateActionCard: {
+            template: '<div class="guidance-empty-state-stub"></div>',
+            props: ['emptyState'],
           },
           // Stub StoryList to avoid router injection issues and prop type warnings
           StoryList: {

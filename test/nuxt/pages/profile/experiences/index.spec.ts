@@ -5,6 +5,7 @@ import { createTestI18n } from '../../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import ExperiencesPage from '@/pages/profile/experiences/index.vue';
 import type { Experience } from '@/domain/experience/Experience';
+import type { GuidanceModel } from '@/domain/onboarding';
 
 /**
  * Nuxt Component Tests: Experiences List Page
@@ -43,6 +44,7 @@ const router = createRouter({
 const mockExperienceList = vi.fn<[], Promise<Experience[]>>(() => Promise.resolve([]));
 const mockDeleteExperience = vi.fn();
 const mockStoryCount = vi.fn(() => Promise.resolve([]));
+const guidanceRef = ref<GuidanceModel>({});
 
 vi.mock('@/domain/experience/ExperienceRepository', () => ({
   ExperienceRepository: vi.fn(() => ({
@@ -60,6 +62,12 @@ vi.mock('@/domain/starstory/STARStoryService', () => ({
 vi.mock('@/composables/useAuthUser', () => ({
   useAuthUser: () => ({
     userId: ref('test-user-id'),
+  }),
+}));
+
+vi.mock('@/composables/useGuidance', () => ({
+  useGuidance: () => ({
+    guidance: guidanceRef,
   }),
 }));
 
@@ -93,6 +101,14 @@ const stubs = {
   UEmpty: {
     template: '<div class="u-empty"><p>{{ title }}</p><p>{{ description }}</p><slot /></div>',
     props: ['title', 'description', 'icon'],
+  },
+  GuidanceBanner: {
+    template: '<div class="guidance-banner-stub"></div>',
+    props: ['banner'],
+  },
+  EmptyStateActionCard: {
+    template: '<div class="guidance-empty-state-stub"></div>',
+    props: ['emptyState'],
   },
   ListSkeletonCards: {
     template: '<div class="list-skeleton"><div class="u-skeleton"></div></div>',
@@ -244,19 +260,18 @@ describe('Experiences Page Component', () => {
   });
 
   describe('Empty State', () => {
-    it('should render empty state when no experiences', () => {
+    it('should render empty state action card', () => {
       const wrapper = mount(
         {
           template: `
-            <UEmpty
-              :title="t('experiences.list.empty')"
-              :description="t('experiences.list.empty')"
+            <EmptyStateActionCard
+              :empty-state="{
+                titleKey: 'guidance.profileExperiences.empty.title',
+                descriptionKey: 'guidance.profileExperiences.empty.description',
+                cta: { labelKey: 'guidance.profileExperiences.empty.cta', to: '/profile/experiences/new' }
+              }"
             />
           `,
-          setup() {
-            const { t } = i18n.global;
-            return { t };
-          },
         },
         {
           global: {
@@ -266,35 +281,7 @@ describe('Experiences Page Component', () => {
         }
       );
 
-      expect(wrapper.find('.u-empty').exists()).toBe(true);
-      const emptyText = i18n.global.t('experiences.list.empty');
-      expect(wrapper.text()).toContain(emptyText);
-    });
-
-    it('should render empty state with icon', () => {
-      const wrapper = mount(
-        {
-          template: `
-            <UEmpty
-              :title="t('experiences.empty.title')"
-              icon="i-lucide-briefcase"
-            />
-          `,
-          setup() {
-            const { t } = i18n.global;
-            return { t };
-          },
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
-
-      const empty = wrapper.find('.u-empty');
-      expect(empty.exists()).toBe(true);
+      expect(wrapper.find('.guidance-empty-state-stub').exists()).toBe(true);
     });
   });
 
@@ -390,6 +377,16 @@ describe('Experiences Page Integration', () => {
   beforeEach(() => {
     mockExperienceList.mockReset();
     mockStoryCount.mockReset();
+    guidanceRef.value = {
+      emptyState: {
+        titleKey: 'guidance.profileExperiences.empty.title',
+        descriptionKey: 'guidance.profileExperiences.empty.description',
+        cta: {
+          labelKey: 'guidance.profileExperiences.empty.cta',
+          to: '/profile/experiences/new',
+        },
+      },
+    };
   });
 
   const mountExperiencesPage = async () => {
@@ -409,7 +406,7 @@ describe('Experiences Page Integration', () => {
     mockStoryCount.mockResolvedValue([]);
 
     const wrapper = await mountExperiencesPage();
-    expect(wrapper.text()).toContain(i18n.global.t('experiences.list.empty'));
+    expect(wrapper.find('.guidance-empty-state-stub').exists()).toBe(true);
   });
 
   it('shows skeleton until experiences are loaded', async () => {
@@ -434,7 +431,7 @@ describe('Experiences Page Integration', () => {
     await flushPromises();
 
     expect(wrapper.find('.u-skeleton').exists()).toBe(false);
-    expect(wrapper.text()).toContain(i18n.global.t('experiences.list.empty'));
+    expect(wrapper.find('.guidance-empty-state-stub').exists()).toBe(true);
   });
 
   it('renders experience cards when repository returns data', async () => {
@@ -457,6 +454,7 @@ describe('Experiences Page Integration', () => {
       } as Experience,
     ]);
     mockStoryCount.mockResolvedValue([]);
+    guidanceRef.value = {};
 
     const wrapper = await mountExperiencesPage();
     expect(wrapper.findAll('.experience-card-stub')).toHaveLength(1);

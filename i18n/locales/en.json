@@ -669,6 +669,163 @@
       "deleteFailed": "Failed to delete story"
     }
   },
+  "guidance": {
+    "locked": {
+      "badge": "Locked"
+    },
+    "profile": {
+      "banner": {
+        "cv": {
+          "title": "Upload your CV to start",
+          "description": "Import your CV to create your first experiences automatically.",
+          "cta": "Upload CV"
+        },
+        "basics": {
+          "title": "Complete your profile basics",
+          "description": "Add the essentials so your progress engine can guide you accurately.",
+          "cta": "Update profile"
+        },
+        "experiences": {
+          "title": "Add more experiences",
+          "description": "Add at least three experiences to unlock reliable guidance.",
+          "cta": "Add experience"
+        },
+        "profileDepth": {
+          "title": "Build profile depth",
+          "description": "Add goals, aspirations, and values to unlock advanced guidance.",
+          "cta": "Add profile depth"
+        },
+        "stories": {
+          "title": "Create your first STAR story",
+          "description": "Capture impact stories to unlock your personal canvas.",
+          "cta": "Create stories"
+        },
+        "personalCanvas": {
+          "title": "Generate your personal canvas",
+          "description": "Summarize your unique value to guide job matching.",
+          "cta": "Open canvas"
+        }
+      }
+    },
+    "profileStories": {
+      "locked": {
+        "title": "Add experiences to unlock stories",
+        "description": "Create a few experiences first so stories have the right context.",
+        "cta": "Go to experiences"
+      },
+      "banner": {
+        "title": "Create your first stories",
+        "description": "Add STAR stories to unlock your personal canvas.",
+        "cta": "Create stories"
+      },
+      "empty": {
+        "title": "No stories yet",
+        "description": "Generate STAR stories from your experiences to capture impact.",
+        "cta": "Create stories"
+      }
+    },
+    "profileExperiences": {
+      "banner": {
+        "cv": {
+          "title": "Upload your CV to get started",
+          "description": "Import your CV to create your first experiences automatically.",
+          "cta": "Upload CV"
+        },
+        "experience": {
+          "title": "Add more experiences",
+          "description": "Add at least three experiences to unlock reliable guidance.",
+          "cta": "Add experience"
+        }
+      },
+      "empty": {
+        "title": "No experiences yet",
+        "description": "Create your first experience to build your profile foundation.",
+        "cta": "Add experience"
+      }
+    },
+    "profileCanvas": {
+      "locked": {
+        "title": "Personal Canvas is locked",
+        "descriptionProfileDepth": "Add goals, aspirations, and values to unlock your canvas.",
+        "descriptionStories": "Create at least one STAR story to unlock your canvas.",
+        "descriptionDefault": "Complete your profile path to unlock your canvas.",
+        "ctaProfileDepth": "Complete profile depth",
+        "ctaStories": "Create stories"
+      }
+    },
+    "jobs": {
+      "empty": {
+        "title": "No jobs yet",
+        "description": "Upload a job to start matching and tailored materials.",
+        "cta": "Add a job"
+      }
+    },
+    "jobMatch": {
+      "banner": {
+        "title": "Generate your match summary",
+        "description": "Create a match to see how you fit and unlock tailored materials.",
+        "cta": "Generate match"
+      }
+    },
+    "applications": {
+      "locked": {
+        "title": "Tailored materials are locked",
+        "description": "Complete your matching summary to unlock tailored materials.",
+        "cta": "Analyze a job"
+      },
+      "lockedPhase1": {
+        "title": "Complete your experiences first",
+        "description": "Add your experiences before creating tailored materials.",
+        "cta": "Go to experiences"
+      },
+      "lockedProfileDepth": {
+        "title": "Complete your profile depth",
+        "description": "Add goals, aspirations, and values to unlock tailored materials.",
+        "cta": "Update profile"
+      },
+      "lockedStories": {
+        "title": "Add your stories",
+        "description": "Create STAR stories to unlock tailored materials.",
+        "cta": "Create stories"
+      },
+      "lockedCanvas": {
+        "title": "Generate your canvas",
+        "description": "Create your personal canvas to unlock tailored materials.",
+        "cta": "Open canvas"
+      },
+      "lockedJob": {
+        "title": "Upload a job",
+        "description": "Add a job description to unlock tailored materials.",
+        "cta": "Add a job"
+      },
+      "lockedMatchingSummary": {
+        "title": "Generate a match summary",
+        "description": "Analyze a job to unlock tailored materials.",
+        "cta": "Analyze a job"
+      },
+      "cv": {
+        "empty": {
+          "title": "No CVs yet",
+          "description": "Generate a tailored CV for a specific job.",
+          "cta": "Create CV"
+        }
+      },
+      "coverLetters": {
+        "empty": {
+          "title": "No cover letters yet",
+          "description": "Generate a cover letter to match a job.",
+          "cta": "Create cover letter"
+        }
+      },
+      "speech": {
+        "empty": {
+          "title": "No speech blocks yet",
+          "description": "Generate interview-ready talking points.",
+          "cta": "Create speech"
+        }
+      }
+    }
+  },
   "storyView": {
     "title": "Story Details",
     "situation": "Situation",

@@ -2,7 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import { createTestI18n } from '../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
+import { ref } from 'vue';
 import CvIndexPage from '@/pages/applications/cv/index.vue';
+import type { GuidanceModel } from '@/domain/onboarding';
 
 /**
  * Nuxt Component Tests: CV Listing Page
@@ -22,6 +24,7 @@ const mockDeleteDocument = vi.fn();
 const mockItems = ref<any[]>([]);
 const mockLoading = ref(false);
 const mockError = ref<string | null>(null);
+const guidanceRef = ref<GuidanceModel>({});
 
 vi.mock('@/composables/useCvDocuments', () => ({
   useCvDocuments: () => ({
@@ -30,6 +33,12 @@ vi.mock('@/composables/useCvDocuments', () => ({
     error: mockError,
     loadAll: mockLoadAll,
     deleteDocument: mockDeleteDocument,
+  }),
+}));
+
+vi.mock('@/composables/useGuidance', () => ({
+  useGuidance: () => ({
+    guidance: guidanceRef,
   }),
 }));
 
@@ -116,6 +125,13 @@ const stubs = {
 describe('CV Listing Page - Empty State', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    guidanceRef.value = {
+      emptyState: {
+        titleKey: 'guidance.applications.cv.empty.title',
+        descriptionKey: 'guidance.applications.cv.empty.description',
+        cta: { labelKey: 'guidance.applications.cv.empty.cta', to: '/applications/cv/new' },
+      },
+    };
     mockItems.value = [];
     mockLoading.value = false;
     mockError.value = null;
@@ -132,9 +148,7 @@ describe('CV Listing Page - Empty State', () => {
 
     await flushPromises();
 
-    // Should show empty state text
-    expect(wrapper.text()).toContain('No CVs yet');
-    expect(wrapper.text()).toContain('Create your first CV');
+    expect(wrapper.find('.guidance-empty-state-stub').exists()).toBe(true);
   });
 
   it('should display "Create Your First CV" button in empty state', async () => {
@@ -147,8 +161,36 @@ describe('CV Listing Page - Empty State', () => {
 
     await flushPromises();
 
-    // Should have create button
-    expect(wrapper.text()).toContain('Create Your First CV');
+    expect(wrapper.find('.guidance-empty-state-stub').exists()).toBe(true);
+  });
+
+  it('shows locked guidance when prerequisites are missing', async () => {
+    guidanceRef.value = {
+      emptyState: {
+        titleKey: 'guidance.applications.cv.empty.title',
+        descriptionKey: 'guidance.applications.cv.empty.description',
+        cta: { labelKey: 'guidance.applications.cv.empty.cta', to: '/applications/cv/new' },
+      },
+      lockedFeatures: [
+        {
+          id: 'cv-locked',
+          titleKey: 'guidance.applications.locked.title',
+          descriptionKey: 'guidance.applications.locked.description',
+          cta: { labelKey: 'guidance.applications.locked.cta', to: '/jobs' },
+        },
+      ],
+    };
+
+    const wrapper = mount(CvIndexPage, {
+      global: {
+        plugins: [i18n, router],
+        stubs,
+      },
+    });
+
+    await flushPromises();
+
+    expect(wrapper.find('.guidance-locked-stub').exists()).toBe(true);
   });
 
   it('should have page header with title and description', async () => {
@@ -171,6 +213,7 @@ describe('CV Listing Page - Empty State', () => {
 describe('CV Listing Page - With CVs', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    guidanceRef.value = {};
     mockItems.value = [
       {
         id: '1',

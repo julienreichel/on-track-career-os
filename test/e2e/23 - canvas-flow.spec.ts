@@ -31,25 +31,35 @@ async function ensureProfileFilled(page: Page): Promise<void> {
   const fullNameValue = await fullNameInput.inputValue();
 
   if (!fullNameValue || fullNameValue.trim() === '') {
-    // Fill minimal profile data
     await fullNameInput.fill('John Doe');
-
-    const headlineInput = page
-      .locator('input[placeholder*="headline"], input[placeholder*="Headline"]')
-      .first();
-    await headlineInput.fill('Senior Software Engineer');
-
-    const summaryTextarea = page
-      .locator('textarea[placeholder*="summary"], textarea[placeholder*="Summary"]')
-      .first();
-    await summaryTextarea.fill(
-      'Experienced software engineer with 10+ years in full-stack development.'
-    );
-
-    // Save profile
-    await page.locator('button[type="submit"]:has-text("Save")').first().click();
-    await page.waitForTimeout(2000);
   }
+
+  await page.getByPlaceholder('Senior Software Engineer').first().fill('Senior Software Engineer');
+  await page.getByPlaceholder('San Francisco, CA').first().fill('San Francisco, CA');
+  await page.getByPlaceholder('Senior').first().fill('Senior');
+  await page.getByPlaceholder('you[at]example.com').first().fill('john.doe@example.com');
+  await page.getByPlaceholder('+1 415 555 0101').first().fill('+1 415 555 0101');
+  await page
+    .getByPlaceholder('e.g., Eligible to work in EU & US')
+    .first()
+    .fill('Eligible to work in US');
+
+  const addTag = async (placeholder: string, value: string) => {
+    const input = page.getByPlaceholder(placeholder).first();
+    await input.fill(value);
+    await input.press('Enter');
+  };
+
+  await addTag('https://linkedin.com/in/you', 'https://linkedin.com/in/john-doe');
+  await addTag('e.g., Vue.js', 'Vue.js');
+  await addTag('e.g., English', 'English');
+  await addTag('e.g., Become engineering manager', 'Become engineering manager');
+  await addTag('e.g., Lead cross-functional teams', 'Lead cross-functional teams');
+  await addTag('e.g., Integrity', 'Integrity');
+
+  // Save profile
+  await page.locator('button[type="submit"]:has-text("Save")').first().click();
+  await page.waitForTimeout(2000);
 }
 
 test.describe('Personal Canvas E2E Flow', () => {
@@ -69,17 +79,18 @@ test.describe('Personal Canvas E2E Flow', () => {
     // Check for either generate button OR existing canvas sections
     const hasGenerateButton =
       (await page.getByRole('button', { name: /Generate Canvas/i }).count()) > 0;
+    const hasLockedCard = (await page.getByTestId('locked-feature-canvas').count()) > 0;
     const hasCanvasSections =
       (await page.locator('text=/Value Proposition|Key Activities/i').count()) > 0;
 
-    // Should have either generate button (empty) or canvas sections (populated)
-    expect(hasGenerateButton || hasCanvasSections).toBe(true);
+    // Should have either generate button (empty), locked guidance, or canvas sections (populated)
+    expect(hasGenerateButton || hasLockedCard || hasCanvasSections).toBe(true);
   });
 
   test('1. Setup: Ensure profile is filled', async ({ page }) => {
     await ensureProfileFilled(page);
-    const fullNameField = page.getByRole('textbox', { name: /Full Name/i }).first();
-    await expect(fullNameField).not.toHaveValue('');
+    const fullNameValue = page.getByText(/Full Name/i).locator('..').locator('p');
+    await expect(fullNameValue).toHaveText(/.+/);
   });
 
   test('2. Setup: Create experience with full data', async ({ page }) => {
@@ -124,6 +135,12 @@ test.describe('Personal Canvas E2E Flow', () => {
     // Look for "Generate Canvas" button (empty state)
     const generateButton = page.getByRole('button', { name: /Generate Canvas/i });
     const hasGenerateButton = (await generateButton.count()) > 0;
+    const hasLockedCard = (await page.getByTestId('locked-feature-canvas').count()) > 0;
+
+    if (hasLockedCard) {
+      await expect(page.getByTestId('locked-feature-canvas')).toBeVisible();
+      return;
+    }
 
     if (hasGenerateButton) {
       console.log('Found Generate button - clicking to generate canvas');
@@ -161,6 +178,12 @@ test.describe('Personal Canvas E2E Flow', () => {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
+    const hasLockedCard = (await page.getByTestId('locked-feature-canvas').count()) > 0;
+    if (hasLockedCard) {
+      await expect(page.getByTestId('locked-feature-canvas')).toBeVisible();
+      return;
+    }
+
     // Check for key Business Model Canvas sections
     const sections = [
       /Value Proposition/i,
@@ -188,6 +211,12 @@ test.describe('Personal Canvas E2E Flow', () => {
     await page.goto('/profile/canvas');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
+
+    const hasLockedCard = (await page.getByTestId('locked-feature-canvas').count()) > 0;
+    if (hasLockedCard) {
+      await expect(page.getByTestId('locked-feature-canvas')).toBeVisible();
+      return;
+    }
 
     // Find the first Edit section button using aria-label
     const editButton = page.getByRole('button', { name: 'Edit section' }).first();

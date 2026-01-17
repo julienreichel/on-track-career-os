@@ -18,10 +18,17 @@
         ]"
       />
 
-      <UPageBody>
-        <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
-          <UInput
-            v-model="searchQuery"
+    <UPageBody>
+      <LockedFeatureCard
+        v-for="feature in guidance.lockedFeatures"
+        :key="feature.id"
+        :feature="feature"
+        class="mb-6"
+      />
+
+      <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
+        <UInput
+          v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
             :placeholder="t('cvList.search.placeholder')"
             size="lg"
@@ -42,18 +49,10 @@
         <ListSkeletonCards v-if="loading || !hasLoaded" />
 
         <!-- Empty State -->
-        <UEmpty
-          v-else-if="items.length === 0"
-          :title="$t('cvList.emptyState.title')"
-          :description="$t('cvList.emptyState.description')"
-          icon="i-heroicons-document-text"
-        >
-          <template #actions>
-            <UButton icon="i-heroicons-plus" :to="{ name: 'applications-cv-new' }">
-              {{ $t('cvList.emptyState.action') }}
-            </UButton>
-          </template>
-        </UEmpty>
+        <EmptyStateActionCard
+          v-else-if="guidance.emptyState"
+          :empty-state="guidance.emptyState"
+        />
 
         <!-- CV List -->
         <UCard v-else-if="filteredItems.length === 0">
@@ -120,14 +119,20 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
 import { useCvDocuments } from '@/composables/useCvDocuments';
+import { useGuidance } from '@/composables/useGuidance';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
+import EmptyStateActionCard from '@/components/guidance/EmptyStateActionCard.vue';
+import LockedFeatureCard from '@/components/guidance/LockedFeatureCard.vue';
 import { formatListDate } from '@/utils/formatListDate';
 
 const { t } = useI18n();
 const toast = useToast();
 
 const { items, loading, error, loadAll, deleteDocument } = useCvDocuments();
+const { guidance } = useGuidance('applications-cv', () => ({
+  cvCount: items.value.length,
+}));
 const searchQuery = ref('');
 const hasLoaded = ref(false);
 

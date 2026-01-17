@@ -6,8 +6,11 @@ import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { Experience } from '@/domain/experience/Experience';
 import { useAuthUser } from '@/composables/useAuthUser';
+import { useGuidance } from '@/composables/useGuidance';
 import type { PageHeaderLink } from '@/types/ui';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
+import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
+import EmptyStateActionCard from '@/components/guidance/EmptyStateActionCard.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -30,6 +33,9 @@ const hasLoaded = ref(false);
 const errorMessage = ref<string | null>(null);
 const showDeleteModal = ref(false);
 const experienceToDelete = ref<string | null>(null);
+const { guidance } = useGuidance('profile-experiences', () => ({
+  experiencesCount: experiences.value.length,
+}));
 
 const headerLinks = computed<PageHeaderLink[]>(() => [
   {
@@ -159,6 +165,8 @@ function handleViewStories(id: string) {
       />
 
       <UPageBody>
+        <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-4" />
+
         <!-- Error Alert -->
         <UAlert
           v-if="errorMessage"
@@ -175,17 +183,7 @@ function handleViewStories(id: string) {
         <ListSkeletonCards v-if="loading || !hasLoaded" />
 
         <!-- Empty State -->
-        <UCard v-else-if="experiences.length === 0">
-          <UEmpty :title="t('experiences.list.empty')" icon="i-heroicons-briefcase">
-            <template #actions>
-              <UButton
-                :label="t('experiences.list.addNew')"
-                icon="i-heroicons-plus"
-                @click="handleNewExperience"
-              />
-            </template>
-          </UEmpty>
-        </UCard>
+        <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
 
         <!-- Experience Cards -->
         <UPageGrid v-else>

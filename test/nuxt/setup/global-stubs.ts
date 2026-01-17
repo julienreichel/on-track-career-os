@@ -14,4 +14,16 @@ config.global.stubs = {
     name: 'ProgressGuidanceSection',
     template: '<div class="progress-guidance-stub" />',
   },
+  GuidanceBanner: {
+    name: 'GuidanceBanner',
+    template: '<div class="guidance-banner-stub" />',
+  },
+  EmptyStateActionCard: {
+    name: 'EmptyStateActionCard',
+    template: '<div class="guidance-empty-state-stub" />',
+  },
+  LockedFeatureCard: {
+    name: 'LockedFeatureCard',
+    template: '<div class="guidance-locked-stub" />',
+  },
 };

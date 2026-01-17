@@ -107,6 +107,10 @@ const stubs = {
   ListSkeletonCards: {
     template: '<div class="list-skeleton"><div class="u-skeleton"></div></div>',
   },
+  EmptyStateActionCard: {
+    template: '<div class="guidance-empty-state-stub"></div>',
+    props: ['emptyState', 'onAction'],
+  },
   UEmpty: {
     props: ['title', 'description'],
     template: '<div class="u-empty">{{ title }}<slot name="actions" /></div>',
@@ -170,7 +174,7 @@ describe('Speech list page', () => {
 
   it('renders empty state when no speech blocks exist', async () => {
     const { wrapper } = await mountPage();
-    expect(wrapper.text()).toContain(i18n.global.t('speech.list.emptyState.title'));
+    expect(wrapper.find('.guidance-empty-state-stub').exists()).toBe(true);
   });
 
   it('renders back to applications link', async () => {

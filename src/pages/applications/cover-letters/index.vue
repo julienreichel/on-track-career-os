@@ -19,6 +19,13 @@
       />
 
       <UPageBody>
+        <LockedFeatureCard
+          v-for="feature in guidance.lockedFeatures"
+          :key="feature.id"
+          :feature="feature"
+          class="mb-6"
+        />
+
         <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
           <UInput
             v-model="searchQuery"
@@ -39,20 +46,10 @@
 
         <ListSkeletonCards v-if="loading || !hasLoaded" />
 
-        <UEmpty
-          v-else-if="items.length === 0"
-          :title="t('coverLetter.list.emptyState.title')"
-          :description="t('coverLetter.list.emptyState.description')"
-          icon="i-heroicons-document-text"
-        >
-          <template #actions>
-            <UButton
-              icon="i-heroicons-plus"
-              :label="t('coverLetter.list.emptyState.action')"
-              :to="{ name: 'applications-cover-letters-new' }"
-            />
-          </template>
-        </UEmpty>
+        <EmptyStateActionCard
+          v-else-if="guidance.emptyState"
+          :empty-state="guidance.emptyState"
+        />
 
         <UCard v-else-if="filteredItems.length === 0">
           <UEmpty
@@ -120,9 +117,12 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useGuidance } from '@/composables/useGuidance';
 import ItemCard from '@/components/ItemCard.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
+import EmptyStateActionCard from '@/components/guidance/EmptyStateActionCard.vue';
+import LockedFeatureCard from '@/components/guidance/LockedFeatureCard.vue';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 import { formatListDate } from '@/utils/formatListDate';
@@ -130,6 +130,9 @@ import { formatListDate } from '@/utils/formatListDate';
 const { t } = useI18n();
 const toast = useToast();
 const { items, loading, error, loadAll, deleteCoverLetter } = useCoverLetters();
+const { guidance } = useGuidance('applications-cover-letters', () => ({
+  coverLetterCount: items.value.length,
+}));
 
 const deleteModalOpen = ref(false);
 const letterToDelete = ref<CoverLetter | null>(null);

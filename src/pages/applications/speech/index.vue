@@ -21,6 +21,13 @@
       />
 
       <UPageBody>
+        <LockedFeatureCard
+          v-for="feature in guidance.lockedFeatures"
+          :key="feature.id"
+          :feature="feature"
+          class="mb-6"
+        />
+
         <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
           <UInput
             v-model="searchQuery"
@@ -41,22 +48,11 @@
 
         <ListSkeletonCards v-if="loading || !hasLoaded" />
 
-        <UEmpty
+        <EmptyStateActionCard
           v-else-if="items.length === 0"
-          :title="t('speech.list.emptyState.title')"
-          :description="t('speech.list.emptyState.description')"
-          icon="i-heroicons-chat-bubble-left-right"
-        >
-          <template #actions>
-            <UButton
-              icon="i-heroicons-plus"
-              :label="t('speech.list.emptyState.action')"
-              :loading="creating"
-              :disabled="creating"
-              @click="handleCreate"
-            />
-          </template>
-        </UEmpty>
+          :empty-state="emptyState"
+          :on-action="handleCreate"
+        />
 
         <UCard v-else-if="filteredItems.length === 0">
           <UEmpty :title="t('speech.list.search.noResults')" icon="i-heroicons-magnifying-glass">
@@ -99,9 +95,12 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useGuidance } from '@/composables/useGuidance';
 import ItemCard from '@/components/ItemCard.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
+import LockedFeatureCard from '@/components/guidance/LockedFeatureCard.vue';
+import EmptyStateActionCard from '@/components/guidance/EmptyStateActionCard.vue';
 import { useSpeechBlocks } from '@/application/speech-block/useSpeechBlocks';
 import { SpeechBlockService } from '@/domain/speech-block/SpeechBlockService';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
@@ -113,6 +112,18 @@ const { t } = useI18n();
 const toast = useToast();
 const { userId, loadUserId } = useAuthUser();
 const { items, loading, error, loadAll, deleteSpeechBlock, createSpeechBlock } = useSpeechBlocks();
+const { guidance } = useGuidance('applications-speech', () => ({
+  speechCount: items.value.length,
+}));
+const emptyState = computed(() => ({
+  titleKey: 'guidance.applications.speech.empty.title',
+  descriptionKey: 'guidance.applications.speech.empty.description',
+  icon: 'i-heroicons-chat-bubble-left-right',
+  cta: {
+    labelKey: 'guidance.applications.speech.empty.cta',
+    to: '/applications/speech',
+  },
+}));
 const service = new SpeechBlockService();
 const engine = useSpeechEngine();
 

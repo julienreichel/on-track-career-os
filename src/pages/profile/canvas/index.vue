@@ -20,7 +20,15 @@
           @close="error = null"
         />
 
+        <LockedFeatureCard
+          v-for="feature in guidance.lockedFeatures"
+          :key="feature.id"
+          :feature="feature"
+          class="mb-6"
+        />
+
         <PersonalCanvasComponent
+          v-if="!guidance.lockedFeatures?.length"
           :canvas="canvas"
           :loading="loading"
           @generate="handleGenerate"
@@ -36,8 +44,10 @@
 import { computed, watch } from 'vue';
 import { useCanvasEngine } from '@/application/personal-canvas/useCanvasEngine';
 import { useAuthUser } from '@/composables/useAuthUser';
+import { useGuidance } from '@/composables/useGuidance';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
 import type { PageHeaderLink } from '@/types/ui';
+import LockedFeatureCard from '@/components/guidance/LockedFeatureCard.vue';
 
 definePageMeta({
   breadcrumbLabel: 'Canvas',
@@ -48,6 +58,9 @@ const toast = useToast();
 const { userId } = useAuthUser();
 const { canvas, loading, error, initializeForUser, generateAndSave, regenerateAndSave, saveEdits } =
   useCanvasEngine();
+const { guidance } = useGuidance('profile-canvas', () => ({
+  canvasCount: canvas.value ? 1 : 0,
+}));
 
 const headerLinks = computed<PageHeaderLink[]>(() => [
   {

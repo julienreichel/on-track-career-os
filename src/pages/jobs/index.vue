@@ -5,10 +5,16 @@ import { useI18n } from 'vue-i18n';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import JobCard from '@/components/job/JobCard.vue';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
+import { useGuidance } from '@/composables/useGuidance';
+import EmptyStateActionCard from '@/components/guidance/EmptyStateActionCard.vue';
 
 const router = useRouter();
 const { t } = useI18n();
 const jobAnalysis = useJobAnalysis();
+const jobs = jobAnalysis.jobs;
+const { guidance } = useGuidance('jobs', () => ({
+  jobsCount: jobs.value.length,
+}));
 
 const loading = ref(true);
 const hasLoaded = ref(false);
@@ -31,7 +37,6 @@ const headerLinks = computed(() => [
   },
 ]);
 
-const jobs = jobAnalysis.jobs;
 const toTimestamp = (value?: string | null): number => {
   if (!value) return 0;
   const timestamp = new Date(value).getTime();
@@ -130,18 +135,10 @@ function cancelDelete() {
 
         <ListSkeletonCards v-if="loading || !hasLoaded" />
 
-        <UCard v-else-if="jobs.length === 0">
-          <UEmpty :title="t('jobList.empty.title')" icon="i-heroicons-briefcase">
-            <p class="text-sm text-gray-500">{{ t('jobList.empty.description') }}</p>
-            <template #actions>
-              <UButton
-                :label="t('jobList.empty.cta')"
-                icon="i-heroicons-plus"
-                @click="router.push('/jobs/new')"
-              />
-            </template>
-          </UEmpty>
-        </UCard>
+        <EmptyStateActionCard
+          v-else-if="guidance.emptyState"
+          :empty-state="guidance.emptyState"
+        />
 
         <UCard v-else-if="filteredJobs.length === 0">
           <UEmpty :title="t('jobList.search.noResults')" icon="i-heroicons-magnifying-glass">
