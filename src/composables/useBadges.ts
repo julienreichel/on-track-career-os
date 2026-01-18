@@ -66,6 +66,7 @@ export function useBadges() {
         if (badge) {
           toast.add({
             title: t(badge.titleKey),
+            description: t(badge.descriptionKey),
             color: 'neutral',
             icon: 'i-heroicons-check-circle',
           });
@@ -73,6 +74,7 @@ export function useBadges() {
       } else if (diff.newlyEarned.length > 1) {
         toast.add({
           title: t('badges.toast.multiple', { count: diff.newlyEarned.length }),
+          description: t('badges.toast.multipleDescription'),
           color: 'neutral',
           icon: 'i-heroicons-check-circle',
         });
