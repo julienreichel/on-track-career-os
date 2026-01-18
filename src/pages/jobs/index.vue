@@ -7,13 +7,19 @@ import JobCard from '@/components/job/JobCard.vue';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 import { useGuidance } from '@/composables/useGuidance';
 import EmptyStateActionCard from '@/components/guidance/EmptyStateActionCard.vue';
+import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
 
 const router = useRouter();
 const { t } = useI18n();
 const jobAnalysis = useJobAnalysis();
 const jobs = jobAnalysis.jobs;
+const jobNeedingMatch = computed(() => jobs.value.find((job) => job.status !== 'analyzed'));
+const matchPromptJobId = computed(() => jobNeedingMatch.value?.id);
+
 const { guidance } = useGuidance('jobs', () => ({
   jobsCount: jobs.value.length,
+  jobId: matchPromptJobId.value,
+  hasMatchingSummary: matchPromptJobId.value ? false : undefined,
 }));
 
 const loading = ref(true);
@@ -112,6 +118,8 @@ function cancelDelete() {
       />
 
       <UPageBody>
+        <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
+
         <div v-if="hasLoaded && !loading && jobs.length > 0" class="mb-6">
           <UInput
             v-model="searchQuery"

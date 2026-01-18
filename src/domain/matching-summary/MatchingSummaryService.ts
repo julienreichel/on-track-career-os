@@ -143,6 +143,7 @@ export class MatchingSummaryService {
       if (!updated) {
         throw new Error('Failed to update matching summary');
       }
+      await this.markJobAnalyzed(jobId);
       return updated;
     }
 
@@ -159,7 +160,16 @@ export class MatchingSummaryService {
     if (!created) {
       throw new Error('Failed to create matching summary');
     }
+    await this.markJobAnalyzed(jobId);
     return created;
+  }
+
+  private async markJobAnalyzed(jobId: string) {
+    try {
+      await this.jobRepo.update({ id: jobId, status: 'analyzed' });
+    } catch (error) {
+      console.warn('[MatchingSummaryService] Failed to update job status', error);
+    }
   }
 
   async deleteSummary(id: string) {

@@ -6,6 +6,7 @@ export type GuidanceRouteKey =
   | 'profile-stories'
   | 'profile-canvas'
   | 'jobs'
+  | 'job-detail'
   | 'job-match'
   | 'applications-cv'
   | 'applications-cover-letters'
@@ -281,6 +282,19 @@ const getProfileCanvasGuidance = (state: UserProgressState | null): GuidanceMode
 
 const getJobsGuidance = (context: GuidanceContext): GuidanceModel => {
   if (context.jobsCount !== 0) {
+    if (context.jobId && context.hasMatchingSummary === false) {
+      return {
+        banner: {
+          titleKey: 'guidance.jobs.banner.matchMissing.title',
+          descriptionKey: 'guidance.jobs.banner.matchMissing.description',
+          cta: {
+            labelKey: 'guidance.jobs.banner.matchMissing.cta',
+            to: `/jobs/${context.jobId}/match`,
+          },
+        },
+      };
+    }
+
     return {};
   }
 
@@ -292,6 +306,30 @@ const getJobsGuidance = (context: GuidanceContext): GuidanceModel => {
       cta: {
         labelKey: 'guidance.jobs.empty.cta',
         to: '/jobs/new',
+      },
+    },
+  };
+};
+
+const getJobDetailGuidance = (
+  state: UserProgressState | null,
+  context: GuidanceContext
+): GuidanceModel => {
+  if (!context.jobId || context.hasMatchingSummary !== false) {
+    return {};
+  }
+
+  if (!state || state.phase2A.missing.includes('jobUploaded')) {
+    return {};
+  }
+
+  return {
+    banner: {
+      titleKey: 'guidance.jobDetail.banner.title',
+      descriptionKey: 'guidance.jobDetail.banner.description',
+      cta: {
+        labelKey: 'guidance.jobDetail.banner.cta',
+        to: `/jobs/${context.jobId}/match`,
       },
     },
   };
@@ -480,6 +518,7 @@ const guidanceHandlers: Record<
   'profile-stories': (state, context) => getProfileStoriesGuidance(state, context),
   'profile-canvas': (state) => getProfileCanvasGuidance(state),
   jobs: (_, context) => getJobsGuidance(context),
+  'job-detail': (state, context) => getJobDetailGuidance(state, context),
   'job-match': (_, context) => getJobMatchGuidance(context),
   'applications-cv': (state, context) => getApplicationsCvGuidance(state, context),
   'applications-cover-letters': (state, context) =>

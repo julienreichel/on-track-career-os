@@ -635,6 +635,13 @@
       }
     },
     "jobs": {
+      "banner": {
+        "matchMissing": {
+          "title": "Your match is ready to review",
+          "description": "Open the match summary to see fit, gaps, and tailored recommendations.",
+          "cta": "View match"
+        }
+      },
       "empty": {
         "title": "No jobs yet",
         "description": "Upload a job to start matching and tailored materials.",
@@ -646,6 +653,13 @@
         "title": "Generate your match summary",
         "description": "Create a match to see how you fit and unlock tailored materials.",
         "cta": "Generate match"
+      }
+    },
+    "jobDetail": {
+      "banner": {
+        "title": "Review the match summary",
+        "description": "Open the match to see fit, gaps, and next steps.",
+        "cta": "View match"
       }
     },
     "applications": {

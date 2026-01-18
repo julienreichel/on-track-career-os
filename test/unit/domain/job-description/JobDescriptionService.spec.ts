@@ -207,7 +207,7 @@ describe('JobDescriptionService', () => {
         explicitPains: ['Pain'],
       } as ParsedJobDescription;
 
-      const mockUpdated = { id: 'job-1', ...parsed, status: 'analyzed' } as JobDescription;
+      const mockUpdated = { id: 'job-1', ...parsed, status: 'complete' } as JobDescription;
       mockRepository.update.mockResolvedValue(mockUpdated);
 
       const result = await service.attachParsedJobDescription('job-1', parsed);
@@ -216,7 +216,7 @@ describe('JobDescriptionService', () => {
         expect.objectContaining({
           id: 'job-1',
           title: parsed.title,
-          status: 'analyzed',
+          status: 'complete',
         })
       );
       expect(result).toEqual(mockUpdated);

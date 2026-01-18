@@ -161,7 +161,7 @@ export class JobDescriptionService {
       successCriteria: parsed.successCriteria,
       explicitPains: parsed.explicitPains,
       atsKeywords: parsed.atsKeywords,
-      status: 'analyzed',
+      status: 'complete',
     };
   }
 

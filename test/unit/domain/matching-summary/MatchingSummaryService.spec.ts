@@ -42,6 +42,7 @@ describe('MatchingSummaryService', () => {
   };
   let mockJobRepo: {
     getMatchingSummaries: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -55,6 +56,7 @@ describe('MatchingSummaryService', () => {
     } as unknown as typeof mockRepo;
     mockJobRepo = {
       getMatchingSummaries: vi.fn(),
+      update: vi.fn(),
     };
 
     vi.mocked(MatchingSummaryRepository).mockImplementation(
@@ -104,6 +106,7 @@ describe('MatchingSummaryService', () => {
     const summary = buildSummary();
     mockJobRepo.getMatchingSummaries.mockResolvedValue([]);
     mockRepo.create.mockResolvedValue({ id: 'created' } as MatchingSummary);
+    mockJobRepo.update.mockResolvedValue({ id: 'job-1', status: 'analyzed' });
 
     const created = await service.upsertSummary({
       userId: 'user-1',
@@ -122,6 +125,7 @@ describe('MatchingSummaryService', () => {
         recommendation: 'apply',
       })
     );
+    expect(mockJobRepo.update).toHaveBeenCalledWith({ id: 'job-1', status: 'analyzed' });
   });
 
   it('upserts summaries by updating when one exists', async () => {
@@ -135,6 +139,7 @@ describe('MatchingSummaryService', () => {
       } as MatchingSummary,
     ]);
     mockRepo.update.mockResolvedValue({ id: 'existing', overallScore: 78 } as MatchingSummary);
+    mockJobRepo.update.mockResolvedValue({ id: 'job-1', status: 'analyzed' });
 
     const updated = await service.upsertSummary({
       userId: 'user-1',
@@ -151,6 +156,7 @@ describe('MatchingSummaryService', () => {
         recommendation: 'apply',
       })
     );
+    expect(mockJobRepo.update).toHaveBeenCalledWith({ id: 'job-1', status: 'analyzed' });
   });
 
   it('deletes summaries', async () => {

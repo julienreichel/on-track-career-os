@@ -6,7 +6,9 @@ import TagInput from '@/components/TagInput.vue';
 import LinkedCompanyBadge from '@/components/company/LinkedCompanyBadge.vue';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { useCompanies } from '@/composables/useCompanies';
+import { useGuidance } from '@/composables/useGuidance';
 import TailoredMaterialsCard from '@/components/tailoring/TailoredMaterialsCard.vue';
+import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
 import { formatDetailDate } from '@/utils/formatDetailDate';
 import type {
   JobDescription,
@@ -170,6 +172,10 @@ const formattedCreatedAt = computed(() => formatDetailDate(job.value?.createdAt)
 const formattedUpdatedAt = computed(() => formatDetailDate(job.value?.updatedAt));
 const displayTitle = computed(() => form.title.trim() || t('jobList.card.noTitle'));
 const matchingSummary = computed(() => selectMatchingSummary(jobWithRelations.value));
+const { guidance } = useGuidance('job-detail', () => ({
+  jobId: jobId.value,
+  hasMatchingSummary: Boolean(matchingSummary.value),
+}));
 const existingMaterials = computed(() => ({
   cv: pickMostRecent((jobWithRelations.value?.cvs as CVDocument[]) ?? []),
   coverLetter: pickMostRecent((jobWithRelations.value?.coverLetters as CoverLetter[]) ?? []),
@@ -496,6 +502,8 @@ function redirectToCompanyCreate() {
       />
 
       <UPageBody>
+        <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
+
         <UAlert
           v-if="errorMessage"
           icon="i-heroicons-exclamation-triangle"
