@@ -45,7 +45,10 @@ describe('BadgeGridCard', () => {
       },
       global: {
         plugins: [i18n],
-        stubs,
+        stubs: {
+          ...stubs,
+          BadgePill: false,
+        },
       },
     });
 
