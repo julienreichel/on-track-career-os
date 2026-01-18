@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "AI Career OS"
+    "title": "On Track Career"
   },
   "navigation": {
     "home": "Home",
@@ -23,7 +23,7 @@
     "errorSigningOut": "Error signing out"
   },
   "home": {
-    "title": "Welcome to AI Career OS",
+    "title": "Welcome to On Track Career",
     "description": "You are successfully authenticated!"
   },
   "applicationsPage": {

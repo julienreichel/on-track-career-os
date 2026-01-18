@@ -232,7 +232,7 @@ const handleSave = async () => {
     error.value = t('onboarding.errors.validationFailed');
     return;
   }
-  if (!userId.value) {
+  if (!userId.value || !saveProfile) {
     error.value = t('onboarding.errors.missingUser');
     return;
   }
