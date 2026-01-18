@@ -40,6 +40,17 @@ vi.mock('@/composables/useAuthUser', () => ({
   }),
 }));
 
+// Mock useGuidance to avoid JobDescriptionRepository instantiation
+vi.mock('@/composables/useGuidance', () => ({
+  useGuidance: () => ({
+    guidance: ref({
+      banner: null,
+      emptyState: null,
+      lockedFeatures: [],
+    }),
+  }),
+}));
+
 const generateMock = vi.fn();
 const engineMock = {
   isGenerating: ref(false),
