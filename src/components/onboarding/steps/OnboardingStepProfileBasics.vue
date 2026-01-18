@@ -45,6 +45,7 @@ const form = ref<ProfileForm>({
 
 const isEditing = ref(true);
 const loading = ref(false);
+const profileLoading = ref(true);
 const error = ref<string | null>(null);
 const photoPreviewUrl = ref<string | null>(null);
 const uploadingPhoto = ref(false);
@@ -65,32 +66,37 @@ const normalizeList = (items: Array<string | null> | null | undefined): string[]
   Array.isArray(items) ? items.filter((item): item is string => Boolean(item)) : [];
 
 const loadProfile = async (id: string) => {
+  profileLoading.value = true;
   const composable = useUserProfile(id);
   saveProfile = composable.save;
 
-  await composable.load();
-  if (composable.item.value) {
-    const profile = composable.item.value;
-    form.value = {
-      fullName: profile.fullName ?? '',
-      headline: profile.headline ?? '',
-      location: profile.location ?? '',
-      seniorityLevel: profile.seniorityLevel ?? '',
-      primaryEmail: profile.primaryEmail ?? '',
-      primaryPhone: profile.primaryPhone ?? '',
-      workPermitInfo: profile.workPermitInfo ?? '',
-      profilePhotoKey: profile.profilePhotoKey ?? null,
-      goals: normalizeList(profile.goals),
-      aspirations: normalizeList(profile.aspirations),
-      personalValues: normalizeList(profile.personalValues),
-      strengths: normalizeList(profile.strengths),
-      interests: normalizeList(profile.interests),
-      skills: normalizeList(profile.skills),
-      certifications: normalizeList(profile.certifications),
-      languages: normalizeList(profile.languages),
-      socialLinks: normalizeList(profile.socialLinks),
-    };
-    await loadPhotoPreview(form.value.profilePhotoKey);
+  try {
+    await composable.load();
+    if (composable.item.value) {
+      const profile = composable.item.value;
+      form.value = {
+        fullName: profile.fullName ?? '',
+        headline: profile.headline ?? '',
+        location: profile.location ?? '',
+        seniorityLevel: profile.seniorityLevel ?? '',
+        primaryEmail: profile.primaryEmail ?? '',
+        primaryPhone: profile.primaryPhone ?? '',
+        workPermitInfo: profile.workPermitInfo ?? '',
+        profilePhotoKey: profile.profilePhotoKey ?? null,
+        goals: normalizeList(profile.goals),
+        aspirations: normalizeList(profile.aspirations),
+        personalValues: normalizeList(profile.personalValues),
+        strengths: normalizeList(profile.strengths),
+        interests: normalizeList(profile.interests),
+        skills: normalizeList(profile.skills),
+        certifications: normalizeList(profile.certifications),
+        languages: normalizeList(profile.languages),
+        socialLinks: normalizeList(profile.socialLinks),
+      };
+      await loadPhotoPreview(form.value.profilePhotoKey);
+    }
+  } finally {
+    profileLoading.value = false;
   }
 };
 
@@ -224,6 +230,9 @@ const handleRemovePhoto = async () => {
 };
 
 const handleSave = async () => {
+  if (profileLoading.value) {
+    return;
+  }
   if (!form.value.fullName?.trim()) {
     error.value = t('onboarding.errors.fullNameRequired');
     return;
@@ -315,11 +324,21 @@ provide(profileFormContextKey, {
       :description="error"
     />
 
-    <ProfileSectionCoreIdentity />
-    <ProfileSectionWorkPermit />
-    <ProfileSectionContact />
-    <ProfileSectionSocialLinks />
-    <ProfileSectionProfessionalAttributes />
+    <template v-if="profileLoading">
+      <UCard class="space-y-3">
+        <USkeleton class="h-4 w-40" />
+        <USkeleton class="h-10 w-full" />
+        <USkeleton class="h-10 w-full" />
+        <USkeleton class="h-10 w-3/4" />
+      </UCard>
+    </template>
+    <template v-else>
+      <ProfileSectionCoreIdentity />
+      <ProfileSectionWorkPermit />
+      <ProfileSectionContact />
+      <ProfileSectionSocialLinks />
+      <ProfileSectionProfessionalAttributes />
+    </template>
 
     <div class="flex flex-col gap-3 sm:flex-row sm:justify-between">
       <UButton variant="ghost" color="neutral" :label="t('common.back')" @click="emit('back')" />
@@ -327,7 +346,7 @@ provide(profileFormContextKey, {
         color="primary"
         :label="t('onboarding.actions.continue')"
         :loading="loading"
-        :disabled="loading"
+        :disabled="loading || profileLoading"
         @click="handleSave"
       />
     </div>
