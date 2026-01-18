@@ -59,9 +59,8 @@ export function useBadges() {
         profile.earnedBadges = diff.allEarned;
       }
 
-      // Show single calm toast for newly earned badges
-      if (diff.newlyEarned.length === 1) {
-        const badgeId = diff.newlyEarned[0];
+      // Show one toast per newly earned badge
+      diff.newlyEarned.forEach((badgeId) => {
         const badge = badgeId ? badgeCatalogById[badgeId] : undefined;
         if (badge) {
           toast.add({
@@ -71,14 +70,7 @@ export function useBadges() {
             icon: 'i-heroicons-check-circle',
           });
         }
-      } else if (diff.newlyEarned.length > 1) {
-        toast.add({
-          title: t('badges.toast.multiple', { count: diff.newlyEarned.length }),
-          description: t('badges.toast.multipleDescription'),
-          color: 'neutral',
-          icon: 'i-heroicons-check-circle',
-        });
-      }
+      });
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'badges.errors.loadFailed';
     } finally {

@@ -52,14 +52,16 @@ test.describe('Badge flow', () => {
     await expect(badgeGrid).toBeVisible();
     await expect(badgeGrid.getByTestId('badge-pill-grounded')).toBeVisible();
 
+    // Wait for toast showing "Grounded" badge title
     const badgeToast = page
       .locator('[role="alert"]')
-      .filter({ hasText: /New badge earned:/i });
+      .filter({ hasText: /Grounded/i });
     await expect(badgeToast.first()).toBeVisible({ timeout: 10000 });
 
     await page.reload();
     await page.waitForLoadState('networkidle');
 
+    // Toast should not appear again after reload
     await expect(badgeToast).toHaveCount(0);
   });
 });
