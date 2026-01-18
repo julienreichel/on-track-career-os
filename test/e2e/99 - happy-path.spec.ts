@@ -54,12 +54,6 @@ async function signUp(page: Page, user: { email: string; password: string; name:
     page.waitForNavigation({ timeout: 15000 }).catch(() => {}),
     createAccountButton.click(),
   ]);
-
-  await page.goto('/profile/full?mode=edit');
-  await page.waitForLoadState('networkidle');
-  await expect(page.getByRole('textbox', { name: /Full Name/i }).first()).toBeVisible({
-    timeout: 10000,
-  });
 }
 
 test.describe('Happy path discovery flow', () => {
@@ -81,6 +75,15 @@ test.describe('Happy path discovery flow', () => {
     await expect(toast.first()).toBeVisible({ timeout: 15000 });
   };
 
+  const expectProgressCta = async (page: Page, label: RegExp, href?: RegExp) => {
+    const cta = page.getByTestId('progress-primary-cta');
+    await expect(cta).toBeVisible({ timeout: 10000 });
+    await expect(cta).toHaveText(label);
+    if (href) {
+      await expect(cta).toHaveAttribute('href', href);
+    }
+  };
+
   test('Phase 1 onboarding + Grounded badge', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
@@ -88,6 +91,7 @@ test.describe('Happy path discovery flow', () => {
     await expect(page.getByRole('link', { name: /Start onboarding/i })).toBeVisible({
       timeout: 10000,
     });
+    await expect(page.getByTestId('progress-primary-cta')).toHaveCount(0);
     await page.getByRole('link', { name: /Start onboarding/i }).click();
     await expect(page).toHaveURL(/\/onboarding$/);
     await expect(page.getByText(/Upload your CV/i)).toBeVisible();
@@ -144,7 +148,45 @@ test.describe('Happy path discovery flow', () => {
     await expect(page.getByTestId('badge-pill-grounded')).toBeVisible({ timeout: 20000 });
   });
 
+  test('Phase 2A job upload + match + badge', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expectProgressCta(page, /Upload a job/i, /\/jobs\/new$/);
+
+    await page.goto('/jobs');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByTestId('guidance-empty-state')).toBeVisible({ timeout: 10000 });
+    await page.getByRole('link', { name: /Add a job/i }).click();
+    await expect(page).toHaveURL(/\/jobs\/new/);
+
+    const jobInput = page.locator('input[type="file"]').first();
+    await jobInput.setInputFiles(JOB_FIXTURE);
+
+    await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 20000 });
+    const jobIdMatch = page.url().match(/\/jobs\/([0-9a-f-]+)$/i);
+    expect(jobIdMatch).toBeTruthy();
+    jobId = jobIdMatch ? jobIdMatch[1] : null;
+    if (!jobId) return;
+
+    await page.goto(`/jobs/${jobId}/match`);
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText(/Overall Match Score/i)).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole('button', { name: /Generate tailored CV/i })).toBeVisible({
+      timeout: 20000,
+    });
+
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expectBadgeToast(page, 'Job Clarity');
+    await expect(page.getByTestId('badge-pill-jobClarity')).toBeVisible({ timeout: 20000 });
+  });
+
   test('Phase 2B identity completion + badge', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expectProgressCta(page, /Deepen your profile/i, /\/profile\/full\?mode=edit$/);
+
     await page.goto('/profile/full?mode=edit');
     await page.waitForLoadState('networkidle');
 
@@ -180,9 +222,7 @@ test.describe('Happy path discovery flow', () => {
       await page.waitForSelector('[class*="animate-spin"]', { state: 'hidden', timeout: 30000 });
     }
 
-    await expect(
-      page.getByRole('heading', { name: /Value Proposition/i })
-    ).toBeVisible({
+    await expect(page.getByRole('heading', { name: /Value Proposition/i })).toBeVisible({
       timeout: 20000,
     });
 
@@ -192,39 +232,13 @@ test.describe('Happy path discovery flow', () => {
     await expect(page.getByTestId('badge-pill-identityDefined')).toBeVisible({ timeout: 20000 });
   });
 
-  test('Phase 2A job upload + match + badge', async ({ page }) => {
-    await page.goto('/jobs');
-    await page.waitForLoadState('networkidle');
-
-    await expect(page.getByTestId('guidance-empty-state')).toBeVisible({ timeout: 10000 });
-    await page.getByRole('link', { name: /Add a job/i }).click();
-    await expect(page).toHaveURL(/\/jobs\/new/);
-
-    const jobInput = page.locator('input[type="file"]').first();
-    await jobInput.setInputFiles(JOB_FIXTURE);
-
-    await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 20000 });
-    const jobIdMatch = page.url().match(/\/jobs\/([0-9a-f-]+)$/i);
-    expect(jobIdMatch).toBeTruthy();
-    jobId = jobIdMatch ? jobIdMatch[1] : null;
-    if (!jobId) return;
-
-    await page.goto(`/jobs/${jobId}/match`);
-    await page.waitForLoadState('networkidle');
-    await expect(page.getByText(/Overall Match Score/i)).toBeVisible({ timeout: 30000 });
-    await expect(
-      page.getByRole('button', { name: /Generate tailored CV/i })
-    ).toBeVisible({ timeout: 20000 });
-
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    await expectBadgeToast(page, 'Job Clarity');
-    await expect(page.getByTestId('badge-pill-jobClarity')).toBeVisible({ timeout: 20000 });
-  });
-
   test('Phase 3 materials triad + Application Complete badge', async ({ page }) => {
     expect(jobId).toBeTruthy();
     if (!jobId) return;
+
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expectProgressCta(page, /Create tailored materials/i, /\/jobs$/);
 
     await page.goto(`/jobs/${jobId}/match`);
     await page.waitForLoadState('networkidle');
