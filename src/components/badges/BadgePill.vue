@@ -10,13 +10,15 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <UBadge
-    color="neutral"
-    variant="subtle"
-    class="flex items-center gap-2"
-    :data-testid="`badge-pill-${props.badge.id}`"
-  >
-    <UIcon :name="props.badge.icon" />
-    <span>{{ t(props.badge.titleKey) }}</span>
-  </UBadge>
+  <UTooltip :text="t(props.badge.descriptionKey)">
+    <UBadge
+      color="neutral"
+      variant="subtle"
+      class="flex items-center gap-2 cursor-help"
+      :data-testid="`badge-pill-${props.badge.id}`"
+    >
+      <UIcon :name="props.badge.icon" />
+      <span>{{ t(props.badge.titleKey) }}</span>
+    </UBadge>
+  </UTooltip>
 </template>

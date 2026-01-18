@@ -24,27 +24,29 @@ const baseProfile = {
 const baseInputs = (overrides: Partial<ProgressInputs> = {}): ProgressInputs => ({
   profile: baseProfile as ProgressInputs['profile'],
   cvCount: 1,
-  experiencesCount: 3,
-  storiesCount: 1,
+  experienceCount: 3,
+  storyCount: 1,
   personalCanvasCount: 1,
-  jobsCount: 1,
+  jobCount: 1,
   matchingSummaryCount: 1,
   tailoredCvCount: 1,
   tailoredCoverLetterCount: 1,
   tailoredSpeechCount: 1,
+  companyCanvasCount: 0,
+  hasCustomTemplate: false,
   ...overrides,
 });
 
 describe('computeUserProgressState', () => {
   it('flags phase 1 when CV is missing', () => {
-    const state = computeUserProgressState(baseInputs({ cvCount: 1, experiencesCount: 0 }));
+    const state = computeUserProgressState(baseInputs({ cvCount: 0, experienceCount: 0 }));
     expect(state.phase).toBe('phase1');
     expect(state.phase1.isComplete).toBe(false);
     expect(state.phase1.missing).toContain('cvUploaded');
   });
 
   it('flags phase 1 when experiences are missing', () => {
-    const state = computeUserProgressState(baseInputs({ experiencesCount: 1 }));
+    const state = computeUserProgressState(baseInputs({ experienceCount: 1 }));
     expect(state.phase).toBe('phase1');
     expect(state.phase1.missing).toContain('experienceCount');
   });
@@ -58,7 +60,7 @@ describe('computeUserProgressState', () => {
           aspirations: [],
           personalValues: [],
         } as ProgressInputs['profile'],
-        storiesCount: 0,
+        storyCount: 0,
       })
     );
     expect(state.phase).toBe('phase2');
@@ -67,7 +69,7 @@ describe('computeUserProgressState', () => {
   });
 
   it('flags phase 2 when job path is incomplete', () => {
-    const state = computeUserProgressState(baseInputs({ jobsCount: 0, matchingSummaryCount: 0 }));
+    const state = computeUserProgressState(baseInputs({ jobCount: 0, matchingSummaryCount: 0 }));
     expect(state.phase).toBe('phase2');
     expect(state.phase2A.isComplete).toBe(false);
   });

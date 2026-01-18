@@ -1329,7 +1329,8 @@
       "multipleDescription": "View your badge collection on the dashboard"
     },
     "grid": {
-      "title": "Your milestones"
+      "title": "Your milestones",
+      "description": "Key capability signals you've reached on your application journey"
     },
     "grounded": {
       "title": "Grounded",

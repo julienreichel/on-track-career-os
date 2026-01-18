@@ -15,14 +15,13 @@ const { t } = useI18n();
     <div class="space-y-4">
       <div>
         <h2 class="text-lg font-semibold">{{ t('badges.grid.title') }}</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          {{ t('badges.grid.description') }}
+        </p>
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <BadgePill
-          v-for="badge in props.badges"
-          :key="badge.id"
-          :badge="badge"
-        />
+        <BadgePill v-for="badge in props.badges" :key="badge.id" :badge="badge" />
       </div>
     </div>
   </UCard>
