@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useToast } from '#imports';
 import { useUserProgress } from '@/composables/useUserProgress';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import { badgeCatalogById, computeEligibleBadges, diffBadges } from '@/domain/badges';
