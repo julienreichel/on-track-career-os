@@ -201,10 +201,11 @@ function handleViewStories(id: string) {
     </UPage>
 
     <!-- Delete Confirmation Modal -->
-    <UModal v-model:open="showDeleteModal" :title="t('experiences.delete.title')">
-      <template #body>
-        <p>{{ t('experiences.delete.message') }}</p>
-      </template>
+    <UModal
+      v-model:open="showDeleteModal"
+      :title="t('experiences.delete.title')"
+      :description="t('experiences.delete.message')"
+    >
 
       <template #footer>
         <UButton

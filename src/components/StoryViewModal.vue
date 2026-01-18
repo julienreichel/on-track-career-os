@@ -27,6 +27,7 @@ const close = () => {
   <UModal
     :open="open"
     :title="story.title || t('storyView.title')"
+    :description="t('storyView.description')"
     @update:open="emit('update:open', $event)"
   >
     <template #body>

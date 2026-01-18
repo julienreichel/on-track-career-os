@@ -751,6 +751,7 @@
   },
   "storyView": {
     "title": "Story Details",
+    "description": "Review the STAR details for this story.",
     "achievements": "Achievements",
     "kpis": "Key Performance Indicators"
   },

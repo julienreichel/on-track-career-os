@@ -109,14 +109,9 @@ const cancelDelete = () => {
   <UModal
     v-model:open="showDeleteConfirm"
     :title="t('storyCard.deleteConfirm.title')"
+    :description="t('storyCard.deleteConfirm.message')"
     :ui="{ footer: 'justify-end' }"
   >
-    <template #body>
-      <p class="text-sm text-gray-600 dark:text-gray-400">
-        {{ t('storyCard.deleteConfirm.message') }}
-      </p>
-    </template>
-
     <template #footer>
       <UButton :label="t('common.cancel')" color="neutral" variant="soft" @click="cancelDelete" />
       <UButton :label="t('common.delete')" color="error" @click="confirmDelete" />

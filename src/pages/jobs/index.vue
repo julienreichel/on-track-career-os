@@ -161,10 +161,11 @@ function cancelDelete() {
       </UPageBody>
     </UPage>
 
-    <UModal v-model:open="showDeleteModal" :title="t('jobList.delete.title')">
-      <template #body>
-        <p>{{ t('jobList.delete.message') }}</p>
-      </template>
+    <UModal
+      v-model:open="showDeleteModal"
+      :title="t('jobList.delete.title')"
+      :description="t('jobList.delete.message')"
+    >
       <template #footer>
         <UButton
           color="neutral"
