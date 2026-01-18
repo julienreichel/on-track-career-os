@@ -2,10 +2,7 @@ import type { ProgressInputs, UserProgressState } from '@/domain/onboarding';
 import { badgeCatalog } from './catalog';
 import type { BadgeId } from './types';
 
-export function computeEligibleBadges(
-  inputs: ProgressInputs,
-  state: UserProgressState
-): BadgeId[] {
+export function computeEligibleBadges(inputs: ProgressInputs, state: UserProgressState): BadgeId[] {
   const eligible = new Set<BadgeId>();
 
   // Phase 1: Grounded (CV uploaded + 3 experiences + basics filled)

@@ -4,7 +4,11 @@ import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import type { ProgressInputs, UserProgressState } from '@/domain/onboarding';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
-import { computeUserProgressState, getNextAction, getUnlockableFeatures } from '@/domain/onboarding';
+import {
+  computeUserProgressState,
+  getNextAction,
+  getUnlockableFeatures,
+} from '@/domain/onboarding';
 
 export function useUserProgress() {
   const auth = useAuthUser();

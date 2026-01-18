@@ -1365,6 +1365,43 @@
       "tailoredSpeech": "progress.checklist.tailoredSpeech"
     }
   },
+  "badges": {
+    "toast": {
+      "multiple": "Progress confirmed: {count} milestones reached",
+      "multipleDescription": "View your badge collection on the dashboard"
+    },
+    "grid": {
+      "title": "Your milestones"
+    },
+    "grounded": {
+      "title": "Grounded",
+      "description": "You've uploaded your CV and imported your foundational experiences"
+    },
+    "jobClarity": {
+      "title": "Job Clarity",
+      "description": "You've analyzed a job description and understand the opportunity"
+    },
+    "identityDefined": {
+      "title": "Identity Defined",
+      "description": "You've built a personal canvas that clarifies your professional narrative"
+    },
+    "applicationComplete": {
+      "title": "Application Complete",
+      "description": "You've tailored a CV, cover letter, and speech/pitch for a specific job"
+    },
+    "beyondTheCv": {
+      "title": "Beyond the CV",
+      "description": "You've manually crafted a STAR story to capture your impact"
+    },
+    "companyStrategist": {
+      "title": "Company Strategist",
+      "description": "You've researched a company deeply with a business model canvas"
+    },
+    "customApproach": {
+      "title": "Custom Approach",
+      "description": "You've tailored a speech/pitch to position yourself for a specific opportunity"
+    }
+  },
   "onboarding": {
     "title": "Welcome to your onboarding",
     "description": "Complete the essentials to unlock your next actions.",

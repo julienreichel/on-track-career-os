@@ -13,26 +13,12 @@ const stubs = {
 };
 
 describe('BadgeGridCard', () => {
-  it('renders empty state when no badges are earned', () => {
-    const wrapper = mount(BadgeGridCard, {
-      props: {
-        badges: [],
-      },
-      global: {
-        plugins: [i18n],
-        stubs,
-      },
-    });
-
-    expect(wrapper.text()).toContain(i18n.global.t('badges.empty'));
-  });
-
   it('renders earned badges', () => {
     const badges: BadgeDefinition[] = [
       {
         id: 'grounded',
-        titleKey: 'badges.catalog.grounded.title',
-        descriptionKey: 'badges.catalog.grounded.description',
+        titleKey: 'badges.grounded.title',
+        descriptionKey: 'badges.grounded.description',
         icon: 'i-heroicons-globe-alt',
         phase: 'phase1',
       },
@@ -41,7 +27,6 @@ describe('BadgeGridCard', () => {
     const wrapper = mount(BadgeGridCard, {
       props: {
         badges,
-        newlyEarnedIds: ['grounded'],
       },
       global: {
         plugins: [i18n],
@@ -52,7 +37,6 @@ describe('BadgeGridCard', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(i18n.global.t('badges.catalog.grounded.title'));
-    expect(wrapper.text()).toContain(i18n.global.t('badges.new'));
+    expect(wrapper.text()).toContain(i18n.global.t('badges.grounded.title'));
   });
 });

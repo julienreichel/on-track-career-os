@@ -23,9 +23,9 @@
       <ProgressGuidanceSection v-if="!showOnboarding" class="mb-6" />
 
       <BadgeGridCard
+        v-if="badges.earnedBadgeDefinitions.value.length > 0"
         class="mb-6"
         :badges="badges.earnedBadgeDefinitions.value"
-        :newly-earned-ids="badges.newlyEarnedBadges.value"
       />
 
       <UCard>

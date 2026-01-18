@@ -50,15 +50,15 @@ vi.mock('@/domain/user-profile/UserProfileService', () => ({
 
 const baseInputs: ProgressInputs = {
   profile: null,
-  cvCount: 0,
-  experiencesCount: 1,
+  cvCount: 1,
+  experiencesCount: 3,
   storiesCount: 1,
   personalCanvasCount: 0,
   jobsCount: 0,
   matchingSummaryCount: 0,
   tailoredCvCount: 0,
   tailoredCoverLetterCount: 0,
-  tailoredSpeechCount: 1,
+  tailoredSpeechCount: 0,
 };
 
 const baseState: UserProgressState = {
@@ -91,7 +91,7 @@ describe('useBadges', () => {
     await badges.load();
 
     expect(updateUserProfile).toHaveBeenCalledWith(
-      expect.objectContaining({ earnedBadges: expect.arrayContaining(['grounded', 'pitchReady']) })
+      expect.objectContaining({ earnedBadges: expect.arrayContaining(['grounded']) })
     );
     expect(toastAdd).toHaveBeenCalled();
   });

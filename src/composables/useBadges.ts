@@ -59,15 +59,21 @@ export function useBadges() {
         profile.earnedBadges = diff.allEarned;
       }
 
-      if (diff.newlyEarned.length > 0) {
-        diff.newlyEarned.forEach((badgeId) => {
-          const badge = badgeCatalogById[badgeId];
-          if (!badge) return;
+      // Show single calm toast for newly earned badges
+      if (diff.newlyEarned.length === 1) {
+        const badge = badgeCatalogById[diff.newlyEarned[0]];
+        if (badge) {
           toast.add({
-            title: t('badges.toast.title', { badge: t(badge.titleKey) }),
-            description: t(badge.descriptionKey),
-            color: 'primary',
+            title: t(badge.titleKey),
+            color: 'neutral',
+            icon: 'i-heroicons-check-circle',
           });
+        }
+      } else if (diff.newlyEarned.length > 1) {
+        toast.add({
+          title: t('badges.toast.multiple', { count: diff.newlyEarned.length }),
+          color: 'neutral',
+          icon: 'i-heroicons-check-circle',
         });
       }
     } catch (err) {

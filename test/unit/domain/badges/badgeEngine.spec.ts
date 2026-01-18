@@ -27,28 +27,34 @@ describe('badge engine', () => {
   it('computes eligible badges based on progress inputs', () => {
     const inputs: ProgressInputs = {
       ...baseInputs,
+      cvCount: 1,
+      experiencesCount: 3,
       tailoredCvCount: 1,
+      tailoredCoverLetterCount: 1,
+      tailoredSpeechCount: 1,
     };
     const state: UserProgressState = {
       ...baseState,
+      phase: 'phase3',
       phase1: { isComplete: true, missing: [] },
       phase2A: { isComplete: true, missing: [] },
       phase2B: { isComplete: true, missing: [] },
+      phase3: { isComplete: true, missing: [] },
     };
 
     const eligible = computeEligibleBadges(inputs, state);
     expect(eligible).toContain('grounded');
-    expect(eligible).toContain('realityCheck');
-    expect(eligible).toContain('selfAware');
-    expect(eligible).toContain('cvTailored');
+    expect(eligible).toContain('jobClarity');
+    expect(eligible).toContain('identityDefined');
+    expect(eligible).toContain('applicationComplete');
   });
 
   it('diffs newly earned badges from eligible list', () => {
-    const existing = ['grounded', 'cvTailored'];
-    const eligible = ['grounded', 'cvTailored', 'applicationReady'];
+    const existing = ['grounded', 'jobClarity'];
+    const eligible = ['grounded', 'jobClarity', 'identityDefined'];
     const diff = diffBadges(existing, eligible);
 
-    expect(diff.newlyEarned).toEqual(['applicationReady']);
-    expect(diff.allEarned).toEqual(['grounded', 'cvTailored', 'applicationReady']);
+    expect(diff.newlyEarned).toEqual(['identityDefined']);
+    expect(diff.allEarned).toEqual(['grounded', 'jobClarity', 'identityDefined']);
   });
 });
