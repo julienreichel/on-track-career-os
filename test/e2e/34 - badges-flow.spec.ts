@@ -7,8 +7,14 @@ test.describe('Badge flow', () => {
       await page.goto('/profile/full?mode=edit');
       await page.waitForLoadState('networkidle');
 
-      await page.getByRole('textbox', { name: /Full Name/i }).first().fill('E2E Badge User');
-      await page.getByPlaceholder('Senior Software Engineer').first().fill('Senior Software Engineer');
+      await page
+        .getByRole('textbox', { name: /Full Name/i })
+        .first()
+        .fill('E2E Badge User');
+      await page
+        .getByPlaceholder('Senior Software Engineer')
+        .first()
+        .fill('Senior Software Engineer');
       await page.getByPlaceholder('San Francisco, CA').first().fill('San Francisco, CA');
       await page.getByPlaceholder('Senior').first().fill('Senior');
       await page.getByPlaceholder('you[at]example.com').first().fill('e2e-badge@example.com');
@@ -53,9 +59,7 @@ test.describe('Badge flow', () => {
     await expect(badgeGrid.getByTestId('badge-pill-grounded')).toBeVisible();
 
     // Wait for toast showing "Grounded" badge title
-    const badgeToast = page
-      .locator('[role="alert"]')
-      .filter({ hasText: /Grounded/i });
+    const badgeToast = page.locator('[role="alert"]').filter({ hasText: /Grounded/i });
     await expect(badgeToast.first()).toBeVisible({ timeout: 10000 });
 
     await page.reload();
