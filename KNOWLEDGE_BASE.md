@@ -6,7 +6,7 @@ _A high-level summary of the project architecture, domain model, AI operations, 
 
 ## 1. Global Context
 
-This project is **Your AI Career OS** — an AI-powered job-search and career-development platform that guides users through:
+This project is **Your On Track Career** — an AI-powered job-search and career-development platform that guides users through:
 
 - Understanding their professional identity
 - Modeling job roles and companies

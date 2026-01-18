@@ -1,4 +1,4 @@
-# AI Career OS - Copilot Instructions
+# On Track Career - Copilot Instructions
 
 ## Stack & Architecture
 

@@ -81,7 +81,7 @@ describe('Index Page Component', () => {
       );
 
       expect(wrapper.find('.u-page-header').exists()).toBe(true);
-      expect(wrapper.text()).toContain('AI Career OS');
+      expect(wrapper.text()).toContain('On Track Career');
     });
 
     it('should render page description', () => {

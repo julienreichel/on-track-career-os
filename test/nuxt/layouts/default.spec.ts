@@ -66,7 +66,7 @@ describe('default.vue layout', () => {
       },
     });
 
-    expect(wrapper.text()).toContain('AI Career OS');
+    expect(wrapper.text()).toContain('On Track Career');
   });
 
   it('should display the sign out button', () => {
@@ -109,7 +109,7 @@ describe('default.vue layout', () => {
     });
 
     // Should have header with title and button, plus slot content
-    expect(wrapper.text()).toContain('AI Career OS');
+    expect(wrapper.text()).toContain('On Track Career');
     expect(wrapper.text()).toContain('Sign Out');
     expect(wrapper.text()).toContain('Page content');
   });

@@ -1,6 +1,6 @@
 # PRODUCT DESCRIPTION
 
-**Your AI Career OS — Discover Yourself. Understand Companies. Communicate Your Value.**
+**Your On Track Career — Discover Yourself. Understand Companies. Communicate Your Value.**
 
 ---
 

@@ -1,4 +1,4 @@
-# AI Career OS — Agent Instructions
+# On Track Career — Agent Instructions
 
 Use this file as the primary guidance for automated changes in this repo. It mirrors
 the intent of `.github/copilot-instructions.md` and points to the canonical project

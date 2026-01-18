@@ -6,7 +6,7 @@
 
 ## Overview
 
-Comprehensive E2E testing suite for AI Career OS using Playwright, covering all implemented EPICs (1A, 1B, 2, 3, 3B, 4, 4B, 5A, 5B, 5C, 6). 87 out of 88 tests are actively passing, with 1 flaky test in company workflow, providing near-complete coverage of user workflows from authentication through tailored materials generation.
+Comprehensive E2E testing suite for On Track Career using Playwright, covering all implemented EPICs (1A, 1B, 2, 3, 3B, 4, 4B, 5A, 5B, 5C, 6). 87 out of 88 tests are actively passing, with 1 flaky test in company workflow, providing near-complete coverage of user workflows from authentication through tailored materials generation.
 
 ## What Was Implemented
 

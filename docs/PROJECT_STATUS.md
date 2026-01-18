@@ -1,4 +1,4 @@
-# Project Status — AI Career OS
+# Project Status — On Track Career
 
 **Last Updated:** 2026-01-14  
 **Version:** v0.9.0 — Production-Ready MVP with Advanced Matching and ATS Optimization
@@ -945,7 +945,7 @@ The project has achieved **production-ready MVP status** with comprehensive test
 
 ## 📝 Conclusion
 
-The **AI Career OS** project has made **excellent progress** with 11 of 11 MVP EPICs fully implemented (1A, 1B, 2, 3, 3B, 4, 4B, 5A, 5B, 5C, 6). The backend and domain layers are production-ready, with comprehensive testing (1050+ tests passing) and clean architecture following Domain-Driven Design principles.
+The **On Track Career** project has made **excellent progress** with 11 of 11 MVP EPICs fully implemented (1A, 1B, 2, 3, 3B, 4, 4B, 5A, 5B, 5C, 6). The backend and domain layers are production-ready, with comprehensive testing (1050+ tests passing) and clean architecture following Domain-Driven Design principles.
 
 **Major Milestones Achieved:**
 

@@ -1,6 +1,6 @@
 # E2E Testing with Playwright
 
-This directory contains end-to-end (E2E) tests for the AI Career OS application using Playwright.
+This directory contains end-to-end (E2E) tests for the On Track Career application using Playwright.
 
 ## Setup
 

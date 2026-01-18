@@ -1,4 +1,4 @@
-# AI Career OS
+# On Track Career
 
 > AI-powered career development platform to help you understand yourself, analyze opportunities, and communicate your value.
 
@@ -7,7 +7,7 @@
 
 ## 🎯 Overview
 
-**Your AI Career OS** guides you through a structured job search workflow:
+**Your On Track Career** guides you through a structured job search workflow:
 
 1. **Know Yourself** → Build your professional profile, document experiences with STAR methodology, generate your Personal Canvas
 2. **Understand the Opportunity** → Analyze job descriptions, research companies, create role and company canvases
