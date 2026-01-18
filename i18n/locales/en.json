@@ -555,48 +555,6 @@
     "createFirst": "Create Your First Story",
     "create": "Create Stories"
   },
-  "badges": {
-    "title": "Badges",
-    "subtitle": "Milestones you have unlocked so far.",
-    "empty": "Earn badges as you complete key milestones.",
-    "new": "New",
-    "toast": {
-      "title": "New badge earned: {badge}"
-    },
-    "errors": {
-      "loadFailed": "Failed to load badges"
-    },
-    "catalog": {
-      "grounded": {
-        "title": "Grounded",
-        "description": "You have a working foundation in the system. Ready to explore all features."
-      },
-      "jobClarity": {
-        "title": "Job Clarity",
-        "description": "You understand what this role truly requires. Can make informed decisions about fit."
-      },
-      "identityDefined": {
-        "title": "Identity Defined",
-        "description": "Your professional narrative is clear and structured. Ready to position yourself with confidence."
-      },
-      "applicationComplete": {
-        "title": "Application Complete",
-        "description": "You have everything needed to apply with confidence: CV, letter, and pitch ready."
-      },
-      "beyondTheCv": {
-        "title": "Beyond the CV",
-        "description": "You've expanded your narrative beyond your CV by creating additional stories."
-      },
-      "companyStrategist": {
-        "title": "Company Strategist",
-        "description": "You understand company context strategically. Deeper preparation for interviews."
-      },
-      "customApproach": {
-        "title": "Custom Approach",
-        "description": "You've moved beyond templates to personalized materials. Ownership and sophistication."
-      }
-    }
-  },
   "guidance": {
     "locked": {
       "badge": "Locked"

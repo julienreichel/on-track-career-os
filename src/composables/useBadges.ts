@@ -61,7 +61,8 @@ export function useBadges() {
 
       // Show single calm toast for newly earned badges
       if (diff.newlyEarned.length === 1) {
-        const badge = badgeCatalogById[diff.newlyEarned[0]];
+        const badgeId = diff.newlyEarned[0];
+        const badge = badgeId ? badgeCatalogById[badgeId] : undefined;
         if (badge) {
           toast.add({
             title: t(badge.titleKey),

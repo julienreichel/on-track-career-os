@@ -69,7 +69,7 @@ export function useUserProgress() {
         tailoredCvCount: tailoredCvs.length,
         tailoredCoverLetterCount: tailoredCoverLetters.length,
         tailoredSpeechCount: tailoredSpeechBlocks.length,
-        companyCanvasCount: snapshot.companyCanvases?.length ?? 0,
+        companyCanvasCount: 0, // TODO: Add company canvases to progress snapshot
         hasCustomTemplate: false, // TODO: Implement custom template tracking
       };
 
