@@ -10,6 +10,8 @@ import {
   getUnlockableFeatures,
 } from '@/domain/onboarding';
 
+export type UseUserProgress = ReturnType<typeof useUserProgress>;
+
 export function useUserProgress() {
   const auth = useAuthUser();
   const jobAnalysis = useJobAnalysis();

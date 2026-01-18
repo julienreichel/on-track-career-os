@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { UseUserProgress } from '@/composables/useUserProgress';
 import { onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useUserProgress } from '@/composables/useUserProgress';
@@ -6,7 +7,11 @@ import ProgressBannerCard from '@/components/onboarding/ProgressBannerCard.vue';
 import ProgressChecklistCard from '@/components/onboarding/ProgressChecklistCard.vue';
 
 const { t } = useI18n();
-const progress = useUserProgress();
+const props = defineProps<{
+  progress?: UseUserProgress;
+}>();
+
+const progress = props.progress ?? useUserProgress();
 
 onMounted(() => {
   void progress.load();

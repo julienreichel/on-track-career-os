@@ -20,7 +20,14 @@
         </div>
       </UCard>
 
-      <ProgressGuidanceSection v-if="!showOnboarding" class="mb-6" />
+      <ProgressGuidanceSection v-if="!showOnboarding" class="mb-6" :progress="progress" />
+
+      <ActiveJobsCard
+        v-if="!showOnboarding && showActiveJobs"
+        class="mb-6"
+        :states="activeJobs.states.value"
+        :loading="activeJobs.loading.value"
+      />
 
       <BadgeGridCard
         v-if="badges.earnedBadgeDefinitions.value.length > 0"
@@ -62,13 +69,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import { useAuthUser } from '@/composables/useAuthUser';
 import ProgressGuidanceSection from '@/components/onboarding/ProgressGuidanceSection.vue';
+import ActiveJobsCard from '@/components/dashboard/ActiveJobsCard.vue';
 import { useBadges } from '@/composables/useBadges';
 import BadgeGridCard from '@/components/badges/BadgeGridCard.vue';
+import { useActiveJobsDashboard } from '@/composables/useActiveJobsDashboard';
+import { useUserProgress } from '@/composables/useUserProgress';
 
 // Home page - requires authentication
 const { t } = useI18n();
@@ -78,9 +88,20 @@ const showCvUpload = ref(false);
 const showOnboarding = ref(false);
 const experienceRepo = new ExperienceRepository();
 const badges = useBadges();
+const activeJobs = useActiveJobsDashboard();
+const progress = useUserProgress();
+
+const showActiveJobs = computed(() => {
+  if (progress.state.value?.phase !== 'bonus') {
+    return false;
+  }
+  return activeJobs.loading.value || activeJobs.states.value.length > 0;
+});
 
 onMounted(() => {
   void badges.load();
+  void activeJobs.load();
+  void progress.load();
 });
 
 // Check if user has any experiences when userId is available

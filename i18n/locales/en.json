@@ -1337,6 +1337,31 @@
       "tailoredSpeech": "progress.checklist.tailoredSpeech"
     }
   },
+  "dashboard": {
+    "activeJobs": {
+      "title": "Active jobs",
+      "description": "Track match readiness and materials for your most recent roles.",
+      "empty": "No active jobs yet.",
+      "companyFallback": "Company not set",
+      "match": {
+        "value": "Match {score}%",
+        "naValue": "Match N/A"
+      },
+      "materials": {
+        "cv": "CV",
+        "coverLetter": "Cover letter",
+        "speech": "Speech"
+      },
+      "cta": {
+        "generateMatch": "Generate match",
+        "generateCv": "Generate CV",
+        "generateCoverLetter": "Generate cover letter",
+        "generateSpeech": "Generate speech",
+        "reviewMatch": "Review match",
+        "viewJob": "View job"
+      }
+    }
+  },
   "badges": {
     "toast": {
       "multiple": "Progress confirmed: {count} milestones reached",

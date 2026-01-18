@@ -100,8 +100,26 @@ export class JobDescriptionRepository {
       return [];
     }
 
-    return fetchAllListItems<JobDescription>((options) =>
-      this.model.listJobDescriptionByOwner({ owner }, options)
+    const selectionSet = [
+      'id',
+      'owner',
+      'title',
+      'seniorityLevel',
+      'roleSummary',
+      'status',
+      'companyId',
+      'createdAt',
+      'updatedAt',
+      'company.companyName',
+      'matchingSummaries.overallScore',
+      'matchingSummaries.updatedAt',
+      'matchingSummaries.createdAt',
+      'matchingSummaries.generatedAt',
+    ];
+
+    return fetchAllListItems<JobDescription>(
+      (options) => this.model.listJobDescriptionByOwner({ owner }, options),
+      { selectionSet }
     );
   }
 
