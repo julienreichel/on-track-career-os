@@ -10,6 +10,7 @@ const stubs = {
   UCard: { template: '<div class="u-card"><slot /></div>' },
   UBadge: { template: '<span class="u-badge"><slot /></span>' },
   UIcon: { template: '<span class="u-icon"></span>' },
+  UTooltip: { template: '<div><slot /></div>' },
 };
 
 describe('BadgeGridCard', () => {
