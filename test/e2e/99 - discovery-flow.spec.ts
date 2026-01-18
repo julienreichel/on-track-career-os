@@ -56,7 +56,7 @@ async function signUp(page: Page, user: { email: string; password: string; name:
   ]);
 }
 
-test.describe('Happy path discovery flow', () => {
+test.describe('Discovery flow', () => {
   const user = generateTestUser();
   let jobId: string | null = null;
 
