@@ -73,6 +73,14 @@ vi.mock('@/composables/useCompanies', () => ({
   useCompanies: () => companyStoreMock,
 }));
 
+vi.mock('@/composables/useGuidance', () => ({
+  useGuidance: () => ({
+    guidance: ref({}),
+    loading: ref(false),
+    error: ref(null),
+  }),
+}));
+
 const authMock = {
   userId: ref('user-1'),
   loadUserId: vi.fn().mockResolvedValue(undefined),
@@ -248,6 +256,9 @@ const stubs = {
       'descriptionKey',
     ],
     template: '<section class="tailored-materials-card"></section>',
+  },
+  GuidanceBanner: {
+    template: '<div class="guidance-banner-stub"></div>',
   },
 };
 
