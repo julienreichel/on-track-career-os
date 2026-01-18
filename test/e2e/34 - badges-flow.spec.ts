@@ -52,11 +52,14 @@ test.describe('Badge flow', () => {
     await expect(badgeGrid).toBeVisible();
     await expect(badgeGrid.getByTestId('badge-pill-grounded')).toBeVisible();
 
-    await expect(page.getByText(/New badge earned/i)).toBeVisible({ timeout: 10000 });
+    const badgeToast = page
+      .locator('[role="alert"]')
+      .filter({ hasText: /New badge earned:/i });
+    await expect(badgeToast.first()).toBeVisible({ timeout: 10000 });
 
     await page.reload();
     await page.waitForLoadState('networkidle');
 
-    await expect(page.getByText(/New badge earned/i)).toHaveCount(0);
+    await expect(badgeToast).toHaveCount(0);
   });
 });
