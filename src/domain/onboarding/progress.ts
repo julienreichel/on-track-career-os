@@ -27,8 +27,8 @@ function hasProfileDepth(profile: ProgressInputs['profile']): boolean {
 }
 
 function computePhase1(input: ProgressInputs): ProgressCheckResult {
-  const cvUploaded = input.experiencesCount > 0;
-  const hasExperiences = input.experiencesCount >= MIN_EXPERIENCE_COUNT;
+  const cvUploaded = input.experienceCount > 0;
+  const hasExperiences = input.experienceCount >= MIN_EXPERIENCE_COUNT;
   const basicsComplete =
     Boolean(input.profile?.fullName?.trim()) &&
     hasContactInfo(input.profile) &&
@@ -52,7 +52,7 @@ function computePhase1(input: ProgressInputs): ProgressCheckResult {
 
 function computePhase2A(input: ProgressInputs): ProgressCheckResult {
   const profileDepthComplete = hasProfileDepth(input.profile);
-  const hasStories = input.storiesCount > 0;
+  const hasStories = input.storyCount > 0;
   const hasCanvas = input.personalCanvasCount > 0;
 
   const phase2BMissing: ProgressGate[] = [];
@@ -70,7 +70,7 @@ function computePhase2A(input: ProgressInputs): ProgressCheckResult {
 }
 
 function computePhase2B(input: ProgressInputs): ProgressCheckResult {
-  const hasJobs = input.jobsCount > 0;
+  const hasJobs = input.jobCount > 0;
   const hasMatchingSummary = input.matchingSummaryCount > 0;
 
   const phase2AMissing: ProgressGate[] = [];

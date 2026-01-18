@@ -4,12 +4,12 @@ export type BadgePhase = ProgressPhase | 'bonus';
 
 export type BadgeId =
   | 'grounded'
-  | 'realityCheck'
-  | 'selfAware'
-  | 'cvTailored'
-  | 'letterCrafted'
-  | 'pitchReady'
-  | 'applicationReady';
+  | 'jobClarity'
+  | 'identityDefined'
+  | 'applicationComplete'
+  | 'beyondTheCv'
+  | 'companyStrategist'
+  | 'customApproach';
 
 export type BadgeDefinition = {
   id: BadgeId;

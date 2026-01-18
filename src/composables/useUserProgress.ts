@@ -57,14 +57,16 @@ export function useUserProgress() {
       const progressInputs: ProgressInputs = {
         profile: snapshot.profile,
         cvCount: snapshot.cvs.length,
-        experiencesCount: snapshot.experiences.length,
-        storiesCount: snapshot.stories.length,
+        experienceCount: snapshot.experiences.length,
+        storyCount: snapshot.stories.length,
         personalCanvasCount: snapshot.personalCanvas ? 1 : 0,
-        jobsCount: jobs.length,
+        jobCount: jobs.length,
         matchingSummaryCount: snapshot.matchingSummaries.length,
         tailoredCvCount: tailoredCvs.length,
         tailoredCoverLetterCount: tailoredCoverLetters.length,
         tailoredSpeechCount: tailoredSpeechBlocks.length,
+        companyCanvasCount: snapshot.companyCanvases?.length ?? 0,
+        hasCustomTemplate: false, // TODO: Implement custom template tracking
       };
 
       profile.value = snapshot.profile;

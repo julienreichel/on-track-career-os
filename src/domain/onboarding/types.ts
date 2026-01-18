@@ -31,14 +31,16 @@ export type UserProgressState = {
 export type ProgressInputs = {
   profile: UserProfile | null;
   cvCount: number;
-  experiencesCount: number;
-  storiesCount: number;
+  experienceCount: number;
+  storyCount: number;
   personalCanvasCount: number;
-  jobsCount: number;
+  jobCount: number;
   matchingSummaryCount: number;
   tailoredCvCount: number;
   tailoredCoverLetterCount: number;
   tailoredSpeechCount: number;
+  companyCanvasCount: number;
+  hasCustomTemplate: boolean;
 };
 
 export type NextActionItem = {

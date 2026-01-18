@@ -211,34 +211,27 @@ Badges should **mark transitions**, not micro-actions.
 
 ### 🎯 Phase 3 — Positioning Badges
 
-- **CV Tailored**
-  → Job-specific CV created
-
-- **Letter Crafted**
-  → Job-specific cover letter created
-
-- **Pitch Ready**
-  → Speech created
-
-- **Application Ready** _(meta-badge)_
-  → CV + letter + speech exist for same job
+- **Application Complete**
+  → CV + cover letter + speech exist for same job
+  → _What this means_: "You have everything needed to apply with confidence"
+  → _Replaces_: CV Tailored, Letter Crafted, Pitch Ready, Application Ready
 
 ---
 
 ### ⭐ Bonus / Power Badges
 
-- **Story Builder**
-  → STAR story manually created from free text
-- **Job Master**
-  → 10 jobs uploaded
-- **Application Master**
-  → 10 CV or 10 Cover letter created
+- **Beyond the CV**
+  → First STAR story manually created (not from CV import)
+  → _What this means_: "You've expanded your narrative beyond your CV"
+  → _Growth signal_: Moving from reactive (CV-based) to proactive storytelling
+
 - **Company Strategist**
   → Company canvas created
-- **Customization Pro**
-  → Custom template used
-- **Profile Architect** _(future)_
-  → Advanced profile configuration
+  → _What this means_: "You understand company context strategically"
+
+- **Custom Approach**
+  → Custom template used (not auto-generated)
+  → _What this means_: "You've moved beyond templates to personalized materials"
 
 ---
 

@@ -385,6 +385,225 @@ Output:
 
 ---
 
+## Master Prompt — Badge System Audit & Improvement (Motivation-Driven)
+
+### 1. Title
+
+**F2-Badge Audit: Motivation, Meaning & User Value Review**
+
+---
+
+### 2. Intro (context + why this prompt exists)
+
+The current badge system has been implemented following **Master Prompt 4**, and badges are now awarded deterministically and persisted.
+Before finalizing EPIC F2, we must **audit and refine the badge system** to ensure it genuinely supports **user motivation, clarity, and confidence**, rather than adding noise or gamification artifacts.
+
+This audit must align with the product’s intent:
+
+- Serious, reflective, career-oriented
+- Mentor-like guidance, not dopamine mechanics
+- Badges as **signals of readiness and capability**, not rewards for activity
+
+Your goal is to **evaluate, improve, and possibly remove or merge badges** so that the system:
+
+- Reduces uncertainty
+- Marks meaningful transitions
+- Supports the Phase model (Ground me → Growing up → Position myself)
+
+You must **not redesign the entire system** — only audit and improve what exists.
+
+---
+
+### 3. Feature scope
+
+#### In scope
+
+- Audit the **existing badge list** (below) against motivation best practices
+- Identify:
+  - Badges that should be **kept**
+  - Badges that should be **renamed or reframed**
+  - Badges that should be **merged**
+  - Badges that should be **removed**
+
+- Improve:
+  - Badge naming (tone, clarity, professionalism)
+  - Badge descriptions (“what this means for the user”)
+  - Badge intent (capability / readiness / confidence signal)
+
+- Propose **minor rule adjustments** if needed (without changing core mechanics)
+- Ensure consistency with:
+  - Phase model
+  - Next Action Engine
+  - Progressive disclosure
+
+#### Explicitly out of scope
+
+- Adding leaderboard, points, streaks, or social comparison
+- Adding new badge categories unrelated to the current phases
+- Adding AI-generated or probabilistic badges
+- UI redesign beyond small copy adjustments
+
+---
+
+### 4. Input: current badge set to audit
+
+Use **this exact list** as the starting point:
+
+#### 🟢 Phase 1 — Activation
+
+- **Grounded**
+  → CV uploaded + basics filled
+  → 3+ experiences structured
+
+---
+
+#### 🔍 Phase 2A — Job
+
+- **Reality Check**
+  → First job uploaded
+  → Matching summary viewed
+
+---
+
+#### 🧭 Phase 2B — Identity
+
+- **Self-Aware**
+  → Career direction + values filled
+  → First STAR story created
+  → Personal canvas created
+
+---
+
+#### 🎯 Phase 3 — Positioning
+
+- **CV Tailored**
+  → Job-specific CV created
+
+- **Letter Crafted**
+  → Job-specific cover letter created
+
+- **Pitch Ready**
+  → Speech created
+
+- **Application Ready** _(meta-badge)_
+  → CV + letter + speech exist for same job
+
+---
+
+#### ⭐ Bonus / Power
+
+- **Story Builder**
+  → STAR story manually created from free text
+- **Job Master**
+  → 10 jobs uploaded
+- **Application Master**
+  → 10 CV or 10 cover letters created
+- **Company Strategist**
+  → Company canvas created
+- **Customization Pro**
+  → Custom template used
+- **Profile Architect** _(future)_
+  → Advanced profile configuration
+
+---
+
+### 5. Audit criteria (you must apply all of these)
+
+Evaluate each badge against the following **non-negotiable principles**:
+
+1. **Capability over activity**
+   - Does the badge represent _what the user can now do_?
+
+2. **Alignment with real user goals**
+   - Does it reduce uncertainty, anxiety, or confusion?
+
+3. **Phase coherence**
+   - Does it clearly belong to a phase transition?
+
+4. **Signal strength**
+   - Would a user feel _reassured_ by earning this badge?
+
+5. **Noise check**
+   - Would removing this badge make the system clearer?
+
+6. **Tone & professionalism**
+   - Does the name sound credible, calm, and adult?
+
+---
+
+### 6. Expected outputs
+
+Produce the following structured outputs:
+
+#### A. Badge-by-badge audit table
+
+For each badge:
+
+- Keep / Rename / Merge / Remove
+- Rationale (1–2 concise paragraphs)
+- If renamed:
+  - Old name
+  - New proposed name
+  - Why the new name is better
+
+#### B. Revised badge list (final proposal)
+
+- Clean, minimal list
+- Ordered by Phase
+- With:
+  - Badge name
+  - One-line meaning (“what this means for the user”)
+  - Optional “what this unlocks / confirms”
+
+#### C. Anti-patterns detected
+
+- Identify where the current system:
+  - Slips into volume-based gamification
+  - Rewards repetition instead of insight
+  - Risks devaluing core badges
+
+#### D. Concrete improvement recommendations
+
+- Max 5 actionable recommendations, such as:
+  - “Remove volume-based badges”
+  - “Merge X and Y into a single readiness badge”
+  - “Move this badge from Bonus to Phase 2”
+
+---
+
+### 7. Technical boundaries
+
+- Do **not** change the badge engine architecture
+- Do **not** introduce new persistence models unless strictly required
+- Any rule changes must remain deterministic and testable
+- Keep compatibility with existing `BadgeId` types where possible (suggest migration only if justified)
+
+---
+
+### 8. Acceptance criteria
+
+Your output is valid if:
+
+- [ ] Every badge has been evaluated against motivation principles
+- [ ] At least one badge is **removed, merged, or reframed** (if justified)
+- [ ] The final badge list is **smaller or more meaningful** than the original
+- [ ] Volume-based or grind-oriented badges are explicitly addressed
+- [ ] The system clearly supports confidence, clarity, and readiness — not gamification
+
+---
+
+### 9. Tone & mindset reminder
+
+Think like:
+
+> _A calm, experienced career mentor validating meaningful progress_
+
+Not like:
+
+> _A game designer optimizing engagement metrics_
+
+---
+
 ## Master Prompt 5 — End-to-End UX Stitching + Single E2E Happy Path
 
 1. **Title**
