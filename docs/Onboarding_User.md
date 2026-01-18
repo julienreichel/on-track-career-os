@@ -40,7 +40,24 @@ This is important psychologically:
 
 ---
 
-## 🧭 Phase 2A — _Make sense of myself_ (Identity Path)
+## 🔍 Phase 2A — _Understand the job_ (Context Path)
+
+> **Objective:** Decode what the job _really_ expects
+
+### Actions
+
+- Upload a job description
+- Generate & review **matching summary** for that job
+
+### What this path produces
+
+- Clear expectations
+- ATS-aware keywords
+- Explicit fit / gap understanding
+
+---
+
+## 🧭 Phase 2B — _Make sense of myself_ (Identity Path)
 
 > **Objective:** Turn raw data into a coherent professional identity
 
@@ -59,23 +76,6 @@ This is important psychologically:
 - Strong **personal narrative**
 - Reusable building blocks
 - Higher-quality AI outputs later
-
----
-
-## 🔍 Phase 2B — _Understand the job_ (Context Path)
-
-> **Objective:** Decode what the job _really_ expects
-
-### Actions
-
-- Upload a job description
-- Generate & review **matching summary** for that job
-
-### What this path produces
-
-- Clear expectations
-- ATS-aware keywords
-- Explicit fit / gap understanding
 
 ---
 
@@ -159,10 +159,10 @@ This is almost ready to be implemented as a simple rules engine:
    → “Upload your CV to get started”
 
 2. **Else if Phase 2A not complete**
-   → “Clarify your professional story”
+   → “Analyze your target job”
 
 3. **Else if Phase 2B not complete**
-   → “Analyze your target job”
+   → “Clarify your professional story”
 
 4. **Else if Phase 3 not started**
    → “Create your tailored application”
@@ -188,28 +188,24 @@ Badges should **mark transitions**, not micro-actions.
 
 - **Grounded**
   → CV uploaded + basics filled
-- **Experience Ready**
   → 3+ experiences structured
 
 ---
 
-### 🧭 Phase 2A — Identity Badges
+### 🔍 Phase 2A — Job Badges
 
-- **Self-Aware**
-  → Career direction + values filled
-- **Story Builder**
-  → First STAR story created
-- **Personal Modeler**
-  → Personal canvas created
+- **Reality Check**
+  → First job uploaded
+  → Matching summary viewed
 
 ---
 
-### 🔍 Phase 2B — Job Badges
+### 🧭 Phase 2B — Identity Badges
 
-- **Job Decoder**
-  → First job uploaded
-- **Reality Check**
-  → Matching summary viewed
+- **Self-Aware**
+  → Career direction + values filled
+  → First STAR story created
+  → Personal canvas created
 
 ---
 
@@ -224,13 +220,19 @@ Badges should **mark transitions**, not micro-actions.
 - **Pitch Ready**
   → Speech created
 
-- 🏆 **Application Ready** _(meta-badge)_
+- **Application Ready** _(meta-badge)_
   → CV + letter + speech exist for same job
 
 ---
 
 ### ⭐ Bonus / Power Badges
 
+- **Story Builder**
+  → STAR story manually created from free text
+- **Job Master**
+  → 10 jobs uploaded
+- **Application Master**
+  → 10 CV or 10 Cover letter created
 - **Company Strategist**
   → Company canvas created
 - **Customization Pro**

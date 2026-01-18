@@ -3,6 +3,7 @@ import { useAuthUser } from '@/composables/useAuthUser';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import type { ProgressInputs, UserProgressState } from '@/domain/onboarding';
+import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import { computeUserProgressState, getNextAction, getUnlockableFeatures } from '@/domain/onboarding';
 
 export function useUserProgress() {
@@ -12,6 +13,8 @@ export function useUserProgress() {
   const loading = ref(false);
   const error = ref<string | null>(null);
   const state = ref<UserProgressState | null>(null);
+  const profile = ref<UserProfile | null>(null);
+  const inputs = ref<ProgressInputs | null>(null);
   const hasLoaded = ref(false);
 
   const nextAction = computed(() => (state.value ? getNextAction(state.value) : null));
@@ -51,7 +54,7 @@ export function useUserProgress() {
       const tailoredCoverLetters = snapshot.coverLetters.filter((doc) => Boolean(doc.jobId));
       const tailoredSpeechBlocks = snapshot.speechBlocks.filter((doc) => Boolean(doc.jobId));
 
-      const inputs: ProgressInputs = {
+      const progressInputs: ProgressInputs = {
         profile: snapshot.profile,
         cvCount: snapshot.cvs.length,
         experiencesCount: snapshot.experiences.length,
@@ -64,11 +67,15 @@ export function useUserProgress() {
         tailoredSpeechCount: tailoredSpeechBlocks.length,
       };
 
-      state.value = computeUserProgressState(inputs);
+      profile.value = snapshot.profile;
+      inputs.value = progressInputs;
+      state.value = computeUserProgressState(progressInputs);
       hasLoaded.value = true;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'progress.errors.loadFailed';
       state.value = null;
+      profile.value = null;
+      inputs.value = null;
       hasLoaded.value = false;
       console.error('[useUserProgress] Failed to load progress', err);
     } finally {
@@ -83,6 +90,8 @@ export function useUserProgress() {
 
   return {
     state,
+    profile,
+    inputs,
     nextAction,
     unlockableFeatures,
     loading,

@@ -555,6 +555,48 @@
     "createFirst": "Create Your First Story",
     "create": "Create Stories"
   },
+  "badges": {
+    "title": "Badges",
+    "subtitle": "Milestones you have unlocked so far.",
+    "empty": "Earn badges as you complete key milestones.",
+    "new": "New",
+    "toast": {
+      "title": "New badge earned: {badge}"
+    },
+    "errors": {
+      "loadFailed": "Failed to load badges"
+    },
+    "catalog": {
+      "grounded": {
+        "title": "Grounded",
+        "description": "Uploaded a CV, completed basics, and structured at least three experiences."
+      },
+      "realityCheck": {
+        "title": "Reality Check",
+        "description": "Uploaded a job and reviewed its matching summary."
+      },
+      "selfAware": {
+        "title": "Self-Aware",
+        "description": "Completed career direction, created a story, and generated your canvas."
+      },
+      "cvTailored": {
+        "title": "CV Tailored",
+        "description": "Generated a job-specific CV."
+      },
+      "letterCrafted": {
+        "title": "Letter Crafted",
+        "description": "Generated a job-specific cover letter."
+      },
+      "pitchReady": {
+        "title": "Pitch Ready",
+        "description": "Generated a tailored speech or pitch."
+      },
+      "applicationReady": {
+        "title": "Application Ready",
+        "description": "Completed a full CV, cover letter, and speech set."
+      }
+    }
+  },
   "guidance": {
     "locked": {
       "badge": "Locked"
@@ -598,11 +640,6 @@
         "title": "Add experiences to unlock stories",
         "description": "Create a few experiences first so stories have the right context.",
         "cta": "Go to experiences"
-      },
-      "banner": {
-        "title": "Create your first stories",
-        "description": "Add STAR stories to unlock your personal canvas.",
-        "cta": "Create stories"
       },
       "empty": {
         "title": "No stories yet",
@@ -920,6 +957,7 @@
     },
     "materials": {
       "title": "Application materials",
+      "description": "Generate tailored documents using the matching summary.",
       "missingSummaryHint": "Generate a matching summary first to unlock tailored materials.",
       "generateMatch": "Generate match",
       "generateCv": "Generate tailored CV",
@@ -982,6 +1020,11 @@
       "message": "Are you sure you want to delete this job? This action cannot be undone.",
       "cancel": "Cancel",
       "confirm": "Delete"
+    },
+    "status": {
+      "draft": "Draft",
+      "analyzed": "Analyzed",
+      "complete": "Complete"
     },
     "card": {
       "noSeniority": "Seniority unknown",

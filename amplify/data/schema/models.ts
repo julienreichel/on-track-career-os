@@ -26,6 +26,7 @@ export const schemaModels = {
       skills: a.string().array(),
       certifications: a.string().array(),
       languages: a.string().array(),
+      earnedBadges: a.string().array(),
 
       // Relationships
       experiences: a.hasMany('Experience', 'userId'),

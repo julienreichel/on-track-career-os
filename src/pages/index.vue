@@ -22,6 +22,12 @@
 
       <ProgressGuidanceSection v-if="!showOnboarding" class="mb-6" />
 
+      <BadgeGridCard
+        class="mb-6"
+        :badges="badges.earnedBadgeDefinitions.value"
+        :newly-earned-ids="badges.newlyEarnedBadges.value"
+      />
+
       <UCard>
         <UPageGrid>
           <UPageCard
@@ -56,11 +62,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import { useAuthUser } from '@/composables/useAuthUser';
 import ProgressGuidanceSection from '@/components/onboarding/ProgressGuidanceSection.vue';
+import { useBadges } from '@/composables/useBadges';
+import BadgeGridCard from '@/components/badges/BadgeGridCard.vue';
 
 // Home page - requires authentication
 const { t } = useI18n();
@@ -69,6 +77,11 @@ const { userId } = useAuthUser();
 const showCvUpload = ref(false);
 const showOnboarding = ref(false);
 const experienceRepo = new ExperienceRepository();
+const badges = useBadges();
+
+onMounted(() => {
+  void badges.load();
+});
 
 // Check if user has any experiences when userId is available
 watch(userId, async (newUserId) => {

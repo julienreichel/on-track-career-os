@@ -89,6 +89,7 @@ export class UserProfileRepository {
       'socialLinks',
       'skills',
       'languages',
+      'earnedBadges',
       'strengths',
       'goals',
       'aspirations',

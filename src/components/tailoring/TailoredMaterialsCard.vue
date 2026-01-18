@@ -17,7 +17,6 @@ type Props = {
   matchLink?: string | null;
   summaryLoading?: boolean;
   summaryError?: string | null;
-  descriptionKey?: 'description' | 'matchDescription';
 };
 
 const props = defineProps<Props>();
@@ -64,9 +63,7 @@ const speechLink = computed(() =>
   existingSpeech.value?.id ? `/applications/speech/${existingSpeech.value.id}` : null
 );
 
-const headerDescription = computed(() =>
-  t(`tailoredMaterials.materials.${props.descriptionKey ?? 'description'}`)
-);
+const headerDescription = computed(() => t(`tailoredMaterials.materials.description`));
 
 watch(
   () => props.job?.id,

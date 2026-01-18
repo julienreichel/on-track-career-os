@@ -26,4 +26,12 @@ config.global.stubs = {
     name: 'LockedFeatureCard',
     template: '<div class="guidance-locked-stub" />',
   },
+  BadgeGridCard: {
+    name: 'BadgeGridCard',
+    template: '<div class="badge-grid-stub" />',
+  },
+  BadgePill: {
+    name: 'BadgePill',
+    template: '<span class="badge-pill-stub" />',
+  },
 };

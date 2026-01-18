@@ -322,7 +322,7 @@ Output:
        - Examples: CV uploaded + basics complete, 3 experiences, first story, personal canvas created, first job parsed, first match generated, first tailored CV/letter/speech for same job, etc.
 
      - Persist awarded badges and show “new badge earned” toast once.
-     - Provide a badge panel on dashboard and optionally on profile page.
+     - Provide a badge panel on dashboard.
 
    - **Out of scope**
      - Leaderboards, points, social sharing.
@@ -337,7 +337,7 @@ Output:
      - `diffBadges(existing, eligible): { newlyEarned, allEarned }`
 
    - Persistence (choose minimal, consistent approach):
-     - Preferred: extend **UserProfile** with `earnedBadges: BadgeId[]` and `badgeSeen: BadgeId[]`
+     - Preferred: extend **UserProfile** with `earnedBadges: BadgeId[]`
        - Update repository/service/composable accordingly
        - Ensure strict typing and migrations are safe
 
@@ -358,9 +358,6 @@ Output:
 6. **Pages/routes**
    - Update `/` dashboard:
      - Add badge card below progress banner.
-
-   - Optional update `/profile`:
-     - Add “Your progress” card with badges (avoid clutter).
 
    - No new routes required unless you add `/badges` (only if it stays tiny and useful).
 
