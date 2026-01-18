@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import MatchPage from '@/pages/jobs/[jobId]/match.vue';
 import { createTestI18n } from '../../../../utils/createTestI18n';
+import type { GuidanceModel } from '@/domain/onboarding';
 
 const baseJob = {
   id: 'job-1',
@@ -58,6 +59,14 @@ const companyStoreMock = {
 
 vi.mock('@/composables/useCompanies', () => ({
   useCompanies: () => companyStoreMock,
+}));
+
+const guidanceRef = ref<GuidanceModel>({});
+
+vi.mock('@/composables/useGuidance', () => ({
+  useGuidance: () => ({
+    guidance: guidanceRef,
+  }),
 }));
 
 const router = createRouter({

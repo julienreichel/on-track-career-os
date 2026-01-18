@@ -879,7 +879,8 @@
     "goBack": "Go back",
     "backToList": "Back to list",
     "notAvailable": "Not available",
-    "lastUpdated": "Last updated {date}"
+    "lastUpdated": "Last updated {date}",
+    "search": "Search..."
   },
   "canvas": {
     "title": "Personal Business Model Canvas",
