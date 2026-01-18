@@ -119,7 +119,7 @@ test.describe('Story workflow', () => {
     await page.goto('/profile/stories');
     await page.waitForTimeout(500);
     await page.waitForLoadState('networkidle');
-    const storiesSearch = page.getByPlaceholder(/Search stories/i);
+    const storiesSearch = page.getByPlaceholder(/Search/i);
     await storiesSearch.fill(MANUAL_STORY_TITLE);
     await page.waitForTimeout(500);
     await expect(page.getByRole('heading', { level: 3, name: MANUAL_STORY_TITLE })).toBeVisible({
