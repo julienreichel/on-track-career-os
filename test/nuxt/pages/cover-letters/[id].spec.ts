@@ -231,8 +231,9 @@ describe('Cover letter detail page', () => {
     expect(engineMock.load).toHaveBeenCalled();
 
     // Should be in view mode by default
-    expect(wrapper.find('.prose').exists()).toBe(true);
-    expect(wrapper.text()).toContain(itemRef.value?.content);
+    expect(wrapper.find('.doc-markdown').exists()).toBe(true);
+    expect(wrapper.text()).toContain('Dear Hiring Manager');
+    expect(wrapper.text()).toContain('I am writing to apply');
   });
 
   it('displays content in view mode and edit mode', async () => {
@@ -240,9 +241,10 @@ describe('Cover letter detail page', () => {
     await flushPromises();
 
     // First check view mode content
-    const proseContent = wrapper.find('.prose');
+    const proseContent = wrapper.find('.doc-markdown');
     expect(proseContent.exists()).toBe(true);
-    expect(proseContent.text()).toContain(itemRef.value?.content);
+    expect(proseContent.text()).toContain('Dear Hiring Manager');
+    expect(proseContent.text()).toContain('I am writing to apply');
 
     const setupState = wrapper.vm.$.setupState as {
       isEditing: boolean;

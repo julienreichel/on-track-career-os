@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import SpeechBlockEditorCard from '@/components/speech/SpeechBlockEditorCard.vue';
 import UnsavedChangesModal from '@/components/UnsavedChangesModal.vue';
+import MarkdownContent from '@/components/MarkdownContent.vue';
 import { useSpeechBlock } from '@/application/speech-block/useSpeechBlock';
 import { useSpeechEngine } from '@/composables/useSpeechEngine';
 import { useAuthUser } from '@/composables/useAuthUser';
@@ -368,9 +369,11 @@ watch(item, (newValue) => {
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
                       {{ t('speech.editor.sections.elevatorPitch.label') }}
                     </h3>
-                    <p v-if="hasElevatorPitch" class="text-base text-gray-900 dark:text-gray-100">
-                      {{ formState.elevatorPitch }}
-                    </p>
+                    <MarkdownContent
+                      v-if="hasElevatorPitch"
+                      :content="formState.elevatorPitch"
+                      class="doc-markdown"
+                    />
                   </div>
                 </div>
               </UCard>
@@ -381,9 +384,11 @@ watch(item, (newValue) => {
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
                       {{ t('speech.editor.sections.careerStory.label') }}
                     </h3>
-                    <p v-if="hasCareerStory" class="text-base text-gray-900 dark:text-gray-100">
-                      {{ formState.careerStory }}
-                    </p>
+                    <MarkdownContent
+                      v-if="hasCareerStory"
+                      :content="formState.careerStory"
+                      class="doc-markdown"
+                    />
                   </div>
                 </div>
               </UCard>
@@ -394,9 +399,7 @@ watch(item, (newValue) => {
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
                       {{ t('speech.editor.sections.whyMe.label') }}
                     </h3>
-                    <p v-if="hasWhyMe" class="text-base text-gray-900 dark:text-gray-100">
-                      {{ formState.whyMe }}
-                    </p>
+                    <MarkdownContent v-if="hasWhyMe" :content="formState.whyMe" class="doc-markdown" />
                   </div>
                 </div>
                 <template #footer>

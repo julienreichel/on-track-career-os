@@ -1,2 +1,306 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
+@plugin '@tailwindcss/typography';
+
+.doc-markdown {
+  @apply prose prose-gray max-w-none;
+}
+
+.dark .doc-markdown {
+  @apply prose-invert;
+}
+
+.doc-markdown h1 {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgb(var(--color-primary-500));
+}
+
+.doc-markdown h2 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid;
+}
+
+.doc-markdown h3 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 500;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.doc-markdown p {
+  margin-bottom: 0.75rem;
+}
+
+.doc-markdown ul,
+.doc-markdown ol {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.doc-markdown ul > li + li,
+.doc-markdown ol > li + li {
+  margin-top: 0.25rem;
+}
+
+.doc-markdown strong {
+  font-weight: 600;
+}
+
+.doc-markdown em {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.doc-markdown code {
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  opacity: 0.9;
+}
+
+.doc-markdown a {
+  color: rgb(var(--color-primary-500));
+  text-decoration: none;
+}
+
+.doc-markdown a:hover {
+  text-decoration: underline;
+}
+
+.doc-print {
+  @apply prose prose-gray max-w-none;
+  --tw-prose-body: #000;
+  --tw-prose-headings: #000;
+  --tw-prose-lead: #000;
+  --tw-prose-links: #000;
+  --tw-prose-bold: #000;
+  --tw-prose-counters: #000;
+  --tw-prose-bullets: #000;
+  --tw-prose-hr: #333;
+  --tw-prose-quotes: #000;
+  --tw-prose-quote-borders: #333;
+  --tw-prose-captions: #000;
+  --tw-prose-code: #000;
+  --tw-prose-pre-code: #000;
+  --tw-prose-pre-bg: transparent;
+  --tw-prose-th-borders: #333;
+  --tw-prose-td-borders: #333;
+}
+
+.doc-print h1 {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #333;
+}
+
+.doc-print h2 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #666;
+}
+
+.doc-print h3 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 500;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.doc-print p {
+  margin-bottom: 0.75rem;
+}
+
+.doc-print ul,
+.doc-print ol {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.doc-print ul > li + li,
+.doc-print ol > li + li {
+  margin-top: 0.25rem;
+}
+
+.doc-print strong {
+  font-weight: 600;
+}
+
+.doc-print em {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.doc-print code {
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  opacity: 0.9;
+}
+
+.doc-print h1,
+.doc-print h2,
+.doc-print h3,
+.doc-print h4,
+.doc-print h5,
+.doc-print h6,
+.doc-print p,
+.doc-print li,
+.doc-print blockquote,
+.doc-print strong,
+.doc-print em {
+  color: #000 !important;
+}
+
+.doc-print a {
+  color: #000;
+  text-decoration: underline;
+}
+
+.print-container {
+  min-height: 100vh;
+  background: white;
+}
+
+.print-actions {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 1000;
+  background: white;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.print-content {
+  padding: 2rem;
+  max-width: 21cm;
+  margin: 0 auto;
+}
+
+.cv-printable {
+  max-width: 100%;
+}
+
+.cover-letter-printable {
+  max-width: 100%;
+}
+
+.print-photo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 3px solid #333;
+  background: white;
+}
+
+.print-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cv-photo-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 3px solid rgba(59, 130, 246, 0.4);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  background: white;
+}
+
+.cv-photo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media print {
+  .doc-print h1,
+  .doc-print h2,
+  .doc-print h3 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  .doc-print ul,
+  .doc-print ol,
+  .doc-print p {
+    page-break-inside: avoid;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-container {
+    background: white;
+  }
+
+  .print-content {
+    padding: 0;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  @page {
+    size: A4;
+    margin: 1.5cm 2cm;
+  }
+
+  .doc-print h1 {
+    border-bottom-color: #333 !important;
+    color: #000 !important;
+  }
+
+  .doc-print h2 {
+    border-bottom-color: #666 !important;
+    color: #000 !important;
+  }
+
+  .doc-print h3,
+  .doc-print p,
+  .doc-print li {
+    color: #000 !important;
+  }
+
+  .doc-print a {
+    color: #000 !important;
+    text-decoration: underline !important;
+  }
+
+  .doc-print code {
+    background-color: #f0f0f0 !important;
+    color: #000 !important;
+  }
+}

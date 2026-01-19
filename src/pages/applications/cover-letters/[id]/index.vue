@@ -9,6 +9,7 @@ import { useCoverLetterEngine } from '@/composables/useCoverLetterEngine';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import TailoredJobBanner from '@/components/tailoring/TailoredJobBanner.vue';
+import MarkdownContent from '@/components/MarkdownContent.vue';
 import { formatDetailDate } from '@/utils/formatDetailDate';
 import type { PageHeaderLink } from '@/types/ui';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
@@ -362,8 +363,8 @@ watch(item, (newValue) => {
           <!-- View Mode -->
           <template v-else-if="item">
             <UCard>
-              <div class="prose prose-gray max-w-none dark:prose-invert">
-                <div v-if="item.content" class="whitespace-pre-wrap">{{ item.content }}</div>
+              <div>
+                <MarkdownContent v-if="item.content" :content="item.content" class="doc-markdown" />
                 <div v-else class="text-gray-500 dark:text-gray-400 italic">
                   {{ t('coverLetter.display.emptyContent') }}
                 </div>

@@ -34,8 +34,7 @@
         <div v-if="showPhoto" class="print-photo">
           <img :src="profilePhotoUrl!" :alt="$t('cvDisplay.photoAlt')" />
         </div>
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <div class="cv-printable prose prose-gray" v-html="renderedHtml" />
+        <MarkdownContent :content="cvDocument.content" class="cv-printable doc-print" />
       </div>
     </div>
   </div>
@@ -44,7 +43,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
-import { marked } from 'marked';
+import MarkdownContent from '@/components/MarkdownContent.vue';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
@@ -73,11 +72,6 @@ const profilePhotoError = ref<string | null>(null);
 useHead(() => ({
   title: cvDocument.value?.name?.trim() || 'Print CV',
 }));
-
-const renderedHtml = computed(() => {
-  if (!cvDocument.value?.content) return '';
-  return marked(cvDocument.value.content);
-});
 
 const showPhoto = computed(() => {
   return (cvDocument.value?.showProfilePhoto ?? true) && !!profilePhotoUrl.value;
@@ -139,193 +133,3 @@ onMounted(() => {
   void load();
 });
 </script>
-
-<style scoped>
-.print-container {
-  min-height: 100vh;
-  background: white;
-}
-
-.print-actions {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  display: flex;
-  gap: 0.5rem;
-  z-index: 1000;
-  background: white;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.print-content {
-  padding: 2rem;
-  max-width: 21cm;
-  margin: 0 auto;
-}
-
-.cv-printable {
-  max-width: 100%;
-}
-
-.print-photo {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 7.5rem;
-  height: 7.5rem;
-  border-radius: 9999px;
-  overflow: hidden;
-  border: 3px solid #333;
-  background: white;
-}
-
-.print-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Print styles */
-@media print {
-  .no-print {
-    display: none !important;
-  }
-
-  .print-container {
-    background: white;
-  }
-
-  .print-content {
-    padding: 0;
-    max-width: 100%;
-    margin: 0;
-  }
-
-  @page {
-    size: A4;
-    margin: 1.5cm 2cm;
-  }
-
-  /* Ensure proper page breaks */
-  .prose h1,
-  .prose h2,
-  .prose h3 {
-    page-break-after: avoid;
-    page-break-inside: avoid;
-  }
-
-  .prose ul,
-  .prose ol,
-  .prose p {
-    page-break-inside: avoid;
-  }
-
-  /* Adjust colors for print */
-  .prose h1 {
-    border-bottom-color: #333 !important;
-    color: #000 !important;
-  }
-
-  .prose h2 {
-    border-bottom-color: #666 !important;
-    color: #000 !important;
-  }
-
-  .prose h3,
-  .prose p,
-  .prose li {
-    color: #000 !important;
-  }
-
-  .prose a {
-    color: #000 !important;
-    text-decoration: underline !important;
-  }
-
-  .prose code {
-    background-color: #f0f0f0 !important;
-    color: #000 !important;
-  }
-}
-
-/* CV heading styles (matching main view) */
-:deep(.prose h1) {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #333;
-  color: #000;
-}
-
-:deep(.prose h2) {
-  font-size: 1.5rem;
-  line-height: 2rem;
-  font-weight: 600;
-  margin-top: 2rem;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.25rem;
-  border-bottom: 1px solid #666;
-  color: #000;
-}
-
-:deep(.prose h3) {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  font-weight: 500;
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: #000;
-}
-
-:deep(.prose p) {
-  margin-bottom: 0.75rem;
-  color: #000;
-}
-
-:deep(.prose ul),
-:deep(.prose ol) {
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
-:deep(.prose ul > li + li),
-:deep(.prose ol > li + li) {
-  margin-top: 0.25rem;
-}
-
-:deep(.prose li) {
-  color: #000;
-}
-
-:deep(.prose strong) {
-  font-weight: 600;
-  color: #000;
-}
-
-:deep(.prose em) {
-  font-style: italic;
-  color: #333;
-}
-
-:deep(.prose code) {
-  padding: 0.125rem 0.375rem;
-  border-radius: 0.25rem;
-  font-size: 0.875rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  background-color: #f0f0f0;
-  color: #000;
-}
-
-:deep(.prose a) {
-  color: #000;
-  text-decoration: underline;
-}
-
-:deep(.prose a:hover) {
-  text-decoration: underline;
-}
-</style>
