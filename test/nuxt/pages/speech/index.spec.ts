@@ -62,6 +62,21 @@ vi.mock('@/composables/useSpeechEngine', () => ({
   useSpeechEngine: () => engineMock,
 }));
 
+vi.mock('@/application/tailoring/useTailoredMaterials', () => ({
+  useTailoredMaterials: () => ({
+    isGenerating: ref(false),
+    error: ref<string | null>(null),
+    contextLoading: ref(false),
+    contextError: ref(null),
+    materialsLoading: ref(false),
+    materialsError: ref(null),
+    loadTailoringContext: vi.fn().mockResolvedValue({ ok: false, error: null }),
+    loadExistingMaterialsForJob: vi.fn().mockResolvedValue({ ok: false, error: null }),
+    generateTailoredSpeechForJob: vi.fn().mockResolvedValue(null),
+    regenerateTailoredSpeechForJob: vi.fn().mockResolvedValue(null),
+  }),
+}));
+
 vi.mock('#app', () => ({
   useToast: () => mockToast,
 }));
