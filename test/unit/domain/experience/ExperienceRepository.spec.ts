@@ -94,6 +94,13 @@ describe('ExperienceRepository', () => {
   });
 
   describe('list', () => {
+    it('should return empty array when user id is missing', async () => {
+      const result = await repository.list('');
+
+      expect(mockUserProfileModel.get).not.toHaveBeenCalled();
+      expect(result).toEqual([]);
+    });
+
     it('should fetch a list of experiences', async () => {
       const mockExperiences: Experience[] = [
         {
@@ -169,6 +176,42 @@ describe('ExperienceRepository', () => {
       const result = await repository.list('user-123');
 
       expect(result).toEqual([]);
+    });
+  });
+
+  describe('getExperienceContext', () => {
+    it('should return empty context when user id is missing', async () => {
+      const result = await repository.getExperienceContext('');
+
+      expect(mockUserProfileModel.get).not.toHaveBeenCalled();
+      expect(result).toEqual({ experiences: [], personalCanvas: null });
+    });
+
+    it('should fetch experiences with stories and canvas', async () => {
+      mockUserProfileModel.get.mockResolvedValue({
+        data: {
+          id: 'user-123',
+          experiences: [
+            {
+              id: 'exp-1',
+              stories: [{ id: 'story-1' }],
+            },
+            null,
+          ],
+          canvas: { id: 'canvas-1' },
+        },
+      });
+
+      const result = await repository.getExperienceContext('user-123');
+
+      expect(mockUserProfileModel.get).toHaveBeenCalledWith(
+        { id: 'user-123' },
+        expect.objectContaining({
+          selectionSet: ['id', 'experiences.*', 'experiences.stories.*', 'canvas.*'],
+        })
+      );
+      expect(result.experiences).toHaveLength(1);
+      expect(result.personalCanvas).toEqual({ id: 'canvas-1' });
     });
   });
 

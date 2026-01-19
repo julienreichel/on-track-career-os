@@ -17,6 +17,7 @@ describe('UserProfileService', () => {
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      getProgressSnapshot: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<UserProfileRepository>>;
 
     service = new UserProfileService(mockRepository);
@@ -119,6 +120,38 @@ describe('UserProfileService', () => {
       const customRepo = new UserProfileRepository();
       const serviceWithCustomRepo = new UserProfileService(customRepo);
       expect(serviceWithCustomRepo).toBeInstanceOf(UserProfileService);
+    });
+  });
+
+  describe('getProgressSnapshot', () => {
+    it('should delegate to repository', async () => {
+      const snapshot = { profile: { id: 'user-123' } } as unknown as {
+        profile: UserProfile;
+      };
+      mockRepository.getProgressSnapshot.mockResolvedValue(snapshot);
+
+      const result = await service.getProgressSnapshot('user-123');
+
+      expect(mockRepository.getProgressSnapshot).toHaveBeenCalledWith('user-123');
+      expect(result).toBe(snapshot);
+    });
+  });
+
+  describe('updateUserProfile', () => {
+    it('should update profile via repository', async () => {
+      const updatedProfile = { id: 'user-123', fullName: 'Updated' } as UserProfile;
+      mockRepository.update.mockResolvedValue(updatedProfile);
+
+      const result = await service.updateUserProfile({
+        id: 'user-123',
+        fullName: 'Updated',
+      });
+
+      expect(mockRepository.update).toHaveBeenCalledWith({
+        id: 'user-123',
+        fullName: 'Updated',
+      });
+      expect(result).toEqual(updatedProfile);
     });
   });
 });

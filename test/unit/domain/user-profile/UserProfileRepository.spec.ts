@@ -111,6 +111,56 @@ describe('UserProfileRepository', () => {
     });
   });
 
+  describe('getProgressSnapshot', () => {
+    it('should return null when id is missing', async () => {
+      const result = await repository.getProgressSnapshot('');
+
+      expect(mockModel.get).not.toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+
+    it('should return null when no profile data is returned', async () => {
+      mockModel.get.mockResolvedValue({ data: null });
+
+      const result = await repository.getProgressSnapshot('user-123');
+
+      expect(result).toBeNull();
+    });
+
+    it('should normalize snapshot arrays and stories', async () => {
+      mockModel.get.mockResolvedValue({
+        data: {
+          id: 'user-123',
+          experiences: [
+            { id: 'exp-1', stories: [{ id: 'story-1' }] },
+            null,
+            { id: 'exp-2', stories: null },
+          ],
+          canvas: { id: 'canvas-1' },
+          cvs: [{ id: 'cv-1' }, null],
+          coverLetters: [{ id: 'cover-1' }],
+          speechBlocks: null,
+          matchingSummaries: [{ id: 'match-1' }],
+        },
+      });
+
+      const result = await repository.getProgressSnapshot('user-123');
+
+      expect(mockModel.get).toHaveBeenCalledWith(
+        { id: 'user-123' },
+        expect.objectContaining({
+          selectionSet: expect.arrayContaining(['experiences.*', 'canvas.*', 'matchingSummaries.*']),
+        })
+      );
+      expect(result?.experiences).toHaveLength(2);
+      expect(result?.stories).toHaveLength(1);
+      expect(result?.personalCanvas).toEqual({ id: 'canvas-1' });
+      expect(result?.cvs).toHaveLength(1);
+      expect(result?.speechBlocks).toEqual([]);
+      expect(result?.matchingSummaries).toHaveLength(1);
+    });
+  });
+
   describe('update', () => {
     it('should update an existing user profile', async () => {
       const input = {
