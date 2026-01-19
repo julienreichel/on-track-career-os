@@ -1,5 +1,4 @@
 import { gqlOptions } from '@/data/graphql/options';
-import { fetchAllListItems } from '@/data/graphql/pagination';
 import type {
   MatchingSummaryCreateInput,
   MatchingSummaryUpdateInput,
@@ -11,9 +10,6 @@ export type AmplifyMatchingSummaryModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: MatchingSummary | null }>;
-  list: (
-    options?: Record<string, unknown>
-  ) => Promise<{ data: MatchingSummary[]; nextToken?: string | null }>;
   create: (
     input: MatchingSummaryCreateInput,
     options?: Record<string, unknown>
@@ -54,10 +50,6 @@ export class MatchingSummaryRepository {
     return res.data;
   }
 
-  async list(options: Record<string, unknown> = {}) {
-    return fetchAllListItems<MatchingSummary>(this.model.list.bind(this.model), options);
-  }
-
   async create(input: MatchingSummaryCreateInput) {
     const { data } = await this.model.create(input, gqlOptions());
     return data;
@@ -70,32 +62,5 @@ export class MatchingSummaryRepository {
 
   async delete(id: string) {
     await this.model.delete({ id }, gqlOptions());
-  }
-
-  async findByContext(userId: string, jobId: string, companyId?: string | null) {
-    const results = await this.list({
-      filter: {
-        userId: { eq: userId },
-        jobId: { eq: jobId },
-      },
-    });
-
-    if (!results?.length) {
-      return null;
-    }
-
-    if (companyId) {
-      return results.find((item) => item?.companyId === companyId) ?? null;
-    }
-
-    return results.find((item) => !item?.companyId) ?? results[0] ?? null;
-  }
-
-  async listByJob(jobId: string) {
-    return this.list({
-      filter: {
-        jobId: { eq: jobId },
-      },
-    });
   }
 }

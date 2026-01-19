@@ -34,8 +34,6 @@ describe('MatchingSummaryService', () => {
   let service: MatchingSummaryService;
   let mockRepo: {
     get: ReturnType<typeof vi.fn>;
-    listByJob: ReturnType<typeof vi.fn>;
-    findByContext: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
@@ -48,8 +46,6 @@ describe('MatchingSummaryService', () => {
   beforeEach(() => {
     mockRepo = {
       get: vi.fn(),
-      listByJob: vi.fn(),
-      findByContext: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -197,7 +193,7 @@ describe('mapMatchingSummaryResult', () => {
     expect(mapped.strengthsForThisRole).toEqual(['Value']);
     expect(mapped.skillMatch).toEqual(['[MATCH] Leadership']);
     expect(mapped.generatedAt).toMatch(/T/);
-    expect(JSON.parse(mapped.scoreBreakdown as string)).toEqual({
+    expect(JSON.parse(mapped.scoreBreakdown as unknown as string)).toEqual({
       skillFit: 45,
       experienceFit: 25,
       interestFit: 10,
