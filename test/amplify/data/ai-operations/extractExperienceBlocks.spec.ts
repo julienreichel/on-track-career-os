@@ -307,5 +307,85 @@ describe('ai.extractExperienceBlocks', () => {
       expect(result[0].title).toBe('Experience 1');
       expect(result[0].companyName).toBe('Unknown Company');
     });
+
+    it('should normalize snake_case fields and invalid types', async () => {
+      mockSend.mockImplementationOnce(async () => {
+        return {
+          body: new TextEncoder().encode(
+            JSON.stringify({
+              output: {
+                message: {
+                  content: [
+                    {
+                      text: JSON.stringify([
+                        {
+                          title: 'Data Analyst',
+                          company: 'DataCorp',
+                          start_date: '2022-05',
+                          end_date: '2023-02-10',
+                          responsibilities: ['Built dashboards', 12],
+                          tasks: ['Analyzed trends', false],
+                          experience_type: 'invalid',
+                        },
+                      ]),
+                    },
+                  ],
+                },
+              },
+            })
+          ),
+        };
+      });
+
+      const resultString = await handler({
+        arguments: {
+          experienceTextBlocks: ['Data Analyst at DataCorp (May 2022 - Feb 2023)'],
+        },
+      });
+      const result = resultString as Array<{
+        title: string;
+        companyName: string;
+        startDate: string;
+        endDate: string | null;
+        responsibilities: string[];
+        tasks: string[];
+        experienceType?: string;
+      }>;
+
+      expect(result).toHaveLength(1);
+      expect(result[0].companyName).toBe('DataCorp');
+      expect(result[0].startDate).toBe('2022-05-01');
+      expect(result[0].endDate).toBe('2023-02-10');
+      expect(result[0].responsibilities).toEqual(['Built dashboards']);
+      expect(result[0].tasks).toEqual(['Analyzed trends']);
+      expect(result[0].experienceType).toBe('work');
+    });
+
+    it('should fall back when AI returns an empty array', async () => {
+      mockSend.mockImplementationOnce(async () => {
+        return {
+          body: new TextEncoder().encode(
+            JSON.stringify({
+              output: {
+                message: {
+                  content: [{ text: JSON.stringify([]) }],
+                },
+              },
+            })
+          ),
+        };
+      });
+
+      const resultString = await handler({
+        arguments: {
+          experienceTextBlocks: ['Empty result'],
+        },
+      });
+      const result = resultString as Array<{ title: string; companyName: string }>;
+
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe('Experience 1');
+      expect(result[0].companyName).toBe('Unknown Company');
+    });
   });
 });

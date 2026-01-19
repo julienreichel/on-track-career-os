@@ -16,6 +16,7 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => {
  * Unit tests for ai.generateCv Lambda function
  * Tests the actual implementation with mocked Bedrock responses
  */
+// eslint-disable-next-line max-lines-per-function
 describe('ai.generateCv', () => {
   let handler: (event: { arguments: any }) => Promise<string>;
   let mockSend: ReturnType<typeof vi.fn>;
@@ -314,6 +315,121 @@ Seeking opportunities`;
 
     expect(userPrompt).toContain('COMPANY SUMMARY');
     expect(userPrompt).toContain('Acme Systems');
+  });
+
+  it('includes non-work experience sections and STAR highlights in prompt', async () => {
+    const { InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime');
+
+    mockSend.mockResolvedValue({
+      body: Buffer.from(
+        JSON.stringify({
+          output: {
+            message: {
+              content: [{ text: '# CV' }],
+            },
+          },
+        })
+      ),
+    });
+
+    await handler({
+      arguments: {
+        language: 'en',
+        profile: { fullName: 'Taylor' },
+        experiences: [
+          {
+            id: 'exp-work',
+            title: 'Engineer',
+            companyName: 'WorkCo',
+            startDate: '2022-01-01',
+            experienceType: 'work',
+            responsibilities: ['Delivered projects'],
+          },
+          {
+            id: 'exp-edu',
+            title: 'BSc Computer Science',
+            companyName: 'State University',
+            startDate: '2018-01-01',
+            experienceType: 'education',
+          },
+          {
+            id: 'exp-vol',
+            title: 'Volunteer Mentor',
+            companyName: 'TechForGood',
+            startDate: '2020-01-01',
+            experienceType: 'volunteer',
+          },
+          {
+            id: 'exp-proj',
+            title: 'Side Project',
+            companyName: 'Personal',
+            startDate: '2021-01-01',
+            experienceType: 'project',
+          },
+        ],
+        stories: [
+          {
+            experienceId: 'exp-work',
+            situation: 'Legacy system',
+            task: 'Improve uptime',
+            action: 'Refactored services',
+            result: '99.9% uptime',
+            achievements: ['Cut incidents by 40%'],
+          },
+        ],
+      },
+    });
+
+    const calls = (InvokeModelCommand as unknown as ReturnType<typeof vi.fn>).mock.calls;
+    const commandInput = calls[0][0];
+    const payload = JSON.parse(commandInput.body);
+    const userPrompt = payload.messages[0].content[0].text as string;
+
+    expect(userPrompt).toContain('## WORK EXPERIENCE');
+    expect(userPrompt).toContain('## EDUCATION');
+    expect(userPrompt).toContain('## VOLUNTEER EXPERIENCE');
+    expect(userPrompt).toContain('## PROJECTS');
+    expect(userPrompt).toContain('Key Achievements (from STAR stories)');
+    expect(userPrompt).toContain('Highlights');
+  });
+
+  it('warns and skips tailoring when matching summary is invalid', async () => {
+    const { InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime');
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    mockSend.mockResolvedValue({
+      body: Buffer.from(
+        JSON.stringify({
+          output: {
+            message: {
+              content: [{ text: '# CV' }],
+            },
+          },
+        })
+      ),
+    });
+
+    await handler({
+      arguments: {
+        language: 'en',
+        profile: { fullName: 'Taylor' },
+        experiences: [],
+        jobDescription: { title: 'Staff Engineer' },
+        matchingSummary: {
+          overallScore: 80,
+          scoreBreakdown: { skillFit: 40 },
+        },
+      },
+    });
+
+    const calls = (InvokeModelCommand as unknown as ReturnType<typeof vi.fn>).mock.calls;
+    const commandInput = calls[0][0];
+    const payload = JSON.parse(commandInput.body);
+    const userPrompt = payload.messages[0].content[0].text as string;
+
+    expect(warnSpy).toHaveBeenCalled();
+    expect(userPrompt).not.toContain('TARGET JOB DESCRIPTION');
+    warnSpy.mockRestore();
   });
 
   it('should generate CV with various section headers', async () => {

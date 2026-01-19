@@ -696,7 +696,6 @@ describe('AiOperationsService', () => {
         keyActivities: [],
         keyPartners: [],
         costStructure: [],
-        confidence: 0.87,
       };
 
       (globalThis as any).window = {
