@@ -1,4 +1,4 @@
-import { computed, onMounted, unref } from 'vue';
+import { computed, getCurrentInstance, onMounted, unref } from 'vue';
 import { useUserProgress } from '@/composables/useUserProgress';
 import { getGuidance } from '@/domain/onboarding';
 import type { GuidanceContext, GuidanceModel, GuidanceRouteKey } from '@/domain/onboarding';
@@ -12,11 +12,15 @@ const isTestEnvironment =
 export function useGuidance(routeKey: GuidanceRouteKey, context: GuidanceContextSource = {}) {
   const progress = useUserProgress();
 
-  onMounted(() => {
-    if (!isTestEnvironment) {
-      void progress.load();
-    }
-  });
+  if (getCurrentInstance()) {
+    onMounted(() => {
+      if (!isTestEnvironment) {
+        void progress.load();
+      }
+    });
+  } else if (!isTestEnvironment) {
+    void progress.load();
+  }
 
   const resolvedContext = computed(() =>
     typeof context === 'function' ? context() : unref(context)
