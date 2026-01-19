@@ -32,6 +32,22 @@ describe('JobDescriptionRepository', () => {
     expect(result).toEqual(mockJob);
   });
 
+  it('should get job summary fields', async () => {
+    const mockJob = { id: 'job-123', title: 'Engineer' } as JobDescription;
+    mockModel.get.mockResolvedValue({ data: mockJob });
+
+    const repo = buildRepository();
+    const result = await repo.getSummary('job-123');
+
+    expect(mockModel.get).toHaveBeenCalledWith(
+      { id: 'job-123' },
+      expect.objectContaining({
+        selectionSet: expect.arrayContaining(['id', 'title', 'companyId']),
+      })
+    );
+    expect(result).toEqual(mockJob);
+  });
+
   it('should return null when job description is not found', async () => {
     mockModel.get.mockResolvedValue({ data: null });
 

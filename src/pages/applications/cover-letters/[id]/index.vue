@@ -5,7 +5,6 @@ import { useI18n } from 'vue-i18n';
 import UnsavedChangesModal from '@/components/UnsavedChangesModal.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
 import { useCoverLetter } from '@/application/cover-letter/useCoverLetter';
-import { useCoverLetterEngine } from '@/composables/useCoverLetterEngine';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import TailoredJobBanner from '@/components/tailoring/TailoredJobBanner.vue';
@@ -14,6 +13,7 @@ import { formatDetailDate } from '@/utils/formatDetailDate';
 import type { PageHeaderLink } from '@/types/ui';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
+import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -22,11 +22,12 @@ const toast = useToast();
 
 const coverLetterId = computed(() => route.params.id as string);
 const { item, loading, error, load, save, remove } = useCoverLetter(coverLetterId.value);
-const engine = useCoverLetterEngine();
 const auth = useAuthUser();
 const tailoredMaterials = useTailoredMaterials({ auth });
+const jobService = new JobDescriptionService();
 const targetJob = ref<JobDescription | null>(null);
 const matchingSummary = ref<MatchingSummary | null>(null);
+const hasLoadedContext = ref(false);
 
 // View/Edit state
 const isEditing = ref(false);
@@ -44,28 +45,27 @@ const hasChanges = computed(
   () => editTitle.value !== originalTitle.value || editContent.value !== originalContent.value
 );
 const hasJobContext = computed(() => Boolean(item.value?.jobId));
-const targetJobTitle = computed(
-  () => targetJob.value?.title?.trim() || t('tailoredMaterials.unknownJobTitle')
-);
-const jobLink = computed(() => (targetJob.value?.id ? `/jobs/${targetJob.value.id}` : null));
-const matchLink = computed(() =>
-  targetJob.value?.id ? `/jobs/${targetJob.value.id}/match` : null
-);
+const targetJobTitle = computed(() => {
+  const title = targetJob.value?.title?.trim();
+  if (title) return title;
+  return t('tailoredMaterials.unknownJobTitle');
+});
+const jobId = computed(() => targetJob.value?.id ?? item.value?.jobId ?? null);
+const jobLink = computed(() => (jobId.value ? `/jobs/${jobId.value}` : null));
+const matchLink = computed(() => (jobId.value ? `/jobs/${jobId.value}/match` : null));
 const isRegenerating = computed(() => tailoredMaterials.isGenerating.value);
 const contextLoading = computed(() => tailoredMaterials.contextLoading.value);
 const contextErrorCode = computed(() => tailoredMaterials.contextError.value);
 const contextErrorMessage = computed(() =>
   contextErrorCode.value ? t(`tailoredMaterials.errors.${contextErrorCode.value}`) : null
 );
-const canRegenerate = computed(() =>
-  Boolean(item.value?.id && targetJob.value && matchingSummary.value)
-);
+const canRegenerate = computed(() => Boolean(item.value?.id && item.value?.jobId));
 const regenerateDisabled = computed(
   () => !canRegenerate.value || contextLoading.value || isRegenerating.value
 );
 const regenerateError = computed(() => tailoredMaterials.error.value);
-const missingSummary = computed(() =>
-  Boolean(item.value?.jobId && targetJob.value && !matchingSummary.value)
+const missingSummary = computed(
+  () => hasLoadedContext.value && Boolean(item.value?.jobId && !matchingSummary.value)
 );
 
 const headerLinks: PageHeaderLink[] = [
@@ -160,8 +160,27 @@ const handleDelete = async () => {
   }
 };
 
+const loadJobSummary = async (jobId?: string | null) => {
+  if (!jobId) {
+    targetJob.value = null;
+    return;
+  }
+
+  if (targetJob.value?.id === jobId) {
+    return;
+  }
+
+  try {
+    const job = await jobService.getJobSummary(jobId);
+    targetJob.value = job;
+  } catch (err) {
+    console.error('[coverLetterDisplay] Failed to load job summary', err);
+  }
+};
+
 const loadTailoringContext = async (jobId?: string | null) => {
   const result = await tailoredMaterials.loadTailoringContext(jobId);
+  hasLoadedContext.value = true;
   if (result.ok) {
     targetJob.value = result.job;
     matchingSummary.value = result.matchingSummary;
@@ -173,7 +192,19 @@ const loadTailoringContext = async (jobId?: string | null) => {
 };
 
 const handleRegenerateTailored = async () => {
-  if (!item.value?.id || !targetJob.value || !matchingSummary.value) {
+  if (!item.value?.id || !item.value?.jobId) {
+    return;
+  }
+
+  if (!targetJob.value || !matchingSummary.value) {
+    await loadTailoringContext(item.value.jobId);
+  }
+
+  if (!targetJob.value || !matchingSummary.value) {
+    toast.add({
+      title: t('tailoredMaterials.toast.coverLetterRegenerateFailed'),
+      color: 'error',
+    });
     return;
   }
 
@@ -204,7 +235,7 @@ const handleRegenerateTailored = async () => {
 onMounted(async () => {
   isInitializing.value = true;
   try {
-    await Promise.all([engine.load(), load()]);
+    await load();
   } finally {
     isInitializing.value = false;
   }
@@ -220,7 +251,7 @@ watch(item, (newValue) => {
     originalContent.value = editContent.value;
     // Update breadcrumb with cover letter name
     route.meta.breadcrumbLabel = newValue.name || t('coverLetter.display.untitled');
-    void loadTailoringContext(newValue.jobId);
+    void loadJobSummary(newValue.jobId);
   }
 });
 </script>
@@ -268,32 +299,6 @@ watch(item, (newValue) => {
             class="mb-6"
             :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
             @close="error = null"
-          />
-
-          <UAlert
-            v-if="engine.error.value && !isInitializing"
-            icon="i-heroicons-exclamation-triangle"
-            color="warning"
-            variant="soft"
-            :title="t('coverLetter.display.states.generateErrorTitle')"
-            :description="engine.error.value"
-            class="mb-6"
-            :close-button="{
-              icon: 'i-heroicons-x-mark-20-solid',
-              color: 'warning',
-              variant: 'link',
-            }"
-            @close="engine.error.value = null"
-          />
-
-          <UAlert
-            v-if="!engine.hasProfile.value && !engine.isLoading.value && !isInitializing"
-            icon="i-heroicons-information-circle"
-            color="info"
-            variant="soft"
-            :title="t('coverLetter.display.profileRequiredTitle')"
-            :description="t('coverLetter.display.profileRequiredDescription')"
-            class="mb-6"
           />
 
           <UCard v-if="loading || isInitializing">

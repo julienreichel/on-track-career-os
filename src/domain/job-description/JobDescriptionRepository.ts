@@ -56,6 +56,12 @@ export class JobDescriptionRepository {
     return res.data;
   }
 
+  async getSummary(id: string) {
+    const selectionSet = ['id', 'title', 'companyId'];
+    const res = await this.model.get({ id }, gqlOptions({ selectionSet }));
+    return res.data;
+  }
+
   async getWithRelations(id: string) {
     const selectionSet = [
       'id',

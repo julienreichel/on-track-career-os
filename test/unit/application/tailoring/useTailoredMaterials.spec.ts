@@ -13,9 +13,6 @@ import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 import type { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { UserProfileService } from '@/domain/user-profile/UserProfileService';
-import type { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
-import type { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import type { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { CompanyService } from '@/domain/company/CompanyService';
 import type { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
 import type { CoverLetterService } from '@/domain/cover-letter/CoverLetterService';
@@ -140,17 +137,15 @@ describe('useTailoredMaterials', () => {
       }),
     } as unknown as AiOperationsService,
     userProfileService: {
-      getFullUserProfile: vi.fn().mockResolvedValue(profile),
+      getProfileForTailoring: vi.fn().mockResolvedValue({
+        ...profile,
+        experiences: experiences.map((experience) => ({
+          ...experience,
+          stories,
+        })),
+        canvas: null,
+      }),
     } as unknown as UserProfileService,
-    personalCanvasRepo: {
-      getByUserId: vi.fn().mockResolvedValue(null),
-    } as unknown as PersonalCanvasRepository,
-    experienceRepo: {
-      list: vi.fn().mockResolvedValue(experiences),
-    } as unknown as ExperienceRepository,
-    storyService: {
-      getStoriesByExperience: vi.fn().mockResolvedValue(stories),
-    } as unknown as STARStoryService,
     companyService: {
       getCompany: vi.fn().mockResolvedValue(company),
     } as unknown as CompanyService,

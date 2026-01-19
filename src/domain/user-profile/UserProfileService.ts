@@ -15,6 +15,10 @@ export class UserProfileService {
     return item;
   }
 
+  async getProfileForTailoring(id: string): Promise<UserProfile | null> {
+    return await this.repo.getForTailoring(id);
+  }
+
   async getProgressSnapshot(id: string) {
     return this.repo.getProgressSnapshot(id);
   }

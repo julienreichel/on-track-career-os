@@ -13,6 +13,7 @@ describe('UserProfileService', () => {
   beforeEach(() => {
     mockRepository = {
       get: vi.fn(),
+      getForTailoring: vi.fn(),
       list: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
@@ -134,6 +135,18 @@ describe('UserProfileService', () => {
 
       expect(mockRepository.getProgressSnapshot).toHaveBeenCalledWith('user-123');
       expect(result).toBe(snapshot);
+    });
+  });
+
+  describe('getProfileForTailoring', () => {
+    it('should delegate to repository', async () => {
+      const profile = { id: 'user-123' } as UserProfile;
+      mockRepository.getForTailoring.mockResolvedValue(profile);
+
+      const result = await service.getProfileForTailoring('user-123');
+
+      expect(mockRepository.getForTailoring).toHaveBeenCalledWith('user-123');
+      expect(result).toEqual(profile);
     });
   });
 

@@ -62,6 +62,38 @@ export class UserProfileRepository {
     return res.data;
   }
 
+  async getForTailoring(id: string): Promise<UserProfile | null> {
+    if (!id) {
+      return null;
+    }
+
+    const selectionSet = [
+      'id',
+      'fullName',
+      'headline',
+      'location',
+      'primaryEmail',
+      'primaryPhone',
+      'workPermitInfo',
+      'socialLinks',
+      'goals',
+      'strengths',
+      'seniorityLevel',
+      'aspirations',
+      'personalValues',
+      'skills',
+      'languages',
+      'certifications',
+      'interests',
+      'experiences.*',
+      'experiences.stories.*',
+      'canvas.*',
+    ];
+
+    const { data } = await this.model.get({ id }, gqlOptions({ selectionSet }));
+    return data;
+  }
+
   async list(filter: Record<string, unknown> = {}) {
     return fetchAllListItems<UserProfile>(this.model.list.bind(this.model), filter);
   }

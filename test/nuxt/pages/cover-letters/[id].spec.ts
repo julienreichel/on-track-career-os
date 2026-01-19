@@ -40,20 +40,6 @@ vi.mock('@/application/cover-letter/useCoverLetter', () => ({
   }),
 }));
 
-const generateMock = vi.fn();
-const engineMock = {
-  isGenerating: ref(false),
-  isLoading: ref(false),
-  error: ref<string | null>(null),
-  hasProfile: ref(true),
-  load: vi.fn(),
-  generate: generateMock,
-};
-
-vi.mock('@/composables/useCoverLetterEngine', () => ({
-  useCoverLetterEngine: () => engineMock,
-}));
-
 const authMock = {
   userId: ref('user-1'),
   loadUserId: vi.fn().mockResolvedValue(undefined),
@@ -77,7 +63,7 @@ vi.mock('@/application/tailoring/useTailoredMaterials', () => ({
 }));
 
 const jobServiceMock = {
-  getFullJobDescription: vi.fn().mockResolvedValue({ id: 'job-1', title: 'Lead Engineer' }),
+  getJobSummary: vi.fn().mockResolvedValue({ id: 'job-1', title: 'Lead Engineer' }),
 };
 
 vi.mock('@/domain/job-description/JobDescriptionService', () => ({
@@ -209,15 +195,9 @@ describe('Cover letter detail page', () => {
     };
     loadingRef.value = false;
     errorRef.value = null;
-    engineMock.isGenerating.value = false;
-    engineMock.isLoading.value = false;
-    engineMock.error.value = null;
-    engineMock.hasProfile.value = true;
     mockLoad.mockResolvedValue(undefined);
     mockSave.mockResolvedValue(itemRef.value);
     mockRemove.mockResolvedValue(true);
-    generateMock.mockClear();
-    generateMock.mockResolvedValue('New generated cover letter content...');
     mockToast.add.mockClear();
     tailoredMaterialsMock.isGenerating.value = false;
     tailoredMaterialsMock.error.value = null;
@@ -228,7 +208,6 @@ describe('Cover letter detail page', () => {
     const wrapper = await mountPage();
     await flushPromises();
     expect(mockLoad).toHaveBeenCalled();
-    expect(engineMock.load).toHaveBeenCalled();
 
     // Should be in view mode by default
     expect(wrapper.find('.doc-markdown').exists()).toBe(true);

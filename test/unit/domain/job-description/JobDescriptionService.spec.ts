@@ -31,6 +31,7 @@ describe('JobDescriptionService', () => {
   beforeEach(() => {
     mockRepository = {
       get: vi.fn(),
+      getSummary: vi.fn(),
       getWithRelations: vi.fn(),
       listByOwner: vi.fn(),
       create: vi.fn(),
@@ -97,6 +98,18 @@ describe('JobDescriptionService', () => {
     });
 
     // TODO: Add more tests for lazy loading and relations
+  });
+
+  describe('getJobSummary', () => {
+    it('should fetch job summary via repository', async () => {
+      const mockJob = { id: 'job-1', title: 'Engineer' } as JobDescription;
+      mockRepository.getSummary = vi.fn().mockResolvedValue(mockJob);
+
+      const result = await service.getJobSummary('job-1');
+
+      expect(mockRepository.getSummary).toHaveBeenCalledWith('job-1');
+      expect(result).toEqual(mockJob);
+    });
   });
 
   describe('listJobs', () => {

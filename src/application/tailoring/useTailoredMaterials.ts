@@ -4,9 +4,6 @@ import { buildSpeechInput } from '@/composables/useSpeechEngine';
 import { buildTailoringContext } from './buildTailoringContext';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
-import { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
-import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import { CompanyService } from '@/domain/company/CompanyService';
 import { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
 import { CoverLetterService } from '@/domain/cover-letter/CoverLetterService';
@@ -32,9 +29,6 @@ type AuthComposable = {
 type TailoredMaterialsDependencies = {
   aiService: AiOperationsService;
   userProfileService: UserProfileService;
-  personalCanvasRepo: PersonalCanvasRepository;
-  experienceRepo: ExperienceRepository;
-  storyService: STARStoryService;
   companyService: CompanyService;
   cvRepository: CVDocumentRepository;
   coverLetterService: CoverLetterService;
@@ -335,9 +329,6 @@ function createDependencies(
   return {
     aiService: overrides.aiService ?? new AiOperationsService(),
     userProfileService: overrides.userProfileService ?? new UserProfileService(),
-    personalCanvasRepo: overrides.personalCanvasRepo ?? new PersonalCanvasRepository(),
-    experienceRepo: overrides.experienceRepo ?? new ExperienceRepository(),
-    storyService: overrides.storyService ?? new STARStoryService(),
     companyService: overrides.companyService ?? new CompanyService(),
     cvRepository: overrides.cvRepository ?? new CVDocumentRepository(),
     coverLetterService: overrides.coverLetterService ?? new CoverLetterService(),
@@ -693,25 +684,29 @@ async function loadUserContext(
   experiences: Experience[];
   stories: STARStory[];
 }> {
-  const profile = await deps.userProfileService.getFullUserProfile(userId);
+  const profile = await deps.userProfileService.getProfileForTailoring(userId);
   if (!profile) {
     throw new Error('User profile not found');
   }
 
-  const personalCanvas = await deps.personalCanvasRepo.getByUserId(userId).catch(() => null);
-  const experiences = await deps.experienceRepo.list(userId);
-  const stories = await loadStories(experiences, deps.storyService);
+  const data = profile as UserProfile & {
+    experiences?: (Experience & { stories?: (STARStory | null)[] | null })[] | null;
+    canvas?: PersonalCanvas | null;
+  };
 
-  return { profile, personalCanvas, experiences, stories };
-}
+  const experiences = (data.experiences ?? []).filter(
+    (exp): exp is Experience & { stories?: (STARStory | null)[] | null } => Boolean(exp)
+  );
+  const stories = experiences
+    .flatMap((exp) => exp.stories ?? [])
+    .filter((story): story is STARStory => Boolean(story));
 
-async function loadStories(
-  experiences: Experience[],
-  service: STARStoryService
-): Promise<STARStory[]> {
-  const storyPromises = experiences.map((exp) => service.getStoriesByExperience(exp.id));
-  const storyArrays = await Promise.all(storyPromises);
-  return storyArrays.flat();
+  return {
+    profile,
+    personalCanvas: (data.canvas ?? null) as PersonalCanvas | null,
+    experiences,
+    stories,
+  };
 }
 
 async function loadCompanySummary(companyId: string | null | undefined, service: CompanyService) {

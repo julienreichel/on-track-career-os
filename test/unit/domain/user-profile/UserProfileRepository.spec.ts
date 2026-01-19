@@ -77,6 +77,40 @@ describe('UserProfileRepository', () => {
     });
   });
 
+  describe('getForTailoring', () => {
+    it('should return null when id is missing', async () => {
+      const result = await repository.getForTailoring('');
+
+      expect(mockModel.get).not.toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+
+    it('should fetch tailoring profile with related data', async () => {
+      const mockUserProfile = {
+        id: 'user-123',
+        fullName: 'John Doe',
+      };
+
+      mockModel.get.mockResolvedValue({
+        data: mockUserProfile,
+      });
+
+      const result = await repository.getForTailoring('user-123');
+
+      expect(mockModel.get).toHaveBeenCalledWith(
+        { id: 'user-123' },
+        expect.objectContaining({
+          selectionSet: expect.arrayContaining([
+            'experiences.*',
+            'experiences.stories.*',
+            'canvas.*',
+          ]),
+        })
+      );
+      expect(result).toEqual(mockUserProfile);
+    });
+  });
+
   describe('list', () => {
     it('should fetch a list of user profiles', async () => {
       const mockUserProfiles = [
