@@ -37,14 +37,6 @@ export function useCompanyCanvas(companyId: string) {
     }
   };
 
-  const load = async () => {
-    const result = await run(() => service.getByCompanyId(companyId));
-    canvas.value = result;
-    hydrateDraft(result);
-    dirty.value = false;
-    return result;
-  };
-
   const hydrate = (data: CompanyCanvas | null) => {
     canvas.value = data;
     hydrateDraft(data);
@@ -62,7 +54,7 @@ export function useCompanyCanvas(companyId: string) {
     const payload = {
       ...draftBlocks.value,
     };
-    const updated = await run(() => service.saveDraft(companyId, payload));
+    const updated = await run(() => service.saveDraft(companyId, payload, canvas.value));
     canvas.value = updated;
     hydrateDraft(updated);
     dirty.value = false;
@@ -70,7 +62,7 @@ export function useCompanyCanvas(companyId: string) {
   };
 
   const regenerate = async (notes?: string[]) => {
-    const regenerated = await run(() => service.regenerateCanvas(companyId, notes));
+    const regenerated = await run(() => service.regenerateCanvas(companyId, notes, canvas.value));
     canvas.value = regenerated;
     hydrateDraft(regenerated);
     dirty.value = false;
@@ -102,7 +94,6 @@ export function useCompanyCanvas(companyId: string) {
     isEmpty,
     loading,
     error,
-    load,
     hydrate,
     updateBlock,
     save,

@@ -17,12 +17,12 @@ export class CompanyCanvasService {
   ) {}
 
   async getByCompanyId(companyId: string) {
-    const existing = await this.canvasRepo.getByCompanyId(companyId);
-    return existing;
+    const company = await this.companyRepo.getWithRelations(companyId);
+    return (company?.canvas ?? null) as CompanyCanvas | null;
   }
 
-  async saveDraft(companyId: string, patch: CanvasPatch) {
-    const existing = await this.validateOrCreateCanvas(companyId);
+  async saveDraft(companyId: string, patch: CanvasPatch, existingCanvas?: CompanyCanvas | null) {
+    const existing = await this.ensureCanvas(companyId, existingCanvas);
     const normalized = this.normalizeBlocks(patch);
 
     const payload: CompanyCanvasUpdateInput = {
@@ -41,11 +41,12 @@ export class CompanyCanvasService {
 
   async regenerateCanvas(
     companyId: string,
-    additionalNotes: string[] = []
+    additionalNotes: string[] = [],
+    existingCanvas?: CompanyCanvas | null
   ): Promise<CompanyCanvas> {
     const [company, canvas] = await Promise.all([
       this.requireCompany(companyId),
-      this.validateOrCreateCanvas(companyId),
+      this.ensureCanvas(companyId, existingCanvas),
     ]);
 
     const aiInput: GeneratedCompanyCanvasInput = {
@@ -89,10 +90,15 @@ export class CompanyCanvasService {
     return updated;
   }
 
-  private async validateOrCreateCanvas(companyId: string) {
-    const existing = await this.canvasRepo.getByCompanyId(companyId);
-    if (existing) {
-      return existing;
+  private async ensureCanvas(companyId: string, existingCanvas?: CompanyCanvas | null) {
+    if (existingCanvas) {
+      return existingCanvas;
+    }
+
+    const company = await this.companyRepo.getWithRelations(companyId);
+    const companyCanvas = (company?.canvas ?? null) as CompanyCanvas | null;
+    if (companyCanvas) {
+      return companyCanvas;
     }
 
     const created = await this.canvasRepo.create({

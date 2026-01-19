@@ -10,15 +10,14 @@ describe('useCompanyCanvas', () => {
 
   beforeEach(() => {
     service = {
-      getByCompanyId: vi.fn(),
       saveDraft: vi.fn(),
       regenerateCanvas: vi.fn(),
     } as unknown as vi.Mocked<CompanyCanvasService>;
     vi.mocked(CompanyCanvasService).mockImplementation(() => service);
   });
 
-  it('loads canvas and hydrates draft', async () => {
-    const canvas = {
+  it('saves drafts through service', async () => {
+    const existing = {
       id: 'canvas-1',
       companyId: 'c1',
       customerSegments: ['Startups'],
@@ -31,33 +30,11 @@ describe('useCompanyCanvas', () => {
       keyPartners: [],
       costStructure: [],
     } as CompanyCanvas;
-    service.getByCompanyId.mockResolvedValue(canvas);
-    const composable = useCompanyCanvas('c1');
-
-    await composable.load();
-    expect(composable.draftBlocks.value.customerSegments).toEqual(['Startups']);
-    expect(composable.dirty.value).toBe(false);
-  });
-
-  it('saves drafts through service', async () => {
-    const updated = {
-      id: 'canvas-1',
-      companyId: 'c1',
-      customerSegments: ['Enterprise'],
-      valuePropositions: [],
-      channels: [],
-      customerRelationships: [],
-      revenueStreams: [],
-      keyResources: [],
-      keyActivities: [],
-      keyPartners: [],
-      costStructure: [],
-    } as CompanyCanvas;
-    service.getByCompanyId.mockResolvedValue(updated);
+    const updated = { ...existing, customerSegments: ['Enterprise'] } as CompanyCanvas;
     service.saveDraft.mockResolvedValue(updated);
 
     const composable = useCompanyCanvas('c1');
-    await composable.load();
+    composable.hydrate(existing);
     composable.updateBlock('customerSegments', ['Enterprise']);
     await composable.save();
 
@@ -65,7 +42,8 @@ describe('useCompanyCanvas', () => {
       'c1',
       expect.objectContaining({
         customerSegments: ['Enterprise'],
-      })
+      }),
+      existing
     );
     expect(composable.dirty.value).toBe(false);
   });
@@ -91,5 +69,29 @@ describe('useCompanyCanvas', () => {
     expect(composable.canvas.value).toEqual(canvas);
     expect(composable.draftBlocks.value.customerSegments).toEqual(['Enterprise']);
     expect(composable.dirty.value).toBe(false);
+  });
+
+  it('regenerates through service with existing canvas', async () => {
+    const canvas = {
+      id: 'canvas-1',
+      companyId: 'c1',
+      customerSegments: ['Enterprise'],
+      valuePropositions: [],
+      channels: [],
+      customerRelationships: [],
+      revenueStreams: [],
+      keyResources: [],
+      keyActivities: [],
+      keyPartners: [],
+      costStructure: [],
+    } as CompanyCanvas;
+    service.regenerateCanvas.mockResolvedValue(canvas);
+
+    const composable = useCompanyCanvas('c1');
+    composable.hydrate(canvas);
+
+    await composable.regenerate(['note']);
+
+    expect(service.regenerateCanvas).toHaveBeenCalledWith('c1', ['note'], canvas);
   });
 });

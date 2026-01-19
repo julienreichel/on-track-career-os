@@ -18,13 +18,13 @@ describe('CompanyCanvasService', () => {
 
   beforeEach(() => {
     canvasRepo = {
-      getByCompanyId: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
     } as unknown as vi.Mocked<CompanyCanvasRepository>;
 
     companyRepo = {
       get: vi.fn(),
+      getWithRelations: vi.fn(),
     } as unknown as vi.Mocked<CompanyRepository>;
 
     ai = {
@@ -40,7 +40,7 @@ describe('CompanyCanvasService', () => {
       companyId: 'company-1',
       customerSegments: [],
     } as CompanyCanvas;
-    canvasRepo.getByCompanyId.mockResolvedValue(canvas);
+    const existingCanvas = canvas;
     canvasRepo.update.mockResolvedValue({
       ...canvas,
       customerSegments: ['Fintech'],
@@ -48,7 +48,7 @@ describe('CompanyCanvasService', () => {
 
     const result = await service.saveDraft('company-1', {
       customerSegments: [' Fintech ', 'fintech'],
-    });
+    }, existingCanvas);
 
     expect(canvasRepo.update).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -67,7 +67,7 @@ describe('CompanyCanvasService', () => {
       companyId: 'company-1',
       customerSegments: [],
     } as CompanyCanvas;
-    canvasRepo.getByCompanyId.mockResolvedValue(canvas);
+    const existingCanvas = canvas;
     companyRepo.get.mockResolvedValue({
       id: 'company-1',
       companyName: 'Acme',
@@ -93,7 +93,7 @@ describe('CompanyCanvasService', () => {
       needsUpdate: false,
     } as CompanyCanvas);
 
-    const regenerated = await service.regenerateCanvas('company-1');
+    const regenerated = await service.regenerateCanvas('company-1', [], existingCanvas);
 
     expect(ai.generateCompanyCanvas).toHaveBeenCalled();
     expect(canvasRepo.update).toHaveBeenCalledWith(
@@ -105,7 +105,6 @@ describe('CompanyCanvasService', () => {
   });
 
   it('initializes canvas when none exists before saving', async () => {
-    canvasRepo.getByCompanyId.mockResolvedValueOnce(null);
     canvasRepo.create.mockResolvedValue({
       id: 'canvas-1',
       companyId: 'company-1',
@@ -126,6 +125,7 @@ describe('CompanyCanvasService', () => {
       customerSegments: ['Fintech'],
       needsUpdate: true,
     } as CompanyCanvas);
+    companyRepo.getWithRelations.mockResolvedValue(null);
 
     await service.saveDraft('company-1', {
       customerSegments: ['Fintech'],
@@ -140,14 +140,16 @@ describe('CompanyCanvasService', () => {
   });
 
   it('throws when regenerating canvas for unknown company', async () => {
-    canvasRepo.getByCompanyId.mockResolvedValue({
+    const existingCanvas = {
       id: 'canvas-1',
       companyId: 'company-1',
       customerSegments: [],
-    } as CompanyCanvas);
+    } as CompanyCanvas;
     companyRepo.get.mockResolvedValue(null);
 
-    await expect(service.regenerateCanvas('company-1')).rejects.toThrow('Company not found');
+    await expect(
+      service.regenerateCanvas('company-1', [], existingCanvas)
+    ).rejects.toThrow('Company not found');
   });
 
   it('passes additional notes to AI during regeneration', async () => {
@@ -156,7 +158,7 @@ describe('CompanyCanvasService', () => {
       companyId: 'company-1',
       customerSegments: [],
     } as CompanyCanvas;
-    canvasRepo.getByCompanyId.mockResolvedValue(canvas);
+    const existingCanvas = canvas;
     companyRepo.get.mockResolvedValue({
       id: 'company-1',
       companyName: 'Acme',
@@ -178,7 +180,7 @@ describe('CompanyCanvasService', () => {
     });
     canvasRepo.update.mockResolvedValue(canvas);
 
-    await service.regenerateCanvas('company-1', ['note']);
+    await service.regenerateCanvas('company-1', ['note'], existingCanvas);
 
     expect(ai.generateCompanyCanvas).toHaveBeenCalledWith(
       expect.objectContaining({
