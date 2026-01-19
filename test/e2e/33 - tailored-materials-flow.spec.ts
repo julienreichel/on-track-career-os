@@ -99,7 +99,7 @@ test.describe('Tailored materials workflow', () => {
     }
     coverLetterId = coverLetterMatch[1];
 
-    const content = page.locator('.prose');
+    const content = page.locator('.doc-markdown');
     await expect(content).toBeVisible();
     await expect(content).not.toBeEmpty();
 

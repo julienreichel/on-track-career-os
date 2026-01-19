@@ -87,7 +87,7 @@ test.describe('Cover Letter E2E Flow', () => {
     ).toBeVisible();
 
     // Check that content has been generated (should be in view mode by default)
-    const content = page.locator('.prose');
+    const content = page.locator('.doc-markdown');
     await expect(content).toBeVisible();
     await expect(content).not.toBeEmpty();
 
@@ -162,7 +162,7 @@ test.describe('Cover Letter E2E Flow', () => {
     });
 
     // Should return to view mode
-    await expect(page.locator('.prose')).toBeVisible();
+    await expect(page.locator('.doc-markdown')).toBeVisible();
   });
 
   test('6. Verify persistence and navigate back to list', async ({ page }) => {

@@ -57,7 +57,7 @@ test.describe('CV Generation Workflow', () => {
     await page.goto(`/applications/cv/${cvId}`);
     await page.waitForLoadState('networkidle');
 
-    await expect(page.locator('.prose, .cv-content').first()).toBeVisible();
+    await expect(page.locator('.doc-markdown').first()).toBeVisible();
     await expect(page.getByRole('button', { name: 'Edit', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: /export to pdf|print/i })).toBeVisible();
   });
