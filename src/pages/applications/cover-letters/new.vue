@@ -145,7 +145,7 @@ const cancel = () => {
 };
 
 const generateCoverLetter = async () => {
-  if (!coverLetterName.value.trim() || !userId.value) {
+  if (!coverLetterName.value.trim()) {
     return;
   }
 
@@ -153,6 +153,17 @@ const generateCoverLetter = async () => {
   generationError.value = null;
 
   try {
+    if (!userId.value) {
+      await loadUserId();
+    }
+    if (!userId.value) {
+      toast.add({
+        title: t('coverLetter.new.toast.createFailed'),
+        color: 'error',
+      });
+      return;
+    }
+
     // Load engine data
     await engine.load();
 
