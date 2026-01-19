@@ -73,7 +73,7 @@ test.describe('Matching summary workflow', () => {
       .filter({ has: page.locator('h3', { hasText: jobTitle }) });
     await expect(jobCard).toBeVisible({ timeout: 20000 });
 
-    await jobCard.getByRole('button', { name: /edit/i }).click();
+    await jobCard.getByRole('button', { name: /view/i }).click();
     await expect(page).toHaveURL(new RegExp(`/jobs/${jobId}$`, 'i'));
   });
 
