@@ -7,7 +7,6 @@ export type GuidanceRouteKey =
   | 'profile-canvas'
   | 'jobs'
   | 'job-detail'
-  | 'job-match'
   | 'applications-cv'
   | 'applications-cover-letters'
   | 'applications-speech';
@@ -335,23 +334,6 @@ const getJobDetailGuidance = (
   };
 };
 
-const getJobMatchGuidance = (context: GuidanceContext): GuidanceModel => {
-  if (context.hasMatchingSummary !== false || context.isGenerating || !context.jobId) {
-    return {};
-  }
-
-  return {
-    banner: {
-      titleKey: 'guidance.jobMatch.banner.title',
-      descriptionKey: 'guidance.jobMatch.banner.description',
-      cta: {
-        labelKey: 'guidance.jobMatch.banner.cta',
-        to: `/jobs/${context.jobId}/match`,
-      },
-    },
-  };
-};
-
 const getApplicationsLocked = (state: UserProgressState | null, id: string): LockedFeature[] => {
   if (!state) {
     return [];
@@ -519,7 +501,6 @@ const guidanceHandlers: Record<
   'profile-canvas': (state) => getProfileCanvasGuidance(state),
   jobs: (_, context) => getJobsGuidance(context),
   'job-detail': (state, context) => getJobDetailGuidance(state, context),
-  'job-match': (_, context) => getJobMatchGuidance(context),
   'applications-cv': (state, context) => getApplicationsCvGuidance(state, context),
   'applications-cover-letters': (state, context) =>
     getApplicationsCoverLettersGuidance(state, context),

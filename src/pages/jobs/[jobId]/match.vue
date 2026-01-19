@@ -8,7 +8,6 @@ import LinkedCompanyBadge from '@/components/company/LinkedCompanyBadge.vue';
 import TailoredMaterialsCard from '@/components/tailoring/TailoredMaterialsCard.vue';
 import { useMatchingEngine } from '@/composables/useMatchingEngine';
 import { useCompanies } from '@/composables/useCompanies';
-import { useGuidance } from '@/composables/useGuidance';
 import type { PageHeaderLink } from '@/types/ui';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
@@ -66,11 +65,6 @@ const isLoading = computed(() => engine.isLoading.value);
 const isGenerating = computed(() => engine.isGenerating.value);
 const hasSummary = computed(() => engine.hasSummary.value);
 const errorMessage = engine.error;
-const { guidance } = useGuidance('job-match', () => ({
-  hasMatchingSummary: hasSummary.value,
-  isGenerating: isGenerating.value,
-  jobId: jobId.value,
-}));
 
 function parseScoreBreakdown(scoreBreakdown: unknown) {
   if (!scoreBreakdown) {
@@ -159,8 +153,6 @@ onMounted(async () => {
       />
 
       <UPageBody>
-        <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
-
         <UAlert
           v-if="errorMessage"
           icon="i-heroicons-exclamation-triangle"

@@ -166,13 +166,4 @@ describe('guidanceCatalog', () => {
     });
     expect(guidance.banner?.cta?.to).toBe('/jobs/job-1/match');
   });
-
-  it('returns job match banner when match is missing', () => {
-    const guidance = getGuidance('job-match', baseState(), {
-      jobId: 'job-2',
-      hasMatchingSummary: false,
-      isGenerating: false,
-    });
-    expect(guidance.banner?.cta?.to).toBe('/jobs/job-2/match');
-  });
 });
