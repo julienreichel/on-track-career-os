@@ -46,10 +46,6 @@ definePageMeta({
   layout: false,
 });
 
-useHead({
-  title: 'Print Cover Letter',
-});
-
 const route = useRoute();
 
 const coverLetterId = computed(() => route.params.id as string);
@@ -57,6 +53,10 @@ const coverLetterId = computed(() => route.params.id as string);
 const PRINT_DELAY_MS = 500;
 
 const { item, loading, error, load } = useCoverLetter(coverLetterId.value);
+
+useHead(() => ({
+  title: item.value?.name?.trim() || 'Print Cover Letter',
+}));
 
 const loadPrint = async () => {
   try {

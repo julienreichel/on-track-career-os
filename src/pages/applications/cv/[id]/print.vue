@@ -18,7 +18,7 @@
     </div>
 
     <!-- Print Content -->
-    <div v-else-if="document" class="print-content">
+    <div v-else-if="cvDocument" class="print-content">
       <!-- Print Actions (hidden on print) -->
       <div class="print-actions no-print">
         <UButton
@@ -54,10 +54,6 @@ definePageMeta({
   layout: false,
 });
 
-useHead({
-  title: 'Print CV',
-});
-
 const route = useRoute();
 
 const cvId = computed(() => route.params.id as string);
@@ -67,20 +63,24 @@ const PRINT_DELAY_MS = 500;
 const service = new CVDocumentService();
 const userProfileService = new UserProfileService();
 const profilePhotoService = new ProfilePhotoService();
-const document = ref<CVDocument | null>(null);
+const cvDocument = ref<CVDocument | null>(null);
 const loading = ref(false);
 const error = ref<string | null>(null);
 const profilePhotoUrl = ref<string | null>(null);
 const profilePhotoLoading = ref(false);
 const profilePhotoError = ref<string | null>(null);
 
+useHead(() => ({
+  title: cvDocument.value?.name?.trim() || 'Print CV',
+}));
+
 const renderedHtml = computed(() => {
-  if (!document.value?.content) return '';
-  return marked(document.value.content);
+  if (!cvDocument.value?.content) return '';
+  return marked(cvDocument.value.content);
 });
 
 const showPhoto = computed(() => {
-  return (document.value?.showProfilePhoto ?? true) && !!profilePhotoUrl.value;
+  return (cvDocument.value?.showProfilePhoto ?? true) && !!profilePhotoUrl.value;
 });
 
 const loadProfilePhoto = async (userId: string) => {
@@ -109,9 +109,9 @@ const load = async () => {
   error.value = null;
 
   try {
-    document.value = await service.getFullCVDocument(cvId.value);
-    if (document.value) {
-      await loadProfilePhoto(document.value.userId);
+    cvDocument.value = await service.getFullCVDocument(cvId.value);
+    if (cvDocument.value) {
+      await loadProfilePhoto(cvDocument.value.userId);
     }
 
     // Auto-trigger print dialog after content loads
