@@ -23,11 +23,6 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ **NEW:** Contextual guidance layer with next-action suggestions
 - ✅ **NEW:** Dashboard active jobs & application status cockpit
 - ✅ **NEW:** Progressive feature unlocking based on user progress
-- ✅ ATS keywords extraction and optimization for job descriptions
-- ✅ Auto-generating matching summaries on job load for better UX
-- ✅ Advanced duplicate company prevention with GraphQL optimization
-- ✅ Streamlined experience import with merge capabilities
-- ✅ CV import count tracking with summary feedback
 - ✅ Jobs workflow complete: upload → parse → list → search → edit → save
 - ✅ Full E2E test coverage for jobs flow with fixtures
 - ✅ Company workflow complete: create → analyze → canvas → link to jobs
@@ -65,8 +60,9 @@ The project has achieved **production-ready MVP status** with comprehensive test
 | **5B** | Company Analysis & Canvas   | 100%    | 100%   | 100% (2/2) | 100%     | **100%** |
 | **5C** | User-Job-Company Matching   | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **6**  | Tailored Materials          | 100%    | 100%   | 100% (3/3) | 100%     | **100%** |
+| **F2** | Onboarding & Guidance       | 100%    | 100%   | N/A        | 100%     | **100%** |
 
-**Overall MVP Progress:** ~95%
+**Overall MVP Progress:** ~97%
 
 ### Detailed EPIC Analysis
 
@@ -658,6 +654,7 @@ The project has achieved **production-ready MVP status** with comprehensive test
 **Implemented:**
 
 **🎯 5-Phase Progress System:**
+
 - ✅ Phase 1: Complete your profile (gates: profile + ≥1 experience)
 - ✅ Phase 2A: Create your canvas (gate: canvas exists)
 - ✅ Phase 2B: Document your stories (gate: ≥3 STAR stories)
@@ -668,6 +665,7 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ `useUserProgress` composable for reactive state
 
 **🏅 Milestone-Based Badge System (7 Badges):**
+
 - ✅ Badge catalog: Profile Pioneer, Canvas Creator, Story Master, Job Hunter, CV Craftsman, Letter Writer, Speech Artist
 - ✅ Badge engine with deterministic earning logic
 - ✅ Badge persistence via UserProfile model
@@ -678,6 +676,7 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ Calm, mentor-style UI (no "NEW" labels, uniform colors, cursor-help)
 
 **🧭 Contextual Guidance Layer:**
+
 - ✅ `getNextAction` domain function with phase-specific suggestions
 - ✅ `guidanceCatalog` with 5 guidance types (profile-empty, experiences-empty, canvas-needed, stories-few, jobs-missing)
 - ✅ `useGuidance` composable for context-aware messages
@@ -686,6 +685,7 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ LockedFeatureCard for locked features (e.g., matching locked until Phase 3)
 
 **🎓 Onboarding Wizard:**
+
 - ✅ `/onboarding` page with 4-step wizard
 - ✅ Step 1: Welcome & profile basics
 - ✅ Step 2: Experience import (CV upload or manual)
@@ -697,6 +697,7 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ ProgressGuidanceSection with progress bar + next action
 
 **📊 Dashboard Enhancements:**
+
 - ✅ ActiveJobsCard with last 3 active jobs
 - ✅ JobApplicationStatusRow with match score + materials readiness (CV/letter/speech)
 - ✅ `useActiveJobsDashboard` composable aggregating job + match + materials
@@ -704,12 +705,14 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ Conditional blocks based on progress phase
 
 **🔓 Progressive Feature Unlocking:**
+
 - ✅ Matching features locked until Phase 3 (1 job required)
 - ✅ Active jobs dashboard visible only in Bonus Phase
 - ✅ CV upload shortcut visible based on experience count
 - ✅ Onboarding prompt on home if profile incomplete
 
 **✅ Testing:**
+
 - ✅ 13 test files covering badges, progress, guidance, onboarding
 - ✅ E2E tests: `02 - onboarding-flow.spec.ts`, `13 - progress-engine.spec.ts`
 - ✅ 5 unit test files for domain logic (badgeEngine, computeUserProgressState, getNextAction, guidanceCatalog, unlocks)
@@ -718,6 +721,7 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ All 1450+ tests passing
 
 **Validation:**
+
 - ✅ Users see clear next actions at all stages
 - ✅ Progress system guides from empty profile → complete application materials
 - ✅ Badge system rewards milestones without gamification noise

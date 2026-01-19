@@ -86,24 +86,60 @@ Each page includes:
 
 ### Components
 
-- None (uses Nuxt UI layout components)
+- `ProgressBannerCard` - onboarding prompt (if incomplete profile)
+- `ProgressGuidanceSection` - progress bar + next action
+- `ActiveJobsCard` - job cockpit (Bonus Phase only)
+- `BadgeGridCard` - badge collection display
 
 ### Composables
 
 - `useAuthUser()` - check user state
-- Conditional CV upload visibility
+- `useUserProgress()` - progress state
+- `useBadges()` - badge collection
+- `useActiveJobsDashboard()` - active jobs aggregation
 
 ### CDM Entities
 
-- None (navigation only)
+- **UserProfile** (for progress + badges)
 
 ### AI Ops
 
 - None
 
-**Status:** ✅ Implemented (simple navigation hub)
+**Status:** ✅ Implemented with EPIC F2 enhancements (progress tracking, badges, active jobs cockpit)
 
-**Note:** Original "First-Time Onboarding Wizard" not implemented - users start with CV upload or manual data entry
+---
+
+## **0.3 Onboarding Wizard** ✅
+
+**Route:** `/onboarding`
+
+### UI
+
+- `<UCard>`, `<UButton>`, `<UForm>`
+
+### Components
+
+- `OnboardingWizard` - 4-step wizard
+- Step components (profile, experience, canvas, story)
+
+### Composables
+
+- `useOnboardingWizard()` - wizard state
+- `useUserProfile()` - profile CRUD
+- `useCanvasEngine()` - canvas generation
+- `useStoryEngine()` - story creation
+
+### CDM Entities
+
+- **UserProfile**, **Experience**, **PersonalCanvas**, **STARStory**
+
+### AI Ops
+
+- `ai.generatePersonalCanvas`
+- `ai.generateStarStory`
+
+**Status:** ✅ Implemented (EPIC F2)
 
 ---
 
@@ -1071,8 +1107,24 @@ Each page includes:
 - `ParsingStep` - AI parsing indicator
 - `GeneratingStep` - CV generation indicator
 - `ImportSuccess` - import completion
-- `BadgeList` - list of badges
-- `SingleBadge` - individual badge
+- `BadgeGridCard` - badge collection display (F2)
+- `BadgePill` - individual badge with tooltip (F2)
+
+**Onboarding & Progress Components (EPIC F2):**
+
+- `OnboardingWizard` - 4-step wizard flow
+- `ProgressBannerCard` - dashboard progress prompt
+- `ProgressChecklistCard` - phase-based task checklist
+- `ProgressChecklistItems` - checklist item rendering
+- `ProgressGuidanceSection` - progress bar + next action
+- `GuidanceBanner` - contextual guidance messages
+- `EmptyStateActionCard` - feature-specific empty states
+- `LockedFeatureCard` - locked feature explanations
+
+**Dashboard Components (EPIC F2):**
+
+- `ActiveJobsCard` - dashboard job cockpit
+- `JobApplicationStatusRow` - job status + materials readiness
 
 **Job Components:**
 
@@ -1130,6 +1182,14 @@ Each page includes:
 - `useSpeechBlocks()` - speech list operations
 - `useSpeechEngine()` - speech workflow orchestration
 - `useTailoredMaterials()` - tailored CV/letter/applications/speech generation
+
+**Progress & Onboarding Layer (EPIC F2):**
+
+- `useUserProgress()` - progress state tracking across 5 phases
+- `useBadges()` - badge earning, persistence, and display
+- `useGuidance()` - contextual guidance messages based on progress
+- `useOnboardingWizard()` - onboarding wizard state and navigation
+- `useActiveJobsDashboard()` - active jobs dashboard aggregation
 
 ## 8.5 AI Operations Status (12/12 Implemented)
 

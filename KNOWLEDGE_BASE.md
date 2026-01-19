@@ -41,6 +41,7 @@ Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer
 - ✅ EPIC 5B (Company Analysis & Canvas) — 100% complete
 - ✅ EPIC 5C (User-Job-Company Matching) — 100% complete
 - ✅ EPIC 6 (Tailored Application Materials) — 100% complete
+- ✅ EPIC F2 (Onboarding, Guidance & User Flow Clarity) — 100% complete
 
 ### 2.1 Frontend (Nuxt 4)
 
@@ -125,6 +126,7 @@ _(From Component Model + Component→Page Mapping) _
 - **Cover Letter Generator**
 - **Speech Builder**
 - **Dashboard Widgets**
+- **Progress & Onboarding Components**
 
 ### 4.2 Composables
 
@@ -150,6 +152,11 @@ _(From Component Model + Component→Page Mapping) _
 - `useAiOperations()` - AI operations orchestration
 - `useCvDocuments()` - CV document management
 - `useCvGenerator()` - CV generation from user data
+- `useUserProgress()` - Progress state tracking across 5 phases
+- `useBadges()` - Badge earning, persistence, and display
+- `useGuidance()` - Contextual guidance messages based on progress
+- `useOnboardingWizard()` - Onboarding wizard state and navigation
+- `useActiveJobsDashboard()` - Active jobs dashboard aggregation
 
 ---
 
@@ -192,6 +199,7 @@ _(Structured per navigation zones)_
 - `/cover-letters/:id` - Cover letter editor
 - `/cover-letters/:id/print` - Cover letter print layout
 - `/cv/:id`, `/cover-letters/:id`, `/speech/:id` show job backlink + regenerate tailored action when jobId exists
+- `/onboarding` - 4-step onboarding wizard for first-time users
   (From Navigation Structure & Component Mapping )
 
 ### 5.1 My Profile
@@ -220,6 +228,48 @@ _(Structured per navigation zones)_
   - Markdown editor with preview + print/export-ready layout, including top-right profile photo badge when enabled
 - **Cover Letter Builder**
 - **Speech Builder**
+
+### 5.4 Onboarding & Progress System (EPIC F2)
+
+**5-Phase Progress System:**
+
+- **Phase 1**: Complete your profile (requires profile + ≥1 experience)
+- **Phase 2A**: Create your canvas (requires canvas exists)
+- **Phase 2B**: Document your stories (requires ≥3 STAR stories)
+- **Phase 3**: Find job opportunities (requires ≥1 job description)
+- **Bonus Phase**: Generate application materials (unlocked after Phase 3)
+
+**Badge System (7 Badges):**
+
+1. Profile Pioneer - First profile completion
+2. Canvas Creator - Generated personal canvas
+3. Story Master - Created 3+ STAR stories
+4. Job Hunter - Added first job description
+5. CV Craftsman - Generated first CV
+6. Letter Writer - Generated first cover letter
+7. Speech Artist - Generated first speech block
+
+**Guidance Layer:**
+
+- Context-aware next-action suggestions
+- Empty-state guidance cards
+- Locked feature explanations with unlock requirements
+- Dashboard progress tracking with visual indicators
+
+**Onboarding Wizard:**
+
+- Step 1: Welcome & profile basics
+- Step 2: Experience import (CV upload or manual)
+- Step 3: Canvas generation
+- Step 4: First STAR story
+
+**Dashboard Integration:**
+
+- Personalized greeting with user's name
+- Progress banner with phase indicator
+- Active jobs cockpit (Bonus Phase only)
+- Badge collection display
+- Phase-based feature unlocking
 - **Tailored Materials**
   - Generate tailored CV/cover letter/speech from `/jobs/:id` or `/jobs/:id/match`
   - Regenerate from document pages via job backlink banner when jobId exists
