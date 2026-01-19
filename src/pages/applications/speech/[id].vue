@@ -362,15 +362,6 @@ watch(item, (newValue) => {
             </template>
 
             <template v-else>
-              <UCard class="mb-6">
-                <div>
-                  <p class="text-sm text-gray-500">{{ t('speech.detail.titleLabel') }}</p>
-                  <p class="text-base text-gray-900 dark:text-gray-100">
-                    {{ formState.title || t('speech.detail.untitled') }}
-                  </p>
-                </div>
-              </UCard>
-
               <UCard>
                 <div class="space-y-2">
                   <div>
