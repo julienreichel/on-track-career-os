@@ -1,4 +1,4 @@
-import { invokeAiWithRetry } from './utils/bedrock';
+import { invokeBedrock } from './utils/bedrock';
 import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
 import type {
   JobDescription,
@@ -12,14 +12,32 @@ import type {
 
 const SYSTEM_PROMPT = `You generate personal narrative speech based on user identity data.
 
-Write natural-flow English with no headings, labels, or bullet lists. Follow this guidance
-implicitly: hook/positioning -> fil rouge -> proof (STAR-style) -> credibility/training
--> projection -> human note -> opening question. The structure is guidance; do not
-output section titles.
+Return a single Markdown document with exactly three H2 sections:
+
+## Elevator Pitch
+... Target ~120 words, 5-7 sentences ...
+
+## Career Story
+... Target ~360 words, 3-5 paragraphs ...
+
+## Why Me
+...  target ~240 words, 2-3 paragraphs ...
+
+Do not add other H2 sections. Do not use code fences.
+
+Write natural-flow. 
+
+IMPORTANT: The structure is guidance only (no headings for it):
+Decor -> Parcours -> Expertise (STAR-style) -> Training -> Project -> Me -> Question.
+Keep the narrative coherent and natural.
+
+Formatting is allowed when helpful (paragraphs, bold/italics, bullets). Career Story
+should usually contain multiple paragraphs.
 
 Tailoring rules:
 - If jobDescription is provided, align to the role needs even if matchingSummary is missing.
-- Use company context only when provided; keep it summary-level framing only.
+- If only matchingSummary is provided, stay generic but emphasize relevant strengths.
+- Use company context only when jobDescription exists or company is provided; keep it summary-level framing.
 
 Groundedness:
 - Do not invent employers, skills, degrees, or achievements.
@@ -34,13 +52,9 @@ Stories:
 Output must be:
 - concise, professional, first-person voice
 - motivational but realistic
-- JSON only, no extra keys`;
+- natural narrative flow
 
-const OUTPUT_SCHEMA = `{
-  "elevatorPitch": "string",
-  "careerStory": "string",
-  "whyMe": "string"
-}`;
+Word counts are targets, not strict limits. End each section with an opening question.`;
 
 const PROMPT_INDENT_SPACES = 2;
 
@@ -62,6 +76,16 @@ export interface GenerateSpeechOutput {
 }
 
 type ModelResponse = Partial<GenerateSpeechOutput>;
+
+type TailoringContext = {
+  jobDescription: JobDescription | null;
+  matchingSummary: MatchingSummaryContext | null;
+  company: CompanyProfile | null;
+};
+
+type HandlerEvent = {
+  arguments: GenerateSpeechInput;
+};
 
 function sanitizeString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
@@ -89,6 +113,12 @@ function buildUserPrompt(args: GenerateSpeechInput): string {
   const matchingSummary = tailoring.matchingSummary;
   const company = tailoring.company;
   const stories = args.stories ?? [];
+  const tailoringFlags = {
+    hasJobDescription: Boolean(jobDescription),
+    hasMatchingSummary: Boolean(matchingSummary),
+    hasCompany: Boolean(company),
+  };
+  const hasTailoringFlags = Object.values(tailoringFlags).some(Boolean);
 
   return `Use the following data to create personal speech material.
 
@@ -107,7 +137,14 @@ ${JSON.stringify(stories, null, PROMPT_INDENT_SPACES)}
 PERSONAL CANVAS:
 ${JSON.stringify(args.personalCanvas ?? {}, null, PROMPT_INDENT_SPACES)}
 
-TARGET JOB DESCRIPTION (optional):
+${
+  hasTailoringFlags
+    ? `TAILORING CONTEXT:
+${JSON.stringify(tailoringFlags, null, PROMPT_INDENT_SPACES)}
+
+`
+    : ''
+}TARGET JOB DESCRIPTION (optional):
 ${JSON.stringify(jobDescription, null, PROMPT_INDENT_SPACES)}
 
 MATCHING SUMMARY (optional):
@@ -118,23 +155,29 @@ ${JSON.stringify(company, null, PROMPT_INDENT_SPACES)}
 
 Output guidance (targets, not strict limits):
 - elevatorPitch: ~45-60s, target ~120 words, 5-7 sentences, end with an opening question.
-- careerStory: ~2-3 min, target ~360 words, 3-5 short paragraphs, include 1-2 STAR-style proofs.
-- whyMe: ~1-2 min, target ~240 words, "their need/problem -> my proof -> fit -> opening question".
+- careerStory: ~2-3 min, target ~360 words, 3-5 paragraphs, include 1-2 STAR-style proofs.
+- whyMe: ~1-2 min, target ~240 words, "their problem -> my proof -> fit -> opening question".
 
 Make the fil rouge explicit: focus on 2-3 recurring patterns across experience, avoid
 chronological date-by-date recital. Prefer "I've repeatedly..." over "In 2018...".
 
-Do not use headings, labels, or bullet lists. End each output with an opening question.
+Markdown formatting is allowed (paragraphs, bold/italics, bullets). 
 
-Return ONLY valid JSON matching this exact schema:
-${OUTPUT_SCHEMA}`;
+Career Story should use 3-5 paragraphs (blank lines) or bullets where helpful.
+
+Return a single Markdown document with exactly three H2 sections:
+
+## Elevator Pitch
+... Target ~120 words, 5-7 sentences ...
+
+## Career Story
+... Target ~360 words, 3-5 paragraphs ...
+
+## Why Me
+... Target ~240 words, 2-3 paragraphs ...
+
+Do not add other H2 sections. Do not use code fences. End each section with an opening question.`;
 }
-
-type TailoringContext = {
-  jobDescription: JobDescription | null;
-  matchingSummary: MatchingSummaryContext | null;
-  company: CompanyProfile | null;
-};
 
 function resolveTailoringContext(args: GenerateSpeechInput): TailoringContext {
   const hasJob = isValidJobDescription(args.jobDescription);
@@ -171,9 +214,60 @@ function isValidMatchingSummary(
   );
 }
 
-type HandlerEvent = {
-  arguments: GenerateSpeechInput;
-};
+function parseSpeechMarkdown(raw: string): GenerateSpeechOutput | null {
+  const normalized = normalizeMarkdown(raw);
+  const elevatorPitch = extractMarkdownSection(normalized, 'Elevator Pitch');
+  const careerStory = extractMarkdownSection(normalized, 'Career Story');
+  const whyMe = extractMarkdownSection(normalized, 'Why Me');
+
+  if (!elevatorPitch || !careerStory || !whyMe) {
+    return null;
+  }
+
+  return sanitizeSpeechOutput({
+    elevatorPitch,
+    careerStory,
+    whyMe,
+  });
+}
+
+function extractMarkdownSection(markdown: string, heading: string): string | null {
+  const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pattern = new RegExp(`^##\\s+${escapedHeading}\\s*\\n([\\s\\S]*?)(?=^##\\s+|$)`, 'm');
+  const match = markdown.match(pattern);
+  return match ? stripTrailingNoise(match[1]) : null;
+}
+
+function normalizeMarkdown(markdown: string): string {
+  return markdown
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('```'))
+    .join('\n')
+    .trim();
+}
+
+function stripTrailingNoise(section: string): string {
+  const lines = section.split('\n');
+  const dividerIndex = lines.findIndex((line) => line.trim() === '---');
+  const trimmedLines = dividerIndex === -1 ? lines : lines.slice(0, dividerIndex);
+  return trimmedLines.join('\n').trim();
+}
+
+function buildRepairPrompt(previousOutput: string): string {
+  return `You returned invalid format. Please return Markdown with exactly the three required headings
+and provide content for each. Fix formatting only, do not add new content.
+
+Previous output:
+${previousOutput}`;
+}
+
+function buildFallbackOutputFromText(): GenerateSpeechOutput {
+  return sanitizeSpeechOutput({
+    elevatorPitch: '',
+    careerStory: '',
+    whyMe: '',
+  });
+}
 
 export const handler = async (event: HandlerEvent) => {
   if (!event?.arguments) {
@@ -187,15 +281,25 @@ export const handler = async (event: HandlerEvent) => {
       const userPrompt = buildUserPrompt(args);
 
       try {
-        const response = await invokeAiWithRetry<ModelResponse>({
-          systemPrompt: SYSTEM_PROMPT,
-          userPrompt,
-          outputSchema: OUTPUT_SCHEMA,
-          validate: (raw) => sanitizeSpeechOutput(raw ?? {}),
-          operationName: 'generateSpeech',
-        });
+        const responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);
+        const parsed = parseSpeechMarkdown(responseText);
 
-        return response;
+        if (parsed) {
+          return parsed;
+        }
+
+        const repairPrompt = buildRepairPrompt(responseText);
+        const repairedText = await invokeBedrock(SYSTEM_PROMPT, repairPrompt);
+        const repairedParsed = parseSpeechMarkdown(repairedText);
+
+        if (repairedParsed) {
+          return repairedParsed;
+        }
+
+        console.error('generateSpeech markdown parse failed after repair', {
+          reason: 'missing required sections',
+        });
+        return buildFallbackOutputFromText();
       } catch (error) {
         console.error('generateSpeech fallback triggered', {
           reason: (error as Error).message,

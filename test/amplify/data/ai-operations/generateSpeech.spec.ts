@@ -90,29 +90,31 @@ describe('ai.generateSpeech', () => {
   });
 
   it('returns normalized speech output', async () => {
+    const markdown = `## Elevator Pitch
+I lead teams to ship reliable systems and align execution with product intent. Does that sound like the kind of leadership you need?
+
+## Career Story
+I started as a developer focused on reliability and delivery, then grew into leading teams that unblock cross-functional partners.
+
+- Mentored engineers and improved delivery cadence across multiple releases.
+
+## Why Me
+Your teams need consistent delivery and coaching; I bring repeatable systems and people leadership. Would exploring that fit be useful?`;
+
     mockSend.mockResolvedValue(
-      buildBedrockResponse({
-        elevatorPitch: 'I lead teams to ship reliable systems.',
-        careerStory: 'I grew from developer to engineering lead by focusing on impact.',
-        whyMe: 'I align teams with outcomes and deliver consistently.',
-      })
+      buildBedrockResponse(markdown)
     );
 
     const response = await handler({ arguments: validArguments as never });
 
     expect(response.elevatorPitch).toContain('I lead teams');
     expect(response.careerStory).toContain('developer');
-    expect(response.whyMe).toContain('outcomes');
+    expect(response.whyMe).toContain('repeatable systems');
+    expect(response.careerStory).toContain('leading teams');
   });
 
   it('includes job description context when provided', async () => {
-    mockSend.mockResolvedValue(
-      buildBedrockResponse({
-        elevatorPitch: 'Short pitch.',
-        careerStory: 'Short story.',
-        whyMe: 'Short why.',
-      })
-    );
+    mockSend.mockResolvedValue(buildBedrockResponse('## Elevator Pitch\nTest\n\n## Career Story\nTest\n\n## Why Me\nTest'));
 
     await handler({ arguments: validArguments as never });
 
@@ -130,13 +132,7 @@ describe('ai.generateSpeech', () => {
   });
 
   it('keeps job context when matching summary is missing', async () => {
-    mockSend.mockResolvedValue(
-      buildBedrockResponse({
-        elevatorPitch: 'Short pitch.',
-        careerStory: 'Short story.',
-        whyMe: 'Short why.',
-      })
-    );
+    mockSend.mockResolvedValue(buildBedrockResponse('## Elevator Pitch\nTest\n\n## Career Story\nTest\n\n## Why Me\nTest'));
 
     const argsWithoutSummary = { ...validArguments, matchingSummary: undefined };
     await handler({ arguments: argsWithoutSummary as never });
@@ -165,5 +161,56 @@ describe('ai.generateSpeech', () => {
       careerStory: '',
       whyMe: '',
     });
+  });
+
+  it('repairs markdown format once when sections are missing', async () => {
+    const repaired = `## Elevator Pitch
+Short pitch. Could this be useful to you?
+
+## Career Story
+Short story with a paragraph break.
+
+Second paragraph for depth.
+
+## Why Me
+Short why me. Shall we explore this?`;
+
+    mockSend.mockResolvedValueOnce(buildBedrockResponse('Missing headings entirely.'));
+    mockSend.mockResolvedValueOnce(buildBedrockResponse(repaired));
+
+    const response = await handler({ arguments: validArguments as never });
+
+    expect(response.elevatorPitch).toContain('Short pitch');
+    expect(response.careerStory).toContain('Short story with a paragraph break.');
+    expect(response.whyMe).toContain('Short why me');
+    expect(mockSend).toHaveBeenCalledTimes(2);
+  });
+
+  it('parses markdown with preamble, code fences, and trailing notes', async () => {
+    const markdown = `Preamble note before headings.
+\`\`\`markdown
+## Elevator Pitch
+I lead teams to ship reliable systems. Would that be useful to you?
+
+## Career Story
+I grew into leadership by focusing on delivery and mentorship.
+
+- Built reliable release processes
+- Coached engineers through change
+
+## Why Me
+You need steady execution; I bring repeatable systems and coaching. Should we explore that?
+\`\`\`
+---
+Trailing comment that should be ignored.`;
+
+    mockSend.mockResolvedValue(buildBedrockResponse(markdown));
+
+    const response = await handler({ arguments: validArguments as never });
+
+    expect(response.elevatorPitch).toContain('I lead teams');
+    expect(response.careerStory).toContain('delivery and mentorship');
+    expect(response.whyMe).toContain('steady execution');
+    expect(response.whyMe).not.toContain('Trailing comment');
   });
 });
