@@ -22,7 +22,6 @@ const subtitle = computed(() => props.job.seniorityLevel || t('jobList.card.noSe
 
 const lastUpdated = computed(() => formatListDate(props.job.updatedAt ?? props.job.createdAt));
 
-const canViewMatch = computed(() => props.job.status === 'analyzed');
 const matchLink = computed(() => `/jobs/${props.job.id}/match`);
 
 function handleOpen() {
@@ -72,7 +71,6 @@ function handleDelete() {
         variant="soft"
         data-testid="job-card-match"
         :to="matchLink"
-        :disabled="!canViewMatch"
       />
     </template>
   </ItemCard>

@@ -10,7 +10,6 @@ import { useMatchingEngine } from '@/composables/useMatchingEngine';
 import { useCompanies } from '@/composables/useCompanies';
 import type { PageHeaderLink } from '@/types/ui';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
-import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
 
 definePageMeta({
   breadcrumbLabel: 'Match',

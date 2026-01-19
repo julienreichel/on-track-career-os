@@ -138,7 +138,6 @@ const tabItems = computed(() =>
   }))
 );
 
-const canViewMatch = computed(() => job.value?.status === 'analyzed');
 const matchLink = computed(() => (jobId.value ? `/jobs/${jobId.value}/match` : undefined));
 
 const headerLinks = computed<PageHeaderLink[]>(() => [
@@ -151,8 +150,6 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     label: t('jobDetail.match.view'),
     icon: 'i-heroicons-sparkles',
     to: matchLink.value,
-    disabled: !canViewMatch.value,
-    ariaLabel: !canViewMatch.value ? t('jobDetail.match.disabledTooltip') : undefined,
   },
 ]);
 

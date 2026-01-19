@@ -94,13 +94,13 @@ describe('JobCard', () => {
     expect(wrapper.find('.delete').exists()).toBe(false);
   });
 
-  it('links to match page and disables button when job not analyzed', () => {
+  it('links to match page and never disabled', () => {
     const wrapper = createWrapper({
       job: { ...mockJob, status: 'draft' },
     });
     const button = wrapper.find('[data-testid="job-card-match"]');
     expect(button.attributes('data-to')).toBe(`/jobs/${mockJob.id}/match`);
-    expect(button.attributes()).toHaveProperty('disabled');
+    expect(button.attributes()).not.toHaveProperty('disabled');
 
     const enabledWrapper = createWrapper();
     const enabledButton = enabledWrapper.find('[data-testid="job-card-match"]');
