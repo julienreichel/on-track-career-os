@@ -23,8 +23,9 @@
     "errorSigningOut": "Error signing out"
   },
   "home": {
-    "title": "Welcome to On Track Career",
-    "description": "You are successfully authenticated!"
+    "title": "Welcome {name}",
+    "description": "What do you want to do today?",
+    "fallbackName": "there"
   },
   "applicationsPage": {
     "title": "Applications",

@@ -1,6 +1,9 @@
 <template>
   <UPage>
-    <UPageHeader :title="t('home.title')" :description="t('home.description')" />
+    <UPageHeader
+      :title="t('home.title', { name: welcomeName })"
+      :description="t('home.description')"
+    />
 
     <UPageBody>
       <UCard v-if="showOnboarding" class="mb-6">
@@ -90,6 +93,7 @@ const experienceRepo = new ExperienceRepository();
 const badges = useBadges();
 const activeJobs = useActiveJobsDashboard();
 const progress = useUserProgress();
+const welcomeName = computed(() => progress.profile.value?.fullName?.trim() || t('home.fallbackName'));
 
 const showActiveJobs = computed(() => {
   if (progress.state.value?.phase !== 'bonus') {
