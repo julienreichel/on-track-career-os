@@ -40,6 +40,57 @@ describe('getNextAction', () => {
     expect(action.primary.id).toBe('upload-job');
   });
 
+  it('returns add experiences when phase 1 is missing experience count', () => {
+    const state = baseState({
+      phase: 'phase1',
+      phase1: { isComplete: false, missing: ['experienceCount'] },
+    });
+    const action = getNextAction(state);
+    expect(action.primary.id).toBe('add-experiences');
+  });
+
+  it('returns complete profile when only profile basics are missing', () => {
+    const state = baseState({
+      phase: 'phase1',
+      phase1: { isComplete: false, missing: ['profileBasics'] },
+    });
+    const action = getNextAction(state);
+    expect(action.primary.id).toBe('complete-profile');
+  });
+
+  it('returns generate match when job is uploaded but match is missing', () => {
+    const state = baseState({
+      phase: 'phase2',
+      phase1: { isComplete: true, missing: [] },
+      phase2B: { isComplete: true, missing: [] },
+      phase2A: { isComplete: false, missing: ['matchingSummary'] },
+    });
+    const action = getNextAction(state);
+    expect(action.primary.id).toBe('generate-match');
+  });
+
+  it('returns add stories when phase 2B is missing stories', () => {
+    const state = baseState({
+      phase: 'phase2',
+      phase1: { isComplete: true, missing: [] },
+      phase2B: { isComplete: false, missing: ['stories'] },
+      phase2A: { isComplete: true, missing: [] },
+    });
+    const action = getNextAction(state);
+    expect(action.primary.id).toBe('add-stories');
+  });
+
+  it('returns build canvas when profile depth and stories are complete', () => {
+    const state = baseState({
+      phase: 'phase2',
+      phase1: { isComplete: true, missing: [] },
+      phase2B: { isComplete: false, missing: ['personalCanvas'] },
+      phase2A: { isComplete: true, missing: [] },
+    });
+    const action = getNextAction(state);
+    expect(action.primary.id).toBe('build-canvas');
+  });
+
   it('returns tailored materials CTA for phase 3', () => {
     const state = baseState({
       phase: 'phase3',
