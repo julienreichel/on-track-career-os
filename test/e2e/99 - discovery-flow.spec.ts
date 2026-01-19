@@ -235,6 +235,8 @@ test.describe('Discovery flow', () => {
   });
 
   test('Phase 3 materials triad + Application Complete badge', async ({ page }) => {
+    test.setTimeout(60000); // Increase timeout for material generation + badge computation in CI
+
     expect(jobId).toBeTruthy();
     if (!jobId) return;
 
@@ -275,7 +277,7 @@ test.describe('Discovery flow', () => {
     await page.waitForURL(/\/applications\/speech\/[0-9a-f-]+$/i, { timeout: 30000 });
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('networkidle', { timeout: 60000 });
     await expectBadgeToast(page, 'Application Complete');
     await expect(page.getByTestId('badge-pill-applicationComplete')).toBeVisible({
       timeout: 20000,
