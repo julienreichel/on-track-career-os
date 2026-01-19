@@ -6,7 +6,7 @@
     />
 
     <UPageBody>
-      <UCard>
+      <UCard v-if="!isAutoFlow">
         <div class="space-y-6">
           <div>
             <h3 class="text-lg font-semibold mb-2">
@@ -59,6 +59,24 @@
               data-testid="generate-cover-letter-button"
               @click="generateCoverLetter"
             />
+          </div>
+        </div>
+      </UCard>
+
+      <UCard v-else>
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-2">
+              {{ $t('coverLetter.new.generate.action') }}
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ $t('common.loading') }}
+            </p>
+          </div>
+          <div class="space-y-3">
+            <USkeleton class="h-8 w-2/3" />
+            <USkeleton class="h-24 w-full" />
+            <USkeleton class="h-10 w-32" />
           </div>
         </div>
       </UCard>
@@ -120,6 +138,7 @@ const autoJobId = computed(() => {
   }
   return null;
 });
+const isAutoFlow = computed(() => Boolean(autoJobId.value));
 
 const cancel = () => {
   void router.push({ name: 'cover-letters' });

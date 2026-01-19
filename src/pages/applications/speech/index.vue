@@ -28,7 +28,7 @@
           class="mb-6"
         />
 
-        <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
+        <div v-if="hasLoaded && !loading && items.length > 0 && !isAutoFlow" class="mb-6">
           <UInput
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
@@ -46,7 +46,7 @@
           class="mb-6"
         />
 
-        <ListSkeletonCards v-if="loading || !hasLoaded" />
+        <ListSkeletonCards v-if="loading || !hasLoaded || isAutoFlow" />
 
         <EmptyStateActionCard
           v-else-if="items.length === 0"
@@ -138,6 +138,7 @@ const creating = ref(false);
 const searchQuery = ref('');
 const hasLoaded = ref(false);
 const autoTriggered = ref(false);
+const isAutoFlow = computed(() => Boolean(autoJobId.value));
 const TITLE_MAX_LENGTH = 72;
 const PREVIEW_MAX_LENGTH = 140;
 const autoJobId = computed(() => {

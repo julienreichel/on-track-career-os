@@ -123,7 +123,6 @@ describe('TailoredMaterialsCard', () => {
       ok: true,
       data: { cv: null, coverLetter: null, speechBlock: null },
     });
-    generateTailoredCvForJob.mockResolvedValue({ id: 'cv-1' });
 
     const wrapper = mount(TailoredMaterialsCard, {
       props: {
@@ -143,11 +142,7 @@ describe('TailoredMaterialsCard', () => {
     }
 
     await generateCvButton.trigger('click');
-    expect(generateTailoredCvForJob).toHaveBeenCalledWith({
-      job: baseJob,
-      matchingSummary: baseSummary,
-    });
-    expect(pushMock).toHaveBeenCalledWith('/applications/cv/cv-1');
+    expect(pushMock).toHaveBeenCalledWith('/applications/cv/new?jobId=job-1');
   });
 
   it('uses provided existing materials without loading', async () => {

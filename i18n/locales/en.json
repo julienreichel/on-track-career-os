@@ -746,7 +746,8 @@
     "backToList": "Back to list",
     "notAvailable": "Not available",
     "lastUpdated": "Last updated {date}",
-    "search": "Search..."
+    "search": "Search...",
+    "loading": "Loading..."
   },
   "canvas": {
     "needsUpdate": "Update recommended",
