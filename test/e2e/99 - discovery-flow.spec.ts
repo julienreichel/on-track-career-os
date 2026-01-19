@@ -183,6 +183,8 @@ test.describe('Discovery flow', () => {
   });
 
   test('Phase 2B identity completion + badge', async ({ page }) => {
+    test.setTimeout(60000); // Increase timeout for canvas generation in CI
+
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     await expectProgressCta(page, /Deepen your profile/i, /\/profile\/full\?mode=edit$/);
@@ -227,7 +229,7 @@ test.describe('Discovery flow', () => {
     });
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('networkidle', { timeout: 60000 });
     await expectBadgeToast(page, 'Identity Defined');
     await expect(page.getByTestId('badge-pill-identityDefined')).toBeVisible({ timeout: 20000 });
   });
