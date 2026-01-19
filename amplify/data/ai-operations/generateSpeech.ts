@@ -235,7 +235,10 @@ function extractMarkdownSection(markdown: string, heading: string): string | nul
   const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const pattern = new RegExp(`^##\\s+${escapedHeading}\\s*\\n([\\s\\S]*?)(?=^##\\s+|$)`, 'm');
   const match = markdown.match(pattern);
-  return match ? stripTrailingNoise(match[1]) : null;
+  if (!match?.[1]) {
+    return null;
+  }
+  return stripTrailingNoise(match[1]);
 }
 
 function normalizeMarkdown(markdown: string): string {
