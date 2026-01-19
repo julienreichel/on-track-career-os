@@ -60,22 +60,20 @@ const materialItems = computed(() => [
     </div>
 
     <template #footer>
-      <UButtonGroup>
-        <UButton
-          size="xs"
-          color="neutral"
-          variant="soft"
-          :label="t(state.cta.labelKey)"
-          :to="state.cta.to"
-        />
-        <UButton
-          size="xs"
-          color="neutral"
-          variant="ghost"
-          :label="t('dashboard.activeJobs.cta.viewJob')"
-          :to="jobLink"
-        />
-      </UButtonGroup>
+      <UButton
+        size="xs"
+        color="neutral"
+        variant="soft"
+        :label="t(state.cta.labelKey)"
+        :to="state.cta.to"
+      />
+      <UButton
+        size="xs"
+        color="neutral"
+        variant="ghost"
+        :label="t('dashboard.activeJobs.cta.viewJob')"
+        :to="jobLink"
+      />
     </template>
   </UCard>
 </template>

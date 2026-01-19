@@ -9,11 +9,10 @@ const i18n = createTestI18n();
 const stubs = {
   UCard: { template: '<div class="u-card"><slot name="header" /><slot /></div>' },
   UBadge: { template: '<span class="u-badge"><slot /></span>' },
-      UButton: {
-        props: ['label'],
-        template: '<button class="u-button"><slot>{{ label }}</slot></button>',
-      },
-  UButtonGroup: { template: '<div class="u-button-group"><slot /></div>' },
+  UButton: {
+    props: ['label'],
+    template: '<button class="u-button"><slot>{{ label }}</slot></button>',
+  },
   UIcon: { template: '<span class="u-icon"></span>' },
   UList: { template: '<ul class="u-list"><slot /></ul>' },
   UListItem: { template: '<li class="u-list-item"><slot /></li>' },
