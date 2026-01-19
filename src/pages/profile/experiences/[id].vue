@@ -5,6 +5,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience, ExperienceCreateInput } from '@/domain/experience/Experience';
 import ExperienceForm from '@/components/ExperienceForm.vue';
+import type { PageHeaderLink } from '@/types/ui';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -135,6 +136,26 @@ const displayEndDate = computed(() => {
 });
 const responsibilitiesList = computed(() => experience.value?.responsibilities ?? []);
 const tasksList = computed(() => experience.value?.tasks ?? []);
+
+const headerLinks = computed<PageHeaderLink[]>(() => {
+  const links: PageHeaderLink[] = [
+    {
+      label: t('experiences.list.title'),
+      icon: 'i-heroicons-arrow-left',
+      to: '/profile/experiences',
+    },
+  ];
+
+  if (!isNewExperience.value && experienceId.value) {
+    links.push({
+      label: t('experiences.list.viewStories'),
+      icon: 'i-heroicons-document-text',
+      to: `/profile/experiences/${experienceId.value}/stories`,
+    });
+  }
+
+  return links;
+});
 </script>
 
 <template>
@@ -144,13 +165,7 @@ const tasksList = computed(() => experience.value?.tasks ?? []);
         :title="
           isNewExperience ? t('experiences.form.createTitle') : t('experiences.form.editTitle')
         "
-        :links="[
-          {
-            label: t('experiences.list.title'),
-            icon: 'i-heroicons-arrow-left',
-            to: '/profile/experiences',
-          },
-        ]"
+        :links="headerLinks"
       />
 
       <UPageBody>
