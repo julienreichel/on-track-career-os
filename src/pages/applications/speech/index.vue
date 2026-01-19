@@ -13,9 +13,7 @@
           {
             label: t('speech.list.actions.create'),
             icon: 'i-heroicons-plus',
-            onClick: handleCreate,
-            disabled: creating,
-            loading: creating,
+            to: { name: 'applications-speech-new' },
           },
         ]"
       />
@@ -28,7 +26,7 @@
           class="mb-6"
         />
 
-        <div v-if="hasLoaded && !loading && items.length > 0 && !isAutoFlow" class="mb-6">
+        <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
           <UInput
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
@@ -46,7 +44,7 @@
           class="mb-6"
         />
 
-        <ListSkeletonCards v-if="loading || !hasLoaded || isAutoFlow" />
+        <ListSkeletonCards v-if="loading || !hasLoaded" />
 
         <EmptyStateActionCard
           v-else-if="items.length === 0"
@@ -104,9 +102,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, watch } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { useGuidance } from '@/composables/useGuidance';
 import ItemCard from '@/components/ItemCard.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
@@ -114,18 +112,13 @@ import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 import LockedFeatureCard from '@/components/guidance/LockedFeatureCard.vue';
 import EmptyStateActionCard from '@/components/guidance/EmptyStateActionCard.vue';
 import { useSpeechBlocks } from '@/application/speech-block/useSpeechBlocks';
-import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
-import { SpeechBlockService } from '@/domain/speech-block/SpeechBlockService';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
-import { useAuthUser } from '@/composables/useAuthUser';
-import { useSpeechEngine } from '@/composables/useSpeechEngine';
 import { formatListDate } from '@/utils/formatListDate';
 
 const { t } = useI18n();
-const route = useRoute();
+const router = useRouter();
 const toast = useToast();
-const { userId, loadUserId } = useAuthUser();
-const { items, loading, error, loadAll, deleteSpeechBlock, createSpeechBlock } = useSpeechBlocks();
+const { items, loading, error, loadAll, deleteSpeechBlock } = useSpeechBlocks();
 const { guidance } = useGuidance('applications-speech', () => ({
   speechCount: items.value.length,
 }));
@@ -135,33 +128,17 @@ const emptyState = computed(() => ({
   icon: 'i-heroicons-chat-bubble-left-right',
   cta: {
     labelKey: 'guidance.applications.speech.empty.cta',
-    to: '/applications/speech',
+    to: '/applications/speech/new',
   },
 }));
-const service = new SpeechBlockService();
-const engine = useSpeechEngine();
-const tailoredMaterials = useTailoredMaterials();
 
 const deleteModalOpen = ref(false);
 const speechToDelete = ref<SpeechBlock | null>(null);
 const deleting = ref(false);
-const creating = ref(false);
 const searchQuery = ref('');
 const hasLoaded = ref(false);
-const autoTriggered = ref(false);
-const isAutoFlow = computed(() => Boolean(autoJobId.value));
 const TITLE_MAX_LENGTH = 72;
 const PREVIEW_MAX_LENGTH = 140;
-const autoJobId = computed(() => {
-  const value = route.query.jobId;
-  if (typeof value === 'string') {
-    return value;
-  }
-  if (Array.isArray(value)) {
-    return value[0] ?? null;
-  }
-  return null;
-});
 const toTimestamp = (value?: string | null): number => {
   if (!value) return 0;
   const timestamp = new Date(value).getTime();
@@ -196,83 +173,13 @@ onMounted(async () => {
 });
 
 const handleCreate = async () => {
-  if (creating.value) return;
-  creating.value = true;
   try {
-    if (!userId.value) {
-      await loadUserId();
-    }
-    if (!userId.value) {
-      throw new Error(t('speech.list.toast.createFailed'));
-    }
-    const result = await engine.generate();
-    const draft = service.createDraftSpeechBlock(userId.value);
-    const created = await createSpeechBlock({
-      ...draft,
-      elevatorPitch: result.elevatorPitch ?? '',
-      careerStory: result.careerStory ?? '',
-      whyMe: result.whyMe ?? '',
-    });
-    if (created?.id) {
-      await navigateTo({ name: 'applications-speech-id', params: { id: created.id } });
-    } else {
-      toast.add({ title: t('speech.list.toast.createFailed'), color: 'error' });
-    }
+    await router.push({ name: 'applications-speech-new' });
   } catch (err) {
-    console.error('[speechList] Failed to create speech block', err);
-    const toastKey = engine.error.value
-      ? 'speech.list.toast.generateFailed'
-      : 'speech.list.toast.createFailed';
-    toast.add({ title: t(toastKey), color: 'error' });
-  } finally {
-    creating.value = false;
-  }
-};
-
-const handleTailoredCreate = async (jobId: string) => {
-  if (creating.value) return;
-  creating.value = true;
-  try {
-    const context = await tailoredMaterials.loadTailoringContext(jobId);
-    if (!context.ok) {
-      toast.add({ title: t('speech.list.toast.createFailed'), color: 'error' });
-      await navigateTo('/jobs');
-      return;
-    }
-    if (!context.matchingSummary) {
-      toast.add({ title: t('speech.list.toast.generateFailed'), color: 'error' });
-      await navigateTo(`/jobs/${jobId}/match`);
-      return;
-    }
-
-    const created = await tailoredMaterials.generateTailoredSpeechForJob({
-      job: context.job,
-      matchingSummary: context.matchingSummary,
-    });
-    if (created?.id) {
-      await navigateTo({ name: 'applications-speech-id', params: { id: created.id } });
-    } else {
-      toast.add({ title: t('speech.list.toast.createFailed'), color: 'error' });
-    }
-  } catch (err) {
-    console.error('[speechList] Failed to create tailored speech block', err);
+    console.error('[speechList] Failed to open speech creation', err);
     toast.add({ title: t('speech.list.toast.createFailed'), color: 'error' });
-  } finally {
-    creating.value = false;
   }
 };
-
-watch(
-  () => autoJobId.value,
-  (jobId) => {
-    if (!jobId || autoTriggered.value) {
-      return;
-    }
-    autoTriggered.value = true;
-    void handleTailoredCreate(jobId);
-  },
-  { immediate: true }
-);
 
 const confirmDelete = (block: SpeechBlock) => {
   speechToDelete.value = block;

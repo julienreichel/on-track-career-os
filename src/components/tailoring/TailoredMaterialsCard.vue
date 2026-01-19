@@ -139,7 +139,7 @@ const handleGenerateSpeech = async () => {
 
   activeMaterial.value = 'speech';
   try {
-    await router.push(`/applications/speech?jobId=${props.job.id}`);
+    await router.push(`/applications/speech/new?jobId=${props.job.id}`);
   } finally {
     activeMaterial.value = null;
   }

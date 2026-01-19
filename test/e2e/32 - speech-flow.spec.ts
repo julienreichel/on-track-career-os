@@ -26,7 +26,10 @@ test.describe('Speech Block E2E Flow', () => {
     await expect(page.getByRole('heading', { name: /speech/i, level: 1 })).toBeVisible();
 
     // Create button should be visible (using first since there may be multiple)
-    const createButton = page.getByRole('button', { name: /Create speech/i }).first();
+    const createButton = page
+      .getByRole('link', { name: /Create speech/i })
+      .or(page.getByRole('button', { name: /Create speech/i }))
+      .first();
     await expect(createButton).toBeVisible();
   });
 
@@ -34,16 +37,32 @@ test.describe('Speech Block E2E Flow', () => {
     await page.goto('/applications/speech');
     await page.waitForLoadState('networkidle');
 
-    const createButton = page.getByRole('button', { name: /Create speech/i }).first();
+    const createButton = page
+      .getByRole('link', { name: /Create speech/i })
+      .or(page.getByRole('button', { name: /Create speech/i }))
+      .first();
     await expect(createButton).toBeVisible();
     await createButton.click();
 
-    // Wait for navigation to the speech editor page
-    await page.waitForURL(/\/speech\/[0-9a-f-]+$/i, { timeout: 10000 });
+    // Wait for navigation to the speech creation page
+    await page.waitForURL(/\/applications\/speech\/new$/i, { timeout: 10000 });
+
+    const nameInput = page.getByTestId('speech-name-input');
+    await expect(nameInput).toBeVisible();
+    await nameInput.fill('E2E Speech Pitch');
+
+    const contextInput = page.getByTestId('speech-context-textarea');
+    await contextInput.fill('Speaking context for a lead engineering role.');
+
+    const generateButton = page.getByRole('button', { name: /Generate speech/i });
+    await expect(generateButton).toBeEnabled();
+    await generateButton.click();
+
+    await page.waitForURL(/\/applications\/speech\/[0-9a-f-]+$/i, { timeout: 60000 });
 
     // Store the URL for later tests
     speechUrl = page.url();
-    expect(speechUrl).toMatch(/\/speech\/[0-9a-f-]+$/i);
+    expect(speechUrl).toMatch(/\/applications\/speech\/[0-9a-f-]+$/i);
   });
 
   test('3. Verify editor page displays all sections', async ({ page }) => {
@@ -56,7 +75,7 @@ test.describe('Speech Block E2E Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Verify we're on the editor page
-    await expect(page.getByRole('heading', { name: 'Speech', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /E2E Speech Pitch/i, level: 1 })).toBeVisible();
 
     // Verify all three sections are visible by their labels
     await expect(page.getByRole('heading', { name: 'Elevator pitch' })).toBeVisible();

@@ -96,6 +96,11 @@ const router = createRouter({
   routes: [
     { path: '/applications/speech', name: 'applications-speech', component: SpeechIndexPage },
     {
+      path: '/applications/speech/new',
+      name: 'applications-speech-new',
+      component: { template: '<div>Speech new</div>' },
+    },
+    {
       path: '/applications/speech/:id',
       name: 'applications-speech-id',
       component: { template: '<div>Speech detail</div>' },
@@ -108,6 +113,17 @@ const stubs = {
   UPage: { template: '<div class="u-page"><slot /></div>' },
   UPageHeader: {
     props: ['title', 'description', 'links'],
+    methods: {
+      handleLink(link: { onClick?: () => void; to?: unknown }) {
+        if (link.onClick) {
+          link.onClick();
+          return;
+        }
+        if (link.to) {
+          this.$router.push(link.to);
+        }
+      },
+    },
     template: `
       <header class="u-page-header">
         <h1>{{ title }}</h1>
@@ -117,7 +133,7 @@ const stubs = {
             v-for="(link, idx) in links"
             :key="idx"
             type="button"
-            @click="link.onClick && link.onClick()"
+            @click="handleLink(link)"
           >
             {{ link.label }}
           </button>
@@ -276,23 +292,8 @@ describe('Speech list page', () => {
     expect(cards[0]?.text()).toContain('Targeted pitch');
   });
 
-  it('creates a speech block with AI content from the list', async () => {
-    generateMock.mockResolvedValue({
-      elevatorPitch: 'AI pitch',
-      careerStory: 'AI story',
-      whyMe: 'AI why',
-    });
-    mockCreateSpeechBlock.mockResolvedValue({
-      id: 'speech-1',
-      userId: 'user-1',
-      elevatorPitch: 'AI pitch',
-      careerStory: 'AI story',
-      whyMe: 'AI why',
-      createdAt: '2024-02-01T00:00:00.000Z',
-      updatedAt: '2024-02-01T00:00:00.000Z',
-    });
-
-    const { wrapper } = await mountPage();
+  it('navigates to the speech creation page from the list', async () => {
+    const { wrapper, router } = await mountPage();
     await wrapper.vm.$nextTick();
 
     const createButton = wrapper
@@ -303,12 +304,6 @@ describe('Speech list page', () => {
     await createButton?.trigger('click');
     await flushPromises();
 
-    expect(generateMock).toHaveBeenCalled();
-    expect(mockCreateSpeechBlock).toHaveBeenCalledWith({
-      userId: 'user-1',
-      elevatorPitch: 'AI pitch',
-      careerStory: 'AI story',
-      whyMe: 'AI why',
-    });
+    expect(router.currentRoute.value.name).toBe('applications-speech-new');
   });
 });

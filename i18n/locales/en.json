@@ -1220,6 +1220,30 @@
         "createFailed": "Unable to create speech"
       }
     },
+    "new": {
+      "title": "Create Speech",
+      "subtitle": "Generate a speech or pitch with AI assistance",
+      "setup": {
+        "title": "Speech Details",
+        "description": "Provide a title and optional context for your speech",
+        "nameLabel": "Speech Name",
+        "namePlaceholder": "e.g., Engineering leadership pitch",
+        "contextLabel": "Context (Optional)",
+        "contextDescription": "Add context to tailor the tone and focus of your speech",
+        "contextPlaceholder": "Paste a role summary or context to tailor your speech...",
+        "contextTitleFallback": "Speech context"
+      },
+      "generate": {
+        "action": "Generate Speech",
+        "error": "Failed to generate speech"
+      },
+      "toast": {
+        "created": "Speech created successfully!",
+        "createFailed": "Failed to create speech",
+        "generationFailed": "Failed to generate speech content",
+        "error": "An error occurred"
+      }
+    },
     "detail": {
       "description": "Build your elevator pitch, career story, and why-me narrative.",
       "untitled": "Untitled speech",
