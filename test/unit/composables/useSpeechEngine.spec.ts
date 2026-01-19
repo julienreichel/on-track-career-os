@@ -8,7 +8,6 @@ import type { Experience } from '@/domain/experience/Experience';
 import type { STARStory } from '@/domain/starstory/STARStory';
 import type { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { UserProfileService } from '@/domain/user-profile/UserProfileService';
-import type { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
 import type { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { STARStoryService } from '@/domain/starstory/STARStoryService';
 
@@ -79,7 +78,14 @@ describe('useSpeechEngine', () => {
   type DepsStub = ReturnType<typeof createDepsBase>;
 
   function createDeps(overrides: Partial<DepsStub> = {}): DepsStub {
-    return { ...createDepsBase(), ...overrides };
+    const base = createDepsBase();
+    return {
+      ...base,
+      ...overrides,
+      userProfileService: overrides.userProfileService
+        ? ({ ...base.userProfileService, ...overrides.userProfileService } as UserProfileService)
+        : base.userProfileService,
+    };
   }
 
   function createDepsBase() {
@@ -89,11 +95,8 @@ describe('useSpeechEngine', () => {
       } as unknown as AiOperationsService,
       userProfileService: {
         getFullUserProfile: vi.fn().mockResolvedValue(profile),
+        getCanvasForUser: vi.fn().mockResolvedValue(canvas),
       } as unknown as UserProfileService,
-      personalCanvasRepo: {
-        list: vi.fn().mockResolvedValue([canvas]),
-        getByUserId: vi.fn().mockResolvedValue(canvas),
-      } as unknown as PersonalCanvasRepository,
       experienceRepo: {
         list: vi.fn().mockResolvedValue(experiences),
       } as unknown as ExperienceRepository,

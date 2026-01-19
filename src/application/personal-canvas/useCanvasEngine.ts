@@ -148,11 +148,9 @@ export function useCanvasEngine() {
         return;
       }
 
-      // Try to load existing canvas for this user
-      const existingCanvas = await repository.getByUserId(userId);
-      if (existingCanvas) {
-        await loadCanvas(existingCanvas.id);
-      }
+      // Load existing canvas for this user via profile selection set
+      const existingCanvas = await userProfileRepo.getCanvasSnapshot(userId);
+      canvas.value = existingCanvas ?? null;
     } catch (err) {
       console.error('[useCanvasEngine] Error initializing:', err);
       // Don't set error for missing canvas - that's expected for new users

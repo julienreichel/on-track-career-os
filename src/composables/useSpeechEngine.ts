@@ -4,7 +4,6 @@ import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService'
 import type { SpeechInput } from '@/domain/ai-operations/SpeechResult';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
-import { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
@@ -14,7 +13,6 @@ import type { STARStory } from '@/domain/starstory/STARStory';
 type SpeechEngineDependencies = {
   aiService: AiOperationsService;
   userProfileService: UserProfileService;
-  personalCanvasRepo: PersonalCanvasRepository;
   experienceRepo: ExperienceRepository;
   storyService: STARStoryService;
 };
@@ -36,7 +34,6 @@ function createDependencies(
   return {
     aiService: overrides.aiService ?? new AiOperationsService(),
     userProfileService: overrides.userProfileService ?? new UserProfileService(),
-    personalCanvasRepo: overrides.personalCanvasRepo ?? new PersonalCanvasRepository(),
     experienceRepo: overrides.experienceRepo ?? new ExperienceRepository(),
     storyService: overrides.storyService ?? new STARStoryService(),
   };
@@ -77,7 +74,7 @@ function createSpeechEngineState({ providedUserId, deps, auth }: EngineStateArgs
     runWithState(isLoading, async () => {
       const userId = await resolveUserId();
       userProfile.value = await ensureProfile(userId, deps.userProfileService);
-      personalCanvas.value = await loadCanvas(userId, deps.personalCanvasRepo);
+      personalCanvas.value = await loadCanvas(userId, deps.userProfileService);
       experiences.value = await deps.experienceRepo.list(userId);
       stories.value = await loadStories(experiences.value, deps.storyService);
       return {
@@ -174,8 +171,8 @@ async function ensureProfile(userId: string, service: UserProfileService) {
   return profile;
 }
 
-async function loadCanvas(userId: string, repo: PersonalCanvasRepository) {
-  return await repo.getByUserId(userId);
+async function loadCanvas(userId: string, service: UserProfileService) {
+  return await service.getCanvasForUser(userId);
 }
 
 async function loadStories(experiences: Experience[], storyService: STARStoryService) {

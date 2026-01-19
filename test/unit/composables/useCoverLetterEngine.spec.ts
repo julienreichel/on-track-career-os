@@ -9,7 +9,6 @@ import type { Experience } from '@/domain/experience/Experience';
 import type { STARStory } from '@/domain/starstory/STARStory';
 import type { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { UserProfileService } from '@/domain/user-profile/UserProfileService';
-import type { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
 import type { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { STARStoryService } from '@/domain/starstory/STARStoryService';
 
@@ -86,7 +85,14 @@ describe('useCoverLetterEngine', () => {
   type DepsStub = ReturnType<typeof createDepsBase>;
 
   function createDeps(overrides: Partial<DepsStub> = {}): DepsStub {
-    return { ...createDepsBase(), ...overrides };
+    const base = createDepsBase();
+    return {
+      ...base,
+      ...overrides,
+      userProfileService: overrides.userProfileService
+        ? ({ ...base.userProfileService, ...overrides.userProfileService } as UserProfileService)
+        : base.userProfileService,
+    };
   }
 
   function createDepsBase() {
@@ -96,10 +102,8 @@ describe('useCoverLetterEngine', () => {
       } as unknown as AiOperationsService,
       userProfileService: {
         getFullUserProfile: vi.fn().mockResolvedValue(profile),
+        getCanvasForUser: vi.fn().mockResolvedValue(canvas),
       } as unknown as UserProfileService,
-      personalCanvasRepo: {
-        getByUserId: vi.fn().mockResolvedValue(canvas),
-      } as unknown as PersonalCanvasRepository,
       experienceRepo: {
         list: vi.fn().mockResolvedValue(experiences),
       } as unknown as ExperienceRepository,
@@ -195,9 +199,10 @@ describe('useCoverLetterEngine', () => {
 
     it('should load canvas even if it does not exist (returns null)', async () => {
       const deps = createDeps({
-        personalCanvasRepo: {
-          getByUserId: vi.fn().mockResolvedValue(null),
-        } as unknown as PersonalCanvasRepository,
+        userProfileService: {
+          getFullUserProfile: vi.fn().mockResolvedValue(profile),
+          getCanvasForUser: vi.fn().mockResolvedValue(null),
+        } as unknown as UserProfileService,
       });
       const auth = buildAuthStub();
       const engine = useCoverLetterEngine({ auth, dependencies: deps });
@@ -210,9 +215,10 @@ describe('useCoverLetterEngine', () => {
 
     it('should handle canvas repository errors gracefully', async () => {
       const deps = createDeps({
-        personalCanvasRepo: {
-          getByUserId: vi.fn().mockRejectedValue(new Error('Canvas not found')),
-        } as unknown as PersonalCanvasRepository,
+        userProfileService: {
+          getFullUserProfile: vi.fn().mockResolvedValue(profile),
+          getCanvasForUser: vi.fn().mockRejectedValue(new Error('Canvas not found')),
+        } as unknown as UserProfileService,
       });
       const auth = buildAuthStub();
       const engine = useCoverLetterEngine({ auth, dependencies: deps });
@@ -548,9 +554,10 @@ describe('useCoverLetterEngine', () => {
 
     it('should generate without canvas if not available', async () => {
       const deps = createDeps({
-        personalCanvasRepo: {
-          getByUserId: vi.fn().mockResolvedValue(null),
-        } as unknown as PersonalCanvasRepository,
+        userProfileService: {
+          getFullUserProfile: vi.fn().mockResolvedValue(profile),
+          getCanvasForUser: vi.fn().mockResolvedValue(null),
+        } as unknown as UserProfileService,
       });
       const auth = buildAuthStub();
       const engine = useCoverLetterEngine({ auth, dependencies: deps });

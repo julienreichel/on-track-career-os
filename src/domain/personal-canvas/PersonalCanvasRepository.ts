@@ -1,5 +1,4 @@
 import { gqlOptions } from '@/data/graphql/options';
-import { fetchAllListItems } from '@/data/graphql/pagination';
 import type {
   PersonalCanvasCreateInput,
   PersonalCanvasUpdateInput,
@@ -11,9 +10,6 @@ export type AmplifyPersonalCanvasModel = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: PersonalCanvas | null }>;
-  list: (
-    options?: Record<string, unknown>
-  ) => Promise<{ data: PersonalCanvas[]; nextToken?: string | null }>;
   create: (
     input: PersonalCanvasCreateInput,
     options?: Record<string, unknown>
@@ -54,10 +50,6 @@ export class PersonalCanvasRepository {
     return res.data;
   }
 
-  async list(filter: Record<string, unknown> = {}) {
-    return fetchAllListItems<PersonalCanvas>(this.model.list.bind(this.model), filter);
-  }
-
   async create(input: PersonalCanvasCreateInput) {
     const { data } = await this.model.create(input, gqlOptions());
     return data;
@@ -70,14 +62,5 @@ export class PersonalCanvasRepository {
 
   async delete(id: string) {
     await this.model.delete({ id }, gqlOptions());
-  }
-
-  async getByUserId(userId: string) {
-    const results = await this.list({
-      filter: {
-        userId: { eq: userId },
-      },
-    });
-    return results[0] ?? null;
   }
 }

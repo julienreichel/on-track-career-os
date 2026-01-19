@@ -82,15 +82,14 @@ describe('useCanvasEngine', () => {
 
     mockRepository = {
       get: vi.fn(),
-      list: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
-      getByUserId: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<PersonalCanvasRepository>>;
 
     mockUserProfileRepo = {
       get: vi.fn(),
+      getCanvasSnapshot: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<UserProfileRepository>>;
 
     mockExperienceRepo = {
@@ -468,8 +467,7 @@ describe('useCanvasEngine', () => {
   describe('initializeForUser', () => {
     it('should load user profile and existing canvas', async () => {
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
-      mockRepository.getByUserId.mockResolvedValue(mockPersonalCanvas);
-      mockService.getFullPersonalCanvas.mockResolvedValue(mockPersonalCanvas);
+      mockUserProfileRepo.getCanvasSnapshot.mockResolvedValue(mockPersonalCanvas);
 
       const { profile, canvas, initializeForUser } = useCanvasEngine();
 
@@ -478,7 +476,7 @@ describe('useCanvasEngine', () => {
       expect(profile.value).toEqual(mockUserProfile);
       expect(canvas.value).toEqual(mockPersonalCanvas);
       expect(mockUserProfileRepo.get).toHaveBeenCalledWith('user-123');
-      expect(mockRepository.getByUserId).toHaveBeenCalledWith('user-123');
+      expect(mockUserProfileRepo.getCanvasSnapshot).toHaveBeenCalledWith('user-123');
     });
 
     it('should handle missing user profile', async () => {
@@ -493,7 +491,7 @@ describe('useCanvasEngine', () => {
 
     it('should handle user without existing canvas', async () => {
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
-      mockRepository.getByUserId.mockResolvedValue(null);
+      mockUserProfileRepo.getCanvasSnapshot.mockResolvedValue(null);
 
       const { profile, canvas, error, initializeForUser } = useCanvasEngine();
 
@@ -513,7 +511,7 @@ describe('useCanvasEngine', () => {
       delete (newCanvas as any).id;
 
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
-      mockRepository.list.mockResolvedValue([]); // No existing canvas
+      mockUserProfileRepo.getCanvasSnapshot.mockResolvedValue(null); // No existing canvas
       mockExperienceRepo.list.mockResolvedValue([mockExperience]);
       mockStoryService.getStoriesByExperience.mockResolvedValue([mockStory]);
       mockService.regenerateCanvas.mockResolvedValue(newCanvas as PersonalCanvas);
@@ -535,8 +533,7 @@ describe('useCanvasEngine', () => {
     it('should update existing canvas instead of creating new one', async () => {
       const existingCanvas = { ...mockPersonalCanvas, id: 'existing-id' };
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
-      mockRepository.list.mockResolvedValue([existingCanvas]);
-      mockService.getFullPersonalCanvas.mockResolvedValue(existingCanvas);
+      mockUserProfileRepo.getCanvasSnapshot.mockResolvedValue(existingCanvas);
       mockExperienceRepo.list.mockResolvedValue([mockExperience]);
       mockStoryService.getStoriesByExperience.mockResolvedValue([mockStory]);
       mockService.regenerateCanvas.mockResolvedValue(mockPersonalCanvas);
@@ -564,6 +561,7 @@ describe('useCanvasEngine', () => {
       'should handle generation errors',
       withMockedConsoleError(async () => {
         mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
+        mockUserProfileRepo.getCanvasSnapshot.mockResolvedValue(null);
         mockExperienceRepo.list.mockResolvedValue([]);
         mockStoryService.getStoriesByExperience.mockResolvedValue([]);
         mockService.regenerateCanvas.mockRejectedValue(new Error('AI service error'));
@@ -582,6 +580,7 @@ describe('useCanvasEngine', () => {
   describe('regenerateAndSave', () => {
     it('should regenerate and save canvas successfully', async () => {
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
+      mockUserProfileRepo.getCanvasSnapshot.mockResolvedValue(null);
       mockExperienceRepo.list.mockResolvedValue([mockExperience]);
       mockStoryService.getStoriesByExperience.mockResolvedValue([mockStory]);
       mockService.regenerateCanvas.mockResolvedValue(mockPersonalCanvas);
@@ -600,8 +599,7 @@ describe('useCanvasEngine', () => {
   describe('saveEdits', () => {
     it('should save manual edits to canvas', async () => {
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
-      mockRepository.getByUserId.mockResolvedValue(mockPersonalCanvas);
-      mockService.getFullPersonalCanvas.mockResolvedValue(mockPersonalCanvas);
+      mockUserProfileRepo.getCanvasSnapshot.mockResolvedValue(mockPersonalCanvas);
       mockRepository.update.mockResolvedValue({
         ...mockPersonalCanvas,
         valueProposition: ['Updated value prop'],

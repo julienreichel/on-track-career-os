@@ -20,7 +20,6 @@ describe('PersonalCanvasRepository', () => {
   let repository: PersonalCanvasRepository;
   let mockModel: {
     get: ReturnType<typeof vi.fn>;
-    list: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
@@ -30,7 +29,6 @@ describe('PersonalCanvasRepository', () => {
     // Create fresh mocks for each test
     mockModel = {
       get: vi.fn(),
-      list: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -78,52 +76,6 @@ describe('PersonalCanvasRepository', () => {
       const result = await repository.get('non-existent-id');
 
       expect(result).toBeNull();
-    });
-  });
-
-  describe('list', () => {
-    it('should fetch a list of PersonalCanvas items', async () => {
-      const mockCanvasList = [
-        { id: 'canvas-1', userId: 'user-1', needsUpdate: false },
-        { id: 'canvas-2', userId: 'user-2', needsUpdate: true },
-      ];
-
-      mockModel.list.mockResolvedValue({
-        data: mockCanvasList,
-      });
-
-      const result = await repository.list();
-
-      expect(mockModel.list).toHaveBeenCalledWith(
-        expect.objectContaining({ authMode: 'userPool' })
-      );
-      expect(result).toEqual(mockCanvasList);
-    });
-
-    it('should apply filters when provided', async () => {
-      const mockFilter = { userId: { eq: 'user-123' } };
-      mockModel.list.mockResolvedValue({
-        data: [],
-      });
-
-      await repository.list(mockFilter);
-
-      expect(mockModel.list).toHaveBeenCalledWith(
-        expect.objectContaining({
-          authMode: 'userPool',
-          userId: { eq: 'user-123' },
-        })
-      );
-    });
-
-    it('should handle empty list results', async () => {
-      mockModel.list.mockResolvedValue({
-        data: [],
-      });
-
-      const result = await repository.list();
-
-      expect(result).toEqual([]);
     });
   });
 
@@ -322,7 +274,6 @@ describe('PersonalCanvasRepository', () => {
     it('should accept a custom model via dependency injection', () => {
       const customModel = {
         get: vi.fn(),
-        list: vi.fn(),
         create: vi.fn(),
         update: vi.fn(),
         delete: vi.fn(),
@@ -333,58 +284,6 @@ describe('PersonalCanvasRepository', () => {
       );
 
       expect(repoWithCustomModel).toBeInstanceOf(PersonalCanvasRepository);
-    });
-  });
-
-  describe('getByUserId', () => {
-    it('should fetch PersonalCanvas by userId', async () => {
-      const mockCanvas = {
-        id: 'canvas-123',
-        userId: 'user-123',
-        valueProposition: 'Test proposition',
-        needsUpdate: false,
-      };
-
-      mockModel.list.mockResolvedValue({
-        data: [mockCanvas],
-      });
-
-      const result = await repository.getByUserId('user-123');
-
-      expect(mockModel.list).toHaveBeenCalledWith(
-        expect.objectContaining({
-          filter: {
-            userId: { eq: 'user-123' },
-          },
-          authMode: 'userPool',
-        })
-      );
-      expect(result).toEqual(mockCanvas);
-    });
-
-    it('should return null when no PersonalCanvas found for userId', async () => {
-      mockModel.list.mockResolvedValue({
-        data: [],
-      });
-
-      const result = await repository.getByUserId('user-456');
-
-      expect(result).toBeNull();
-    });
-
-    it('should return first canvas when multiple exist for userId', async () => {
-      const mockCanvases = [
-        { id: 'canvas-1', userId: 'user-123', needsUpdate: false },
-        { id: 'canvas-2', userId: 'user-123', needsUpdate: true },
-      ];
-
-      mockModel.list.mockResolvedValue({
-        data: mockCanvases,
-      });
-
-      const result = await repository.getByUserId('user-123');
-
-      expect(result).toEqual(mockCanvases[0]);
     });
   });
 });

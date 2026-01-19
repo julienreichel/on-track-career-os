@@ -14,6 +14,7 @@ describe('UserProfileService', () => {
     mockRepository = {
       get: vi.fn(),
       getForTailoring: vi.fn(),
+      getCanvasSnapshot: vi.fn(),
       list: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
@@ -147,6 +148,18 @@ describe('UserProfileService', () => {
 
       expect(mockRepository.getForTailoring).toHaveBeenCalledWith('user-123');
       expect(result).toEqual(profile);
+    });
+  });
+
+  describe('getCanvasForUser', () => {
+    it('should delegate to repository', async () => {
+      const canvas = { id: 'canvas-1' };
+      mockRepository.getCanvasSnapshot.mockResolvedValue(canvas);
+
+      const result = await service.getCanvasForUser('user-123');
+
+      expect(mockRepository.getCanvasSnapshot).toHaveBeenCalledWith('user-123');
+      expect(result).toEqual(canvas);
     });
   });
 

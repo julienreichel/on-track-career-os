@@ -111,6 +111,36 @@ describe('UserProfileRepository', () => {
     });
   });
 
+  describe('getCanvasSnapshot', () => {
+    it('should return null when id is missing', async () => {
+      const result = await repository.getCanvasSnapshot('');
+
+      expect(mockModel.get).not.toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+
+    it('should fetch canvas snapshot with selection set', async () => {
+      const mockUserProfile = {
+        id: 'user-123',
+        canvas: { id: 'canvas-1' },
+      };
+
+      mockModel.get.mockResolvedValue({
+        data: mockUserProfile,
+      });
+
+      const result = await repository.getCanvasSnapshot('user-123');
+
+      expect(mockModel.get).toHaveBeenCalledWith(
+        { id: 'user-123' },
+        expect.objectContaining({
+          selectionSet: expect.arrayContaining(['canvas.*']),
+        })
+      );
+      expect(result).toEqual({ id: 'canvas-1' });
+    });
+  });
+
   describe('list', () => {
     it('should fetch a list of user profiles', async () => {
       const mockUserProfiles = [

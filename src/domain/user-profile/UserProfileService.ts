@@ -19,6 +19,10 @@ export class UserProfileService {
     return await this.repo.getForTailoring(id);
   }
 
+  async getCanvasForUser(id: string) {
+    return await this.repo.getCanvasSnapshot(id);
+  }
+
   async getProgressSnapshot(id: string) {
     return this.repo.getProgressSnapshot(id);
   }

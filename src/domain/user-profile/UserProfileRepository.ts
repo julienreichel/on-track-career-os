@@ -94,6 +94,21 @@ export class UserProfileRepository {
     return data;
   }
 
+  async getCanvasSnapshot(id: string): Promise<PersonalCanvas | null> {
+    if (!id) {
+      return null;
+    }
+
+    const selectionSet = ['id', 'canvas.*'];
+    const { data } = await this.model.get({ id }, gqlOptions({ selectionSet }));
+    if (!data) {
+      return null;
+    }
+
+    const record = data as unknown as { canvas?: PersonalCanvas | null };
+    return record.canvas ?? null;
+  }
+
   async list(filter: Record<string, unknown> = {}) {
     return fetchAllListItems<UserProfile>(this.model.list.bind(this.model), filter);
   }
