@@ -54,7 +54,7 @@ export async function createExperience(
     .first();
   await expect(experienceCard).toBeVisible();
 
-  await experienceCard.getByRole('button', { name: /View/i }).click();
+  await experienceCard.getByRole('button', { name: /^View$/ }).click();
   await page.waitForLoadState('domcontentloaded');
 
   await expect(page).toHaveURL(/\/profile\/experiences\/[a-f0-9-]+$/);
