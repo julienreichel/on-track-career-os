@@ -86,8 +86,8 @@
                 @click="handlePrint(letter)"
               />
               <UButton
-                :label="$t('common.edit')"
-                icon="i-heroicons-pencil"
+                :label="$t('common.view')"
+                icon="i-heroicons-eye"
                 size="xs"
                 color="primary"
                 variant="soft"

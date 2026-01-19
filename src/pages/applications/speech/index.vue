@@ -74,6 +74,17 @@
                 {{ resolvePreview(block) }}
               </p>
             </div>
+
+            <template #actions>
+              <UButton
+                :label="t('common.view')"
+                icon="i-heroicons-eye"
+                size="xs"
+                color="primary"
+                variant="soft"
+                @click="navigateTo({ name: 'applications-speech-id', params: { id: block.id } })"
+              />
+            </template>
           </ItemCard>
         </div>
       </UPageBody>

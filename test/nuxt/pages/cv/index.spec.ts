@@ -264,9 +264,9 @@ describe('CV Listing Page - With CVs', () => {
 
     await flushPromises();
 
-    // Should have Print and Edit buttons (from ItemCard custom actions)
+    // Should have Print and View buttons (from ItemCard custom actions)
     expect(wrapper.text()).toContain('Print');
-    expect(wrapper.text()).toContain('Edit');
+    expect(wrapper.text()).toContain('View');
   });
 
   it('should show loading state initially', async () => {
