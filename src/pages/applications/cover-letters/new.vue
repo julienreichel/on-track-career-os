@@ -67,15 +67,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
 import { useCoverLetterEngine } from '@/composables/useCoverLetterEngine';
+import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import type { SpeechInput } from '@/domain/ai-operations/SpeechResult';
 
 const { t } = useI18n();
+const route = useRoute();
 const router = useRouter();
 const toast = useToast();
 
@@ -84,6 +86,7 @@ const { userId } = useAuthUser();
 
 const { createCoverLetter } = useCoverLetters();
 const engine = useCoverLetterEngine();
+const tailoredMaterials = useTailoredMaterials();
 
 // Form state
 const coverLetterName = ref('');
@@ -106,6 +109,17 @@ const jobDescriptionObj = computed<SpeechInput['jobDescription'] | undefined>(()
 // Generation state
 const generating = ref(false);
 const generationError = ref<string | null>(null);
+const autoTriggered = ref(false);
+const autoJobId = computed(() => {
+  const value = route.query.jobId;
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
+  return null;
+});
 
 const cancel = () => {
   void router.push({ name: 'cover-letters' });
@@ -174,4 +188,69 @@ const generateCoverLetter = async () => {
     generating.value = false;
   }
 };
+
+const generateTailoredCoverLetter = async (jobId: string) => {
+  if (autoTriggered.value) {
+    return;
+  }
+  autoTriggered.value = true;
+  generating.value = true;
+  generationError.value = null;
+
+  try {
+    const context = await tailoredMaterials.loadTailoringContext(jobId);
+    if (!context.ok) {
+      toast.add({
+        title: t('coverLetter.new.toast.error'),
+        color: 'error',
+      });
+      await router.push('/jobs');
+      return;
+    }
+    if (!context.matchingSummary) {
+      toast.add({
+        title: t('coverLetter.new.toast.generationFailed'),
+        color: 'error',
+      });
+      await router.push(`/jobs/${jobId}/match`);
+      return;
+    }
+
+    const created = await tailoredMaterials.generateTailoredCoverLetterForJob({
+      job: context.job,
+      matchingSummary: context.matchingSummary,
+    });
+    if (created?.id) {
+      await router.push({
+        name: 'applications-cover-letters-id',
+        params: { id: created.id },
+      });
+      return;
+    }
+
+    toast.add({
+      title: t('coverLetter.new.toast.createFailed'),
+      color: 'error',
+    });
+  } catch (err) {
+    console.error('[coverLetterNew] Error generating tailored cover letter:', err);
+    generationError.value = err instanceof Error ? err.message : 'Unknown error';
+    toast.add({
+      title: t('coverLetter.new.toast.error'),
+      color: 'error',
+    });
+  } finally {
+    generating.value = false;
+  }
+};
+
+watch(
+  () => autoJobId.value,
+  (jobId) => {
+    if (jobId) {
+      void generateTailoredCoverLetter(jobId);
+    }
+  },
+  { immediate: true }
+);
 </script>

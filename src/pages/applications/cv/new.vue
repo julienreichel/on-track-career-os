@@ -4,7 +4,7 @@
 
     <UPageBody>
       <!-- Wizard Steps -->
-      <div class="mb-6">
+      <div v-if="!isAutoFlow" class="mb-6">
         <div class="flex items-center justify-center gap-4">
           <div
             class="flex items-center gap-2"
@@ -47,7 +47,7 @@
       </div>
 
       <!-- Step 1: Select Experiences -->
-      <UCard v-if="currentStep === 1">
+      <UCard v-if="currentStep === 1 && !isAutoFlow">
         <div class="space-y-6">
           <div>
             <h2 class="text-xl font-semibold text-gray-900 mb-2">
@@ -72,10 +72,10 @@
       </UCard>
 
       <!-- Generating State -->
-      <CvGeneratingStep v-if="generating" />
+      <CvGeneratingStep v-if="isGenerating" />
 
       <!-- Step 2: Generate CV -->
-      <UCard v-else-if="currentStep === 2">
+      <UCard v-else-if="currentStep === 2 && !isAutoFlow">
         <div class="space-y-6">
           <div>
             <h2 class="text-xl font-semibold text-gray-900 mb-2">
@@ -145,15 +145,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useCvDocuments } from '@/composables/useCvDocuments';
 import { useCvGenerator } from '@/composables/useCvGenerator';
+import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 
 const { t } = useI18n();
+const route = useRoute();
 const router = useRouter();
 const toast = useToast();
 
@@ -162,10 +164,13 @@ const { userId } = useAuthUser();
 
 const { createDocument } = useCvDocuments();
 const { generateCv, generating, error: generationError } = useCvGenerator();
+const tailoredMaterials = useTailoredMaterials();
 
 // Wizard state
 const currentStep = ref(1);
 const selectedExperienceIds = ref<string[]>([]);
+const autoGenerating = ref(false);
+const autoTriggered = ref(false);
 
 // Step 2 state
 const cvName = ref('');
@@ -175,6 +180,20 @@ const includeCertifications = ref(false);
 const includeInterests = ref(false);
 const includeProfilePhoto = ref(true);
 const jobDescription = ref('');
+const autoJobId = computed(() => {
+  const value = route.query.jobId;
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value[0] ?? null;
+  }
+  return null;
+});
+const isAutoFlow = computed(() => Boolean(autoJobId.value));
+const isGenerating = computed(
+  () => generating.value || autoGenerating.value || tailoredMaterials.isGenerating.value
+);
 
 const LAST_STEP = 2;
 const FIRST_STEP = 1;
@@ -193,6 +212,58 @@ const previousStep = () => {
 
 const cancel = () => {
   void router.push({ name: 'cv' });
+};
+
+const generateTailoredCv = async (jobId: string) => {
+  if (autoTriggered.value) {
+    return;
+  }
+  autoTriggered.value = true;
+  autoGenerating.value = true;
+  try {
+    const context = await tailoredMaterials.loadTailoringContext(jobId);
+    if (!context.ok) {
+      toast.add({
+        title: t('cvNew.toast.error'),
+        color: 'error',
+      });
+      await router.push('/jobs');
+      return;
+    }
+    if (!context.matchingSummary) {
+      toast.add({
+        title: t('cvNew.toast.generationFailed'),
+        color: 'error',
+      });
+      await router.push(`/jobs/${jobId}/match`);
+      return;
+    }
+
+    const created = await tailoredMaterials.generateTailoredCvForJob({
+      job: context.job,
+      matchingSummary: context.matchingSummary,
+    });
+    if (created?.id) {
+      await router.push({
+        name: 'applications-cv-id',
+        params: { id: created.id },
+      });
+      return;
+    }
+
+    toast.add({
+      title: t('cvNew.toast.createFailed'),
+      color: 'error',
+    });
+  } catch (err) {
+    console.error('[cvNew] Error generating tailored CV:', err);
+    toast.add({
+      title: t('cvNew.toast.error'),
+      color: 'error',
+    });
+  } finally {
+    autoGenerating.value = false;
+  }
 };
 
 const generateCV = async () => {
@@ -257,4 +328,14 @@ const generateCV = async () => {
     generating.value = false;
   }
 };
+
+watch(
+  () => autoJobId.value,
+  (jobId) => {
+    if (jobId) {
+      void generateTailoredCv(jobId);
+    }
+  },
+  { immediate: true }
+);
 </script>

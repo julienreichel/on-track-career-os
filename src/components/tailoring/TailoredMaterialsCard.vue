@@ -107,57 +107,39 @@ watch(
 );
 
 const handleGenerateCv = async () => {
-  if (!props.job || !props.matchingSummary) {
+  if (!props.job) {
     return;
   }
 
   activeMaterial.value = 'cv';
   try {
-    const created = await tailoredMaterials.generateTailoredCvForJob({
-      job: props.job,
-      matchingSummary: props.matchingSummary,
-    });
-    if (created?.id) {
-      await router.push(`/applications/cv/${created.id}`);
-    }
+    await router.push(`/applications/cv/new?jobId=${props.job.id}`);
   } finally {
     activeMaterial.value = null;
   }
 };
 
 const handleGenerateCoverLetter = async () => {
-  if (!props.job || !props.matchingSummary) {
+  if (!props.job) {
     return;
   }
 
   activeMaterial.value = 'cover-letter';
   try {
-    const created = await tailoredMaterials.generateTailoredCoverLetterForJob({
-      job: props.job,
-      matchingSummary: props.matchingSummary,
-    });
-    if (created?.id) {
-      await router.push(`/applications/cover-letters/${created.id}`);
-    }
+    await router.push(`/applications/cover-letters/new?jobId=${props.job.id}`);
   } finally {
     activeMaterial.value = null;
   }
 };
 
 const handleGenerateSpeech = async () => {
-  if (!props.job || !props.matchingSummary) {
+  if (!props.job) {
     return;
   }
 
   activeMaterial.value = 'speech';
   try {
-    const created = await tailoredMaterials.generateTailoredSpeechForJob({
-      job: props.job,
-      matchingSummary: props.matchingSummary,
-    });
-    if (created?.id) {
-      await router.push(`/applications/speech/${created.id}`);
-    }
+    await router.push(`/applications/speech?jobId=${props.job.id}`);
   } finally {
     activeMaterial.value = null;
   }
@@ -236,7 +218,7 @@ const handleGenerateSpeech = async () => {
           variant="outline"
           icon="i-heroicons-document-text"
           :label="t('tailoredMaterials.materials.generateCv')"
-          :loading="tailoredMaterials.isGenerating.value && activeMaterial === 'cv'"
+          :loading="activeMaterial === 'cv'"
           :disabled="materialsDisabled"
           @click="handleGenerateCv"
         />
@@ -254,7 +236,7 @@ const handleGenerateSpeech = async () => {
           variant="outline"
           icon="i-heroicons-envelope"
           :label="t('tailoredMaterials.materials.generateCoverLetter')"
-          :loading="tailoredMaterials.isGenerating.value && activeMaterial === 'cover-letter'"
+          :loading="activeMaterial === 'cover-letter'"
           :disabled="materialsDisabled"
           @click="handleGenerateCoverLetter"
         />
@@ -272,7 +254,7 @@ const handleGenerateSpeech = async () => {
           variant="outline"
           icon="i-heroicons-microphone"
           :label="t('tailoredMaterials.materials.generateSpeech')"
-          :loading="tailoredMaterials.isGenerating.value && activeMaterial === 'speech'"
+          :loading="activeMaterial === 'speech'"
           :disabled="materialsDisabled"
           @click="handleGenerateSpeech"
         />

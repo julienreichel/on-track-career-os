@@ -109,7 +109,7 @@ const resolveCta = (job: JobDescription, missing: JobMaterialKey[]) => {
   if (missing.includes('speech')) {
     return {
       labelKey: 'dashboard.activeJobs.cta.generateSpeech',
-      to: `/applications/speech/new?jobId=${job.id}`,
+      to: `/applications/speech?jobId=${job.id}`,
     };
   }
 
