@@ -279,9 +279,16 @@ const getProfileCanvasGuidance = (state: UserProgressState | null): GuidanceMode
   };
 };
 
-const getJobsGuidance = (context: GuidanceContext): GuidanceModel => {
+const getJobsGuidance = (
+  state: UserProgressState | null,
+  context: GuidanceContext
+): GuidanceModel => {
   if (context.jobsCount !== 0) {
-    if (context.jobId && context.hasMatchingSummary === false) {
+    if (
+      context.jobId &&
+      context.hasMatchingSummary === false &&
+      state?.phase2A.missing.includes('matchingSummary')
+    ) {
       return {
         banner: {
           titleKey: 'guidance.jobs.banner.matchMissing.title',
@@ -318,7 +325,7 @@ const getJobDetailGuidance = (
     return {};
   }
 
-  if (!state || state.phase2A.missing.includes('jobUploaded')) {
+  if (!state?.phase2A.missing.includes('matchingSummary')) {
     return {};
   }
 
@@ -499,7 +506,7 @@ const guidanceHandlers: Record<
   'profile-experiences': (state, context) => getProfileExperiencesGuidance(state, context),
   'profile-stories': (state, context) => getProfileStoriesGuidance(state, context),
   'profile-canvas': (state) => getProfileCanvasGuidance(state),
-  jobs: (_, context) => getJobsGuidance(context),
+  jobs: (state, context) => getJobsGuidance(state, context),
   'job-detail': (state, context) => getJobDetailGuidance(state, context),
   'applications-cv': (state, context) => getApplicationsCvGuidance(state, context),
   'applications-cover-letters': (state, context) =>
