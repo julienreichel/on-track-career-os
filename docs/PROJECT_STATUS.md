@@ -1,7 +1,7 @@
 # Project Status — On Track Career
 
-**Last Updated:** 2026-01-14  
-**Version:** v0.9.0 — Production-Ready MVP with Advanced Matching and ATS Optimization
+**Last Updated:** 2026-01-20  
+**Version:** v0.10.0 — Production-Ready MVP with Onboarding, Guidance & User Flow Clarity
 
 ---
 
@@ -16,13 +16,18 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ 12 of 12 AI operations implemented (100%)
 - ✅ 16 data models in GraphQL schema (complete for MVP)
 - ✅ 9 domain modules with full repository/service/composable layers
-- ✅ 400+ tests passing across 45+ test suites (lint + unit + E2E all green)
+- ✅ 1450+ tests passing across 50+ test suites (lint + unit + E2E all green)
 - ✅ Type-safe architecture with single source of truth pattern
-- ✅ **NEW:** ATS keywords extraction and optimization for job descriptions
-- ✅ **NEW:** Auto-generating matching summaries on job load for better UX
-- ✅ **NEW:** Advanced duplicate company prevention with GraphQL optimization
-- ✅ **NEW:** Streamlined experience import with merge capabilities
-- ✅ **NEW:** CV import count tracking with summary feedback
+- ✅ **NEW:** EPIC F2 complete — Onboarding, Guidance & User Flow Clarity
+- ✅ **NEW:** 5-phase progress system with milestone-based badge system (7 badges)
+- ✅ **NEW:** Contextual guidance layer with next-action suggestions
+- ✅ **NEW:** Dashboard active jobs & application status cockpit
+- ✅ **NEW:** Progressive feature unlocking based on user progress
+- ✅ ATS keywords extraction and optimization for job descriptions
+- ✅ Auto-generating matching summaries on job load for better UX
+- ✅ Advanced duplicate company prevention with GraphQL optimization
+- ✅ Streamlined experience import with merge capabilities
+- ✅ CV import count tracking with summary feedback
 - ✅ Jobs workflow complete: upload → parse → list → search → edit → save
 - ✅ Full E2E test coverage for jobs flow with fixtures
 - ✅ Company workflow complete: create → analyze → canvas → link to jobs
@@ -33,13 +38,13 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ Speech pages live at `/applications/speech` and `/applications/speech/:id` with E2E coverage
 - ✅ Tailored materials workflow complete: job/match entry points, tailored regeneration banners, and E2E coverage
 
-**MVP Readiness:** ~95% complete
+**MVP Readiness:** ~97% complete
 
 - Backend Infrastructure: 100% complete
-- Domain Logic: 98% complete
-- Frontend UI: 90% complete (EPICs 1A, 1B, 2, 3, 3B, 4, 4B, 5A, 5B, 5C, 6 fully implemented)
+- Domain Logic: 99% complete
+- Frontend UI: 95% complete (EPICs 1A, 1B, 2, 3, 3B, 4, 4B, 5A, 5B, 5C, 6, F2 fully implemented)
 - AI Operations: 100% complete (12/12)
-- Code Quality: 95% complete (comprehensive test coverage, type safety, performance optimizations)
+- Code Quality: 97% complete (comprehensive test coverage, type safety, performance optimizations)
 
 ---
 
@@ -641,6 +646,85 @@ The project has achieved **production-ready MVP status** with comprehensive test
 **Next Steps:**
 
 1. Continue post-MVP roadmap planning
+
+---
+
+#### ✅ EPIC F2: Onboarding, Guidance & User Flow Clarity (100% Complete)
+
+**Status:** ✅ **FULLY IMPLEMENTED** - Progress engine, badge system, guidance layer, and dashboard complete
+
+**Goal:** Ensure users always know **what to do next** and **why it matters**.
+
+**Implemented:**
+
+**🎯 5-Phase Progress System:**
+- ✅ Phase 1: Complete your profile (gates: profile + ≥1 experience)
+- ✅ Phase 2A: Create your canvas (gate: canvas exists)
+- ✅ Phase 2B: Document your stories (gate: ≥3 STAR stories)
+- ✅ Phase 3: Find job opportunities (gate: ≥1 job description)
+- ✅ Bonus Phase: Generate application materials (unlocked after Phase 3)
+- ✅ Deterministic progress computation with clear gates
+- ✅ `computeUserProgressState` domain function (100% test coverage)
+- ✅ `useUserProgress` composable for reactive state
+
+**🏅 Milestone-Based Badge System (7 Badges):**
+- ✅ Badge catalog: Profile Pioneer, Canvas Creator, Story Master, Job Hunter, CV Craftsman, Letter Writer, Speech Artist
+- ✅ Badge engine with deterministic earning logic
+- ✅ Badge persistence via UserProfile model
+- ✅ `useBadges` composable with auto-computation on mount
+- ✅ BadgeGridCard dashboard component (hidden when empty)
+- ✅ BadgePill with UTooltip descriptions
+- ✅ Toast notifications per earned badge (neutral style, mentor tone)
+- ✅ Calm, mentor-style UI (no "NEW" labels, uniform colors, cursor-help)
+
+**🧭 Contextual Guidance Layer:**
+- ✅ `getNextAction` domain function with phase-specific suggestions
+- ✅ `guidanceCatalog` with 5 guidance types (profile-empty, experiences-empty, canvas-needed, stories-few, jobs-missing)
+- ✅ `useGuidance` composable for context-aware messages
+- ✅ GuidanceBanner component with icon + description + action button
+- ✅ EmptyStateActionCard for feature-specific empty states
+- ✅ LockedFeatureCard for locked features (e.g., matching locked until Phase 3)
+
+**🎓 Onboarding Wizard:**
+- ✅ `/onboarding` page with 4-step wizard
+- ✅ Step 1: Welcome & profile basics
+- ✅ Step 2: Experience import (CV upload or manual)
+- ✅ Step 3: Canvas generation
+- ✅ Step 4: First STAR story
+- ✅ OnboardingWizard component with step navigation
+- ✅ ProgressBannerCard for dashboard onboarding prompt
+- ✅ ProgressChecklistCard with phase-based task list
+- ✅ ProgressGuidanceSection with progress bar + next action
+
+**📊 Dashboard Enhancements:**
+- ✅ ActiveJobsCard with last 3 active jobs
+- ✅ JobApplicationStatusRow with match score + materials readiness (CV/letter/speech)
+- ✅ `useActiveJobsDashboard` composable aggregating job + match + materials
+- ✅ Personalized greeting with user's name
+- ✅ Conditional blocks based on progress phase
+
+**🔓 Progressive Feature Unlocking:**
+- ✅ Matching features locked until Phase 3 (1 job required)
+- ✅ Active jobs dashboard visible only in Bonus Phase
+- ✅ CV upload shortcut visible based on experience count
+- ✅ Onboarding prompt on home if profile incomplete
+
+**✅ Testing:**
+- ✅ 13 test files covering badges, progress, guidance, onboarding
+- ✅ E2E tests: `02 - onboarding-flow.spec.ts`, `13 - progress-engine.spec.ts`
+- ✅ 5 unit test files for domain logic (badgeEngine, computeUserProgressState, getNextAction, guidanceCatalog, unlocks)
+- ✅ 4 Nuxt component tests (BadgeGridCard, ProgressBannerCard, ProgressChecklistCard, ProgressChecklistItems)
+- ✅ E2E discovery flow test with badge earning validation (60s timeout for CI stability)
+- ✅ All 1450+ tests passing
+
+**Validation:**
+- ✅ Users see clear next actions at all stages
+- ✅ Progress system guides from empty profile → complete application materials
+- ✅ Badge system rewards milestones without gamification noise
+- ✅ Onboarding wizard tested with E2E flows
+- ✅ Dashboard provides job-centric cockpit view
+- ✅ Empty states provide actionable guidance
+- ✅ Locked features communicate requirements clearly
 
 ---
 

@@ -17,9 +17,19 @@ const showEmpty = computed(() => !props.loading && props.states.length === 0);
 <template>
   <UCard data-testid="active-jobs-card">
     <template #header>
-      <div class="space-y-1">
-        <h2 class="text-lg font-semibold">{{ t('dashboard.activeJobs.title') }}</h2>
-        <p class="text-sm text-dimmed">{{ t('dashboard.activeJobs.description') }}</p>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div class="space-y-1">
+          <h2 class="text-lg font-semibold">{{ t('dashboard.activeJobs.title') }}</h2>
+          <p class="text-sm text-dimmed">{{ t('dashboard.activeJobs.description') }}</p>
+        </div>
+        <UButton
+          :label="t('jobList.actions.add')"
+          icon="i-heroicons-plus"
+          size="xs"
+          color="primary"
+          variant="soft"
+          to="/jobs/new"
+        />
       </div>
     </template>
 
