@@ -100,7 +100,7 @@ const router = useRouter();
 const toast = useToast();
 
 // Get current user ID from auth
-const { userId } = useAuthUser();
+const { userId, loadUserId } = useAuthUser();
 
 const { createCoverLetter } = useCoverLetters();
 const engine = useCoverLetterEngine();
