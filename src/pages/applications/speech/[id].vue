@@ -127,10 +127,9 @@ const resetForm = () => {
   originalState.value = { ...formState.value };
 };
 
-const formatSection = (value: string) => {
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : t('speech.detail.emptySection');
-};
+const hasElevatorPitch = computed(() => formState.value.elevatorPitch.trim().length > 0);
+const hasCareerStory = computed(() => formState.value.careerStory.trim().length > 0);
+const hasWhyMe = computed(() => formState.value.whyMe.trim().length > 0);
 
 const handleEdit = () => {
   resetForm();
@@ -378,13 +377,10 @@ watch(item, (newValue) => {
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
                       {{ t('speech.editor.sections.elevatorPitch.label') }}
                     </h3>
-                    <p class="text-base text-gray-900 dark:text-gray-100">
-                      {{ formatSection(formState.elevatorPitch) }}
+                    <p v-if="hasElevatorPitch" class="text-base text-gray-900 dark:text-gray-100">
+                      {{ formState.elevatorPitch }}
                     </p>
                   </div>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t('speech.editor.sections.elevatorPitch.description') }}
-                  </p>
                 </div>
               </UCard>
 
@@ -394,13 +390,10 @@ watch(item, (newValue) => {
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
                       {{ t('speech.editor.sections.careerStory.label') }}
                     </h3>
-                    <p class="text-base text-gray-900 dark:text-gray-100">
-                      {{ formatSection(formState.careerStory) }}
+                    <p v-if="hasCareerStory" class="text-base text-gray-900 dark:text-gray-100">
+                      {{ formState.careerStory }}
                     </p>
                   </div>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t('speech.editor.sections.careerStory.description') }}
-                  </p>
                 </div>
               </UCard>
 
@@ -410,13 +403,10 @@ watch(item, (newValue) => {
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
                       {{ t('speech.editor.sections.whyMe.label') }}
                     </h3>
-                    <p class="text-base text-gray-900 dark:text-gray-100">
-                      {{ formatSection(formState.whyMe) }}
+                    <p v-if="hasWhyMe" class="text-base text-gray-900 dark:text-gray-100">
+                      {{ formState.whyMe }}
                     </p>
                   </div>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ t('speech.editor.sections.whyMe.description') }}
-                  </p>
                 </div>
                 <template #footer>
                   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
