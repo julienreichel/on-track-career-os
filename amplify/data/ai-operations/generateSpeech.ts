@@ -12,34 +12,37 @@ import type {
 
 const SYSTEM_PROMPT = `You generate personal narrative speech based on user identity data.
 
-If tailoring context is provided (jobDescription + matchingSummary), tailor phrasing to the role and job needs without inventing facts.
-If tailoring context is absent, keep the speech generic (no job targeting).
-Use company context only when provided and only as summary-level framing.
+Write natural-flow English with no headings, labels, or bullet lists. Follow this guidance
+implicitly: hook/positioning -> fil rouge -> proof (STAR-style) -> credibility/training
+-> projection -> human note -> opening question. The structure is guidance; do not
+output section titles.
+
+Tailoring rules:
+- If jobDescription is provided, align to the role needs even if matchingSummary is missing.
+- Use company context only when provided; keep it summary-level framing only.
+
+Groundedness:
+- Do not invent employers, skills, degrees, or achievements.
+- Use experiences, responsibilities, tasks, achievements, profile skills/certs, and
+  provided stories as the only sources of facts.
+- If a detail is missing, omit it or stay generic (do not fabricate specifics).
+
+Stories:
+- Use the provided stories as proof examples.
+- If none are provided, derive 1 proof from experiences without inventing.
 
 Output must be:
-- concise
-- professional
-- first-person voice
+- concise, professional, first-person voice
 - motivational but realistic
-- grounded in data provided
-- no invented work history or skills
-- no extra keys
-- JSON only`;
+- JSON only, no extra keys`;
 
 const OUTPUT_SCHEMA = `{
-  "elevatorPitch": "string (<= 80 words)",
-  "careerStory": "string (<= 160 words)",
-  "whyMe": "string (<= 120 words)"
+  "elevatorPitch": "string",
+  "careerStory": "string",
+  "whyMe": "string"
 }`;
 
 const PROMPT_INDENT_SPACES = 2;
-
-
-
-
-
-
-
 
 export interface GenerateSpeechInput {
   language: 'en';
@@ -60,27 +63,15 @@ export interface GenerateSpeechOutput {
 
 type ModelResponse = Partial<GenerateSpeechOutput>;
 
-const ELEVATOR_MAX_WORDS = 120;
-const CAREER_MAX_WORDS = 360;
-const WHY_ME_MAX_WORDS = 240;
-
 function sanitizeString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function trimToWordCount(value: string, maxWords: number): string {
-  const words = value.split(/\s+/).filter(Boolean);
-  if (words.length <= maxWords) {
-    return value;
-  }
-  return words.slice(0, maxWords).join(' ');
-}
-
 function sanitizeSpeechOutput(raw: ModelResponse): GenerateSpeechOutput {
   return {
-    elevatorPitch: trimToWordCount(sanitizeString(raw.elevatorPitch), ELEVATOR_MAX_WORDS),
-    careerStory: trimToWordCount(sanitizeString(raw.careerStory), CAREER_MAX_WORDS),
-    whyMe: trimToWordCount(sanitizeString(raw.whyMe), WHY_ME_MAX_WORDS),
+    elevatorPitch: sanitizeString(raw.elevatorPitch),
+    careerStory: sanitizeString(raw.careerStory),
+    whyMe: sanitizeString(raw.whyMe),
   };
 }
 
@@ -94,9 +85,10 @@ function buildFallbackOutput(): GenerateSpeechOutput {
 
 function buildUserPrompt(args: GenerateSpeechInput): string {
   const tailoring = resolveTailoringContext(args);
-  const jobDescription = tailoring?.jobDescription ?? null;
-  const matchingSummary = tailoring?.matchingSummary ?? null;
-  const company = tailoring?.company ?? null;
+  const jobDescription = tailoring.jobDescription;
+  const matchingSummary = tailoring.matchingSummary;
+  const company = tailoring.company;
+  const stories = args.stories ?? [];
 
   return `Use the following data to create personal speech material.
 
@@ -109,8 +101,8 @@ ${JSON.stringify(args.profile ?? {}, null, PROMPT_INDENT_SPACES)}
 EXPERIENCES:
 ${JSON.stringify(args.experiences ?? [], null, PROMPT_INDENT_SPACES)}
 
-STORIES:
-${JSON.stringify(args.stories ?? [], null, PROMPT_INDENT_SPACES)}
+STORIES (use these for proof examples):
+${JSON.stringify(stories, null, PROMPT_INDENT_SPACES)}
 
 PERSONAL CANVAS:
 ${JSON.stringify(args.personalCanvas ?? {}, null, PROMPT_INDENT_SPACES)}
@@ -124,32 +116,42 @@ ${JSON.stringify(matchingSummary, null, PROMPT_INDENT_SPACES)}
 COMPANY SUMMARY (optional):
 ${JSON.stringify(company, null, PROMPT_INDENT_SPACES)}
 
-Return JSON with:
-- elevatorPitch (80 words max)
-- careerStory (160 words max)
-- whyMe (120 words max)
+Output guidance (targets, not strict limits):
+- elevatorPitch: ~45-60s, target ~120 words, 5-7 sentences, end with an opening question.
+- careerStory: ~2-3 min, target ~360 words, 3-5 short paragraphs, include 1-2 STAR-style proofs.
+- whyMe: ~1-2 min, target ~240 words, "their need/problem -> my proof -> fit -> opening question".
+
+Make the fil rouge explicit: focus on 2-3 recurring patterns across experience, avoid
+chronological date-by-date recital. Prefer "I've repeatedly..." over "In 2018...".
+
+Do not use headings, labels, or bullet lists. End each output with an opening question.
 
 Return ONLY valid JSON matching this exact schema:
 ${OUTPUT_SCHEMA}`;
 }
 
-function resolveTailoringContext(args: GenerateSpeechInput) {
+type TailoringContext = {
+  jobDescription: JobDescription | null;
+  matchingSummary: MatchingSummaryContext | null;
+  company: CompanyProfile | null;
+};
+
+function resolveTailoringContext(args: GenerateSpeechInput): TailoringContext {
   const hasJob = isValidJobDescription(args.jobDescription);
   const hasSummary = isValidMatchingSummary(args.matchingSummary);
 
-  if (hasJob && hasSummary) {
-    return {
-      jobDescription: args.jobDescription ?? null,
-      matchingSummary: args.matchingSummary ?? null,
-      company: args.company ?? null,
-    };
+  if (args.jobDescription && !hasJob) {
+    console.warn('[generateSpeech] jobDescription provided without title.');
+  }
+  if (args.matchingSummary && !hasSummary) {
+    console.warn('[generateSpeech] matchingSummary provided but missing required scores.');
   }
 
-  if (args.jobDescription || args.matchingSummary) {
-    console.warn('[generateSpeech] Invalid tailoring context detected. Falling back to generic.');
-  }
-
-  return null;
+  return {
+    jobDescription: hasJob ? (args.jobDescription ?? null) : null,
+    matchingSummary: hasSummary ? (args.matchingSummary ?? null) : null,
+    company: args.company ?? null,
+  };
 }
 
 function isValidJobDescription(value?: JobDescription | null): value is JobDescription {

@@ -129,7 +129,7 @@ describe('ai.generateSpeech', () => {
     expect(userPrompt).toContain('Acme Systems');
   });
 
-  it('drops job context when matching summary is missing', async () => {
+  it('keeps job context when matching summary is missing', async () => {
     mockSend.mockResolvedValue(
       buildBedrockResponse({
         elevatorPitch: 'Short pitch.',
@@ -147,7 +147,11 @@ describe('ai.generateSpeech', () => {
     const payload = JSON.parse(commandInput.body);
     const userPrompt = payload.messages[0].content[0].text as string;
 
-    expect(userPrompt).not.toContain('Head of Engineering');
+    expect(userPrompt).toContain('TARGET JOB DESCRIPTION');
+    expect(userPrompt).toContain('Head of Engineering');
+    expect(userPrompt).toContain('MATCHING SUMMARY');
+    expect(userPrompt).toContain('COMPANY SUMMARY');
+    expect(userPrompt).toContain('Acme Systems');
   });
 
   it('falls back to empty strings when AI output is invalid', async () => {
