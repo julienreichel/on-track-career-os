@@ -141,7 +141,7 @@ Casey Candidate`;
     const payload = JSON.parse(commandInput.body);
     const userPrompt = payload.messages[0].content[0].text as string;
 
-    expect(userPrompt).toContain('generic cover letter');
+    expect(userPrompt).toContain('personalized cover letter');
     expect(userPrompt).not.toContain('Head of Engineering');
   });
 
@@ -159,7 +159,7 @@ Casey Candidate`;
     expect(userPrompt).toContain('TARGET JOB DESCRIPTION');
     expect(userPrompt).toContain('Head of Engineering');
     expect(userPrompt).toContain('MATCHING SUMMARY');
-    expect(userPrompt).toContain('tailored');
+    expect(userPrompt).toContain('personalized cover letter');
     expect(userPrompt).toContain('COMPANY SUMMARY');
     expect(userPrompt).toContain('Acme Systems');
   });

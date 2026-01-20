@@ -10,29 +10,103 @@ import type {
   SpeechStory,
 } from './types/schema-types';
 
-const SYSTEM_PROMPT = `You generate professional cover letters based on user identity data.
+const SYSTEM_PROMPT = `You generate professional, recruiter-grade cover letters.
 
-If tailoring context is provided (jobDescription + matchingSummary), tailor the letter to demonstrate fit for that specific role.
-If tailoring context is absent, create a generic cover letter showcasing the candidate's value proposition.
-Use company context only when provided and only as summary-level framing.
+GOAL
+Write a one-page cover letter whose sole purpose is to increase the likelihood of an interview by clearly connecting the candidate’s evidence to the employer’s challenges.
 
-Output must be:
-- professional and authentic
-- first-person voice
-- concise yet compelling (300-500 words)
-- structured with clear paragraphs
-- grounded in data provided
-- no invented work history, skills, or achievements
-- return a plain Markdown cover letter only (no JSON, no code fences, no extra commentary)`;
+OUTPUT FORMAT
+- Markdown ONLY
+- No JSON
+- No explanations, no comments, no metadata
+
+LETTER FORMAT (MANDATORY)
+The output MUST be a real letter and include, in this order:
+1) Salutation line (e.g. "Dear Hiring Manager,")
+2) Body paragraphs (VOUS → MOI → NOUS)
+3) Closing line (e.g. "Sincerely," or "Kind regards,")
+4) Signature with the candidate’s full name (from PROFILE)
+
+If the recipient name is unknown, use: "Dear Hiring Manager,"
+Do NOT use placeholders like [Name] or [Company].
+
+STYLE
+- Professional, authentic, first-person
+- Concrete, specific, grounded in facts
+- Short paragraphs (2–4 lines)
+- No buzzwords, no jargon unless present in the job description
+- No repetitive transitions (e.g. "Moreover", "Additionally")
+- Target length: 250–400 words (strict)
+
+TRUTHFULNESS
+- Use ONLY information explicitly provided in the inputs
+- Do NOT invent skills, roles, achievements, metrics, or education
+- If information is missing, omit it rather than guessing
+
+STRUCTURE (MANDATORY — VOUS / MOI / NOUS)
+
+VOUS — EMPLOYER CONTEXT (LONGEST, DECISIVE)
+- Identify 2-4 key employer challenges or priorities
+- Base them on the job description and/or company context
+- Interpret them in your own words (do NOT rephrase job-ad bullets)
+- Explain why these challenges matter now
+
+VOUS — STRICT RULES
+- Do NOT mention the candidate, their experience, or their qualifications
+- No first-person references ("I", "my", "me") in VOUS
+- VOUS is strictly about the employer’s context, risks, and priorities
+
+MOI — PROOF OF VALUE
+- Use at most ONE primary example per paragraph
+- Use 2-3 examples total
+- Each example must include:
+  • context
+  • one main action
+  • outcome
+- Supporting actions may be mentioned but must be subordinate
+- Avoid lists of tools, techniques, or initiatives
+
+NOUS — FUTURE COLLABORATION
+- Forward-looking only (no recap of past achievements)
+- Describe how collaboration would work in this specific context
+- Must explicitly reference at least TWO of:
+  • company size
+  • product type (e.g. AI-powered SaaS)
+  • growth or scaling phase
+  • team structure or constraints
+- 2-4 sentences maximum
+- Avoid generic best-practice statements
+
+CLOSING
+The closing must contain TWO distinct elements, in this order:
+
+A connection-oriented sentence that invites dialogue or exchange
+- Focus on discussing challenges, perspectives, or collaboration
+- Use neutral, senior language (curiosity, alignment, exchange)
+- Do NOT express excitement or emotion
+
+A professional sign-off line
+- No pushiness, no exaggeration
+
+Do NOT use generic enthusiasm phrases such as:
+  "I am excited about", "thrilled", "passionate about your mission"
+
+AVOID (HARD RULES)
+- Generic openings ("I am writing to apply…")
+- Overconfidence ("perfect fit", "you won't regret")
+- Negative framing (burnout, unemployment, failure)
+- Mission hype without direct relevance
+
+SELF-CHECK (SILENT)
+Before finalizing:
+- VOUS contains no first-person references
+- MOI contains no lists
+- NOUS is context-anchored
+- Closing contains no generic enthusiasm
+If any rule is violated, rewrite before output.
+`;
 
 const PROMPT_INDENT_SPACES = 2;
-
-
-
-
-
-
-
 
 export interface GenerateCoverLetterInput {
   language: 'en';
@@ -47,49 +121,55 @@ export interface GenerateCoverLetterInput {
 
 function buildUserPrompt(args: GenerateCoverLetterInput): string {
   const tailoring = resolveTailoringContext(args);
-  const hasJob = Boolean(tailoring?.jobDescription);
   const jobDescription = tailoring?.jobDescription ?? null;
   const matchingSummary = tailoring?.matchingSummary ?? null;
   const company = tailoring?.company ?? null;
 
-  const instruction = hasJob
-    ? 'Create a cover letter tailored to the target job description.'
-    : "Create a generic cover letter showcasing the candidate's professional value.";
+  return `TASK
+Using the information below, write a personalized cover letter following strictly the VOUS → MOI → NOUS structure and all system instructions.
 
-  return `${instruction}
-
-LANGUAGE:
+LANGUAGE
 ${args.language}
 
-PROFILE:
-${JSON.stringify(args.profile ?? {}, null, PROMPT_INDENT_SPACES)}
+PROFILE
+${JSON.stringify(args.profile, null, PROMPT_INDENT_SPACES)}
 
-EXPERIENCES:
-${JSON.stringify(args.experiences ?? [], null, PROMPT_INDENT_SPACES)}
+EXPERIENCES
+${JSON.stringify(args.experiences, null, PROMPT_INDENT_SPACES)}
 
-STORIES:
-${JSON.stringify(args.stories ?? [], null, PROMPT_INDENT_SPACES)}
+STORIES
+${JSON.stringify(args.stories ?? {}, null, PROMPT_INDENT_SPACES)}
 
-PERSONAL CANVAS:
+PERSONAL CANVAS
 ${JSON.stringify(args.personalCanvas ?? {}, null, PROMPT_INDENT_SPACES)}
 
-TARGET JOB DESCRIPTION (optional):
+TARGET JOB DESCRIPTION (optional)
 ${JSON.stringify(jobDescription, null, PROMPT_INDENT_SPACES)}
 
-MATCHING SUMMARY (optional):
-${JSON.stringify(matchingSummary, null, PROMPT_INDENT_SPACES)}
+MATCHING SUMMARY (optional)
+${JSON.stringify(matchingSummary ?? {}, null, PROMPT_INDENT_SPACES)}
 
-COMPANY SUMMARY (optional):
-${JSON.stringify(company, null, PROMPT_INDENT_SPACES)}
+COMPANY SUMMARY (optional)
+${JSON.stringify(company ?? {}, null, PROMPT_INDENT_SPACES)}
 
-Structure the cover letter with:
-1. Opening paragraph: Express interest and briefly introduce yourself
-2. Body paragraphs (2-3): Highlight relevant experience, achievements, and fit
-3. Closing paragraph: Express enthusiasm and call to action
+RECIPIENT CONTEXT
+- Company name: ${company?.companyName || 'unknown'}
+- Job title: ${jobDescription?.title || 'unknown'}
 
-${hasJob ? 'Demonstrate specific fit for the role and company needs.' : 'Focus on transferable value and professional identity.'}
+INTERNAL PLANNING (DO NOT OUTPUT)
+Before writing:
+1) Identify employer challenges (VOUS)
+2) Select the strongest proof for each challenge (MOI)
+3) Decide how collaboration would work in THIS context (NOUS)
+Only then write the letter.
 
-Return a plain Markdown cover letter only. Do not include JSON, code fences, or any extra preamble.`;
+FORMATTING RULES
+- Markdown only
+- Natural letter flow (no section labels like "VOUS / MOI / NOUS")
+- One salutation at the top
+- One sign-off and signature at the end
+- No generic opening sentence
+`;
 }
 
 function resolveTailoringContext(args: GenerateCoverLetterInput) {
@@ -113,9 +193,7 @@ function resolveTailoringContext(args: GenerateCoverLetterInput) {
   return null;
 }
 
-function isValidJobDescription(
-  value?: JobDescription | null
-): value is JobDescription {
+function isValidJobDescription(value?: JobDescription | null): value is JobDescription {
   return Boolean(value?.title);
 }
 
@@ -204,19 +282,7 @@ function cleanCoverLetterMarkdown(input: string): string {
 }
 
 function parseCoverLetterResponse(responseText: string): { content: string } {
-  const trimmed = responseText.trim();
-  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
-    try {
-      const parsed = JSON.parse(trimmed) as { content?: unknown };
-      if (typeof parsed.content === 'string') {
-        return { content: parsed.content };
-      }
-    } catch {
-      // Fall through to markdown parsing.
-    }
-  }
-
-  return { content: trimmed };
+  return { content: responseText.trim() };
 }
 
 export const handler = async (event: HandlerEvent): Promise<string> => {
