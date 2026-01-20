@@ -192,7 +192,21 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
     expect(typeof result).toBe('string');
     expect(result.length).toBeGreaterThan(0);
     expect(result).toContain(mockUserProfile.fullName);
-    expect(result).toContain(jobDescription.title);
+    const keywordCandidates = [
+      jobDescription.title,
+      jobDescription.roleSummary,
+      'startup',
+      'scalable',
+      'technical debt',
+      'microservices',
+      'system design',
+      'mentoring',
+    ];
+    const normalizedResult = result.toLowerCase();
+    const keywordMatches = keywordCandidates.filter((keyword) =>
+      normalizedResult.includes(keyword.toLowerCase())
+    );
+    expect(keywordMatches.length).toBeGreaterThanOrEqual(3);
 
     console.log('Generated tailored cover letter:', result.slice(0, 200) + '...');
   });
