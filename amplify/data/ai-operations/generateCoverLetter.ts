@@ -1,5 +1,6 @@
 import { invokeBedrock } from './utils/bedrock';
 import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
+import { formatAiInputContext } from './utils/promptFormat';
 import type {
   JobDescription,
   MatchingSummaryContext,
@@ -106,8 +107,6 @@ Before finalizing:
 If any rule is violated, rewrite before output.
 `;
 
-const PROMPT_INDENT_SPACES = 2;
-
 export interface GenerateCoverLetterInput {
   language: 'en';
   profile: Profile;
@@ -128,29 +127,16 @@ function buildUserPrompt(args: GenerateCoverLetterInput): string {
   return `TASK
 Using the information below, write a personalized cover letter following strictly the VOUS → MOI → NOUS structure and all system instructions.
 
-LANGUAGE
-${args.language}
-
-PROFILE
-${JSON.stringify(args.profile, null, PROMPT_INDENT_SPACES)}
-
-EXPERIENCES
-${JSON.stringify(args.experiences, null, PROMPT_INDENT_SPACES)}
-
-STORIES
-${JSON.stringify(args.stories ?? {}, null, PROMPT_INDENT_SPACES)}
-
-PERSONAL CANVAS
-${JSON.stringify(args.personalCanvas ?? {}, null, PROMPT_INDENT_SPACES)}
-
-TARGET JOB DESCRIPTION (optional)
-${JSON.stringify(jobDescription, null, PROMPT_INDENT_SPACES)}
-
-MATCHING SUMMARY (optional)
-${JSON.stringify(matchingSummary ?? {}, null, PROMPT_INDENT_SPACES)}
-
-COMPANY SUMMARY (optional)
-${JSON.stringify(company ?? {}, null, PROMPT_INDENT_SPACES)}
+${formatAiInputContext({
+  language: args.language,
+  profile: args.profile,
+  experiences: args.experiences,
+  stories: args.stories,
+  personalCanvas: args.personalCanvas,
+  jobDescription,
+  matchingSummary,
+  company,
+})}
 
 RECIPIENT CONTEXT
 - Company name: ${company?.companyName || 'unknown'}

@@ -145,7 +145,7 @@ Your teams need consistent delivery and coaching; I bring repeatable systems and
 
     expect(userPrompt).toContain('TARGET JOB DESCRIPTION');
     expect(userPrompt).toContain('Head of Engineering');
-    expect(userPrompt).toContain('MATCHING SUMMARY');
+    expect(userPrompt).not.toContain('MATCHING SUMMARY');
     expect(userPrompt).toContain('COMPANY SUMMARY');
     expect(userPrompt).toContain('Acme Systems');
   });

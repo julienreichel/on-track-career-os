@@ -1,5 +1,6 @@
 import { invokeBedrock } from './utils/bedrock';
 import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
+import { formatAiInputContext } from './utils/promptFormat';
 import type {
   JobDescription,
   MatchingSummaryContext,
@@ -56,8 +57,6 @@ Output must be:
 
 Word counts are targets, not strict limits. End each section with an opening question.`;
 
-const PROMPT_INDENT_SPACES = 2;
-
 export interface GenerateSpeechInput {
   language: 'en';
   profile: Profile;
@@ -113,45 +112,19 @@ function buildUserPrompt(args: GenerateSpeechInput): string {
   const matchingSummary = tailoring.matchingSummary;
   const company = tailoring.company;
   const stories = args.stories ?? [];
-  const tailoringFlags = {
-    hasJobDescription: Boolean(jobDescription),
-    hasMatchingSummary: Boolean(matchingSummary),
-    hasCompany: Boolean(company),
-  };
-  const hasTailoringFlags = Object.values(tailoringFlags).some(Boolean);
 
   return `Use the following data to create personal speech material.
 
-LANGUAGE:
-${args.language}
-
-PROFILE:
-${JSON.stringify(args.profile ?? {}, null, PROMPT_INDENT_SPACES)}
-
-EXPERIENCES:
-${JSON.stringify(args.experiences ?? [], null, PROMPT_INDENT_SPACES)}
-
-STORIES (use these for proof examples):
-${JSON.stringify(stories, null, PROMPT_INDENT_SPACES)}
-
-PERSONAL CANVAS:
-${JSON.stringify(args.personalCanvas ?? {}, null, PROMPT_INDENT_SPACES)}
-
-${
-  hasTailoringFlags
-    ? `TAILORING CONTEXT:
-${JSON.stringify(tailoringFlags, null, PROMPT_INDENT_SPACES)}
-
-`
-    : ''
-}TARGET JOB DESCRIPTION (optional):
-${JSON.stringify(jobDescription, null, PROMPT_INDENT_SPACES)}
-
-MATCHING SUMMARY (optional):
-${JSON.stringify(matchingSummary, null, PROMPT_INDENT_SPACES)}
-
-COMPANY SUMMARY (optional):
-${JSON.stringify(company, null, PROMPT_INDENT_SPACES)}
+${formatAiInputContext({
+  language: args.language,
+  profile: args.profile,
+  experiences: args.experiences,
+  stories,
+  personalCanvas: args.personalCanvas,
+  jobDescription,
+  matchingSummary,
+  company,
+})}
 
 Output guidance (targets, not strict limits):
 - elevatorPitch: ~45-60s, target ~120 words, 5-7 sentences, end with an opening question.
