@@ -113,11 +113,7 @@ I look forward to discussing how my background aligns with your needs.
 Best regards,
 Casey Candidate`;
 
-    mockSend.mockResolvedValue(
-      buildBedrockResponse({
-        content: mockContent,
-      })
-    );
+    mockSend.mockResolvedValue(buildBedrockResponse(mockContent));
 
     const response = await handler({ arguments: validArguments as never });
 
@@ -134,9 +130,7 @@ Casey Candidate`;
     };
 
     mockSend.mockResolvedValue(
-      buildBedrockResponse({
-        content: 'Generic professional cover letter content showcasing value proposition.',
-      })
+      buildBedrockResponse('Generic professional cover letter content showcasing value proposition.')
     );
 
     await handler({ arguments: genericArgs as never });
@@ -152,11 +146,7 @@ Casey Candidate`;
   });
 
   it('includes job description context when provided', async () => {
-    mockSend.mockResolvedValue(
-      buildBedrockResponse({
-        content: 'Tailored cover letter content.',
-      })
-    );
+    mockSend.mockResolvedValue(buildBedrockResponse('Tailored cover letter content.'));
 
     await handler({ arguments: validArguments as never });
 
@@ -175,11 +165,7 @@ Casey Candidate`;
   });
 
   it('drops job context when matching summary is missing', async () => {
-    mockSend.mockResolvedValue(
-      buildBedrockResponse({
-        content: 'Generic cover letter content.',
-      })
-    );
+    mockSend.mockResolvedValue(buildBedrockResponse('Generic cover letter content.'));
 
     const argsWithoutSummary = { ...validArguments, matchingSummary: undefined };
     await handler({ arguments: argsWithoutSummary as never });
@@ -195,9 +181,7 @@ Casey Candidate`;
 
   it('validates output schema and returns valid content', async () => {
     mockSend.mockResolvedValue(
-      buildBedrockResponse({
-        content: 'Valid cover letter content with proper structure.',
-      })
+      buildBedrockResponse('Valid cover letter content with proper structure.')
     );
 
     const response = await handler({ arguments: validArguments as never });
@@ -206,33 +190,41 @@ Casey Candidate`;
     expect(response.length).toBeGreaterThan(0);
   });
 
-  it('falls back to raw text when AI output is invalid JSON', async () => {
-    mockSend.mockResolvedValueOnce(buildBedrockResponse('not json at all'));
+  it('strips preamble and epilogue commentary', async () => {
+    mockSend.mockResolvedValue(
+      buildBedrockResponse(
+        `Here is your cover letter:
 
-    const response = await handler({ arguments: validArguments as never });
+Dear Hiring Manager,
 
-    expect(response).toBe('not json at all');
-  });
+I am excited to apply for the role.
 
-  it('returns empty string when AI output has wrong schema', async () => {
-    mockSend.mockResolvedValueOnce(
-      buildBedrockResponse({
-        wrongKey: 'wrong value',
-      })
+Let me know if you'd like adjustments.`
+      )
     );
 
     const response = await handler({ arguments: validArguments as never });
 
-    // Wrong schema (missing content field) returns empty string
-    expect(response).toBe('');
+    expect(response).toContain('Dear Hiring Manager');
+    expect(response).not.toContain('Here is your cover letter');
+    expect(response).not.toContain("Let me know if you'd like adjustments");
+  });
+
+  it('strips code fences when present', async () => {
+    mockSend.mockResolvedValue(
+      buildBedrockResponse(
+        '```markdown\nDear Hiring Manager,\n\nThank you for your time.\n```\n'
+      )
+    );
+
+    const response = await handler({ arguments: validArguments as never });
+
+    expect(response).toContain('Dear Hiring Manager');
+    expect(response).not.toContain('```');
   });
 
   it('includes STAR stories in the prompt', async () => {
-    mockSend.mockResolvedValue(
-      buildBedrockResponse({
-        content: 'Cover letter leveraging STAR stories.',
-      })
-    );
+    mockSend.mockResolvedValue(buildBedrockResponse('Cover letter leveraging STAR stories.'));
 
     await handler({ arguments: validArguments as never });
 
@@ -247,11 +239,7 @@ Casey Candidate`;
   });
 
   it('includes personal canvas in the prompt', async () => {
-    mockSend.mockResolvedValue(
-      buildBedrockResponse({
-        content: 'Cover letter with canvas context.',
-      })
-    );
+    mockSend.mockResolvedValue(buildBedrockResponse('Cover letter with canvas context.'));
 
     await handler({ arguments: validArguments as never });
 
@@ -266,11 +254,7 @@ Casey Candidate`;
   });
 
   it('trims whitespace from content', async () => {
-    mockSend.mockResolvedValue(
-      buildBedrockResponse({
-        content: '  \n\n  Trimmed content  \n  ',
-      })
-    );
+    mockSend.mockResolvedValue(buildBedrockResponse('  \n\n  Trimmed content  \n  '));
 
     const response = await handler({ arguments: validArguments as never });
 

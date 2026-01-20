@@ -23,12 +23,7 @@ Output must be:
 - structured with clear paragraphs
 - grounded in data provided
 - no invented work history, skills, or achievements
-- no extra keys
-- JSON only`;
-
-const OUTPUT_SCHEMA = `{
-  "content": "string (complete cover letter in plain text or markdown)"
-}`;
+- return a plain Markdown cover letter only (no JSON, no code fences, no extra commentary)`;
 
 const PROMPT_INDENT_SPACES = 2;
 
@@ -94,8 +89,7 @@ Structure the cover letter with:
 
 ${hasJob ? 'Demonstrate specific fit for the role and company needs.' : 'Focus on transferable value and professional identity.'}
 
-Return ONLY valid JSON matching this exact schema:
-${OUTPUT_SCHEMA}`;
+Return a plain Markdown cover letter only. Do not include JSON, code fences, or any extra preamble.`;
 }
 
 function resolveTailoringContext(args: GenerateCoverLetterInput) {
@@ -142,6 +136,89 @@ type HandlerEvent = {
   arguments: GenerateCoverLetterInput;
 };
 
+const PREAMBLE_PATTERNS = [
+  /^here('?s| is) (your|a) cover letter[:\s-]*/i,
+  /^certainly[,!]\s*/i,
+  /^sure[,!]\s*/i,
+  /^below is (your|a) cover letter[:\s-]*/i,
+  /^cover letter[:\s-]*/i,
+  /^---$/,
+];
+
+const EPILOGUE_PATTERNS = [
+  /let me know if/i,
+  /hope this helps/i,
+  /if you'd like/i,
+  /feel free to/i,
+  /would you like/i,
+  /happy to revise/i,
+  /^---$/,
+];
+
+function stripCodeFences(input: string): string {
+  return input
+    .replace(/```[\s\S]*?```/g, (match) => match.replace(/```[^\n]*\n?/g, ''))
+    .replace(/```/g, '');
+}
+
+function stripPreamble(lines: string[]): string[] {
+  let startIndex = 0;
+  while (startIndex < lines.length) {
+    const line = lines[startIndex]?.trim();
+    if (!line) {
+      startIndex += 1;
+      continue;
+    }
+    if (PREAMBLE_PATTERNS.some((pattern) => pattern.test(line))) {
+      startIndex += 1;
+      continue;
+    }
+    break;
+  }
+  return lines.slice(startIndex);
+}
+
+function stripEpilogue(lines: string[]): string[] {
+  let endIndex = lines.length;
+  while (endIndex > 0) {
+    const line = lines[endIndex - 1]?.trim();
+    if (!line) {
+      endIndex -= 1;
+      continue;
+    }
+    if (EPILOGUE_PATTERNS.some((pattern) => pattern.test(line))) {
+      endIndex -= 1;
+      continue;
+    }
+    break;
+  }
+  return lines.slice(0, endIndex);
+}
+
+function cleanCoverLetterMarkdown(input: string): string {
+  const normalized = stripCodeFences(input).trim();
+  const lines = normalized.split(/\r?\n/);
+  const withoutPreamble = stripPreamble(lines);
+  const withoutEpilogue = stripEpilogue(withoutPreamble);
+  return withoutEpilogue.join('\n').trim();
+}
+
+function parseCoverLetterResponse(responseText: string): { content: string } {
+  const trimmed = responseText.trim();
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    try {
+      const parsed = JSON.parse(trimmed) as { content?: unknown };
+      if (typeof parsed.content === 'string') {
+        return { content: parsed.content };
+      }
+    } catch {
+      // Fall through to markdown parsing.
+    }
+  }
+
+  return { content: trimmed };
+}
+
 export const handler = async (event: HandlerEvent): Promise<string> => {
   if (!event?.arguments) {
     throw new Error('arguments are required');
@@ -156,18 +233,8 @@ export const handler = async (event: HandlerEvent): Promise<string> => {
 
       console.log('[generateCoverLetter] Generated cover letter length:', responseText.length);
 
-      // Parse JSON response and extract content
-      try {
-        const parsed = JSON.parse(responseText);
-        const content = typeof parsed.content === 'string' ? parsed.content.trim() : '';
-        return content;
-      } catch (parseError) {
-        console.error('[generateCoverLetter] Failed to parse JSON response, returning raw text', {
-          error: (parseError as Error).message,
-        });
-        // If JSON parsing fails, return the raw text as fallback
-        return responseText.trim();
-      }
+      const parsed = parseCoverLetterResponse(responseText);
+      return cleanCoverLetterMarkdown(parsed.content);
     },
     (args) => ({
       userName: args.profile?.fullName,
