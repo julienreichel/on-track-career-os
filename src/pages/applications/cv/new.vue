@@ -1,186 +1,76 @@
 <template>
   <UPage>
-    <UPageHeader :title="$t('cvNew.title')" :description="$t('cvNew.subtitle')" />
+    <UPageHeader :title="t('cvGenerate.title')" :description="t('cvGenerate.subtitle')" />
 
     <UPageBody>
-      <!-- Wizard Steps -->
-      <div v-if="!isAutoFlow" class="mb-6">
-        <div class="flex items-center justify-center gap-4">
-          <div
-            class="flex items-center gap-2"
-            :class="{
-              'text-primary-600 font-semibold': currentStep === 1,
-              'text-gray-400': currentStep !== 1,
-            }"
-          >
-            <div
-              class="flex items-center justify-center w-8 h-8 rounded-full border-2"
-              :class="{
-                'border-primary-600 bg-primary-50': currentStep === 1,
-                'border-gray-300': currentStep !== 1,
-              }"
-            >
-              1
-            </div>
-            <span>{{ $t('cvNew.steps.selectExperiences') }}</span>
-          </div>
-          <UIcon name="i-heroicons-chevron-right" class="text-gray-400" />
-          <div
-            class="flex items-center gap-2"
-            :class="{
-              'text-primary-600 font-semibold': currentStep === 2,
-              'text-gray-400': currentStep !== 2,
-            }"
-          >
-            <div
-              class="flex items-center justify-center w-8 h-8 rounded-full border-2"
-              :class="{
-                'border-primary-600 bg-primary-50': currentStep === 2,
-                'border-gray-300': currentStep !== 2,
-              }"
-            >
-              2
-            </div>
-            <span>{{ $t('cvNew.steps.generate') }}</span>
-          </div>
-        </div>
-      </div>
+      <CvGenerateEntryCard
+        :template-name="templateLabel"
+        :section-count="selectedSections.length"
+        :experience-count="selectedExperienceIds.length"
+        :ask-each-time="defaults.askEachTime"
+        :show-profile-photo="defaults.showProfilePhoto"
+        :generating="isGenerating"
+        @generate="handleGenerateClick"
+        @edit-settings="modalOpen = true"
+      />
 
-      <!-- Step 1: Select Experiences -->
-      <UCard v-if="currentStep === 1 && !isAutoFlow">
-        <div class="space-y-6">
-          <div>
-            <h2 class="text-xl font-semibold text-gray-900 mb-2">
-              {{ $t('cvNew.step1.title') }}
-            </h2>
-            <p class="text-gray-600">
-              {{ $t('cvNew.step1.description') }}
-            </p>
-          </div>
-
-          <CvExperiencePicker v-model="selectedExperienceIds" :user-id="userId" />
-
-          <div class="flex justify-end gap-3 pt-4 border-t">
-            <UButton color="neutral" variant="outline" @click="cancel">
-              {{ $t('cvNew.actions.cancel') }}
-            </UButton>
-            <UButton :disabled="selectedExperienceIds.length === 0" @click="nextStep">
-              {{ $t('cvNew.actions.next') }}
-            </UButton>
-          </div>
-        </div>
-      </UCard>
-
-      <!-- Generating State -->
-      <CvGeneratingStep v-if="isGenerating" />
-
-      <!-- Step 2: Generate CV -->
-      <UCard v-else-if="currentStep === 2 && !isAutoFlow">
-        <div class="space-y-6">
-          <div>
-            <h2 class="text-xl font-semibold text-gray-900 mb-2">
-              {{ $t('cvNew.step2.title') }}
-            </h2>
-            <p class="text-gray-600">
-              {{ $t('cvNew.step2.description') }}
-            </p>
-          </div>
-
-          <!-- CV Name -->
-          <UFormField :label="$t('cvNew.step2.fields.name')" required>
-            <UInput
-              v-model="cvName"
-              :placeholder="$t('cvNew.step2.placeholders.name')"
-              class="w-full"
-            />
-          </UFormField>
-
-          <!-- Optional Sections -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-3">
-              {{ $t('cvNew.step2.fields.optionalSections') }}
-            </label>
-            <div class="grid grid-cols-2 gap-2">
-              <UCheckbox v-model="includeSkills" :label="$t('cvNew.step2.sections.skills')" />
-              <UCheckbox v-model="includeLanguages" :label="$t('cvNew.step2.sections.languages')" />
-              <UCheckbox
-                v-model="includeCertifications"
-                :label="$t('cvNew.step2.sections.certifications')"
-              />
-              <UCheckbox v-model="includeInterests" :label="$t('cvNew.step2.sections.interests')" />
-            </div>
-            <div class="mt-2">
-              <UCheckbox
-                v-model="includeProfilePhoto"
-                :label="$t('cvNew.step2.sections.profilePhoto')"
-              />
-            </div>
-          </div>
-
-          <!-- Job Description (Optional) -->
-          <UFormField
-            :label="$t('cvNew.step2.fields.jobDescription')"
-            :help="$t('cvNew.step2.help.jobDescription')"
-          >
-            <UTextarea
-              v-model="jobDescription"
-              :placeholder="$t('cvNew.step2.placeholders.jobDescription')"
-              :rows="4"
-              class="w-full"
-            />
-          </UFormField>
-
-          <div class="flex justify-end gap-3 pt-4 border-t">
-            <UButton color="neutral" variant="outline" @click="previousStep">
-              {{ $t('cvNew.actions.back') }}
-            </UButton>
-            <UButton :disabled="!cvName.trim()" @click="generateCV">
-              {{ $t('cvNew.actions.generate') }}
-            </UButton>
-          </div>
-        </div>
-      </UCard>
+      <CvGenerationModal
+        v-model:open="modalOpen"
+        :templates="templates"
+        :experiences="experiences"
+        :loading-experiences="loadingExperiences"
+        :initial-template-id="selectedTemplateId"
+        :initial-enabled-sections="selectedSections"
+        :initial-selected-experience-ids="selectedExperienceIds"
+        :generating="isGenerating"
+        @confirm="handleModalConfirm"
+      />
     </UPageBody>
   </UPage>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useCvDocuments } from '@/composables/useCvDocuments';
 import { useCvGenerator } from '@/composables/useCvGenerator';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
+import { useCvSettings } from '@/application/cvsettings/useCvSettings';
+import { useCvTemplates } from '@/application/cvtemplate/useCvTemplates';
+import { getDefaultCvSettings } from '@/domain/cvsettings/getDefaultCvSettings';
+import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import type { Experience } from '@/domain/experience/Experience';
+import type { CvSectionKey } from '@/domain/cvsettings/CvSectionKey';
+import { resolveSystemCvTemplates } from '@/domain/cvtemplate/systemTemplates';
+import CvGenerateEntryCard from '@/components/cv/CvGenerateEntryCard.vue';
+import CvGenerationModal from '@/components/cv/CvGenerationModal.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
 
-// Get current user ID from auth
-const { userId } = useAuthUser();
-
+const { userId, loadUserId } = useAuthUser();
 const { createDocument } = useCvDocuments();
 const { generateCv, generating, error: generationError } = useCvGenerator();
 const tailoredMaterials = useTailoredMaterials();
+const { settings, load: loadSettings } = useCvSettings();
+const { templates, load: loadTemplates } = useCvTemplates();
+const experienceRepo = new ExperienceRepository();
 
-// Wizard state
-const currentStep = ref(1);
+const experiences = ref<Experience[]>([]);
+const loadingExperiences = ref(false);
+const modalOpen = ref(false);
+const initialized = ref(false);
+const preparing = ref(false);
+
+const selectedTemplateId = ref<string | null>(null);
+const selectedSections = ref<CvSectionKey[]>([]);
 const selectedExperienceIds = ref<string[]>([]);
-const autoGenerating = ref(false);
-const autoTriggered = ref(false);
 
-// Step 2 state
-const cvName = ref('');
-const includeSkills = ref(true);
-const includeLanguages = ref(false);
-const includeCertifications = ref(false);
-const includeInterests = ref(false);
-const includeProfilePhoto = ref(true);
-const jobDescription = ref('');
-const autoJobId = computed(() => {
+const jobId = computed(() => {
   const value = route.query.jobId;
   if (typeof value === 'string') {
     return value;
@@ -190,152 +80,253 @@ const autoJobId = computed(() => {
   }
   return null;
 });
-const isAutoFlow = computed(() => Boolean(autoJobId.value));
-const isGenerating = computed(
-  () => generating.value || autoGenerating.value || tailoredMaterials.isGenerating.value
+
+const defaults = computed(() =>
+  getDefaultCvSettings({
+    settings: settings.value,
+    experiences: experiences.value,
+  })
 );
 
-const LAST_STEP = 2;
-const FIRST_STEP = 1;
-
-const nextStep = () => {
-  if (currentStep.value < LAST_STEP) {
-    currentStep.value++;
+const systemTemplates = computed(() => resolveSystemCvTemplates(locale.value, t));
+const fallbackTemplate = computed(() => systemTemplates.value[0] ?? null);
+const templateLabel = computed(() => {
+  const template = templates.value.find((item) => item.id === selectedTemplateId.value);
+  if (template?.name) {
+    return template.name;
   }
+  return fallbackTemplate.value?.name ?? t('cvGenerate.entry.templateFallback');
+});
+
+const isGenerating = computed(
+  () => preparing.value || generating.value || tailoredMaterials.isGenerating.value
+);
+
+const setDefaults = () => {
+  selectedTemplateId.value = defaults.value.defaultTemplateId;
+  selectedSections.value = [...defaults.value.defaultEnabledSections] as CvSectionKey[];
+  selectedExperienceIds.value = [...defaults.value.defaultIncludedExperienceIds];
 };
 
-const previousStep = () => {
-  if (currentStep.value > FIRST_STEP) {
-    currentStep.value--;
+const resolveTemplateMarkdown = (templateId: string | null) => {
+  const template = templates.value.find((item) => item.id === templateId);
+  if (template?.content?.trim()) {
+    return template.content.trim();
   }
+  return fallbackTemplate.value?.content?.trim() ?? '';
 };
 
-const cancel = () => {
-  void router.push({ name: 'cv' });
+const resolveGenerationContext = (override?: {
+  templateId?: string | null;
+  enabledSections?: CvSectionKey[];
+  selectedExperienceIds?: string[];
+}) => {
+  const templateId = override?.templateId ?? selectedTemplateId.value;
+  const enabledSections = override?.enabledSections ?? selectedSections.value;
+  const experienceIds = override?.selectedExperienceIds ?? selectedExperienceIds.value;
+
+  return {
+    templateId: templateId ?? null,
+    templateMarkdown: resolveTemplateMarkdown(templateId ?? null),
+    enabledSections,
+    selectedExperienceIds: experienceIds,
+    showProfilePhoto: defaults.value.showProfilePhoto,
+  };
 };
 
-const generateTailoredCv = async (jobId: string) => {
-  if (autoTriggered.value) {
-    return;
-  }
-  autoTriggered.value = true;
-  autoGenerating.value = true;
-  try {
-    const context = await tailoredMaterials.loadTailoringContext(jobId);
-    if (!context.ok) {
-      toast.add({
-        title: t('cvNew.toast.error'),
-        color: 'error',
-      });
-      await router.push('/jobs');
-      return;
-    }
-    if (!context.matchingSummary) {
-      toast.add({
-        title: t('cvNew.toast.generationFailed'),
-        color: 'error',
-      });
-      await router.push(`/jobs/${jobId}/match`);
-      return;
-    }
-
-    const created = await tailoredMaterials.generateTailoredCvForJob({
-      job: context.job,
-      matchingSummary: context.matchingSummary,
-    });
-    if (created?.id) {
-      await router.push({
-        name: 'applications-cv-id',
-        params: { id: created.id },
-      });
-      return;
-    }
-
-    toast.add({
-      title: t('cvNew.toast.createFailed'),
-      color: 'error',
-    });
-  } catch (err) {
-    console.error('[cvNew] Error generating tailored CV:', err);
-    toast.add({
-      title: t('cvNew.toast.error'),
-      color: 'error',
-    });
-  } finally {
-    autoGenerating.value = false;
-  }
-};
-
-const generateCV = async () => {
-  if (!cvName.value.trim() || !userId.value) {
+const generateGenericCv = async (context: ReturnType<typeof resolveGenerationContext>) => {
+  if (!userId.value) {
     return;
   }
 
-  try {
-    // Generate CV markdown using composable
-    const cvMarkdown = await generateCv(userId.value, selectedExperienceIds.value, {
-      jobDescription: jobDescription.value || undefined,
-      includeSkills: includeSkills.value,
-      includeLanguages: includeLanguages.value,
-      includeCertifications: includeCertifications.value,
-      includeInterests: includeInterests.value,
-    });
+  const cvMarkdown = await generateCv(userId.value, context.selectedExperienceIds, {
+    enabledSections: context.enabledSections,
+    templateMarkdown: context.templateMarkdown,
+  });
 
-    if (!cvMarkdown) {
-      toast.add({
-        title: t('cvNew.toast.generationFailed'),
-        description: generationError.value || undefined,
-        color: 'error',
-      });
-      return;
-    }
-
-    // Create CV document with markdown content
-    const cvDocument = await createDocument({
-      name: cvName.value,
-      userId: userId.value,
-      isTailored: !!jobDescription.value,
-      content: cvMarkdown,
-      showProfilePhoto: includeProfilePhoto.value,
-    });
-
-    if (cvDocument) {
-      toast.add({
-        title: t('cvNew.toast.created'),
-        color: 'primary',
-      });
-
-      // Navigate to editor
-      await router.push({
-        name: 'applications-cv-id',
-        params: { id: cvDocument.id },
-      });
-    } else {
-      console.error('[cvNew] Failed to create CV document - createDocument returned null');
-      toast.add({
-        title: t('cvNew.toast.createFailed'),
-        color: 'error',
-      });
-    }
-  } catch (err) {
-    console.error('[cvNew] Error generating CV:', err);
-    generationError.value = err instanceof Error ? err.message : 'Unknown error';
+  if (!cvMarkdown) {
     toast.add({
-      title: t('cvNew.toast.error'),
+      title: t('cvGenerate.toast.generationFailed'),
+      description: generationError.value || undefined,
       color: 'error',
     });
+    return;
+  }
+
+  const dateLabel = new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date());
+  const cvDocument = await createDocument({
+    name: t('cvGenerate.defaultName', { date: dateLabel }),
+    userId: userId.value,
+    isTailored: false,
+    content: cvMarkdown,
+    showProfilePhoto: context.showProfilePhoto,
+    templateId: context.templateId ?? undefined,
+  });
+
+  if (!cvDocument) {
+    toast.add({
+      title: t('cvGenerate.toast.createFailed'),
+      color: 'error',
+    });
+    return;
+  }
+
+  toast.add({
+    title: t('cvGenerate.toast.created'),
+    color: 'primary',
+  });
+
+  await router.push({
+    name: 'applications-cv-id',
+    params: { id: cvDocument.id },
+  });
+};
+
+const generateTailoredCv = async (
+  context: ReturnType<typeof resolveGenerationContext>,
+  targetJobId: string
+) => {
+  const tailoringContext = await tailoredMaterials.loadTailoringContext(targetJobId);
+  if (!tailoringContext.ok) {
+    toast.add({
+      title: t('cvGenerate.toast.error'),
+      color: 'error',
+    });
+    await router.push('/jobs');
+    return;
+  }
+
+  if (!tailoringContext.matchingSummary) {
+    toast.add({
+      title: t('cvGenerate.toast.generationFailed'),
+      color: 'error',
+    });
+    await router.push(`/jobs/${targetJobId}/match`);
+    return;
+  }
+
+  const created = await tailoredMaterials.generateTailoredCvForJob({
+    job: tailoringContext.job,
+    matchingSummary: tailoringContext.matchingSummary,
+    options: {
+      name: `Tailored CV — ${tailoringContext.job.title}`,
+      templateId: context.templateId ?? undefined,
+      templateMarkdown: context.templateMarkdown,
+      enabledSections: context.enabledSections,
+      selectedExperienceIds: context.selectedExperienceIds,
+      showProfilePhoto: context.showProfilePhoto,
+    },
+  });
+
+  if (!created?.id) {
+    toast.add({
+      title: t('cvGenerate.toast.createFailed'),
+      color: 'error',
+    });
+    return;
+  }
+
+  await router.push({
+    name: 'applications-cv-id',
+    params: { id: created.id },
+  });
+};
+
+const startGeneration = async (override?: {
+  templateId?: string | null;
+  enabledSections?: CvSectionKey[];
+  selectedExperienceIds?: string[];
+}) => {
+  if (!userId.value) {
+    return;
+  }
+
+  const context = resolveGenerationContext(override);
+  if (jobId.value) {
+    await generateTailoredCv(context, jobId.value);
+    return;
+  }
+
+  await generateGenericCv(context);
+};
+
+const handleGenerateClick = async () => {
+  await prepareDefaults();
+  if (!userId.value) {
+    toast.add({ title: t('cvGenerate.toast.error'), color: 'error' });
+    return;
+  }
+  if (defaults.value.askEachTime) {
+    modalOpen.value = true;
+    return;
+  }
+  void startGeneration();
+};
+
+const handleModalConfirm = async (payload: {
+  templateId: string | null;
+  enabledSections: CvSectionKey[];
+  selectedExperienceIds: string[];
+}) => {
+  modalOpen.value = false;
+  await prepareDefaults();
+  void startGeneration(payload);
+};
+
+const loadExperiences = async () => {
+  if (!userId.value) {
+    return;
+  }
+
+  loadingExperiences.value = true;
+  try {
+    experiences.value = await experienceRepo.list(userId.value);
   } finally {
-    generating.value = false;
+    loadingExperiences.value = false;
+  }
+};
+
+const ensureLoaded = async () => {
+  if (!userId.value) {
+    await loadUserId();
+  }
+  if (!userId.value) {
+    return;
+  }
+
+  await Promise.all([loadSettings(), loadTemplates(), loadExperiences()]);
+  initialized.value = true;
+};
+
+const prepareDefaults = async () => {
+  if (initialized.value || preparing.value) {
+    return;
+  }
+  preparing.value = true;
+  try {
+    await ensureLoaded();
+    setDefaults();
+  } finally {
+    preparing.value = false;
   }
 };
 
 watch(
-  () => autoJobId.value,
-  (jobId) => {
-    if (jobId) {
-      void generateTailoredCv(jobId);
+  () => defaults.value,
+  () => {
+    if (!initialized.value) {
+      return;
     }
+    setDefaults();
   },
   { immediate: true }
 );
+
+onMounted(async () => {
+  await ensureLoaded();
+  setDefaults();
+});
 </script>
