@@ -1,69 +1,61 @@
+import classicEn from '@/content/templates/cv/en/classic.md?raw';
+import modernEn from '@/content/templates/cv/en/modern.md?raw';
+import competencyEn from '@/content/templates/cv/en/competency.md?raw';
+
+export type SystemCvTemplateDefinition = {
+  id: string;
+  source: string;
+  nameKey: string;
+  descriptionKey: string;
+  contentByLocale: Record<string, string>;
+};
+
 export type SystemCvTemplate = {
   id: string;
-  name: string;
   source: string;
+  name: string;
+  description: string;
   content: string;
 };
 
-export const SYSTEM_CV_TEMPLATES: SystemCvTemplate[] = [
+export const SYSTEM_CV_TEMPLATE_DEFS: SystemCvTemplateDefinition[] = [
   {
     id: 'system:classic',
-    name: 'Classic',
     source: 'system:classic',
-    content: `# {{fullName}}
-{{headline}}
-
-## Summary
-{{summary}}
-
-## Experience
-{{experience}}
-
-## Education
-{{education}}
-
-## Skills
-{{skills}}
-`,
+    nameKey: 'cvTemplates.system.classic.name',
+    descriptionKey: 'cvTemplates.system.classic.description',
+    contentByLocale: {
+      en: classicEn,
+    },
   },
   {
     id: 'system:modern',
-    name: 'Modern',
     source: 'system:modern',
-    content: `# {{fullName}}
-{{headline}} · {{location}}
-
-## Impact Summary
-{{summary}}
-
-## Core Skills
-{{skills}}
-
-## Experience
-{{experience}}
-
-## Education
-{{education}}
-`,
+    nameKey: 'cvTemplates.system.modern.name',
+    descriptionKey: 'cvTemplates.system.modern.description',
+    contentByLocale: {
+      en: modernEn,
+    },
   },
   {
     id: 'system:competency',
-    name: 'Competency',
     source: 'system:competency',
-    content: `# {{fullName}}
-{{headline}}
-
-## Profile
-{{summary}}
-
-## Competencies
-{{skills}}
-
-## Experience
-{{experience}}
-
-## Certifications
-{{certifications}}
-`,
+    nameKey: 'cvTemplates.system.competency.name',
+    descriptionKey: 'cvTemplates.system.competency.description',
+    contentByLocale: {
+      en: competencyEn,
+    },
   },
 ];
+
+export const resolveSystemCvTemplates = (
+  locale: string,
+  t: (key: string) => string
+): SystemCvTemplate[] =>
+  SYSTEM_CV_TEMPLATE_DEFS.map((template) => ({
+    id: template.id,
+    source: template.source,
+    name: t(template.nameKey),
+    description: t(template.descriptionKey),
+    content: template.contentByLocale[locale] ?? template.contentByLocale.en,
+  }));

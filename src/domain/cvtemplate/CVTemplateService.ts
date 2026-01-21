@@ -1,6 +1,6 @@
 import { CVTemplateRepository } from './CVTemplateRepository';
 import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
-import type { CVTemplate, CVTemplateCreateInput } from './CVTemplate';
+import type { CVTemplate, CVTemplateCreateInput, CVTemplateUpdateInput } from './CVTemplate';
 
 export class CVTemplateService {
   constructor(
@@ -18,5 +18,17 @@ export class CVTemplateService {
 
   async createFromExemplar(input: CVTemplateCreateInput): Promise<CVTemplate | null> {
     return this.repo.createFromExemplar(input);
+  }
+
+  async create(input: CVTemplateCreateInput): Promise<CVTemplate | null> {
+    return this.repo.create(input);
+  }
+
+  async update(input: CVTemplateUpdateInput): Promise<CVTemplate | null> {
+    return this.repo.update(input);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.repo.delete(id);
   }
 }

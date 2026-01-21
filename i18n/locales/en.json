@@ -825,6 +825,94 @@
       "deleteFailed": "Failed to delete CV"
     }
   },
+  "cvTemplates": {
+    "list": {
+      "title": "CV Templates",
+      "subtitle": "Manage reusable templates for CV generation.",
+      "system": {
+        "title": "System templates",
+        "description": "Start from a vetted exemplar and customize it."
+      },
+      "user": {
+        "title": "Your templates",
+        "description": "Templates you've created or customized."
+      },
+      "actions": {
+        "create": "Create template",
+        "useTemplate": "Use template",
+        "edit": "Edit template",
+        "setDefault": "Set as default"
+      },
+      "empty": {
+        "title": "No templates yet",
+        "description": "Create a template or start from a system template."
+      },
+      "newTemplateName": "Untitled template"
+    },
+    "editor": {
+      "title": "Template editor",
+      "subtitle": "Edit your template markdown and preview the output.",
+      "backToList": "Back to templates",
+      "setDefault": "Set as default",
+      "nameLabel": "Template name",
+      "contentLabel": "Template markdown",
+      "preview": "Preview",
+      "showPreview": "Show preview",
+      "hidePreview": "Hide preview"
+    },
+    "labels": {
+      "default": "Default",
+      "updated": "Updated"
+    },
+    "system": {
+      "classic": {
+        "name": "Classic",
+        "description": "Clean, traditional layout with clear section hierarchy."
+      },
+      "modern": {
+        "name": "Modern",
+        "description": "Contemporary layout with compact summary and skills first."
+      },
+      "competency": {
+        "name": "Competency",
+        "description": "Competency-led layout for skills-forward roles."
+      }
+    },
+    "source": {
+      "system": "System-derived",
+      "user": "User"
+    },
+    "delete": {
+      "title": "Delete \"{name}\"?",
+      "description": "This action cannot be undone."
+    },
+    "toast": {
+      "created": "Template created",
+      "createFailed": "Unable to create template",
+      "saved": "Template saved",
+      "saveFailed": "Unable to save template",
+      "deleted": "Template deleted",
+      "deleteFailed": "Unable to delete template",
+      "defaultSet": "Default template updated",
+      "defaultFailed": "Unable to set default template"
+    },
+    "errors": {
+      "settings": "Unable to load CV settings.",
+      "notFound": "Template not found.",
+      "loadFailed": "Unable to load template."
+    }
+  },
+  "templates": {
+    "title": "Templates",
+    "subtitle": "Manage reusable documents and settings.",
+    "actions": {
+      "cvTemplates": "CV Templates"
+    },
+    "empty": {
+      "title": "Template library",
+      "description": "Start by managing your CV templates."
+    }
+  },
   "cvNew": {
     "title": "Create New CV",
     "subtitle": "Follow the wizard to create a tailored CV",
