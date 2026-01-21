@@ -158,6 +158,7 @@ export const schemaLambdas = {
       jobDescription: a.ref('JobType'),
       matchingSummary: a.ref('MatchingSummaryContextType'),
       company: a.ref('CompanyType'),
+      templateMarkdown: a.string(),
     })
     .returns(a.string())
     .authorization((allow) => [allow.authenticated()])

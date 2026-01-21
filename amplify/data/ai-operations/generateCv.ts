@@ -24,6 +24,7 @@ import type {
  * - jobDescription: Optional job description for tailoring
  * - matchingSummary: Optional matching summary for tailoring
  * - company: Optional company summary context
+ * - templateMarkdown: Optional Markdown exemplar to loosely match structure/style
  *
  * Output Schema:
  * - Returns complete CV as plain Markdown text
@@ -41,6 +42,7 @@ interface GenerateCvInput {
   jobDescription?: JobDescription;
   matchingSummary?: MatchingSummaryContext;
   company?: CompanyProfile;
+  templateMarkdown?: string;
 }
 
 /**
@@ -313,6 +315,11 @@ function buildUserPrompt(input: GenerateCvInput): string {
 
   prompt += formatUserProfile(input.profile);
   prompt += formatExperiencesWithStories(input.experiences, input.stories);
+
+  if (input.templateMarkdown?.trim()) {
+    prompt += `## TEMPLATE EXEMPLAR (MARKDOWN)\n${input.templateMarkdown.trim()}\n\n`;
+    prompt += `Instructions: Use this exemplar as a loose guide for structure and tone. Do not copy verbatim.\n\n`;
+  }
 
   // Add skills with guidance
   if (input.profile.skills?.length) {

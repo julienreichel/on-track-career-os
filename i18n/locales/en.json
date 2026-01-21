@@ -955,6 +955,47 @@
       "saveFailed": "Could not save settings"
     }
   },
+  "cvGenerate": {
+    "title": "Generate CV",
+    "subtitle": "Create a new CV using your saved defaults.",
+    "defaultName": "CV — {date}",
+    "entry": {
+      "title": "CV generation",
+      "description": "Review the defaults that will be applied before generating a CV.",
+      "templateLabel": "Template",
+      "sectionsLabel": "Sections",
+      "experiencesLabel": "Experiences",
+      "otherLabel": "Other settings",
+      "templateFallback": "Classic template",
+      "sections": "{count} sections",
+      "experiences": "{count} experiences",
+      "askEachTimeEnabled": "Ask before generating",
+      "askEachTimeDisabled": "Use saved defaults",
+      "showProfilePhotoEnabled": "Profile photo included",
+      "showProfilePhotoDisabled": "Profile photo hidden"
+    },
+    "modal": {
+      "title": "Confirm CV settings",
+      "description": "Adjust the template, sections, and experiences before generating.",
+      "templateLabel": "Template",
+      "sectionsLabel": "Sections",
+      "experiencesTitle": "Included experiences",
+      "experiencesEmpty": "No experiences yet. Add one to include it in your CV.",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selected": "{count} selected"
+    },
+    "actions": {
+      "generate": "Generate CV",
+      "settings": "Edit settings"
+    },
+    "toast": {
+      "created": "CV created successfully!",
+      "createFailed": "Failed to create CV",
+      "generationFailed": "Failed to generate CV content",
+      "error": "An error occurred"
+    }
+  },
   "templates": {
     "title": "Templates",
     "subtitle": "Manage reusable documents and settings.",

@@ -20,6 +20,7 @@ import type { STARStory } from '@/domain/starstory/STARStory';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
+import type { CvSectionKey } from '@/domain/cvsettings/CvSectionKey';
 
 type AuthComposable = {
   userId: Ref<string | null>;
@@ -41,10 +42,14 @@ type TailoredCvOptions = {
   name?: string;
   templateId?: string;
   showProfilePhoto?: boolean;
+  templateMarkdown?: string;
+  enabledSections?: CvSectionKey[];
+  selectedExperienceIds?: string[];
   includeSkills?: boolean;
   includeLanguages?: boolean;
   includeCertifications?: boolean;
   includeInterests?: boolean;
+  includeLinks?: boolean;
 };
 
 type TailoredCoverLetterOptions = {
@@ -434,6 +439,9 @@ function createGenerateTailoredCvForJob(
         jobDescription: tailoring.value.jobDescription,
         matchingSummary: tailoring.value.matchingSummary,
         company: tailoring.value.company,
+        ...(params.options?.templateMarkdown?.trim()
+          ? { templateMarkdown: params.options.templateMarkdown.trim() }
+          : {}),
       };
 
       const content = await deps.aiService.generateCv(aiInput);
@@ -482,6 +490,9 @@ function createRegenerateTailoredCvForJob(
         jobDescription: tailoring.value.jobDescription,
         matchingSummary: tailoring.value.matchingSummary,
         company: tailoring.value.company,
+        ...(params.options?.templateMarkdown?.trim()
+          ? { templateMarkdown: params.options.templateMarkdown.trim() }
+          : {}),
       };
 
       const content = await deps.aiService.generateCv(aiInput);
@@ -725,6 +736,48 @@ function buildCvInput(args: {
   stories: STARStory[];
   options?: TailoredCvOptions;
 }): GenerateCvInput {
+  const { sections: enabledSections, hasExplicit: hasExplicitSections } = resolveEnabledSections(
+    args.options?.enabledSections
+  );
+  const experiences = filterExperiencesBySelection(
+    filterExperiencesBySections(args.experiences, enabledSections, hasExplicitSections),
+    args.options?.selectedExperienceIds
+  );
+  const allowedExperienceIds = new Set(experiences.map((exp) => exp.id));
+  const stories = args.stories.filter(
+    (story) => !story.experienceId || allowedExperienceIds.has(story.experienceId)
+  );
+  const includeSkills = resolveSectionFlag(
+    args.options,
+    enabledSections,
+    hasExplicitSections,
+    'skills'
+  );
+  const includeLanguages = resolveSectionFlag(
+    args.options,
+    enabledSections,
+    hasExplicitSections,
+    'languages'
+  );
+  const includeCertifications = resolveSectionFlag(
+    args.options,
+    enabledSections,
+    hasExplicitSections,
+    'certifications'
+  );
+  const includeInterests = resolveSectionFlag(
+    args.options,
+    enabledSections,
+    hasExplicitSections,
+    'interests'
+  );
+  const includeLinks = resolveSectionFlag(
+    args.options,
+    enabledSections,
+    hasExplicitSections,
+    'links'
+  );
+
   const input: GenerateCvInput = {
     language: 'en',
     profile: {
@@ -734,14 +787,14 @@ function buildCvInput(args: {
       primaryEmail: args.profile.primaryEmail || undefined,
       primaryPhone: args.profile.primaryPhone || undefined,
       workPermitInfo: args.profile.workPermitInfo || undefined,
-      socialLinks: filterStrings(args.profile.socialLinks),
+      socialLinks: includeLinks ? filterStrings(args.profile.socialLinks) : undefined,
       goals: filterStrings(args.profile.goals),
       strengths: filterStrings(args.profile.strengths),
       seniorityLevel: args.profile.seniorityLevel || undefined,
       aspirations: filterStrings(args.profile.aspirations),
       personalValues: filterStrings(args.profile.personalValues),
     },
-    experiences: args.experiences.map((exp) => ({
+    experiences: experiences.map((exp) => ({
       id: exp.id,
       title: exp.title || '',
       companyName: exp.companyName ?? '',
@@ -753,7 +806,7 @@ function buildCvInput(args: {
       responsibilities: filterStrings(exp.responsibilities) ?? [],
       tasks: filterStrings(exp.tasks) ?? [],
     })),
-    stories: args.stories.map((story) => ({
+    stories: stories.map((story) => ({
       experienceId: story.experienceId,
       situation: story.situation,
       task: story.task,
@@ -763,30 +816,20 @@ function buildCvInput(args: {
     })),
   };
 
-  applyOptionalList(
-    input.profile,
-    'skills',
-    args.profile.skills,
-    args.options?.includeSkills ?? true
-  );
+  applyOptionalList(input.profile, 'skills', args.profile.skills, includeSkills);
   applyOptionalList(
     input.profile,
     'languages',
     args.profile.languages,
-    args.options?.includeLanguages ?? true
+    includeLanguages
   );
   applyOptionalList(
     input.profile,
     'certifications',
     args.profile.certifications,
-    args.options?.includeCertifications ?? true
+    includeCertifications
   );
-  applyOptionalList(
-    input.profile,
-    'interests',
-    args.profile.interests,
-    args.options?.includeInterests ?? true
-  );
+  applyOptionalList(input.profile, 'interests', args.profile.interests, includeInterests);
 
   return input;
 }
@@ -808,4 +851,69 @@ function filterStrings(values?: (string | null)[] | null): string[] | undefined 
   if (!values) return undefined;
   const filtered = values.filter((value): value is string => Boolean(value?.trim()));
   return filtered.length ? filtered : undefined;
+}
+
+function resolveEnabledSections(enabledSections?: CvSectionKey[]) {
+  return {
+    sections: enabledSections ?? [],
+    hasExplicit: enabledSections !== undefined,
+  };
+}
+
+function resolveSectionFlag(
+  options: TailoredCvOptions | undefined,
+  enabledSections: CvSectionKey[],
+  hasExplicitSections: boolean,
+  section: CvSectionKey
+) {
+  if (hasExplicitSections) {
+    return enabledSections.includes(section);
+  }
+  const defaults: Record<CvSectionKey, boolean> = {
+    summary: true,
+    skills: options?.includeSkills ?? true,
+    experience: true,
+    education: true,
+    certifications: options?.includeCertifications ?? true,
+    languages: options?.includeLanguages ?? true,
+    projects: true,
+    interests: options?.includeInterests ?? true,
+    links: options?.includeLinks ?? true,
+  };
+
+  return defaults[section] ?? true;
+}
+
+function filterExperiencesBySelection(
+  experiences: Experience[],
+  selectedExperienceIds?: string[]
+) {
+  if (!selectedExperienceIds || selectedExperienceIds.length === 0) {
+    return experiences;
+  }
+  const allowed = new Set(selectedExperienceIds);
+  return experiences.filter((exp) => allowed.has(exp.id));
+}
+
+function filterExperiencesBySections(
+  experiences: Experience[],
+  enabledSections: CvSectionKey[],
+  hasExplicitSections: boolean
+) {
+  if (!hasExplicitSections) {
+    return experiences;
+  }
+  if (enabledSections.length === 0) {
+    return [];
+  }
+  const allowExperience = enabledSections.includes('experience');
+  const allowEducation = enabledSections.includes('education');
+  const allowProjects = enabledSections.includes('projects');
+
+  return experiences.filter((exp) => {
+    const type = exp.experienceType ?? 'work';
+    if (type === 'education') return allowEducation;
+    if (type === 'project') return allowProjects;
+    return allowExperience;
+  });
 }

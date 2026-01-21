@@ -319,10 +319,6 @@ export class AiOperationsService {
       throw new Error('Experiences must be an array');
     }
 
-    if (input.experiences.length === 0) {
-      throw new Error('At least one experience must be provided');
-    }
-
     // Validate each experience has required fields
     for (const exp of input.experiences) {
       if (!exp.title || !exp.startDate) {

@@ -90,6 +90,7 @@ export interface GenerateCvInput {
     customerSegments: string[];
     rawNotes: string;
   };
+  templateMarkdown?: string;
 }
 
 /**

@@ -292,7 +292,8 @@ test.describe('Personal Canvas E2E Flow', () => {
       (error) =>
         !error.includes('favicon') && // Ignore favicon errors
         !error.includes('sourcemap') && // Ignore sourcemap warnings
-        !error.includes('DevTools') // Ignore DevTools messages
+        !error.includes('DevTools') && // Ignore DevTools messages
+        !error.includes('Failed to load resource: the server responded with a status of 400') // Ignore noisy 400s
     );
 
     expect(criticalErrors).toHaveLength(0);

@@ -14,9 +14,9 @@ test.describe('CV Generation Workflow', () => {
   test.describe.configure({ mode: 'serial' });
 
   let cvId: string | null = null;
-  const cvName = 'Test Engineer CV';
+  let cvName: string | null = null;
 
-  test('should complete CV generation wizard', async ({ page }) => {
+  test('should complete CV generation flow', async ({ page }) => {
     const experienceTitle = `E2E CV Wizard Experience ${Date.now()}`;
     const experienceId = await createFullExperience(page, experienceTitle);
     expect(experienceId).not.toBeNull();
@@ -29,15 +29,9 @@ test.describe('CV Generation Workflow', () => {
 
     await expect(page).toHaveURL(/\/applications\/cv\/new/);
 
-    const experienceCheckboxes = page.getByRole('checkbox');
-    await expect(experienceCheckboxes.first()).toBeVisible({ timeout: 10000 });
-    await experienceCheckboxes.first().check();
-    await expect(page.getByRole('button', { name: /next/i })).toBeEnabled();
-    await page.getByRole('button', { name: /next/i }).click();
-
-    await expect(page.getByLabel(/cv name/i)).toBeVisible();
-    await page.getByLabel(/cv name/i).fill(cvName);
-    await page.getByRole('button', { name: /generate cv/i }).click();
+    const generateButtons = page.getByRole('button', { name: /generate cv/i });
+    await expect(generateButtons.first()).toBeVisible();
+    await generateButtons.first().click();
 
     await expect(page).toHaveURL(/\/applications\/cv\/[\w-]+/, { timeout: 15000 });
     await expect(page.getByText(/review and refine your cv details/i)).toBeVisible({
@@ -48,6 +42,11 @@ test.describe('CV Generation Workflow', () => {
     const match = url.match(/\/applications\/cv\/([\w-]+)/);
     cvId = match ? match[1] : null;
     expect(cvId).not.toBeNull();
+
+    const heading = page.getByRole('heading', { level: 1 }).first();
+    await expect(heading).toBeVisible();
+    cvName = (await heading.textContent())?.trim() ?? null;
+    expect(cvName).toBeTruthy();
   });
 
   test('should display generated CV in view mode', async ({ page }) => {
@@ -99,6 +98,9 @@ test.describe('CV Generation Workflow', () => {
 
     await page.goto('/applications/cv');
     await page.waitForLoadState('networkidle');
+
+    expect(cvName).toBeTruthy();
+    if (!cvName) return;
 
     const cardTitle = page.locator('h3', { hasText: cvName }).first();
     await expect(cardTitle).toBeVisible();

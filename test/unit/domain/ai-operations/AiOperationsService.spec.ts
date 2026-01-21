@@ -411,11 +411,13 @@ describe('AiOperationsService', () => {
       expect(result).toBe('## CV');
     });
 
-    it('rejects when no experiences provided', async () => {
-      await expect(service.generateCv({ ...baseInput, experiences: [] })).rejects.toThrow(
-        'At least one experience must be provided'
-      );
-      expect(mockRepo.generateCv).not.toHaveBeenCalled();
+    it('allows empty experiences when provided', async () => {
+      mockRepo.generateCv.mockResolvedValue('## CV');
+
+      const result = await service.generateCv({ ...baseInput, experiences: [] });
+
+      expect(mockRepo.generateCv).toHaveBeenCalledWith({ ...baseInput, experiences: [] });
+      expect(result).toBe('## CV');
     });
 
     it('rejects when experience missing required fields', async () => {

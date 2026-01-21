@@ -340,6 +340,7 @@ describe('useCvGenerator', () => {
         includeCertifications: true,
         includeInterests: true,
         jobDescription: 'Test job description',
+        templateMarkdown: '# Template',
       });
 
       expect(input).not.toBeNull();
@@ -361,6 +362,7 @@ describe('useCvGenerator', () => {
       expect(input?.profile.languages).toEqual(['English', 'Spanish']);
       expect(input?.profile.certifications).toEqual(['AWS Certified']);
       expect(input?.profile.interests).toEqual(['Open source', 'Mentoring']);
+      expect(input?.templateMarkdown).toBe('# Template');
       expect(input?.jobDescription).toEqual({
         title: 'Target role',
         roleSummary: 'Test job description',
@@ -460,6 +462,19 @@ describe('useCvGenerator', () => {
       expect(input?.profile.languages).toBeUndefined();
       expect(input?.profile.certifications).toBeUndefined();
       expect(input?.profile.interests).toBeUndefined();
+    });
+
+    it('filters experiences when experience section is disabled', async () => {
+      const { buildGenerationInput } = useCvGenerator();
+
+      const input = await buildGenerationInput('user-123', ['exp-1'], {
+        enabledSections: ['skills'],
+      });
+
+      expect(input?.experiences).toEqual([]);
+      expect(input?.stories).toEqual([]);
+      expect(input?.profile.skills).toEqual(['TypeScript', 'Vue.js', 'Node.js']);
+      expect(input?.profile.socialLinks).toBeUndefined();
     });
 
     it(
