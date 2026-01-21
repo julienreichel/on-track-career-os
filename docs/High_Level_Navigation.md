@@ -532,6 +532,8 @@ Tabs:
 Features:
 
 - Template selector (`<USelect>`)
+- Uses saved CV settings; `/applications/cv/new` becomes a thin generate entry point
+- “Ask each time” modal flow
 - Block editor (`<UEditor>`)
 - Experience/story insertion modal
 - Live preview
@@ -638,26 +640,27 @@ Actions:
 
 # SECTION 5 — SYSTEM UTILITY PAGES
 
-## PAGE 5.1 — Template Library ❌ NOT IMPLEMENTED
+## PAGE 5.1 — Template Library ✅ IMPLEMENTED (EPIC 3C)
 
-_(EPIC 12 - V1)_
+**Routes:**
 
-**Status:** Future enhancement
+- `/templates/cv`
 
-**Planned Features:**
+**Features (EPIC 3C):**
 
 - CV templates
 - Letter tone presets
 - Story formats
 
-## PAGE 5.2 — Settings ❌ NOT IMPLEMENTED
+## PAGE 5.2 — Settings ✅ IMPLEMENTED (EPIC 3C)
 
-**Status:** Low priority, planned for V1
+**Routes:**
 
-**Planned Features:**
+- `/settings/cv`
 
-- Account settings
-- User preferences
+**Features (EPIC 3C):**
+
+- CV settings (default template, ask each time, default sections/experiences)
 - Data export
 - Delete account
 
@@ -694,7 +697,7 @@ Dashboard → Navigate to Profile/Applications/Jobs
 
 - Generic CV (`/applications/cv/new`, `/applications/cv/:id`) ✅
 - Speech Builder (`/applications/speech`, `/applications/speech/:id`) ✅ Implemented (EPIC 4)
-- Tailored CV ❌ Not Implemented (EPIC 6)
+- Tailored CV ✅ Implemented (EPIC 6)
 - Tailored Letter ❌ Not Implemented (EPIC 6)
 
 ### STEP 7 — Export & Apply ✅
@@ -786,8 +789,8 @@ Dashboard → Navigate to Profile/Applications/Jobs
 
 
 🧱 System Utilities
-├── Template Library ❌ (EPIC 12 - V1)
-└── Settings ❌ (Low Priority)
+├── CV Templates ✅ (EPIC 3C) → /templates/cv
+└── CV Settings ✅ (EPIC 3C) → /settings/cv
 
 ---
 

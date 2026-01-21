@@ -12,9 +12,7 @@ Each operation must conform to:
 - **Output schema** (validated after AI returns)
 - **Fallback strategy** for malformed output
 
-**All operations must return structured, validated data to the application.** Most operations use JSON directly, but some use text formats that are parsed into JSON by the Lambda function for greater AI flexibility.
-
-**No operation may return free-form text to the application. All outputs to the app _must_ be structured JSON.**
+**All operations must return structured, validated data to the application.** Most operations use JSON directly. Document-generation operations return Markdown strings, validated as strings, for user-facing documents.
 
 ---
 
@@ -822,7 +820,7 @@ Additionally:
 
 #### Purpose
 
-Generate a **job-tailored CV in Markdown format**, using:
+Generate a **CV in Markdown format**, using:
 
 - User profile
 - Selected experiences (with stories / achievements / KPIs already available in the data layer)
@@ -832,6 +830,11 @@ Generate a **job-tailored CV in Markdown format**, using:
 - A soft constraint that the CV should be **around 2 pages**
 
 This operation outputs **complete CV as Markdown text** that follows CV best practices and is ATS-optimized.
+
+**Modes:**
+
+- **Generic mode (no job provided):** Generate a generic CV and support instantiating a user-specific template from a system exemplar. Output remains Markdown.
+- **Tailored mode (job provided):** Generate a job-tailored CV.
 
 ---
 
@@ -965,6 +968,7 @@ CRITICAL REMINDER: Use ONLY the information provided above. Do not use placehold
     achievements?: string[];
     kpiSuggestions?: string[];
   }>;
+  templateMarkdown?: string; // Markdown exemplar to loosely match (structure/style)
   stories?: Array<{
     // SpeechStoryType from schema (simplified STARStory)
     situation?: string;

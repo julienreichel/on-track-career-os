@@ -261,9 +261,9 @@ _(EPIC 3 + EPIC 6)_
 
 - id
 - name (optional)
-- templateId (optional)
-- isTailored (boolean, optional)
-- content (string)
+- templateId (optional; user template used as exemplar)
+- isTailored (boolean, optional; indicates job context was used)
+- content (string, Markdown)
 - showProfilePhoto (boolean)
 - jobId (optional)
 
@@ -310,6 +310,48 @@ _(EPIC 4)_
 
 - 1 SpeechBlock → 1 UserProfile
 - 1 SpeechBlock → 1 JobDescription (optional)
+
+---
+
+## **ENTITY: CVTemplate** _(EPIC 3C)_
+
+**Attributes:**
+
+- templateId
+- userId (owner)
+- name
+- content (string, Markdown)
+- source (enum/string: system:classic | system:modern | system:competency | user)
+- createdAt
+- updatedAt
+
+**Relationships:**
+
+- 1 UserProfile → \* CVTemplates
+- 1 CVDocument → 0..1 CVTemplate (via templateId)
+- (Optional) 1 CVSettings → 0..1 CVTemplate as default
+
+**Notes:**
+System exemplars can live in code; `source` preserves origin while storing only user-instantiated/custom templates.
+
+---
+
+## **ENTITY: CVSettings** _(EPIC 3C)_
+
+**Attributes:**
+
+- userId (PK or unique FK)
+- defaultTemplateId (optional)
+- askEachTime (boolean)
+- defaultIncludedExperienceIds (list)
+- defaultEnabledSections (list)
+- showProfilePhoto (boolean, optional)
+- createdAt
+- updatedAt
+
+**Relationships:**
+
+- 1 UserProfile → 0..1 CVSettings
 
 ---
 
