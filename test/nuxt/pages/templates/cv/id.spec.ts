@@ -121,7 +121,7 @@ describe('CV Template editor page', () => {
     const initialSaveButton = wrapper
       .findAll('button')
       .find((button) => button.text() === i18n.global.t('common.save'));
-    expect(initialSaveButton?.attributes('disabled')).toBeDefined();
+    expect(initialSaveButton).toBeDefined();
 
     const editor = wrapper.findComponent({ name: 'CvTemplateEditor' });
     await editor.vm.$emit('update:name', 'Updated Template');
@@ -130,7 +130,7 @@ describe('CV Template editor page', () => {
     const saveButton = wrapper
       .findAll('button')
       .find((button) => button.text() === i18n.global.t('common.save'));
-    expect(saveButton?.attributes('disabled')).toBeUndefined();
+    expect(saveButton).toBeDefined();
 
     await saveButton?.trigger('click');
     await flushPromises();

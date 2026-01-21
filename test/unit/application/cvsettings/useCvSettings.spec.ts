@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { useCvSettings } from '@/application/cvsettings/useCvSettings';
+import { CV_SECTION_KEYS } from '@/domain/cvsettings/CvSectionKey';
 import type { CVSettingsService } from '@/domain/cvsettings/CVSettingsService';
 
 describe('useCvSettings', () => {
@@ -29,6 +30,7 @@ describe('useCvSettings', () => {
 
     expect(service.getOrCreate).toHaveBeenCalledWith('user-1');
     expect(settings.value?.id).toBe('user-1');
+    expect(settings.value?.defaultEnabledSections).toEqual(CV_SECTION_KEYS);
   });
 
   it('saves settings updates', async () => {

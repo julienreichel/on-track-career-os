@@ -11,7 +11,7 @@ const stubs = {
     props: ['label', 'icon', 'ariaLabel'],
     emits: ['click'],
     template:
-      '<button type="button" :aria-label="ariaLabel" @click="$emit(\'click\')">{{ icon }}{{ label }}</button>',
+      '<button type="button" :aria-label="ariaLabel" @click="$emit(\'click\')">{{ label }}</button>',
   },
   UIcon: { template: '<span class="u-icon"></span>' },
   ItemCard: {
@@ -77,7 +77,8 @@ describe('CvTemplateCard', () => {
     });
 
     const buttons = wrapper.findAll('button');
-    const findButton = (label: string) => buttons.find((button) => button.text() === label);
+    const findButton = (label: string) =>
+      buttons.find((button) => button.text().includes(label));
     const findButtonByAria = (label: string) =>
       buttons.find((button) => button.attributes('aria-label') === label);
 

@@ -839,7 +839,7 @@
       },
       "actions": {
         "create": "Create template",
-        "useTemplate": "Use Template",
+        "useTemplate": "Use",
         "duplicate": "Duplicate",
         "delete": "Delete"
       },
@@ -903,6 +903,58 @@
       "loadFailed": "Unable to load template."
     }
   },
+  "cvSettings": {
+    "title": "CV settings",
+    "subtitle": "Set defaults for every CV you create.",
+    "actions": {
+      "templates": "Edit templates"
+    },
+    "sections": {
+      "sections": {
+        "title": "Sections",
+        "description": "Choose which sections are included by default."
+      },
+      "experiences": {
+        "title": "Experiences",
+        "description": "Select which experiences are eligible by default."
+      },
+      "other": {
+        "title": "Other settings",
+        "description": "Defaults for templates, prompts, and profile photo."
+      }
+    },
+    "template": {
+      "label": "Template",
+      "none": "No default template",
+      "manage": "Manage templates"
+    },
+    "sectionLabels": {
+      "summary": "Summary",
+      "skills": "Skills",
+      "experience": "Experience",
+      "education": "Education",
+      "certifications": "Certifications",
+      "languages": "Languages",
+      "projects": "Projects",
+      "interests": "Interests",
+      "links": "Links"
+    },
+    "experiences": {
+      "title": "Included experiences",
+      "empty": "No experiences yet. Add one to include it in your CV defaults.",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selected": "{count} selected"
+    },
+    "other": {
+      "askEachTime": "Ask before generating",
+      "showProfilePhoto": "Include profile photo by default"
+    },
+    "toast": {
+      "saved": "Settings saved",
+      "saveFailed": "Could not save settings"
+    }
+  },
   "templates": {
     "title": "Templates",
     "subtitle": "Manage reusable documents and settings.",
@@ -912,6 +964,15 @@
     "empty": {
       "title": "Template library",
       "description": "Start by managing your CV templates."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Configure defaults for your documents.",
+    "cv": {
+      "title": "CV settings",
+      "description": "Set your default template, sections, and experiences.",
+      "action": "Open CV settings"
     }
   },
   "cvNew": {

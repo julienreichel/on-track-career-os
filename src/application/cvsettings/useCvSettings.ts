@@ -2,6 +2,7 @@ import { ref } from 'vue';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { CVSettingsService } from '@/domain/cvsettings/CVSettingsService';
 import type { CVSettings, CVSettingsUpdateInput } from '@/domain/cvsettings/CVSettings';
+import { getDefaultCvSettings } from '@/domain/cvsettings/getDefaultCvSettings';
 
 type AuthComposable = {
   userId: { value: string | null };
@@ -32,7 +33,19 @@ export function useCvSettings(options: UseCvSettingsOptions = {}) {
       if (!auth.userId.value) {
         throw new Error('Missing user id');
       }
-      settings.value = await service.getOrCreate(auth.userId.value);
+      const result = await service.getOrCreate(auth.userId.value);
+      if (result) {
+        const defaults = getDefaultCvSettings({ settings: result });
+        settings.value = {
+          ...result,
+          askEachTime: defaults.askEachTime,
+          defaultTemplateId: defaults.defaultTemplateId,
+          defaultEnabledSections: defaults.defaultEnabledSections,
+          showProfilePhoto: defaults.showProfilePhoto,
+        };
+      } else {
+        settings.value = null;
+      }
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Unknown error occurred';
       console.error('[useCvSettings] Failed to load settings:', err);
