@@ -9,13 +9,12 @@ const i18n = createTestI18n();
 
 const mockGet = vi.fn();
 const mockUpdate = vi.fn();
-const mockDelete = vi.fn();
 
 vi.mock('@/domain/cvtemplate/CVTemplateService', () => ({
   CVTemplateService: vi.fn().mockImplementation(() => ({
     get: mockGet,
     update: mockUpdate,
-    delete: mockDelete,
+    delete: vi.fn(),
   })),
 }));
 
@@ -80,12 +79,6 @@ const stubs = {
   },
   UCard: { template: '<div class="u-card"><slot name="header" /><slot /></div>' },
   USkeleton: { template: '<div class="u-skeleton"></div>' },
-  ConfirmModal: {
-    props: ['open'],
-    emits: ['confirm'],
-    template: '<div v-if="open"><button @click="$emit(\'confirm\')">Confirm</button></div>',
-  },
-  TemplateSourceBadge: { template: '<span class="badge"></span>' },
   CvTemplateEditor: {
     name: 'CvTemplateEditor',
     props: ['name', 'content', 'loading'],

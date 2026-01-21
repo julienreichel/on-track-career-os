@@ -6,16 +6,16 @@ import CvTemplateCard from '@/components/cv/CvTemplateCard.vue';
 const i18n = createTestI18n();
 
 const stubs = {
-  UCard: { template: '<div class="u-card"><slot name="header" /><slot /></div>' },
   UBadge: { template: '<span class="u-badge"><slot /></span>' },
   UButton: {
     props: ['label'],
     emits: ['click'],
     template: '<button type="button" @click="$emit(\'click\')">{{ label }}</button>',
   },
-  TemplateSourceBadge: {
-    props: ['source'],
-    template: '<span class="source">{{ source }}</span>',
+  ItemCard: {
+    props: ['title', 'subtitle'],
+    template:
+      '<div class="item-card"><h3>{{ title }}</h3><p>{{ subtitle }}</p><slot /><slot name="badges" /><slot name="actions" /></div>',
   },
 };
 

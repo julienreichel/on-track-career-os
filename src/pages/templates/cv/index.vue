@@ -198,7 +198,7 @@ const handleCreateBlank = async () => {
       });
       await router.push({ name: 'templates-cv-id', params: { id: created.id } });
     }
-  } catch (err) {
+  } catch {
     toast.add({
       title: t('cvTemplates.toast.createFailed'),
       color: 'error',
@@ -216,7 +216,7 @@ const handleUseTemplate = async (template: SystemCvTemplate) => {
       });
       await router.push({ name: 'templates-cv-id', params: { id: created.id } });
     }
-  } catch (err) {
+  } catch {
     toast.add({
       title: t('cvTemplates.toast.createFailed'),
       color: 'error',
@@ -225,7 +225,7 @@ const handleUseTemplate = async (template: SystemCvTemplate) => {
 };
 
 const handleEdit = (id: string) => {
-  router.push({ name: 'templates-cv-id', params: { id } });
+  void router.push({ name: 'templates-cv-id', params: { id } });
 };
 
 const handleSetDefault = async (id: string) => {
@@ -239,7 +239,7 @@ const handleSetDefault = async (id: string) => {
       title: t('cvTemplates.toast.defaultSet'),
       color: 'primary',
     });
-  } catch (err) {
+  } catch {
     toast.add({
       title: t('cvTemplates.toast.defaultFailed'),
       color: 'error',
@@ -263,7 +263,7 @@ const handleDelete = async () => {
       color: 'primary',
     });
     deleteModalOpen.value = false;
-  } catch (err) {
+  } catch {
     toast.add({
       title: t('cvTemplates.toast.deleteFailed'),
       color: 'error',
@@ -273,12 +273,10 @@ const handleDelete = async () => {
   }
 };
 
-onMounted(async () => {
+onMounted(() => {
   hasLoaded.value = false;
-  try {
-    await Promise.all([load(), loadSettings()]);
-  } finally {
+  void Promise.all([load(), loadSettings()]).finally(() => {
     hasLoaded.value = true;
-  }
+  });
 });
 </script>

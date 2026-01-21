@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import TemplateSourceBadge from '@/components/cv/TemplateSourceBadge.vue';
+import ItemCard from '@/components/ItemCard.vue';
 
 const props = withDefaults(
   defineProps<{
@@ -18,7 +18,16 @@ const props = withDefaults(
   dataTestid?: string;
   }>(),
   {
+    description: '',
+    updatedAt: null,
+    source: null,
+    isDefault: false,
+    primaryActionLabel: '',
+    secondaryActionLabel: '',
     showDelete: false,
+    defaultBadgeLabel: '',
+    deleteLabel: '',
+    dataTestid: '',
   }
 );
 
@@ -41,48 +50,44 @@ const updatedLabel = computed(() => t('cvTemplates.labels.updated'));
 </script>
 
 <template>
-  <UCard :data-testid="dataTestid" class="space-y-3">
-    <template #header>
-      <div class="flex items-start justify-between gap-3">
-        <div>
-          <h3 class="text-base font-semibold text-default">{{ name }}</h3>
-          <div class="mt-2 flex flex-wrap items-center gap-2">
-            <TemplateSourceBadge :source="source" />
-            <UBadge v-if="isDefault" color="primary" variant="soft">
-              {{ resolvedDefaultLabel }}
-            </UBadge>
-          </div>
-        </div>
-        <div v-if="updatedAt" class="text-xs text-dimmed">
-          {{ updatedLabel }} {{ updatedAt }}
-        </div>
-      </div>
-    </template>
+  <div :data-testid="dataTestid">
+    <ItemCard :title="name" :subtitle="description" :show-delete="false">
+      <p v-if="updatedAt" class="text-xs text-dimmed">
+        {{ updatedLabel }} {{ updatedAt }}
+      </p>
 
-    <p v-if="description" class="text-sm text-dimmed">{{ description }}</p>
+      <template #badges>
+        <UBadge v-if="isDefault" color="primary" variant="soft">
+          {{ resolvedDefaultLabel }}
+        </UBadge>
+      </template>
 
-    <div v-if="hasActions" class="flex flex-wrap gap-2">
-      <UButton
-        v-if="primaryActionLabel"
-        size="sm"
-        :label="primaryActionLabel"
-        @click="emit('primary')"
-      />
-      <UButton
-        v-if="secondaryActionLabel"
-        size="sm"
-        variant="ghost"
-        :label="secondaryActionLabel"
-        @click="emit('secondary')"
-      />
-      <UButton
-        v-if="showDelete"
-        size="sm"
-        color="error"
-        variant="ghost"
-        :label="resolvedDeleteLabel"
-        @click="emit('delete')"
-      />
-    </div>
-  </UCard>
+      <template v-if="hasActions" #actions>
+        <UButton
+          v-if="primaryActionLabel"
+          size="xs"
+          :label="primaryActionLabel"
+          color="primary"
+          variant="soft"
+          @click="emit('primary')"
+        />
+        <UButton
+          v-if="secondaryActionLabel"
+          size="xs"
+          :label="secondaryActionLabel"
+          color="neutral"
+          variant="soft"
+          @click="emit('secondary')"
+        />
+        <UButton
+          v-if="showDelete"
+          size="xs"
+          :label="resolvedDeleteLabel"
+          color="error"
+          variant="ghost"
+          @click="emit('delete')"
+        />
+      </template>
+    </ItemCard>
+  </div>
 </template>

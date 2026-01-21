@@ -7,7 +7,7 @@ export type SystemCvTemplateDefinition = {
   source: string;
   nameKey: string;
   descriptionKey: string;
-  contentByLocale: Record<string, string>;
+  contentByLocale: Record<string, string> & { en: string };
 };
 
 export type SystemCvTemplate = {
