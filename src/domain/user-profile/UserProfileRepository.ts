@@ -8,6 +8,7 @@ import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
+import type { CVTemplate } from '@/domain/cvtemplate/CVTemplate';
 
 export type AmplifyUserProfileModel = {
   get: (
@@ -107,6 +108,23 @@ export class UserProfileRepository {
 
     const record = data as unknown as { canvas?: PersonalCanvas | null };
     return record.canvas ?? null;
+  }
+
+  async getCvTemplatesSnapshot(id: string): Promise<CVTemplate[]> {
+    if (!id) {
+      return [];
+    }
+
+    const selectionSet = ['id', 'cvTemplates.*'];
+    const { data } = await this.model.get({ id }, gqlOptions({ selectionSet }));
+    if (!data) {
+      return [];
+    }
+
+    const record = data as unknown as { cvTemplates?: CVTemplate[] | null };
+    return Array.isArray(record.cvTemplates)
+      ? record.cvTemplates.filter(Boolean)
+      : [];
   }
 
   async list(filter: Record<string, unknown> = {}) {

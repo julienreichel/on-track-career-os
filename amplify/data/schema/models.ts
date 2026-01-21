@@ -35,6 +35,8 @@ export const schemaModels = {
       cvs: a.hasMany('CVDocument', 'userId'),
       coverLetters: a.hasMany('CoverLetter', 'userId'),
       speechBlocks: a.hasMany('SpeechBlock', 'userId'),
+      cvTemplates: a.hasMany('CVTemplate', 'userId'),
+      cvSettings: a.hasOne('CVSettings', 'userId'),
       matchingSummaries: a.hasMany('MatchingSummary', 'userId'),
     })
     .authorization((allow) => [allow.owner()]),
@@ -235,6 +237,30 @@ export const schemaModels = {
 
       jobId: a.id(),
       job: a.belongsTo('JobDescription', 'jobId'),
+    })
+    .authorization((allow) => [allow.owner()]),
+
+  CVTemplate: a
+    .model({
+      name: a.string().required(),
+      content: a.string().required(),
+      source: a.string(),
+
+      userId: a.id().required(),
+      user: a.belongsTo('UserProfile', 'userId'),
+    })
+    .authorization((allow) => [allow.owner()]),
+
+  CVSettings: a
+    .model({
+      defaultTemplateId: a.string(),
+      askEachTime: a.boolean().default(false),
+      defaultIncludedExperienceIds: a.string().array(),
+      defaultEnabledSections: a.string().array(),
+      showProfilePhoto: a.boolean().default(true),
+
+      userId: a.id().required(),
+      user: a.belongsTo('UserProfile', 'userId'),
     })
     .authorization((allow) => [allow.owner()]),
 
