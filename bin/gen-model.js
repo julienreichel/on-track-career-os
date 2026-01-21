@@ -66,7 +66,6 @@ export type Amplify${modelName}Model = {
     input: { id: string },
     options?: Record<string, unknown>
   ) => Promise<{ data: ${modelName} | null }>;
-  list: (options?: Record<string, unknown>) => Promise<{ data: ${modelName}[] }>;
   create: (
     input: ${modelName}CreateInput,
     options?: Record<string, unknown>
@@ -105,11 +104,6 @@ export class ${modelName}Repository {
   async get(id: string) {
     const res = await this.model.get({ id }, gqlOptions());
     return res.data;
-  }
-
-  async list(filter: Record<string, unknown> = {}) {
-    const { data } = await this.model.list(gqlOptions(filter));
-    return data;
   }
 
   async create(input: ${modelName}CreateInput) {
@@ -207,7 +201,6 @@ describe('${modelName}Service', () => {
   beforeEach(() => {
     mockRepository = {
       get: vi.fn(),
-      list: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
