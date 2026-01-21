@@ -8,14 +8,30 @@ const i18n = createTestI18n();
 const stubs = {
   UBadge: { template: '<span class="u-badge"><slot /></span>' },
   UButton: {
-    props: ['label'],
+    props: ['label', 'icon', 'ariaLabel'],
     emits: ['click'],
-    template: '<button type="button" @click="$emit(\'click\')">{{ label }}</button>',
-  },
-  ItemCard: {
-    props: ['title', 'subtitle'],
     template:
-      '<div class="item-card"><h3>{{ title }}</h3><p>{{ subtitle }}</p><slot /><slot name="badges" /><slot name="actions" /></div>',
+      '<button type="button" :aria-label="ariaLabel" @click="$emit(\'click\')">{{ icon }}{{ label }}</button>',
+  },
+  UIcon: { template: '<span class="u-icon"></span>' },
+  ItemCard: {
+    props: ['title', 'subtitle', 'showDelete'],
+    emits: ['delete'],
+    template: `
+      <div class="item-card">
+        <h3>{{ title }}</h3>
+        <p>{{ subtitle }}</p>
+        <slot />
+        <slot name="badges" />
+        <slot name="actions" />
+        <button
+          v-if="showDelete !== false"
+          type="button"
+          aria-label="Delete"
+          @click="$emit('delete')"
+        ></button>
+      </div>
+    `,
   },
 };
 
@@ -28,7 +44,8 @@ describe('CvTemplateCard', () => {
         updatedAt: 'Jan 12, 2025',
         source: 'system:classic',
         isDefault: true,
-        primaryActionLabel: 'Edit template',
+        primaryActionLabel: 'Edit',
+        primaryActionIcon: 'i-heroicons-pencil',
       },
       global: {
         plugins: [i18n],
@@ -47,8 +64,11 @@ describe('CvTemplateCard', () => {
       props: {
         name: 'My Template',
         primaryActionLabel: 'Edit template',
+        primaryActionIcon: 'i-heroicons-pencil',
         secondaryActionLabel: 'Set as default',
+        secondaryActionIcon: 'i-heroicons-document-duplicate',
         showDelete: true,
+        deleteIcon: 'i-heroicons-trash',
       },
       global: {
         plugins: [i18n],
@@ -58,10 +78,12 @@ describe('CvTemplateCard', () => {
 
     const buttons = wrapper.findAll('button');
     const findButton = (label: string) => buttons.find((button) => button.text() === label);
+    const findButtonByAria = (label: string) =>
+      buttons.find((button) => button.attributes('aria-label') === label);
 
     await findButton('Edit template')?.trigger('click');
     await findButton('Set as default')?.trigger('click');
-    await findButton(i18n.global.t('common.delete'))?.trigger('click');
+    await findButtonByAria(i18n.global.t('common.delete'))?.trigger('click');
 
     expect(wrapper.emitted('primary')).toBeTruthy();
     expect(wrapper.emitted('secondary')).toBeTruthy();

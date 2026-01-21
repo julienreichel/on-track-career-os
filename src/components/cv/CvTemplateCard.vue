@@ -5,17 +5,20 @@ import ItemCard from '@/components/ItemCard.vue';
 
 const props = withDefaults(
   defineProps<{
-  name: string;
-  description?: string;
-  updatedAt?: string | null;
-  source?: string | null;
-  isDefault?: boolean;
-  primaryActionLabel?: string;
-  secondaryActionLabel?: string;
-  showDelete?: boolean;
-  defaultBadgeLabel?: string;
-  deleteLabel?: string;
-  dataTestid?: string;
+    name: string;
+    description?: string;
+    updatedAt?: string | null;
+    source?: string | null;
+    isDefault?: boolean;
+    primaryActionLabel?: string;
+    primaryActionIcon?: string;
+    secondaryActionLabel?: string;
+    secondaryActionIcon?: string;
+    showDelete?: boolean;
+    defaultBadgeLabel?: string;
+    deleteLabel?: string;
+    deleteIcon?: string;
+    dataTestid?: string;
   }>(),
   {
     description: '',
@@ -23,10 +26,13 @@ const props = withDefaults(
     source: null,
     isDefault: false,
     primaryActionLabel: '',
+    primaryActionIcon: '',
     secondaryActionLabel: '',
+    secondaryActionIcon: '',
     showDelete: false,
     defaultBadgeLabel: '',
     deleteLabel: '',
+    deleteIcon: 'i-heroicons-trash',
     dataTestid: '',
   }
 );
@@ -42,51 +48,51 @@ const hasActions = computed(
   () => props.primaryActionLabel || props.secondaryActionLabel || props.showDelete
 );
 
-const resolvedDefaultLabel = computed(
-  () => props.defaultBadgeLabel ?? t('cvTemplates.labels.default')
-);
-const resolvedDeleteLabel = computed(() => props.deleteLabel ?? t('common.delete'));
+const resolvedDefaultLabel = computed(() => {
+  const label = props.defaultBadgeLabel?.trim();
+  return label || t('cvTemplates.labels.default');
+});
 const updatedLabel = computed(() => t('cvTemplates.labels.updated'));
 </script>
 
 <template>
   <div :data-testid="dataTestid">
-    <ItemCard :title="name" :subtitle="description" :show-delete="false">
-      <p v-if="updatedAt" class="text-xs text-dimmed">
-        {{ updatedLabel }} {{ updatedAt }}
-      </p>
+    <ItemCard
+      :title="name"
+      :subtitle="description"
+      :show-delete="showDelete"
+      @delete="emit('delete')"
+    >
+      <p v-if="updatedAt" class="text-xs text-dimmed">{{ updatedLabel }} {{ updatedAt }}</p>
 
       <template #badges>
-        <UBadge v-if="isDefault" color="primary" variant="soft">
+        <UBadge v-if="isDefault" color="primary" variant="soft" size="xs">
+          <UIcon name="i-heroicons-star" class="w-3 h-3 mr-1" />
           {{ resolvedDefaultLabel }}
         </UBadge>
       </template>
 
       <template v-if="hasActions" #actions>
-        <UButton
-          v-if="primaryActionLabel"
-          size="xs"
-          :label="primaryActionLabel"
-          color="primary"
-          variant="soft"
-          @click="emit('primary')"
-        />
-        <UButton
-          v-if="secondaryActionLabel"
-          size="xs"
-          :label="secondaryActionLabel"
-          color="neutral"
-          variant="soft"
-          @click="emit('secondary')"
-        />
-        <UButton
-          v-if="showDelete"
-          size="xs"
-          :label="resolvedDeleteLabel"
-          color="error"
-          variant="ghost"
-          @click="emit('delete')"
-        />
+        <div class="flex items-center gap-2">
+          <UButton
+            v-if="primaryActionLabel"
+            size="xs"
+            :label="primaryActionLabel"
+            :icon="primaryActionIcon || undefined"
+            color="primary"
+            variant="soft"
+            @click="emit('primary')"
+          />
+          <UButton
+            v-if="secondaryActionLabel"
+            size="xs"
+            :label="secondaryActionLabel"
+            :icon="secondaryActionIcon || undefined"
+            color="neutral"
+            variant="soft"
+            @click="emit('secondary')"
+          />
+        </div>
       </template>
     </ItemCard>
   </div>

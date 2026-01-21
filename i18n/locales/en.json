@@ -839,15 +839,16 @@
       },
       "actions": {
         "create": "Create template",
-        "useTemplate": "Use template",
-        "edit": "Edit template",
-        "setDefault": "Set as default"
+        "useTemplate": "Use Template",
+        "duplicate": "Duplicate",
+        "delete": "Delete"
       },
       "empty": {
         "title": "No templates yet",
         "description": "Create a template or start from a system template."
       },
-      "newTemplateName": "Untitled template"
+      "newTemplateName": "Untitled template",
+      "duplicateName": "{name} (Copy)"
     },
     "editor": {
       "title": "Template editor",

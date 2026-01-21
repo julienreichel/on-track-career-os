@@ -199,6 +199,35 @@ describe('CV Templates list page', () => {
     expect(router.currentRoute.value.name).toBe('templates-cv-id');
   });
 
+  it('duplicates a template from the list', async () => {
+    mockCreateTemplate.mockResolvedValue({
+      id: 'template-copy',
+      name: 'My Template (Copy)',
+      content: '# Template',
+      source: 'user',
+    });
+
+    const wrapper = mount(CvTemplatesIndexPage, {
+      global: {
+        plugins: [i18n, router],
+        stubs,
+      },
+    });
+
+    await flushPromises();
+
+    await wrapper
+      .find('[data-testid="cv-template-template-1"] [data-testid="secondary"]')
+      .trigger('click');
+    await flushPromises();
+
+    expect(mockCreateTemplate).toHaveBeenCalledWith({
+      name: 'My Template (Copy)',
+      content: '# Template',
+      source: 'user',
+    });
+  });
+
   it('deletes a template after confirmation', async () => {
     mockDeleteTemplate.mockImplementation(async (id: string) => {
       templatesRef.value = templatesRef.value.filter((template) => template.id !== id);

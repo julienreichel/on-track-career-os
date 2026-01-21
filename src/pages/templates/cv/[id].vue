@@ -55,7 +55,7 @@
             color="primary"
             :label="t('common.save')"
             :loading="saving"
-            :disabled="!isDirty || saving || !template"
+            :disabled="saving || !template"
             @click="handleSave"
           />
         </div>
@@ -130,6 +130,9 @@ const loadTemplate = async () => {
 
 const handleSave = async () => {
   if (!template.value) return;
+  if (!isDirty.value) {
+    return;
+  }
   saving.value = true;
   try {
     const updated = await service.update({

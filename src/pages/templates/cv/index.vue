@@ -25,8 +25,8 @@
 
         <ListSkeletonCards v-if="loading || !hasLoaded" />
 
-        <div v-else class="space-y-8">
-          <UCard>
+      <div v-else class="space-y-8">
+        <UCard>
             <template #header>
               <div class="space-y-1">
                 <h2 class="text-lg font-semibold text-default">
@@ -46,6 +46,7 @@
                 :description="template.description"
                 :source="template.source"
                 :primary-action-label="t('cvTemplates.list.actions.useTemplate')"
+                primary-action-icon="i-heroicons-arrow-right"
                 :data-testid="systemTemplateTestId(template.id)"
                 @primary="handleUseTemplate(template)"
               />
@@ -88,16 +89,16 @@
                 :source="template.source"
                 :is-default="template.id === defaultTemplateId"
                 :updated-at="formatTemplateDate(template)"
-                :primary-action-label="t('cvTemplates.list.actions.edit')"
-                :secondary-action-label="
-                  template.id === defaultTemplateId
-                    ? undefined
-                    : t('cvTemplates.list.actions.setDefault')
-                "
+                :primary-action-label="t('common.edit')"
+                primary-action-icon="i-heroicons-pencil"
+                :secondary-action-label="t('cvTemplates.list.actions.duplicate')"
+                secondary-action-icon="i-heroicons-document-duplicate"
                 :show-delete="true"
+                :delete-label="t('common.delete')"
+                delete-icon="i-heroicons-trash"
                 :data-testid="`cv-template-${template.id}`"
                 @primary="handleEdit(template.id)"
-                @secondary="handleSetDefault(template.id)"
+                @secondary="handleDuplicate(template)"
                 @delete="confirmDelete(template)"
               />
             </UPageGrid>
@@ -146,7 +147,7 @@ const {
   deleteTemplate,
 } = useCvTemplates();
 
-const { settings, load: loadSettings, saveSettings } = useCvSettings();
+const { settings, load: loadSettings } = useCvSettings();
 
 const hasLoaded = ref(false);
 const deleteModalOpen = ref(false);
@@ -173,16 +174,6 @@ const formatTemplateDate = (template: CVTemplate) =>
   formatListDate(template.updatedAt ?? template.createdAt);
 
 const systemTemplateTestId = (id: string) => `cv-template-system-${id.replace(/[:]/g, '-')}`;
-
-const ensureSettings = async () => {
-  if (!settings.value) {
-    await loadSettings();
-  }
-  if (!settings.value) {
-    throw new Error(t('cvTemplates.errors.settings'));
-  }
-  return settings.value;
-};
 
 const handleCreateBlank = async () => {
   try {
@@ -228,20 +219,23 @@ const handleEdit = (id: string) => {
   void router.push({ name: 'templates-cv-id', params: { id } });
 };
 
-const handleSetDefault = async (id: string) => {
+const handleDuplicate = async (template: CVTemplate) => {
   try {
-    const current = await ensureSettings();
-    await saveSettings({
-      id: current.id,
-      defaultTemplateId: id,
+    const created = await createTemplate({
+      name: t('cvTemplates.list.duplicateName', { name: template.name }),
+      content: template.content,
+      source: 'user',
     });
-    toast.add({
-      title: t('cvTemplates.toast.defaultSet'),
-      color: 'primary',
-    });
+    if (created) {
+      toast.add({
+        title: t('cvTemplates.toast.created'),
+        color: 'primary',
+      });
+      await router.push({ name: 'templates-cv-id', params: { id: created.id } });
+    }
   } catch {
     toast.add({
-      title: t('cvTemplates.toast.defaultFailed'),
+      title: t('cvTemplates.toast.createFailed'),
       color: 'error',
     });
   }
