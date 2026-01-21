@@ -250,13 +250,8 @@ test.describe('Discovery flow', () => {
     await page.getByRole('button', { name: /Generate tailored CV/i }).click();
     await page.waitForURL(/\/applications\/cv\/new(\?|$)/i, { timeout: 30000 });
 
-    const modalHeading = page.getByRole('heading', { name: /Confirm CV settings/i });
     const generateButtons = page.getByRole('button', { name: /Generate CV/i });
-    if (await modalHeading.isVisible()) {
-      await generateButtons.last().click();
-    } else {
-      await generateButtons.first().click();
-    }
+    await generateButtons.first().click();
 
     await page.waitForURL(/\/applications\/cv\/[0-9a-f-]+$/i, { timeout: 60000 });
     await expect(page.getByRole('link', { name: /View job/i })).toBeVisible({

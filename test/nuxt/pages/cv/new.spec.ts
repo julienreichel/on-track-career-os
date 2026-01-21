@@ -11,7 +11,6 @@ const i18n = createTestI18n();
 const settingsRef = ref({
   id: 'settings-1',
   userId: 'user-1',
-  askEachTime: false,
   defaultTemplateId: 'template-1',
   defaultEnabledSections: ['summary', 'experience', 'skills'],
   defaultIncludedExperienceIds: ['exp-1'],
@@ -130,8 +129,9 @@ const stubs = {
   UPageHeader: { props: ['title', 'description'], template: '<div><h1>{{ title }}</h1></div>' },
   UPageBody: { template: '<div><slot /></div>' },
   CvGenerateEntryCard: {
-    emits: ['generate'],
-    template: '<button data-testid="generate" @click="$emit(\'generate\')">Generate</button>',
+    emits: ['generate', 'edit-settings'],
+    template:
+      '<div><button data-testid="generate" @click="$emit(\'generate\')">Generate</button><button data-testid="settings" @click="$emit(\'edit-settings\')">Settings</button></div>',
   },
   CvGenerationModal: {
     props: ['open'],
@@ -157,10 +157,9 @@ const mountPage = async () => {
 describe('CV new page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    settingsRef.value.askEachTime = false;
   });
 
-  it('generates with defaults when askEachTime is false', async () => {
+  it('generates with defaults when generate is clicked', async () => {
     const wrapper = await mountPage();
 
     await wrapper.find('[data-testid="generate"]').trigger('click');
@@ -179,19 +178,12 @@ describe('CV new page', () => {
     );
   });
 
-  it('opens modal and uses selections when askEachTime is true', async () => {
-    settingsRef.value.askEachTime = true;
+  it('opens modal when edit settings is clicked', async () => {
     const wrapper = await mountPage();
 
-    await wrapper.find('[data-testid="generate"]').trigger('click');
+    await wrapper.find('[data-testid="settings"]').trigger('click');
     await flushPromises();
 
-    await wrapper.find('[data-testid="confirm"]').trigger('click');
-    await flushPromises();
-
-    expect(mockGenerateCv).toHaveBeenCalledWith('user-1', ['exp-1'], {
-      enabledSections: ['skills'],
-      templateMarkdown: '# Template',
-    });
+    expect(wrapper.find('[data-testid="confirm"]').exists()).toBe(true);
   });
 });

@@ -56,7 +56,6 @@ const initializeForm = () => {
   });
 
   formState.value = {
-    askEachTime: defaults.askEachTime,
     defaultTemplateId: defaults.defaultTemplateId,
     defaultEnabledSections: defaults.defaultEnabledSections,
     defaultIncludedExperienceIds: defaults.defaultIncludedExperienceIds,
@@ -73,7 +72,6 @@ const handleSave = async () => {
     await saveSettings({
       id: settings.value.id,
       defaultTemplateId: formState.value.defaultTemplateId,
-      askEachTime: formState.value.askEachTime,
       defaultEnabledSections: formState.value.defaultEnabledSections,
       defaultIncludedExperienceIds: formState.value.defaultIncludedExperienceIds,
       showProfilePhoto: formState.value.showProfilePhoto,

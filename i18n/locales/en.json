@@ -947,7 +947,6 @@
       "selected": "{count} selected"
     },
     "other": {
-      "askEachTime": "Ask before generating",
       "showProfilePhoto": "Include profile photo by default"
     },
     "toast": {
@@ -969,8 +968,6 @@
       "templateFallback": "Classic template",
       "sections": "{count} sections",
       "experiences": "{count} experiences",
-      "askEachTimeEnabled": "Ask before generating",
-      "askEachTimeDisabled": "Use saved defaults",
       "showProfilePhotoEnabled": "Profile photo included",
       "showProfilePhotoDisabled": "Profile photo hidden"
     },

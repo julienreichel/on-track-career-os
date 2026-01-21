@@ -21,7 +21,6 @@ describe('CvGenerateEntryCard', () => {
         templateName: 'Classic',
         sectionCount: 5,
         experienceCount: 3,
-        askEachTime: true,
         showProfilePhoto: false,
       },
       global: {
@@ -34,7 +33,6 @@ describe('CvGenerateEntryCard', () => {
     expect(wrapper.text()).toContain('Classic');
     expect(wrapper.text()).toContain(i18n.global.t('cvGenerate.entry.sections', { count: 5 }));
     expect(wrapper.text()).toContain(i18n.global.t('cvGenerate.entry.experiences', { count: 3 }));
-    expect(wrapper.text()).toContain(i18n.global.t('cvGenerate.entry.askEachTimeEnabled'));
     expect(wrapper.text()).toContain(i18n.global.t('cvGenerate.entry.showProfilePhotoDisabled'));
   });
 
@@ -44,7 +42,6 @@ describe('CvGenerateEntryCard', () => {
         templateName: 'Classic',
         sectionCount: 2,
         experienceCount: 1,
-        askEachTime: false,
         showProfilePhoto: true,
       },
       global: {

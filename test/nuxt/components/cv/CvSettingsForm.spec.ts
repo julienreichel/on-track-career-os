@@ -66,7 +66,6 @@ describe('CvSettingsForm', () => {
     const wrapper = mount(CvSettingsForm, {
       props: {
         modelValue: {
-          askEachTime: false,
           defaultTemplateId: null,
           defaultEnabledSections: ['summary'],
           defaultIncludedExperienceIds: [],
@@ -89,7 +88,6 @@ describe('CvSettingsForm', () => {
     const wrapper = mount(CvSettingsForm, {
       props: {
         modelValue: {
-          askEachTime: false,
           defaultTemplateId: null,
           defaultEnabledSections: ['summary'],
           defaultIncludedExperienceIds: [],

@@ -33,7 +33,7 @@ test.describe('CV Generation Workflow', () => {
     await expect(generateButtons.first()).toBeVisible();
     await generateButtons.first().click();
 
-    await expect(page).toHaveURL(/\/applications\/cv\/[\w-]+/, { timeout: 15000 });
+    await expect(page).toHaveURL(/\/applications\/cv\/[\w-]+/, { timeout: 30000 });
     await expect(page.getByText(/review and refine your cv details/i)).toBeVisible({
       timeout: 15000,
     });

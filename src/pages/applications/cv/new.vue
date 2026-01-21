@@ -7,7 +7,6 @@
         :template-name="templateLabel"
         :section-count="selectedSections.length"
         :experience-count="selectedExperienceIds.length"
-        :ask-each-time="defaults.askEachTime"
         :show-profile-photo="defaults.showProfilePhoto"
         :generating="isGenerating"
         @generate="handleGenerateClick"
@@ -257,10 +256,6 @@ const handleGenerateClick = async () => {
   await prepareDefaults();
   if (!userId.value) {
     toast.add({ title: t('cvGenerate.toast.error'), color: 'error' });
-    return;
-  }
-  if (defaults.value.askEachTime) {
-    modalOpen.value = true;
     return;
   }
   void startGeneration();

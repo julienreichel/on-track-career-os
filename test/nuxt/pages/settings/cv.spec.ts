@@ -11,7 +11,6 @@ const i18n = createTestI18n();
 const settingsRef = ref({
   id: 'user-1',
   userId: 'user-1',
-  askEachTime: false,
 } as const);
 
 const mockLoadSettings = vi.fn();
@@ -169,7 +168,6 @@ describe('CV Settings page', () => {
     mockSaveSettings.mockResolvedValue({
       id: 'user-1',
       userId: 'user-1',
-      askEachTime: true,
     });
 
     const wrapper = mount(CvSettingsPage, {

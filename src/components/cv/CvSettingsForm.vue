@@ -64,13 +64,6 @@
       <div class="space-y-4">
         <div class="flex items-center justify-between gap-4">
           <p class="text-sm font-medium text-default">
-            {{ t('cvSettings.other.askEachTime') }}
-          </p>
-          <USwitch v-model="askEachTime" />
-        </div>
-
-        <div class="flex items-center justify-between gap-4">
-          <p class="text-sm font-medium text-default">
             {{ t('cvSettings.other.showProfilePhoto') }}
           </p>
           <USwitch v-model="showProfilePhoto" />
@@ -105,7 +98,6 @@ import type { Experience } from '@/domain/experience/Experience';
 import CvExperienceMultiSelect from '@/components/cv/CvExperienceMultiSelect.vue';
 
 export type CvSettingsFormState = {
-  askEachTime: boolean;
   defaultTemplateId: string | null;
   defaultEnabledSections: string[];
   defaultIncludedExperienceIds: string[];
@@ -157,11 +149,6 @@ const selectedTemplate = computed({
   get: () => props.modelValue.defaultTemplateId ?? NO_TEMPLATE_VALUE,
   set: (value: string) =>
     updateValue({ defaultTemplateId: value === NO_TEMPLATE_VALUE ? null : value }),
-});
-
-const askEachTime = computed({
-  get: () => props.modelValue.askEachTime,
-  set: (value: boolean) => updateValue({ askEachTime: value }),
 });
 
 const experienceSelection = computed({

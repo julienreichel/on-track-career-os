@@ -7,7 +7,6 @@ const props = withDefaults(
     templateName: string;
     sectionCount: number;
     experienceCount: number;
-    askEachTime: boolean;
     showProfilePhoto: boolean;
     generating?: boolean;
   }>(),
@@ -22,12 +21,6 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
-
-const askEachTimeLabel = computed(() =>
-  props.askEachTime
-    ? t('cvGenerate.entry.askEachTimeEnabled')
-    : t('cvGenerate.entry.askEachTimeDisabled')
-);
 
 const showProfilePhotoLabel = computed(() =>
   props.showProfilePhoto
@@ -86,7 +79,7 @@ const experienceLabel = computed(() =>
             {{ t('cvGenerate.entry.otherLabel') }}
           </p>
           <p class="text-sm font-medium text-default">
-            {{ askEachTimeLabel }} · {{ showProfilePhotoLabel }}
+            {{ showProfilePhotoLabel }}
           </p>
         </div>
       </div>

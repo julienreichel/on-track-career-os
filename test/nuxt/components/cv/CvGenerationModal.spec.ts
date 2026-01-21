@@ -28,7 +28,11 @@ const experiences: Experience[] = [
 ];
 
 const stubs = {
-  UModal: { template: '<div><slot /></div>' },
+  UModal: {
+    props: ['title', 'description'],
+    template:
+      '<div><h2>{{ title }}</h2><p>{{ description }}</p><slot /><slot name="body" /><slot name="footer" /></div>',
+  },
   UCard: { template: '<div class="card"><slot name="header" /><slot /><slot name="footer" /></div>' },
   UFormField: { template: '<div class="form-field"><slot /></div>' },
   USelect: {
