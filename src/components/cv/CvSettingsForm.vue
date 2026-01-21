@@ -68,18 +68,6 @@
           </p>
           <USwitch v-model="showProfilePhoto" />
         </div>
-
-        <UFormField :label="t('cvSettings.template.label')">
-          <USelect v-model="selectedTemplate" :items="templateItems" class="w-full lg:w-1/2" />
-        </UFormField>
-
-        <UButton
-          color="neutral"
-          variant="ghost"
-          icon="i-heroicons-arrow-top-right-on-square"
-          :label="t('cvSettings.template.manage')"
-          to="/templates/cv"
-        />
       </div>
     </UCard>
 
@@ -93,7 +81,6 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { CV_SECTION_KEYS } from '@/domain/cvsettings/CvSectionKey';
-import type { CVTemplate } from '@/domain/cvtemplate/CVTemplate';
 import type { Experience } from '@/domain/experience/Experience';
 import CvExperienceMultiSelect from '@/components/cv/CvExperienceMultiSelect.vue';
 
@@ -106,7 +93,6 @@ export type CvSettingsFormState = {
 
 interface Props {
   modelValue: CvSettingsFormState;
-  templates: CVTemplate[];
   experiences: Experience[];
   loadingExperiences?: boolean;
   saving?: boolean;
@@ -128,28 +114,12 @@ const updateValue = (patch: Partial<CvSettingsFormState>) => {
   emit('update:modelValue', { ...props.modelValue, ...patch });
 };
 
-const NO_TEMPLATE_VALUE = '__none__';
-
-const templateItems = computed(() => [
-  { value: NO_TEMPLATE_VALUE, label: t('cvSettings.template.none') },
-  ...props.templates.map((template) => ({
-    value: template.id,
-    label: template.name,
-  })),
-]);
-
 const sectionOptions = computed(() =>
   CV_SECTION_KEYS.map((section) => ({
     value: section,
     label: t(`cvSettings.sectionLabels.${section}`),
   }))
 );
-
-const selectedTemplate = computed({
-  get: () => props.modelValue.defaultTemplateId ?? NO_TEMPLATE_VALUE,
-  set: (value: string) =>
-    updateValue({ defaultTemplateId: value === NO_TEMPLATE_VALUE ? null : value }),
-});
 
 const experienceSelection = computed({
   get: () => props.modelValue.defaultIncludedExperienceIds,

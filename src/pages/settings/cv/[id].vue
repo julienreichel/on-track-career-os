@@ -8,7 +8,7 @@
           {
             label: t('cvTemplates.editor.backToList'),
             icon: 'i-heroicons-arrow-left',
-            to: { name: 'templates-cv' },
+            to: { name: 'settings-cv' },
           },
         ]"
       />

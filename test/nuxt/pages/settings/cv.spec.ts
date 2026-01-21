@@ -3,7 +3,7 @@ import { mount, flushPromises } from '@vue/test-utils';
 import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
-import CvSettingsPage from '@/pages/settings/cv.vue';
+import CvSettingsPage from '@/pages/settings/cv/index.vue';
 import type { CVTemplate } from '@/domain/cvtemplate/CVTemplate';
 
 const i18n = createTestI18n();
@@ -35,17 +35,31 @@ const templatesRef = ref<CVTemplate[]>([
   } as CVTemplate,
 ]);
 const mockLoadTemplates = vi.fn();
+const mockCreateTemplate = vi.fn();
+const mockCreateFromExemplar = vi.fn();
+const mockUpdateTemplate = vi.fn();
+const mockDeleteTemplate = vi.fn();
+const systemTemplatesRef = ref([
+  {
+    id: 'system:classic',
+    name: 'Classic',
+    description: 'Classic template',
+    source: 'system:classic',
+    content: '# Classic',
+  },
+]);
 
 vi.mock('@/application/cvtemplate/useCvTemplates', () => ({
   useCvTemplates: () => ({
     templates: templatesRef,
-    systemTemplates: ref([]),
+    systemTemplates: systemTemplatesRef,
     loading: ref(false),
     error: ref(null),
     load: mockLoadTemplates,
-    createFromExemplar: vi.fn(),
-    createTemplate: vi.fn(),
-    deleteTemplate: vi.fn(),
+    createFromExemplar: mockCreateFromExemplar,
+    createTemplate: mockCreateTemplate,
+    updateTemplate: mockUpdateTemplate,
+    deleteTemplate: mockDeleteTemplate,
   }),
 }));
 
@@ -112,6 +126,12 @@ const stubs = {
   },
   UAlert: { template: '<div class="u-alert"><slot /></div>' },
   UCard: { template: '<div class="u-card"><slot name="header" /><slot /></div>' },
+  UPageGrid: { template: '<div class="u-page-grid"><slot /></div>' },
+  UEmpty: {
+    props: ['title', 'description'],
+    template:
+      '<div class="u-empty"><p>{{ title }}</p><p>{{ description }}</p><slot name="actions" /></div>',
+  },
   UFormField: { template: '<div class="u-form-field"><slot /></div>' },
   USelect: {
     props: ['modelValue', 'items'],
@@ -138,6 +158,23 @@ const stubs = {
   },
   UIcon: { template: '<span class="u-icon"></span>' },
   ListSkeletonCards: { template: '<div class="skeleton"></div>' },
+  CvTemplateCard: {
+    props: ['name', 'primaryActionLabel', 'secondaryActionLabel', 'showDelete', 'dataTestid'],
+    emits: ['primary', 'secondary', 'delete'],
+    template: `
+      <div :data-testid="dataTestid">
+        <p>{{ name }}</p>
+        <button v-if="primaryActionLabel" data-testid="primary" @click="$emit('primary')">
+          {{ primaryActionLabel }}
+        </button>
+        <button v-if="secondaryActionLabel" data-testid="secondary" @click="$emit('secondary')">
+          {{ secondaryActionLabel }}
+        </button>
+        <button v-if="showDelete" data-testid="delete" @click="$emit('delete')">delete</button>
+      </div>
+    `,
+  },
+  ConfirmModal: { template: '<div class="confirm-modal"></div>' },
 };
 
 describe('CV Settings page', () => {
@@ -160,6 +197,7 @@ describe('CV Settings page', () => {
     expect(mockLoadSettings).toHaveBeenCalled();
     expect(mockLoadTemplates).toHaveBeenCalled();
     expect(wrapper.text()).toContain(i18n.global.t('cvSettings.sections.other.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('cvTemplates.list.title'));
     expect(wrapper.text()).toContain('Classic');
     expect(wrapper.text()).toContain('Engineer');
   });

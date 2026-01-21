@@ -3,7 +3,7 @@ import { mount, flushPromises } from '@vue/test-utils';
 import { ref } from 'vue';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../../utils/createTestI18n';
-import CvTemplateEditorPage from '@/pages/templates/cv/[id].vue';
+import CvTemplateEditorPage from '@/pages/settings/cv/[id].vue';
 
 const i18n = createTestI18n();
 
@@ -49,13 +49,13 @@ const router = createRouter({
   history: createMemoryHistory(),
   routes: [
     {
-      path: '/templates/cv/:id',
-      name: 'templates-cv-id',
+      path: '/settings/cv/:id',
+      name: 'settings-cv-id',
       component: CvTemplateEditorPage,
     },
     {
-      path: '/templates/cv',
-      name: 'templates-cv',
+      path: '/settings/cv',
+      name: 'settings-cv',
       component: { template: '<div>Templates list</div>' },
     },
   ],
@@ -102,7 +102,7 @@ describe('CV Template editor page', () => {
       content: '# Template',
       source: 'system:classic',
     });
-    await router.push('/templates/cv/template-1');
+    await router.push('/settings/cv/template-1');
     await router.isReady();
   });
 

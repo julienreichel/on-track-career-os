@@ -2,19 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestI18n } from '../../../utils/createTestI18n';
 import CvSettingsForm from '@/components/cv/CvSettingsForm.vue';
-import type { CVTemplate } from '@/domain/cvtemplate/CVTemplate';
 import type { Experience } from '@/domain/experience/Experience';
 
 const i18n = createTestI18n();
-
-const templates: CVTemplate[] = [
-  {
-    id: 'template-1',
-    name: 'Classic',
-    content: '# Classic',
-    source: 'user',
-  } as CVTemplate,
-];
 
 const experiences: Experience[] = [
   {
@@ -29,13 +19,6 @@ const experiences: Experience[] = [
 
 const stubs = {
   UCard: { template: '<div class="card"><slot name="header" /><slot /></div>' },
-  UFormField: { template: '<div class="form-field"><slot /></div>' },
-  USelect: {
-    props: ['modelValue', 'items'],
-    emits: ['update:modelValue'],
-    template:
-      '<select @change="$emit(\'update:modelValue\', $event.target.value)"><option v-for="item in items" :key="item.value" :value="item.value">{{ item.label }}</option></select>',
-  },
   UCheckbox: {
     props: ['modelValue', 'label'],
     emits: ['update:modelValue'],
@@ -62,7 +45,7 @@ const stubs = {
 };
 
 describe('CvSettingsForm', () => {
-  it('renders sections and templates', () => {
+  it('renders sections and other settings', () => {
     const wrapper = mount(CvSettingsForm, {
       props: {
         modelValue: {
@@ -71,7 +54,6 @@ describe('CvSettingsForm', () => {
           defaultIncludedExperienceIds: [],
           showProfilePhoto: true,
         },
-        templates,
         experiences,
       },
       global: {
@@ -81,7 +63,6 @@ describe('CvSettingsForm', () => {
     });
 
     expect(wrapper.text()).toContain(i18n.global.t('cvSettings.sections.other.title'));
-    expect(wrapper.text()).toContain('Classic');
   });
 
   it('emits updates when sections are toggled and saved', async () => {
@@ -93,7 +74,6 @@ describe('CvSettingsForm', () => {
           defaultIncludedExperienceIds: [],
           showProfilePhoto: true,
         },
-        templates,
         experiences,
       },
       global: {
