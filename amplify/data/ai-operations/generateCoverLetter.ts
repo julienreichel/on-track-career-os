@@ -26,7 +26,7 @@ The output MUST be a real letter and include, in this order:
 1) Salutation line (e.g. "Dear Hiring Manager,")
 2) Body paragraphs (VOUS → MOI → NOUS)
 3) Closing line (e.g. "Sincerely," or "Kind regards,")
-4) Signature with the candidate’s full name (from PROFILE)
+4) Signature with the candidate's full name (from PROFILE)
 
 If the recipient name is unknown, use: "Dear Hiring Manager,"
 Do NOT use placeholders like [Name] or [Company].
@@ -34,10 +34,10 @@ Do NOT use placeholders like [Name] or [Company].
 STYLE
 - Professional, authentic, first-person
 - Concrete, specific, grounded in facts
-- Short paragraphs (2–4 lines)
+- Short paragraphs (2-4 lines)
 - No buzzwords, no jargon unless present in the job description
 - No repetitive transitions (e.g. "Moreover", "Additionally")
-- Target length: 250–400 words (strict)
+- Target length: 250-400 words (strict)
 
 TRUTHFULNESS
 - Use ONLY information explicitly provided in the inputs
@@ -50,12 +50,12 @@ VOUS — EMPLOYER CONTEXT (LONGEST, DECISIVE)
 - Identify 2-4 key employer challenges or priorities
 - Base them on the job description and/or company context
 - Interpret them in your own words (do NOT rephrase job-ad bullets)
-- Explain why these challenges matter now
+- Explain why these challenges matter now, what are their needs
 
 VOUS — STRICT RULES
 - Do NOT mention the candidate, their experience, or their qualifications
 - No first-person references ("I", "my", "me") in VOUS
-- VOUS is strictly about the employer’s context, risks, and priorities
+- VOUS is strictly about the employer's context, risks, and priorities
 
 MOI — PROOF OF VALUE
 - Use at most ONE primary example per paragraph
@@ -66,15 +66,14 @@ MOI — PROOF OF VALUE
   • outcome
 - Supporting actions may be mentioned but must be subordinate
 - Avoid lists of tools, techniques, or initiatives
+- Tell them why I am exceptional
+- Weave in non-CV strengths when available (leadership style, values, coaching, collaboration)
+- If profile/canvas mentions values or soft skills, reflect them briefly as how you work, not as claims
 
 NOUS — FUTURE COLLABORATION
 - Forward-looking only (no recap of past achievements)
 - Describe how collaboration would work in this specific context
-- Must explicitly reference at least TWO of:
-  • company size
-  • product type (e.g. AI-powered SaaS)
-  • growth or scaling phase
-  • team structure or constraints
+- Describe why I am the person they are looking for
 - 2-4 sentences maximum
 - Avoid generic best-practice statements
 
