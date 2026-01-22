@@ -28,15 +28,6 @@ const emit = defineEmits<{ (e: 'regenerate'): void }>();
       <div>
         <p class="text-sm text-gray-500">{{ props.targetJobLabel }}</p>
         <p class="text-lg font-semibold">{{ props.jobTitle }}</p>
-        <UButton
-          v-if="props.jobLink"
-          class="mt-2"
-          color="neutral"
-          variant="ghost"
-          icon="i-heroicons-arrow-top-right-on-square"
-          :label="props.viewJobLabel"
-          :to="props.jobLink"
-        />
       </div>
       <div class="flex flex-wrap items-center gap-3">
         <UButton
@@ -46,6 +37,14 @@ const emit = defineEmits<{ (e: 'regenerate'): void }>();
           :loading="props.regenerateLoading"
           :disabled="props.regenerateDisabled"
           @click="emit('regenerate')"
+        />
+        <UButton
+          v-if="props.jobLink"
+          color="neutral"
+          variant="outline"
+          icon="i-heroicons-briefcase"
+          :label="props.viewJobLabel"
+          :to="props.jobLink"
         />
         <UButton
           v-if="props.matchLink"
