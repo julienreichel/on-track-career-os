@@ -181,11 +181,8 @@ const handleSetDefault = async () => {
 };
 
 onMounted(async () => {
-  console.log('Mounted');
   await Promise.all([loadTemplate(), loadSettings()]);
-  console.log('Loaded', template.value, settings.value, settings.value?.defaultTemplateId);
   if (template.value && settings.value && !settings.value.defaultTemplateId) {
-    console.log('No default');
     try {
       await saveSettings({
         id: settings.value.id,
