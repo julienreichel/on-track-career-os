@@ -144,7 +144,6 @@ describe('FullForm', () => {
       primaryEmail: 'john@example.com',
       primaryPhone: '+1234567890',
       workPermitInfo: 'US Citizen',
-      goals: ['Goal 1', 'Goal 2'],
       aspirations: ['Aspiration 1'],
       personalValues: ['Value 1'],
       strengths: ['Strength 1'],

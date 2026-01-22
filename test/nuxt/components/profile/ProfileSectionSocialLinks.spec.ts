@@ -31,7 +31,6 @@ const mountSection = (isEditing = false, links: string[] = ['https://example.com
     primaryPhone: '',
     workPermitInfo: '',
     profilePhotoKey: null,
-    goals: [],
     aspirations: [],
     personalValues: [],
     strengths: [],

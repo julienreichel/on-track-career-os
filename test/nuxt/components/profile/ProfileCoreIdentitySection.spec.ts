@@ -40,7 +40,6 @@ const createWrapper = (isEditing = false) => {
     primaryPhone: '',
     workPermitInfo: '',
     profilePhotoKey: null,
-    goals: [],
     aspirations: [],
     personalValues: [],
     strengths: [],

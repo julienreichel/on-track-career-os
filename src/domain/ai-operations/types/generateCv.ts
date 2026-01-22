@@ -12,7 +12,6 @@ export interface GenerateCvInput {
     primaryPhone?: string;
     workPermitInfo?: string;
     socialLinks?: string[];
-    goals?: string[];
     aspirations?: string[];
     personalValues?: string[];
     strengths?: string[];

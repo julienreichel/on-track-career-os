@@ -32,7 +32,6 @@ const form = ref<ProfileForm>({
   primaryPhone: '',
   workPermitInfo: '',
   profilePhotoKey: null,
-  goals: [],
   aspirations: [],
   personalValues: [],
   strengths: [],
@@ -83,7 +82,6 @@ const loadProfile = async (id: string) => {
         primaryPhone: profile.primaryPhone ?? '',
         workPermitInfo: profile.workPermitInfo ?? '',
         profilePhotoKey: profile.profilePhotoKey ?? null,
-        goals: normalizeList(profile.goals),
         aspirations: normalizeList(profile.aspirations),
         personalValues: normalizeList(profile.personalValues),
         strengths: normalizeList(profile.strengths),
@@ -265,7 +263,6 @@ const handleSave = async () => {
       certifications: form.value.certifications,
       strengths: form.value.strengths,
       interests: form.value.interests,
-      goals: form.value.goals,
       aspirations: form.value.aspirations,
       personalValues: form.value.personalValues,
     };

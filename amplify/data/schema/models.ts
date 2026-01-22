@@ -18,7 +18,6 @@ export const schemaModels = {
       profilePhotoKey: a.string(),
       socialLinks: a.string().array(),
 
-      goals: a.string().array(),
       aspirations: a.string().array(),
       personalValues: a.string().array(),
       strengths: a.string().array(),

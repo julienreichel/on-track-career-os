@@ -31,7 +31,6 @@ const mountSection = (isEditing = false) => {
     primaryPhone: '',
     workPermitInfo: '',
     profilePhotoKey: null,
-    goals: ['Lead research', 'Mentor engineers'],
     aspirations: ['Advance AI safety'],
     personalValues: [],
     strengths: [],
@@ -58,15 +57,14 @@ const mountSection = (isEditing = false) => {
 };
 
 describe('ProfileSectionCareerDirection', () => {
-  it('renders goals and aspirations in view mode', () => {
+  it('renders aspirations in view mode', () => {
     const wrapper = mountSection(false);
     expect(wrapper.text()).toContain('Career Direction');
-    expect(wrapper.text()).toContain('Lead research');
     expect(wrapper.text()).toContain('Advance AI safety');
   });
 
   it('renders tag inputs in edit mode', () => {
     const wrapper = mountSection(true);
-    expect(wrapper.findAll('.tag-input')).toHaveLength(2);
+    expect(wrapper.findAll('.tag-input')).toHaveLength(1);
   });
 });

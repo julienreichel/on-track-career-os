@@ -42,7 +42,6 @@ function formatProfile(profile?: Profile | null): string | null {
   if (profile.socialLinks?.length) lines.push(`Social links: ${profile.socialLinks.join(', ')}`);
 
   const listFields = [
-    formatList('Goals', profile.goals),
     formatList('Aspirations', profile.aspirations),
     formatList('Personal values', profile.personalValues),
     formatList('Strengths', profile.strengths),

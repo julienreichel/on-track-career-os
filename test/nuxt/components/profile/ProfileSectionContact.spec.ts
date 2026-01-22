@@ -33,7 +33,6 @@ const mountSection = (isEditing = false) => {
     primaryPhone: '+41123456789',
     workPermitInfo: '',
     profilePhotoKey: null,
-    goals: [],
     aspirations: [],
     personalValues: [],
     strengths: [],

@@ -104,7 +104,7 @@ describe('AI Operations - Generate CV (E2E Sandbox)', () => {
     primaryEmail: 'jane.smith@example.com',
     primaryPhone: '+1-555-0123',
     socialLinks: ['https://linkedin.com/in/janesmith', 'https://github.com/janesmith'],
-    goals: ['Lead technical teams', 'Architect scalable systems'],
+    aspirations: ['Lead technical teams', 'Architect scalable systems'],
     strengths: ['System design', 'Team mentorship', 'Cloud architecture'],
   };
 

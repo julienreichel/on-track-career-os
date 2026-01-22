@@ -14,7 +14,6 @@ const mockProfile = ref({
   primaryPhone: '+41 12 345 67 89',
   workPermitInfo: 'Swiss Citizen',
   profilePhotoKey: null,
-  goals: [],
   aspirations: [],
   personalValues: [],
   strengths: [],

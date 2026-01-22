@@ -32,7 +32,6 @@ const mockProfile: ParseCvTextOutput['profile'] = {
   headline: 'Senior Software Engineer',
   location: 'San Francisco, CA',
   seniorityLevel: 'Senior',
-  goals: ['Lead team', 'Architect solutions'],
   aspirations: ['CTO', 'Technical Leader'],
   personalValues: ['Innovation', 'Collaboration'],
   strengths: ['Problem solving', 'Communication'],
@@ -69,7 +68,6 @@ describe('ProfilePreview', () => {
 
   it('displays array fields', () => {
     const wrapper = createWrapper();
-    expect(wrapper.text()).toContain('Lead team, Architect solutions');
     expect(wrapper.text()).toContain('CTO, Technical Leader');
     expect(wrapper.text()).toContain('Innovation, Collaboration');
   });
@@ -91,7 +89,7 @@ describe('ProfilePreview', () => {
     await badgeLists[0].vm.$emit('remove', 1);
 
     expect(wrapper.emitted('removeArrayItem')).toBeTruthy();
-    expect(wrapper.emitted('removeArrayItem')?.[0]).toEqual(['goals', 1]);
+    expect(wrapper.emitted('removeArrayItem')?.[0]).toEqual(['aspirations', 1]);
   });
 
   it('does not render when profile has no data', () => {
@@ -100,7 +98,6 @@ describe('ProfilePreview', () => {
       headline: '',
       location: '',
       seniorityLevel: '',
-      goals: [],
       aspirations: [],
       personalValues: [],
       strengths: [],
@@ -118,7 +115,6 @@ describe('ProfilePreview', () => {
       headline: '',
       location: '',
       seniorityLevel: '',
-      goals: [],
       aspirations: [],
       personalValues: [],
       strengths: [],
@@ -137,8 +133,7 @@ describe('ProfilePreview', () => {
       headline: '',
       location: '',
       seniorityLevel: '',
-      goals: ['Goal 1'],
-      aspirations: [],
+      aspirations: ['Aspiration 1'],
       personalValues: [],
       strengths: [],
       interests: [],
@@ -146,17 +141,16 @@ describe('ProfilePreview', () => {
     };
 
     const wrapper = createWrapper({ profile: partialProfile });
-    expect(wrapper.text()).toContain('Goals');
-    expect(wrapper.text()).not.toContain('Aspirations');
+    expect(wrapper.text()).toContain('Aspirations');
   });
 
   it('handles null values in arrays', () => {
     const profileWithNulls: ParseCvTextOutput['profile'] = {
       ...mockProfile,
-      goals: [],
+      aspirations: [],
     };
 
     const wrapper = createWrapper({ profile: profileWithNulls });
-    expect(wrapper.text()).not.toContain('Goals:');
+    expect(wrapper.text()).not.toContain('Aspirations:');
   });
 });

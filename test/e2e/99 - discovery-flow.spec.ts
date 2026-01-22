@@ -198,7 +198,6 @@ test.describe('Discovery flow', () => {
       await input.press('Enter');
     };
 
-    await addTag('e.g., Become engineering manager', 'Become engineering manager');
     await addTag('e.g., Lead cross-functional teams', 'Lead cross-functional teams');
     await addTag('e.g., Integrity', 'Integrity');
 

@@ -27,7 +27,6 @@ describe('ProfileSummaryCard', () => {
           fullName: 'Ada Lovelace',
           headline: 'Mathematician',
           location: 'London',
-          goals: [],
           aspirations: [],
         },
         photoUrl: null,
@@ -65,8 +64,7 @@ describe('ProfileSummaryCard', () => {
         profile: {
           fullName: 'Ada Lovelace',
           headline: 'Mathematician',
-          goals: ['Goal A', 'Goal B'],
-          aspirations: ['Aspiration C'],
+          aspirations: ['Aspiration A', 'Aspiration B', 'Aspiration C'],
         },
         photoUrl: null,
       },
@@ -76,7 +74,7 @@ describe('ProfileSummaryCard', () => {
       },
     });
 
-    expect(wrapper.text()).toContain('Goal A');
+    expect(wrapper.text()).toContain('Aspiration A');
     expect(wrapper.text()).toContain('Aspiration C');
   });
 });

@@ -213,7 +213,6 @@ function mapProfileToSpeechProfile(profile: UserProfile) {
     location: profile.location ?? undefined,
     seniorityLevel: profile.seniorityLevel ?? undefined,
     workPermitInfo: profile.workPermitInfo ?? undefined,
-    goals: filterNulls(profile.goals),
     aspirations: filterNulls(profile.aspirations),
     personalValues: filterNulls(profile.personalValues),
     strengths: filterNulls(profile.strengths),

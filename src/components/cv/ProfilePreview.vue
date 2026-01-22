@@ -21,7 +21,6 @@ function hasProfileData(profile: ParseCvTextOutput['profile']): boolean {
     profile.headline ||
     profile.location ||
     profile.seniorityLevel ||
-    (profile.goals && profile.goals.length > 0) ||
     (profile.aspirations && profile.aspirations.length > 0) ||
     (profile.personalValues && profile.personalValues.length > 0) ||
     (profile.strengths && profile.strengths.length > 0) ||
@@ -70,13 +69,6 @@ function hasProfileData(profile: ParseCvTextOutput['profile']): boolean {
       />
 
       <!-- Array fields -->
-      <CvBadgeList
-        v-if="profile.goals && profile.goals.length > 0"
-        :label="t('cvUpload.profile.goals')"
-        :items="profile.goals"
-        @remove="(index: number) => emit('removeArrayItem', 'goals', index)"
-      />
-
       <CvBadgeList
         v-if="profile.aspirations && profile.aspirations.length > 0"
         :label="t('cvUpload.profile.aspirations')"

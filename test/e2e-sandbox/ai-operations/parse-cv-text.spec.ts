@@ -172,7 +172,6 @@ French (Basic)
     expect(typeof parsedCv.profile).toBe('object');
 
     // Profile should have array fields
-    expect(Array.isArray(parsedCv.profile.goals)).toBe(true);
     expect(Array.isArray(parsedCv.profile.aspirations)).toBe(true);
     expect(Array.isArray(parsedCv.profile.personalValues)).toBe(true);
     expect(Array.isArray(parsedCv.profile.strengths)).toBe(true);
@@ -194,7 +193,6 @@ French (Basic)
       parsedCv.profile.fullName ||
       parsedCv.profile.headline ||
       parsedCv.profile.location ||
-      parsedCv.profile.goals.length > 0 ||
       parsedCv.profile.strengths.length > 0 ||
       parsedCv.profile.languages.length > 0
     );
@@ -223,7 +221,6 @@ French (Basic)
 
     // Profile should exist with empty/undefined fields
     expect(parsedCv.profile).toBeDefined();
-    expect(Array.isArray(parsedCv.profile.goals)).toBe(true);
     expect(Array.isArray(parsedCv.profile.aspirations)).toBe(true);
     expect(Array.isArray(parsedCv.profile.personalValues)).toBe(true);
     expect(Array.isArray(parsedCv.profile.strengths)).toBe(true);

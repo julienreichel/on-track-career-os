@@ -66,7 +66,6 @@ describe('AiOperationsService', () => {
           headline: 'Senior Software Engineer',
           location: 'San Francisco, CA',
           seniorityLevel: 'Senior',
-          goals: ['Lead team'],
           aspirations: ['CTO'],
           personalValues: ['Innovation'],
           strengths: ['Problem solving'],

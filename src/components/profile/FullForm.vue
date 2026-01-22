@@ -93,7 +93,6 @@ const form = ref<ProfileForm>({
   primaryPhone: '',
   workPermitInfo: '',
   profilePhotoKey: null,
-  goals: [],
   aspirations: [],
   personalValues: [],
   strengths: [],
@@ -150,9 +149,7 @@ const hasCoreIdentity = computed(() => {
   );
 });
 
-const hasCareerDirection = computed(() => {
-  return form.value.goals.length > 0 || form.value.aspirations.length > 0;
-});
+const hasCareerDirection = computed(() => form.value.aspirations.length > 0);
 
 const hasIdentityValues = computed(() => {
   return (
@@ -230,7 +227,6 @@ const loadProfileToForm = () => {
     primaryPhone: toSafeString(profile.value.primaryPhone),
     workPermitInfo: toSafeString(profile.value.workPermitInfo),
     profilePhotoKey: profile.value.profilePhotoKey || null,
-    goals: toSafeArray(profile.value.goals),
     aspirations: toSafeArray(profile.value.aspirations),
     personalValues: toSafeArray(profile.value.personalValues),
     strengths: toSafeArray(profile.value.strengths),
@@ -372,7 +368,6 @@ const handleSubmit = async () => {
       primaryEmail: form.value.primaryEmail || null,
       primaryPhone: form.value.primaryPhone || null,
       workPermitInfo: form.value.workPermitInfo || null,
-      goals: form.value.goals,
       aspirations: form.value.aspirations,
       personalValues: form.value.personalValues,
       strengths: form.value.strengths,

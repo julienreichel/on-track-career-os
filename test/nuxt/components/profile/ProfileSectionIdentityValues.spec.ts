@@ -31,7 +31,6 @@ const mountSection = (isEditing = false) => {
     primaryPhone: '',
     workPermitInfo: '',
     profilePhotoKey: null,
-    goals: [],
     aspirations: [],
     personalValues: ['Curiosity'],
     strengths: ['Leadership'],

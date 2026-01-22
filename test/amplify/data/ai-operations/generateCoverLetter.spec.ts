@@ -39,7 +39,7 @@ describe('ai.generateCoverLetter', () => {
       fullName: 'Casey Candidate',
       headline: 'Engineering Lead',
       strengths: ['Leadership', 'Mentorship'],
-      goals: ['Build great teams'],
+      aspirations: ['Build great teams'],
     },
     experiences: [
       {

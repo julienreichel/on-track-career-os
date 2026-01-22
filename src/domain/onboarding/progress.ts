@@ -20,10 +20,9 @@ function hasProfessionalAttributes(profile: ProgressInputs['profile']): boolean 
 }
 
 function hasProfileDepth(profile: ProgressInputs['profile']): boolean {
-  const goals = profile?.goals ?? [];
   const aspirations = profile?.aspirations ?? [];
   const personalValues = profile?.personalValues ?? [];
-  return goals.length > 0 && aspirations.length > 0 && personalValues.length > 0;
+  return aspirations.length > 0 && personalValues.length > 0;
 }
 
 function computePhase1(input: ProgressInputs): ProgressCheckResult {

@@ -31,7 +31,7 @@ describe('useProfileMerge', () => {
     id: 'user-123',
     fullName: 'John Doe',
     headline: 'Software Engineer',
-    goals: ['Goal 1'],
+    aspirations: ['Aspiration 1'],
     skills: ['JavaScript'],
     certifications: ['Cert 1'],
   });
@@ -41,8 +41,7 @@ describe('useProfileMerge', () => {
     headline: 'Senior Software Engineer',
     location: 'San Francisco',
     seniorityLevel: 'Senior',
-    goals: ['Goal 2', 'Goal 3'],
-    aspirations: ['CTO'],
+    aspirations: ['Aspiration 2', 'Aspiration 3'],
     personalValues: ['Innovation'],
     strengths: ['Leadership'],
     interests: ['AI'],
@@ -118,11 +117,11 @@ describe('useProfileMerge', () => {
 
     const updateCall = mockRepo.update.mock.calls[0][0];
 
-    // Goals should merge: ['Goal 1'] + ['Goal 2', 'Goal 3'] = ['Goal 1', 'Goal 2', 'Goal 3']
-    expect(updateCall.goals).toContain('Goal 1');
-    expect(updateCall.goals).toContain('Goal 2');
-    expect(updateCall.goals).toContain('Goal 3');
-    expect(updateCall.goals).toHaveLength(3);
+    // Aspirations should merge: ['Aspiration 1'] + ['Aspiration 2', 'Aspiration 3']
+    expect(updateCall.aspirations).toContain('Aspiration 1');
+    expect(updateCall.aspirations).toContain('Aspiration 2');
+    expect(updateCall.aspirations).toContain('Aspiration 3');
+    expect(updateCall.aspirations).toHaveLength(3);
   });
 
   it('should handle null values in arrays', async () => {
@@ -130,7 +129,7 @@ describe('useProfileMerge', () => {
 
     mockRepo.get.mockResolvedValue({
       ...getMockExistingProfile(),
-      goals: [null, 'Goal 1', null],
+      aspirations: [null, 'Aspiration 1', null],
     } as never);
     mockRepo.update.mockResolvedValue({});
 
@@ -139,8 +138,8 @@ describe('useProfileMerge', () => {
     const updateCall = mockRepo.update.mock.calls[0][0];
 
     // Should filter out nulls
-    expect(updateCall.goals).not.toContain(null);
-    expect(updateCall.goals).toContain('Goal 1');
+    expect(updateCall.aspirations).not.toContain(null);
+    expect(updateCall.aspirations).toContain('Aspiration 1');
   });
 
   it('should merge skills from parsed CV sections', async () => {
@@ -186,7 +185,6 @@ describe('useProfileMerge', () => {
     mockRepo.update.mockResolvedValue({});
 
     const emptyProfile: ParseCvTextOutput['profile'] = {
-      goals: [],
       aspirations: [],
       personalValues: [],
       strengths: [],
@@ -198,7 +196,6 @@ describe('useProfileMerge', () => {
 
     const updateCall = mockRepo.update.mock.calls[0][0];
 
-    expect(updateCall.goals).toEqual([]);
     expect(updateCall.aspirations).toEqual([]);
   });
 
@@ -219,7 +216,7 @@ describe('useProfileMerge', () => {
     expect(updateCall.headline).toBe('Senior Software Engineer');
     expect(updateCall.location).toBe('San Francisco');
     expect(updateCall.seniorityLevel).toBe('Senior');
-    expect(updateCall.aspirations).toContain('CTO');
+    expect(updateCall.aspirations).toContain('Aspiration 2');
     expect(updateCall.personalValues).toContain('Innovation');
     expect(updateCall.strengths).toContain('Leadership');
     expect(updateCall.interests).toContain('AI');
@@ -239,7 +236,7 @@ describe('useProfileMerge', () => {
     const updateCall = mockRepo.update.mock.calls[0][0];
 
     // Should still merge profile data
-    expect(updateCall.goals).toBeDefined();
+    expect(updateCall.aspirations).toBeDefined();
     // But skills/certifications from sections won't be added since parsedCv is null
     expect(updateCall.skills).toBeUndefined();
   });
@@ -255,7 +252,6 @@ describe('useProfileMerge', () => {
       {
         fullName: '',
         headline: 'Updated Headline',
-        goals: [],
         aspirations: [],
         personalValues: [],
         strengths: [],
@@ -279,15 +275,14 @@ describe('useProfileMerge', () => {
 
     mockRepo.get.mockResolvedValue({
       ...getMockExistingProfile(),
-      goals: ['Goal 2', 'Goal 1'],
+      aspirations: ['Aspiration 2', 'Aspiration 1'],
     });
     mockRepo.update.mockResolvedValue({});
 
     await mergeProfile(
       'user-123',
       {
-        goals: ['Goal 2', 'Goal 3', 'Goal 2'],
-        aspirations: [],
+        aspirations: ['Aspiration 2', 'Aspiration 3', 'Aspiration 2'],
         personalValues: [],
         strengths: [],
         interests: [],
@@ -299,7 +294,7 @@ describe('useProfileMerge', () => {
     const updateCall = mockRepo.update.mock.calls[0][0];
 
     // Should contain: Goal 2, Goal 1, Goal 3 (no duplicates)
-    expect(updateCall.goals).toHaveLength(3);
-    expect(new Set(updateCall.goals).size).toBe(3);
+    expect(updateCall.aspirations).toHaveLength(3);
+    expect(new Set(updateCall.aspirations).size).toBe(3);
   });
 });

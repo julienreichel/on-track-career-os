@@ -242,7 +242,6 @@ function mapUserProfile(profile: UserProfile) {
     location: profile.location || undefined,
     seniorityLevel: profile.seniorityLevel || undefined,
     workPermitInfo: profile.workPermitInfo || undefined,
-    goals: normalizeStringArray(profile.goals),
     aspirations: normalizeStringArray(profile.aspirations),
     personalValues: normalizeStringArray(profile.personalValues),
     strengths: normalizeStringArray(profile.strengths),

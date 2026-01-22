@@ -7,7 +7,6 @@ export interface ProfileForm {
   primaryPhone: string;
   workPermitInfo: string;
   profilePhotoKey: string | null;
-  goals: string[];
   aspirations: string[];
   personalValues: string[];
   strengths: string[];

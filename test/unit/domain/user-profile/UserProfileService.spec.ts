@@ -33,7 +33,6 @@ describe('UserProfileService', () => {
         headline: 'Software Engineer',
         location: 'San Francisco, CA',
         seniorityLevel: 'Senior',
-        goals: ['Lead a team', 'Learn AI/ML'],
         aspirations: ['CTO'],
         personalValues: ['Innovation', 'Collaboration'],
         strengths: ['Problem Solving', 'Communication'],
@@ -89,7 +88,6 @@ describe('UserProfileService', () => {
       const profileWithEmptyArrays = {
         id: 'user-123',
         fullName: 'John Doe',
-        goals: [],
         aspirations: [],
         personalValues: [],
         strengths: [],
@@ -107,7 +105,6 @@ describe('UserProfileService', () => {
       const result = await service.getFullUserProfile('user-123');
 
       expect(result).toEqual(profileWithEmptyArrays);
-      expect(result?.goals).toEqual([]);
       expect(result?.skills).toEqual([]);
     });
   });

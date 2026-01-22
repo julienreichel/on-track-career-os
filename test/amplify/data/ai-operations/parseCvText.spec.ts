@@ -59,9 +59,6 @@ AWS Certified Solutions Architect
 LANGUAGES
 English (Native), Spanish (Fluent)
 
-GOALS
-- Lead a distributed engineering team
-- Contribute to open source
   `.trim();
 
   /**
@@ -128,16 +125,6 @@ GOALS
           .filter((l) => l)
       : [];
 
-    // Extract goals
-    const goalsMatch = cvText.match(/GOALS\n([\s\S]*?)(?=\n[A-Z]+\n|$)/);
-    const goals = goalsMatch
-      ? goalsMatch[1]
-          .trim()
-          .split('\n')
-          .map((g) => g.replace(/^-\s*/, '').trim())
-          .filter((g) => g)
-      : [];
-
     return {
       sections: {
         experiencesBlocks: experiences,
@@ -151,7 +138,6 @@ GOALS
         headline,
         location,
         seniorityLevel: headline?.includes('Senior') ? 'Senior' : undefined,
-        goals,
         aspirations: [],
         personalValues: [],
         strengths: [],
@@ -208,7 +194,6 @@ GOALS
           location?: string;
           seniorityLevel?: string;
           languages: string[];
-          goals: string[];
         };
       };
       expect(parsed.sections.experiencesBlocks).toHaveLength(1);
@@ -228,8 +213,6 @@ GOALS
       expect(parsed.profile.seniorityLevel).toBe('Senior');
       expect(parsed.profile.languages).toContain('English');
       expect(parsed.profile.languages).toContain('Spanish');
-      expect(parsed.profile.goals).toHaveLength(2);
-      expect(parsed.profile.goals[0]).toContain('distributed engineering team');
     });
     it('should validate output structure and apply operation-specific fallbacks', async () => {
       const mockBedrockResponse = {
@@ -269,7 +252,6 @@ GOALS
         };
         profile: {
           fullName?: string;
-          goals: string[];
           aspirations: string[];
           personalValues: string[];
           strengths: string[];
@@ -287,7 +269,6 @@ GOALS
       // Verify profile validation
       expect(parsed.profile).toBeDefined();
       expect(parsed.profile.fullName).toBe('Test User');
-      expect(parsed.profile.goals).toEqual([]);
       expect(parsed.profile.aspirations).toEqual([]);
       expect(parsed.profile.languages).toEqual([]);
     });
@@ -323,7 +304,6 @@ GOALS
           rawBlocks: string[];
         };
         profile: {
-          goals: string[];
           aspirations: string[];
           personalValues: string[];
           strengths: string[];
@@ -342,7 +322,6 @@ GOALS
 
       // Should apply fallback for missing profile
       expect(result.profile).toBeDefined();
-      expect(result.profile.goals).toEqual([]);
       expect(result.profile.aspirations).toEqual([]);
       expect(result.profile.personalValues).toEqual([]);
       expect(result.profile.strengths).toEqual([]);

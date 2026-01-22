@@ -162,9 +162,6 @@ function formatUserProfile(profile: Profile): string {
   if (profile.primaryEmail) section += `Email: ${profile.primaryEmail}\n`;
   if (profile.primaryPhone) section += `Phone: ${profile.primaryPhone}\n`;
 
-  if (profile.goals && profile.goals.length > 0) {
-    section += `\nCareer Goals:\n${profile.goals.map((g: string) => `- ${g}`).join('\n')}\n`;
-  }
   if (profile.strengths && profile.strengths.length > 0) {
     section += `\nKey Strengths:\n${profile.strengths.map((s: string) => `- ${s}`).join('\n')}\n`;
   }

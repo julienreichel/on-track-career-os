@@ -53,7 +53,6 @@ async function ensureProfileFilled(page: Page): Promise<void> {
   await addTag('https://linkedin.com/in/you', 'https://linkedin.com/in/john-doe');
   await addTag('e.g., Vue.js', 'Vue.js');
   await addTag('e.g., English', 'English');
-  await addTag('e.g., Become engineering manager', 'Become engineering manager');
   await addTag('e.g., Lead cross-functional teams', 'Lead cross-functional teams');
   await addTag('e.g., Integrity', 'Integrity');
 

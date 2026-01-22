@@ -42,7 +42,7 @@ describe('useCvGenerator', () => {
     primaryPhone: '+1 555 0100',
     workPermitInfo: 'Eligible to work in EU & US',
     socialLinks: ['https://linkedin.com/in/johndoe', 'https://github.com/johndoe'],
-    goals: ['Lead technical teams', 'Build scalable systems'],
+    aspirations: ['Lead technical teams', 'Build scalable systems'],
     strengths: ['Problem solving', 'Team leadership'],
     skills: ['TypeScript', 'Vue.js', 'Node.js'],
     languages: ['English', 'Spanish'],
@@ -233,7 +233,7 @@ describe('useCvGenerator', () => {
     it('should filter null values from profile arrays', async () => {
       const profileWithNulls = {
         ...mockUserProfile,
-        goals: ['Goal 1', null, 'Goal 2'],
+        aspirations: ['Aspiration 1', null, 'Aspiration 2'],
         strengths: [null, 'Strength 1'],
         skills: ['Skill 1', null],
         socialLinks: ['https://example.com', '', null as unknown as string],
@@ -244,7 +244,7 @@ describe('useCvGenerator', () => {
       await generateCv('user-123', ['exp-1'], { includeSkills: true });
 
       const aiInput = mockAiService.generateCv.mock.calls[0][0];
-      expect(aiInput.profile.goals).toEqual(['Goal 1', 'Goal 2']);
+      expect(aiInput.profile.aspirations).toEqual(['Aspiration 1', 'Aspiration 2']);
       expect(aiInput.profile.strengths).toEqual(['Strength 1']);
       expect(aiInput.profile.skills).toEqual(['Skill 1']);
       expect(aiInput.profile.socialLinks).toEqual(['https://example.com']);
@@ -355,7 +355,7 @@ describe('useCvGenerator', () => {
         'https://linkedin.com/in/johndoe',
         'https://github.com/johndoe',
       ]);
-      expect(input?.profile.goals).toEqual(['Lead technical teams', 'Build scalable systems']);
+      expect(input?.profile.aspirations).toEqual(['Lead technical teams', 'Build scalable systems']);
       expect(input?.experiences).toHaveLength(1);
       expect(input?.stories).toHaveLength(2);
       expect(input?.profile.skills).toEqual(['TypeScript', 'Vue.js', 'Node.js']);
@@ -445,7 +445,7 @@ describe('useCvGenerator', () => {
       expect(input?.profile.fullName).toBe('Jane Doe');
       expect(input?.profile.headline).toBeUndefined();
       expect(input?.profile.location).toBeUndefined();
-      expect(input?.profile.goals).toBeUndefined();
+      expect(input?.profile.aspirations).toBeUndefined();
     });
 
     it('should not include optional sections when options are false', async () => {

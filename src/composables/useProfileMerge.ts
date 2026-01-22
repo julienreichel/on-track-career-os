@@ -60,7 +60,6 @@ export function useProfileMerge() {
     }
 
     // Merge arrays
-    updateData.goals = mergeArrays(existingProfile.goals, profile.goals);
     updateData.aspirations = mergeArrays(existingProfile.aspirations, profile.aspirations);
     updateData.personalValues = mergeArrays(existingProfile.personalValues, profile.personalValues);
     updateData.strengths = mergeArrays(existingProfile.strengths, profile.strengths);

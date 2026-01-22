@@ -62,7 +62,6 @@ describe('useMatchingEngine', () => {
       location: 'Remote',
       seniorityLevel: 'Director',
       workPermitInfo: 'US Citizen',
-      goals: ['Grow teams'],
       aspirations: ['CTO'],
       personalValues: ['Trust'],
       strengths: ['Leadership'],

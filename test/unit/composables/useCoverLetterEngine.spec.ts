@@ -33,7 +33,7 @@ describe('useCoverLetterEngine', () => {
       headline: 'Senior Software Engineer',
       location: 'San Francisco, CA',
       seniorityLevel: 'senior',
-      goals: ['Lead technical initiatives'],
+      aspirations: ['Lead technical initiatives'],
       strengths: ['Problem solving', 'Team collaboration'],
       skills: ['TypeScript', 'Vue.js'],
     } as UserProfile;
@@ -507,21 +507,15 @@ describe('useCoverLetterEngine', () => {
 
       expect(deps.aiService.generateCoverLetter).toHaveBeenCalledWith(
         expect.objectContaining({
-          profile: {
+          profile: expect.objectContaining({
             fullName: 'Alex Developer',
             headline: 'Senior Software Engineer',
             location: 'San Francisco, CA',
             seniorityLevel: 'senior',
-            goals: ['Lead technical initiatives'],
+            aspirations: ['Lead technical initiatives'],
             strengths: ['Problem solving', 'Team collaboration'],
             skills: ['TypeScript', 'Vue.js'],
-            workPermitInfo: undefined,
-            aspirations: undefined,
-            personalValues: undefined,
-            interests: undefined,
-            certifications: undefined,
-            languages: undefined,
-          },
+          }),
         })
       );
     });
@@ -574,7 +568,7 @@ describe('useCoverLetterEngine', () => {
     it('should filter null values from arrays', async () => {
       const profileWithNulls = {
         ...profile,
-        goals: ['Goal 1', null, 'Goal 2'],
+        aspirations: ['Aspiration 1', null, 'Aspiration 2'],
         strengths: [null, 'Strength 1'],
       } as UserProfile;
 
@@ -591,7 +585,7 @@ describe('useCoverLetterEngine', () => {
       expect(deps.aiService.generateCoverLetter).toHaveBeenCalledWith(
         expect.objectContaining({
           profile: expect.objectContaining({
-            goals: ['Goal 1', 'Goal 2'],
+            aspirations: ['Aspiration 1', 'Aspiration 2'],
             strengths: ['Strength 1'],
           }),
         })

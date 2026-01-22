@@ -788,7 +788,6 @@ function buildCvInput(args: {
       primaryPhone: args.profile.primaryPhone || undefined,
       workPermitInfo: args.profile.workPermitInfo || undefined,
       socialLinks: includeLinks ? filterStrings(args.profile.socialLinks) : undefined,
-      goals: filterStrings(args.profile.goals),
       strengths: filterStrings(args.profile.strengths),
       seniorityLevel: args.profile.seniorityLevel || undefined,
       aspirations: filterStrings(args.profile.aspirations),

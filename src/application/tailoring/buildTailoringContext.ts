@@ -75,7 +75,6 @@ function mapUserProfile(profile: UserProfile, fullName: string): Profile {
     ...(location && { location }),
     ...(seniorityLevel && { seniorityLevel }),
     ...(workPermitInfo && { workPermitInfo }),
-    ...(optionalStringArray(profile.goals) && { goals: optionalStringArray(profile.goals) }),
     ...(optionalStringArray(profile.aspirations) && {
       aspirations: optionalStringArray(profile.aspirations),
     }),

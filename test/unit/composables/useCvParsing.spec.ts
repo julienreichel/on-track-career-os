@@ -339,7 +339,6 @@ describe('useCvParsing', () => {
         headline: 'Developer',
         location: 'SF',
         seniorityLevel: 'Senior',
-        goals: [],
         aspirations: [],
         personalValues: [],
         strengths: [],
@@ -367,18 +366,17 @@ describe('useCvParsing', () => {
       const parsing = useCvParsing();
 
       parsing.extractedProfile.value = {
-        goals: ['Goal 1', 'Goal 2', 'Goal 3'],
-        aspirations: [],
+        aspirations: ['Aspiration 1', 'Aspiration 2', 'Aspiration 3'],
         personalValues: [],
         strengths: [],
         interests: [],
         languages: [],
       };
 
-      parsing.removeProfileArrayItem('goals', 1);
+      parsing.removeProfileArrayItem('aspirations', 1);
 
-      expect(parsing.extractedProfile.value.goals).toHaveLength(2);
-      expect(parsing.extractedProfile.value.goals).toEqual(['Goal 1', 'Goal 3']);
+      expect(parsing.extractedProfile.value.aspirations).toHaveLength(2);
+      expect(parsing.extractedProfile.value.aspirations).toEqual(['Aspiration 1', 'Aspiration 3']);
     });
 
     it('should handle null profile', () => {
@@ -386,7 +384,7 @@ describe('useCvParsing', () => {
 
       parsing.extractedProfile.value = null;
 
-      expect(() => parsing.removeProfileArrayItem('goals', 0)).not.toThrow();
+      expect(() => parsing.removeProfileArrayItem('aspirations', 0)).not.toThrow();
     });
 
     it('should handle non-array field', () => {
@@ -394,7 +392,6 @@ describe('useCvParsing', () => {
 
       parsing.extractedProfile.value = {
         fullName: 'John',
-        goals: [],
         aspirations: [],
         personalValues: [],
         strengths: [],
@@ -424,7 +421,6 @@ describe('useCvParsing', () => {
       ];
       parsing.extractedProfile.value = {
         fullName: 'John',
-        goals: [],
         aspirations: [],
         personalValues: [],
         strengths: [],
@@ -457,8 +453,7 @@ describe('useCvParsing', () => {
         profile: {
           fullName: 'Jane Smith',
           headline: 'Engineer',
-          goals: ['Goal 1'],
-          aspirations: [],
+          aspirations: ['Aspiration 1'],
           personalValues: [],
           strengths: [],
           interests: [],
@@ -483,8 +478,7 @@ describe('useCvParsing', () => {
       expect(parsing.extractedProfile.value).toEqual({
         fullName: 'Jane Smith',
         headline: 'Engineer',
-        goals: ['Goal 1'],
-        aspirations: [],
+        aspirations: ['Aspiration 1'],
         personalValues: [],
         strengths: [],
         interests: [],

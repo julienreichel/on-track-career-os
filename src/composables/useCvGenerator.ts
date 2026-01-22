@@ -303,7 +303,6 @@ function buildProfileBase(profile: UserProfile, includeLinks: boolean) {
     primaryPhone: profile.primaryPhone || undefined,
     workPermitInfo: profile.workPermitInfo || undefined,
     socialLinks: includeLinks ? filterSocialLinks(profile.socialLinks) : undefined,
-    goals: filterNullableStrings(profile.goals),
     aspirations: filterNullableStrings(profile.aspirations),
     personalValues: filterNullableStrings(profile.personalValues),
     strengths: filterNullableStrings(profile.strengths),

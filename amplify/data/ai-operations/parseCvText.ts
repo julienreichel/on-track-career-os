@@ -50,7 +50,6 @@ const OUTPUT_SCHEMA = `{
     "headline": "string",
     "location": "string",
     "seniorityLevel": "string",
-    "goals": ["string"],
     "aspirations": ["string"],
     "personalValues": ["string"],
     "strengths": ["string"],
@@ -73,7 +72,6 @@ export interface ParseCvTextOutput {
     headline?: string;
     location?: string;
     seniorityLevel?: string;
-    goals?: string[];
     aspirations?: string[];
     personalValues?: string[];
     strengths?: string[];
@@ -136,7 +134,6 @@ function validateProfile(
     location: typeof parsedProfile.location === 'string' ? parsedProfile.location : undefined,
     seniorityLevel:
       typeof parsedProfile.seniorityLevel === 'string' ? parsedProfile.seniorityLevel : undefined,
-    goals: Array.isArray(parsedProfile.goals) ? parsedProfile.goals : [],
     aspirations: Array.isArray(parsedProfile.aspirations) ? parsedProfile.aspirations : [],
     personalValues: Array.isArray(parsedProfile.personalValues) ? parsedProfile.personalValues : [],
     strengths: Array.isArray(parsedProfile.strengths) ? parsedProfile.strengths : [],

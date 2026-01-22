@@ -11,7 +11,6 @@ const baseProfile = {
   skills: ['Leadership'],
   languages: ['English'],
   strengths: ['Coaching'],
-  goals: ['Lead teams'],
   aspirations: ['CTO'],
   personalValues: ['Trust'],
   interests: ['AI'],
@@ -56,7 +55,6 @@ describe('computeUserProgressState', () => {
       baseInputs({
         profile: {
           ...baseProfile,
-          goals: [],
           aspirations: [],
           personalValues: [],
         } as ProgressInputs['profile'],

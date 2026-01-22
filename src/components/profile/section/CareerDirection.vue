@@ -7,17 +7,6 @@
     </template>
 
     <div v-if="!isEditing" class="space-y-4">
-      <div v-if="form.goals.length > 0">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {{ t('profile.fields.goals') }}
-        </label>
-        <div class="flex flex-wrap gap-2">
-          <UBadge v-for="(goal, index) in form.goals" :key="index" color="primary" variant="subtle">
-            {{ goal }}
-          </UBadge>
-        </div>
-      </div>
-
       <div v-if="form.aspirations.length > 0">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {{ t('profile.fields.aspirations') }}
@@ -36,14 +25,6 @@
     </div>
 
     <div v-else class="space-y-4">
-      <TagInput
-        v-model="form.goals"
-        :label="t('profile.fields.goals')"
-        :placeholder="t('profile.fields.goalsPlaceholder')"
-        :hint="t('profile.fields.goalsHint')"
-        color="primary"
-      />
-
       <TagInput
         v-model="form.aspirations"
         :label="t('profile.fields.aspirations')"

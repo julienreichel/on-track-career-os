@@ -32,7 +32,6 @@ const mountSection = (isEditing = false, info = 'Swiss Citizen') => {
     primaryPhone: '',
     workPermitInfo: info,
     profilePhotoKey: null,
-    goals: [],
     aspirations: [],
     personalValues: [],
     strengths: [],

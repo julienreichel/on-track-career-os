@@ -51,7 +51,7 @@ describe('ai.generateCv', () => {
 
 ## Professional Summary
 
-${profileData.goals?.[0] || 'Experienced professional'} with proven track record of ${profileData.strengths?.[0] || 'delivering results'}.
+${profileData.aspirations?.[0] || 'Experienced professional'} with proven track record of ${profileData.strengths?.[0] || 'delivering results'}.
 
 ## Professional Experience
 
@@ -78,7 +78,7 @@ Python, JavaScript, AWS, Docker, Kubernetes
         fullName: 'John Doe',
         headline: 'Senior Software Engineer',
         location: 'San Francisco, CA',
-        goals: ['Lead technical teams'],
+        aspirations: ['Lead technical teams'],
         strengths: ['Cloud architecture'],
       },
     });
