@@ -11,6 +11,13 @@
             to: { name: 'applications' },
           },
           {
+            label: $t('cvList.actions.settings'),
+            icon: 'i-heroicons-cog-6-tooth',
+            to: '/settings/cv',
+            color: 'neutral',
+            variant: 'outline',
+          },
+          {
             label: $t('cvList.actions.create'),
             icon: 'i-heroicons-plus',
             to: { name: 'applications-cv-new' },
@@ -18,17 +25,17 @@
         ]"
       />
 
-    <UPageBody>
-      <LockedFeatureCard
-        v-for="feature in guidance.lockedFeatures"
-        :key="feature.id"
-        :feature="feature"
-        class="mb-6"
-      />
+      <UPageBody>
+        <LockedFeatureCard
+          v-for="feature in guidance.lockedFeatures"
+          :key="feature.id"
+          :feature="feature"
+          class="mb-6"
+        />
 
-      <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
-        <UInput
-          v-model="searchQuery"
+        <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
+          <UInput
+            v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
             :placeholder="t('cvList.search.placeholder')"
             size="lg"
@@ -49,10 +56,7 @@
         <ListSkeletonCards v-if="loading || !hasLoaded" />
 
         <!-- Empty State -->
-        <EmptyStateActionCard
-          v-else-if="guidance.emptyState"
-          :empty-state="guidance.emptyState"
-        />
+        <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
 
         <!-- CV List -->
         <UCard v-else-if="filteredItems.length === 0">
