@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
+import { CVTemplateService } from '@/domain/cvtemplate/CVTemplateService';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
 import { CompanyService } from '@/domain/company/CompanyService';
 import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
@@ -16,6 +17,7 @@ interface BreadcrumbMapping {
 const mappingCache = ref<BreadcrumbMapping>({});
 let experienceService: ExperienceService | null = null;
 let cvDocumentService: CVDocumentService | null = null;
+let cvTemplateService: CVTemplateService | null = null;
 let companyService: CompanyService | null = null;
 let jobService: JobDescriptionService | null = null;
 
@@ -81,6 +83,32 @@ export function useBreadcrumbMapping() {
   };
 
   /**
+   * Get display name for a CV template ID
+   */
+  const getCVTemplateName = async (templateId: string): Promise<string> => {
+    if (!cvTemplateService) {
+      cvTemplateService = new CVTemplateService();
+    }
+
+    if (mappingCache.value[templateId]) {
+      return mappingCache.value[templateId];
+    }
+
+    try {
+      const template = await cvTemplateService.get(templateId);
+      const name = template?.name;
+      if (name) {
+        mappingCache.value[templateId] = name;
+        return name;
+      }
+    } catch (err) {
+      console.error('[useBreadcrumbMapping] Error fetching CV template:', err);
+    }
+
+    return templateId;
+  };
+
+  /**
    * Check if a string looks like a UUID
    */
   const isUUID = (str: string): boolean => {
@@ -94,7 +122,8 @@ export function useBreadcrumbMapping() {
    */
   const resolveSegment = async (
     segment: string,
-    previousSegment?: string
+    previousSegment?: string,
+    previousParentSegment?: string
   ): Promise<string | null> => {
     // Only process if it looks like an ID
     if (!isUUID(segment)) {
@@ -107,6 +136,9 @@ export function useBreadcrumbMapping() {
     }
 
     if (previousSegment === 'cv') {
+      if (previousParentSegment === 'settings') {
+        return await getCVTemplateName(segment);
+      }
       return await getCVDocumentName(segment);
     }
 
