@@ -50,6 +50,8 @@ const formState = ref<CvSettingsFormState | null>(null);
 const initialized = ref(false);
 const deleteModalOpen = ref(false);
 const templateToDelete = ref<CVTemplate | null>(null);
+const createModalOpen = ref(false);
+const creatingTemplate = ref(false);
 
 const isLoading = computed(
   () => settingsLoading.value || templatesLoading.value || loadingExperiences.value
@@ -103,8 +105,6 @@ const sortedTemplates = computed(() =>
 const formatTemplateDate = (template: CVTemplate) =>
   formatListDate(template.updatedAt ?? template.createdAt);
 
-const systemTemplateTestId = (id: string) => `cv-template-system-${id.replace(/[:]/g, '-')}`;
-
 const handleSave = async () => {
   if (!settings.value || !formState.value) return;
 
@@ -131,29 +131,9 @@ const handleSave = async () => {
   }
 };
 
-const handleCreateBlank = async () => {
-  try {
-    const created = await createTemplate({
-      name: t('cvTemplates.list.newTemplateName'),
-      content: '',
-      source: 'user',
-    });
-    if (created) {
-      toast.add({
-        title: t('cvTemplates.toast.created'),
-        color: 'primary',
-      });
-      await router.push({ name: 'settings-cv-id', params: { id: created.id } });
-    }
-  } catch {
-    toast.add({
-      title: t('cvTemplates.toast.createFailed'),
-      color: 'error',
-    });
-  }
-};
-
-const handleUseTemplate = async (template: SystemCvTemplate) => {
+const handleCreateFromBase = async (template: SystemCvTemplate) => {
+  if (creatingTemplate.value) return;
+  creatingTemplate.value = true;
   try {
     const created = await createFromExemplar(template);
     if (created) {
@@ -161,6 +141,7 @@ const handleUseTemplate = async (template: SystemCvTemplate) => {
         title: t('cvTemplates.toast.created'),
         color: 'primary',
       });
+      createModalOpen.value = false;
       await router.push({ name: 'settings-cv-id', params: { id: created.id } });
     }
   } catch {
@@ -168,6 +149,8 @@ const handleUseTemplate = async (template: SystemCvTemplate) => {
       title: t('cvTemplates.toast.createFailed'),
       color: 'error',
     });
+  } finally {
+    creatingTemplate.value = false;
   }
 };
 
@@ -278,59 +261,16 @@ watch(
           <ListSkeletonCards v-if="isLoading || !hasLoaded || !formState" />
 
           <div v-else class="space-y-10">
-            <CvSettingsForm
-              v-model="formState"
-              :experiences="experiences"
-              :loading-experiences="loadingExperiences"
-              :saving="saving"
-              @save="handleSave"
-            />
-
-            <section id="cv-templates" class="space-y-6">
-              <div class="space-y-1">
-                <h2 class="text-lg font-semibold text-default">
-                  {{ t('cvTemplates.list.title') }}
-                </h2>
-                <p class="text-sm text-dimmed">
-                  {{ t('cvTemplates.list.subtitle') }}
-                </p>
-              </div>
-
-              <UCard>
-                <template #header>
-                  <div class="space-y-1">
-                    <h3 class="text-base font-semibold text-default">
-                      {{ t('cvTemplates.list.system.title') }}
-                    </h3>
-                    <p class="text-sm text-dimmed">
-                      {{ t('cvTemplates.list.system.description') }}
-                    </p>
-                  </div>
-                </template>
-
-                <UPageGrid>
-                  <CvTemplateCard
-                    v-for="template in systemTemplates"
-                    :key="template.id"
-                    :name="template.name"
-                    :description="template.description"
-                    :primary-action-label="t('cvTemplates.list.actions.useTemplate')"
-                    primary-action-icon="i-heroicons-arrow-right"
-                    :data-testid="systemTemplateTestId(template.id)"
-                    @primary="handleUseTemplate(template)"
-                  />
-                </UPageGrid>
-              </UCard>
-
+            <section id="cv-templates">
               <UCard>
                 <template #header>
                   <div class="flex flex-wrap items-start justify-between gap-3">
                     <div class="space-y-1">
-                      <h3 class="text-base font-semibold text-default">
-                        {{ t('cvTemplates.list.user.title') }}
-                      </h3>
+                      <h2 class="text-lg font-semibold text-default">
+                        {{ t('cvTemplates.list.title') }}
+                      </h2>
                       <p class="text-sm text-dimmed">
-                        {{ t('cvTemplates.list.user.description') }}
+                        {{ t('cvTemplates.list.subtitle') }}
                       </p>
                     </div>
                     <UButton
@@ -338,7 +278,7 @@ watch(
                       variant="soft"
                       :label="t('cvTemplates.list.actions.create')"
                       icon="i-heroicons-plus"
-                      @click="handleCreateBlank"
+                      @click="createModalOpen = true"
                     />
                   </div>
                 </template>
@@ -356,7 +296,7 @@ watch(
                       color="primary"
                       :label="t('cvTemplates.list.actions.create')"
                       icon="i-heroicons-plus"
-                      @click="handleCreateBlank"
+                      @click="createModalOpen = true"
                     />
                   </template>
                 </UEmpty>
@@ -383,6 +323,14 @@ watch(
                 </UPageGrid>
               </UCard>
             </section>
+
+            <CvSettingsForm
+              v-model="formState"
+              :experiences="experiences"
+              :loading-experiences="loadingExperiences"
+              :saving="saving"
+              @save="handleSave"
+            />
           </div>
         </UPageBody>
       </UPage>
@@ -398,5 +346,35 @@ watch(
       :loading="deletingTemplate"
       @confirm="handleDelete"
     />
+
+    <UModal
+      v-model:open="createModalOpen"
+      :title="t('cvTemplates.list.system.title')"
+      :description="t('cvTemplates.list.system.description')"
+    >
+      <template #body>
+        <div class="flex flex-col gap-3">
+          <UButton
+            v-for="template in systemTemplates"
+            :key="template.id"
+            color="neutral"
+            variant="soft"
+            class="w-full justify-between"
+            :label="template.name"
+            :loading="creatingTemplate"
+            @click="handleCreateFromBase(template)"
+          />
+        </div>
+      </template>
+
+      <template #footer>
+        <UButton
+          color="neutral"
+          variant="ghost"
+          :label="t('common.cancel')"
+          @click="createModalOpen = false"
+        />
+      </template>
+    </UModal>
   </div>
 </template>
