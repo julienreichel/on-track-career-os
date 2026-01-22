@@ -15,29 +15,32 @@ export type DefaultCvSettings = {
   showProfilePhoto: boolean;
 };
 
+const normalizeStringArray = (values?: (string | null)[] | null): string[] =>
+  (values ?? []).filter((value): value is string => Boolean(value));
+
+const resolveEnabledSections = (settings?: CVSettings | null) => {
+  const sections = normalizeStringArray(settings?.defaultEnabledSections ?? null);
+  return sections.length > 0 ? sections : CV_SECTION_KEYS;
+};
+
+const resolveIncludedExperiences = (
+  settings: CVSettings | null | undefined,
+  experiences?: Experience[]
+) => {
+  const explicitIds = normalizeStringArray(settings?.defaultIncludedExperienceIds ?? null);
+  if (explicitIds.length > 0) return explicitIds;
+  return (experiences ?? []).map((experience) => experience.id);
+};
+
 export const getDefaultCvSettings = ({
   settings,
   experiences,
 }: DefaultCvSettingsInput): DefaultCvSettings => {
-  const hasSections = Array.isArray(settings?.defaultEnabledSections);
-  const hasExperiences = Array.isArray(settings?.defaultIncludedExperienceIds);
-  const cleanedExperienceIds = hasExperiences
-    ? (settings?.defaultIncludedExperienceIds ?? []).filter(
-        (value): value is string => Boolean(value)
-      )
-    : [];
-  const fallbackExperienceIds = (experiences ?? []).map((experience) => experience.id);
-
   return {
     askEachTime: settings?.askEachTime ?? false,
     defaultTemplateId: settings?.defaultTemplateId ?? null,
-    defaultEnabledSections: hasSections
-      ? (settings?.defaultEnabledSections ?? []).filter(
-          (value): value is string => Boolean(value)
-        )
-      : CV_SECTION_KEYS,
-    defaultIncludedExperienceIds:
-      cleanedExperienceIds.length > 0 ? cleanedExperienceIds : fallbackExperienceIds,
+    defaultEnabledSections: resolveEnabledSections(settings),
+    defaultIncludedExperienceIds: resolveIncludedExperiences(settings, experiences),
     showProfilePhoto: settings?.showProfilePhoto ?? true,
   };
 };

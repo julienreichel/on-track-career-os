@@ -66,7 +66,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { CVTemplateService } from '@/domain/cvtemplate/CVTemplateService';
 import type { CVTemplate } from '@/domain/cvtemplate/CVTemplate';
 import { useCvSettings } from '@/application/cvsettings/useCvSettings';
@@ -75,6 +75,7 @@ import CvTemplateEditor from '@/components/cv/CvTemplateEditor.vue';
 const { t } = useI18n();
 const toast = useToast();
 const route = useRoute();
+const router = useRouter();
 const service = new CVTemplateService();
 
 const { settings, load: loadSettings, saveSettings } = useCvSettings();
@@ -130,33 +131,33 @@ const loadTemplate = async () => {
 
 const handleSave = async () => {
   if (!template.value) return;
-  if (!isDirty.value) {
-    return;
-  }
-  saving.value = true;
-  try {
-    const updated = await service.update({
-      id: template.value.id,
-      name: name.value,
-      content: content.value,
-    });
-    if (updated) {
-      template.value = updated;
-      originalName.value = updated.name;
-      originalContent.value = updated.content;
-      toast.add({
-        title: t('cvTemplates.toast.saved'),
-        color: 'primary',
+  if (isDirty.value) {
+    saving.value = true;
+    try {
+      const updated = await service.update({
+        id: template.value.id,
+        name: name.value,
+        content: content.value,
       });
+      if (updated) {
+        template.value = updated;
+        originalName.value = updated.name;
+        originalContent.value = updated.content;
+        toast.add({
+          title: t('cvTemplates.toast.saved'),
+          color: 'primary',
+        });
+      }
+    } catch {
+      toast.add({
+        title: t('cvTemplates.toast.saveFailed'),
+        color: 'error',
+      });
+    } finally {
+      saving.value = false;
     }
-  } catch {
-    toast.add({
-      title: t('cvTemplates.toast.saveFailed'),
-      color: 'error',
-    });
-  } finally {
-    saving.value = false;
   }
+  await router.push({ name: 'settings-cv' });
 };
 
 const handleSetDefault = async () => {
@@ -179,8 +180,23 @@ const handleSetDefault = async () => {
   }
 };
 
-
 onMounted(async () => {
+  console.log('Mounted');
   await Promise.all([loadTemplate(), loadSettings()]);
+  console.log('Loaded', template.value, settings.value, settings.value?.defaultTemplateId);
+  if (template.value && settings.value && !settings.value.defaultTemplateId) {
+    console.log('No default');
+    try {
+      await saveSettings({
+        id: settings.value.id,
+        defaultTemplateId: template.value.id,
+      });
+    } catch {
+      toast.add({
+        title: t('cvTemplates.toast.defaultFailed'),
+        color: 'error',
+      });
+    }
+  }
 });
 </script>
