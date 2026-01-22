@@ -21,6 +21,12 @@ export const getDefaultCvSettings = ({
 }: DefaultCvSettingsInput): DefaultCvSettings => {
   const hasSections = Array.isArray(settings?.defaultEnabledSections);
   const hasExperiences = Array.isArray(settings?.defaultIncludedExperienceIds);
+  const cleanedExperienceIds = hasExperiences
+    ? (settings?.defaultIncludedExperienceIds ?? []).filter(
+        (value): value is string => Boolean(value)
+      )
+    : [];
+  const fallbackExperienceIds = (experiences ?? []).map((experience) => experience.id);
 
   return {
     askEachTime: settings?.askEachTime ?? false,
@@ -30,11 +36,8 @@ export const getDefaultCvSettings = ({
           (value): value is string => Boolean(value)
         )
       : CV_SECTION_KEYS,
-    defaultIncludedExperienceIds: hasExperiences
-      ? (settings?.defaultIncludedExperienceIds ?? []).filter(
-          (value): value is string => Boolean(value)
-        )
-      : (experiences ?? []).map((experience) => experience.id),
+    defaultIncludedExperienceIds:
+      cleanedExperienceIds.length > 0 ? cleanedExperienceIds : fallbackExperienceIds,
     showProfilePhoto: settings?.showProfilePhoto ?? true,
   };
 };
