@@ -122,6 +122,17 @@ watch(
         <UFormField :label="t('cvGenerate.modal.templateLabel')">
           <USelect v-model="selectedTemplate" :items="templateItems" class="w-full" />
         </UFormField>
+        <UButton
+          size="xs"
+          color="neutral"
+          variant="ghost"
+          icon="i-heroicons-arrow-top-right-on-square"
+          :label="t('cvSettings.template.manage')"
+          to="/settings/cv"
+          target="_blank"
+          rel="noopener"
+          class="w-fit"
+        />
 
         <div class="space-y-2">
           <p class="text-sm font-medium text-default">
