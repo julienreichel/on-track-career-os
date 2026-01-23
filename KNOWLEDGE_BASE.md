@@ -1,502 +1,247 @@
-# KNOWLEDGE_BASE.md
+# Knowledge Base — On Track Career
 
-_A high-level summary of the project architecture, domain model, AI operations, and development constraints._
+**Purpose:** Core technical reference for understanding the project architecture, data model, and implementation patterns.
 
 ---
 
 ## 1. Global Context
 
-This project is **Your On Track Career** — an AI-powered job-search and career-development platform that guides users through:
+**On Track Career** is a Nuxt 4 TypeScript application helping job seekers create targeted application materials through AI-powered analysis and generation. The system combines personal discovery (identity, skills, stories) with job analysis (company research, description parsing, matching) to generate customized CVs, cover letters, and speeches.
 
-- Understanding their professional identity
-- Modeling job roles and companies
-- Mapping user strengths to company pains
-- Generating tailored CVs, cover letters, speeches
+**Stack:** Nuxt 4 (TypeScript strict) + AWS Amplify Gen2 (GraphQL API, Lambda functions, Cognito auth) + Nuxt UI component library + Vitest/Playwright testing.
 
-The workflow is:
-
-1. **Know Yourself** → Profile, Experiences, STAR stories, Personal Canvas
-2. **Understand the Opportunity** → Job Role Card, Company Canvas
-3. **Communicate Your Value** → Tailored CV/Letter/Speech
-4. **Prepare & Apply**
-
-(From product description & vision )
+**Architecture:** Clean architecture with clear domain separation. All business logic in domain/application layers, UI components consume typed composables, GraphQL repositories handle data access, AI operations via Lambda functions with strict JSON contracts.
 
 ---
 
-## 2. High-Level Project Architecture
+## 2. Architecture Layers
 
-Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer**.
+```
+┌─────────────────────────────────────────────┐
+│  UI Layer (Nuxt Pages + Components)        │  Vue 3 pages, Nuxt UI components
+├─────────────────────────────────────────────┤
+│  Composables Layer                          │  useUserProfile, useStoryEngine, etc.
+├─────────────────────────────────────────────┤
+│  Application Services Layer                 │  Business workflows, AI orchestration
+├─────────────────────────────────────────────┤
+│  Domain Layer                               │  Entities, value objects, rules
+├─────────────────────────────────────────────┤
+│  Data Repositories Layer                    │  GraphQL operations, type mapping
+├─────────────────────────────────────────────┤
+│  Backend (Amplify Gen2)                     │  GraphQL schema, Lambda AI ops
+└─────────────────────────────────────────────┘
+```
 
-**Current Implementation Status (January 2026):**
-
-- ✅ EPIC 1A (User Data Intake) — 100% complete
-- ✅ EPIC 1B (Personal Canvas) — 100% complete end-to-end
-- ✅ EPIC 2 (Experience Builder - STAR Stories) — 100% complete
-- ✅ EPIC 3 (Generic CV Generator) — 100% complete
-- ✅ EPIC 3B (CV Header & Contact Information) — 100% complete
-- ✅ EPIC 3C (CV Customization - Sections/Experience Selection + Templates) — 100% complete
-- ✅ EPIC 4 (User Speech Builder) — 100% complete
-- ✅ EPIC 4B (Generic Cover Letter Generator) — 100% complete
-- ✅ EPIC 5A (Job Description Analysis) — 100% complete
-- ✅ EPIC 5B (Company Analysis & Canvas) — 100% complete
-- ✅ EPIC 5C (User-Job-Company Matching) — 100% complete
-- ✅ EPIC 6 (Tailored Application Materials) — 100% complete
-- ✅ EPIC F2 (Onboarding, Guidance & User Flow Clarity) — 100% complete
-
-### 2.1 Frontend (Nuxt 4)
-
-- Nuxt 4 + TypeScript (strict)
-- Nuxt UI components + Tailwind
-- State via composables
-- Pages structured by domain: Profile / Jobs & Companies / Applications
-- Calls backend through server routes that proxy Lambda functions
-  (From Tech Foundations & Navigation Structure )
-
-### 2.2 Backend (Amplify Gen 2 + Lambda)
-
-- Amplify Data (GraphQL)
-- Cognito authentication
-- Lambda functions for each AI operation
-- Owner-based authorization for all user data
-  (From Tech Foundations )
-
-### 2.3 AI Layer
-
-- 12 core AI operations defined by the AI Interaction Contract
-- Strict JSON I/O schemas with validation + fallback
-- No free text returned; all results are structured
-  (From AIC contract )
-
-### 2.4 Data Layer
-
-- Clean conceptual domain model with ~25 entities
-- Strong relationships across identity ↔ job ↔ company ↔ application materials
-  (From CDM document )
+**Key Principles:**
+- Domain-driven design with bounded contexts
+- Repository pattern for data access
+- Composables over Pinia stores (composition API native)
+- Strict TypeScript (no `any` types)
+- AI operations as Lambda functions with JSON I/O
 
 ---
 
-## 3. Data Models (Domain Summary)
+## 3. Data Model (5 Domains)
 
-_(Condensed from full CDM; only key-developer-relevant models.)_
+### 3.1 Identity Domain
+**UserProfile** — User identity, goals, contact info, profile photo  
+**PersonalCanvas** — Personal Business Model Canvas (9 blocks)  
+**Experience** — Work history entries with responsibilities, achievements
 
-### 3.1 User Identity Domain
+### 3.2 Experience Domain
+**STARStory** — Achievement narratives (Situation, Task, Action, Result, KPIs)  
+Linked to Experience (1-to-many), structured achievement tracking
 
-- **UserProfile**: identity, goals, values, strengths, skills, languages, contact data (`primaryEmail`, `primaryPhone`), work authorization, `socialLinks[]`, and `profilePhotoKey` (S3 key used for CV header)
-- **PersonalCanvas**: value prop, key activities, strengths, target roles, etc.
-- **CommunicationProfile** (V1)
+### 3.3 Job Domain
+**JobDescription** — Parsed job data (title, seniority, responsibilities, skills, benefits, culture)  
+Status tracking (draft, active, closed), company relationship
 
-### 3.2 Experience & Story Domain
+### 3.4 Company Domain
+**Company** — Company information (name, industry, size, markets)  
+**CompanyCanvas** — Company Business Model Canvas (9 blocks)  
+Research notes field for AI analysis input
 
-- **Experience**: title, company, responsibilities, tasks, dates
-- **STARStory**: situation, task, action, result, achievements, KPI suggestions
+### 3.5 Materials Domain
+**CVDocument** — Generated CVs (markdown, template reference, experience selection)  
+**CoverLetter** — Cover letters (markdown, job-targeted)  
+**SpeechBlock** — Speech blocks (3 sections: pitch, story, why-me)  
+**CVTemplate** — Markdown templates (system: 3 built-in, user: customizable)  
+**CVSettings** — User CV defaults (template, sections, experiences)
 
-### 3.3 Job & Company Domain
+### 3.6 Matching Domain
+**MatchingSummary** — User-job fit analysis (score, strengths, gaps, recommendations)
 
-- **JobDescription**: rawText, title, seniorityLevel, roleSummary, responsibilities, requiredSkills, behaviours, successCriteria, explicitPains, status (draft/analyzed/complete), companyId
-- **Company**: companyName, industry, sizeRange, website, productsServices, targetMarkets, customerSegments, description, additionalNotes, lastAnalyzedAt
-- **CompanyCanvas**: 9 Business Model Canvas blocks (keyPartners, keyActivities, keyResources, valuePropositions, customerRelationships, channels, customerSegments, costStructure, revenueStreams), summary, lastUpdatedAt
-- **MatchingSummary**: overallScore, scoreBreakdown, recommendation, reasoningHighlights, strengthsForThisRole, skillMatch, riskyPoints, impactOpportunities, tailoringTips, generatedAt, needsUpdate
-
-### 3.4 Application Materials
-
-- **CVDocument**: name, content (Markdown), experienceIds (selected experiences), templateId, jobId (optional), generatedAt, needsUpdate, status
-- **CoverLetter**: name, content (Markdown), jobId (optional), generatedAt, needsUpdate, status
-- **SpeechBlock**: elevatorPitch (text + keyMessages[]), careerStory (text + keyMessages[]), whyMe (text + keyMessages[]), optional jobId for targeting
-- **CVTemplate**: name, locale, templateMarkdown (AI exemplar), systemTemplate (boolean), createdAt, updatedAt
-- **CVSettings**: defaultTemplateId, includedSections (enum[]), defaultExperienceIds, askEachTime (boolean), updatedAt
-
-(From CDM document )
-
----
-
-## 4. Core Components & Composables
-
-_(From Component Model + Component→Page Mapping) _
-
-### 4.1 Key Frontend Components
-
-- **User Profile Manager**
-- **Experience Intake / Experience Editor**
-- **STAR Story Builder**
-- **Personal Canvas Component**
-- **Company Canvas Component**
-- **Job Role Card Component**
-- **Matching Summary Component**
-- **Tailored Materials Card**
-- **Tailored Job Banner**
-- **CV Builder**
-- **Cover Letter Generator**
-- **Speech Builder**
-- **Dashboard Widgets**
-- **Progress & Onboarding Components**
-
-### 4.2 Composables
-
-- `useUserProfile()` - User profile CRUD with photo upload
-- `useExperienceStore()` - Experience management
-- `useStoryEngine()` - STAR story creation/editing
-- `useCanvasEngine()` - Personal Canvas generation/editing
-- `useJobAnalysis()` - Job CRUD, list, parse, reanalyse, delete
-- `useJobUpload()` - File upload, text extraction, validation
-- `useCompany()` - Company CRUD, list, search, AI analysis
-- `useCompanyCanvas()` - Company Canvas generation/editing
-- `useCompanyUpload()` - Company research notes upload
-- `useCompanyJobs()` - Fetch jobs linked to a company
-- `useMatchingEngine()` - User-Job-Company matching workflow
-- `useMatchingSummary()` - MatchingSummary CRUD + persistence
-- `useSpeechBlock()` - SpeechBlock CRUD with AI generation
-- `useSpeechBlocks()` - SpeechBlock list management
-- `useSpeechEngine()` - Speech workflow orchestration
-- `useCoverLetter()` - CoverLetter CRUD with AI generation
-- `useCoverLetters()` - CoverLetter list management
-- `useCoverLetterEngine()` - Cover letter workflow orchestration
-- `useTailoredMaterials()` - Tailored CV/cover letter/speech generation + reuse
-- `useAiOperations()` - AI operations orchestration
-- `useCvDocuments()` - CV document management
-- `useCvGenerator()` - CV generation from user data
-- `useCvTemplates()` - CV template CRUD with system templates
-- `useCvSettings()` - CV settings persistence (defaults, askEachTime)
-- `getDefaultCvSettings()` - Get or create user CV settings
-- `useUserProgress()` - Progress state tracking across 5 phases
-- `useBadges()` - Badge earning, persistence, and display
-- `useGuidance()` - Contextual guidance messages based on progress
-- `useOnboardingWizard()` - Onboarding wizard state and navigation
-- `useActiveJobsDashboard()` - Active jobs dashboard aggregation
+### Authorization
+All models: Owner-based auth via `authorization((allow) => [allow.owner()])`  
+User-scoped data access enforced at GraphQL layer
 
 ---
 
-## 5. Pages & Their Interactions
+## 4. Composables (State + Logic)
 
-_(Structured per navigation zones)_
+### Identity & Profile
+`useUserProfile()` — Profile CRUD, photo upload, contact management  
+`useCanvasEngine()` — Canvas generation, drag-drop editing, persistence  
+`useExperience()` — Experience CRUD, timeline management
 
-### Profile Zone
+### Experience & Stories
+`useStoryEngine()` — STAR story generation, achievement KPIs  
+`useStoryList()` — List management, filtering, search  
+`useStoryForm()` — Story editing, validation
 
-- `/profile` - View/edit user profile with all identity fields
-- `/profile/canvas` - Personal Canvas with 9-section BMC layout
-- `/profile/experiences` - Experience list with create/edit/delete
-- `/profile/experiences/:id/edit` - Experience form
-- `/profile/experiences/:id/stories` - Per-experience story list
-- `/profile/experiences/:id/stories/:storyId` - Story editor (STAR)
-- `/profile/stories` - Global story library
-- `/cv-upload` - CV upload → AI parsing → import workflow
-
-### Jobs & Companies Zone
-
-- `/jobs` - Job list with search, status badges, delete modal
-- `/jobs/new` - Upload job description (PDF/TXT) → AI parsing
-- `/jobs/:id` - View/edit job details with 5 tabbed sections, reanalyse, company linking
-- `/jobs/:id/match` - Matching summary with fit score + structured sections
-- `/jobs/:id` and `/jobs/:id/match` include Application Materials card for tailored CV/letter/speech
-- `/companies` - Company list with search, delete modal
-- `/companies/new` - Create company with optional AI analysis
-- `/companies/:companyId` - View/edit company info, BMC canvas, and linked jobs
-
-### Applications Zone
-
-- `/cv` - CV document list with Settings link
-- `/cv/new` - Thin CV generation entry with settings summary + optional modal
-- `/cv/:id` - CV Markdown editor with preview
-- `/cv/:id/print` - A4 print layout with auto-print
-- `/speech` - Speech block list
-- `/speech/:id` - Speech block editor
-- `/cover-letters` - Cover letter list
-- `/cover-letters/new` - Cover letter creation wizard
-- `/cover-letters/:id` - Cover letter editor
-- `/cover-letters/:id/print` - Cover letter print layout
-- `/cv/:id`, `/cover-letters/:id`, `/speech/:id` show job backlink + regenerate tailored action when jobId exists
-- `/onboarding` - 4-step onboarding wizard for first-time users
-
-### Settings Zone
-
-- `/settings/cv` - CV template library with system templates + clone
-- `/settings/cv/:id` - CV template markdown editor with preview
-  (From Navigation Structure & Component Mapping )
-
-### 5.1 My Profile
-
-- **Profile Overview** → edit identity, goals, values, contact fields, work permit, TagInput-powered social links, and upload/manage a profile photo (Amplify Storage pipeline + preview)
-- **Experience List** → CRUD experiences
-- **Experience Editor** → edit experience fields, trigger achievements/KPIs
-- **STAR Story Builder** → chat-guided story creation
-- **Personal Business Model Canvas** → drag-drop canvas, regenerate via AI
-- **Communication Profile (V1)**
-
-### 5.2 Jobs & Companies
-
-- **Job List & Add Job** → paste JD → AI parsing
-- **Job Role Card** → responsibilities, skills, pains
-- **Company List & Add Company**
-- **Company Canvas**
-- **Matching Summary** (User ↔ Job ↔ Company)
-
-### 5.3 Applications
-
-- **CV Builder** (thin entry point with template library, settings-driven defaults, optional "ask each time" modal)
-  - Generic CV generator live: `/cv`, `/cv/new`, `/cv/:id`, `/cv/:id/print`
-  - AI-powered Markdown generation via `useCvGenerator` + `generateCv` Lambda (now strips stray ``` fences)
-  - Experience picker + optional profile sections + job description tailoring + toggle to include profile photo
-  - Markdown editor with preview + print/export-ready layout, including top-right profile photo badge when enabled
-- **Cover Letter Builder**
-- **Speech Builder**
-
-### 5.4 Onboarding & Progress System (EPIC F2)
-
-**5-Phase Progress System:**
-
-- **Phase 1**: Complete your profile (requires profile + ≥1 experience)
-- **Phase 2A**: Create your canvas (requires canvas exists)
-- **Phase 2B**: Document your stories (requires ≥3 STAR stories)
-- **Phase 3**: Find job opportunities (requires ≥1 job description)
-- **Bonus Phase**: Generate application materials (unlocked after Phase 3)
-
-**Badge System (7 Badges):**
-
-1. Profile Pioneer - First profile completion
-2. Canvas Creator - Generated personal canvas
-3. Story Master - Created 3+ STAR stories
-4. Job Hunter - Added first job description
-5. CV Craftsman - Generated first CV
-6. Letter Writer - Generated first cover letter
-7. Speech Artist - Generated first speech block
-
-**Guidance Layer:**
-
-- Context-aware next-action suggestions
-- Empty-state guidance cards
-- Locked feature explanations with unlock requirements
-- Dashboard progress tracking with visual indicators
-
-**Onboarding Wizard:**
-
-- Step 1: Welcome & profile basics
-- Step 2: Experience import (CV upload or manual)
-- Step 3: Canvas generation
-- Step 4: First STAR story
-
-**Dashboard Integration:**
-
-- Personalized greeting with user's name
-- Progress banner with phase indicator
-- Active jobs cockpit (Bonus Phase only)
-- Badge collection display
-- Phase-based feature unlocking
-- **Tailored Materials**
-  - Generate tailored CV/cover letter/speech from `/jobs/:id` or `/jobs/:id/match`
-  - Regenerate from document pages via job backlink banner when jobId exists
-
-### 5.4 System Pages
-
-- **Dashboard**
-- **Template Library**
-- **Settings**
-
----
-
-## 6. AI Operations (Full List)
-
-_(From AI Interaction Contract) _
-
-### Identity & Experience
-
-1. `ai.parseCvText` - **Enhanced: Extracts both experience sections AND profile information** (fullName, headline, location, seniority, goals, aspirations, values, strengths, interests, languages, skills, certifications)
-2. `ai.extractExperienceBlocks`
-3. `ai.generateStarStory`
-4. `ai.generateAchievementsAndKpis`
-
-### User Model / Canvas
-
-5. `ai.generatePersonalCanvas`
-
-### Jobs & Companies
-
-6. `ai.parseJobDescription`
-7. `ai.analyzeCompanyInfo`
-8. `ai.generateCompanyCanvas`
+### Job & Company
+`useJobDescription()` — Job CRUD, PDF upload, AI parsing  
+`useCompanies()` — Company CRUD, AI analysis  
+`useCompanyCanvas()` — Company BMC generation
 
 ### Matching
+`useMatchingEngine()` — Fit score calculation, recommendation generation
 
-9. `ai.generateMatchingSummary`
+### Materials
+`useCVGeneration()` — CV generation, template selection, experience filtering  
+`useCoverLetterGeneration()` — Letter generation, job targeting  
+`useSpeechGeneration()` — Speech block generation  
+`useCVTemplates()` — Template library management  
+`useCVSettings()` — User defaults management
 
-### Tailored Application Materials
-
-10. `ai.generateCv`
-11. `ai.generateCoverLetter`
-12. `ai.generateSpeech` - **IMPLEMENTED:** Generates elevator pitch, career story, and "why me" sections with optional job targeting
-
-**Rules:**
-
-- Strict JSON only
-- Validate input + output
-- Retry with schema-fix prompt
-- Return structured error contract
-- Tailoring inputs: jobDescription + matchingSummary + optional company summary
-- Invalid tailoring context falls back to generic output
+### System
+`useAuthUser()` — Authentication, user session  
+`useOnboardingProgress()` — 5-phase progress tracking, guidance  
+`useBreadcrumbMapping()` — Dynamic breadcrumbs
 
 ---
 
-## 8. Current Implementation Status
+## 5. Pages & Navigation (4 Zones)
 
-### MVP Progress: ~90% Complete
+### Auth & Home
+`/login` — Authentication  
+`/` — Dashboard with active jobs, onboarding progress  
+`/onboarding` — 4-step wizard (identity, canvas, stories, opportunities)
 
-#### ✅ EPIC 1A: User Data Intake & Identity (100% Complete)
+### Profile Zone
+`/profile` — User profile editing  
+`/profile/canvas` — Personal BMC generation and editing  
+`/profile/experiences` — Experience list with timeline  
+`/profile/experiences/:id/stories` — STAR stories for experience  
+`/cv-upload` — Initial CV upload and parsing
 
-**Fully Implemented:**
+### Jobs & Companies
+`/jobs` — Job list with search, status filters  
+`/jobs/:id` — 5-tab detail view (info, analysis, company, match, materials)  
+`/jobs/:id/match` — Matching summary with fit score  
+`/companies` — Company list with search  
+`/companies/:id` — Company detail with canvas
 
-- CV upload workflow with PDF/TXT parsing
-- AI extraction of experiences and profile data
-- Profile page with all fields (goals, aspirations, values, strengths, interests, skills, certifications, languages)
-- Experience management (list, create, edit, delete)
-- Profile merge from CV upload
-- 139 tests (65 component, 62 unit, 12 validator)
+### Applications
+`/applications/cv` — CV library  
+`/applications/cv/:id` — CV editor (markdown + preview)  
+`/applications/cv/:id/print` — Print-optimized view  
+`/applications/cover-letters` — Letter library  
+`/applications/speech` — Speech library
 
-#### ✅ EPIC 1B: Personal Canvas Generation (100% Complete)
-
-**Fully Implemented:**
-
-- Backend: GraphQL model + Lambda + repository/service/composable (40 tests)
-- Frontend: `/profile/canvas` page with Business Model Canvas layout
-- PersonalCanvasComponent (261 lines) with 9 editable sections
-- CanvasSectionCard component with tag-based editing
-- Generate and regenerate canvas functionality
-- Per-section editing with save/cancel
-- 121 tests passing (7 Amplify + 40 unit + 25 composable + 8 page + 21 CanvasSectionCard + 7 PersonalCanvasComponent + 13 usePersonalCanvas)
-- E2E canvas flow tests
-
-#### ✅ EPIC 2: Experience Builder - STAR Stories (100% Complete)
-
-**Fully Implemented:**
-
-- Backend: GraphQL model + 2 AI Lambdas + repository/service/composables
-- Frontend: Global story library, per-experience stories, 3-mode story creation
-- 100+ tests (28 E2E, 70+ unit/component)
-
-#### ✅ EPIC 3: Generic CV Generator (100% Complete)
-
-**Fully Implemented:**
-
-- `generateCv` Lambda with synthesis helpers, markdown-only contract, trailing-note stripping
-- Amplify `generateCv` query wired with JSON args + 90s timeout
-- Domain stack (`AiOperationsService`, `AiOperationsRepository`, `useCvGenerator`, `useCvDocuments`)
-- CV Builder flow: `/cv` list, `/cv/new` wizard, `/cv/:id` Markdown editor with preview/save, `/cv/:id/print` A4 print layout
-- Print/export ready typography + Markdown editing guidance
-
-**Validation:**
-
-- Lambda unit tests: `test/amplify/data/ai-operations/generateCv.spec.ts`
-- Sandbox E2E hitting deployed Lambda: `test/e2e-sandbox/ai-operations/generate-cv.spec.ts`
-- Composable & domain tests: `test/unit/composables/useCvGenerator.spec.ts`, CVDocument service/repo specs
-- Utility coverage: `test/unit/ai-operations/generateCv-notes-stripping.spec.ts`
-- ⚠️ UI specs under `test/nuxt/pages/cv` and `test/nuxt/components/cv` exist but are `describe.skip` → no automated run yet
-
-#### ✅ EPIC 5A: Job Description Analysis (100% Complete)
-
-**Fully Implemented:**
-
-- Backend: GraphQL model + Lambda + repository/service/composables (25+ tests)
-- Frontend: `/jobs`, `/jobs/new`, `/jobs/[jobId]` pages with complete CRUD
-- JobCard and JobUploadStep components
-- Full i18n support (jobUpload, jobList, jobDetail)
-- E2E test coverage (jobs-flow.spec.ts)
-- PDF/TXT upload with AI parsing
-- Job search and filtering
-- Tabbed job detail editing
-- Job status tracking (draft/analyzed/complete)
-- Company linking via CompanySelector
-
-#### ✅ EPIC 5B: Company Analysis & Company Business Model Canvas (100% Complete)
-
-**Fully Implemented:**
-
-- Backend: Company and CompanyCanvas GraphQL models + 2 AI Lambdas + repository/service/composables (50+ tests)
-- Frontend: `/companies`, `/companies/new`, `/companies/[companyId]` pages with complete CRUD
-- 7 company components: CompanyCard, CompanyForm, CompanyCanvasEditor, CanvasBlockSection, CompanyNotesInput, CompanySelector, LinkedCompanyBadge
-- Full i18n support (company, companyUpload, BMC block labels)
-- E2E test coverage (company-workflow.spec.ts)
-- AI-powered company analysis from research notes
-- Business Model Canvas generation with 9 blocks
-- Per-block canvas editing with tag-based input
-- Job-company linking (bidirectional)
-- Automatic company extraction from job descriptions
-- Smart company deduplication with normalization
-- Related jobs display on company detail page
-- 2 E2E sandbox tests (analyze-company-info, generate-company-canvas)
-
-**Schema Simplification:**
-
-- Removed `signals` structure for cleaner data model
-- Focused on core company profile fields
-- Business Model Canvas provides structured business understanding
-
-#### ✅ EPIC 4: User Speech Builder (100% Complete)
-
-**Fully Implemented:**
-
-- Backend: SpeechBlock GraphQL model + `generateSpeech` Lambda + repository/service/composables (25+ tests)
-- Frontend: `/speech` list and `/speech/:id` editor pages
-- 3 speech components: SpeechBlockEditorCard, SpeechSectionEditor, SpeechGenerateButton
-- Three speech sections with tag-based editing: elevator pitch, career story, why me
-- Optional job targeting strategy
-- Card-based UI consistent with CV/matching patterns
-- Full i18n support (speech translations)
-- E2E test coverage (speech-flow.spec.ts with 7 tests)
-- Semantic selectors for accessibility (getByRole, getByText, getByLabel)
-- 1 E2E sandbox test (generate-speech)
-- Navigation integration with links from default layout and home page
-
-**Technical Implementation:**
-
-- SpeechBlock entity with `elevatorPitch`, `careerStory`, and `whyMe` objects
-- Each section contains `text` (string) and `keyMessages` (array)
-- Optional `jobId` for job-targeted speech generation
-- Complete workflow: create → generate → edit → save → persist
-- Character count display for text sections
-- Tag input for key messages with add/remove functionality
-
-#### ⚠️ Other EPICs: Backend foundations in place, frontend implementation pending
-
-See [PROJECT_STATUS.md](PROJECT_STATUS.md) for detailed progress on all 10 MVP EPICs.
+### Settings
+`/settings/cv` — Template library (system + user templates)  
+`/settings/cv/:id` — Template editor with markdown preview
 
 ---
 
-## 9. Development Constraints
+## 6. AI Operations (12 Total)
 
-_(From Tech Foundations) _
+All AI operations are Lambda functions with strict JSON I/O contracts:
 
-### 7.1 Workflow & Branching
+**Input:** `{ operation: string, input: {...}, user_id: string }`  
+**Output:** `{ success: boolean, data?: {...}, error?: { code, message, details } }`
 
-- **Trunk-Based Development**
-- Short-lived feature branches
-- Merge to main triggers deploy
+### Categories
+**Identity & Discovery (4):** parseCvText, extractExperienceBlocks, generatePersonalCanvas, generateStarStory  
+**Job & Company (3):** parseJobDescription, analyzeCompany, generateCompanyCanvas  
+**Matching (1):** generateMatchingSummary  
+**Materials (4):** generateCv, generateCoverLetter, generateSpeech, tailorCv
 
-### 7.2 Code Quality
+### Error Handling
+Structured error codes: `AI_SCHEMA_ERROR`, `AI_PROVIDER_ERROR`, `AI_TIMEOUT`, `AI_INVALID_INPUT`  
+No silent failures, errors bubble to composable layer for UI feedback
 
-- TypeScript strict
-- ESLint strict + Prettier
-- Cyclomatic complexity limits
-- Tests required for merge
+---
 
-### 7.3 Testing
+## 7. Core Conventions
 
-- **Vitest** unit & component tests
-- **Playwright** E2E smoke suite
-- 80% coverage required
-- Fake AI provider for testing
+### TypeScript
+- Strict mode, no `any` types
+- Type imports only (`import type {...}`)
+- Unused vars start with `_`
+- Props interfaces for components
 
-### 7.4 Security & Auth
+### Internationalization
+- ALL text via `t('key.path')`
+- No hard-coded strings
+- Files in `i18n/locales/{locale}.json`
 
-- Cognito owner-based access
-- Users only access their own data
-- Secrets stored in Amplify env vars
+### Nuxt UI First
+- Use Nuxt UI components before custom HTML/CSS
+- Key components: UButton, UCard, UFormField, UInput, UTable, UModal, UToast, UIcon
+- Composables: useToast(), useOverlay(), useFormField()
 
-### 7.5 Error Handling
+### Testing
+- TDD: Write tests FIRST
+- 80%+ coverage required
+- Vitest (unit/integration), Playwright (E2E)
+- Naming: `*.spec.ts`, `*.e2e.ts`
 
-- No silent errors
-- Clear user feedback
-- Structured AI error contract
+### Code Quality
+- Complexity ≤16, nesting ≤4, function lines ≤100, params ≤4
+- Repository pattern for data access
+- Conventional commits: `feat|fix|docs|style|refactor|test|chore(scope): desc`
 
-### 7.6 UI/UX
+### Project Structure
+- `srcDir: 'src/'` — All app code in src/
+- `src/pages/` — File-based routing
+- `src/components/` — Auto-imported UI components
+- `src/composables/` — State + logic (auto-imported)
+- `src/data/repositories/` — GraphQL operations
+- `src/domain/` — Business entities and rules
+- `src/application/` — Services and workflows
+- `amplify/` — Backend (schema, AI ops, auth)
 
-- Nuxt UI first
-- Tailwind minimal baseline
-- Dark mode from day 1
+---
+
+## 8. Development Workflow
+
+### Setup
+```bash
+npm install
+npx amplify sandbox  # Start local backend
+npm run dev           # Start Nuxt dev server
+```
+
+### Testing
+```bash
+npm test              # Unit tests (Vitest)
+npm run test:e2e      # E2E tests (Playwright)
+npm run test:coverage # Coverage report
+```
+
+### AI Development
+1. Define JSON schema in `docs/AI_Interaction_Contract.md`
+2. Create Lambda handler in `amplify/data/ai-operations/{operation}/handler.ts`
+3. Register in `amplify/data/resource.ts`
+4. Create repository in `src/data/repositories/`
+5. Create service in `src/application/ai-operations/`
+6. Expose via composable
+
+---
+
+## 9. Key Features
+
+**Personal Discovery:** Profile creation, BMC generation, experience documentation, STAR story builder  
+**Job Analysis:** PDF upload, AI parsing, company research, BMC generation  
+**Matching:** Fit score (0-100), strengths/gaps analysis, tailoring recommendations  
+**Material Generation:** Job-specific CVs, cover letters, speeches with markdown editing  
+**Customization:** Template library (3 system + user templates), CV defaults, section toggles  
+**Onboarding:** 5-phase progress system, milestone badges, contextual guidance
+
+---
+
+**For Implementation Details:** See [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md)  
+**For UI Mapping:** See [docs/Component_Page_Mapping.md](docs/Component_Page_Mapping.md)  
+**For Architecture:** See [docs/High_Level_Architecture.md](docs/High_Level_Architecture.md)
