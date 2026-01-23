@@ -10,6 +10,7 @@ import { useCvTemplates } from '@/application/cvtemplate/useCvTemplates';
 import { getDefaultCvSettings } from '@/domain/cvsettings/getDefaultCvSettings';
 import type { CVTemplate } from '@/domain/cvtemplate/CVTemplate';
 import type { SystemCvTemplate } from '@/domain/cvtemplate/systemTemplates';
+import { useCvGenerator } from '@/composables/useCvGenerator';
 import CvSettingsForm, { type CvSettingsFormState } from '@/components/cv/CvSettingsForm.vue';
 import CvTemplateCard from '@/components/cv/CvTemplateCard.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
@@ -22,6 +23,7 @@ const toast = useToast();
 const router = useRouter();
 const { userId, loadUserId } = useAuthUser();
 const experienceRepo = new ExperienceRepository();
+const { generateCv } = useCvGenerator();
 
 const {
   settings,
@@ -36,7 +38,6 @@ const {
   loading: templatesLoading,
   error: templatesError,
   load: loadTemplates,
-  createFromExemplar,
   createTemplate,
   deleteTemplate,
 } = useCvTemplates();
@@ -105,6 +106,25 @@ const sortedTemplates = computed(() =>
 const formatTemplateDate = (template: CVTemplate) =>
   formatListDate(template.updatedAt ?? template.createdAt);
 
+const selectExperienceIdsByType = (items: Experience[]) => {
+  const ordered = [...items].sort((a, b) => {
+    const aTime = toTimestamp(a.updatedAt ?? a.createdAt);
+    const bTime = toTimestamp(b.updatedAt ?? b.createdAt);
+    return bTime - aTime;
+  });
+
+  const byType = new Map<string, Experience>();
+  for (const exp of ordered) {
+    if (!exp?.id) continue;
+    const type = exp.experienceType ?? 'work';
+    if (!byType.has(type)) {
+      byType.set(type, exp);
+    }
+  }
+
+  return Array.from(byType.values()).map((exp) => exp.id);
+};
+
 const handleSave = async () => {
   if (!settings.value || !formState.value) return;
 
@@ -135,7 +155,29 @@ const handleCreateFromBase = async (template: SystemCvTemplate) => {
   if (creatingTemplate.value) return;
   creatingTemplate.value = true;
   try {
-    const created = await createFromExemplar(template);
+    if (!userId.value) {
+      await loadUserId();
+    }
+    if (!userId.value) {
+      throw new Error('Missing user id');
+    }
+
+    const selectedExperienceIds = selectExperienceIdsByType(experiences.value);
+    const content = await generateCv(userId.value, selectedExperienceIds, {
+      templateMarkdown: template.content,
+      includeLanguages: true,
+      includeCertifications: true,
+    });
+
+    if (!content) {
+      throw new Error('Template generation failed');
+    }
+
+    const created = await createTemplate({
+      name: template.name,
+      content,
+      source: template.source,
+    });
     if (created) {
       toast.add({
         title: t('cvTemplates.toast.created'),

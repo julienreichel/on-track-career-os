@@ -36,7 +36,6 @@ const templatesRef = ref<CVTemplate[]>([
 ]);
 const mockLoadTemplates = vi.fn();
 const mockCreateTemplate = vi.fn();
-const mockCreateFromExemplar = vi.fn();
 const mockUpdateTemplate = vi.fn();
 const mockDeleteTemplate = vi.fn();
 const systemTemplatesRef = ref([
@@ -56,10 +55,16 @@ vi.mock('@/application/cvtemplate/useCvTemplates', () => ({
     loading: ref(false),
     error: ref(null),
     load: mockLoadTemplates,
-    createFromExemplar: mockCreateFromExemplar,
     createTemplate: mockCreateTemplate,
     updateTemplate: mockUpdateTemplate,
     deleteTemplate: mockDeleteTemplate,
+  }),
+}));
+
+const mockGenerateCv = vi.fn();
+vi.mock('@/composables/useCvGenerator', () => ({
+  useCvGenerator: () => ({
+    generateCv: mockGenerateCv,
   }),
 }));
 
@@ -70,18 +75,11 @@ vi.mock('@/composables/useAuthUser', () => ({
   }),
 }));
 
+const mockExperienceList = vi.fn();
 vi.mock('@/domain/experience/ExperienceRepository', () => ({
   ExperienceRepository: class {
     list() {
-      return Promise.resolve([
-        {
-          id: 'exp-1',
-          title: 'Engineer',
-          companyName: 'Acme',
-          startDate: '2021-01-01',
-          endDate: null,
-        },
-      ]);
+      return mockExperienceList();
     }
   },
 }));
@@ -150,6 +148,17 @@ const stubs = {
     emits: ['click'],
     template: '<button type="button" @click="$emit(\'click\')">{{ label }}</button>',
   },
+  UModal: {
+    props: ['open', 'title', 'description'],
+    template: `
+      <div v-if="open" class="u-modal">
+        <h3>{{ title }}</h3>
+        <p>{{ description }}</p>
+        <slot name="body" />
+        <slot name="footer" />
+      </div>
+    `,
+  },
   USwitch: {
     props: ['modelValue'],
     emits: ['update:modelValue'],
@@ -180,6 +189,17 @@ const stubs = {
 describe('CV Settings page', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
+    mockExperienceList.mockResolvedValue([
+      {
+        id: 'exp-1',
+        title: 'Engineer',
+        companyName: 'Acme',
+        startDate: '2021-01-01',
+        endDate: null,
+        experienceType: 'work',
+        updatedAt: '2024-01-02T00:00:00Z',
+      },
+    ]);
     await router.push('/settings/cv');
     await router.isReady();
   });
@@ -224,5 +244,79 @@ describe('CV Settings page', () => {
     await flushPromises();
 
     expect(mockSaveSettings).toHaveBeenCalled();
+  });
+
+  it('generates a template from system exemplar using one experience per type', async () => {
+    mockExperienceList.mockResolvedValue([
+      {
+        id: 'exp-work-latest',
+        title: 'Lead Engineer',
+        experienceType: 'work',
+        updatedAt: '2024-03-01T00:00:00Z',
+      },
+      {
+        id: 'exp-work-old',
+        title: 'Engineer',
+        experienceType: 'work',
+        updatedAt: '2023-01-01T00:00:00Z',
+      },
+      {
+        id: 'exp-edu',
+        title: 'BSc',
+        experienceType: 'education',
+        updatedAt: '2024-02-01T00:00:00Z',
+      },
+      {
+        id: 'exp-project',
+        title: 'Side Project',
+        experienceType: 'project',
+        updatedAt: '2024-01-01T00:00:00Z',
+      },
+    ]);
+    mockGenerateCv.mockResolvedValue('# Tailored Template');
+    mockCreateTemplate.mockResolvedValue({
+      id: 'template-2',
+      name: 'Classic',
+      content: '# Tailored Template',
+      source: 'system:classic',
+    });
+
+    const wrapper = mount(CvSettingsPage, {
+      global: {
+        plugins: [i18n, router],
+        stubs,
+      },
+    });
+
+    await flushPromises();
+
+    const createButton = wrapper
+      .findAll('button')
+      .find((button) => button.text() === i18n.global.t('cvTemplates.list.actions.create'));
+    expect(createButton).toBeTruthy();
+    await createButton?.trigger('click');
+    await flushPromises();
+
+    const systemButton = wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Classic');
+    expect(systemButton).toBeTruthy();
+    await systemButton?.trigger('click');
+    await flushPromises();
+
+    expect(mockGenerateCv).toHaveBeenCalledWith(
+      'user-1',
+      ['exp-work-latest', 'exp-edu', 'exp-project'],
+      expect.objectContaining({
+        templateMarkdown: '# Classic',
+      })
+    );
+    expect(mockCreateTemplate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Classic',
+        content: '# Tailored Template',
+        source: 'system:classic',
+      })
+    );
   });
 });
