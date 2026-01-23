@@ -102,12 +102,23 @@ test.describe('CV Generation Workflow', () => {
     expect(cvName).toBeTruthy();
     if (!cvName) return;
 
-    // Find the card by title, then find the delete button within the same card
-    // Use article (UCard renders as article) to scope the search properly
-    const card = page.locator('article').filter({ has: page.locator('h3', { hasText: cvName }) }).first();
-    await expect(card).toBeVisible();
-    
-    await card.getByRole('button', { name: /delete/i }).click();
+    // Verify the CV card title is visible
+    const cardTitle = page.locator('h3', { hasText: cvName });
+    await expect(cardTitle).toBeVisible();
+
+    // Find the card container by locating parent that contains both title and buttons
+    // The grid item contains the card with title and actions
+    const cardContainer = page
+      .locator('div')
+      .filter({
+        has: cardTitle,
+      })
+      .filter({
+        has: page.getByRole('button', { name: /delete/i }),
+      })
+      .first();
+
+    await cardContainer.getByRole('button', { name: /delete/i }).click();
     await page.getByRole('button', { name: /^Delete$/i }).click();
 
     await expect(page.locator('h3', { hasText: cvName })).toHaveCount(0);
