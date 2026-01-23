@@ -43,6 +43,7 @@
     "marked": "^17.0.1",
     "nuxt": "^4.2.1",
     "pdf-parse": "^2.4.5",
+    "posthog-js": "^1.335.0",
     "vue": "^3.5.25",
     "vue-router": "^4.6.3",
     "vuedraggable": "^4.1.0"

@@ -31,6 +31,14 @@ export default defineNuxtConfig({
     strategy: 'no_prefix',
   },
 
+  runtimeConfig: {
+    public: {
+      posthogPublicKey: process.env.PUBLIC_POSTHOG_KEY || '',
+      posthogHost: process.env.PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com',
+      posthogDefaults: process.env.PUBLIC_POSTHOG_DEFAULTS || '2025-11-30',
+    },
+  },
+
   alias: {
     '@amplify': resolve(__dirname, './amplify'),
   },
