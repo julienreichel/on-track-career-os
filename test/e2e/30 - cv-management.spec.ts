@@ -102,10 +102,11 @@ test.describe('CV Generation Workflow', () => {
     expect(cvName).toBeTruthy();
     if (!cvName) return;
 
-    const cardTitle = page.locator('h3', { hasText: cvName }).first();
-    await expect(cardTitle).toBeVisible();
-
-    const card = page.locator('div').filter({ has: cardTitle }).first();
+    // Find the card by title, then find the delete button within the same card
+    // Use article (UCard renders as article) to scope the search properly
+    const card = page.locator('article').filter({ has: page.locator('h3', { hasText: cvName }) }).first();
+    await expect(card).toBeVisible();
+    
     await card.getByRole('button', { name: /delete/i }).click();
     await page.getByRole('button', { name: /^Delete$/i }).click();
 
