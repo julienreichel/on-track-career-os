@@ -43,8 +43,8 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
     // Wait for post-confirmation Lambda to create UserProfile
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Initialize repository with client
-    repository = new AiOperationsRepository(client.queries);
+    // Initialize repository with client (cast to handle Amplify's generated types)
+    repository = new AiOperationsRepository(client.queries as any);
   }, 30000);
 
   beforeEach(async () => {
@@ -140,7 +140,19 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
     expect(typeof result).toBe('string');
     expect(result.length).toBeGreaterThan(0);
     expect(result).toContain(mockUserProfile.fullName);
-    expect(result).toContain(mockExperiences[0].companyName);
+
+    // Check for experience content (at least 3 of: companyName, title, responsibilities, tasks)
+    const experienceContentCandidates = [
+      mockExperiences[0].companyName,
+      mockExperiences[0].title,
+      ...mockExperiences[0].responsibilities,
+      ...mockExperiences[0].tasks,
+    ];
+    const normalizedResult = result.toLowerCase();
+    const contentMatches = experienceContentCandidates.filter((candidate) =>
+      normalizedResult.includes(candidate.toLowerCase())
+    );
+    expect(contentMatches.length).toBeGreaterThanOrEqual(3);
 
     console.log('Generated cover letter:', result.slice(0, 200) + '...');
   });

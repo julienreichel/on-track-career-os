@@ -97,7 +97,7 @@ export type AmplifyAiOperations = {
   parseCvText: (
     input: ParseCvInput,
     options?: Record<string, unknown>
-  ) => Promise<{ data: ParsedCV | null; errors?: unknown[] }>;
+  ) => Promise<{ data: ParsedCV; errors?: unknown[] }>;
 
   extractExperienceBlocks: (
     input: ExtractExperienceInput,
@@ -166,10 +166,11 @@ export class AiOperationsRepository implements IAiOperationsRepository {
    * Constructor with optional dependency injection for testing
    * @param client - Optional Amplify client instance (for testing)
    */
-  constructor(client?: AmplifyAiOperations) {
+  constructor(client?: AmplifyAiOperations | unknown) {
     if (client) {
       // Use injected client (for tests)
-      this._client = client;
+      // Cast to AmplifyAiOperations to handle Amplify's generated types with optional fields
+      this._client = client as AmplifyAiOperations;
     } else {
       // Use Nuxt's auto-imported useNuxtApp (for production)
       // Cast to AmplifyAiOperations since Amplify's generated types are complex
