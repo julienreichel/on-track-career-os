@@ -30,10 +30,7 @@
       </div>
 
       <!-- Cover Letter Content -->
-      <MarkdownContent
-        :content="item.content"
-        class="cover-letter-printable doc-print"
-      />
+      <MarkdownContent :content="item.content" class="cover-letter-printable doc-print" />
     </div>
   </div>
 </template>

@@ -92,12 +92,7 @@ watch(contentInput, (value) => emit('update:content', value));
           :disabled="previewLoading"
           @click="emit('preview')"
         />
-        <UButton
-          size="sm"
-          variant="ghost"
-          :label="resolvedToggleLabel"
-          @click="togglePreview"
-        />
+        <UButton size="sm" variant="ghost" :label="resolvedToggleLabel" @click="togglePreview" />
       </div>
     </div>
 

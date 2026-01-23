@@ -95,8 +95,7 @@ const generateBreadcrumbs = async () => {
     currentPath += `/${pathSegments[i]}`;
     const segment = pathSegments[i];
     const previousSegment = i > 0 ? pathSegments[i - 1] : undefined;
-    const previousParentSegment =
-      i > 1 ? pathSegments[i - parentSegmentOffset] : undefined;
+    const previousParentSegment = i > 1 ? pathSegments[i - parentSegmentOffset] : undefined;
 
     // Try to resolve ID segments to names first
     if (segment && isUUID(segment)) {

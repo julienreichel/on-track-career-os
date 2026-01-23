@@ -94,9 +94,11 @@ export class JobDescriptionRepository {
   async getMatchingSummaries(id: string): Promise<MatchingSummary[]> {
     const selectionSet = ['id', 'matchingSummaries.*'];
     const res = await this.model.get({ id }, gqlOptions({ selectionSet }));
-    const data = res.data as (JobDescription & {
-      matchingSummaries?: (MatchingSummary | null)[] | null;
-    }) | null;
+    const data = res.data as
+      | (JobDescription & {
+          matchingSummaries?: (MatchingSummary | null)[] | null;
+        })
+      | null;
     const summaries = (data?.matchingSummaries ?? []) as MatchingSummary[];
     return summaries.filter((summary): summary is MatchingSummary => Boolean(summary));
   }

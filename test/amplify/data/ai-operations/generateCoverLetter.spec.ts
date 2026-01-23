@@ -130,7 +130,9 @@ Casey Candidate`;
     };
 
     mockSend.mockResolvedValue(
-      buildBedrockResponse('Generic professional cover letter content showcasing value proposition.')
+      buildBedrockResponse(
+        'Generic professional cover letter content showcasing value proposition.'
+      )
     );
 
     await handler({ arguments: genericArgs as never });
@@ -212,9 +214,7 @@ Let me know if you'd like adjustments.`
 
   it('strips code fences when present', async () => {
     mockSend.mockResolvedValue(
-      buildBedrockResponse(
-        '```markdown\nDear Hiring Manager,\n\nThank you for your time.\n```\n'
-      )
+      buildBedrockResponse('```markdown\nDear Hiring Manager,\n\nThank you for your time.\n```\n')
     );
 
     const response = await handler({ arguments: validArguments as never });

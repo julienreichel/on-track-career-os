@@ -277,10 +277,7 @@ describe('useExperienceImport', () => {
         'Designed scalable payment processing system for international clients',
         'Mentored junior developers',
       ],
-      tasks: [
-        'Automated deployment pipelines with terraform scripts',
-        'Reviewed pull requests',
-      ],
+      tasks: ['Automated deployment pipelines with terraform scripts', 'Reviewed pull requests'],
     });
   });
 

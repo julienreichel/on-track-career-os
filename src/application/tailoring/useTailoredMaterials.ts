@@ -816,12 +816,7 @@ function buildCvInput(args: {
   };
 
   applyOptionalList(input.profile, 'skills', args.profile.skills, includeSkills);
-  applyOptionalList(
-    input.profile,
-    'languages',
-    args.profile.languages,
-    includeLanguages
-  );
+  applyOptionalList(input.profile, 'languages', args.profile.languages, includeLanguages);
   applyOptionalList(
     input.profile,
     'certifications',
@@ -883,10 +878,7 @@ function resolveSectionFlag(
   return defaults[section] ?? true;
 }
 
-function filterExperiencesBySelection(
-  experiences: Experience[],
-  selectedExperienceIds?: string[]
-) {
+function filterExperiencesBySelection(experiences: Experience[], selectedExperienceIds?: string[]) {
   if (!selectedExperienceIds || selectedExperienceIds.length === 0) {
     return experiences;
   }

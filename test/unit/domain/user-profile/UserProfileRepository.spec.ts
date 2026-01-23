@@ -213,7 +213,11 @@ describe('UserProfileRepository', () => {
       expect(mockModel.get).toHaveBeenCalledWith(
         { id: 'user-123' },
         expect.objectContaining({
-          selectionSet: expect.arrayContaining(['experiences.*', 'canvas.*', 'matchingSummaries.*']),
+          selectionSet: expect.arrayContaining([
+            'experiences.*',
+            'canvas.*',
+            'matchingSummaries.*',
+          ]),
         })
       );
       expect(result?.experiences).toHaveLength(2);

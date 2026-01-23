@@ -355,7 +355,10 @@ describe('useCvGenerator', () => {
         'https://linkedin.com/in/johndoe',
         'https://github.com/johndoe',
       ]);
-      expect(input?.profile.aspirations).toEqual(['Lead technical teams', 'Build scalable systems']);
+      expect(input?.profile.aspirations).toEqual([
+        'Lead technical teams',
+        'Build scalable systems',
+      ]);
       expect(input?.experiences).toHaveLength(1);
       expect(input?.stories).toHaveLength(2);
       expect(input?.profile.skills).toEqual(['TypeScript', 'Vue.js', 'Node.js']);

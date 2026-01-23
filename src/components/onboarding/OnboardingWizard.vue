@@ -62,9 +62,7 @@ const stepItems = computed(() =>
           @complete="wizard.finish"
         />
 
-        <OnboardingCompletionCard
-          v-else
-        />
+        <OnboardingCompletionCard v-else />
       </UPageBody>
     </UPage>
   </UContainer>

@@ -88,7 +88,10 @@ test.describe('Personal Canvas E2E Flow', () => {
 
   test('1. Setup: Ensure profile is filled', async ({ page }) => {
     await ensureProfileFilled(page);
-    const fullNameValue = page.getByText(/Full Name/i).locator('..').locator('p');
+    const fullNameValue = page
+      .getByText(/Full Name/i)
+      .locator('..')
+      .locator('p');
     await expect(fullNameValue).toHaveText(/.+/);
   });
 

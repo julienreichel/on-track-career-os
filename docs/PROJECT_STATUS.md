@@ -124,75 +124,88 @@
 ## 🚀 EPIC Implementation Summary
 
 ### ✅ EPIC 1A: User Profile & Identity (98%)
+
 **Core:** UserProfile model with full CRUD, profile photo upload, contact management  
 **Features:** Personal info, career goals, social links, language preferences  
 **Status:** Complete except optional LinkedIn sync
 
 ### ✅ EPIC 1B: Personal Canvas (100%)
+
 **Core:** PersonalCanvas model with 9 BMC blocks  
 **Features:** AI generation from profile, drag-drop editing, persistence  
 **AI:** `generatePersonalCanvas` with relationship mapping
 
 ### ✅ EPIC 2: Experience Builder - STAR Stories (98%)
+
 **Core:** Experience & STARStory models with full CRUD  
 **Features:** Timeline view, achievements with KPIs, validation  
 **AI:** `generateStarStory` from experience context  
 **Status:** Complete except bulk story generation
 
 ### ✅ EPIC 3: Generic CV Generator (100%)
+
 **Core:** CVDocument model with markdown storage  
 **Features:** AI generation, markdown editor, live preview, print view  
 **AI:** `generateCv` from profile + experiences  
 **Pages:** `/applications/cv`, `/applications/cv/:id`, `/applications/cv/:id/print`
 
 ### ✅ EPIC 3B: CV Header & Contact (100%)
+
 **Core:** Profile photo integration in CV header  
 **Features:** Contact info rendering, social links, formatting  
 **Integration:** Embedded in generateCv AI operation
 
 ### ✅ EPIC 3C: CV Customization (100%) — v0.11.0
+
 **Core:** CVTemplate & CVSettings models with full CRUD  
 **Features:** 3 system templates (Classic, Modern, Competency), template library, markdown editor, "ask each time" modal, experience/section selection  
 **Pages:** `/settings/cv`, `/settings/cv/:id`  
 **Impact:** Repeatable CV generation with consistent structure
 
 ### ✅ EPIC 4: User Speech Builder (100%)
+
 **Core:** SpeechBlock model with 3-section structure (pitch, story, why-me)  
 **Features:** AI generation, markdown editing, job context  
 **AI:** `generateSpeech` from profile + stories  
 **Pages:** `/applications/speech`, `/applications/speech/:id`
 
 ### ✅ EPIC 4B: Generic Cover Letter Generator (100%)
+
 **Core:** CoverLetter model with markdown storage  
 **Features:** AI generation, markdown editor, generic + job-targeted  
 **AI:** `generateCoverLetter` with job context  
 **Pages:** `/applications/cover-letters`, `/applications/cover-letters/:id`
 
 ### ✅ EPIC 5A: Job Description Analysis (100%)
+
 **Core:** JobDescription model with 10+ structured fields  
 **Features:** PDF/TXT upload, AI parsing, 5-tab detail view, status tracking, reanalyze capability  
 **AI:** `parseJobDescription` with comprehensive extraction  
 **Pages:** `/jobs`, `/jobs/new`, `/jobs/:id`
 
 ### ✅ EPIC 5B: Company Analysis & Canvas (100%)
+
 **Core:** Company & CompanyCanvas models with 9 BMC blocks  
 **Features:** Company CRUD, AI analysis from research notes, company-job linking (1-to-many)  
 **AI:** `analyzeCompany`, `generateCompanyCanvas`  
 **Pages:** `/companies`, `/companies/new`, `/companies/:id`
 
 ### ✅ EPIC 5C: User-Job-Company Matching (100%)
+
 **Core:** MatchingSummary model with fit analysis  
 **Features:** 0-100 score, strengths/gaps/opportunities breakdown, tailoring recommendations  
 **AI:** `generateMatchingSummary` with context synthesis  
 **Pages:** `/jobs/:id/match` (dedicated tab)
 
 ### ✅ EPIC 6: Tailored Application Materials (100%)
+
 **Core:** Job-specific CV/letter/speech generation  
 **Features:** Entry from job detail/match pages, matching context injection, tailored banners, regeneration  
 **AI:** Reuses `generateCv`, `generateCoverLetter`, `generateSpeech` with job context  
 **Integration:** Seamless workflow from job → matching → materials
 
 ### ✅ EPIC F2: Onboarding & Guidance (100%)
+
 **Core:** 5-phase progress system with milestone tracking  
 **Features:** Phase detection (Complete profile → Create canvas → Document stories → Find opportunities → Apply), 7 badges, contextual guidance, dashboard cockpit  
 **Pages:** `/`, `/onboarding` (4-step wizard)  

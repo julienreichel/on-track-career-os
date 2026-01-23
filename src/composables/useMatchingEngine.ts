@@ -125,7 +125,8 @@ function createMatchingEngineState({ jobId, providedUserId, deps, auth }: Engine
       const profile = cachedProfile ?? (await ensureProfile(userId, deps.userProfileService));
       cachedProfile = profile;
 
-      const { experiences, personalCanvas } = await deps.experienceRepo.getExperienceContext(userId);
+      const { experiences, personalCanvas } =
+        await deps.experienceRepo.getExperienceContext(userId);
       const experienceSignals = loadExperienceSignals(experiences);
       const companyPayload = jobRecord.companyId
         ? await loadCompanyPayload(jobRecord.companyId, deps.companyService)
@@ -214,9 +215,7 @@ type DatedItem = {
   generatedAt?: string | null;
 };
 
-function pickMostRecent<T extends DatedItem>(
-  items: Array<T | null> | null | undefined
-): T | null {
+function pickMostRecent<T extends DatedItem>(items: Array<T | null> | null | undefined): T | null {
   if (!Array.isArray(items) || items.length === 0) {
     return null;
   }
@@ -226,11 +225,13 @@ function pickMostRecent<T extends DatedItem>(
     return null;
   }
 
-  return [...validItems].sort((a, b) => {
-    const dateA = new Date(a.updatedAt ?? a.generatedAt ?? a.createdAt ?? 0).getTime();
-    const dateB = new Date(b.updatedAt ?? b.generatedAt ?? b.createdAt ?? 0).getTime();
-    return dateB - dateA;
-  })[0] ?? null;
+  return (
+    [...validItems].sort((a, b) => {
+      const dateA = new Date(a.updatedAt ?? a.generatedAt ?? a.createdAt ?? 0).getTime();
+      const dateB = new Date(b.updatedAt ?? b.generatedAt ?? b.createdAt ?? 0).getTime();
+      return dateB - dateA;
+    })[0] ?? null
+  );
 }
 
 function selectMatchingSummaryFromJob(

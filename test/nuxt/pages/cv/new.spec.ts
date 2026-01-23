@@ -120,7 +120,11 @@ const router = createRouter({
   history: createMemoryHistory(),
   routes: [
     { path: '/applications/cv/new', name: 'applications-cv-new', component: CvNewPage },
-    { path: '/applications/cv/:id', name: 'applications-cv-id', component: { template: '<div />' } },
+    {
+      path: '/applications/cv/:id',
+      name: 'applications-cv-id',
+      component: { template: '<div />' },
+    },
   ],
 });
 
@@ -137,7 +141,7 @@ const stubs = {
     props: ['open'],
     emits: ['update:open', 'confirm'],
     template:
-      '<div><button v-if="open" data-testid="confirm" @click="$emit(\'confirm\', { templateId: \'template-1\', enabledSections: [\'skills\'], selectedExperienceIds: [\'exp-1\'] })">Confirm</button></div>',
+      "<div><button v-if=\"open\" data-testid=\"confirm\" @click=\"$emit('confirm', { templateId: 'template-1', enabledSections: ['skills'], selectedExperienceIds: ['exp-1'] })\">Confirm</button></div>",
   },
 };
 

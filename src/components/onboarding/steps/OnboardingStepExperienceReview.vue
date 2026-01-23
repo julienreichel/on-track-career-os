@@ -60,12 +60,7 @@ const handleAddManual = () => {
     <CvProfilePreview v-if="profile" :profile="profile" />
 
     <div class="flex flex-col gap-3 sm:flex-row sm:justify-between">
-      <UButton
-        variant="ghost"
-        color="neutral"
-        :label="t('common.back')"
-        @click="emit('back')"
-      />
+      <UButton variant="ghost" color="neutral" :label="t('common.back')" @click="emit('back')" />
       <div class="flex flex-col gap-2 sm:flex-row">
         <UButton
           v-if="!hasEnoughExperiences"

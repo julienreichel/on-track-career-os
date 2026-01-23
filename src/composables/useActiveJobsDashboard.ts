@@ -36,10 +36,8 @@ const toTimestamp = (value?: string | null): number => {
   return Number.isNaN(ts) ? 0 : ts;
 };
 
-const hasJobMaterial = <T extends { jobId?: string | null }>(
-  items: T[],
-  jobId: string
-) => items.some((item) => item.jobId === jobId);
+const hasJobMaterial = <T extends { jobId?: string | null }>(items: T[], jobId: string) =>
+  items.some((item) => item.jobId === jobId);
 
 type MatchingSummaryLite = {
   overallScore?: number | null;
@@ -68,8 +66,7 @@ const resolveMatchStatus = (
   score?: number | null;
 } => {
   const summary = pickMostRecentSummary(job.matchingSummaries);
-  const score =
-    typeof summary?.overallScore === 'number' ? Math.round(summary.overallScore) : null;
+  const score = typeof summary?.overallScore === 'number' ? Math.round(summary.overallScore) : null;
 
   if (job.status === 'analyzed' && score !== null) {
     return {
@@ -170,14 +167,17 @@ export function useActiveJobsDashboard() {
         (key) => !materials[key]
       );
 
-      const match = resolveMatchStatus(job as JobDescription & {
-        matchingSummaries?: MatchingSummaryLite[] | null;
-      });
+      const match = resolveMatchStatus(
+        job as JobDescription & {
+          matchingSummaries?: MatchingSummaryLite[] | null;
+        }
+      );
       return {
         jobId,
         title: job.title ?? '',
-        companyName: (job as JobDescription & { company?: { companyName?: string | null } })
-          .company?.companyName ?? null,
+        companyName:
+          (job as JobDescription & { company?: { companyName?: string | null } }).company
+            ?.companyName ?? null,
         matchStatus: match.status,
         matchLabelKey: match.labelKey,
         matchLabelParams: match.labelParams,
@@ -191,10 +191,8 @@ export function useActiveJobsDashboard() {
     const sorted = [...mapped].sort((a, b) => {
       const jobA = jobs.value.find((job) => job.id === a.jobId);
       const jobB = jobs.value.find((job) => job.id === b.jobId);
-      const aIncomplete =
-        a.matchStatus !== 'ready' || a.materialsMissing.length > 0 ? 1 : 0;
-      const bIncomplete =
-        b.matchStatus !== 'ready' || b.materialsMissing.length > 0 ? 1 : 0;
+      const aIncomplete = a.matchStatus !== 'ready' || a.materialsMissing.length > 0 ? 1 : 0;
+      const bIncomplete = b.matchStatus !== 'ready' || b.materialsMissing.length > 0 ? 1 : 0;
       if (aIncomplete !== bIncomplete) {
         return bIncomplete - aIncomplete;
       }

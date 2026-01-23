@@ -38,11 +38,13 @@ type DatedSummary = MatchingSummary & {
 };
 
 function pickMostRecent(items: DatedSummary[]) {
-  return [...items].sort((a, b) => {
-    const dateA = new Date(a.updatedAt ?? a.generatedAt ?? a.createdAt ?? 0).getTime();
-    const dateB = new Date(b.updatedAt ?? b.generatedAt ?? b.createdAt ?? 0).getTime();
-    return dateB - dateA;
-  })[0] ?? null;
+  return (
+    [...items].sort((a, b) => {
+      const dateA = new Date(a.updatedAt ?? a.generatedAt ?? a.createdAt ?? 0).getTime();
+      const dateB = new Date(b.updatedAt ?? b.generatedAt ?? b.createdAt ?? 0).getTime();
+      return dateB - dateA;
+    })[0] ?? null
+  );
 }
 
 function selectMatchingSummary(

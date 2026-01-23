@@ -121,9 +121,7 @@ export class UserProfileRepository {
     }
 
     const record = data as unknown as { cvTemplates?: CVTemplate[] | null };
-    return Array.isArray(record.cvTemplates)
-      ? record.cvTemplates.filter(Boolean)
-      : [];
+    return Array.isArray(record.cvTemplates) ? record.cvTemplates.filter(Boolean) : [];
   }
 
   async list(filter: Record<string, unknown> = {}) {

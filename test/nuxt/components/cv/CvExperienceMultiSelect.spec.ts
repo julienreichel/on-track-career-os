@@ -36,8 +36,7 @@ const stubs = {
   UCheckbox: {
     props: ['modelValue'],
     emits: ['click'],
-    template:
-      '<input type="checkbox" :checked="modelValue" @click="$emit(\'click\')" />',
+    template: '<input type="checkbox" :checked="modelValue" @click="$emit(\'click\')" />',
   },
 };
 

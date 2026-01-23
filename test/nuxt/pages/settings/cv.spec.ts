@@ -268,9 +268,7 @@ describe('CV Settings page', () => {
     await createButton?.trigger('click');
     await flushPromises();
 
-    const systemButton = wrapper
-      .findAll('button')
-      .find((button) => button.text() === 'Classic');
+    const systemButton = wrapper.findAll('button').find((button) => button.text() === 'Classic');
     expect(systemButton).toBeTruthy();
     await systemButton?.trigger('click');
     await flushPromises();

@@ -46,10 +46,7 @@
 
         <ListSkeletonCards v-if="loading || !hasLoaded" />
 
-        <EmptyStateActionCard
-          v-else-if="guidance.emptyState"
-          :empty-state="guidance.emptyState"
-        />
+        <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
 
         <UCard v-else-if="filteredItems.length === 0">
           <UEmpty

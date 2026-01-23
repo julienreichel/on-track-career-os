@@ -26,11 +26,7 @@ describe('useGuidance', () => {
     const { guidance } = useGuidance('jobs', () => context.value);
     void guidance.value;
 
-    expect(mockGetGuidance).toHaveBeenCalledWith(
-      'jobs',
-      { phase: 'phase1' },
-      { jobsCount: 2 }
-    );
+    expect(mockGetGuidance).toHaveBeenCalledWith('jobs', { phase: 'phase1' }, { jobsCount: 2 });
   });
 
   it('reacts to context changes', async () => {
@@ -43,10 +39,6 @@ describe('useGuidance', () => {
     await nextTick();
     void guidance.value;
 
-    expect(mockGetGuidance).toHaveBeenLastCalledWith(
-      'jobs',
-      { phase: 'phase1' },
-      { jobsCount: 3 }
-    );
+    expect(mockGetGuidance).toHaveBeenLastCalledWith('jobs', { phase: 'phase1' }, { jobsCount: 3 });
   });
 });

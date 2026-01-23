@@ -93,7 +93,9 @@ const experienceRepo = new ExperienceRepository();
 const badges = useBadges();
 const activeJobs = useActiveJobsDashboard();
 const progress = useUserProgress();
-const welcomeName = computed(() => progress.profile.value?.fullName?.trim() || t('home.fallbackName'));
+const welcomeName = computed(
+  () => progress.profile.value?.fullName?.trim() || t('home.fallbackName')
+);
 
 const showActiveJobs = computed(() => {
   if (progress.state.value?.phase !== 'bonus') {

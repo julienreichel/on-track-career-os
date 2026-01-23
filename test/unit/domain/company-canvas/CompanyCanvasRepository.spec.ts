@@ -58,7 +58,6 @@ describe('CompanyCanvasRepository', () => {
     expect(result).toEqual(canvas);
   });
 
-
   it('creates a canvas', async () => {
     const input = { companyId: 'c1' } as CompanyCanvasCreateInput;
     const created = { id: 'canvas-1', companyId: 'c1' } as CompanyCanvas;
@@ -97,5 +96,4 @@ describe('CompanyCanvasRepository', () => {
       expect.objectContaining({ authMode: 'userPool' })
     );
   });
-
 });

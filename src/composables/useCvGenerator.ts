@@ -281,14 +281,24 @@ function resolveSectionFlags(
 ) {
   return {
     includeSkills: resolveSectionFlag(options, enabledSections, hasExplicitSections, 'skills'),
-    includeLanguages: resolveSectionFlag(options, enabledSections, hasExplicitSections, 'languages'),
+    includeLanguages: resolveSectionFlag(
+      options,
+      enabledSections,
+      hasExplicitSections,
+      'languages'
+    ),
     includeCertifications: resolveSectionFlag(
       options,
       enabledSections,
       hasExplicitSections,
       'certifications'
     ),
-    includeInterests: resolveSectionFlag(options, enabledSections, hasExplicitSections, 'interests'),
+    includeInterests: resolveSectionFlag(
+      options,
+      enabledSections,
+      hasExplicitSections,
+      'interests'
+    ),
     includeLinks: resolveSectionFlag(options, enabledSections, hasExplicitSections, 'links'),
   };
 }
@@ -373,7 +383,10 @@ function applyOptionalProfileSections(
 
 function applyOptionalJobContext(
   input: GenerateCvInput,
-  options: { jobDescription?: GenerateCvInput['jobDescription'] | string; templateMarkdown?: string }
+  options: {
+    jobDescription?: GenerateCvInput['jobDescription'] | string;
+    templateMarkdown?: string;
+  }
 ) {
   if (options.jobDescription) {
     input.jobDescription = normalizeJobDescription(options.jobDescription);

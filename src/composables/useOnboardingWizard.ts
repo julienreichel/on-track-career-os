@@ -34,9 +34,7 @@ function createStepPersistence(
     }
     const stored = localStorage.getItem(buildStorageKey(auth.userId.value));
     if (!stored) return null;
-    return onboardingSteps.some((step) => step.id === stored)
-      ? (stored as OnboardingStepId)
-      : null;
+    return onboardingSteps.some((step) => step.id === stored) ? (stored as OnboardingStepId) : null;
   };
 
   return { persistStep, readPersistedStep };
@@ -184,11 +182,7 @@ export function useOnboardingWizard() {
   );
 
   const { persistStep, readPersistedStep } = createStepPersistence(auth, currentStep);
-  const { goToStep, next, back, skip } = createStepNavigation(
-    currentStep,
-    stepIndex,
-    persistStep
-  );
+  const { goToStep, next, back, skip } = createStepNavigation(currentStep, stepIndex, persistStep);
 
   const { load, handleCvFile, importExperiences, finish } = createOnboardingActions({
     auth,

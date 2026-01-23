@@ -399,7 +399,11 @@ watch(item, (newValue) => {
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
                       {{ t('speech.editor.sections.whyMe.label') }}
                     </h3>
-                    <MarkdownContent v-if="hasWhyMe" :content="formState.whyMe" class="doc-markdown" />
+                    <MarkdownContent
+                      v-if="hasWhyMe"
+                      :content="formState.whyMe"
+                      class="doc-markdown"
+                    />
                   </div>
                 </div>
                 <template #footer>

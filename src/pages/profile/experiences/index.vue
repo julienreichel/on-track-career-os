@@ -206,7 +206,6 @@ function handleViewStories(id: string) {
       :title="t('experiences.delete.title')"
       :description="t('experiences.delete.message')"
     >
-
       <template #footer>
         <UButton
           color="neutral"

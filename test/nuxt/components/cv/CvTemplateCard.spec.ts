@@ -77,8 +77,7 @@ describe('CvTemplateCard', () => {
     });
 
     const buttons = wrapper.findAll('button');
-    const findButton = (label: string) =>
-      buttons.find((button) => button.text().includes(label));
+    const findButton = (label: string) => buttons.find((button) => button.text().includes(label));
     const findButtonByAria = (label: string) =>
       buttons.find((button) => button.attributes('aria-label') === label);
 

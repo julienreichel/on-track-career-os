@@ -56,8 +56,8 @@ const creatingTemplate = ref(false);
 const isLoading = computed(
   () => settingsLoading.value || templatesLoading.value || loadingExperiences.value
 );
-const isReady = computed(
-  () => Boolean(settings.value && formState.value && hasLoaded.value && !isLoading.value)
+const isReady = computed(() =>
+  Boolean(settings.value && formState.value && hasLoaded.value && !isLoading.value)
 );
 const defaultTemplateId = computed(
   () => formState.value?.defaultTemplateId ?? settings.value?.defaultTemplateId ?? null

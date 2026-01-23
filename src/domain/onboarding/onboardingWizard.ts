@@ -1,10 +1,6 @@
 import type { UserProgressState } from './types';
 
-export type OnboardingStepId =
-  | 'cv-upload'
-  | 'experience-review'
-  | 'profile-basics'
-  | 'complete';
+export type OnboardingStepId = 'cv-upload' | 'experience-review' | 'profile-basics' | 'complete';
 
 export type OnboardingStep = {
   id: OnboardingStepId;

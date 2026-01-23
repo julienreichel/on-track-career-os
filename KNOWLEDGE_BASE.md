@@ -18,7 +18,7 @@
 
 ```
 ┌─────────────────────────────────────────────┐
-│  UI Layer (Nuxt Pages + Components)        │  Vue 3 pages, Nuxt UI components
+│  UI Layer (Nuxt Pages + Components)         │  Vue 3 pages, Nuxt UI components
 ├─────────────────────────────────────────────┤
 │  Composables Layer                          │  useUserProfile, useStoryEngine, etc.
 ├─────────────────────────────────────────────┤
@@ -33,6 +33,7 @@
 ```
 
 **Key Principles:**
+
 - Domain-driven design with bounded contexts
 - Repository pattern for data access
 - Composables over Pinia stores (composition API native)
@@ -44,24 +45,29 @@
 ## 3. Data Model (5 Domains)
 
 ### 3.1 Identity Domain
+
 **UserProfile** — User identity, goals, contact info, profile photo  
 **PersonalCanvas** — Personal Business Model Canvas (9 blocks)  
 **Experience** — Work history entries with responsibilities, achievements
 
 ### 3.2 Experience Domain
+
 **STARStory** — Achievement narratives (Situation, Task, Action, Result, KPIs)  
 Linked to Experience (1-to-many), structured achievement tracking
 
 ### 3.3 Job Domain
+
 **JobDescription** — Parsed job data (title, seniority, responsibilities, skills, benefits, culture)  
 Status tracking (draft, active, closed), company relationship
 
 ### 3.4 Company Domain
+
 **Company** — Company information (name, industry, size, markets)  
 **CompanyCanvas** — Company Business Model Canvas (9 blocks)  
 Research notes field for AI analysis input
 
 ### 3.5 Materials Domain
+
 **CVDocument** — Generated CVs (markdown, template reference, experience selection)  
 **CoverLetter** — Cover letters (markdown, job-targeted)  
 **SpeechBlock** — Speech blocks (3 sections: pitch, story, why-me)  
@@ -69,9 +75,11 @@ Research notes field for AI analysis input
 **CVSettings** — User CV defaults (template, sections, experiences)
 
 ### 3.6 Matching Domain
+
 **MatchingSummary** — User-job fit analysis (score, strengths, gaps, recommendations)
 
 ### Authorization
+
 All models: Owner-based auth via `authorization((allow) => [allow.owner()])`  
 User-scoped data access enforced at GraphQL layer
 
@@ -80,24 +88,29 @@ User-scoped data access enforced at GraphQL layer
 ## 4. Composables (State + Logic)
 
 ### Identity & Profile
+
 `useUserProfile()` — Profile CRUD, photo upload, contact management  
 `useCanvasEngine()` — Canvas generation, drag-drop editing, persistence  
 `useExperience()` — Experience CRUD, timeline management
 
 ### Experience & Stories
+
 `useStoryEngine()` — STAR story generation, achievement KPIs  
 `useStoryList()` — List management, filtering, search  
 `useStoryForm()` — Story editing, validation
 
 ### Job & Company
+
 `useJobDescription()` — Job CRUD, PDF upload, AI parsing  
 `useCompanies()` — Company CRUD, AI analysis  
 `useCompanyCanvas()` — Company BMC generation
 
 ### Matching
+
 `useMatchingEngine()` — Fit score calculation, recommendation generation
 
 ### Materials
+
 `useCVGeneration()` — CV generation, template selection, experience filtering  
 `useCoverLetterGeneration()` — Letter generation, job targeting  
 `useSpeechGeneration()` — Speech block generation  
@@ -105,6 +118,7 @@ User-scoped data access enforced at GraphQL layer
 `useCVSettings()` — User defaults management
 
 ### System
+
 `useAuthUser()` — Authentication, user session  
 `useOnboardingProgress()` — 5-phase progress tracking, guidance  
 `useBreadcrumbMapping()` — Dynamic breadcrumbs
@@ -114,11 +128,13 @@ User-scoped data access enforced at GraphQL layer
 ## 5. Pages & Navigation (4 Zones)
 
 ### Auth & Home
+
 `/login` — Authentication  
 `/` — Dashboard with active jobs, onboarding progress  
 `/onboarding` — 4-step wizard (identity, canvas, stories, opportunities)
 
 ### Profile Zone
+
 `/profile` — User profile editing  
 `/profile/canvas` — Personal BMC generation and editing  
 `/profile/experiences` — Experience list with timeline  
@@ -126,6 +142,7 @@ User-scoped data access enforced at GraphQL layer
 `/cv-upload` — Initial CV upload and parsing
 
 ### Jobs & Companies
+
 `/jobs` — Job list with search, status filters  
 `/jobs/:id` — 5-tab detail view (info, analysis, company, match, materials)  
 `/jobs/:id/match` — Matching summary with fit score  
@@ -133,6 +150,7 @@ User-scoped data access enforced at GraphQL layer
 `/companies/:id` — Company detail with canvas
 
 ### Applications
+
 `/applications/cv` — CV library  
 `/applications/cv/:id` — CV editor (markdown + preview)  
 `/applications/cv/:id/print` — Print-optimized view  
@@ -140,6 +158,7 @@ User-scoped data access enforced at GraphQL layer
 `/applications/speech` — Speech library
 
 ### Settings
+
 `/settings/cv` — Template library (system + user templates)  
 `/settings/cv/:id` — Template editor with markdown preview
 
@@ -153,12 +172,14 @@ All AI operations are Lambda functions with strict JSON I/O contracts:
 **Output:** `{ success: boolean, data?: {...}, error?: { code, message, details } }`
 
 ### Categories
+
 **Identity & Discovery (4):** parseCvText, extractExperienceBlocks, generatePersonalCanvas, generateStarStory  
 **Job & Company (3):** parseJobDescription, analyzeCompany, generateCompanyCanvas  
 **Matching (1):** generateMatchingSummary  
 **Materials (4):** generateCv, generateCoverLetter, generateSpeech, tailorCv
 
 ### Error Handling
+
 Structured error codes: `AI_SCHEMA_ERROR`, `AI_PROVIDER_ERROR`, `AI_TIMEOUT`, `AI_INVALID_INPUT`  
 No silent failures, errors bubble to composable layer for UI feedback
 
@@ -167,33 +188,39 @@ No silent failures, errors bubble to composable layer for UI feedback
 ## 7. Core Conventions
 
 ### TypeScript
+
 - Strict mode, no `any` types
 - Type imports only (`import type {...}`)
 - Unused vars start with `_`
 - Props interfaces for components
 
 ### Internationalization
+
 - ALL text via `t('key.path')`
 - No hard-coded strings
 - Files in `i18n/locales/{locale}.json`
 
 ### Nuxt UI First
+
 - Use Nuxt UI components before custom HTML/CSS
 - Key components: UButton, UCard, UFormField, UInput, UTable, UModal, UToast, UIcon
 - Composables: useToast(), useOverlay(), useFormField()
 
 ### Testing
+
 - TDD: Write tests FIRST
 - 80%+ coverage required
 - Vitest (unit/integration), Playwright (E2E)
 - Naming: `*.spec.ts`, `*.e2e.ts`
 
 ### Code Quality
+
 - Complexity ≤16, nesting ≤4, function lines ≤100, params ≤4
 - Repository pattern for data access
 - Conventional commits: `feat|fix|docs|style|refactor|test|chore(scope): desc`
 
 ### Project Structure
+
 - `srcDir: 'src/'` — All app code in src/
 - `src/pages/` — File-based routing
 - `src/components/` — Auto-imported UI components
@@ -208,6 +235,7 @@ No silent failures, errors bubble to composable layer for UI feedback
 ## 8. Development Workflow
 
 ### Setup
+
 ```bash
 npm install
 npx amplify sandbox  # Start local backend
@@ -215,6 +243,7 @@ npm run dev           # Start Nuxt dev server
 ```
 
 ### Testing
+
 ```bash
 npm test              # Unit tests (Vitest)
 npm run test:e2e      # E2E tests (Playwright)
@@ -222,6 +251,7 @@ npm run test:coverage # Coverage report
 ```
 
 ### AI Development
+
 1. Define JSON schema in `docs/AI_Interaction_Contract.md`
 2. Create Lambda handler in `amplify/data/ai-operations/{operation}/handler.ts`
 3. Register in `amplify/data/resource.ts`

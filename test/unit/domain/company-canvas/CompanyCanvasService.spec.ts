@@ -46,9 +46,13 @@ describe('CompanyCanvasService', () => {
       customerSegments: ['Fintech'],
     } as CompanyCanvas);
 
-    const result = await service.saveDraft('company-1', {
-      customerSegments: [' Fintech ', 'fintech'],
-    }, existingCanvas);
+    const result = await service.saveDraft(
+      'company-1',
+      {
+        customerSegments: [' Fintech ', 'fintech'],
+      },
+      existingCanvas
+    );
 
     expect(canvasRepo.update).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -147,9 +151,9 @@ describe('CompanyCanvasService', () => {
     } as CompanyCanvas;
     companyRepo.get.mockResolvedValue(null);
 
-    await expect(
-      service.regenerateCanvas('company-1', [], existingCanvas)
-    ).rejects.toThrow('Company not found');
+    await expect(service.regenerateCanvas('company-1', [], existingCanvas)).rejects.toThrow(
+      'Company not found'
+    );
   });
 
   it('passes additional notes to AI during regeneration', async () => {

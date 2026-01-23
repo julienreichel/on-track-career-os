@@ -75,9 +75,9 @@ describe('CvTemplateEditor', () => {
 
     expect(wrapper.find('.markdown').exists()).toBe(false);
 
-    const toggle = wrapper.findAll('button').find((btn) =>
-      btn.text().includes(i18n.global.t('cvTemplates.editor.showPreview'))
-    );
+    const toggle = wrapper
+      .findAll('button')
+      .find((btn) => btn.text().includes(i18n.global.t('cvTemplates.editor.showPreview')));
     await toggle?.trigger('click');
 
     expect(wrapper.find('.markdown').exists()).toBe(true);
@@ -98,9 +98,9 @@ describe('CvTemplateEditor', () => {
       },
     });
 
-    const toggle = wrapper.findAll('button').find((btn) =>
-      btn.text().includes(i18n.global.t('cvTemplates.editor.showPreview'))
-    );
+    const toggle = wrapper
+      .findAll('button')
+      .find((btn) => btn.text().includes(i18n.global.t('cvTemplates.editor.showPreview')));
     await toggle?.trigger('click');
 
     expect(wrapper.find('.markdown').text()).toContain('Preview content');

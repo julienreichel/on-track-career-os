@@ -2,7 +2,10 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { CVTemplateService } from '@/domain/cvtemplate/CVTemplateService';
-import { resolveSystemCvTemplates, type SystemCvTemplate } from '@/domain/cvtemplate/systemTemplates';
+import {
+  resolveSystemCvTemplates,
+  type SystemCvTemplate,
+} from '@/domain/cvtemplate/systemTemplates';
 import type {
   CVTemplate,
   CVTemplateCreateInput,
@@ -31,9 +34,7 @@ export function useCvTemplates(options: UseCvTemplatesOptions = {}) {
   const templates = ref<CVTemplate[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
-  const systemTemplates = computed(() =>
-    resolveSystemCvTemplates(i18n.locale.value, i18n.t)
-  );
+  const systemTemplates = computed(() => resolveSystemCvTemplates(i18n.locale.value, i18n.t));
 
   const load = async () => {
     loading.value = true;

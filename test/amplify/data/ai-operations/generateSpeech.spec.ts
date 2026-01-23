@@ -101,9 +101,7 @@ I started as a developer focused on reliability and delivery, then grew into lea
 ## Why Me
 Your teams need consistent delivery and coaching; I bring repeatable systems and people leadership. Would exploring that fit be useful?`;
 
-    mockSend.mockResolvedValue(
-      buildBedrockResponse(markdown)
-    );
+    mockSend.mockResolvedValue(buildBedrockResponse(markdown));
 
     const response = await handler({ arguments: validArguments as never });
 
@@ -114,7 +112,9 @@ Your teams need consistent delivery and coaching; I bring repeatable systems and
   });
 
   it('includes job description context when provided', async () => {
-    mockSend.mockResolvedValue(buildBedrockResponse('## Elevator Pitch\nTest\n\n## Career Story\nTest\n\n## Why Me\nTest'));
+    mockSend.mockResolvedValue(
+      buildBedrockResponse('## Elevator Pitch\nTest\n\n## Career Story\nTest\n\n## Why Me\nTest')
+    );
 
     await handler({ arguments: validArguments as never });
 
@@ -132,7 +132,9 @@ Your teams need consistent delivery and coaching; I bring repeatable systems and
   });
 
   it('keeps job context when matching summary is missing', async () => {
-    mockSend.mockResolvedValue(buildBedrockResponse('## Elevator Pitch\nTest\n\n## Career Story\nTest\n\n## Why Me\nTest'));
+    mockSend.mockResolvedValue(
+      buildBedrockResponse('## Elevator Pitch\nTest\n\n## Career Story\nTest\n\n## Why Me\nTest')
+    );
 
     const argsWithoutSummary = { ...validArguments, matchingSummary: undefined };
     await handler({ arguments: argsWithoutSummary as never });

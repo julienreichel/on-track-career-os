@@ -22,9 +22,7 @@ describe('CVTemplateService', () => {
 
   it('lists templates for a user', async () => {
     const templates = [{ id: 'tpl-1' }];
-    (mockUserRepo.getCvTemplatesSnapshot as ReturnType<typeof vi.fn>).mockResolvedValue(
-      templates
-    );
+    (mockUserRepo.getCvTemplatesSnapshot as ReturnType<typeof vi.fn>).mockResolvedValue(templates);
 
     const result = await service.listForUser('user-1');
 

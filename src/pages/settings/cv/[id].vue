@@ -195,7 +195,9 @@ const selectPreviewExperienceIds = (items: Experience[]): string[] => {
   const selected: string[] = [];
   byType.forEach((list) => {
     list
-      .sort((a, b) => toTimestamp(b.updatedAt ?? b.createdAt) - toTimestamp(a.updatedAt ?? a.createdAt))
+      .sort(
+        (a, b) => toTimestamp(b.updatedAt ?? b.createdAt) - toTimestamp(a.updatedAt ?? a.createdAt)
+      )
       .slice(0, previewExperiencesPerType)
       .forEach((exp) => selected.push(exp.id));
   });
@@ -288,5 +290,4 @@ onMounted(async () => {
     }
   }
 });
-
 </script>
