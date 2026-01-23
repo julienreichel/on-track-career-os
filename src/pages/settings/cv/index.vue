@@ -325,7 +325,7 @@ watch(
             </section>
 
             <CvSettingsForm
-              v-model="formState"
+              v-model="formState!"
               :experiences="experiences"
               :loading-experiences="loadingExperiences"
               :saving="saving"
