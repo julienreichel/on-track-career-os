@@ -57,6 +57,8 @@ Your task is to generate a professional, ATS-optimized CV in Markdown format wit
 3. Final CV must look like a real human-written CV, not raw database output.
 4. If matchingSummary is provided, use its tailoringTips/strengths to guide emphasis.
 5. If company summary is provided, use only summary-level info and do not invent details.
+6. If template examplar is provided, follow the provided layout.
+7. NEVER invent experiences, skills or certifications, use ONLY provided data
 
 ## INFORMATION-TRANSFORMATION PRINCIPLES
 ### **A. Preserve Uniqueness Over Compression**
@@ -100,6 +102,7 @@ Rewrite each bullet as:
    * Company | Dates (Formated as Month Year, i.e. Nov 2021)
    * 4-7 bullets MAX, For senior roles (5+ years), produce 6-7 bullets whenever data supports it.
    * Each bullet must show IMPACT (not duties)
+   * !!NEVER invent experience, use ONLY the provided data
 4. **Education**
    * Clean, chronological.
 5. **Skills**
@@ -107,7 +110,7 @@ Rewrite each bullet as:
    * Remove irrelevant ones.
    * Skills section must reflect breadth; include 12-18 skills grouped into categories
 6. **Certifications, Languages, Interests**
-   * Only if meaningful.
+   * Only if provided meaningful.
 
 ## LANGUAGE GUIDELINES
 Use strong verbs:
@@ -313,11 +316,6 @@ function buildUserPrompt(input: GenerateCvInput): string {
   prompt += formatUserProfile(input.profile);
   prompt += formatExperiencesWithStories(input.experiences, input.stories);
 
-  if (input.templateMarkdown?.trim()) {
-    prompt += `## TEMPLATE EXEMPLAR (MARKDOWN)\n${input.templateMarkdown.trim()}\n\n`;
-    prompt += `Instructions: Use this exemplar as a loose guide for structure and tone. Do not copy verbatim.\n\n`;
-  }
-
   // Add skills with guidance
   if (input.profile.skills?.length) {
     prompt += `## SKILLS (RAW LIST - SYNTHESIZE INTO CATEGORIES)\n`;
@@ -368,6 +366,10 @@ function buildUserPrompt(input: GenerateCvInput): string {
   prompt += `- Separate Education from Work Experience\n`;
   prompt += `- Transform verbose input into professional, impactful output`;
 
+  if (input.templateMarkdown?.trim()) {
+    prompt += `## TEMPLATE EXEMPLAR (MARKDOWN)\n${input.templateMarkdown.trim()}\n\n`;
+    prompt += `Instructions: Use this exemplar as a guide for structure and tone. Do not copy verbatim.\n\n`;
+  }
   return prompt;
 }
 
