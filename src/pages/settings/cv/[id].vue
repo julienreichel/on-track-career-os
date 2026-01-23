@@ -79,6 +79,7 @@ import { useCvGenerator } from '@/composables/useCvGenerator';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
+import type { CvSectionKey } from '@/domain/cvsettings/CvSectionKey';
 
 const { t } = useI18n();
 const toast = useToast();
@@ -180,6 +181,8 @@ const toTimestamp = (value?: string | null): number => {
   return Number.isNaN(timestamp) ? 0 : timestamp;
 };
 
+const previewExperiencesPerType = 2;
+
 const selectPreviewExperienceIds = (items: Experience[]): string[] => {
   const byType = new Map<string, Experience[]>();
   items.forEach((exp) => {
@@ -193,7 +196,7 @@ const selectPreviewExperienceIds = (items: Experience[]): string[] => {
   byType.forEach((list) => {
     list
       .sort((a, b) => toTimestamp(b.updatedAt ?? b.createdAt) - toTimestamp(a.updatedAt ?? a.createdAt))
-      .slice(0, 2)
+      .slice(0, previewExperiencesPerType)
       .forEach((exp) => selected.push(exp.id));
   });
   return selected;
@@ -223,7 +226,9 @@ const handlePreview = async () => {
 
     const enabledSections =
       settings.value?.defaultEnabledSections && settings.value.defaultEnabledSections.length > 0
-        ? settings.value.defaultEnabledSections
+        ? settings.value.defaultEnabledSections.filter(
+            (section): section is CvSectionKey => typeof section === 'string'
+          )
         : undefined;
 
     const result = await generateCv(userId.value, previewExperienceIds, {
