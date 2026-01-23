@@ -72,7 +72,13 @@
     </UCard>
 
     <div class="flex items-center justify-end">
-      <UButton color="primary" :label="t('common.save')" :loading="saving" @click="$emit('save')" />
+      <UButton
+        color="primary"
+        type="button"
+        :label="t('common.save')"
+        :loading="saving"
+        @click="emit('save')"
+      />
     </div>
   </div>
 </template>

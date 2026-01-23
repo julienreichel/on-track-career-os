@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useAuthUser } from '@/composables/useAuthUser';
@@ -20,7 +20,8 @@ defineOptions({ name: 'CvSettingsPage' });
 const { t } = useI18n();
 const toast = useToast();
 const router = useRouter();
-const { userId, loadUserId } = useAuthUser();
+const auth = useAuthUser();
+const { userId } = auth;
 const experienceRepo = new ExperienceRepository();
 const {
   settings,
@@ -28,7 +29,7 @@ const {
   error: settingsError,
   load,
   saveSettings,
-} = useCvSettings();
+} = useCvSettings({ auth });
 const {
   templates,
   systemTemplates,
@@ -38,7 +39,7 @@ const {
   createFromExemplar,
   createTemplate,
   deleteTemplate,
-} = useCvTemplates();
+} = useCvTemplates({ auth });
 
 const experiences = ref<Experience[]>([]);
 const loadingExperiences = ref(false);
@@ -54,6 +55,9 @@ const creatingTemplate = ref(false);
 
 const isLoading = computed(
   () => settingsLoading.value || templatesLoading.value || loadingExperiences.value
+);
+const isReady = computed(
+  () => Boolean(settings.value && formState.value && hasLoaded.value && !isLoading.value)
 );
 const defaultTemplateId = computed(
   () => formState.value?.defaultTemplateId ?? settings.value?.defaultTemplateId ?? null
@@ -204,40 +208,37 @@ const handleDelete = async () => {
   }
 };
 
-watch(
-  userId,
-  async (value) => {
-    if (!value) {
-      await loadUserId();
-    }
-    if (!userId.value) return;
-
-    await Promise.all([load(), loadTemplates(), loadExperiences(userId.value)]);
+const initializePage = async () => {
+  await auth.loadUserId();
+  if (!userId.value) {
     hasLoaded.value = true;
-  },
-  { immediate: true }
-);
+    return;
+  }
+
+  await Promise.allSettled([load(), loadTemplates(), loadExperiences(userId.value)]);
+  hasLoaded.value = true;
+};
+
+onMounted(() => {
+  void initializePage();
+});
 
 watch(
-  [settings, experiences],
+  [settings, experiences, loadingExperiences],
   () => {
-    if (!initialized.value && settings.value) {
+    if (!initialized.value && settings.value && !loadingExperiences.value) {
       initializeForm();
     }
   },
   { immediate: true }
 );
-
 </script>
 
 <template>
   <div>
     <UContainer>
       <UPage>
-        <UPageHeader
-          :title="t('cvSettings.title')"
-          :description="t('cvSettings.subtitle')"
-        />
+        <UPageHeader :title="t('cvSettings.title')" :description="t('cvSettings.subtitle')" />
 
         <UPageBody>
           <UAlert
@@ -257,7 +258,7 @@ watch(
             class="mb-6"
           />
 
-          <ListSkeletonCards v-if="isLoading || !hasLoaded || !formState" />
+          <ListSkeletonCards v-if="!isReady" />
 
           <div v-else class="space-y-10">
             <section id="cv-templates">

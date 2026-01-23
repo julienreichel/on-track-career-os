@@ -77,9 +77,10 @@ describe('default.vue layout', () => {
       },
     });
 
-    const button = wrapper.find('[data-testid="button"]');
-    expect(button.exists()).toBe(true);
-    expect(button.text()).toContain('Sign Out');
+    const signOutButton = wrapper
+      .findAll('[data-testid="button"]')
+      .find((button) => button.text().includes('Sign Out'));
+    expect(signOutButton).toBeTruthy();
   });
 
   it('should render slot content', () => {
@@ -122,11 +123,13 @@ describe('default.vue layout', () => {
       },
     });
 
-    const button = wrapper.find('[data-testid="button"]');
-    expect(button.exists()).toBe(true);
+    const signOutButton = wrapper
+      .findAll('[data-testid="button"]')
+      .find((button) => button.text().includes('Sign Out'));
+    expect(signOutButton).toBeTruthy();
 
     // Button should be clickable
-    await button.trigger('click');
+    await signOutButton?.trigger('click');
     // Note: Full sign out flow requires e2e testing with Amplify Auth
   });
 });
