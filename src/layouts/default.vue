@@ -8,9 +8,17 @@
       </template>
 
       <template #right>
-        <UButton variant="ghost" @click="handleSignOut">
-          {{ t('auth.signOut') }}
-        </UButton>
+        <div class="flex items-center gap-2">
+          <UButton
+            variant="ghost"
+            icon="i-heroicons-cog-6-tooth"
+            :label="t('navigation.settings')"
+            to="/settings/cv"
+          />
+          <UButton variant="ghost" @click="handleSignOut">
+            {{ t('auth.signOut') }}
+          </UButton>
+        </div>
       </template>
     </UHeader>
 
@@ -41,12 +49,14 @@ const getSegmentLabel = (segment: string): string => {
     profile: t('navigation.profile'),
     'cv-upload': t('navigation.cvUpload'),
     experiences: t('navigation.experiences'),
+    settings: t('navigation.settings'),
     jobs: t('navigation.jobs'),
     companies: t('navigation.companies'),
     applications: t('navigation.applications'),
     'cover-letters': t('navigation.coverLetters'),
     speech: t('navigation.speech'),
     interview: t('navigation.interview'),
+    cv: t('navigation.cv'),
     stories: t('stories.list.title'),
   };
   return segmentMap[segment] || segment;

@@ -789,7 +789,6 @@ Dashboard → Navigate to Profile/Applications/Jobs
 
 
 🧱 System Utilities
-├── CV Templates ✅ (EPIC 3C) → /templates/cv
 └── CV Settings ✅ (EPIC 3C) → /settings/cv
 
 ---
