@@ -1,28 +1,64 @@
-# {{fullName}}
+# {{First name LAST NAME}}
 
-{{headline}}
+{{Position / Professional Title}}
 
-{{phone}} | [mail@example.com](mailto:mail@example.com) | {{location}}<br>
-{{works autorizations}} | [linkedin.com/in/your-name/](https://www.linkedin.com/in/your-name/)
+{{Nationality / Work authorization}}  
+[linkedin.com/in/{{linkedinHandle}}](https://www.linkedin.com/in/{{linkedinHandle}})
 
-{{summary}}
+Mobile: {{phone}}  
+E-mail: {{email}}
 
-## Experience
+## Summary
 
-{{experience}}
+- {{After analysing the target role, industry, and company context}}
+- {{Highlight the elements of your background that best establish credibility}}
+- {{Focus on the direct value you can bring}}
+- {{Mention relevant languages, tools, methods, or transversal skills}}
+- {{Include contextual experience (startup, SME, multinational, public sector, etc.)}}
+
+## Professional Experience
+
+### {{Job title}}
+
+**{{Company}}, {{Location}}**  
+{{Dates (month + year)}}
+
+- {{Main missions and responsibilities}}
+- {{Prioritise activities most relevant to the targeted position}}
+- {{Describe scope, autonomy, or collaboration}}
+- {{Avoid exhaustive lists; clarity and relevance first}}
+
+**{{Optional }} Achievements**
+
+- {{Concrete result or measurable outcome}}
+- {{Growth, improvement, promotion, recognition, or award}}
 
 ## Education
 
-{{education}}
+- {{Seminar, workshop, or professional training}}
+- {{Training on tools, systems, or methods}}
+- {{Project management, leadership, or domain-specific learning}}
+- {{Any relevant ongoing education}}
 
-## Certifications (if available)
+**{{Degree}}**  
+{{Dates (year/s)}} – {{Institution}}
 
-{{certifications}}
+**{{Degree}}**  
+{{Dates (year/s)}} – {{Institution}}
 
-## Skills
+## Language & Technical Skills
 
-{{skills}}
+**Languages**
+
+- {{Language}} — {{level}}
+- {{Language}} — {{level}}
+
+**Technical / Professional Skills**
+
+- {{Skill category as bullet point}}: {{skills list}}
+- {{Skill category as bullet point}}: {{skills list}}
+- {{Skill category as bullet point}}: {{skills list}}
 
 ## Interests
 
-{{interests}}
+{{Interest or activity}}

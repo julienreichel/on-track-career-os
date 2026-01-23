@@ -860,7 +860,9 @@
       "contentLabel": "Template markdown",
       "preview": "Preview",
       "showPreview": "Show preview",
-      "hidePreview": "Hide preview"
+      "hidePreview": "Hide preview",
+      "regenerate": "Regenerate preview",
+      "previewFailed": "Unable to generate preview."
     },
     "labels": {
       "default": "Default",

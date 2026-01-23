@@ -28,6 +28,7 @@ const stubs = {
     template: '<button type="button" @click="$emit(\'click\')">{{ label }}</button>',
   },
   UCard: { template: '<div class="u-card"><slot /></div>' },
+  USkeleton: { template: '<div class="u-skeleton"></div>' },
   MarkdownContent: {
     props: ['content'],
     template: '<div class="markdown">{{ content }}</div>',
@@ -81,5 +82,27 @@ describe('CvTemplateEditor', () => {
 
     expect(wrapper.find('.markdown').exists()).toBe(true);
     expect(wrapper.text()).toContain(i18n.global.t('cvTemplates.editor.hidePreview'));
+    expect(wrapper.emitted('preview')).toBeTruthy();
+  });
+
+  it('renders preview content when provided', async () => {
+    const wrapper = mount(CvTemplateEditor, {
+      props: {
+        name: 'Classic',
+        content: '# Template',
+        previewContent: 'Preview content',
+      },
+      global: {
+        plugins: [i18n],
+        stubs,
+      },
+    });
+
+    const toggle = wrapper.findAll('button').find((btn) =>
+      btn.text().includes(i18n.global.t('cvTemplates.editor.showPreview'))
+    );
+    await toggle?.trigger('click');
+
+    expect(wrapper.find('.markdown').text()).toContain('Preview content');
   });
 });

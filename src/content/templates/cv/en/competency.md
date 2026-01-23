@@ -1,30 +1,66 @@
 # {{fullName}}
 
-{{phone}} · [mail@example.com](mailto:mail@example.com) · {{location}}<br>
+{{phone}} · [xxx@example.com](mailto:xxx@example.com) · {{location}}<br>
 {{works autorizations}} | [linkedin.com/in/your-name/](https://www.linkedin.com/in/your-name/)
 
-{{headline}}
+**{{headline — role or professional identity aligned with the target position}}**
 
-{{summary: A brief summary at the beginning of your CV should outline your key competencies and how they align with the role. This section sets the tone for the rest of the document, so make sure it’s concise and tailored to the job.}}
+{{summary — concise personal profile highlighting key competencies, behaviours, and how they align with the role; sets the tone for a competency-based application}}
 
-## Highlights
+## Key Competencies
 
-- {{3-5 competencies to highlight the specific competencies required for the role. Use bullet points to list each competency, followed by a brief example of how you’ve demonstrated it in your previous roles}}
+- **{{Competency name}}**  
+  {{Brief example showing how this competency was demonstrated in a real situation and what the outcome was}}
 
-## Experience
+- **{{Competency name}}**  
+  {{Brief example illustrating behaviour, decision-making, or impact}}
 
-{{experience, focus on how your experience has enabled you to develop and demonstrate the key competencies}}
+- **{{Competency name}}**  
+  {{Short, concrete illustration linked to results or learning}}
+
+- **{{Competency name}}**  
+  {{Optional additional competency relevant to the role}}
+
+## Professional Experience
+
+### {{Role / Function}}
+
+**{{Organization}}, {{Location}} | {{Dates}}**  
+{{Context: team, environment, project, or organisational setting}}
+
+- {{Example showing how a key competency was applied in this role}}
+- {{Example highlighting problem-solving, leadership, collaboration, or adaptability}}
+- {{Example focused on impact, outcomes, or improvements}}
+- {{Optional learning, growth, or behavioural insight}}
 
 ## Education
 
-{{education, focus on how your education has equipped you with the skills needed for the role, rather than listing qualifications without context}}
+### {{Degree / Training}}
+
+**{{Institution}}, {{Location}} | {{Years}}**  
+{{How this education contributed to developing relevant skills or competencies}}
+
+### {{Degree / Training}}
+
+**{{Institution}}, {{Location}} | {{Years}}**  
+{{Relevant competencies, methods, or knowledge acquired}}
 
 ## Skills, Certifications, Languages
 
-{{skills}}
-{{certifications}}
-{{languages}}
+**Skills**
+
+- {{Skill category as bullet point}}: {{skills list}}
+- {{Skill category as bullet point}}: {{skills list}}
+- {{Skill category as bullet point}}: {{skills list}}
+
+**Certifications**
+
+- {{Certification or credential}}, {{Certification or credential}}
+
+**Languages**
+
+- {{Language}} ({{level}}), {{Language}} ({{level}})
 
 ## Interests
 
-{{interests}}
+{{Interest or activity illustrating transferable skills, mindset, or values}}, {{Interest or activity}}

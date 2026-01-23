@@ -34,6 +34,10 @@
           v-model:name="name"
           v-model:content="content"
           :loading="loading || saving"
+          :preview-content="previewContent ?? ''"
+          :preview-loading="previewLoading"
+          :preview-error="previewError"
+          @preview="handlePreview"
         />
         <UCard v-else-if="loading">
           <USkeleton class="h-6 w-40 mb-4" />
@@ -71,12 +75,19 @@ import { CVTemplateService } from '@/domain/cvtemplate/CVTemplateService';
 import type { CVTemplate } from '@/domain/cvtemplate/CVTemplate';
 import { useCvSettings } from '@/application/cvsettings/useCvSettings';
 import CvTemplateEditor from '@/components/cv/CvTemplateEditor.vue';
+import { useCvGenerator } from '@/composables/useCvGenerator';
+import { useAuthUser } from '@/composables/useAuthUser';
+import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import type { Experience } from '@/domain/experience/Experience';
 
 const { t } = useI18n();
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 const service = new CVTemplateService();
+const experienceRepo = new ExperienceRepository();
+const { generateCv } = useCvGenerator();
+const { userId, loadUserId } = useAuthUser();
 
 const { settings, load: loadSettings, saveSettings } = useCvSettings();
 
@@ -88,6 +99,9 @@ const originalContent = ref('');
 const loading = ref(false);
 const saving = ref(false);
 const error = ref<string | null>(null);
+const previewContent = ref<string | null>(null);
+const previewLoading = ref(false);
+const previewError = ref<string | null>(null);
 
 const pageTitle = computed(() => name.value || t('cvTemplates.editor.title'));
 const isDirty = computed(
@@ -158,6 +172,79 @@ const handleSave = async () => {
     }
   }
   await router.push({ name: 'settings-cv' });
+};
+
+const toTimestamp = (value?: string | null): number => {
+  if (!value) return 0;
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
+const selectPreviewExperienceIds = (items: Experience[]): string[] => {
+  const byType = new Map<string, Experience[]>();
+  items.forEach((exp) => {
+    const type = exp.experienceType ?? 'work';
+    const list = byType.get(type) ?? [];
+    list.push(exp);
+    byType.set(type, list);
+  });
+
+  const selected: string[] = [];
+  byType.forEach((list) => {
+    list
+      .sort((a, b) => toTimestamp(b.updatedAt ?? b.createdAt) - toTimestamp(a.updatedAt ?? a.createdAt))
+      .slice(0, 2)
+      .forEach((exp) => selected.push(exp.id));
+  });
+  return selected;
+};
+
+const resolvePreviewExperienceIds = async (): Promise<string[]> => {
+  if (!userId.value) {
+    await loadUserId();
+  }
+  if (!userId.value) {
+    return [];
+  }
+  const all = await experienceRepo.list(userId.value);
+  return selectPreviewExperienceIds(all);
+};
+
+const handlePreview = async () => {
+  previewError.value = null;
+  previewLoading.value = true;
+
+  try {
+    const previewExperienceIds = await resolvePreviewExperienceIds();
+    if (!userId.value) {
+      previewError.value = t('common.error');
+      return;
+    }
+
+    const enabledSections =
+      settings.value?.defaultEnabledSections && settings.value.defaultEnabledSections.length > 0
+        ? settings.value.defaultEnabledSections
+        : undefined;
+
+    const result = await generateCv(userId.value, previewExperienceIds, {
+      templateMarkdown: content.value,
+      enabledSections,
+      includeLinks: true,
+      includeSkills: true,
+      includeLanguages: true,
+      includeCertifications: true,
+      includeInterests: true,
+    });
+
+    previewContent.value = result ?? '';
+    if (!result) {
+      previewError.value = t('cvTemplates.editor.previewFailed');
+    }
+  } catch {
+    previewError.value = t('cvTemplates.editor.previewFailed');
+  } finally {
+    previewLoading.value = false;
+  }
 };
 
 const handleSetDefault = async () => {

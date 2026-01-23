@@ -37,12 +37,36 @@ const mockToast = {
   add: vi.fn(),
 };
 
+const mockGenerateCv = vi.fn();
+
 vi.mock('#app', () => ({
   useToast: () => mockToast,
 }));
 
 vi.mock('#imports', () => ({
   useToast: () => mockToast,
+}));
+
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => ({
+    userId: ref('user-1'),
+    loadUserId: vi.fn(),
+  }),
+}));
+
+vi.mock('@/composables/useCvGenerator', () => ({
+  useCvGenerator: () => ({
+    generateCv: mockGenerateCv,
+  }),
+}));
+
+const mockExperienceList = vi.fn();
+vi.mock('@/domain/experience/ExperienceRepository', () => ({
+  ExperienceRepository: class {
+    list() {
+      return mockExperienceList();
+    }
+  },
 }));
 
 const router = createRouter({
@@ -81,8 +105,8 @@ const stubs = {
   USkeleton: { template: '<div class="u-skeleton"></div>' },
   CvTemplateEditor: {
     name: 'CvTemplateEditor',
-    props: ['name', 'content', 'loading'],
-    emits: ['update:name', 'update:content'],
+    props: ['name', 'content', 'loading', 'previewContent', 'previewLoading', 'previewError'],
+    emits: ['update:name', 'update:content', 'preview'],
     template: '<div class="cv-template-editor"></div>',
   },
 };
@@ -90,6 +114,7 @@ const stubs = {
 describe('CV Template editor page', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
+    mockExperienceList.mockResolvedValue([]);
     mockGet.mockResolvedValue({
       id: 'template-1',
       name: 'Classic Template',
@@ -140,5 +165,38 @@ describe('CV Template editor page', () => {
       name: 'Updated Template',
       content: '# Template',
     });
+  });
+
+  it('generates preview content when requested', async () => {
+    mockExperienceList.mockResolvedValue([
+      {
+        id: 'exp-1',
+        experienceType: 'work',
+        updatedAt: '2024-01-01T00:00:00Z',
+      },
+    ]);
+    mockGenerateCv.mockResolvedValue('# Preview content');
+
+    const wrapper = mount(CvTemplateEditorPage, {
+      global: {
+        plugins: [i18n, router],
+        stubs,
+      },
+    });
+
+    await flushPromises();
+
+    const editor = wrapper.findComponent({ name: 'CvTemplateEditor' });
+    await editor.vm.$emit('preview');
+    await flushPromises();
+
+    expect(mockGenerateCv).toHaveBeenCalledWith(
+      'user-1',
+      ['exp-1'],
+      expect.objectContaining({
+        templateMarkdown: '# Template',
+      })
+    );
+    expect(editor.props('previewContent')).toBe('# Preview content');
   });
 });

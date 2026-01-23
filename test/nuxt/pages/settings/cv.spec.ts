@@ -35,6 +35,7 @@ const templatesRef = ref<CVTemplate[]>([
   } as CVTemplate,
 ]);
 const mockLoadTemplates = vi.fn();
+const mockCreateFromExemplar = vi.fn();
 const mockCreateTemplate = vi.fn();
 const mockUpdateTemplate = vi.fn();
 const mockDeleteTemplate = vi.fn();
@@ -55,16 +56,10 @@ vi.mock('@/application/cvtemplate/useCvTemplates', () => ({
     loading: ref(false),
     error: ref(null),
     load: mockLoadTemplates,
+    createFromExemplar: mockCreateFromExemplar,
     createTemplate: mockCreateTemplate,
     updateTemplate: mockUpdateTemplate,
     deleteTemplate: mockDeleteTemplate,
-  }),
-}));
-
-const mockGenerateCv = vi.fn();
-vi.mock('@/composables/useCvGenerator', () => ({
-  useCvGenerator: () => ({
-    generateCv: mockGenerateCv,
   }),
 }));
 
@@ -98,7 +93,10 @@ vi.mock('#imports', () => ({
 
 const router = createRouter({
   history: createMemoryHistory(),
-  routes: [{ path: '/settings/cv', name: 'settings-cv', component: CvSettingsPage }],
+  routes: [
+    { path: '/settings/cv', name: 'settings-cv', component: CvSettingsPage },
+    { path: '/settings/cv/:id', name: 'settings-cv-id', component: { template: '<div />' } },
+  ],
 });
 
 const stubs = {
@@ -246,38 +244,11 @@ describe('CV Settings page', () => {
     expect(mockSaveSettings).toHaveBeenCalled();
   });
 
-  it('generates a template from system exemplar using one experience per type', async () => {
-    mockExperienceList.mockResolvedValue([
-      {
-        id: 'exp-work-latest',
-        title: 'Lead Engineer',
-        experienceType: 'work',
-        updatedAt: '2024-03-01T00:00:00Z',
-      },
-      {
-        id: 'exp-work-old',
-        title: 'Engineer',
-        experienceType: 'work',
-        updatedAt: '2023-01-01T00:00:00Z',
-      },
-      {
-        id: 'exp-edu',
-        title: 'BSc',
-        experienceType: 'education',
-        updatedAt: '2024-02-01T00:00:00Z',
-      },
-      {
-        id: 'exp-project',
-        title: 'Side Project',
-        experienceType: 'project',
-        updatedAt: '2024-01-01T00:00:00Z',
-      },
-    ]);
-    mockGenerateCv.mockResolvedValue('# Tailored Template');
-    mockCreateTemplate.mockResolvedValue({
+  it('creates a template from a system exemplar', async () => {
+    mockCreateFromExemplar.mockResolvedValue({
       id: 'template-2',
       name: 'Classic',
-      content: '# Tailored Template',
+      content: '# Classic',
       source: 'system:classic',
     });
 
@@ -304,18 +275,10 @@ describe('CV Settings page', () => {
     await systemButton?.trigger('click');
     await flushPromises();
 
-    expect(mockGenerateCv).toHaveBeenCalledWith(
-      'user-1',
-      ['exp-work-latest', 'exp-edu', 'exp-project'],
+    expect(mockCreateFromExemplar).toHaveBeenCalledWith(
       expect.objectContaining({
-        templateMarkdown: '# Classic',
-      })
-    );
-    expect(mockCreateTemplate).toHaveBeenCalledWith(
-      expect.objectContaining({
+        id: 'system:classic',
         name: 'Classic',
-        content: '# Tailored Template',
-        source: 'system:classic',
       })
     );
   });

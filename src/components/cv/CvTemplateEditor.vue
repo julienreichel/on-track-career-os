@@ -7,6 +7,9 @@ const props = defineProps<{
   name: string;
   content: string;
   loading?: boolean;
+  previewContent?: string;
+  previewLoading?: boolean;
+  previewError?: string | null;
   nameLabel?: string;
   contentLabel?: string;
   previewLabel?: string;
@@ -17,6 +20,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:name': [value: string];
   'update:content': [value: string];
+  preview: [];
 }>();
 
 const { t } = useI18n();
@@ -32,6 +36,15 @@ const resolvedToggleLabel = computed(() =>
     ? (props.hidePreviewLabel ?? t('cvTemplates.editor.hidePreview'))
     : (props.showPreviewLabel ?? t('cvTemplates.editor.showPreview'))
 );
+
+const previewContent = computed(() => props.previewContent ?? contentInput.value);
+
+const togglePreview = () => {
+  showPreview.value = !showPreview.value;
+  if (showPreview.value) {
+    emit('preview');
+  }
+};
 
 watch(
   () => props.name,
@@ -70,16 +83,35 @@ watch(contentInput, (value) => emit('update:content', value));
 
     <div class="flex items-center justify-between">
       <p class="text-sm text-dimmed">{{ resolvedPreviewLabel }}</p>
-      <UButton
-        size="sm"
-        variant="ghost"
-        :label="resolvedToggleLabel"
-        @click="showPreview = !showPreview"
-      />
+      <div class="flex items-center gap-2">
+        <UButton
+          v-if="showPreview"
+          size="sm"
+          variant="soft"
+          :label="t('cvTemplates.editor.regenerate')"
+          :disabled="previewLoading"
+          @click="emit('preview')"
+        />
+        <UButton
+          size="sm"
+          variant="ghost"
+          :label="resolvedToggleLabel"
+          @click="togglePreview"
+        />
+      </div>
     </div>
 
     <UCard v-if="showPreview">
-      <MarkdownContent :content="contentInput" class="doc-markdown" />
+      <div v-if="previewLoading" class="space-y-3">
+        <USkeleton class="h-4 w-40" />
+        <USkeleton class="h-24 w-full" />
+      </div>
+      <div v-else>
+        <MarkdownContent :content="previewContent" class="doc-markdown" />
+        <p v-if="previewError" class="mt-3 text-sm text-red-600">
+          {{ previewError }}
+        </p>
+      </div>
     </UCard>
   </div>
 </template>
