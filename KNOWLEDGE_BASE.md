@@ -35,6 +35,7 @@ Architecture is split into **Frontend**, **Backend**, **AI Layer**, **Data Layer
 - ✅ EPIC 2 (Experience Builder - STAR Stories) — 100% complete
 - ✅ EPIC 3 (Generic CV Generator) — 100% complete
 - ✅ EPIC 3B (CV Header & Contact Information) — 100% complete
+- ✅ EPIC 3C (CV Customization - Sections/Experience Selection + Templates) — 100% complete
 - ✅ EPIC 4 (User Speech Builder) — 100% complete
 - ✅ EPIC 4B (Generic Cover Letter Generator) — 100% complete
 - ✅ EPIC 5A (Job Description Analysis) — 100% complete
@@ -99,9 +100,11 @@ _(Condensed from full CDM; only key-developer-relevant models.)_
 
 ### 3.4 Application Materials
 
-- **CVDocument**
+- **CVDocument**: name, content (Markdown), experienceIds (selected experiences), templateId, jobId (optional), generatedAt, needsUpdate, status
 - **CoverLetter**: name, content (Markdown), jobId (optional), generatedAt, needsUpdate, status
 - **SpeechBlock**: elevatorPitch (text + keyMessages[]), careerStory (text + keyMessages[]), whyMe (text + keyMessages[]), optional jobId for targeting
+- **CVTemplate**: name, locale, templateMarkdown (AI exemplar), systemTemplate (boolean), createdAt, updatedAt
+- **CVSettings**: defaultTemplateId, includedSections (enum[]), defaultExperienceIds, askEachTime (boolean), updatedAt
 
 (From CDM document )
 
@@ -152,6 +155,9 @@ _(From Component Model + Component→Page Mapping) _
 - `useAiOperations()` - AI operations orchestration
 - `useCvDocuments()` - CV document management
 - `useCvGenerator()` - CV generation from user data
+- `useCvTemplates()` - CV template CRUD with system templates
+- `useCvSettings()` - CV settings persistence (defaults, askEachTime)
+- `getDefaultCvSettings()` - Get or create user CV settings
 - `useUserProgress()` - Progress state tracking across 5 phases
 - `useBadges()` - Badge earning, persistence, and display
 - `useGuidance()` - Contextual guidance messages based on progress
@@ -188,8 +194,8 @@ _(Structured per navigation zones)_
 
 ### Applications Zone
 
-- `/cv` - CV document list
-- `/cv/new` - CV creation wizard (experience picker, options)
+- `/cv` - CV document list with Settings link
+- `/cv/new` - Thin CV generation entry with settings summary + optional modal
 - `/cv/:id` - CV Markdown editor with preview
 - `/cv/:id/print` - A4 print layout with auto-print
 - `/speech` - Speech block list
@@ -200,6 +206,11 @@ _(Structured per navigation zones)_
 - `/cover-letters/:id/print` - Cover letter print layout
 - `/cv/:id`, `/cover-letters/:id`, `/speech/:id` show job backlink + regenerate tailored action when jobId exists
 - `/onboarding` - 4-step onboarding wizard for first-time users
+
+### Settings Zone
+
+- `/settings/cv` - CV template library with system templates + clone
+- `/settings/cv/:id` - CV template markdown editor with preview
   (From Navigation Structure & Component Mapping )
 
 ### 5.1 My Profile
@@ -221,7 +232,7 @@ _(Structured per navigation zones)_
 
 ### 5.3 Applications
 
-- **CV Builder** (generic + tailored)
+- **CV Builder** (thin entry point with template library, settings-driven defaults, optional "ask each time" modal)
   - Generic CV generator live: `/cv`, `/cv/new`, `/cv/:id`, `/cv/:id/print`
   - AI-powered Markdown generation via `useCvGenerator` + `generateCv` Lambda (now strips stray ``` fences)
   - Experience picker + optional profile sections + job description tailoring + toggle to include profile photo

@@ -1,7 +1,7 @@
 # COMPONENT → PAGE MAPPING (MVP → V1)
 
-**Last Updated:** 2025-12-31  
-**Status:** Reflects actual implementation as of EPIC 5B completion
+**Last Updated:** 2025-01-23  
+**Status:** Reflects actual implementation as of EPIC 3C completion
 
 **Complete mapping of:**
 
@@ -23,20 +23,22 @@ Each page includes:
 
 ## 📋 DOCUMENT STATUS
 
-**✅ Implemented (7 EPICs - 70% Complete):**
+**✅ Implemented (10 EPICs - 85% Complete):**
 
 - EPIC 1A: User Data Intake & Identity
 - EPIC 1B: Personal Canvas Generation
 - EPIC 2: Experience Builder (STAR Stories)
 - EPIC 3: Generic CV Generator
 - EPIC 3B: CV Header & Contact Info
+- EPIC 3C: CV Customization (Sections/Experience Selection + Templates)
+- EPIC F2: Onboarding & Guidance
 - EPIC 5A: Job Description Analysis
 - EPIC 5B: Company Analysis & Canvas
+- EPIC 5C: User-Job-Company Matching
 
-**❌ Not Implemented (3 EPICs - 30% Remaining):**
+**❌ Not Implemented (2 EPICs - 15% Remaining):**
 
 - EPIC 4: User Speech Builder
-- EPIC 5C: User-Job-Company Matching
 - EPIC 6: Tailored Application Materials
 - EPIC 7: Interview Prep
 
@@ -461,7 +463,7 @@ Each page includes:
 
 ---
 
-# 2. CV DOCUMENTS (EPIC 3 + 3B)
+# 2. CV DOCUMENTS (EPIC 3 + 3B + 3C)
 
 ---
 
@@ -473,7 +475,7 @@ Each page includes:
 
 - `<UPage>`, `<UPageHeader>`, `<UPageBody>`
 - `<UCard>`, `<UPageGrid>`, `<UEmpty>`
-- `<UButton>`
+- `<UButton>` (New CV, CV Settings link)
 
 ### Components
 
@@ -492,44 +494,48 @@ Each page includes:
 - None
 
 **Status:** ✅ Implemented  
-**Pattern:** Card grid with delete and print shortcuts
+**Pattern:** Card grid with delete and print shortcuts, link to CV settings
 
 ---
 
-## **2.2 CV Generator Wizard** ✅
+## **2.2 CV Generator Entry** ✅
 
 **Route:** `/applications/cv/new`
 
 ### UI
 
 - `<UPage>`, `<UPageHeader>`, `<UPageBody>`
-- `<UCard>`, `<UFormField>`, `<UInput>`
-- `<UCheckbox>` (optional sections)
-- Step indicator (custom)
+- `<UCard>`, `<UButton>`
 
 ### Components
 
-- `CvExperiencePicker` - select experiences for CV
-- `CvGeneratingStep` - AI generation loading state
+- `CvGenerateEntryCard` - displays current settings summary (template, sections, experiences)
+- `CvGenerationModal` - optional modal (when `askEachTime=true`) to confirm/override settings
+- `CvExperienceMultiSelect` - multi-select component for experiences (in modal)
 
 ### Composables
 
 - `useCvGenerator()` - build AI payload
 - `useCvDocuments()` - save generated CV
+- `useCvSettings()` - read/write user CV generation defaults
+- `useCvTemplates()` - list templates
+- `getDefaultCvSettings()` - get or create user settings
 
 ### CDM Entities
 
 - **CVDocument** (create)
+- **CVSettings** (read)
+- **CVTemplate** (read)
 - **UserProfile** (read)
 - **Experience** (read, select)
 - **STARStory** (read)
 
 ### AI Ops
 
-- `ai.generateCv` - generate markdown CV from profile/experiences/stories
+- `ai.generateCv` - generate markdown CV from profile/experiences/stories + templateMarkdown
 
 **Status:** ✅ Implemented  
-**Pattern:** 2-step wizard (select experiences → configure options → generate)
+**Pattern:** Thin entry point using saved defaults, optional "ask each time" modal for customization
 
 ---
 
@@ -598,6 +604,71 @@ Each page includes:
 - None
 
 **Status:** ✅ Implemented  
+**Pattern:** Print-optimized layout with auto-print trigger
+
+---
+
+## **2.5 CV Settings (Template Library)** ✅
+
+**Route:** `/settings/cv`
+
+### UI
+
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UPageGrid>`, `<UButton>`
+- `<UBadge>` (system template indicator)
+
+### Components
+
+- None (inline cards)
+
+### Composables
+
+- `useCvTemplates()` - list, delete, clone system templates
+- `useCvSettings()` - read/write user defaults (template, sections, experiences, askEachTime)
+- `getDefaultCvSettings()` - get or create user settings
+
+### CDM Entities
+
+- **CVTemplate[]** (list, delete, clone)
+- **CVSettings** (read, update)
+
+### AI Ops
+
+- None
+
+**Status:** ✅ Implemented  
+**Pattern:** Template library with system templates (Classic, Modern, Competency) + user clones
+
+---
+
+## **2.6 CV Template Editor** ✅
+
+**Route:** `/settings/cv/:id`
+
+### UI
+
+- `<UPage>`, `<UPageHeader>`, `<UPageBody>`
+- `<UCard>`, `<UFormField>`
+
+### Components
+
+- `CvTemplateEditor` - markdown editor with preview for template exemplars
+
+### Composables
+
+- `useCvTemplates()` - read, update template
+
+### CDM Entities
+
+- **CVTemplate** (read, update)
+
+### AI Ops
+
+- None (template editing only, used in `ai.generateCv`)
+
+**Status:** ✅ Implemented  
+**Pattern:** Markdown template editor with preview, templates serve as AI exemplars  
 **Pattern:** Print-optimized view with auto-trigger
 
 ---

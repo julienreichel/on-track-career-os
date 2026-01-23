@@ -1,7 +1,7 @@
 # Project Status — On Track Career
 
-**Last Updated:** 2026-01-20  
-**Version:** v0.10.0 — Production-Ready MVP with Onboarding, Guidance & User Flow Clarity
+**Last Updated:** 2026-01-23  
+**Version:** v0.11.0 — Production-Ready MVP with CV Customization & Templates
 
 ---
 
@@ -14,15 +14,20 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - **Key Achievements:**
 
 - ✅ 12 of 12 AI operations implemented (100%)
-- ✅ 16 data models in GraphQL schema (complete for MVP)
-- ✅ 9 domain modules with full repository/service/composable layers
-- ✅ 1450+ tests passing across 50+ test suites (lint + unit + E2E all green)
+- ✅ 18 data models in GraphQL schema (complete for MVP + V1 customization)
+- ✅ 11 domain modules with full repository/service/composable layers
+- ✅ 1500+ tests passing across 55+ test suites (lint + unit + E2E all green)
 - ✅ Type-safe architecture with single source of truth pattern
-- ✅ **NEW:** EPIC F2 complete — Onboarding, Guidance & User Flow Clarity
-- ✅ **NEW:** 5-phase progress system with milestone-based badge system (7 badges)
-- ✅ **NEW:** Contextual guidance layer with next-action suggestions
-- ✅ **NEW:** Dashboard active jobs & application status cockpit
-- ✅ **NEW:** Progressive feature unlocking based on user progress
+- ✅ **NEW:** EPIC 3C complete — CV Customization (Sections/Experience Selection + Templates)
+- ✅ **NEW:** CV template library with 3 system templates (Classic, Modern, Competency-based)
+- ✅ **NEW:** CV settings page for default template, sections, and experiences
+- ✅ **NEW:** Template markdown editor with preview
+- ✅ **NEW:** "Ask each time" modal for generation-time customization
+- ✅ EPIC F2 complete — Onboarding, Guidance & User Flow Clarity
+- ✅ 5-phase progress system with milestone-based badge system (7 badges)
+- ✅ Contextual guidance layer with next-action suggestions
+- ✅ Dashboard active jobs & application status cockpit
+- ✅ Progressive feature unlocking based on user progress
 - ✅ Jobs workflow complete: upload → parse → list → search → edit → save
 - ✅ Full E2E test coverage for jobs flow with fixtures
 - ✅ Company workflow complete: create → analyze → canvas → link to jobs
@@ -33,13 +38,13 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ Speech pages live at `/applications/speech` and `/applications/speech/:id` with E2E coverage
 - ✅ Tailored materials workflow complete: job/match entry points, tailored regeneration banners, and E2E coverage
 
-**MVP Readiness:** ~97% complete
+**MVP Readiness:** ~98% complete
 
 - Backend Infrastructure: 100% complete
-- Domain Logic: 99% complete
-- Frontend UI: 95% complete (EPICs 1A, 1B, 2, 3, 3B, 4, 4B, 5A, 5B, 5C, 6, F2 fully implemented)
+- Domain Logic: 100% complete
+- Frontend UI: 98% complete (EPICs 1A, 1B, 2, 3, 3B, 3C, 4, 4B, 5A, 5B, 5C, 6, F2 fully implemented)
 - AI Operations: 100% complete (12/12)
-- Code Quality: 97% complete (comprehensive test coverage, type safety, performance optimizations)
+- Code Quality: 98% complete (comprehensive test coverage, type safety, performance optimizations)
 
 ---
 
@@ -54,6 +59,7 @@ The project has achieved **production-ready MVP status** with comprehensive test
 | **2**  | Experience Builder (STAR)   | 100%    | 100%   | 100% (2/2) | 95%      | **98%**  |
 | **3**  | Generic CV Generator        | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **3B** | CV Header & Contact Info    | 100%    | 100%   | 100% (0/0) | 100%     | **100%** |
+| **3C** | CV Customization            | 100%    | 100%   | 100% (0/0) | 100%     | **100%** |
 | **4**  | User Speech Builder         | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **4B** | Generic Cover Letter        | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
 | **5A** | Job Description Analysis    | 100%    | 100%   | 100% (1/1) | 100%     | **100%** |
@@ -62,7 +68,7 @@ The project has achieved **production-ready MVP status** with comprehensive test
 | **6**  | Tailored Materials          | 100%    | 100%   | 100% (3/3) | 100%     | **100%** |
 | **F2** | Onboarding & Guidance       | 100%    | 100%   | N/A        | 100%     | **100%** |
 
-**Overall MVP Progress:** ~97%
+**Overall MVP Progress:** ~98%
 
 ### Detailed EPIC Analysis
 
@@ -732,6 +738,73 @@ The project has achieved **production-ready MVP status** with comprehensive test
 
 ---
 
+#### ✅ EPIC 3C: CV Customization (Sections/Experience Selection + Templates) (100% Complete)
+
+**Status:** ✅ **FULLY IMPLEMENTED** - Template library, settings management, and thin generation flow complete
+
+**Goal:** Let users control **what goes into a CV** and **how it looks**, with repeatable generation using saved settings and markdown templates.
+
+**Implemented:**
+
+**🎨 CV Template Library (Markdown-Based):**
+
+- ✅ CVTemplate GraphQL model with owner-based authorization
+- ✅ 3 system templates (Classic, Modern, Competency-based) stored as localized markdown
+- ✅ Template CRUD operations via CVTemplateRepository/Service
+- ✅ `useCvTemplates()` composable for template management
+- ✅ Template editor with markdown editing and preview
+- ✅ Template selection passed to `generateCv` AI operation
+
+**⚙️ CV Generation Settings:**
+
+- ✅ CVSettings GraphQL model with per-user defaults
+- ✅ Settings include:
+  - Default template selection
+  - Enabled sections (Summary, Skills, Experience, Education, etc.)
+  - Included experiences (multi-select)
+  - "Ask each time" toggle
+  - Show profile photo option
+- ✅ CVSettingsRepository/Service with get-or-create pattern
+- ✅ `useCvSettings()` composable for settings management
+- ✅ `getDefaultCvSettings()` domain function for smart defaults
+
+**📄 Thin Generation Entry Point:**
+
+- ✅ `/applications/cv/new` redesigned as thin entry point
+- ✅ CvGenerateEntryCard displays current settings summary
+- ✅ CvGenerationModal for "ask each time" confirmation
+- ✅ Modal allows template, sections, and experiences override at generation time
+- ✅ Generation uses saved defaults when "ask each time" disabled
+- ✅ Template markdown passed to AI operation for structure matching
+
+**🔧 Settings UI:**
+
+- ✅ `/settings/cv` - CV templates list and management
+- ✅ `/settings/cv/[id]` - Template editor with markdown editing
+- ✅ CvTemplateEditor component with preview
+- ✅ Settings accessible from main navigation and CV list page
+- ✅ Create template from system exemplars
+- ✅ Edit and delete user templates
+
+**🧪 Testing:**
+
+- ✅ 10 unit test files for repositories, services, and domain logic
+- ✅ 5 Nuxt component/page tests (CvGenerateEntryCard, CvGenerationModal, cv/new, settings/cv, settings/cv/id)
+- ✅ E2E tests updated for new generation flow
+- ✅ Template CRUD operations tested
+- ✅ Settings persistence and defaults tested
+
+**Validation:**
+
+- ✅ Users can generate CV in ≤30 seconds using saved settings
+- ✅ Template structure preserved consistently across regenerations
+- ✅ Multiple templates supported without breaking print/export
+- ✅ "Ask each time" modal is fast and unobtrusive
+- ✅ Generation works for both generic and job-tailored CVs
+- ✅ Template markdown successfully influences AI output structure
+
+---
+
 ## 🤖 AI Operations Status (12/12 Complete) ✅
 
 ### Implemented Operations ✅
@@ -768,7 +841,7 @@ The project has achieved **production-ready MVP status** with comprehensive test
 
 ## 📦 Domain Models Status
 
-### Implemented Models (11/11 MVP Required)
+### Implemented Models (13/13 MVP + V1 Customization)
 
 | Domain              | Models          | Repository | Service | Composable | Tests     |
 | ------------------- | --------------- | ---------- | ------- | ---------- | --------- |
@@ -781,6 +854,8 @@ The project has achieved **production-ready MVP status** with comprehensive test
 | **CompanyCanvas**   | CompanyCanvas   | ✅         | ✅      | ✅         | 50+ tests |
 | **MatchingSummary** | MatchingSummary | ✅         | ✅      | ✅         | 6 tests   |
 | **CV Document**     | CVDocument      | ✅         | ✅      | ✅         | 44 tests  |
+| **CV Template**     | CVTemplate      | ✅         | ✅      | ✅         | 10 tests  |
+| **CV Settings**     | CVSettings      | ✅         | ✅      | ✅         | 10 tests  |
 | **Cover Letter**    | CoverLetter     | ✅         | ✅      | ✅         | ✅        |
 | **Speech Block**    | SpeechBlock     | ✅         | ✅      | ✅         | ✅        |
 
@@ -788,18 +863,19 @@ The project has achieved **production-ready MVP status** with comprehensive test
 
 - None (all schema models have domain layers)
 
-**Note:** All 11 GraphQL models in `amplify/data/resource.ts` have repository/service/composable layers.
+**Note:** All 13 GraphQL models in `amplify/data/resource.ts` have repository/service/composable layers.
 
 ---
 
-## 🎨 Frontend Status (80% Complete)
+## 🎨 Frontend Status (98% Complete)
 
-### Implemented Pages (29)
+### Implemented Pages (35)
 
 **Auth & Home:**
 
 - ✅ `/login` — Login/signup page
 - ✅ `/` — Home dashboard
+- ✅ `/onboarding` — 4-step onboarding wizard
 
 **Profile & Identity (9 pages):**
 
@@ -811,6 +887,43 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ `/profile/experiences/[experienceId]` — Edit experience
 - ✅ `/profile/experiences/[experienceId]/stories` — Stories for experience
 - ✅ `/profile/experiences/[experienceId]/stories/[storyId]` — Edit STAR story
+- ✅ `/profile/stories` — Global story library
+- ✅ `/profile/canvas` — Personal Business Model Canvas
+
+**CV & Templates (7 pages):**
+
+- ✅ `/applications/cv` — CV list with search
+- ✅ `/applications/cv/new` — Thin CV generation entry point
+- ✅ `/applications/cv/:id` — CV editor with Markdown editing
+- ✅ `/applications/cv/:id/print` — Print-ready CV layout
+- ✅ `/settings/cv` — CV templates list and management
+- ✅ `/settings/cv/[id]` — Template editor with preview
+- ✅ `/settings` — Settings hub
+
+**Jobs & Companies (5 pages):**
+
+- ✅ `/jobs` — Job list with search and status filters
+- ✅ `/jobs/new` — Upload job description
+- ✅ `/jobs/[jobId]` — View/edit job with tabbed sections + company linking
+- ✅ `/jobs/[jobId]/match` — Matching summary
+- ✅ `/companies` — List companies with search
+- ✅ `/companies/new` — Create company with optional AI analysis
+- ✅ `/companies/[companyId]` — View/edit company info, BMC canvas, and linked jobs
+
+**Speech Builder (2 pages):**
+
+- ✅ `/applications/speech` — List speech blocks
+- ✅ `/applications/speech/:id` — Edit speech block
+
+**Cover Letters (4 pages):**
+
+- ✅ `/applications/cover-letters` — List cover letters
+- ✅ `/applications/cover-letters/new` — Create cover letter
+- ✅ `/applications/cover-letters/:id` — Edit cover letter
+- ✅ `/applications/cover-letters/:id/print` — Print cover letter
+
+### Components (30+)
+
 - ✅ `/profile/stories` — Global story library
 
 **Personal Canvas (1 page):**
@@ -849,7 +962,7 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ `/applications/cover-letters/:id` — Edit cover letter
 - ✅ `/applications/cover-letters/:id/print` — Print cover letter
 
-### Components (24+)
+### Components (30+)
 
 - ✅ PersonalCanvasComponent — Full canvas with 9 sections
 - ✅ CanvasSectionCard — Tag-based section editor
@@ -863,6 +976,10 @@ The project has achieved **production-ready MVP status** with comprehensive test
 - ✅ StoryViewModal — Full story display modal
 - ✅ TagInput — Tag management component
 - ✅ AchievementsKpisPanel — Achievement/KPI editor
+- ✅ CvGenerateEntryCard — Thin CV generation entry card
+- ✅ CvGenerationModal — Template/section/experience selection modal
+- ✅ CvTemplateEditor — Markdown template editor with preview
+- ✅ CvExperienceMultiSelect — Experience multi-select component
 - ✅ JobCard — Job display card with status badge
 - ✅ JobUploadStep — File upload UI with status feedback
 - ✅ CompanyCard — Company display card with ItemCard pattern

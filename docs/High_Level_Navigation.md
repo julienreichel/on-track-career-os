@@ -1,11 +1,11 @@
 # HIGH-LEVEL NAVIGATION STRUCTURE
 
-**Status:** 60% Implemented (EPICs 1A, 1B, 2, 3, 3B, 5A complete)  
-**Last Updated:** 2025-12-30
+**Status:** 85% Implemented (EPICs 1A, 1B, 2, 3, 3B, 3C, F2, 5A, 5B, 5C complete)  
+**Last Updated:** 2025-01-23
 
 _(MVP → V1)_
 
-The application is organized around **three main navigation zones**:
+The application is organized around **four main navigation zones**:
 
 1. **My Profile** ✅
    Identity, experiences, stories, personal canvas.
@@ -15,6 +15,9 @@ The application is organized around **three main navigation zones**:
 
 3. **Applications** ✅
    CV builder, cover letters, speech builder.
+
+4. **Settings** ✅
+   CV templates, generation defaults, preferences.
 
 This structure forms the **backbone of the product** and ensures users always have a clear next action.
 
@@ -656,13 +659,18 @@ Actions:
 
 **Routes:**
 
-- `/settings/cv`
+- `/settings/cv` - CV template library
+- `/settings/cv/:id` - CV template editor
 
 **Features (EPIC 3C):**
 
+- CV template library with 3 system templates (Classic, Modern, Competency)
+- Clone system templates for customization
+- CV template markdown editor with preview
 - CV settings (default template, ask each time, default sections/experiences)
-- Data export
-- Delete account
+- Default experience selection
+- Data export _(V2)_
+- Delete account _(V2)_
 
 ---
 
