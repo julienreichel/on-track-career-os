@@ -863,17 +863,18 @@ function resolveSectionFlag(
   if (hasExplicitSections) {
     return enabledSections.includes(section);
   }
+  // When no explicit sections provided, all sections are enabled by default
   const defaults: Record<CvSectionKey, boolean> = {
     summary: true,
-    skills: options?.includeSkills ?? true,
+    skills: true,
     experience: true,
     education: true,
-    certifications: options?.includeCertifications ?? true,
-    languages: options?.includeLanguages ?? true,
+    certifications: true,
+    languages: true,
     volunteer: true,
     projects: true,
-    interests: options?.includeInterests ?? true,
-    links: options?.includeLinks ?? true,
+    interests: true,
+    links: true,
   };
 
   return defaults[section] ?? true;
@@ -900,11 +901,13 @@ function filterExperiencesBySections(
   }
   const allowExperience = enabledSections.includes('experience');
   const allowEducation = enabledSections.includes('education');
+  const allowVolunteer = enabledSections.includes('volunteer');
   const allowProjects = enabledSections.includes('projects');
 
   return experiences.filter((exp) => {
     const type = exp.experienceType ?? 'work';
     if (type === 'education') return allowEducation;
+    if (type === 'volunteer') return allowVolunteer;
     if (type === 'project') return allowProjects;
     return allowExperience;
   });
