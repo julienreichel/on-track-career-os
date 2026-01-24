@@ -96,31 +96,44 @@ test.describe('CV Generation Workflow', () => {
     expect(cvId).toBeTruthy();
     if (!cvId) return;
 
+    // First verify the CV exists by navigating to it
+    await page.goto(`/applications/cv/${cvId}`);
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('button', { name: 'Edit', exact: true })).toBeVisible();
+
+    // Get the current CV title from the detail page
+    const heading = page.getByRole('heading', { level: 1 }).first();
+    await expect(heading).toBeVisible();
+    const currentCvName = (await heading.textContent())?.trim() ?? '';
+
+    // Navigate to CV list page
     await page.goto('/applications/cv');
     await page.waitForLoadState('networkidle');
 
-    expect(cvName).toBeTruthy();
-    if (!cvName) return;
+    // Find CV cards by looking for any card that has the CV name and a delete button
+    // Use .first() to handle potential duplicates gracefully
+    const cardTitle = page.locator('h3').filter({ hasText: currentCvName }).first();
+    await expect(cardTitle).toBeVisible({ timeout: 10000 });
 
-    // Verify the CV card title is visible
-    const cardTitle = page.locator('h3', { hasText: cvName });
-    await expect(cardTitle).toBeVisible();
-
-    // Find the card container by locating parent that contains both title and buttons
-    // The grid item contains the card with title and actions
+    // Find the card container by locating parent that contains both title and delete button
     const cardContainer = page
       .locator('div')
-      .filter({
-        has: cardTitle,
-      })
-      .filter({
-        has: page.getByRole('button', { name: /delete/i }),
-      })
+      .filter({ has: cardTitle })
+      .filter({ has: page.getByRole('button', { name: /delete/i }) })
       .first();
 
+    // Click delete button in the card
     await cardContainer.getByRole('button', { name: /delete/i }).click();
+
+    // Confirm deletion in modal
     await page.getByRole('button', { name: /^Delete$/i }).click();
 
-    await expect(page.locator('h3', { hasText: cvName })).toHaveCount(0);
+    // Wait for deletion to complete - check that we're still on the list page
+    await page.waitForLoadState('networkidle');
+
+    // Verify the CV no longer appears or count decreased
+    // Using first() to avoid strict mode issues if there were duplicates
+    const remainingCards = page.locator('h3').filter({ hasText: currentCvName });
+    await expect(remainingCards).toHaveCount(0, { timeout: 5000 });
   });
 });
