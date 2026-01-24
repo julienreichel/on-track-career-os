@@ -1,13 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { Mock } from 'vitest';
 import { ref } from 'vue';
-
-vi.mock('@/composables/useAnalytics', () => ({
-  useAnalytics: () => ({
-    captureEvent: vi.fn(),
-  }),
-}));
-
 import { useMatchingEngine } from '@/composables/useMatchingEngine';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
 import type {
@@ -28,6 +21,12 @@ import type { UserProfileService } from '@/domain/user-profile/UserProfileServic
 import type { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { CompanyService } from '@/domain/company/CompanyService';
 import type { CompanyCanvasService } from '@/domain/company-canvas/CompanyCanvasService';
+
+vi.mock('@/composables/useAnalytics', () => ({
+  useAnalytics: () => ({
+    captureEvent: vi.fn(),
+  }),
+}));
 
 const buildAuthStub = () => ({
   userId: ref<string | null>(null),
