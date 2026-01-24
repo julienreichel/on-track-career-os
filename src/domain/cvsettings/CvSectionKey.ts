@@ -5,6 +5,7 @@ export type CvSectionKey =
   | 'education'
   | 'certifications'
   | 'languages'
+  | 'volunteer'
   | 'projects'
   | 'interests'
   | 'links';
@@ -16,6 +17,7 @@ export const CV_SECTION_KEYS: CvSectionKey[] = [
   'education',
   'certifications',
   'languages',
+  'volunteer',
   'projects',
   'interests',
   'links',

@@ -870,6 +870,7 @@ function resolveSectionFlag(
     education: true,
     certifications: options?.includeCertifications ?? true,
     languages: options?.includeLanguages ?? true,
+    volunteer: true,
     projects: true,
     interests: options?.includeInterests ?? true,
     links: options?.includeLinks ?? true,
