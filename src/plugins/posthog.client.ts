@@ -18,28 +18,27 @@ export default defineNuxtPlugin((_nuxtApp) => {
 
   const router = useRouter();
   const { resolveSegment, isUUID } = useBreadcrumbMapping();
-  const { t } = useI18n();
 
-  // Map route segments to their translated labels
+  // Map route segments to their translated labels (using static mapping to avoid i18n composable issues)
   const getSegmentLabel = (segment: string): string => {
     const segmentMap: Record<string, string> = {
-      profile: t('navigation.profile'),
-      'cv-upload': t('navigation.cvUpload'),
-      experiences: t('navigation.experiences'),
-      settings: t('navigation.settings'),
-      jobs: t('navigation.jobs'),
-      companies: t('navigation.companies'),
-      applications: t('navigation.applications'),
-      'cover-letters': t('navigation.coverLetters'),
-      speech: t('navigation.speech'),
-      interview: t('navigation.interview'),
-      cv: t('navigation.cv'),
-      stories: t('stories.list.title'),
-      canvas: t('navigation.canvas'),
-      match: t('navigation.matching'),
-      new: t('common.new'),
-      edit: t('common.edit'),
-      print: t('common.print'),
+      profile: 'Profile',
+      'cv-upload': 'CV Upload',
+      experiences: 'Experiences',
+      settings: 'Settings',
+      jobs: 'Jobs',
+      companies: 'Companies',
+      applications: 'Applications',
+      'cover-letters': 'Cover Letters',
+      speech: 'Speech',
+      interview: 'Interview',
+      cv: 'CV',
+      stories: 'Stories',
+      canvas: 'Canvas',
+      match: 'Matching',
+      new: 'New',
+      edit: 'Edit',
+      print: 'Print',
     };
     return segmentMap[segment] || segment;
   };
@@ -77,7 +76,7 @@ export default defineNuxtPlugin((_nuxtApp) => {
     }
 
     // Return breadcrumb-style page name, or Home for root
-    return labels.length > 0 ? labels.join(' > ') : t('navigation.home');
+    return labels.length > 0 ? labels.join(' > ') : 'Home';
   };
 
   const capturePageview = async (path: string, meta: Record<string, unknown>) => {
