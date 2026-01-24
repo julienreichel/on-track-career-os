@@ -84,6 +84,12 @@ async function handleSave(data: ExperienceCreateInput) {
         ...data,
         userId,
       });
+      
+      // Track experience creation
+      const { useAnalytics } = await import('@/composables/useAnalytics');
+      const { captureEvent } = useAnalytics();
+      captureEvent('experience_created');
+      
       void router.push('/profile/experiences');
     } else if (experienceId.value) {
       // Update existing experience

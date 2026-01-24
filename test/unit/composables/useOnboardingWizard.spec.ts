@@ -3,6 +3,12 @@ import { ref } from 'vue';
 import { useOnboardingWizard } from '@/composables/useOnboardingWizard';
 import type { UserProgressState } from '@/domain/onboarding';
 
+vi.mock('@/composables/useAnalytics', () => ({
+  useAnalytics: () => ({
+    captureEvent: vi.fn(),
+  }),
+}));
+
 const authUserId = ref('user-1');
 const mockLoadUserId = vi.fn();
 

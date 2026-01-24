@@ -98,6 +98,12 @@ function createOnboardingActions(deps: ActionDependencies) {
     const saved = deps.readPersistedStep();
     const desired = saved ?? required;
     deps.currentStep.value = clampOnboardingStep(desired, required);
+
+    // Track onboarding started (only if not completed)
+    if (required !== 'complete') {
+      const { captureEvent } = useAnalytics();
+      captureEvent('onboarding_started');
+    }
   };
 
   const handleCvFile = async (file: File) => {
@@ -143,6 +149,11 @@ function createOnboardingActions(deps: ActionDependencies) {
       }
 
       await deps.progress.refresh();
+      
+      // Track CV upload completion
+      const { captureEvent } = useAnalytics();
+      captureEvent('cv_upload_completed');
+      
       deps.next();
     } catch {
       deps.setError('onboarding.errors.importFailed');
