@@ -1,6 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { Mock } from 'vitest';
 import { ref } from 'vue';
+
+vi.mock('@/composables/useAnalytics', () => ({
+  useAnalytics: () => ({
+    captureEvent: vi.fn(),
+  }),
+}));
+
 import { useMatchingEngine } from '@/composables/useMatchingEngine';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
 import type {

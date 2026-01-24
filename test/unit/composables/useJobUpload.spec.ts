@@ -41,6 +41,12 @@ vi.mock('pdf-parse', () => ({
   PDFParse: mocks.PDFParseMock,
 }));
 
+vi.mock('@/composables/useAnalytics', () => ({
+  useAnalytics: () => ({
+    captureEvent: vi.fn(),
+  }),
+}));
+
 describe('useJobUpload', () => {
   beforeEach(() => {
     vi.clearAllMocks();

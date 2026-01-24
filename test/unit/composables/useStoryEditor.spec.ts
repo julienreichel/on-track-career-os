@@ -8,6 +8,12 @@ vi.mock('@/domain/starstory/STARStoryService', () => ({
   STARStoryService: vi.fn(),
 }));
 
+vi.mock('@/composables/useAnalytics', () => ({
+  useAnalytics: () => ({
+    captureEvent: vi.fn(),
+  }),
+}));
+
 describe('useStoryEditor', () => {
   let mockService: {
     getFullSTARStory: ReturnType<typeof vi.fn>;

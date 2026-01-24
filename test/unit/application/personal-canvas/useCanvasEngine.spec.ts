@@ -16,6 +16,12 @@ vi.mock('@/domain/user-profile/UserProfileRepository');
 vi.mock('@/domain/experience/ExperienceRepository');
 vi.mock('@/domain/starstory/STARStoryService');
 
+vi.mock('@/composables/useAnalytics', () => ({
+  useAnalytics: () => ({
+    captureEvent: vi.fn(),
+  }),
+}));
+
 describe('useCanvasEngine', () => {
   let mockService: ReturnType<typeof vi.mocked<PersonalCanvasService>>;
   let mockRepository: ReturnType<typeof vi.mocked<PersonalCanvasRepository>>;

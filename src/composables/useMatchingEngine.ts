@@ -1,5 +1,6 @@
 import { computed, ref, type Ref } from 'vue';
 import { useAuthUser } from '@/composables/useAuthUser';
+import { useAnalytics } from '@/composables/useAnalytics';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { MatchingSummaryInput } from '@/domain/ai-operations/MatchingSummaryResult';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
