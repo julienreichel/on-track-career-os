@@ -4,7 +4,10 @@
  */
 
 export type AnalyticsEvent =
+  | 'onboarding_started'
   | 'onboarding_completed'
+  | 'cv_upload_completed'
+  | 'experience_created'
   | 'story_created_from_experience'
   | 'story_created_from_free_text'
   | 'profile_updated'
