@@ -68,6 +68,7 @@ import { useUserProfile } from '@/application/user-profile/useUserProfile';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import { isValidEmail, isValidPhone } from '@/domain/user-profile/contactValidation';
+import { useAnalytics } from '@/composables/useAnalytics';
 import type { UserProfile, UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 import type { ProfileForm } from '@/components/profile/types';
@@ -383,6 +384,10 @@ const handleSubmit = async () => {
       saveSuccess.value = true;
       isEditing.value = false;
       originalForm.value = JSON.parse(JSON.stringify(form.value));
+      
+      // Track profile update
+      const { captureEvent } = useAnalytics();
+      captureEvent('profile_updated');
     } else {
       error.value = t('profile.messages.saveError');
     }

@@ -4,6 +4,7 @@ import { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanva
 import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
+import { useAnalytics } from '@/composables/useAnalytics';
 import type {
   PersonalCanvas,
   PersonalCanvasCreateInput,
@@ -264,6 +265,10 @@ export function useCanvasEngine() {
         lastGeneratedAt: new Date().toISOString().split('T')[0],
         needsUpdate: false,
       });
+
+      // Track canvas creation
+      const { captureEvent } = useAnalytics();
+      captureEvent('canvas_created');
 
       return true;
     } catch (err) {

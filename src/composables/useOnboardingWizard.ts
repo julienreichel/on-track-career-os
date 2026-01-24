@@ -4,6 +4,7 @@ import { useUserProgress } from '@/composables/useUserProgress';
 import { useCvParsing } from '@/composables/useCvParsing';
 import { useExperienceImport } from '@/composables/useExperienceImport';
 import { useProfileMerge } from '@/composables/useProfileMerge';
+import { useAnalytics } from '@/composables/useAnalytics';
 import {
   onboardingSteps,
   clampOnboardingStep,
@@ -153,6 +154,10 @@ function createOnboardingActions(deps: ActionDependencies) {
   const finish = async () => {
     await deps.progress.refresh();
     deps.goToStep('complete');
+    
+    // Track onboarding completion
+    const { captureEvent } = useAnalytics();
+    captureEvent('onboarding_completed');
   };
 
   return {

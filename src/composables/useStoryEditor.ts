@@ -3,6 +3,7 @@ import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { STARStory, STARStoryUpdateInput } from '@/domain/starstory/STARStory';
 import type { STARStory as AiSTARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
+import { useAnalytics } from '@/composables/useAnalytics';
 
 /**
  * Story Editor Form State
@@ -168,11 +169,19 @@ export function useStoryEditor(storyId?: string) {
 
     saving.value = true;
     error.value = null;
+    const { captureEvent } = useAnalytics();
+    
     try {
       if (isNewStory.value) {
         const aiStory = formStateToAiStory(formState.value);
         const achievements = extractEnhancements(formState.value);
         story.value = await service.createAndLinkStory(aiStory, targetExpId, achievements);
+        
+        // Track story creation - determine if it was from experience or free text
+        const isFromExperience = Boolean(targetExpId);
+        captureEvent(
+          isFromExperience ? 'story_created_from_experience' : 'story_created_from_free_text'
+        );
       } else {
         story.value = await service.updateStory(
           story.value!.id,
