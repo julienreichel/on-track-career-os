@@ -154,7 +154,7 @@ function createOnboardingActions(deps: ActionDependencies) {
   const finish = async () => {
     await deps.progress.refresh();
     deps.goToStep('complete');
-    
+
     // Track onboarding completion
     const { captureEvent } = useAnalytics();
     captureEvent('onboarding_completed');

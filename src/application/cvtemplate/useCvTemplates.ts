@@ -2,6 +2,7 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { CVTemplateService } from '@/domain/cvtemplate/CVTemplateService';
+import { useAnalytics } from '@/composables/useAnalytics';
 import {
   resolveSystemCvTemplates,
   type SystemCvTemplate,
@@ -93,6 +94,8 @@ export function useCvTemplates(options: UseCvTemplatesOptions = {}) {
 
     if (created) {
       templates.value = [created, ...templates.value];
+      const { captureEvent } = useAnalytics();
+      captureEvent('cv_template_created');
     }
 
     return created;

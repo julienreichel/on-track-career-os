@@ -38,6 +38,7 @@ import { useCvGenerator } from '@/composables/useCvGenerator';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import { useCvSettings } from '@/application/cvsettings/useCvSettings';
 import { useCvTemplates } from '@/application/cvtemplate/useCvTemplates';
+import { useAnalytics } from '@/composables/useAnalytics';
 import { getDefaultCvSettings } from '@/domain/cvsettings/getDefaultCvSettings';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
@@ -172,6 +173,9 @@ const generateGenericCv = async (context: ReturnType<typeof resolveGenerationCon
     });
     return;
   }
+
+  const { captureEvent } = useAnalytics();
+  captureEvent('cv_created');
 
   toast.add({
     title: t('cvGenerate.toast.created'),

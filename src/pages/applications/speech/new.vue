@@ -89,6 +89,7 @@ import { useSpeechBlocks } from '@/application/speech-block/useSpeechBlocks';
 import { useSpeechEngine } from '@/composables/useSpeechEngine';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import { SpeechBlockService } from '@/domain/speech-block/SpeechBlockService';
+import { useAnalytics } from '@/composables/useAnalytics';
 import type { SpeechInput } from '@/domain/ai-operations/SpeechResult';
 
 const { t } = useI18n();
@@ -177,6 +178,11 @@ const generateSpeech = async () => {
       careerStory: result.careerStory ?? '',
       whyMe: result.whyMe ?? '',
     });
+
+    if (created) {
+      const { captureEvent } = useAnalytics();
+      captureEvent('speech_created');
+    }
 
     if (created?.id) {
       toast.add({

@@ -384,7 +384,7 @@ const handleSubmit = async () => {
       saveSuccess.value = true;
       isEditing.value = false;
       originalForm.value = JSON.parse(JSON.stringify(form.value));
-      
+
       // Track profile update
       const { captureEvent } = useAnalytics();
       captureEvent('profile_updated');

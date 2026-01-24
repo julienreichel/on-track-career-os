@@ -3,6 +3,7 @@ import { useI18n } from 'vue-i18n';
 import { PDFParse } from 'pdf-parse';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
+import { useAnalytics } from '@/composables/useAnalytics';
 
 PDFParse.setWorker(
   'https://cdn.jsdelivr.net/npm/pdf-parse@latest/dist/pdf-parse/web/pdf.worker.mjs'
@@ -66,6 +67,8 @@ export function useJobUpload() {
     try {
       const draft = await jobAnalysis.createJobFromRawText(sanitized);
       const analyzed = await jobAnalysis.reanalyseJob(draft.id);
+      const { captureEvent } = useAnalytics();
+      captureEvent('job_uploaded');
       return analyzed;
     } catch (error) {
       errorMessage.value = error instanceof Error ? error.message : t('jobUpload.errors.generic');

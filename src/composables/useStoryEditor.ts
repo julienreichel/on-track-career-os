@@ -170,13 +170,13 @@ export function useStoryEditor(storyId?: string) {
     saving.value = true;
     error.value = null;
     const { captureEvent } = useAnalytics();
-    
+
     try {
       if (isNewStory.value) {
         const aiStory = formStateToAiStory(formState.value);
         const achievements = extractEnhancements(formState.value);
         story.value = await service.createAndLinkStory(aiStory, targetExpId, achievements);
-        
+
         // Track story creation - determine if it was from experience or free text
         const isFromExperience = Boolean(targetExpId);
         captureEvent(

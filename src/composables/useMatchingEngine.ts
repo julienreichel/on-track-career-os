@@ -148,6 +148,8 @@ function createMatchingEngineState({ jobId, providedUserId, deps, auth }: Engine
         summary: aiResult,
       });
       matchingSummary.value = updated;
+      const { captureEvent } = useAnalytics();
+      captureEvent('job_match_computed');
       return updated;
     });
 

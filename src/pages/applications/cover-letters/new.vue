@@ -92,6 +92,7 @@ import { useAuthUser } from '@/composables/useAuthUser';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
 import { useCoverLetterEngine } from '@/composables/useCoverLetterEngine';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
+import { useAnalytics } from '@/composables/useAnalytics';
 import type { SpeechInput } from '@/domain/ai-operations/SpeechResult';
 
 const { t } = useI18n();
@@ -188,6 +189,9 @@ const generateCoverLetter = async () => {
     });
 
     if (coverLetter) {
+      const { captureEvent } = useAnalytics();
+      captureEvent('cover_letter_created');
+
       toast.add({
         title: t('coverLetter.new.toast.created'),
         color: 'primary',
