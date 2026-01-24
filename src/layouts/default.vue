@@ -140,4 +140,23 @@ watch(
 
 // Only show breadcrumb on non-home pages
 const showBreadcrumb = computed(() => route.path !== '/');
+
+// Generate page title from breadcrumb items (excluding Home icon)
+const pageTitle = computed(() => {
+  // Skip the first item (Home) and get labels
+  const labels = breadcrumbItems.value.slice(1).map((item) => item.label);
+
+  if (labels.length === 0) {
+    // Home page
+    return t('app.title');
+  }
+
+  // Join with " | " and append app title
+  return `${labels.join(' | ')} | ${t('app.title')}`;
+});
+
+// Update document title reactively
+useHead({
+  title: pageTitle,
+});
 </script>
