@@ -280,7 +280,11 @@ export const handler = async (event: HandlerEvent): Promise<string> => {
     { arguments: event.arguments },
     async (args) => {
       const userPrompt = buildUserPrompt(args);
-      const responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);
+      const responseText = await invokeBedrock({
+        systemPrompt: SYSTEM_PROMPT,
+        userPrompt,
+        operationName: 'generateCoverLetter',
+      });
 
       console.log('[generateCoverLetter] Generated cover letter length:', responseText.length);
 

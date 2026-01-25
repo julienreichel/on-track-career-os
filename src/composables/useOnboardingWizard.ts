@@ -149,11 +149,11 @@ function createOnboardingActions(deps: ActionDependencies) {
       }
 
       await deps.progress.refresh();
-      
+
       // Track CV upload completion
       const { captureEvent } = useAnalytics();
       captureEvent('cv_upload_completed');
-      
+
       deps.next();
     } catch {
       deps.setError('onboarding.errors.importFailed');

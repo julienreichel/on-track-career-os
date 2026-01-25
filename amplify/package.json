@@ -1,6 +1,7 @@
 {
   "type": "module",
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.940.0"
+    "@aws-sdk/client-cognito-identity-provider": "^3.940.0",
+    "posthog-node": "^4.2.1"
   }
 }

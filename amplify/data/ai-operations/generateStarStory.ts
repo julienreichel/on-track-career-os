@@ -251,7 +251,11 @@ Remember to use the format with ## headers for each section, include a concise #
  * Uses direct invokeBedrock instead of invokeAiWithRetry since we expect text, not JSON
  */
 async function invokeAiForText(systemPrompt: string, userPrompt: string): Promise<string> {
-  return invokeBedrock(systemPrompt, userPrompt);
+  return invokeBedrock({
+    systemPrompt,
+    userPrompt,
+    operationName: 'generateStarStory',
+  });
 }
 
 /**

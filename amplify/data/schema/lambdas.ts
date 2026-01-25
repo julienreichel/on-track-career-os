@@ -4,11 +4,17 @@ import { deleteUserProfile } from '../delete-user-profile/resource';
 // Bedrock model ID (Amazon Nova Lite)
 export const MODEL_ID = 'eu.amazon.nova-micro-v1:0';
 
+// PostHog configuration for LLM analytics
+export const POSTHOG_API_KEY = process.env.PUBLIC_POSTHOG_KEY || '';
+export const POSTHOG_HOST = process.env.PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com';
+
 // Define AI operation Lambda functions
 export const parseCvTextFunction = defineFunction({
   entry: '../ai-operations/parseCvText.ts',
   environment: {
     MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
   },
   timeoutSeconds: 60,
 });
@@ -17,6 +23,8 @@ export const extractExperienceBlocksFunction = defineFunction({
   entry: '../ai-operations/extractExperienceBlocks.ts',
   environment: {
     MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
   },
   timeoutSeconds: 60,
 });
@@ -25,6 +33,8 @@ export const generateStarStoryFunction = defineFunction({
   entry: '../ai-operations/generateStarStory.ts',
   environment: {
     MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
   },
   timeoutSeconds: 60,
 });
@@ -33,6 +43,8 @@ export const generateAchievementsAndKpisFunction = defineFunction({
   entry: '../ai-operations/generateAchievementsAndKpis.ts',
   environment: {
     MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
   },
   timeoutSeconds: 60,
 });
@@ -41,6 +53,8 @@ export const generatePersonalCanvasFunction = defineFunction({
   entry: '../ai-operations/generatePersonalCanvas.ts',
   environment: {
     MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
   },
   timeoutSeconds: 60,
 });
@@ -49,6 +63,8 @@ export const generateCvFunction = defineFunction({
   entry: '../ai-operations/generateCv.ts',
   environment: {
     MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
   },
   timeoutSeconds: 90, // Longer timeout for full CV generation
 });
@@ -57,6 +73,8 @@ export const parseJobDescriptionFunction = defineFunction({
   entry: '../ai-operations/parseJobDescription.ts',
   environment: {
     MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
   },
   timeoutSeconds: 60,
 });
@@ -65,6 +83,8 @@ export const analyzeCompanyInfoFunction = defineFunction({
   entry: '../ai-operations/analyzeCompanyInfo.ts',
   environment: {
     MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
   },
   timeoutSeconds: 60,
 });
@@ -73,6 +93,8 @@ export const generateCompanyCanvasFunction = defineFunction({
   entry: '../ai-operations/generateCompanyCanvas.ts',
   environment: {
     MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
   },
   timeoutSeconds: 60,
 });
@@ -81,6 +103,8 @@ export const generateMatchingSummaryFunction = defineFunction({
   entry: '../ai-operations/generateMatchingSummary.ts',
   environment: {
     MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
   },
   timeoutSeconds: 60,
 });
@@ -89,6 +113,8 @@ export const generateSpeechFunction = defineFunction({
   entry: '../ai-operations/generateSpeech.ts',
   environment: {
     MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
   },
   timeoutSeconds: 60,
 });
@@ -97,6 +123,8 @@ export const generateCoverLetterFunction = defineFunction({
   entry: '../ai-operations/generateCoverLetter.ts',
   environment: {
     MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
   },
   timeoutSeconds: 60,
 });

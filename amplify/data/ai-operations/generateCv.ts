@@ -473,7 +473,11 @@ export const handler = async (event: { arguments: GenerateCvInput }): Promise<st
     event,
     async (args) => {
       const userPrompt = buildUserPrompt(args);
-      const responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);
+      const responseText = await invokeBedrock({
+        systemPrompt: SYSTEM_PROMPT,
+        userPrompt,
+        operationName: 'generateCv',
+      });
       console.log('[generateCv] Generated CV length:', responseText.length);
 
       // Strip any trailing notes the AI might have added

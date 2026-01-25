@@ -257,7 +257,11 @@ export const handler = async (event: HandlerEvent) => {
       const userPrompt = buildUserPrompt(args);
 
       try {
-        const responseText = await invokeBedrock(SYSTEM_PROMPT, userPrompt);
+        const responseText = await invokeBedrock({
+          systemPrompt: SYSTEM_PROMPT,
+          userPrompt,
+          operationName: 'generateSpeech',
+        });
         const parsed = parseSpeechMarkdown(responseText);
 
         if (parsed) {
@@ -265,7 +269,11 @@ export const handler = async (event: HandlerEvent) => {
         }
 
         const repairPrompt = buildRepairPrompt(responseText);
-        const repairedText = await invokeBedrock(SYSTEM_PROMPT, repairPrompt);
+        const repairedText = await invokeBedrock({
+          systemPrompt: SYSTEM_PROMPT,
+          userPrompt: repairPrompt,
+          operationName: 'generateSpeech_repair',
+        });
         const repairedParsed = parseSpeechMarkdown(repairedText);
 
         if (repairedParsed) {
