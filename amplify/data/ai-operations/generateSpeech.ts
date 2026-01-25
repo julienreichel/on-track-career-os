@@ -206,12 +206,25 @@ function parseSpeechMarkdown(raw: string): GenerateSpeechOutput | null {
 
 function extractMarkdownSection(markdown: string, heading: string): string | null {
   const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const pattern = new RegExp(`^##\\s+${escapedHeading}\\s*\\n([\\s\\S]*?)(?=^##\\s+|$)`, 'm');
-  const match = markdown.match(pattern);
-  if (!match?.[1]) {
+  // Match heading, then capture everything until next ## heading or end
+  const headingPattern = new RegExp(`^##\\s+${escapedHeading}\\s*$`, 'gm');
+  const headingMatch = headingPattern.exec(markdown);
+  
+  if (!headingMatch) {
     return null;
   }
-  return stripTrailingNoise(match[1]);
+  
+  const startIndex = headingMatch.index + headingMatch[0].length + 1; // +1 for newline
+  
+  // Find next heading or end of string
+  const nextHeadingPattern = /^##\s+/gm;
+  nextHeadingPattern.lastIndex = startIndex;
+  const nextHeadingMatch = nextHeadingPattern.exec(markdown);
+  
+  const endIndex = nextHeadingMatch ? nextHeadingMatch.index : markdown.length;
+  const content = markdown.substring(startIndex, endIndex);
+  
+  return stripTrailingNoise(content.trim());
 }
 
 function normalizeMarkdown(markdown: string): string {
