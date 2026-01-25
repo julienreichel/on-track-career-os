@@ -28,13 +28,13 @@ Each LLM invocation sends the following properties to PostHog:
 
 ```typescript
 {
-  $ai_model: string;              // e.g., "eu.amazon.nova-micro-v1:0"
-  $ai_input_tokens: number;       // Prompt tokens
-  $ai_output_tokens: number;      // Completion tokens
-  $ai_total_cost_usd: number;     // Calculated cost
-  $ai_temperature: number;        // Temperature setting
-  $ai_latency_ms: number;         // Request duration
-  operation: string;              // e.g., "generateCv", "parseCvText"
+  $ai_model: string; // e.g., "eu.amazon.nova-micro-v1:0"
+  $ai_input_tokens: number; // Prompt tokens
+  $ai_output_tokens: number; // Completion tokens
+  $ai_total_cost_usd: number; // Calculated cost
+  $ai_temperature: number; // Temperature setting
+  $ai_latency_ms: number; // Request duration
+  operation: string; // e.g., "generateCv", "parseCvText"
 }
 ```
 
@@ -42,11 +42,11 @@ Each LLM invocation sends the following properties to PostHog:
 
 Pricing per 1M tokens (AWS Bedrock):
 
-| Model | Input Cost | Output Cost |
-|-------|------------|-------------|
-| Nova Micro | $0.035 | $0.14 |
-| Nova Lite | $0.06 | $0.24 |
-| Default | $0.10 | $0.40 |
+| Model      | Input Cost | Output Cost |
+| ---------- | ---------- | ----------- |
+| Nova Micro | $0.035     | $0.14       |
+| Nova Lite  | $0.06      | $0.24       |
+| Default    | $0.10      | $0.40       |
 
 ## Environment Configuration
 
@@ -96,7 +96,7 @@ try {
 const result = await invokeBedrock({
   systemPrompt: 'You are a CV expert',
   userPrompt: 'Parse this CV...',
-  operationName: 'parseCvText',  // Tracked in PostHog
+  operationName: 'parseCvText', // Tracked in PostHog
 });
 ```
 
