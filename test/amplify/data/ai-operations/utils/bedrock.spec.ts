@@ -54,7 +54,10 @@ describe('bedrock utilities', () => {
       };
       mockSend.mockResolvedValue(mockResponse);
 
-      const result = await invokeBedrock('system prompt', 'user prompt');
+      const result = await invokeBedrock({
+        systemPrompt: 'system prompt',
+        userPrompt: 'user prompt',
+      });
 
       expect(result).toBe('{"result": "success"}');
       expect(mockSend).toHaveBeenCalledTimes(1);
@@ -97,7 +100,11 @@ describe('bedrock utilities', () => {
       };
       mockSend.mockResolvedValue(mockResponse);
 
-      await invokeBedrock('system', 'user', 2000);
+      await invokeBedrock({
+        systemPrompt: 'system',
+        userPrompt: 'user',
+        maxTokens: 2000,
+      });
 
       const commandCall = (InvokeModelCommand as unknown as Mock).mock.calls[0][0];
       const bodyJson = JSON.parse(commandCall.body);
@@ -118,7 +125,12 @@ describe('bedrock utilities', () => {
       };
       mockSend.mockResolvedValue(mockResponse);
 
-      await invokeBedrock('system', 'user', 4000, 0.5);
+      await invokeBedrock({
+        systemPrompt: 'system',
+        userPrompt: 'user',
+        maxTokens: 4000,
+        temperature: 0.5,
+      });
 
       const commandCall = (InvokeModelCommand as unknown as Mock).mock.calls[0][0];
       const bodyJson = JSON.parse(commandCall.body);
@@ -139,7 +151,10 @@ describe('bedrock utilities', () => {
       };
       mockSend.mockResolvedValue(mockResponse);
 
-      await invokeBedrock('sys', 'usr');
+      await invokeBedrock({
+        systemPrompt: 'sys',
+        userPrompt: 'usr',
+      });
 
       const commandCall = (InvokeModelCommand as unknown as Mock).mock.calls[0][0];
       const bodyJson = JSON.parse(commandCall.body);
@@ -156,13 +171,23 @@ describe('bedrock utilities', () => {
     it('should throw error when response body is empty', async () => {
       mockSend.mockResolvedValue({ body: null });
 
-      await expect(invokeBedrock('system', 'user')).rejects.toThrow('Empty response from Bedrock');
+      await expect(
+        invokeBedrock({
+          systemPrompt: 'system',
+          userPrompt: 'user',
+        })
+      ).rejects.toThrow('Empty response from Bedrock');
     });
 
     it('should throw error when response body is undefined', async () => {
       mockSend.mockResolvedValue({});
 
-      await expect(invokeBedrock('system', 'user')).rejects.toThrow('Empty response from Bedrock');
+      await expect(
+        invokeBedrock({
+          systemPrompt: 'system',
+          userPrompt: 'user',
+        })
+      ).rejects.toThrow('Empty response from Bedrock');
     });
 
     it('should throw error when Nova response structure is invalid (missing output)', async () => {
@@ -171,9 +196,12 @@ describe('bedrock utilities', () => {
       };
       mockSend.mockResolvedValue(mockResponse);
 
-      await expect(invokeBedrock('system', 'user')).rejects.toThrow(
-        'Invalid response structure from Bedrock Nova'
-      );
+      await expect(
+        invokeBedrock({
+          systemPrompt: 'system',
+          userPrompt: 'user',
+        })
+      ).rejects.toThrow('Invalid response structure from Bedrock Nova');
     });
 
     it('should throw error when Nova response structure is invalid (empty content array)', async () => {
@@ -190,9 +218,12 @@ describe('bedrock utilities', () => {
       };
       mockSend.mockResolvedValue(mockResponse);
 
-      await expect(invokeBedrock('system', 'user')).rejects.toThrow(
-        'Invalid response structure from Bedrock Nova'
-      );
+      await expect(
+        invokeBedrock({
+          systemPrompt: 'system',
+          userPrompt: 'user',
+        })
+      ).rejects.toThrow('Invalid response structure from Bedrock Nova');
     });
 
     it('should throw error when Nova response structure is invalid (missing text)', async () => {
@@ -209,15 +240,23 @@ describe('bedrock utilities', () => {
       };
       mockSend.mockResolvedValue(mockResponse);
 
-      await expect(invokeBedrock('system', 'user')).rejects.toThrow(
-        'Invalid response structure from Bedrock Nova'
-      );
+      await expect(
+        invokeBedrock({
+          systemPrompt: 'system',
+          userPrompt: 'user',
+        })
+      ).rejects.toThrow('Invalid response structure from Bedrock Nova');
     });
 
     it('should handle Bedrock API errors', async () => {
       mockSend.mockRejectedValue(new Error('API Error'));
 
-      await expect(invokeBedrock('system', 'user')).rejects.toThrow('API Error');
+      await expect(
+        invokeBedrock({
+          systemPrompt: 'system',
+          userPrompt: 'user',
+        })
+      ).rejects.toThrow('API Error');
     });
 
     it('should reuse same Bedrock client instance (singleton)', async () => {
@@ -234,13 +273,19 @@ describe('bedrock utilities', () => {
       };
       mockSend.mockResolvedValue(mockResponse);
 
-      await invokeBedrock('system1', 'user1');
+      await invokeBedrock({
+        systemPrompt: 'system1',
+        userPrompt: 'user1',
+      });
 
       // Clear the mock call count but keep same client
       vi.clearAllMocks();
       mockSend.mockResolvedValue(mockResponse);
 
-      await invokeBedrock('system2', 'user2');
+      await invokeBedrock({
+        systemPrompt: 'system2',
+        userPrompt: 'user2',
+      });
 
       // Both calls should use same client (mockSend called twice total, but client instantiated once in beforeEach)
       expect(mockSend).toHaveBeenCalledTimes(1);
@@ -260,7 +305,10 @@ describe('bedrock utilities', () => {
       };
       mockSend.mockResolvedValue(mockResponse);
 
-      await invokeBedrock('system', 'user');
+      await invokeBedrock({
+        systemPrompt: 'system',
+        userPrompt: 'user',
+      });
 
       const commandCall = (InvokeModelCommand as unknown as Mock).mock.calls[0][0];
       expect(commandCall.modelId).toBeDefined();

@@ -33,12 +33,14 @@ Each LLM invocation sends the following properties to PostHog following the [off
   $ai_trace_id: string; // UUID to group AI events (generated per invocation)
   $ai_model: string; // e.g., "eu.amazon.nova-micro-v1:0"
   $ai_provider: string; // e.g., "amazon", "anthropic", "bedrock"
-  $ai_input: Array<{ // Messages sent to LLM
+  $ai_input: Array<{
+    // Messages sent to LLM
     role: 'system' | 'user';
     content: string;
   }>;
   $ai_input_tokens: number; // Prompt tokens
-  $ai_output_choices: Array<{ // Response choices from LLM
+  $ai_output_choices: Array<{
+    // Response choices from LLM
     role: 'assistant';
     content: string;
   }>;

@@ -65,11 +65,9 @@ function getBedrockClient(): BedrockRuntimeClient {
  */
 function getPostHogClient(): PostHog | null {
   if (!POSTHOG_API_KEY) {
-    console.log('No PostHog API Keys');
     return null; // PostHog tracking disabled if no API key
   }
   if (!posthogClient) {
-    console.log('Creating posthog client');
     posthogClient = new PostHog(POSTHOG_API_KEY, {
       host: POSTHOG_HOST,
     });
@@ -83,7 +81,6 @@ function getPostHogClient(): PostHog | null {
 function trackLLMGeneration(metrics: LLMGenerationMetrics) {
   const posthog = getPostHogClient();
   if (!posthog) {
-    console.log('No Posthog, no capture');
     return;
   }
 
