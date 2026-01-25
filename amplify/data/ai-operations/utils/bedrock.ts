@@ -78,13 +78,12 @@ function getPostHogClient(): PostHog | null {
 /**
  * Track LLM generation event in PostHog
  */
-function trackLLMGeneration(metrics: LLMGenerationMetrics) {
+async function trackLLMGeneration(metrics: LLMGenerationMetrics) {
   const posthog = getPostHogClient();
   if (!posthog) {
     return;
   }
 
-  console.log('Posthog capture');
   try {
     posthog.capture({
       distinctId: 'backend-ai-operations',
@@ -107,6 +106,8 @@ function trackLLMGeneration(metrics: LLMGenerationMetrics) {
         operation: metrics.operationName || 'unknown',
       },
     });
+
+    await posthog.shutdown();
   } catch (error) {
     // Silent fail - don't break AI operations if PostHog fails
     console.warn('PostHog tracking failed:', error);
@@ -244,7 +245,7 @@ export async function invokeBedrock(params: InvokeBedrockParams): Promise<string
 
   // Track LLM usage in PostHog
   const durationMs = Date.now() - startTime;
-  trackLLMGeneration({
+  await trackLLMGeneration({
     traceId: randomUUID(),
     model: BEDROCK_MODEL_ID,
     provider: getProviderFromModel(BEDROCK_MODEL_ID),
