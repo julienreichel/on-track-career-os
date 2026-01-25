@@ -86,7 +86,7 @@ async function trackLLMGeneration(metrics: LLMGenerationMetrics) {
 
   try {
     posthog.capture({
-      distinctId: 'backend-ai-operations',
+      distinctId: metrics.operationName || 'backend-ai-operations',
       event: '$ai_generation',
       properties: {
         // Required properties per PostHog documentation
@@ -103,7 +103,6 @@ async function trackLLMGeneration(metrics: LLMGenerationMetrics) {
         $ai_latency: metrics.durationMs / MS_TO_SECONDS, // Convert to seconds
         // Optional custom properties
         $ai_temperature: metrics.temperature,
-        operation: metrics.operationName || 'unknown',
       },
     });
 
