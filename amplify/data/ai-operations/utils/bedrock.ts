@@ -13,14 +13,6 @@ import {
   extractJson,
 } from './common';
 
-// Cost per million tokens (USD) - AWS Bedrock pricing
-const NOVA_MICRO_INPUT_COST = 0.035;
-const NOVA_MICRO_OUTPUT_COST = 0.14;
-const NOVA_LITE_INPUT_COST = 0.06;
-const NOVA_LITE_OUTPUT_COST = 0.24;
-const DEFAULT_INPUT_COST = 0.1;
-const DEFAULT_OUTPUT_COST = 0.4;
-const TOKENS_PER_MILLION = 1_000_000;
 const MS_TO_SECONDS = 1000;
 
 /**
@@ -115,11 +107,6 @@ function trackLLMGeneration(metrics: LLMGenerationMetrics) {
         $ai_latency: metrics.durationMs / MS_TO_SECONDS, // Convert to seconds
         // Optional custom properties
         $ai_temperature: metrics.temperature,
-        $ai_total_cost_usd: calculateCost(
-          metrics.model,
-          metrics.promptTokens,
-          metrics.completionTokens
-        ),
         operation: metrics.operationName || 'unknown',
       },
     });
@@ -127,28 +114,6 @@ function trackLLMGeneration(metrics: LLMGenerationMetrics) {
     // Silent fail - don't break AI operations if PostHog fails
     console.warn('PostHog tracking failed:', error);
   }
-}
-
-/**
- * Calculate approximate cost in USD based on AWS Bedrock pricing
- */
-function calculateCost(model: string, inputTokens: number, outputTokens: number): number {
-  if (model.includes('nova-micro')) {
-    return (
-      (inputTokens * NOVA_MICRO_INPUT_COST + outputTokens * NOVA_MICRO_OUTPUT_COST) /
-      TOKENS_PER_MILLION
-    );
-  }
-  if (model.includes('nova-lite')) {
-    return (
-      (inputTokens * NOVA_LITE_INPUT_COST + outputTokens * NOVA_LITE_OUTPUT_COST) /
-      TOKENS_PER_MILLION
-    );
-  }
-  // Default conservative estimate
-  return (
-    (inputTokens * DEFAULT_INPUT_COST + outputTokens * DEFAULT_OUTPUT_COST) / TOKENS_PER_MILLION
-  );
 }
 
 /**
