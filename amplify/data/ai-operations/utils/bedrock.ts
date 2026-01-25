@@ -3,6 +3,7 @@ import {
   InvokeModelCommand,
   type InvokeModelCommandInput,
 } from '@aws-sdk/client-bedrock-runtime';
+import { randomUUID } from 'crypto';
 import { PostHog } from 'posthog-node';
 import {
   BEDROCK_REGION,
@@ -20,6 +21,7 @@ const NOVA_LITE_OUTPUT_COST = 0.24;
 const DEFAULT_INPUT_COST = 0.1;
 const DEFAULT_OUTPUT_COST = 0.4;
 const TOKENS_PER_MILLION = 1_000_000;
+const MS_TO_SECONDS = 1000;
 
 /**
  * Bedrock client wrapper for AI operations
@@ -31,7 +33,12 @@ const POSTHOG_API_KEY = process.env.POSTHOG_API_KEY || '';
 const POSTHOG_HOST = process.env.POSTHOG_HOST || 'https://eu.i.posthog.com';
 
 interface LLMGenerationMetrics {
+  traceId: string;
   model: string;
+  provider: string;
+  systemPrompt: string;
+  userPrompt: string;
+  responseText: string;
   promptTokens: number;
   completionTokens: number;
   temperature: number;
@@ -66,9 +73,11 @@ function getBedrockClient(): BedrockRuntimeClient {
  */
 function getPostHogClient(): PostHog | null {
   if (!POSTHOG_API_KEY) {
+    console.log('No PostHog API Keys');
     return null; // PostHog tracking disabled if no API key
   }
   if (!posthogClient) {
+    console.log('Creating posthog client');
     posthogClient = new PostHog(POSTHOG_API_KEY, {
       host: POSTHOG_HOST,
     });
@@ -81,19 +90,36 @@ function getPostHogClient(): PostHog | null {
  */
 function trackLLMGeneration(metrics: LLMGenerationMetrics) {
   const posthog = getPostHogClient();
-  if (!posthog) return;
+  if (!posthog) {
+    console.log('No Posthog, no capture');
+    return;
+  }
 
+  console.log('Posthog capture');
   try {
     posthog.capture({
       distinctId: 'backend-ai-operations',
       event: '$ai_generation',
       properties: {
+        // Required properties per PostHog documentation
+        $ai_trace_id: metrics.traceId,
         $ai_model: metrics.model,
+        $ai_provider: metrics.provider,
+        $ai_input: [
+          { role: 'system', content: metrics.systemPrompt },
+          { role: 'user', content: metrics.userPrompt },
+        ],
         $ai_input_tokens: metrics.promptTokens,
+        $ai_output_choices: [{ role: 'assistant', content: metrics.responseText }],
         $ai_output_tokens: metrics.completionTokens,
-        $ai_total_cost_usd: calculateCost(metrics.model, metrics.promptTokens, metrics.completionTokens),
+        $ai_latency: metrics.durationMs / MS_TO_SECONDS, // Convert to seconds
+        // Optional custom properties
         $ai_temperature: metrics.temperature,
-        $ai_latency_ms: metrics.durationMs,
+        $ai_total_cost_usd: calculateCost(
+          metrics.model,
+          metrics.promptTokens,
+          metrics.completionTokens
+        ),
         operation: metrics.operationName || 'unknown',
       },
     });
@@ -108,13 +134,34 @@ function trackLLMGeneration(metrics: LLMGenerationMetrics) {
  */
 function calculateCost(model: string, inputTokens: number, outputTokens: number): number {
   if (model.includes('nova-micro')) {
-    return (inputTokens * NOVA_MICRO_INPUT_COST + outputTokens * NOVA_MICRO_OUTPUT_COST) / TOKENS_PER_MILLION;
+    return (
+      (inputTokens * NOVA_MICRO_INPUT_COST + outputTokens * NOVA_MICRO_OUTPUT_COST) /
+      TOKENS_PER_MILLION
+    );
   }
   if (model.includes('nova-lite')) {
-    return (inputTokens * NOVA_LITE_INPUT_COST + outputTokens * NOVA_LITE_OUTPUT_COST) / TOKENS_PER_MILLION;
+    return (
+      (inputTokens * NOVA_LITE_INPUT_COST + outputTokens * NOVA_LITE_OUTPUT_COST) /
+      TOKENS_PER_MILLION
+    );
   }
   // Default conservative estimate
-  return (inputTokens * DEFAULT_INPUT_COST + outputTokens * DEFAULT_OUTPUT_COST) / TOKENS_PER_MILLION;
+  return (
+    (inputTokens * DEFAULT_INPUT_COST + outputTokens * DEFAULT_OUTPUT_COST) / TOKENS_PER_MILLION
+  );
+}
+
+/**
+ * Determine provider from model ID
+ */
+function getProviderFromModel(modelId: string): string {
+  if (modelId.includes('nova') || modelId.includes('amazon')) {
+    return 'amazon';
+  }
+  if (modelId.includes('anthropic') || modelId.includes('claude')) {
+    return 'anthropic';
+  }
+  return 'bedrock';
 }
 
 /**
@@ -125,11 +172,11 @@ function extractNovaResponse(responseBody: Record<string, unknown>) {
     output?: { message?: { content?: Array<{ text?: string }> } };
     usage?: { inputTokens?: number; outputTokens?: number };
   };
-  
+
   if (!body.output?.message?.content?.[0]?.text) {
     throw new Error('Invalid response structure from Bedrock Nova');
   }
-  
+
   return {
     text: body.output.message.content[0].text,
     inputTokens: body.usage?.inputTokens || 0,
@@ -145,11 +192,11 @@ function extractClaudeResponse(responseBody: Record<string, unknown>) {
     content?: Array<{ text?: string }>;
     usage?: { input_tokens?: number; output_tokens?: number };
   };
-  
+
   if (!body.content?.[0]?.text) {
     throw new Error('Invalid response structure from Bedrock Claude');
   }
-  
+
   return {
     text: body.content[0].text,
     inputTokens: body.usage?.input_tokens || 0,
@@ -177,7 +224,7 @@ interface BuildRequestParams {
  */
 function buildRequestBody(params: BuildRequestParams): string {
   const { systemPrompt, userPrompt, maxTokens, temperature, isNovaModel } = params;
-  
+
   const body = isNovaModel
     ? {
         // Amazon Nova format
@@ -236,7 +283,12 @@ export async function invokeBedrock(params: InvokeBedrockParams): Promise<string
   // Track LLM usage in PostHog
   const durationMs = Date.now() - startTime;
   trackLLMGeneration({
+    traceId: randomUUID(),
     model: BEDROCK_MODEL_ID,
+    provider: getProviderFromModel(BEDROCK_MODEL_ID),
+    systemPrompt,
+    userPrompt,
+    responseText: text,
     promptTokens: inputTokens,
     completionTokens: outputTokens,
     temperature,

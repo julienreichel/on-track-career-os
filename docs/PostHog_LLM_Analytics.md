@@ -24,16 +24,35 @@ All AI operations flow through `invokeBedrock()` in [amplify/data/ai-operations/
 
 ## Tracked Metrics
 
-Each LLM invocation sends the following properties to PostHog:
+Each LLM invocation sends the following properties to PostHog following the [official PostHog LLM Analytics documentation](https://posthog.com/docs/llm-analytics/installation/manual-capture?tab=Node.js):
+
+### Required Properties
 
 ```typescript
 {
+  $ai_trace_id: string; // UUID to group AI events (generated per invocation)
   $ai_model: string; // e.g., "eu.amazon.nova-micro-v1:0"
+  $ai_provider: string; // e.g., "amazon", "anthropic", "bedrock"
+  $ai_input: Array<{ // Messages sent to LLM
+    role: 'system' | 'user';
+    content: string;
+  }>;
   $ai_input_tokens: number; // Prompt tokens
+  $ai_output_choices: Array<{ // Response choices from LLM
+    role: 'assistant';
+    content: string;
+  }>;
   $ai_output_tokens: number; // Completion tokens
-  $ai_total_cost_usd: number; // Calculated cost
+  $ai_latency: number; // Request duration in seconds
+}
+```
+
+### Optional Custom Properties
+
+```typescript
+{
   $ai_temperature: number; // Temperature setting
-  $ai_latency_ms: number; // Request duration
+  $ai_total_cost_usd: number; // Calculated cost
   operation: string; // e.g., "generateCv", "parseCvText"
 }
 ```
