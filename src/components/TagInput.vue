@@ -77,7 +77,10 @@ const handleAdd = () => {
 
   if (tokens.length === 0) return;
 
-  const updated = props.single ? [tokens[0]] : [...props.modelValue, ...tokens];
+  const firstToken = tokens[0];
+  if (!firstToken) return;
+
+  const updated = props.single ? [firstToken] : [...props.modelValue, ...tokens];
   emit('update:modelValue', updated);
   inputValue.value = '';
 };
