@@ -22,6 +22,7 @@ function handleFileChange(file: File | null | undefined) {
   <UCard>
     <div class="space-y-4">
       <UFileUpload
+        v-if="!selectedFile"
         :model-value="selectedFile"
         :label="t('cvUpload.dropzoneText')"
         :description="t('cvUpload.dropzoneHint')"

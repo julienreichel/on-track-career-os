@@ -304,7 +304,7 @@ provide(profileFormContextKey, {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 pb-24">
     <UCard>
       <template #header>
         <h2 class="text-lg font-semibold">{{ t('onboarding.steps.profileBasics.title') }}</h2>
@@ -337,15 +337,24 @@ provide(profileFormContextKey, {
       <ProfileSectionProfessionalAttributes />
     </template>
 
-    <div class="flex flex-col gap-3 sm:flex-row sm:justify-between">
-      <UButton variant="ghost" color="neutral" :label="t('common.back')" @click="emit('back')" />
-      <UButton
-        color="primary"
-        :label="t('onboarding.actions.continue')"
-        :loading="loading"
-        :disabled="loading || profileLoading"
-        @click="handleSave"
-      />
-    </div>
+    <UCard class="sticky bottom-0 z-10">
+      <template #footer>
+        <div class="flex items-center justify-between gap-2">
+          <UButton
+            variant="ghost"
+            color="neutral"
+            :label="t('common.back')"
+            @click="emit('back')"
+          />
+          <UButton
+            color="primary"
+            :label="t('onboarding.actions.continue')"
+            :loading="loading"
+            :disabled="loading || profileLoading"
+            @click="handleSave"
+          />
+        </div>
+      </template>
+    </UCard>
   </div>
 </template>

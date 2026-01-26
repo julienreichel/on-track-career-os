@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
 import CvExperiencesPreview from '@/components/cv/ExperiencesPreview.vue';
 import CvProfilePreview from '@/components/cv/ProfilePreview.vue';
 import type { ExtractedExperience } from '@/domain/ai-operations/Experience';
@@ -20,19 +19,14 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
-const router = useRouter();
 
 const MIN_EXPERIENCE_COUNT = 3;
 const experienceCount = computed(() => props.experiences.length);
 const hasEnoughExperiences = computed(() => experienceCount.value >= MIN_EXPERIENCE_COUNT);
-
-const handleAddManual = () => {
-  void router.push('/profile/experiences/new');
-};
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 pb-24">
     <UCard>
       <template #header>
         <h2 class="text-lg font-semibold">{{ t('onboarding.steps.experienceReview.title') }}</h2>
@@ -57,26 +51,26 @@ const handleAddManual = () => {
 
     <CvExperiencesPreview :experiences="experiences" />
 
-    <CvProfilePreview v-if="profile" :profile="profile" />
+    <CvProfilePreview v-if="profile" :profile="profile" editable />
 
-    <div class="flex flex-col gap-3 sm:flex-row sm:justify-between">
-      <UButton variant="ghost" color="neutral" :label="t('common.back')" @click="emit('back')" />
-      <div class="flex flex-col gap-2 sm:flex-row">
-        <UButton
-          v-if="!hasEnoughExperiences"
-          variant="outline"
-          color="neutral"
-          :label="t('onboarding.steps.experienceReview.addManual')"
-          @click="handleAddManual"
-        />
-        <UButton
-          color="primary"
-          :label="t('onboarding.steps.experienceReview.import')"
-          :loading="isProcessing"
-          :disabled="isProcessing || experiences.length === 0"
-          @click="emit('importExperiences')"
-        />
-      </div>
-    </div>
+    <UCard class="sticky bottom-0 z-10">
+      <template #footer>
+        <div class="flex items-center justify-between gap-2">
+          <UButton
+            variant="ghost"
+            color="neutral"
+            :label="t('common.back')"
+            @click="emit('back')"
+          />
+          <UButton
+            color="primary"
+            :label="t('onboarding.steps.experienceReview.import')"
+            :loading="isProcessing"
+            :disabled="isProcessing || experiences.length === 0"
+            @click="emit('importExperiences')"
+          />
+        </div>
+      </template>
+    </UCard>
   </div>
 </template>
