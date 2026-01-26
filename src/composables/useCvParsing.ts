@@ -14,6 +14,7 @@ PDFParse.setWorker(
  * Composable for parsing CV files
  * Handles file reading, text extraction, and AI parsing
  */
+// eslint-disable-next-line max-lines-per-function
 export function useCvParsing() {
   const { t } = useI18n();
   const aiOps = useAiOperations();
@@ -127,6 +128,21 @@ export function useCvParsing() {
     }
   }
 
+  function updateProfileField(
+    field: keyof ParseCvTextOutput['profile'],
+    value: string | undefined
+  ) {
+    if (extractedProfile.value) {
+      extractedProfile.value[field] = (value || undefined) as never;
+    }
+  }
+
+  function updateProfileArrayField(field: keyof ParseCvTextOutput['profile'], value: string[]) {
+    if (extractedProfile.value) {
+      extractedProfile.value[field] = value as never;
+    }
+  }
+
   function reset() {
     extractedText.value = '';
     extractedExperiences.value = [];
@@ -143,6 +159,8 @@ export function useCvParsing() {
     removeExperience,
     removeProfileField,
     removeProfileArrayItem,
+    updateProfileField,
+    updateProfileArrayField,
     reset,
   };
 }

@@ -6,13 +6,16 @@ const { t } = useI18n();
 
 interface Props {
   profile: ParseCvTextOutput['profile'];
+  editable?: boolean;
 }
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  editable: false,
+});
 
 const emit = defineEmits<{
-  removeField: [field: keyof ParseCvTextOutput['profile']];
-  removeArrayItem: [field: keyof ParseCvTextOutput['profile'], index: number];
+  updateField: [field: keyof ParseCvTextOutput['profile'], value: string | undefined];
+  updateArrayField: [field: keyof ParseCvTextOutput['profile'], value: string[]];
 }>();
 
 function hasProfileData(profile: ParseCvTextOutput['profile']): boolean {
@@ -28,6 +31,19 @@ function hasProfileData(profile: ParseCvTextOutput['profile']): boolean {
     (profile.languages && profile.languages.length > 0)
   );
 }
+
+function asSingleValue(value?: string | null): string[] {
+  return value ? [value] : [];
+}
+
+function handleSingleFieldUpdate(field: keyof ParseCvTextOutput['profile'], value: string[]): void {
+  const nextValue = value[0]?.trim();
+  emit('updateField', field, nextValue ? nextValue : undefined);
+}
+
+function handleArrayFieldUpdate(field: keyof ParseCvTextOutput['profile'], value: string[]): void {
+  emit('updateArrayField', field, value);
+}
 </script>
 
 <template>
@@ -40,68 +56,94 @@ function hasProfileData(profile: ParseCvTextOutput['profile']): boolean {
 
     <div class="space-y-4">
       <!-- Single value fields -->
-      <CvSingleBadge
+      <TagInput
         v-if="profile.fullName"
         :label="t('cvUpload.profile.fullName')"
-        :value="profile.fullName"
-        @remove="emit('removeField', 'fullName')"
+        :placeholder="props.editable ? t('cvUpload.profile.fullName') : ''"
+        :model-value="asSingleValue(profile.fullName)"
+        :single="true"
+        :editable="props.editable"
+        color="neutral"
+        @update:model-value="(value) => handleSingleFieldUpdate('fullName', value)"
       />
 
-      <CvSingleBadge
+      <TagInput
         v-if="profile.headline"
         :label="t('cvUpload.profile.headline')"
-        :value="profile.headline"
-        @remove="emit('removeField', 'headline')"
+        :placeholder="props.editable ? t('cvUpload.profile.headline') : ''"
+        :model-value="asSingleValue(profile.headline)"
+        :single="true"
+        :editable="props.editable"
+        color="neutral"
+        @update:model-value="(value) => handleSingleFieldUpdate('headline', value)"
       />
 
-      <CvSingleBadge
+      <TagInput
         v-if="profile.location"
         :label="t('cvUpload.profile.location')"
-        :value="profile.location"
-        @remove="emit('removeField', 'location')"
+        :placeholder="props.editable ? t('cvUpload.profile.location') : ''"
+        :model-value="asSingleValue(profile.location)"
+        :single="true"
+        :editable="props.editable"
+        color="neutral"
+        @update:model-value="(value) => handleSingleFieldUpdate('location', value)"
       />
 
-      <CvSingleBadge
+      <TagInput
         v-if="profile.seniorityLevel"
         :label="t('cvUpload.profile.seniorityLevel')"
-        :value="profile.seniorityLevel"
-        @remove="emit('removeField', 'seniorityLevel')"
+        :placeholder="props.editable ? t('cvUpload.profile.seniorityLevel') : ''"
+        :model-value="asSingleValue(profile.seniorityLevel)"
+        :single="true"
+        :editable="props.editable"
+        color="neutral"
+        @update:model-value="(value) => handleSingleFieldUpdate('seniorityLevel', value)"
       />
 
       <!-- Array fields -->
-      <CvBadgeList
+      <TagInput
         v-if="profile.aspirations && profile.aspirations.length > 0"
         :label="t('cvUpload.profile.aspirations')"
-        :items="profile.aspirations"
-        @remove="(index: number) => emit('removeArrayItem', 'aspirations', index)"
+        :model-value="profile.aspirations ?? []"
+        :editable="props.editable"
+        color="neutral"
+        @update:model-value="(value) => handleArrayFieldUpdate('aspirations', value)"
       />
 
-      <CvBadgeList
+      <TagInput
         v-if="profile.personalValues && profile.personalValues.length > 0"
         :label="t('cvUpload.profile.personalValues')"
-        :items="profile.personalValues"
-        @remove="(index: number) => emit('removeArrayItem', 'personalValues', index)"
+        :model-value="profile.personalValues ?? []"
+        :editable="props.editable"
+        color="neutral"
+        @update:model-value="(value) => handleArrayFieldUpdate('personalValues', value)"
       />
 
-      <CvBadgeList
+      <TagInput
         v-if="profile.strengths && profile.strengths.length > 0"
         :label="t('cvUpload.profile.strengths')"
-        :items="profile.strengths"
-        @remove="(index: number) => emit('removeArrayItem', 'strengths', index)"
+        :model-value="profile.strengths ?? []"
+        :editable="props.editable"
+        color="neutral"
+        @update:model-value="(value) => handleArrayFieldUpdate('strengths', value)"
       />
 
-      <CvBadgeList
+      <TagInput
         v-if="profile.interests && profile.interests.length > 0"
         :label="t('cvUpload.profile.interests')"
-        :items="profile.interests"
-        @remove="(index: number) => emit('removeArrayItem', 'interests', index)"
+        :model-value="profile.interests ?? []"
+        :editable="props.editable"
+        color="neutral"
+        @update:model-value="(value) => handleArrayFieldUpdate('interests', value)"
       />
 
-      <CvBadgeList
+      <TagInput
         v-if="profile.languages && profile.languages.length > 0"
         :label="t('cvUpload.profile.languages')"
-        :items="profile.languages"
-        @remove="(index: number) => emit('removeArrayItem', 'languages', index)"
+        :model-value="profile.languages ?? []"
+        :editable="props.editable"
+        color="neutral"
+        @update:model-value="(value) => handleArrayFieldUpdate('languages', value)"
       />
     </div>
   </UCard>

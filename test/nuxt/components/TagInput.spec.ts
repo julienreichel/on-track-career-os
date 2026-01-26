@@ -63,6 +63,28 @@ describe('TagInput', () => {
     expect(input.attributes('placeholder')).toBe('Enter value');
   });
 
+  it('shows a single tag when single mode is set', async () => {
+    const wrapper = mount(TagInput, {
+      ...i18n,
+      global: {
+        ...i18n.global,
+        stubs,
+      },
+      props: {
+        modelValue: ['Only One'],
+        label: 'Tags',
+        single: true,
+      },
+    });
+
+    expect(wrapper.find('input').exists()).toBe(false);
+    expect(wrapper.text()).toContain('Only One');
+    expect(wrapper.findAll('button')).toHaveLength(1);
+
+    await wrapper.find('button').trigger('click');
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([[]]);
+  });
+
   it('hides input and remove buttons when not editable', () => {
     const wrapper = mount(TagInput, {
       ...i18n,

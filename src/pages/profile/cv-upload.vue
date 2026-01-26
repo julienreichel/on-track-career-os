@@ -125,8 +125,9 @@ function viewExperiences() {
           <CvProfilePreview
             v-if="parsing.extractedProfile.value"
             :profile="parsing.extractedProfile.value"
-            @remove-field="parsing.removeProfileField"
-            @remove-array-item="parsing.removeProfileArrayItem"
+            :editable="true"
+            @update-field="parsing.updateProfileField"
+            @update-array-field="parsing.updateProfileArrayField"
           />
 
           <!-- Actions -->

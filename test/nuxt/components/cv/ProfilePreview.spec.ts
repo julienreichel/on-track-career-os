@@ -13,17 +13,11 @@ const stubs = {
     name: 'UCard',
     template: '<div class="u-card"><slot name="header" /><slot /></div>',
   },
-  CvSingleBadge: {
-    name: 'CvSingleBadge',
-    template: '<div class="cv-single-badge">{{ label }}: {{ value }}</div>',
-    props: ['label', 'value'],
-    emits: ['remove'],
-  },
-  CvBadgeList: {
-    name: 'CvBadgeList',
-    template: '<div class="cv-badge-list">{{ label }}: {{ items.join(", ") }}</div>',
-    props: ['label', 'items'],
-    emits: ['remove'],
+  TagInput: {
+    name: 'TagInput',
+    template: '<div class="tag-input">{{ modelValue?.join(", ") }}</div>',
+    props: ['label', 'modelValue', 'editable'],
+    emits: ['update:modelValue'],
   },
 };
 
@@ -72,24 +66,27 @@ describe('ProfilePreview', () => {
     expect(wrapper.text()).toContain('Innovation, Collaboration');
   });
 
-  it('emits removeField event for single fields', async () => {
+  it('emits updateField event for single fields', async () => {
     const wrapper = createWrapper();
-    const singleBadges = wrapper.findAllComponents({ name: 'CvSingleBadge' });
+    const tagInputs = wrapper.findAllComponents({ name: 'TagInput' });
 
-    await singleBadges[0].vm.$emit('remove');
+    await tagInputs[0].vm.$emit('update:modelValue', ['New Name']);
 
-    expect(wrapper.emitted('removeField')).toBeTruthy();
-    expect(wrapper.emitted('removeField')?.[0]).toEqual(['fullName']);
+    expect(wrapper.emitted('updateField')).toBeTruthy();
+    expect(wrapper.emitted('updateField')?.[0]).toEqual(['fullName', 'New Name']);
   });
 
-  it('emits removeArrayItem event for array fields', async () => {
+  it('emits updateArrayField event for array fields', async () => {
     const wrapper = createWrapper();
-    const badgeLists = wrapper.findAllComponents({ name: 'CvBadgeList' });
+    const tagInputs = wrapper.findAllComponents({ name: 'TagInput' });
 
-    await badgeLists[0].vm.$emit('remove', 1);
+    await tagInputs[4].vm.$emit('update:modelValue', ['CTO', 'Chief Engineer']);
 
-    expect(wrapper.emitted('removeArrayItem')).toBeTruthy();
-    expect(wrapper.emitted('removeArrayItem')?.[0]).toEqual(['aspirations', 1]);
+    expect(wrapper.emitted('updateArrayField')).toBeTruthy();
+    expect(wrapper.emitted('updateArrayField')?.[0]).toEqual([
+      'aspirations',
+      ['CTO', 'Chief Engineer'],
+    ]);
   });
 
   it('does not render when profile has no data', () => {

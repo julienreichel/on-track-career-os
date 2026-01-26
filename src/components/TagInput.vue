@@ -12,6 +12,7 @@ interface Props {
   required?: boolean;
   disabled?: boolean;
   editable?: boolean;
+  single?: boolean;
   testId?: string;
 }
 
@@ -22,6 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
   required: false,
   disabled: false,
   editable: true,
+  single: false,
   testId: undefined,
 });
 
@@ -33,6 +35,11 @@ const attrs = useAttrs();
 const inputValue = ref('');
 const inputTestId = computed(() => (props.testId ? `${props.testId}-input` : undefined));
 const tagsTestId = computed(() => (props.testId ? `${props.testId}-tags` : undefined));
+const showInput = computed(() => {
+  if (!props.editable) return false;
+  if (!props.single) return true;
+  return props.modelValue.length === 0;
+});
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Enter') {
@@ -42,10 +49,11 @@ const handleKeydown = (event: KeyboardEvent) => {
 };
 
 const handleAdd = () => {
-  if (inputValue.value.trim()) {
-    emit('update:modelValue', [...props.modelValue, inputValue.value.trim()]);
-    inputValue.value = '';
-  }
+  const nextValue = inputValue.value.trim();
+  if (!nextValue) return;
+  const updated = props.single ? [nextValue] : [...props.modelValue, nextValue];
+  emit('update:modelValue', updated);
+  inputValue.value = '';
 };
 
 const handleRemove = (index: number) => {
@@ -59,7 +67,7 @@ const handleRemove = (index: number) => {
   <div v-bind="attrs" class="space-y-2">
     <UFormField :label="label" :hint="hint" :required="required">
       <UInput
-        v-if="editable"
+        v-if="showInput"
         v-model="inputValue"
         :placeholder="placeholder"
         :disabled="disabled"
