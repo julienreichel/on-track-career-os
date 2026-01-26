@@ -21,7 +21,7 @@ const companyLink = computed(() => (props.company ? `/companies/${props.company.
 <template>
   <div class="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-3">
     <template v-if="hasCompany">
-      <UBadge color="primary" variant="soft">
+      <UBadge color="neutral" variant="outline">
         {{ label }}
       </UBadge>
       <UButton

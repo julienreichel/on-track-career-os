@@ -175,7 +175,7 @@ onMounted(async () => {
             <div class="grid gap-4 sm:grid-cols-2">
               <div>
                 <p class="text-sm text-dimmed">{{ t('jobDetail.meta.status') }}</p>
-                <UBadge color="primary" variant="soft" class="mt-1">
+                <UBadge color="neutral" variant="outline" class="mt-1">
                   {{ jobStatus }}
                 </UBadge>
               </div>

@@ -73,12 +73,12 @@ const cancelDelete = () => {
     </div>
 
     <!-- Badges -->
-    <template #headerBadges>
-      <UBadge v-if="hasAchievements" color="primary" variant="subtle" size="xs">
+    <template #badges>
+      <UBadge v-if="hasAchievements" color="secondary" variant="outline" size="xs">
         <UIcon name="i-heroicons-trophy" class="w-3 h-3 mr-1" />
         {{ achievementCount }}
       </UBadge>
-      <UBadge v-if="hasKpis" color="primary" variant="subtle" size="xs">
+      <UBadge v-if="hasKpis" color="secondary" variant="outline" size="xs">
         <UIcon name="i-heroicons-chart-bar" class="w-3 h-3 mr-1" />
         {{ kpiCount }}
       </UBadge>

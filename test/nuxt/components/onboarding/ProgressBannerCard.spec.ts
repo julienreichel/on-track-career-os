@@ -8,6 +8,7 @@ const i18n = createTestI18n();
 const stubs = {
   UCard: { template: '<div class="u-card"><slot /></div>' },
   UBadge: { template: '<span class="u-badge"><slot /></span>' },
+  UIcon: { template: '<span class="u-icon"></span>', props: ['name'] },
   UButton: {
     props: ['label', 'to'],
     template: '<button class="u-button">{{ label }}</button>',

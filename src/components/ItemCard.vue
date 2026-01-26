@@ -66,9 +66,9 @@ const handleDelete = (event: Event) => {
         <div v-if="subtitle" class="text-sm font-medium text-gray-700 dark:text-gray-300">
           {{ subtitle }}
         </div>
-        <!-- Optional Header Badges Slot -->
-        <div v-if="slots.headerBadges" class="flex items-center gap-2">
-          <slot name="headerBadges" />
+        <!-- Optional Badges Slot -->
+        <div v-if="slots.badges" class="flex items-center gap-2">
+          <slot name="badges" />
         </div>
       </div>
     </template>
@@ -80,11 +80,6 @@ const handleDelete = (event: Event) => {
 
     <template #footer>
       <div class="space-y-3">
-        <!-- Optional Badges Slot -->
-        <div v-if="slots.badges" class="flex items-center gap-2">
-          <slot name="badges" />
-        </div>
-
         <!-- Action Buttons Row -->
         <div class="flex items-center justify-between gap-2">
           <!-- Left Side Actions -->

@@ -17,6 +17,10 @@ const stubs = {
     template: '<span class="u-badge"><slot /></span>',
     props: ['color', 'variant'],
   },
+  UIcon: {
+    template: '<span class="u-icon"></span>',
+    props: ['name'],
+  },
 };
 
 describe('ProfileSummaryCard', () => {

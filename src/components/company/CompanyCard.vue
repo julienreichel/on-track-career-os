@@ -64,15 +64,6 @@ function handleDelete() {
       </div>
     </div>
 
-    <template #badges>
-      <UBadge v-if="company.productsServices?.length" color="primary" variant="soft" size="xs">
-        {{ t('companies.card.products', { count: company.productsServices.length }) }}
-      </UBadge>
-      <UBadge v-if="company.targetMarkets?.length" color="neutral" variant="soft" size="xs">
-        {{ t('companies.card.markets', { count: company.targetMarkets.length }) }}
-      </UBadge>
-    </template>
-
     <template #actions>
       <UButton
         :label="t('common.view')"

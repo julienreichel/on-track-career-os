@@ -15,6 +15,10 @@ const stubs = {
   UBadge: {
     template: '<span class="u-badge"><slot /></span>',
   },
+  UIcon: {
+    template: '<span class="u-icon"></span>',
+    props: ['name'],
+  },
   TagInput: {
     template: '<div class="tag-input"><slot /></div>',
     props: ['modelValue', 'label', 'testId'],

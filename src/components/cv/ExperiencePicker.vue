@@ -54,14 +54,12 @@
               {{ formatDateRange(experience.startDate, experience.endDate) }}
             </div>
             <div v-if="experience.experienceType" class="mt-2">
-              <UBadge
-                :label="
+              <UBadge size="xs" color="neutral" variant="outline">
+                <UIcon name="i-heroicons-briefcase" class="w-3 h-3 mr-1" />
+                {{
                   $t(`experiences.types.${experience.experienceType}`, experience.experienceType)
-                "
-                size="xs"
-                color="neutral"
-                variant="subtle"
-              />
+                }}
+              </UBadge>
             </div>
           </div>
         </div>

@@ -45,9 +45,9 @@ const description = computed(() => {
 const statusBadge = computed(() => {
   const status = props.experience.status || 'draft';
   return {
-    color: status === 'complete' ? 'success' : 'neutral',
+    color: status === 'complete' ? 'info' : 'neutral',
     label: status === 'complete' ? t('experiences.status.complete') : t('experiences.status.draft'),
-  };
+  } as const;
 });
 
 const hasStories = computed(() => (props.storyCount ?? 0) > 0);
@@ -105,16 +105,17 @@ function getTextContent(input: string | string[] | null | undefined) {
         </p>
       </div>
 
-      <template #headerBadges>
-        <UBadge color="primary" variant="subtle" size="xs">
+      <template #badges>
+        <UBadge color="neutral" variant="outline" size="xs">
           <UIcon name="i-heroicons-briefcase" class="w-3 h-3 mr-1" />
           {{ t(`experiences.types.${experience.experienceType || 'work'}`) }}
         </UBadge>
-        <UBadge v-if="hasStories" color="primary" variant="subtle" size="xs">
+        <UBadge v-if="hasStories" color="secondary" variant="outline" size="xs">
           <UIcon name="i-heroicons-document-text" class="w-3 h-3 mr-1" />
           {{ storyCount }}
         </UBadge>
-        <UBadge color="neutral" variant="soft" size="xs">
+        <UBadge :color="statusBadge.color" variant="outline" size="xs">
+          <UIcon name="i-heroicons-clipboard-document-check" class="w-3 h-3 mr-1" />
           {{ statusBadge.label }}
         </UBadge>
       </template>

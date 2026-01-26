@@ -17,11 +17,11 @@ const emit = defineEmits<{
     <UBadge color="primary" variant="subtle" class="group">
       <span>{{ value }}</span>
       <UButton
-        icon="i-lucide-x"
+        icon="i-heroicons-x-mark-20-solid"
         size="xs"
-        color="error"
-        variant="ghost"
-        class="ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
+        color="primary"
+        variant="link"
+        :padded="false"
         @click="emit('remove')"
       />
     </UBadge>

@@ -33,6 +33,10 @@ const stubs = {
     template: '<span class="badge"><slot /></span>',
     props: ['color', 'variant'],
   },
+  UIcon: {
+    template: '<span class="u-icon"></span>',
+    props: ['name'],
+  },
   UButton: {
     template: '<button v-bind="$attrs" @click="$attrs.onClick || (() => {})"><slot /></button>',
     props: ['icon', 'size', 'color', 'variant', 'padded'],

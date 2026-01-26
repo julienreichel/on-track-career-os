@@ -166,6 +166,10 @@ const stubs = {
   UBadge: {
     template: '<span class="u-badge"><slot /></span>',
   },
+  UIcon: {
+    template: '<span class="u-icon"></span>',
+    props: ['name'],
+  },
   UButton: {
     props: ['label', 'disabled', 'loading'],
     emits: ['click'],

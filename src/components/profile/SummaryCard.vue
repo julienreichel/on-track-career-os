@@ -27,9 +27,6 @@
           <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
             {{ t('profile.summary.careerDirection') }}
           </p>
-          <UBadge v-if="profile?.seniorityLevel" color="primary" variant="soft">
-            {{ profile.seniorityLevel }}
-          </UBadge>
         </div>
         <p v-if="careerDirectionSummary.length === 0" class="text-sm text-gray-500 mt-2">
           {{ t('profile.summary.careerDirectionEmpty') }}

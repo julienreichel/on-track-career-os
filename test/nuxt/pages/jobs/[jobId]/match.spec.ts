@@ -115,6 +115,7 @@ const stubs = {
     `,
   },
   UBadge: { template: '<span class="u-badge"><slot /></span>' },
+  UIcon: { template: '<span class="u-icon"></span>', props: ['name'] },
   USkeleton: { template: '<div class="u-skeleton"></div>' },
   UEmpty: {
     props: ['title'],

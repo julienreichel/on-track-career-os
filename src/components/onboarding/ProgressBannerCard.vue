@@ -26,9 +26,6 @@ const primary = computed(() => props.nextAction.primary);
           {{ phaseLabel }}
         </h2>
       </div>
-      <UBadge color="primary" variant="soft">
-        {{ t('progress.nextActionLabel') }}
-      </UBadge>
     </div>
 
     <div class="space-y-2">

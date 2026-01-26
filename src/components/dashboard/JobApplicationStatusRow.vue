@@ -11,7 +11,8 @@ const { t } = useI18n();
 
 const companyLabel = computed(() => props.state.companyName || '-');
 
-const matchTone = computed(() => (props.state.matchStatus === 'ready' ? 'success' : 'warning'));
+const matchTone = computed(() => (props.state.matchStatus === 'ready' ? 'secondary' : 'warning'));
+
 const jobLink = computed(() => `/jobs/${props.state.jobId}`);
 
 const materialItems = computed(() => [
@@ -38,7 +39,7 @@ const materialItems = computed(() => [
     <template #header>
       <div>
         <h3 class="truncate">{{ state.title }}</h3>
-        <UBadge :color="matchTone" variant="soft">
+        <UBadge :color="matchTone" variant="outline">
           {{ t(state.matchLabelKey, state.matchLabelParams ?? {}) }}
         </UBadge>
         <p class="truncate">{{ companyLabel }}</p>

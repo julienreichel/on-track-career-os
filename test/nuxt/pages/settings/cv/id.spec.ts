@@ -95,6 +95,7 @@ const stubs = {
   },
   UAlert: { template: '<div class="u-alert"><slot /></div>' },
   UBadge: { template: '<span class="u-badge"><slot /></span>' },
+  UIcon: { template: '<span class="u-icon"></span>', props: ['name'] },
   UButton: {
     props: ['label', 'disabled'],
     emits: ['click'],

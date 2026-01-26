@@ -13,7 +13,7 @@ const { t } = useI18n();
   <UTooltip :text="t(props.badge.descriptionKey)">
     <UBadge
       color="neutral"
-      variant="subtle"
+      variant="outline"
       class="flex items-center gap-2 cursor-help"
       :data-testid="`badge-pill-${props.badge.id}`"
     >

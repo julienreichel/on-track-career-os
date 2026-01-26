@@ -13,6 +13,11 @@ const stubs = {
     template: '<span class="u-badge"><slot /></span>',
     props: ['color', 'variant'],
   },
+  UIcon: {
+    name: 'UIcon',
+    template: '<span class="u-icon"></span>',
+    props: ['name'],
+  },
   UButton: {
     name: 'UButton',
     template: '<button class="u-button" @click="$attrs.onClick"><slot /></button>',

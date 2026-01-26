@@ -11,7 +11,7 @@
             <p class="text-4xl font-bold text-highlighted">{{ overallScore }}</p>
             <p class="text-sm text-dimmed">/100</p>
           </div>
-          <UBadge :color="recommendationColor" variant="soft" class="mt-2" size="lg">
+          <UBadge :color="recommendationColor" variant="outline" class="mt-2" size="lg">
             {{ recommendationLabel }}
           </UBadge>
         </div>
@@ -82,7 +82,13 @@
           :key="`skill-${idx}`"
           class="flex items-start gap-2 text-sm"
         >
-          <UBadge :color="getSkillTagColor(item)" variant="soft" size="xs" class="mt-0.5 shrink-0">
+          <UBadge
+            :color="getSkillTagColor(item)"
+            variant="outline"
+            size="xs"
+            class="mt-0.5 shrink-0"
+          >
+            <UIcon name="i-heroicons-tag" class="w-3 h-3 mr-1" />
             {{ getSkillTag(item) }}
           </UBadge>
           <span class="leading-snug text-default">{{ getSkillText(item) }}</span>
@@ -123,7 +129,8 @@
             :key="`impact-${idx}`"
             class="flex items-start gap-2 text-sm text-default"
           >
-            <UBadge color="primary" variant="solid" class="mt-0.5 shrink-0">
+            <UBadge color="neutral" variant="outline" class="mt-0.5 shrink-0">
+              <UIcon name="i-heroicons-hashtag" class="w-3 h-3 mr-1" />
               {{ idx + 1 }}
             </UBadge>
             <span class="leading-snug">{{ item }}</span>
@@ -218,13 +225,26 @@ const scoreBreakdownItems = computed(() => [
 const recommendationColor = computed(() => {
   switch (props.recommendation) {
     case 'apply':
-      return 'success';
+      return 'secondary';
     case 'maybe':
       return 'warning';
     case 'skip':
       return 'error';
     default:
       return 'neutral';
+  }
+});
+
+const recommendationIcon = computed(() => {
+  switch (props.recommendation) {
+    case 'apply':
+      return 'i-heroicons-check-circle';
+    case 'maybe':
+      return 'i-heroicons-exclamation-triangle';
+    case 'skip':
+      return 'i-heroicons-x-circle';
+    default:
+      return 'i-heroicons-minus-circle';
   }
 });
 
@@ -241,13 +261,11 @@ function getSkillText(item: string): string {
   return item.replace(/^\[\w+\]\s*/, '');
 }
 
-function getSkillTagColor(
-  item: string
-): 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral' {
-  if (item.startsWith('[MATCH]')) return 'success';
+function getSkillTagColor(item: string): 'secondary' | 'warning' | 'error' | 'neutral' {
+  if (item.startsWith('[MATCH]')) return 'secondary';
   if (item.startsWith('[PARTIAL]')) return 'warning';
   if (item.startsWith('[MISSING]')) return 'error';
-  if (item.startsWith('[OVER]')) return 'primary';
+  if (item.startsWith('[OVER]')) return 'neutral';
   return 'neutral';
 }
 

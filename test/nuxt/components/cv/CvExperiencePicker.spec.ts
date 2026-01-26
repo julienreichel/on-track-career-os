@@ -46,7 +46,7 @@ const stubs = {
     props: ['modelValue'],
   },
   UBadge: {
-    template: '<span class="badge">{{ label }}</span>',
+    template: '<span class="badge"><slot>{{ label }}</slot></span>',
     props: ['label', 'size', 'color', 'variant'],
   },
 };

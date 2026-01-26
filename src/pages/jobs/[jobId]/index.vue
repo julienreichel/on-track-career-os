@@ -560,7 +560,7 @@ function redirectToCompanyCreate() {
                     <p class="text-sm text-gray-500">
                       {{ t('jobDetail.meta.status') }}
                     </p>
-                    <UBadge color="primary" variant="soft" class="mt-1">
+                    <UBadge color="neutral" variant="outline" class="mt-1">
                       {{ statusLabel }}
                     </UBadge>
                   </div>
@@ -677,7 +677,8 @@ function redirectToCompanyCreate() {
                 </UFormField>
                 <div class="grid gap-4 sm:grid-cols-2">
                   <UFormField :label="t('jobDetail.meta.status')">
-                    <UBadge color="primary" variant="soft">
+                    <UBadge color="neutral" variant="outline">
+                      <UIcon name="i-heroicons-briefcase" class="w-3 h-3 mr-1" />
                       {{ statusLabel }}
                     </UBadge>
                   </UFormField>

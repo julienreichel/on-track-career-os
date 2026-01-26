@@ -24,7 +24,8 @@
         />
 
         <div class="flex items-center gap-2 mb-6">
-          <UBadge v-if="isDefault" color="primary" variant="soft">
+          <UBadge v-if="isDefault" color="secondary" variant="outline">
+            <UIcon name="i-heroicons-star" class="w-3 h-3 mr-1" />
             {{ t('cvTemplates.labels.default') }}
           </UBadge>
         </div>
