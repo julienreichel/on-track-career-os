@@ -66,6 +66,10 @@ const handleDelete = (event: Event) => {
         <div v-if="subtitle" class="text-sm font-medium text-gray-700 dark:text-gray-300">
           {{ subtitle }}
         </div>
+        <!-- Optional Header Badges Slot -->
+        <div v-if="slots.headerBadges" class="flex items-center gap-2">
+          <slot name="headerBadges" />
+        </div>
       </div>
     </template>
 

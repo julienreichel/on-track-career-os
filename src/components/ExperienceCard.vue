@@ -105,7 +105,7 @@ function getTextContent(input: string | string[] | null | undefined) {
         </p>
       </div>
 
-      <template #badges>
+      <template #headerBadges>
         <UBadge color="primary" variant="subtle" size="xs">
           <UIcon name="i-heroicons-briefcase" class="w-3 h-3 mr-1" />
           {{ t(`experiences.types.${experience.experienceType || 'work'}`) }}
