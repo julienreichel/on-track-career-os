@@ -52,7 +52,7 @@ function handleDelete() {
     data-testid="company-card"
     :title="title"
     :subtitle="subtitle"
-    @edit="handleOpen"
+    @view="handleOpen"
     @delete="handleDelete"
   >
     <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300">

@@ -71,7 +71,7 @@
             :key="cv.id"
             :title="cv.name || $t('cvList.untitled')"
             :subtitle="formatListDate(cv.updatedAt ?? cv.createdAt)"
-            @edit="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
+            @view="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
             @delete="confirmDelete(cv)"
           >
             <!-- CV Info Content -->

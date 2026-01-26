@@ -42,8 +42,8 @@ const hasKpis = computed(() => (props.story.kpiSuggestions?.length || 0) > 0);
 const achievementCount = computed(() => props.story.achievements?.length || 0);
 const kpiCount = computed(() => props.story.kpiSuggestions?.length || 0);
 
-const handleView = (event: Event) => {
-  event.stopPropagation();
+const handleView = (event?: Event) => {
+  event?.stopPropagation();
   emit('view', props.story);
 };
 
@@ -66,7 +66,13 @@ const cancelDelete = () => {
 </script>
 
 <template>
-  <ItemCard :title="headerTitle" :subtitle="subtitle" @edit="handleEdit" @delete="handleDelete">
+  <ItemCard
+    :title="headerTitle"
+    :subtitle="subtitle"
+    @view="handleView"
+    @edit="handleEdit"
+    @delete="handleDelete"
+  >
     <!-- Preview Text Content -->
     <div class="text-sm text-gray-700 dark:text-gray-300 line-clamp-4">
       {{ preview }}

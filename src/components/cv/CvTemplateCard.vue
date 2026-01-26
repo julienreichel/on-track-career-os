@@ -53,6 +53,17 @@ const resolvedDefaultLabel = computed(() => {
   return label || t('cvTemplates.labels.default');
 });
 const updatedLabel = computed(() => t('cvTemplates.labels.updated'));
+
+const handleView = () => {
+  if (props.primaryActionLabel) {
+    emit('primary');
+    return;
+  }
+
+  if (props.secondaryActionLabel) {
+    emit('secondary');
+  }
+};
 </script>
 
 <template>
@@ -61,6 +72,7 @@ const updatedLabel = computed(() => t('cvTemplates.labels.updated'));
       :title="name"
       :subtitle="description"
       :show-delete="showDelete"
+      @view="handleView"
       @delete="emit('delete')"
     >
       <p v-if="updatedAt" class="text-xs text-dimmed">{{ updatedLabel }} {{ updatedAt }}</p>

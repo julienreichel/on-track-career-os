@@ -9,13 +9,14 @@ const stubs = {
   ItemCard: {
     name: 'ItemCard',
     props: ['title', 'subtitle', 'showDelete'],
-    emits: ['edit', 'delete'],
+    emits: ['view', 'edit', 'delete'],
     template: `
       <div class="item-card">
         <slot />
         <slot name="badges" />
         <slot name="actions" />
         <button class="edit" @click="$emit('edit')">edit</button>
+        <button class="view" @click="$emit('view')">view</button>
         <button v-if="showDelete !== false" class="delete" @click="$emit('delete')">delete</button>
       </div>
     `,
@@ -71,10 +72,10 @@ describe('JobCard', () => {
     expect(itemCard.props('subtitle')).toBe('Senior');
   });
 
-  it('emits open event when edit action triggered', async () => {
+  it('emits open event when view action triggered', async () => {
     const wrapper = createWrapper();
     const itemCard = wrapper.findComponent(stubs.ItemCard as any);
-    await itemCard.vm.$emit('edit');
+    await itemCard.vm.$emit('view');
 
     expect(wrapper.emitted('open')).toBeTruthy();
     expect(wrapper.emitted('open')?.[0]).toEqual(['job-1']);

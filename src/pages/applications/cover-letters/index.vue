@@ -63,7 +63,7 @@
             :key="letter.id"
             :title="resolveTitle(letter)"
             :subtitle="resolveSubtitle(letter)"
-            @edit="navigateTo({ name: 'applications-cover-letters-id', params: { id: letter.id } })"
+            @view="navigateTo({ name: 'applications-cover-letters-id', params: { id: letter.id } })"
             @delete="confirmDelete(letter)"
           >
             <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">

@@ -39,7 +39,7 @@ function handleDelete() {
     :title="title"
     :subtitle="subtitle"
     :show-delete="props.showDelete !== false"
-    @edit="handleOpen"
+    @view="handleOpen"
     @delete="handleDelete"
   >
     <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
