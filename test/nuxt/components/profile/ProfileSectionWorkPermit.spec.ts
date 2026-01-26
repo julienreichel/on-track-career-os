@@ -15,10 +15,10 @@ const stubs = {
   UFormField: {
     template: '<div class="u-form-field"><slot /></div>',
   },
-  UTextarea: {
+  UInput: {
     template:
-      '<textarea class="u-textarea" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
-    props: ['modelValue', 'rows', 'placeholder'],
+      '<input class="u-input" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+    props: ['modelValue', 'placeholder'],
   },
 };
 
@@ -63,9 +63,9 @@ describe('ProfileSectionWorkPermit', () => {
     expect(wrapper.text()).toContain('Swiss Citizen');
   });
 
-  it('renders textarea in edit mode', () => {
+  it('renders input in edit mode', () => {
     const wrapper = mountSection(true);
-    expect(wrapper.find('.u-textarea').exists()).toBe(true);
+    expect(wrapper.find('.u-input').exists()).toBe(true);
   });
 
   it('shows empty message when no info', () => {

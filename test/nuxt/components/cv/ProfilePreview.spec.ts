@@ -15,7 +15,7 @@ const stubs = {
   },
   TagInput: {
     name: 'TagInput',
-    template: '<div class="tag-input">{{ modelValue?.join(", ") }}</div>',
+    template: '<div class="tag-input">{{ label }} {{ modelValue?.join(", ") }}</div>',
     props: ['label', 'modelValue', 'editable'],
     emits: ['update:modelValue'],
   },
