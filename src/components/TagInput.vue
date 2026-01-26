@@ -48,10 +48,36 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 };
 
+const handleBlur = () => {
+  handleAdd();
+};
+
 const handleAdd = () => {
-  const nextValue = inputValue.value.trim();
-  if (!nextValue) return;
-  const updated = props.single ? [nextValue] : [...props.modelValue, nextValue];
+  const rawValue = inputValue.value.trim();
+  if (!rawValue) return;
+
+  const colonIndex = rawValue.indexOf(':');
+  const splitSource =
+    colonIndex === -1
+      ? rawValue
+      : rawValue.slice(0, colonIndex).replace(/[;,]+$/, '').trim();
+  const suffix = colonIndex === -1 ? '' : rawValue.slice(colonIndex);
+  const tokens: string[] = splitSource
+    .split(/[;,]/)
+    .map((token) => token.trim())
+    .filter((token): token is string => Boolean(token));
+
+  if (colonIndex !== -1) {
+    if (tokens.length > 0) {
+      tokens[tokens.length - 1] = `${tokens[tokens.length - 1]}${suffix}`;
+    } else if (suffix.trim()) {
+      tokens.push(suffix.trim());
+    }
+  }
+
+  if (tokens.length === 0) return;
+
+  const updated = props.single ? [tokens[0]] : [...props.modelValue, ...tokens];
   emit('update:modelValue', updated);
   inputValue.value = '';
 };
@@ -74,6 +100,7 @@ const handleRemove = (index: number) => {
         class="w-xs"
         :data-testid="inputTestId"
         @keydown="handleKeydown"
+        @blur="handleBlur"
       />
     </UFormField>
     <div v-if="modelValue.length > 0" class="flex flex-wrap gap-2" :data-testid="tagsTestId">

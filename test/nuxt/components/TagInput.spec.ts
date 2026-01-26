@@ -149,6 +149,91 @@ describe('TagInput', () => {
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([['New Tag']]);
   });
 
+  it('adds a tag on blur', async () => {
+    const wrapper = mount(TagInput, {
+      ...i18n,
+      global: {
+        ...i18n.global,
+        stubs,
+      },
+      props: {
+        modelValue: [],
+        label: 'Tags',
+      },
+    });
+
+    const input = wrapper.find('input');
+    (wrapper.vm as any).inputValue = 'Blur Tag';
+    await wrapper.vm.$nextTick();
+    await input.trigger('blur');
+
+    expect(wrapper.emitted('update:modelValue')).toBeTruthy();
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([['Blur Tag']]);
+  });
+
+  it('splits tags on commas and semicolons', async () => {
+    const wrapper = mount(TagInput, {
+      ...i18n,
+      global: {
+        ...i18n.global,
+        stubs,
+      },
+      props: {
+        modelValue: [],
+        label: 'Tags',
+      },
+    });
+
+    const input = wrapper.find('input');
+    (wrapper.vm as any).inputValue = 'A,B;C';
+    await wrapper.vm.$nextTick();
+    await input.trigger('keydown', { key: 'Enter' });
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([['A', 'B', 'C']]);
+  });
+
+  it('does not split after a colon', async () => {
+    const wrapper = mount(TagInput, {
+      ...i18n,
+      global: {
+        ...i18n.global,
+        stubs,
+      },
+      props: {
+        modelValue: [],
+        label: 'Tags',
+      },
+    });
+
+    const input = wrapper.find('input');
+    (wrapper.vm as any).inputValue = 'X: A, B';
+    await wrapper.vm.$nextTick();
+    await input.trigger('keydown', { key: 'Enter' });
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([['X: A, B']]);
+  });
+
+  it('splits before a colon and keeps the rest together', async () => {
+    const wrapper = mount(TagInput, {
+      ...i18n,
+      global: {
+        ...i18n.global,
+        stubs,
+      },
+      props: {
+        modelValue: [],
+        label: 'Tags',
+      },
+    });
+
+    const input = wrapper.find('input');
+    (wrapper.vm as any).inputValue = 'X, A:b,c';
+    await wrapper.vm.$nextTick();
+    await input.trigger('keydown', { key: 'Enter' });
+
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([['X', 'A:b,c']]);
+  });
+
   it('clears input after adding a tag', async () => {
     const wrapper = mount(TagInput, {
       ...i18n,
