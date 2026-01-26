@@ -22,7 +22,8 @@ function hasProfessionalAttributes(profile: ProgressInputs['profile']): boolean 
 function hasProfileDepth(profile: ProgressInputs['profile']): boolean {
   const aspirations = profile?.aspirations ?? [];
   const personalValues = profile?.personalValues ?? [];
-  return aspirations.length > 0 && personalValues.length > 0;
+  const socialLinks = profile?.socialLinks ?? [];
+  return socialLinks.length > 0 && aspirations.length > 0 && personalValues.length > 0;
 }
 
 function computePhase1(input: ProgressInputs): ProgressCheckResult {
@@ -31,8 +32,6 @@ function computePhase1(input: ProgressInputs): ProgressCheckResult {
   const basicsComplete =
     Boolean(input.profile?.fullName?.trim()) &&
     hasContactInfo(input.profile) &&
-    Boolean(input.profile?.workPermitInfo?.trim()) &&
-    (input.profile?.socialLinks ?? []).length > 0 &&
     hasProfessionalAttributes(input.profile);
 
   const phase1Missing: ProgressGate[] = [];
