@@ -6,79 +6,35 @@
       </h3>
     </template>
 
-    <div v-if="!isEditing" class="space-y-4">
-      <div v-if="form.skills.length > 0">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {{ t('profile.fields.skills') }}
-        </label>
-        <div class="flex flex-wrap gap-2">
-          <UBadge
-            v-for="(skill, index) in form.skills"
-            :key="index"
-            color="success"
-            variant="subtle"
-          >
-            {{ skill }}
-          </UBadge>
-        </div>
-      </div>
-
-      <div v-if="form.certifications.length > 0">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {{ t('profile.fields.certifications') }}
-        </label>
-        <div class="flex flex-wrap gap-2">
-          <UBadge
-            v-for="(cert, index) in form.certifications"
-            :key="index"
-            color="success"
-            variant="subtle"
-          >
-            {{ cert }}
-          </UBadge>
-        </div>
-      </div>
-
-      <div v-if="form.languages.length > 0">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {{ t('profile.fields.languages') }}
-        </label>
-        <div class="flex flex-wrap gap-2">
-          <UBadge
-            v-for="(lang, index) in form.languages"
-            :key="index"
-            color="success"
-            variant="subtle"
-          >
-            {{ lang }}
-          </UBadge>
-        </div>
-      </div>
-    </div>
-
-    <div v-else class="space-y-4">
+    <div class="space-y-4">
       <TagInput
+        v-if="isEditing || form.skills.length > 0"
         v-model="form.skills"
         :label="t('profile.fields.skills')"
-        :placeholder="t('profile.fields.skillsPlaceholder')"
-        :hint="t('profile.fields.skillsHint')"
+        :placeholder="isEditing ? t('profile.fields.skillsPlaceholder') : ''"
+        :hint="isEditing ? t('profile.fields.skillsHint') : ''"
         color="success"
+        :editable="isEditing"
       />
 
       <TagInput
+        v-if="isEditing || form.certifications.length > 0"
         v-model="form.certifications"
         :label="t('profile.fields.certifications')"
-        :placeholder="t('profile.fields.certificationsPlaceholder')"
-        :hint="t('profile.fields.certificationsHint')"
+        :placeholder="isEditing ? t('profile.fields.certificationsPlaceholder') : ''"
+        :hint="isEditing ? t('profile.fields.certificationsHint') : ''"
         color="success"
+        :editable="isEditing"
       />
 
       <TagInput
+        v-if="isEditing || form.languages.length > 0"
         v-model="form.languages"
         :label="t('profile.fields.languages')"
-        :placeholder="t('profile.fields.languagesPlaceholder')"
-        :hint="t('profile.fields.languagesHint')"
+        :placeholder="isEditing ? t('profile.fields.languagesPlaceholder') : ''"
+        :hint="isEditing ? t('profile.fields.languagesHint') : ''"
         color="success"
+        :editable="isEditing"
       />
     </div>
   </UCard>

@@ -63,6 +63,26 @@ describe('TagInput', () => {
     expect(input.attributes('placeholder')).toBe('Enter value');
   });
 
+  it('hides input and remove buttons when not editable', () => {
+    const wrapper = mount(TagInput, {
+      ...i18n,
+      global: {
+        ...i18n.global,
+        stubs,
+      },
+      props: {
+        modelValue: ['Tag 1', 'Tag 2'],
+        label: 'Tags',
+        editable: false,
+      },
+    });
+
+    expect(wrapper.find('input').exists()).toBe(false);
+    expect(wrapper.findAll('button')).toHaveLength(0);
+    expect(wrapper.text()).toContain('Tag 1');
+    expect(wrapper.text()).toContain('Tag 2');
+  });
+
   it('displays existing tags', () => {
     const wrapper = mount(TagInput, {
       ...i18n,

@@ -20,8 +20,8 @@ const stubs = {
     props: ['name'],
   },
   TagInput: {
-    template: '<div class="tag-input"><slot /></div>',
-    props: ['modelValue', 'label', 'testId'],
+    template: '<div class="tag-input">{{ modelValue?.join(", ") }}</div>',
+    props: ['modelValue', 'label', 'testId', 'editable'],
   },
 };
 

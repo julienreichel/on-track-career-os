@@ -6,31 +6,15 @@
       </h3>
     </template>
 
-    <div v-if="!isEditing" class="space-y-4">
-      <div v-if="form.aspirations.length > 0">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          {{ t('profile.fields.aspirations') }}
-        </label>
-        <div class="flex flex-wrap gap-2">
-          <UBadge
-            v-for="(aspiration, index) in form.aspirations"
-            :key="index"
-            color="primary"
-            variant="subtle"
-          >
-            {{ aspiration }}
-          </UBadge>
-        </div>
-      </div>
-    </div>
-
-    <div v-else class="space-y-4">
+    <div class="space-y-4">
       <TagInput
+        v-if="isEditing || form.aspirations.length > 0"
         v-model="form.aspirations"
         :label="t('profile.fields.aspirations')"
-        :placeholder="t('profile.fields.aspirationsPlaceholder')"
-        :hint="t('profile.fields.aspirationsHint')"
+        :placeholder="isEditing ? t('profile.fields.aspirationsPlaceholder') : ''"
+        :hint="isEditing ? t('profile.fields.aspirationsHint') : ''"
         color="primary"
+        :editable="isEditing"
       />
     </div>
   </UCard>

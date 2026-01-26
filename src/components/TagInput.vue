@@ -11,6 +11,7 @@ interface Props {
   color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'neutral';
   required?: boolean;
   disabled?: boolean;
+  editable?: boolean;
   testId?: string;
 }
 
@@ -20,6 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
   color: 'primary',
   required: false,
   disabled: false,
+  editable: true,
   testId: undefined,
 });
 
@@ -57,6 +59,7 @@ const handleRemove = (index: number) => {
   <div v-bind="attrs" class="space-y-2">
     <UFormField :label="label" :hint="hint" :required="required">
       <UInput
+        v-if="editable"
         v-model="inputValue"
         :placeholder="placeholder"
         :disabled="disabled"
@@ -69,7 +72,7 @@ const handleRemove = (index: number) => {
       <UBadge v-for="(item, index) in modelValue" :key="index" :color="color" variant="subtle">
         {{ item }}
         <UButton
-          v-if="!disabled"
+          v-if="editable && !disabled"
           icon="i-heroicons-x-mark-20-solid"
           size="xs"
           :color="color"
