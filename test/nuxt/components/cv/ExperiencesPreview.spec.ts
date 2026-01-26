@@ -25,8 +25,15 @@ const stubs = {
   },
   UButton: {
     name: 'UButton',
-    template: '<button class="u-button" @click="$attrs.onClick"><slot /></button>',
+    template:
+      '<button class="u-button" v-bind="$attrs" @click="$attrs.onClick"><slot /></button>',
     props: ['icon', 'color', 'variant', 'size'],
+  },
+  ExperienceForm: {
+    name: 'ExperienceForm',
+    template: '<div class="experience-form"></div>',
+    props: ['experience'],
+    emits: ['save', 'cancel'],
   },
 };
 
@@ -107,12 +114,30 @@ describe('ExperiencesPreview', () => {
 
   it('emits remove event when remove button is clicked', async () => {
     const wrapper = createWrapper();
-    const removeButtons = wrapper.findAll('.u-button');
-
-    await removeButtons[0].trigger('click');
+    await wrapper.find('[data-testid="experience-remove-0"]').trigger('click');
 
     expect(wrapper.emitted('remove')).toBeTruthy();
     expect(wrapper.emitted('remove')?.[0]).toEqual([0]);
+  });
+
+  it('emits update event when experience is saved', async () => {
+    const wrapper = createWrapper();
+    await wrapper.find('[data-testid="experience-edit-0"]').trigger('click');
+    await wrapper.findComponent({ name: 'ExperienceForm' }).vm.$emit('save', {
+      title: 'Updated Role',
+      companyName: 'Tech Corp',
+      startDate: '2020-01',
+      endDate: null,
+      responsibilities: ['Updated responsibility'],
+      tasks: [],
+      rawText: '',
+      status: 'draft',
+      experienceType: 'work',
+      userId: '',
+    });
+
+    expect(wrapper.emitted('update')).toBeTruthy();
+    expect(wrapper.emitted('update')?.[0]?.[0]).toBe(0);
   });
 
   it('does not render when experiences array is empty', () => {

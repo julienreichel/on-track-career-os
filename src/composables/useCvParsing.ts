@@ -116,6 +116,11 @@ export function useCvParsing() {
     extractedExperiences.value.splice(index, 1);
   }
 
+  function updateExperience(index: number, value: ExtractedExperience) {
+    if (!extractedExperiences.value[index]) return;
+    extractedExperiences.value.splice(index, 1, value);
+  }
+
   function removeProfileField(field: keyof ParseCvTextOutput['profile']) {
     if (extractedProfile.value) {
       extractedProfile.value[field] = undefined as never;
@@ -157,6 +162,7 @@ export function useCvParsing() {
     aiOps,
     parseFile,
     removeExperience,
+    updateExperience,
     removeProfileField,
     removeProfileArrayItem,
     updateProfileField,

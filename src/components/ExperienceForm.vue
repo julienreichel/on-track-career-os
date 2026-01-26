@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { Experience, ExperienceCreateInput } from '@/domain/experience/Experience';
+import type { ExperienceCreateInput } from '@/domain/experience/Experience';
 
 const { t } = useI18n();
 
 interface Props {
-  experience?: Experience | null;
+  experience?: ExperienceCreateInput | null;
   loading?: boolean;
+  submitLabel?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   experience: null,
   loading: false,
+  submitLabel: '',
 });
 
 const emit = defineEmits<{
@@ -116,12 +118,6 @@ const experienceTypeValue = computed<string>({
 
 <template>
   <UCard>
-    <template #header>
-      <h3 class="text-lg font-semibold">
-        {{ experience ? t('experiences.form.editTitle') : t('experiences.form.createTitle') }}
-      </h3>
-    </template>
-
     <form class="space-y-6" @submit.prevent="handleSubmit">
       <!-- Title -->
       <UFormField :label="t('experiences.form.title')" required>
@@ -217,7 +213,7 @@ const experienceTypeValue = computed<string>({
         />
         <UButton
           type="submit"
-          :label="t('experiences.form.save')"
+          :label="submitLabel || t('experiences.form.save')"
           :loading="loading"
           :disabled="!form.title || !form.startDate"
         />

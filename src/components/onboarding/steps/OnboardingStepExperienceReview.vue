@@ -16,6 +16,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   importExperiences: [];
   back: [];
+  updateExperience: [index: number, value: ExtractedExperience];
 }>();
 
 const { t } = useI18n();
@@ -49,7 +50,10 @@ const hasEnoughExperiences = computed(() => experienceCount.value >= MIN_EXPERIE
       </UAlert>
     </UCard>
 
-    <CvExperiencesPreview :experiences="experiences" />
+    <CvExperiencesPreview
+      :experiences="experiences"
+      @update="(index, value) => emit('updateExperience', index, value)"
+    />
 
     <CvProfilePreview v-if="profile" :profile="profile" editable />
 

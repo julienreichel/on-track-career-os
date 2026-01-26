@@ -54,6 +54,7 @@ const stepItems = computed(() =>
           :is-processing="wizard.isProcessing.value"
           @import-experiences="wizard.importExperiences"
           @back="wizard.back"
+          @update-experience="wizard.parsing.updateExperience"
         />
 
         <OnboardingStepProfileBasics

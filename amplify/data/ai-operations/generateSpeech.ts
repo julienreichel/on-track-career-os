@@ -209,21 +209,21 @@ function extractMarkdownSection(markdown: string, heading: string): string | nul
   // Match heading, then capture everything until next ## heading or end
   const headingPattern = new RegExp(`^##\\s+${escapedHeading}\\s*$`, 'gm');
   const headingMatch = headingPattern.exec(markdown);
-  
+
   if (!headingMatch) {
     return null;
   }
-  
+
   const startIndex = headingMatch.index + headingMatch[0].length + 1; // +1 for newline
-  
+
   // Find next heading or end of string
   const nextHeadingPattern = /^##\s+/gm;
   nextHeadingPattern.lastIndex = startIndex;
   const nextHeadingMatch = nextHeadingPattern.exec(markdown);
-  
+
   const endIndex = nextHeadingMatch ? nextHeadingMatch.index : markdown.length;
   const content = markdown.substring(startIndex, endIndex);
-  
+
   return stripTrailingNoise(content.trim());
 }
 

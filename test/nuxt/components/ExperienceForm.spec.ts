@@ -79,14 +79,10 @@ describe('ExperienceForm', () => {
     expect(wrapper.find('form').exists()).toBe(true);
   });
 
-  it('displays create title when no experience provided', () => {
+  it('renders form content without a header title', () => {
     const wrapper = createWrapper();
-    expect(wrapper.text()).toContain('Add Experience');
-  });
-
-  it('displays edit title when experience provided', () => {
-    const wrapper = createWrapper({ experience: mockExperience });
-    expect(wrapper.text()).toContain('Edit Experience');
+    expect(wrapper.text()).toContain('Job Title');
+    expect(wrapper.text()).toContain('Company Name');
   });
 
   it('renders all form fields', () => {

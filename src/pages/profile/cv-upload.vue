@@ -119,6 +119,7 @@ function viewExperiences() {
           <CvExperiencesPreview
             :experiences="parsing.extractedExperiences.value"
             @remove="parsing.removeExperience"
+            @update="parsing.updateExperience"
           />
 
           <!-- Profile Preview -->
