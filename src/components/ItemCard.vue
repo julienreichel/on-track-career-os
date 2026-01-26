@@ -28,7 +28,6 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  view: [];
   edit: [];
   delete: [];
 }>();
@@ -46,25 +45,16 @@ const handleDelete = (event: Event) => {
   event.stopPropagation();
   emit('delete');
 };
-
-const handleView = (event: MouseEvent) => {
-  const target = event.target as HTMLElement | null;
-  if (target?.closest('[data-card-action]')) {
-    return;
-  }
-  emit('view');
-};
 </script>
 
 <template>
   <UCard
     v-bind="attrs"
-    class="h-full flex flex-col cursor-pointer"
+    class="h-full flex flex-col"
     :ui="{
       body: 'flex flex-col flex-1',
       footer: 'mt-auto',
     }"
-    @click="handleView"
   >
     <template #header>
       <div class="space-y-2">
@@ -92,7 +82,7 @@ const handleView = (event: MouseEvent) => {
         </div>
 
         <!-- Action Buttons Row -->
-        <div class="flex items-center justify-between gap-2" data-card-action>
+        <div class="flex items-center justify-between gap-2">
           <!-- Left Side Actions -->
           <div v-if="slots.actions" class="flex gap-2">
             <slot name="actions" />

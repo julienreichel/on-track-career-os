@@ -95,13 +95,7 @@ function getTextContent(input: string | string[] | null | undefined) {
 
 <template>
   <div data-testid="experience-card">
-    <ItemCard
-      :title="title"
-      :subtitle="subtitle"
-      @view="handleEdit"
-      @edit="handleEdit"
-      @delete="handleDelete"
-    >
+    <ItemCard :title="title" :subtitle="subtitle" @edit="handleEdit" @delete="handleDelete">
       <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
         <div class="font-medium text-gray-900 dark:text-gray-100">
           {{ dateRange }}

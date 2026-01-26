@@ -16,7 +16,7 @@ const stubs = {
   UIcon: { template: '<span class="u-icon"></span>' },
   ItemCard: {
     props: ['title', 'subtitle', 'showDelete'],
-    emits: ['view', 'delete'],
+    emits: ['delete'],
     template: `
       <div class="item-card">
         <h3>{{ title }}</h3>

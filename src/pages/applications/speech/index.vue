@@ -64,7 +64,7 @@
             :key="block.id"
             :title="resolveTitle(block)"
             :subtitle="formatUpdatedAt(block.updatedAt)"
-            @view="navigateTo({ name: 'applications-speech-id', params: { id: block.id } })"
+            @edit="navigateTo({ name: 'applications-speech-id', params: { id: block.id } })"
             @delete="confirmDelete(block)"
           >
             <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">

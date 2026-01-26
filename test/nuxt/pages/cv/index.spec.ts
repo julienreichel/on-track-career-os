@@ -97,7 +97,7 @@ const stubs = {
   },
   ItemCard: {
     props: ['title', 'subtitle'],
-    emits: ['view', 'delete'],
+    emits: ['edit', 'delete'],
     template: '<div><h3>{{ title }}</h3><p>{{ subtitle }}</p><slot name="actions" /><slot /></div>',
   },
   ConfirmModal: {

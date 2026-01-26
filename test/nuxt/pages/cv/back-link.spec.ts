@@ -80,7 +80,6 @@ const stubs = {
   UIcon: { template: '<span class="u-icon"></span>' },
   ItemCard: {
     props: ['title'],
-    emits: ['view', 'delete'],
     template: '<div class="item-card"><h3>{{ title }}</h3><slot /></div>',
   },
   ConfirmModal: { template: '<div class="confirm-modal"></div>' },
