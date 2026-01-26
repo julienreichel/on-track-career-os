@@ -235,19 +235,6 @@ const recommendationColor = computed(() => {
   }
 });
 
-const recommendationIcon = computed(() => {
-  switch (props.recommendation) {
-    case 'apply':
-      return 'i-heroicons-check-circle';
-    case 'maybe':
-      return 'i-heroicons-exclamation-triangle';
-    case 'skip':
-      return 'i-heroicons-x-circle';
-    default:
-      return 'i-heroicons-minus-circle';
-  }
-});
-
 const recommendationLabel = computed(() => {
   return t(`matching.summaryCard.recommendation.${props.recommendation || 'maybe'}`);
 });
