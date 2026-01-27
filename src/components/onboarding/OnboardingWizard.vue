@@ -39,7 +39,7 @@ const stepItems = computed(() =>
           class="mb-6"
         />
 
-        <UStepper :items="stepItems" :model-value="wizard.stepIndex.value" class="mb-6" />
+        <UStepper disabled :items="stepItems" :model-value="wizard.stepIndex.value" class="mb-6" />
 
         <OnboardingStepCvUpload
           v-if="wizard.currentStep.value === 'cv-upload'"
