@@ -46,13 +46,34 @@ async function ensureProfileFilled(page: Page): Promise<void> {
 
   const addTag = async (placeholder: string, value: string) => {
     const input = page.getByPlaceholder(placeholder).first();
-    await input.fill(value);
-    await input.press('Enter');
+    if (await input.count()) {
+      await input.fill(value);
+      await input.press('Enter');
+    }
   };
 
   await addTag('https://linkedin.com/in/you', 'https://linkedin.com/in/john-doe');
   await addTag('e.g., Vue.js', 'Vue.js');
   await addTag('e.g., English', 'English');
+  await addTag('e.g., Lead cross-functional teams', 'Lead cross-functional teams');
+  await addTag('e.g., Integrity', 'Integrity');
+
+  // Save profile
+  await page.locator('button[type="submit"]:has-text("Save")').first().click();
+  await page.waitForTimeout(2000);
+}
+
+async function ensureProfileDepthFilled(page: Page): Promise<void> {
+  await page.goto('/profile/full?mode=edit');
+  await page.waitForLoadState('networkidle');
+
+  const addTag = async (placeholder: string, value: string) => {
+    const input = page.getByPlaceholder(placeholder).first();
+    await expect(input).toBeVisible();
+    await input.fill(value);
+    await input.press('Enter');
+  };
+
   await addTag('e.g., Lead cross-functional teams', 'Lead cross-functional teams');
   await addTag('e.g., Integrity', 'Integrity');
 
@@ -114,6 +135,12 @@ test.describe('Personal Canvas E2E Flow', () => {
     if (!saved) {
       console.warn('Story creation failed or not implemented - continuing without story');
     }
+  });
+
+  test('3.b Setup: Ensure profile depth is filled', async ({ page }) => {
+    await ensureProfileDepthFilled(page);
+    await expect(page.getByText('Lead cross-functional teams')).toBeVisible();
+    await expect(page.getByText('Integrity')).toBeVisible();
   });
 
   test('4. Navigate to canvas page', async ({ page }) => {
