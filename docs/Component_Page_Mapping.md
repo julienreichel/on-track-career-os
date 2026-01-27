@@ -233,7 +233,6 @@ Each page includes:
 
 - `CvUploadStep` - file upload
 - `CvParsingStep` - AI parsing indicator
-- `ProfilePreview` - extracted profile data
 - `ExperiencesPreview` - extracted experiences
 - `CvImportSuccess` - completion message
 
@@ -1173,7 +1172,6 @@ Each page includes:
 
 - `ExperiencePicker` - select experiences for CV
 - `ExperiencesPreview` - preview extracted experiences
-- `ProfilePreview` - preview extracted profile
 - `UploadStep` - file upload UI
 - `ParsingStep` - AI parsing indicator
 - `GeneratingStep` - CV generation indicator

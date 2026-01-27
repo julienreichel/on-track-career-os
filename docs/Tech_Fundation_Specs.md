@@ -448,7 +448,6 @@ project-root/
 │   │   │   ├── GeneratingStep.vue
 │   │   │   ├── UploadStep.vue
 │   │   │   ├── ParsingStep.vue
-│   │   │   ├── ProfilePreview.vue
 │   │   │   ├── ExperiencesPreview.vue
 │   │   │   ├── ImportSuccess.vue
 │   │   │   └── (9 total)

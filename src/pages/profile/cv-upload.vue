@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router';
 import { useCvUploadWorkflow } from '@/composables/useCvUploadWorkflow';
 import { useCvParsing } from '@/composables/useCvParsing';
 import { useExperienceImport } from '@/composables/useExperienceImport';
-import { useProfileMerge } from '@/composables/useProfileMerge';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -13,7 +12,6 @@ const router = useRouter();
 const workflow = useCvUploadWorkflow();
 const parsing = useCvParsing();
 const importing = useExperienceImport();
-const profileMerge = useProfileMerge();
 
 // Handle file selection and parsing
 async function handleFileSelected(file: File) {
@@ -46,15 +44,6 @@ async function handleImport() {
     );
     workflow.setImportSummary(createdCount, updatedCount);
 
-    // Merge profile data
-    if (parsing.extractedProfile.value) {
-      await profileMerge.mergeProfile(
-        userId,
-        parsing.extractedProfile.value,
-        parsing.aiOps.parsedCv.value
-      );
-    }
-
     workflow.setStep('complete');
   } catch (error) {
     workflow.setError(error instanceof Error ? error.message : t('cvUpload.errors.importFailed'));
@@ -66,10 +55,6 @@ async function handleImport() {
 function handleCancel() {
   workflow.reset();
   parsing.reset();
-}
-
-function viewProfile() {
-  void router.push('/profile');
 }
 
 function viewExperiences() {
@@ -122,15 +107,6 @@ function viewExperiences() {
             @update="parsing.updateExperience"
           />
 
-          <!-- Profile Preview -->
-          <CvProfilePreview
-            v-if="parsing.extractedProfile.value"
-            :profile="parsing.extractedProfile.value"
-            :editable="true"
-            @update-field="parsing.updateProfileField"
-            @update-array-field="parsing.updateProfileArrayField"
-          />
-
           <!-- Actions -->
           <div class="flex justify-end gap-3">
             <UButton :label="t('cvUpload.cancel')" variant="outline" @click="handleCancel" />
@@ -150,7 +126,6 @@ function viewExperiences() {
           v-if="workflow.currentStep.value === 'complete'"
           :created-count="workflow.importSummary.value.createdCount"
           :updated-count="workflow.importSummary.value.updatedCount"
-          @view-profile="viewProfile"
           @view-experiences="viewExperiences"
         />
       </UPageBody>

@@ -64,34 +64,17 @@ describe('ImportSuccess', () => {
     expect(wrapper.text()).toContain('Imported 10 experience(s), updated 4 experience(s)');
   });
 
-  it('renders view profile button', () => {
-    const wrapper = createWrapper();
-    const buttons = wrapper.findAll('.u-button');
-    expect(buttons.length).toBe(2);
-    expect(buttons[0].text()).toContain('View Profile');
-  });
-
   it('renders view experiences button', () => {
     const wrapper = createWrapper();
     const buttons = wrapper.findAll('.u-button');
-    expect(buttons[1].text()).toContain('View Experiences');
+    expect(buttons[0].text()).toContain('View Experiences');
   });
 
-  it('emits viewProfile event when first button is clicked', async () => {
+  it('emits viewExperiences event when button is clicked', async () => {
     const wrapper = createWrapper();
     const buttons = wrapper.findAll('.u-button');
 
     await buttons[0].trigger('click');
-
-    expect(wrapper.emitted('viewProfile')).toBeTruthy();
-    expect(wrapper.emitted('viewProfile')?.[0]).toEqual([]);
-  });
-
-  it('emits viewExperiences event when second button is clicked', async () => {
-    const wrapper = createWrapper();
-    const buttons = wrapper.findAll('.u-button');
-
-    await buttons[1].trigger('click');
 
     expect(wrapper.emitted('viewExperiences')).toBeTruthy();
     expect(wrapper.emitted('viewExperiences')?.[0]).toEqual([]);

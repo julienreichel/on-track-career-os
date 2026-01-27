@@ -107,7 +107,7 @@ _(Support EPIC 1A and EPIC 8)_
 **Implementation:**
 
 - Pages: `/profile/cv-upload`, `/profile/experiences`, `/profile/experiences/:id`
-- Components: `ExperienceForm`, `ExperienceCard`, `CvUploadStep`, `CvParsingStep`, `ProfilePreview`, `ExperiencesPreview`, `CvImportSuccess`
+- Components: `ExperienceForm`, `ExperienceCard`, `CvUploadStep`, `CvParsingStep`, `ExperiencesPreview`, `CvImportSuccess`
 - Composables: `useCvUploadWorkflow()`, `useCvParsing()`, `useExperienceImport()`, `useExperience()`
 - AI Ops: `ai.parseCvText`, `ai.extractExperienceBlocks`
 

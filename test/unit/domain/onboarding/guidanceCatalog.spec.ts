@@ -43,7 +43,7 @@ describe('guidanceCatalog', () => {
       phase1: { isComplete: false, missing: ['cvUploaded'] },
     });
     const guidance = getGuidance('profile', state);
-    expect(guidance.banner?.cta?.to).toBe('/profile/cv-upload');
+    expect(guidance.banner?.cta?.to).toBe('/onboarding');
   });
 
   it('returns locked canvas guidance when phase 2A is incomplete', () => {

@@ -40,11 +40,6 @@ const emit = defineEmits<{
 
       <div class="flex flex-col sm:flex-row gap-3">
         <UButton
-          :label="t('cvUpload.viewProfile')"
-          icon="i-lucide-user"
-          @click="emit('viewProfile')"
-        />
-        <UButton
           :label="t('cvUpload.viewExperiences')"
           icon="i-lucide-briefcase"
           variant="outline"

@@ -92,7 +92,7 @@ const getProfileGuidance = (state: UserProgressState | null): GuidanceModel => {
         descriptionKey: 'guidance.profile.banner.cv.description',
         cta: {
           labelKey: 'guidance.profile.banner.cv.cta',
-          to: '/profile/cv-upload',
+          to: '/onboarding',
         },
       },
     };
@@ -170,22 +170,8 @@ const getProfileGuidance = (state: UserProgressState | null): GuidanceModel => {
   return {};
 };
 
-const getProfileExperiencesGuidance = (
-  state: UserProgressState | null,
-  context: GuidanceContext
-): GuidanceModel => {
+const getProfileExperiencesGuidance = (state: UserProgressState | null): GuidanceModel => {
   let emptyState;
-  if (context.experiencesCount === 0) {
-    emptyState = {
-      titleKey: 'guidance.profileExperiences.empty.title',
-      descriptionKey: 'guidance.profileExperiences.empty.description',
-      icon: 'i-heroicons-briefcase',
-      cta: {
-        labelKey: 'guidance.profileExperiences.empty.cta',
-        to: '/profile/experiences/new',
-      },
-    };
-  }
   if (state?.phase1.missing.includes('cvUploaded')) {
     return {
       banner: {
@@ -503,7 +489,7 @@ const guidanceHandlers: Record<
   (state: UserProgressState | null, context: GuidanceContext) => GuidanceModel
 > = {
   profile: (state) => getProfileGuidance(state),
-  'profile-experiences': (state, context) => getProfileExperiencesGuidance(state, context),
+  'profile-experiences': (state) => getProfileExperiencesGuidance(state),
   'profile-stories': (state, context) => getProfileStoriesGuidance(state, context),
   'profile-canvas': (state) => getProfileCanvasGuidance(state),
   jobs: (state, context) => getJobsGuidance(state, context),

@@ -118,8 +118,6 @@ test.describe('CV Upload Flow', () => {
     ).toBeVisible({
       timeout: 15000,
     });
-
-    await expect(page.getByRole('button', { name: /view profile/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /view experiences/i })).toBeVisible();
   });
 
