@@ -2,13 +2,10 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import CvExperiencesPreview from '@/components/cv/ExperiencesPreview.vue';
-import CvProfilePreview from '@/components/cv/ProfilePreview.vue';
 import type { ExtractedExperience } from '@/domain/ai-operations/Experience';
-import type { ParseCvTextOutput } from '@amplify/data/ai-operations/parseCvText';
 
 type Props = {
   experiences: ExtractedExperience[];
-  profile: ParseCvTextOutput['profile'] | null;
   isProcessing: boolean;
 };
 
@@ -54,8 +51,6 @@ const hasEnoughExperiences = computed(() => experienceCount.value >= MIN_EXPERIE
       :experiences="experiences"
       @update="(index, value) => emit('updateExperience', index, value)"
     />
-
-    <CvProfilePreview v-if="profile" :profile="profile" editable />
 
     <UCard class="sticky bottom-0 z-10">
       <template #footer>

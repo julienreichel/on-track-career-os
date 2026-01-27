@@ -50,7 +50,6 @@ const stepItems = computed(() =>
         <OnboardingStepExperienceReview
           v-else-if="wizard.currentStep.value === 'experience-review'"
           :experiences="wizard.parsing.extractedExperiences.value"
-          :profile="wizard.parsing.extractedProfile.value"
           :is-processing="wizard.isProcessing.value"
           @import-experiences="wizard.importExperiences"
           @back="wizard.back"
