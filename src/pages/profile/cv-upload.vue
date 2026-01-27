@@ -112,11 +112,7 @@ function viewExperiences() {
             <template #footer>
               <div class="flex justify-end gap-2">
                 <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
-                <UButton
-                  :label="t('cvUpload.confirmImport')"
-                  icon="i-lucide-download"
-                  @click="handleImport"
-                />
+                <UButton :label="t('cvUpload.confirmImport')" @click="handleImport" />
               </div>
             </template>
           </UCard>

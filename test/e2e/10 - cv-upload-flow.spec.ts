@@ -83,7 +83,7 @@ test.describe('CV Upload Flow', () => {
     await expect(page.getByText(/Tech Corporation/i).first()).toBeVisible();
   });
 
-  test('should show Import All button after parsing', async ({ page }) => {
+  test('should show Confirm & continue button after parsing', async ({ page }) => {
     const testFilePath = join(__dirname, 'fixtures', 'test-cv.txt');
     const fileInput = page.locator('input[type="file"]');
     await fileInput.setInputFiles(testFilePath);
@@ -93,7 +93,7 @@ test.describe('CV Upload Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Should show import button
-    const importButton = page.getByRole('button', { name: /Import All/i });
+    const importButton = page.getByRole('button', { name: /Confirm/i });
     await expect(importButton).toBeVisible();
     await expect(importButton).toBeEnabled();
   });
@@ -105,7 +105,7 @@ test.describe('CV Upload Flow', () => {
     await fileInput.setInputFiles(testFilePath);
 
     // Wait until parsing is finished → Import button appears
-    const importButton = page.getByRole('button', { name: /import all/i });
+    const importButton = page.getByRole('button', { name: /Confirm/i });
 
     await expect(importButton).toBeVisible({ timeout: 20000 });
     await expect(importButton).toBeEnabled();
@@ -131,7 +131,7 @@ test.describe('CV Upload Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Import experiences
-    const importButton = page.getByRole('button', { name: /Import All/i });
+    const importButton = page.getByRole('button', { name: /Confirm/i });
     await importButton.click();
     await page.waitForLoadState('networkidle');
 

@@ -99,7 +99,7 @@ test.describe('Discovery flow', () => {
     const fileInput = page.locator('input[type="file"]').first();
     await fileInput.setInputFiles(CV_FIXTURE);
 
-    const importButton = page.getByRole('button', { name: /Import experiences/i });
+    const importButton = page.getByRole('button', { name: /Confirm/i });
     await expect(importButton).toBeVisible({ timeout: 30000 });
     await importButton.click();
 

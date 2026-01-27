@@ -169,7 +169,7 @@ Comprehensive E2E testing suite for On Track Career using Playwright, covering a
 
 **Import Process** (4 tests):
 
-- ✅ Import all button display
+- ✅ Confirm & continue button display
 - ✅ Import experiences and redirect
 - ✅ Success confirmation
 - ✅ Imported experiences in list

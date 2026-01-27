@@ -66,7 +66,7 @@ test.describe('Onboarding wizard', () => {
     const fileInput = page.locator('input[type="file"]').first();
     await fileInput.setInputFiles(CV_FIXTURE);
 
-    const importButton = page.getByRole('button', { name: /Import experiences/i });
+    const importButton = page.getByRole('button', { name: /confirm/i });
     await expect(importButton).toBeVisible({ timeout: 30000 });
     await importButton.click();
 

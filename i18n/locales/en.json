@@ -239,7 +239,7 @@
     "parsing": "Parsing your CV...",
     "parsingDescription": "AI is extracting your experiences and information.",
     "sections": {
-      "experiences": "Experiences",
+      "experiences": "Review experiences",
       "profile": "Profile Information"
     },
     "profile": {
@@ -254,7 +254,7 @@
       "interests": "Interests",
       "languages": "Languages"
     },
-    "confirmImport": "Import All",
+    "confirmImport": "Confirm & continue",
     "cancel": "Cancel",
     "importing": "Creating experiences...",
     "successSummary": "Imported {created} experience(s), updated {updated} experience(s)",
@@ -1643,7 +1643,7 @@
         "needsMore": "Add at least 3 experiences to continue.",
         "needsMoreHint": "You can add missing experiences manually.",
         "addManual": "Add experience manually",
-        "import": "Import experiences"
+        "import": "Confirm & continue"
       },
       "profileBasics": {
         "title": "Confirm profile basics",
@@ -1662,7 +1662,7 @@
       "jobPath": "Analyze a job"
     },
     "actions": {
-      "continue": "Continue"
+      "continue": "Confirm & continue"
     },
     "errors": {
       "title": "Onboarding issue",
