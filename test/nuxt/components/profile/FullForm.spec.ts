@@ -20,6 +20,9 @@ const mockLoad = vi.fn();
 const mockSaveProfile = vi.fn();
 const mockLoading = ref(false);
 const mockError = ref<string | null>(null);
+const mockProgressState = ref<{ phase1?: { missing?: string[] } } | null>({
+  phase1: { missing: [] },
+});
 
 vi.mock('@/application/user-profile/useUserProfile', () => ({
   useUserProfile: vi.fn(() => ({
@@ -35,6 +38,13 @@ vi.mock('@/composables/useAuthUser', () => ({
   useAuthUser: vi.fn(() => ({
     userId: ref('user-123'),
   })),
+}));
+
+vi.mock('@/composables/useUserProgress', () => ({
+  useUserProgress: () => ({
+    state: mockProgressState,
+    load: vi.fn(),
+  }),
 }));
 
 // Mock services
@@ -133,6 +143,9 @@ const stubs = {
 describe('FullForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockProgressState.value = {
+      phase1: { missing: [] },
+    };
 
     mockProfile.value = {
       id: 'profile-1',
@@ -243,5 +256,47 @@ describe('FullForm', () => {
     await flushPromises();
 
     consoleSpy.mockRestore();
+  });
+
+  it('limits sections when profile basics are missing', async () => {
+    mockProfile.value = {
+      id: 'profile-1',
+      userId: 'user-123',
+      fullName: 'John Doe',
+      headline: '',
+      location: '',
+      seniorityLevel: '',
+      primaryEmail: '',
+      primaryPhone: '',
+      workPermitInfo: '',
+      aspirations: [],
+      personalValues: [],
+      strengths: [],
+      interests: [],
+      skills: [],
+      certifications: [],
+      languages: [],
+      socialLinks: [],
+    } as unknown as UserProfile;
+
+    mockProgressState.value = {
+      phase1: { missing: ['profileBasics'] },
+    };
+
+    const wrapper = mount(FullForm, {
+      global: {
+        plugins: [i18n, router],
+        stubs,
+      },
+      props: {
+        saveProfile: mockSaveProfile,
+      },
+    });
+
+    await flushPromises();
+
+    expect(wrapper.find('.career-direction').exists()).toBe(false);
+    expect(wrapper.find('.identity-values').exists()).toBe(false);
+    expect(wrapper.find('.professional-attributes').exists()).toBe(false);
   });
 });

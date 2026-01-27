@@ -37,8 +37,8 @@
         <ProfileSectionWorkPermit />
         <ProfileSectionContact />
         <ProfileSectionSocialLinks />
-        <ProfileSectionCareerDirection />
-        <ProfileSectionIdentityValues />
+        <ProfileSectionCareerDirection v-if="!isLimitedEditing || hasCareerDirection" />
+        <ProfileSectionIdentityValues v-if="!isLimitedEditing || hasIdentityValues" />
         <ProfileSectionProfessionalAttributes />
 
         <div v-if="isEditing" class="flex justify-end gap-3">
@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, provide, ref, watch } from 'vue';
+import { computed, onMounted, provide, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthUser } from '@/composables/useAuthUser';
@@ -69,6 +69,7 @@ import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import { isValidEmail, isValidPhone } from '@/domain/user-profile/contactValidation';
 import { useAnalytics } from '@/composables/useAnalytics';
+import { useUserProgress } from '@/composables/useUserProgress';
 import type { UserProfile, UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 import type { ProfileForm } from '@/components/profile/types';
@@ -78,6 +79,7 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const { userId } = useAuthUser();
+const progress = useUserProgress();
 
 const profile = ref<UserProfile | null>(null);
 const loading = ref(false);
@@ -186,6 +188,10 @@ const phoneError = computed<string | undefined>(() => {
 });
 
 const hasValidationErrors = computed(() => Boolean(emailError.value) || Boolean(phoneError.value));
+const needsProfileBasics = computed(
+  () => progress.state.value?.phase1?.missing?.includes('profileBasics') ?? false
+);
+const isLimitedEditing = computed(() => isEditing.value && needsProfileBasics.value);
 
 let saveProfile: ((input: UserProfileUpdateInput) => Promise<boolean>) | null = null;
 
@@ -215,6 +221,10 @@ watch(
   },
   { immediate: true }
 );
+
+onMounted(() => {
+  void progress.load();
+});
 
 const loadProfileToForm = () => {
   if (!profile.value) return;

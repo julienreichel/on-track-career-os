@@ -51,6 +51,15 @@ vi.mock('@/application/user-profile/useUserProfile', () => ({
   }),
 }));
 
+vi.mock('@/composables/useUserProgress', () => ({
+  useUserProgress: () => ({
+    state: ref({
+      phase1: { missing: [] },
+    }),
+    load: vi.fn(),
+  }),
+}));
+
 vi.mock('@/domain/user-profile/UserProfileService', () => ({
   UserProfileService: vi.fn().mockImplementation(() => ({
     updateUserProfile: vi.fn().mockResolvedValue(mockProfile.value),
