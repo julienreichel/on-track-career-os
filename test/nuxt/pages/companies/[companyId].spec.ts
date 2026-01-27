@@ -157,7 +157,7 @@ const stubs = {
     emits: ['update:block', 'update:summary', 'save', 'regenerate'],
     template: `
       <div class="company-canvas-editor">
-        <button class="save-canvas" type="button" @click="$emit('save')">Save Canvas</button>
+        <button class="save-canvas" type="button" @click="$emit('save')">Save</button>
         <button class="regenerate-canvas" type="button" @click="$emit('regenerate')">Regenerate</button>
       </div>
     `,

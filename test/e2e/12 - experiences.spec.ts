@@ -71,13 +71,15 @@ test.describe('Experience workflow', () => {
       .getByLabel(/Tasks/i)
       .fill('Led automation rollout and coordinated cross-team delivery.');
 
-    await page.getByRole('button', { name: /Save Experience/i }).click();
+    await page.getByRole('button', { name: /Save/i }).click();
     await page.waitForLoadState('networkidle');
 
     await expect(page).toHaveURL(new RegExp(`/profile/experiences/${manualExperienceId}$`));
     const header = page.getByRole('heading', { level: 1, name: MANUAL_EXPERIENCE_TITLE });
     await expect(header).toBeVisible({ timeout: 20000 });
-    await expect(page.locator('[data-slot="description"]', { hasText: updatedCompanyName })).toBeVisible({
+    await expect(
+      page.locator('[data-slot="description"]', { hasText: updatedCompanyName })
+    ).toBeVisible({
       timeout: 20000,
     });
   });

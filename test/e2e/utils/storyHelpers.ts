@@ -39,7 +39,7 @@ export async function createExperience(
   await page.waitForTimeout(300);
 
   // Save the experience
-  await page.locator('button[type="submit"]:has-text("Save Experience")').click();
+  await page.locator('button[type="submit"]:has-text("Save")').click();
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(2000);
 
