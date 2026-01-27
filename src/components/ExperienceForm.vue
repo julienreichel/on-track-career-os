@@ -208,7 +208,7 @@ const experienceTypeValue = computed<string>({
           type="button"
           color="neutral"
           variant="ghost"
-          :label="t('experiences.form.cancel')"
+          :label="t('common.cancel')"
           @click="handleCancel"
         />
         <UButton

@@ -109,7 +109,7 @@ function viewExperiences() {
 
           <!-- Actions -->
           <div class="flex justify-end gap-3">
-            <UButton :label="t('cvUpload.cancel')" variant="outline" @click="handleCancel" />
+            <UButton :label="t('common.cancel')" variant="outline" @click="handleCancel" />
             <UButton
               :label="t('cvUpload.confirmImport')"
               icon="i-lucide-download"

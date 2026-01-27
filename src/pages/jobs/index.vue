@@ -175,7 +175,7 @@ function cancelDelete() {
         <UButton
           color="neutral"
           variant="ghost"
-          :label="t('jobList.delete.cancel')"
+          :label="t('common.cancel')"
           @click="cancelDelete"
         />
         <UButton color="error" :label="t('jobList.delete.confirm')" @click="confirmDelete" />
