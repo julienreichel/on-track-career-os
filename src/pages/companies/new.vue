@@ -5,7 +5,6 @@ import { useI18n } from 'vue-i18n';
 import { useCompanies } from '@/composables/useCompanies';
 import { useCompanyUpload } from '@/composables/useCompanyUpload';
 import CompanyForm, { type CompanyFormState } from '@/components/company/CompanyForm.vue';
-import CompanyNotesInput from '@/components/company/CompanyNotesInput.vue';
 import CompanyUploadStep from '@/components/company/CompanyUploadStep.vue';
 import { CompanyService } from '@/domain/company/CompanyService';
 
@@ -173,20 +172,9 @@ async function handleUploadSelected(file: File | null | undefined) {
                 :disabled="disableActions"
                 @update:model-value="updateForm"
               />
-              <div class="mt-6">
-                <CompanyNotesInput v-model="rawNotes" :disabled="disableActions" />
-              </div>
 
               <template #footer>
                 <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                  <UButton
-                    color="secondary"
-                    icon="i-heroicons-sparkles"
-                    :label="t('companies.form.actions.analyze')"
-                    :loading="analyzing"
-                    :disabled="disableActions"
-                    @click="handleSave(true)"
-                  />
                   <UButton
                     color="primary"
                     icon="i-heroicons-check"

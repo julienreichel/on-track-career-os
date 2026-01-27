@@ -196,32 +196,6 @@ async function saveCompany() {
   }
 }
 
-async function analyzeCompanyInfo() {
-  if (!company.value) {
-    return;
-  }
-
-  const researchText = rawNotes.value.trim() || company.value.rawNotes?.trim() || '';
-  if (!researchText) {
-    errorMessage.value = t('companies.detail.errors.missingNotes');
-    return;
-  }
-
-  analyzingCompany.value = true;
-  errorMessage.value = null;
-  try {
-    const updated = await companyStore.analyze({ rawText: researchText });
-    if (updated) {
-      hydrateCompany(updated);
-    }
-  } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('companies.detail.errors.generic');
-  } finally {
-    analyzingCompany.value = false;
-  }
-}
-
 function handleEdit() {
   if (!company.value) return;
   hydrateCompany(company.value);
@@ -369,15 +343,6 @@ function clearJobsError() {
                 </p>
                 <div v-if="isEditing" class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                   <UButton
-                    color="secondary"
-                    icon="i-heroicons-sparkles"
-                    :label="t('companies.detail.actions.analyze')"
-                    :loading="analyzingCompany"
-                    :disabled="disableActions"
-                    data-testid="company-analyze-button"
-                    @click="analyzeCompanyInfo"
-                  />
-                  <UButton
                     color="neutral"
                     variant="ghost"
                     :label="t('common.cancel')"
@@ -388,14 +353,14 @@ function clearJobsError() {
                   <UButton
                     color="primary"
                     icon="i-heroicons-check"
-                    :label="t('companies.detail.actions.save')"
+                    :label="t('common.save')"
                     :loading="savingCompany"
                     :disabled="!canSaveCompany"
                     data-testid="company-save-button"
                     @click="saveCompany"
                   />
                 </div>
-                <div v-else class="flex justify-end">
+                <div v-else class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                   <UButton
                     color="primary"
                     variant="outline"
@@ -461,7 +426,7 @@ function clearJobsError() {
               <UButton
                 class="mt-4"
                 color="primary"
-                variant="ghost"
+                variant="outline"
                 :label="t('companies.list.actions.viewJobs')"
                 icon="i-heroicons-arrow-top-right-on-square"
                 to="/jobs"

@@ -65,9 +65,7 @@ const formattedLastGeneratedAt = computed(() => {
           <UBadge
             :color="needsUpdate ? 'warning' : 'secondary'"
             variant="outline"
-            :icon="
-              needsUpdate ? 'i-heroicons-exclamation-triangle' : 'i-heroicons-check-circle'
-            "
+            :icon="needsUpdate ? 'i-heroicons-exclamation-triangle' : 'i-heroicons-check-circle'"
           >
             {{
               needsUpdate
@@ -198,14 +196,6 @@ const formattedLastGeneratedAt = computed(() => {
           {{ t('companies.canvas.lastGeneratedAt', { date: formattedLastGeneratedAt }) }}
         </p>
         <div class="flex flex-wrap justify-end gap-3">
-          <UButton
-            color="secondary"
-            icon="i-heroicons-sparkles"
-            :label="t('companies.canvas.actions.generate')"
-            :loading="regenerating"
-            :disabled="saving"
-            @click="emit('regenerate')"
-          />
           <template v-if="isEditing">
             <UButton
               color="neutral"
@@ -217,22 +207,31 @@ const formattedLastGeneratedAt = computed(() => {
             <UButton
               color="primary"
               icon="i-heroicons-check"
-              :label="t('companies.canvas.actions.save')"
+              :label="t('common.save')"
               :loading="saving"
               :disabled="regenerating"
               @click="emit('save')"
             />
           </template>
-          <UButton
-            v-else
-            color="primary"
-            variant="outline"
-            icon="i-heroicons-pencil"
-            :label="t('common.edit')"
-            :disabled="disableEdit"
-            data-testid="company-canvas-edit"
-            @click="isEditing = true"
-          />
+          <template v-else>
+            <UButton
+              color="primary"
+              icon="i-heroicons-sparkles"
+              :label="t('companies.canvas.actions.generate')"
+              :loading="regenerating"
+              :disabled="saving"
+              @click="emit('regenerate')"
+            />
+            <UButton
+              color="primary"
+              variant="outline"
+              icon="i-heroicons-pencil"
+              :label="t('common.edit')"
+              :disabled="disableEdit"
+              data-testid="company-canvas-edit"
+              @click="isEditing = true"
+            />
+          </template>
         </div>
       </div>
     </template>
