@@ -60,7 +60,10 @@ const handleAdd = () => {
   const splitSource =
     colonIndex === -1
       ? rawValue
-      : rawValue.slice(0, colonIndex).replace(/[;,]+$/, '').trim();
+      : rawValue
+          .slice(0, colonIndex)
+          .replace(/[;,]+$/, '')
+          .trim();
   const suffix = colonIndex === -1 ? '' : rawValue.slice(colonIndex);
   const tokens: string[] = splitSource
     .split(/[;,]/)

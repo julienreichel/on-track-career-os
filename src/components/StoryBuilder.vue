@@ -219,6 +219,7 @@ const isValid = () => {
       <div class="flex justify-end gap-3">
         <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
         <UButton
+          icon="i-heroicons-check"
           :label="t('common.save')"
           color="primary"
           :disabled="!isValid()"

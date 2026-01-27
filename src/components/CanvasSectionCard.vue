@@ -39,7 +39,7 @@
     </template>
 
     <!-- Content area that grows to fill available space -->
-    <div class="flex-1 flex flex-col min-h-0 p-4">
+    <div class="flex-1 flex flex-col min-h-0">
       <!-- Edit mode: TagInput -->
       <div v-if="isEditing" class="space-y-2">
         <UInput

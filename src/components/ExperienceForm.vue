@@ -213,7 +213,8 @@ const experienceTypeValue = computed<string>({
         />
         <UButton
           type="submit"
-          :label="submitLabel || t('experiences.form.save')"
+          icon="i-heroicons-check"
+          :label="submitLabel || t('common.save')"
           :loading="loading"
           :disabled="!form.title || !form.startDate"
         />

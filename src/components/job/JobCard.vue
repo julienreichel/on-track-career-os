@@ -60,15 +60,15 @@ function handleDelete() {
         icon="i-heroicons-eye"
         size="xs"
         color="primary"
-        variant="soft"
+        variant="outline"
         @click.stop="handleOpen"
       />
       <UButton
         :label="t('jobList.actions.match')"
         icon="i-heroicons-sparkles"
         size="xs"
-        color="secondary"
-        variant="soft"
+        color="neutral"
+        variant="outline"
         data-testid="job-card-match"
         :to="matchLink"
       />
