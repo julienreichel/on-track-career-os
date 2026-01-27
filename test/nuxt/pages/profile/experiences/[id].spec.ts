@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../../utils/createTestI18n';
-import ExperienceDetailPage from '@/pages/profile/experiences/[id].vue';
+import ExperienceDetailPage from '@/pages/profile/experiences/[experienceId]/index.vue';
 import type { Experience } from '@/domain/experience/Experience';
 
 const mockGet = vi.fn();
@@ -23,7 +23,7 @@ const router = createRouter({
   history: createMemoryHistory(),
   routes: [
     {
-      path: '/profile/experiences/:id',
+      path: '/profile/experiences/:experienceId',
       name: 'experiences-id',
       component: ExperienceDetailPage,
     },
@@ -110,7 +110,7 @@ describe('Experience Detail Page', () => {
 
     expect(wrapper.find('.experience-form-stub').exists()).toBe(false);
     expect(wrapper.text()).toContain(sampleExperience.title);
-    expect(wrapper.find('h1').text()).toBe(i18n.global.t('experiences.form.editTitle'));
+    expect(wrapper.find('h1').text()).toBe(sampleExperience.title);
 
     const editLabel = i18n.global.t('common.edit');
     const editButton = wrapper.findAll('button').find((button) => button.text() === editLabel);

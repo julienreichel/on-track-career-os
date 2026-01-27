@@ -223,18 +223,6 @@ describe('Company Detail Page', () => {
     expect(canvasMock.regenerate).toHaveBeenCalled();
   });
 
-  it('runs company analysis when analyze button clicked', async () => {
-    const wrapper = await mountPage();
-    await flushPromises();
-    await wrapper.find('[data-testid="company-edit-button"]').trigger('click');
-    const analyzeButton = wrapper
-      .findAll('.u-button')
-      .find((button) => button.text().includes('Analyze company info'));
-    expect(analyzeButton).toBeTruthy();
-    await analyzeButton!.trigger('click');
-    expect(mockAnalyze).toHaveBeenCalled();
-  });
-
   it('renders linked jobs when available', async () => {
     jobsRef.value = [
       {

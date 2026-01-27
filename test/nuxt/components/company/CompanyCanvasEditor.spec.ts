@@ -119,7 +119,7 @@ describe('CompanyCanvasEditor', () => {
 
     const saveButton = wrapper
       .findAll('.u-button')
-      .find((button) => button.text() === i18n.global.t('companies.canvas.actions.save'));
+      .find((button) => button.text() === i18n.global.t('common.save'));
     expect(saveButton).toBeDefined();
     await saveButton!.trigger('click');
     expect(wrapper.emitted('regenerate')).toBeTruthy();

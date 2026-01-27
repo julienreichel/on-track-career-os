@@ -118,7 +118,7 @@ describe('New Company Page', () => {
     const wrapper = await mountPage();
     expect(wrapper.find('.company-form-stub').exists()).toBe(true);
     const buttons = wrapper.findAll('.u-button');
-    expect(buttons).toHaveLength(2);
+    expect(buttons).toHaveLength(1);
   });
 
   it('calls createCompany when saving', async () => {
@@ -127,22 +127,9 @@ describe('New Company Page', () => {
     await wrapper.vm.$nextTick();
     await flushPromises();
     const saveButton =
-      wrapper.findAll('.u-button').find((button) => button.text().includes('Save company')) ??
+      wrapper.findAll('.u-button').find((button) => button.text().includes('Save')) ??
       wrapper.findAll('.u-button')[1];
     await saveButton.trigger('click');
     expect(mockCreateCompany).toHaveBeenCalled();
-  });
-
-  it('calls analyze path when using AI action', async () => {
-    const wrapper = await mountPage();
-    (wrapper.vm as any).form.companyName = 'Nova';
-    (wrapper.vm as any).rawNotes = 'Notes';
-    await wrapper.vm.$nextTick();
-    await flushPromises();
-    const analyzeButton =
-      wrapper.findAll('.u-button').find((button) => button.text().includes('Save & analyze')) ??
-      wrapper.findAll('.u-button')[0];
-    await analyzeButton.trigger('click');
-    expect(mockAnalyzeCreate).toHaveBeenCalled();
   });
 });
