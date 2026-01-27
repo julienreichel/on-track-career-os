@@ -75,7 +75,11 @@ test.describe('Experience workflow', () => {
     await page.waitForLoadState('networkidle');
 
     await expect(page).toHaveURL(new RegExp(`/profile/experiences/${manualExperienceId}$`));
-    await expect(page.getByText(updatedCompanyName)).toBeVisible({ timeout: 20000 });
+    const header = page.getByRole('heading', { level: 1, name: MANUAL_EXPERIENCE_TITLE });
+    await expect(header).toBeVisible({ timeout: 20000 });
+    await expect(page.locator('[data-slot="description"]', { hasText: updatedCompanyName })).toBeVisible({
+      timeout: 20000,
+    });
   });
 
   test('opens the stories page for the manual experience and sees empty state', async ({
