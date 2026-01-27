@@ -339,7 +339,7 @@ provide(profileFormContextKey, {
 
     <UCard class="sticky bottom-0 z-10">
       <template #footer>
-        <div class="flex items-center justify-between gap-2">
+        <div class="flex justify-end gap-2">
           <UButton
             variant="ghost"
             color="neutral"

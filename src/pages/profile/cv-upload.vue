@@ -99,7 +99,7 @@ function viewExperiences() {
         <CvParsingStep v-if="workflow.currentStep.value === 'parsing'" />
 
         <!-- Preview Step -->
-        <div v-if="workflow.currentStep.value === 'preview'" class="space-y-6">
+        <div v-if="workflow.currentStep.value === 'preview'" class="space-y-6 pb-24">
           <!-- Experiences Preview -->
           <CvExperiencesPreview
             :experiences="parsing.extractedExperiences.value"
@@ -108,14 +108,18 @@ function viewExperiences() {
           />
 
           <!-- Actions -->
-          <div class="flex justify-end gap-3">
-            <UButton :label="t('common.cancel')" variant="outline" @click="handleCancel" />
-            <UButton
-              :label="t('cvUpload.confirmImport')"
-              icon="i-lucide-download"
-              @click="handleImport"
-            />
-          </div>
+          <UCard class="sticky bottom-0 z-10">
+            <template #footer>
+              <div class="flex justify-end gap-2">
+                <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
+                <UButton
+                  :label="t('cvUpload.confirmImport')"
+                  icon="i-lucide-download"
+                  @click="handleImport"
+                />
+              </div>
+            </template>
+          </UCard>
         </div>
 
         <!-- Importing Step -->
