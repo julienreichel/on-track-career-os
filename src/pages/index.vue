@@ -51,7 +51,7 @@
             :title="t('features.cvUpload.title')"
             :description="t('features.cvUpload.description')"
             icon="i-heroicons-arrow-up-tray"
-            :to="{ name: 'profile-cv-upload' }"
+            :to="{ name: 'onboarding' }"
           />
           <UPageCard
             :title="t('features.jobs.title')"

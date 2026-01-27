@@ -47,7 +47,7 @@
             :title="t('profile.links.uploadCv')"
             :description="t('profile.links.uploadCvDescription')"
             icon="i-heroicons-document-arrow-up"
-            to="/profile/cv-upload"
+            to="/onboarding"
           />
 
           <UPageCard

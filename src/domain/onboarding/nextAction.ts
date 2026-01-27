@@ -10,7 +10,7 @@ function phase1Primary(state: UserProgressState): NextActionItem {
       'upload-cv',
       'progress.actions.uploadCv',
       'progress.rationale.cvUpload',
-      '/profile/cv-upload'
+      '/onboarding'
     );
   }
   if (state.phase1.missing.includes('experienceCount')) {

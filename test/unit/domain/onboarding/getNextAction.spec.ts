@@ -15,7 +15,7 @@ describe('getNextAction', () => {
   it('returns CV upload as primary when phase 1 is incomplete', () => {
     const action = getNextAction(baseState());
     expect(action.primary.id).toBe('upload-cv');
-    expect(action.primary.to).toBe('/profile/cv-upload');
+    expect(action.primary.to).toBe('/onboarding');
   });
 
   it('returns profile depth when phase 2A is incomplete', () => {
