@@ -17,8 +17,7 @@ const { t } = useI18n();
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="space-y-1">
         <div class="flex items-center gap-2">
-          <UBadge color="warning" variant="outline">
-            <UIcon name="i-heroicons-lock-closed" class="w-3 h-3 mr-1" />
+          <UBadge color="warning" variant="outline" icon="i-heroicons-lock-closed">
             {{ t('guidance.locked.badge') }}
           </UBadge>
           <h3 class="text-base font-semibold text-highlighted">

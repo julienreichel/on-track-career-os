@@ -66,8 +66,13 @@ const updatedLabel = computed(() => t('cvTemplates.labels.updated'));
       <p v-if="updatedAt" class="text-xs text-dimmed">{{ updatedLabel }} {{ updatedAt }}</p>
 
       <template #badges>
-        <UBadge v-if="isDefault" color="secondary" variant="outline" size="xs">
-          <UIcon name="i-heroicons-star" class="w-3 h-3 mr-1" />
+        <UBadge
+          v-if="isDefault"
+          color="secondary"
+          variant="outline"
+          size="xs"
+          icon="i-heroicons-star"
+        >
           {{ resolvedDefaultLabel }}
         </UBadge>
       </template>

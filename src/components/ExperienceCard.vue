@@ -106,16 +106,24 @@ function getTextContent(input: string | string[] | null | undefined) {
       </div>
 
       <template #badges>
-        <UBadge color="neutral" variant="outline" size="xs">
-          <UIcon name="i-heroicons-briefcase" class="w-3 h-3 mr-1" />
+        <UBadge color="neutral" variant="outline" size="xs" icon="i-heroicons-briefcase">
           {{ t(`experiences.types.${experience.experienceType || 'work'}`) }}
         </UBadge>
-        <UBadge v-if="hasStories" color="secondary" variant="outline" size="xs">
-          <UIcon name="i-heroicons-document-text" class="w-3 h-3 mr-1" />
+        <UBadge
+          v-if="hasStories"
+          color="secondary"
+          variant="outline"
+          size="xs"
+          icon="i-heroicons-document-text"
+        >
           {{ storyCount }}
         </UBadge>
-        <UBadge :color="statusBadge.color" variant="outline" size="xs">
-          <UIcon name="i-heroicons-clipboard-document-check" class="w-3 h-3 mr-1" />
+        <UBadge
+          :color="statusBadge.color"
+          variant="outline"
+          size="xs"
+          icon="i-heroicons-clipboard-document-check"
+        >
           {{ statusBadge.label }}
         </UBadge>
       </template>

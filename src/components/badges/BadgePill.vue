@@ -14,11 +14,11 @@ const { t } = useI18n();
     <UBadge
       color="neutral"
       variant="outline"
-      class="flex items-center gap-2 cursor-help"
+      :icon="props.badge.icon"
+      class="cursor-help"
       :data-testid="`badge-pill-${props.badge.id}`"
     >
-      <UIcon :name="props.badge.icon" />
-      <span>{{ t(props.badge.titleKey) }}</span>
+      {{ t(props.badge.titleKey) }}
     </UBadge>
   </UTooltip>
 </template>

@@ -62,11 +62,13 @@ const formattedLastGeneratedAt = computed(() => {
           </p>
         </div>
         <div class="flex flex-wrap gap-3 text-sm text-gray-500">
-          <UBadge :color="needsUpdate ? 'warning' : 'secondary'" variant="outline">
-            <UIcon
-              :name="needsUpdate ? 'i-heroicons-exclamation-triangle' : 'i-heroicons-check-circle'"
-              class="w-3 h-3 mr-1"
-            />
+          <UBadge
+            :color="needsUpdate ? 'warning' : 'secondary'"
+            variant="outline"
+            :icon="
+              needsUpdate ? 'i-heroicons-exclamation-triangle' : 'i-heroicons-check-circle'
+            "
+          >
             {{
               needsUpdate
                 ? t('companies.canvas.status.needsUpdate')

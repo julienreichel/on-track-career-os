@@ -86,9 +86,9 @@
             :color="getSkillTagColor(item)"
             variant="outline"
             size="xs"
+            icon="i-heroicons-tag"
             class="mt-0.5 shrink-0"
           >
-            <UIcon name="i-heroicons-tag" class="w-3 h-3 mr-1" />
             {{ getSkillTag(item) }}
           </UBadge>
           <span class="leading-snug text-default">{{ getSkillText(item) }}</span>
@@ -129,8 +129,12 @@
             :key="`impact-${idx}`"
             class="flex items-start gap-2 text-sm text-default"
           >
-            <UBadge color="neutral" variant="outline" class="mt-0.5 shrink-0">
-              <UIcon name="i-heroicons-hashtag" class="w-3 h-3 mr-1" />
+            <UBadge
+              color="neutral"
+              variant="outline"
+              icon="i-heroicons-hashtag"
+              class="mt-0.5 shrink-0"
+            >
               {{ idx + 1 }}
             </UBadge>
             <span class="leading-snug">{{ item }}</span>

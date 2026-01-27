@@ -182,8 +182,12 @@
 
     <!-- Action Buttons -->
     <div v-if="canvas && !loading" class="flex items-center justify-between pt-4 border-t">
-      <UBadge v-if="canvas.needsUpdate" color="warning" variant="outline">
-        <UIcon name="i-heroicons-exclamation-triangle" class="w-3 h-3 mr-1" />
+      <UBadge
+        v-if="canvas.needsUpdate"
+        color="warning"
+        variant="outline"
+        icon="i-heroicons-exclamation-triangle"
+      >
         {{ t('canvas.needsUpdate') }}
       </UBadge>
       <div v-else />
