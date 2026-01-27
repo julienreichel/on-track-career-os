@@ -107,9 +107,9 @@ test.describe('Discovery flow', () => {
       await expect(page.getByText(/Confirm profile basics/i)).toBeVisible({ timeout: 20000 });
       await page.getByPlaceholder('John Doe').fill(user.name);
       await page.getByPlaceholder('you[at]example.com').fill(user.email);
-      await page.getByPlaceholder('+1 415 555 0101').fill('+1 415 555 0101');
+      await page.getByPlaceholder('+41 79 555 0101').fill('+1 415 555 0101');
       await page
-        .getByPlaceholder('e.g., Eligible to work in EU & US')
+        .getByPlaceholder('e.g., B Permit, Swiss citizen, ..')
         .fill('Eligible to work in US');
 
       const addTag = async (placeholder: string, value: string) => {

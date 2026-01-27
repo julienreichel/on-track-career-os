@@ -74,8 +74,8 @@ test.describe('Onboarding wizard', () => {
 
     await page.getByPlaceholder('John Doe').fill(testUser.name);
     await page.getByPlaceholder('you[at]example.com').fill(testUser.email);
-    await page.getByPlaceholder('+1 415 555 0101').fill('+1 415 555 0101');
-    await page.getByPlaceholder('e.g., Eligible to work in EU & US').fill('Eligible to work in US');
+    await page.getByPlaceholder('+41 79 555 0101').fill('+1 415 555 0101');
+    await page.getByPlaceholder('e.g., B Permit, Swiss citizen, ..').fill('Eligible to work in US');
 
     const socialInput = page.getByPlaceholder('https://linkedin.com/in/you');
     await socialInput.fill('https://linkedin.com/in/test-user');

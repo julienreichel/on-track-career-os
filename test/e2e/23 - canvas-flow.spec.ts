@@ -38,9 +38,9 @@ async function ensureProfileFilled(page: Page): Promise<void> {
   await page.getByPlaceholder('San Francisco, CA').first().fill('San Francisco, CA');
   await page.getByPlaceholder('Senior').first().fill('Senior');
   await page.getByPlaceholder('you[at]example.com').first().fill('john.doe@example.com');
-  await page.getByPlaceholder('+1 415 555 0101').first().fill('+1 415 555 0101');
+  await page.getByPlaceholder('+41 79 555 0101').first().fill('+1 415 555 0101');
   await page
-    .getByPlaceholder('e.g., Eligible to work in EU & US')
+    .getByPlaceholder('e.g., B Permit, Swiss citizen, ..')
     .first()
     .fill('Eligible to work in US');
 
