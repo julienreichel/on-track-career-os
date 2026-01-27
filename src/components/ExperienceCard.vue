@@ -106,7 +106,9 @@ function getTextContent(input: string | string[] | null | undefined) {
       </div>
 
       <template #badges>
-        <UBadge color="neutral" variant="outline" size="xs" icon="i-heroicons-briefcase">
+        <UBadge :color="statusBadge.color" variant="outline" size="xs">
+          {{ statusBadge.label }} </UBadge
+        ><UBadge color="neutral" variant="outline" size="xs">
           {{ t(`experiences.types.${experience.experienceType || 'work'}`) }}
         </UBadge>
         <UBadge
@@ -118,32 +120,24 @@ function getTextContent(input: string | string[] | null | undefined) {
         >
           {{ storyCount }}
         </UBadge>
-        <UBadge
-          :color="statusBadge.color"
-          variant="outline"
-          size="xs"
-          icon="i-heroicons-clipboard-document-check"
-        >
-          {{ statusBadge.label }}
-        </UBadge>
       </template>
 
       <template #actions>
-        <UButton
-          :label="t('experiences.list.viewStories')"
-          icon="i-heroicons-document-text"
-          size="xs"
-          color="neutral"
-          variant="soft"
-          @click.stop="handleViewStories"
-        />
         <UButton
           :label="t('common.view')"
           icon="i-heroicons-eye"
           size="xs"
           color="primary"
-          variant="soft"
+          variant="outline"
           @click.stop="handleEdit"
+        />
+        <UButton
+          :label="t('experiences.list.viewStories')"
+          icon="i-heroicons-document-text"
+          size="xs"
+          color="neutral"
+          variant="outline"
+          @click.stop="handleViewStories"
         />
       </template>
     </ItemCard>

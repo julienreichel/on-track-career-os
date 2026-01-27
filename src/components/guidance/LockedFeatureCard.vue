@@ -30,7 +30,7 @@ const { t } = useI18n();
       </div>
       <UButton
         color="primary"
-        variant="soft"
+        variant="outline"
         :label="t(props.feature.cta.labelKey)"
         :to="props.feature.cta.to"
       />

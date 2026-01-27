@@ -20,7 +20,7 @@ const { t } = useI18n();
     <template v-if="props.banner.cta" #actions>
       <UButton
         color="primary"
-        variant="soft"
+        variant="outline"
         :label="t(props.banner.cta.labelKey)"
         :to="props.banner.cta.to"
       />

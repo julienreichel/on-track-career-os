@@ -79,7 +79,7 @@
                 icon="i-heroicons-eye"
                 size="xs"
                 color="primary"
-                variant="soft"
+                variant="outline"
                 @click="navigateTo({ name: 'applications-speech-id', params: { id: block.id } })"
               />
             </template>

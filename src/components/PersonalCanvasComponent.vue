@@ -193,7 +193,7 @@
       <div v-else />
 
       <div class="flex gap-3">
-        <UButton variant="outline" icon="i-heroicons-arrow-path" @click="$emit('regenerate')">
+        <UButton icon="i-heroicons-arrow-path" @click="$emit('regenerate')">
           {{ t('canvas.actions.regenerate') }}
         </UButton>
       </div>

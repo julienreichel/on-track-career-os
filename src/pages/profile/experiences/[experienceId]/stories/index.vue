@@ -252,12 +252,12 @@ onMounted(async () => {
               :label="t('stories.list.autoGenerate')"
               icon="i-heroicons-sparkles"
               color="primary"
-              variant="soft"
               @click="handleAutoGenerate"
             />
             <UButton
               :label="t('stories.list.addNew')"
               icon="i-heroicons-plus"
+              variant="outline"
               @click="handleNewStory"
             />
           </template>

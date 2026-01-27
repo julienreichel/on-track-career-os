@@ -23,7 +23,6 @@
         <div v-if="isEditing" class="flex flex-wrap gap-2">
           <UButton
             color="primary"
-            variant="soft"
             icon="i-heroicons-arrow-up-on-square"
             :loading="uploadingPhoto"
             :disabled="uploadingPhoto"

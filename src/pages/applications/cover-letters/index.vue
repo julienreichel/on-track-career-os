@@ -75,22 +75,22 @@
             <!-- Custom Actions -->
             <template #actions>
               <UButton
-                :label="$t('coverLetter.display.actions.print')"
-                icon="i-heroicons-printer"
-                size="xs"
-                color="neutral"
-                variant="soft"
-                @click="handlePrint(letter)"
-              />
-              <UButton
                 :label="$t('common.view')"
                 icon="i-heroicons-eye"
                 size="xs"
                 color="primary"
-                variant="soft"
+                variant="outline"
                 @click="
                   navigateTo({ name: 'applications-cover-letters-id', params: { id: letter.id } })
                 "
+              />
+              <UButton
+                :label="$t('coverLetter.display.actions.print')"
+                icon="i-heroicons-printer"
+                size="xs"
+                color="neutral"
+                variant="outline"
+                @click="handlePrint(letter)"
               />
             </template>
           </ItemCard>

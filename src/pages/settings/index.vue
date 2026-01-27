@@ -13,7 +13,7 @@ const { t } = useI18n();
             <p class="text-sm text-dimmed">{{ t('settings.cv.description') }}</p>
             <UButton
               color="primary"
-              variant="soft"
+              variant="outline"
               icon="i-heroicons-arrow-right"
               :label="t('settings.cv.action')"
               to="/settings/cv"

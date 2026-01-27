@@ -275,7 +275,7 @@ watch(
                     </div>
                     <UButton
                       color="primary"
-                      variant="soft"
+                      variant="outline"
                       :label="t('cvTemplates.list.actions.create')"
                       icon="i-heroicons-plus"
                       @click="createModalOpen = true"

@@ -70,7 +70,7 @@ function handleDelete() {
         icon="i-heroicons-eye"
         size="xs"
         color="primary"
-        variant="soft"
+        variant="outline"
         @click.stop="handleOpen"
       />
     </template>

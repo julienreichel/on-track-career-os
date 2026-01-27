@@ -85,20 +85,20 @@
             <!-- Custom Actions -->
             <template #actions>
               <UButton
-                :label="$t('cvList.actions.print')"
-                icon="i-heroicons-printer"
-                size="xs"
-                color="neutral"
-                variant="soft"
-                @click="handlePrint(cv)"
-              />
-              <UButton
                 :label="$t('common.view')"
                 icon="i-heroicons-eye"
                 size="xs"
                 color="primary"
-                variant="soft"
+                variant="outline"
                 @click="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
+              />
+              <UButton
+                :label="$t('cvList.actions.print')"
+                icon="i-heroicons-printer"
+                size="xs"
+                color="neutral"
+                variant="outline"
+                @click="handlePrint(cv)"
               />
             </template>
           </ItemCard>

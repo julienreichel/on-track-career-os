@@ -85,7 +85,7 @@ const updatedLabel = computed(() => t('cvTemplates.labels.updated'));
             :label="primaryActionLabel"
             :icon="primaryActionIcon || undefined"
             color="primary"
-            variant="soft"
+            variant="outline"
             @click="emit('primary')"
           />
           <UButton
@@ -94,7 +94,7 @@ const updatedLabel = computed(() => t('cvTemplates.labels.updated'));
             :label="secondaryActionLabel"
             :icon="secondaryActionIcon || undefined"
             color="neutral"
-            variant="soft"
+            variant="outline"
             @click="emit('secondary')"
           />
         </div>

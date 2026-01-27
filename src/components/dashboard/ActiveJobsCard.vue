@@ -25,9 +25,8 @@ const showEmpty = computed(() => !props.loading && props.states.length === 0);
         <UButton
           :label="t('jobList.actions.add')"
           icon="i-heroicons-plus"
-          size="xs"
           color="primary"
-          variant="soft"
+          variant="outline"
           to="/jobs/new"
         />
       </div>

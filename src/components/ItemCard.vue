@@ -94,7 +94,7 @@ const handleDelete = (event: Event) => {
               icon="i-heroicons-pencil"
               size="xs"
               color="primary"
-              variant="soft"
+              variant="outline"
               @click="handleEdit"
             />
           </div>
