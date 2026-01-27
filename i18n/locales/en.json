@@ -239,7 +239,7 @@
     "parsing": "Parsing your CV...",
     "parsingDescription": "AI is extracting your experiences and information.",
     "sections": {
-      "experiences": "Review experiences",
+      "experiences": "Review and confirm your experiences",
       "profile": "Profile Information"
     },
     "profile": {
@@ -1636,7 +1636,7 @@
         "hint": "We use your CV to extract experiences and profile basics."
       },
       "experienceReview": {
-        "title": "Review experiences",
+        "title": "Experiences",
         "description": "Confirm your experiences and import them.",
         "hint": "Ensure at least three experiences for a strong foundation.",
         "count": "{count} experience(s) detected",

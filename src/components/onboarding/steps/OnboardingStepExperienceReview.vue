@@ -18,9 +18,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const MIN_EXPERIENCE_COUNT = 3;
 const experienceCount = computed(() => props.experiences.length);
-const hasEnoughExperiences = computed(() => experienceCount.value >= MIN_EXPERIENCE_COUNT);
 </script>
 
 <template>
@@ -33,18 +31,6 @@ const hasEnoughExperiences = computed(() => experienceCount.value >= MIN_EXPERIE
       <p class="mt-2 text-sm">
         {{ t('onboarding.steps.experienceReview.count', { count: experienceCount }) }}
       </p>
-      <UAlert
-        v-if="!hasEnoughExperiences"
-        class="mt-4"
-        icon="i-heroicons-information-circle"
-        color="warning"
-        variant="soft"
-        :title="t('onboarding.steps.experienceReview.needsMore')"
-      >
-        <template #description>
-          <span>{{ t('onboarding.steps.experienceReview.needsMoreHint') }}</span>
-        </template>
-      </UAlert>
     </UCard>
 
     <CvExperiencesPreview
