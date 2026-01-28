@@ -20,9 +20,6 @@ import { test, expect } from '@playwright/test';
  */
 
 test.describe('Profile Summary Page', () => {
-  // Retry tests in this suite due to occasional auth state timing issues
-  test.describe.configure({ retries: 2 });
-
   test.beforeEach(async ({ page }) => {
     await page.goto('/profile');
     await page.waitForLoadState('networkidle');
@@ -42,9 +39,9 @@ test.describe('Profile Summary Page', () => {
     await expect(canvasLink).toHaveAttribute('href', '/profile/canvas');
   });
 
-  test('should navigate to full profile when edit button clicked', async ({ page }) => {
-    const editButton = page.locator('button:has-text("Edit profile")').first();
-    await editButton.click();
+  test('should navigate to full profile when summary card clicked', async ({ page }) => {
+    const summaryLink = page.getByRole('link', { name: /view full profile/i });
+    await summaryLink.click();
     await page.waitForTimeout(500);
     expect(page.url()).toContain('/profile/full');
   });

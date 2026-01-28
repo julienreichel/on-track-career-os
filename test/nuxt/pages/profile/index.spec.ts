@@ -94,6 +94,10 @@ const stubs = {
   USkeleton: {
     template: '<div class="u-skeleton" />',
   },
+  NuxtLink: {
+    props: ['to'],
+    template: '<a :href="to"><slot /></a>',
+  },
   GuidanceBanner: {
     props: ['banner'],
     template: '<div class="guidance-banner">{{ banner.title }}</div>',
@@ -136,7 +140,9 @@ describe('Profile Index Page', () => {
 
     expect(wrapper.find('.u-page-header').text()).toContain(i18n.global.t('profile.title'));
     expect(wrapper.find('.profile-summary-card').exists()).toBe(true);
-    expect(wrapper.text()).toContain(i18n.global.t('profile.summary.viewFullProfile'));
+    const summaryLink = wrapper.find('a[href="/profile/full"]');
+    expect(summaryLink.exists()).toBe(true);
+    expect(summaryLink.find('.profile-summary-card').exists()).toBe(true);
     expect(wrapper.text()).toContain(i18n.global.t('profile.links.experiences'));
     expect(wrapper.text()).toContain(i18n.global.t('profile.links.personalCanvas'));
     expect(wrapper.text()).not.toContain(i18n.global.t('profile.links.uploadCv'));

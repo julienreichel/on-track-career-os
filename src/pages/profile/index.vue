@@ -18,30 +18,21 @@
       />
 
       <USkeleton v-if="loading" class="h-40 rounded-xl" />
-      <ProfileSummaryCard v-else :profile="profile" :photo-url="photoPreviewUrl" />
+      <NuxtLink
+        v-else
+        to="/profile/full"
+        class="block cursor-pointer"
+        :aria-label="t('profile.summary.viewFullProfile')"
+      >
+        <ProfileSummaryCard
+          :profile="profile"
+          :photo-url="photoPreviewUrl"
+          class="transition hover:bg-elevated/50"
+        />
+      </NuxtLink>
 
       <UCard class="mt-6">
-        <template #header>
-          <h3 class="text-lg font-semibold">
-            {{ t('profile.sections.relatedPages') }}
-          </h3>
-        </template>
-
         <UPageGrid>
-          <UPageCard
-            :title="t('profile.summary.viewFullProfile')"
-            :description="t('profile.summary.fullProfileDescription')"
-            icon="i-heroicons-user-circle"
-            to="/profile/full"
-            :links="[
-              {
-                label: t('profile.summary.editFromSummary'),
-                icon: 'i-heroicons-pencil-square',
-                to: '/profile/full?mode=edit',
-              },
-            ]"
-          />
-
           <UPageCard
             :title="t('profile.links.experiences')"
             :description="t('profile.links.experiencesDescription')"
@@ -84,7 +75,6 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useUserProfile } from '@/application/user-profile/useUserProfile';
@@ -96,7 +86,6 @@ import type { PageHeaderLink } from '@/types/ui';
 import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
 
 const { t } = useI18n();
-const router = useRouter();
 const { userId } = useAuthUser();
 
 const profile = ref<UserProfile | null>(null);
@@ -107,24 +96,11 @@ const profilePhotoService = new ProfilePhotoService();
 const experienceRepo = new ExperienceRepository();
 const { guidance } = useGuidance('profile');
 
-const goToFullProfile = (mode?: 'edit') => {
-  void router.push({
-    path: '/profile/full',
-    query: mode ? { mode } : undefined,
-  });
-};
-
 const headerLinks = computed<PageHeaderLink[]>(() => [
   {
     label: t('navigation.backToHome'),
     icon: 'i-heroicons-arrow-left',
     to: '/',
-  },
-  {
-    label: t('profile.summary.editFromSummary'),
-    icon: 'i-heroicons-pencil',
-    color: 'primary',
-    onClick: () => goToFullProfile('edit'),
   },
 ]);
 
