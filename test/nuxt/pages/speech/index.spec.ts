@@ -263,6 +263,7 @@ describe('Speech list page', () => {
         updatedAt: '2024-02-02T00:00:00.000Z',
       },
     ] as SpeechBlock[];
+    guidanceRef.value = {};
 
     const { wrapper } = await mountPage();
     await wrapper.vm.$nextTick();
@@ -296,6 +297,7 @@ describe('Speech list page', () => {
         updatedAt: '2024-01-02T00:00:00.000Z',
       },
     ] as SpeechBlock[];
+    guidanceRef.value = {};
 
     const { wrapper } = await mountPage();
     await wrapper.vm.$nextTick();
