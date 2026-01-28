@@ -43,14 +43,6 @@
           />
 
           <UPageCard
-            v-if="showCvUpload"
-            :title="t('profile.links.uploadCv')"
-            :description="t('profile.links.uploadCvDescription')"
-            icon="i-heroicons-document-arrow-up"
-            to="/onboarding"
-          />
-
-          <UPageCard
             :title="t('profile.links.experiences')"
             :description="t('profile.links.experiencesDescription')"
             icon="i-heroicons-briefcase"
@@ -111,8 +103,6 @@ const profile = ref<UserProfile | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const photoPreviewUrl = ref<string | null>(null);
-const showCvUpload = ref(false);
-
 const profilePhotoService = new ProfilePhotoService();
 const experienceRepo = new ExperienceRepository();
 const { guidance } = useGuidance('profile');
@@ -169,13 +159,7 @@ watch(
       loading.value = false;
     }
 
-    try {
-      const experiences = await experienceRepo.list(newUserId);
-      showCvUpload.value = experiences.length === 0;
-    } catch (err) {
-      console.error('[profile-summary] Experience check failed:', err);
-      showCvUpload.value = true;
-    }
+    await experienceRepo.list(newUserId);
   },
   { immediate: true }
 );

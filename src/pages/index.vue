@@ -16,6 +16,7 @@
           </div>
           <UButton
             color="primary"
+            variant="outline"
             icon="i-heroicons-arrow-right"
             :label="t('onboarding.actionBox.cta')"
             :to="{ name: 'onboarding' }"
@@ -45,13 +46,6 @@
             :description="t('features.profile.description')"
             icon="i-heroicons-user-circle"
             :to="{ name: 'profile' }"
-          />
-          <UPageCard
-            v-if="showCvUpload"
-            :title="t('features.cvUpload.title')"
-            :description="t('features.cvUpload.description')"
-            icon="i-heroicons-arrow-up-tray"
-            :to="{ name: 'onboarding' }"
           />
           <UPageCard
             :title="t('features.jobs.title')"
@@ -87,7 +81,6 @@ import { useUserProgress } from '@/composables/useUserProgress';
 const { t } = useI18n();
 const { userId } = useAuthUser();
 
-const showCvUpload = ref(false);
 const showOnboarding = ref(false);
 const experienceRepo = new ExperienceRepository();
 const badges = useBadges();
@@ -117,12 +110,8 @@ watch(userId, async (newUserId) => {
   try {
     const experiences = await experienceRepo.list(newUserId);
     showOnboarding.value = !experiences || experiences.length === 0;
-    // Show CV upload only if user has no experiences
-    showCvUpload.value = !experiences || experiences.length === 0;
   } catch (error) {
     console.error('Error checking experiences:', error);
-    // Show CV upload on error (better UX to show than hide)
-    showCvUpload.value = true;
     showOnboarding.value = true;
   }
 });

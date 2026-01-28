@@ -1,376 +1,160 @@
-import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { mount, flushPromises } from '@vue/test-utils';
 import { createTestI18n } from '../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
+import { ref } from 'vue';
+import IndexPage from '@/pages/index.vue';
 
-/**
- * Nuxt Component Tests: Home/Index Page
- *
- * Tests the home page component rendering, layout, and UI elements.
- * These tests focus on component behavior without full E2E workflows.
- *
- * E2E tests (test/e2e/index-page.spec.ts) cover:
- * - Navigation flows between pages
- * - Authentication redirects
- * - Full page interactions
- */
+const mockUserId = ref<string | null>(null);
+const mockExperienceList = vi.fn();
+const mockBadges = {
+  earnedBadgeDefinitions: ref([]),
+  load: vi.fn(),
+};
+const mockActiveJobs = {
+  loading: ref(false),
+  states: ref([]),
+  load: vi.fn(),
+};
+const mockProgress = {
+  state: ref<{ phase?: string } | null>({ phase: 'bonus' }),
+  profile: ref<{ fullName?: string | null } | null>({ fullName: 'Ava Test' }),
+  load: vi.fn(),
+};
 
-// Create i18n instance for tests
+vi.mock('@/composables/useAuthUser', () => ({
+  useAuthUser: () => ({
+    userId: mockUserId,
+  }),
+}));
+
+vi.mock('@/domain/experience/ExperienceRepository', () => ({
+  ExperienceRepository: vi.fn(() => ({
+    list: mockExperienceList,
+  })),
+}));
+
+vi.mock('@/composables/useBadges', () => ({
+  useBadges: () => mockBadges,
+}));
+
+vi.mock('@/composables/useActiveJobsDashboard', () => ({
+  useActiveJobsDashboard: () => mockActiveJobs,
+}));
+
+vi.mock('@/composables/useUserProgress', () => ({
+  useUserProgress: () => mockProgress,
+}));
+
 const i18n = createTestI18n();
 
-// Create router for tests
 const router = createRouter({
   history: createMemoryHistory(),
-  routes: [
-    { path: '/', name: 'index', component: { template: '<div>Home</div>' } },
-    { path: '/profile', name: 'profile', component: { template: '<div>Profile</div>' } },
-  ],
+  routes: [{ path: '/', name: 'index', component: IndexPage }],
 });
 
-// Stub Nuxt UI components
 const stubs = {
-  UContainer: {
-    template: '<div class="u-container"><slot /></div>',
+  UPage: {
+    template: '<main class="u-page"><slot /></main>',
   },
   UPageHeader: {
-    template: '<div class="u-page-header"><slot name="title" /><slot name="description" /></div>',
+    props: ['title', 'description', 'links'],
+    template:
+      '<div class="u-page-header"><h1>{{ title }}</h1><p v-if="description">{{ description }}</p><slot name="actions" /></div>',
   },
   UPageBody: {
     template: '<div class="u-page-body"><slot /></div>',
   },
   UPageCard: {
-    template:
-      '<div class="u-page-card"><h3 v-if="title">{{ title }}</h3><p v-if="description">{{ description }}</p><slot name="title" /><slot name="description" /><slot /></div>',
     props: ['to', 'icon', 'title', 'description'],
+    template:
+      '<div class="u-page-card"><h3>{{ title }}</h3><p v-if="description">{{ description }}</p></div>',
   },
   UPageGrid: {
     template: '<div class="u-page-grid"><slot /></div>',
   },
-  NuxtLink: {
-    template: '<a :href="to"><slot /></a>',
-    props: ['to'],
+  UCard: {
+    template: '<div class="u-card"><slot /></div>',
+  },
+  UButton: {
+    props: ['label', 'icon', 'to', 'variant', 'color'],
+    template: '<button class="u-button">{{ label }}</button>',
+  },
+  ProgressGuidanceSection: {
+    template: '<div class="progress-guidance-section" />',
+    props: ['progress'],
+  },
+  ActiveJobsCard: {
+    template: '<div class="active-jobs-card" />',
+    props: ['states', 'loading'],
+  },
+  BadgeGridCard: {
+    template: '<div class="badge-grid-card" />',
+    props: ['badges'],
   },
 };
 
+async function mountPage() {
+  const wrapper = mount(IndexPage, {
+    global: {
+      plugins: [i18n, router],
+      stubs,
+    },
+  });
+
+  await flushPromises();
+  return wrapper;
+}
+
 describe('Index Page Component', () => {
-  describe('Page Header', () => {
-    it('should render page header with title', () => {
-      // This is a placeholder - actual index page component needs to be imported
-      // For now, we test that the expected structure would render
-      const wrapper = mount(
-        {
-          template: `
-            <div>
-              <UPageHeader>
-                <template #title>{{ t('app.title') }}</template>
-                <template #description>{{ t('app.description') }}</template>
-              </UPageHeader>
-            </div>
-          `,
-          setup() {
-            const { t } = i18n.global;
-            return { t };
-          },
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
-
-      expect(wrapper.find('.u-page-header').exists()).toBe(true);
-      expect(wrapper.text()).toContain('On Track Career');
-    });
-
-    it('should render page description', () => {
-      const wrapper = mount(
-        {
-          template: `
-            <div>
-              <UPageHeader>
-                <template #description>{{ t('home.description') }}</template>
-              </UPageHeader>
-            </div>
-          `,
-          setup() {
-            const { t } = i18n.global;
-            return { t };
-          },
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
-
-      expect(wrapper.text()).toContain(i18n.global.t('home.description'));
-    });
+  beforeEach(() => {
+    mockUserId.value = null;
+    mockExperienceList.mockReset();
+    mockBadges.earnedBadgeDefinitions.value = [];
+    mockActiveJobs.loading.value = false;
+    mockActiveJobs.states.value = [];
+    mockProgress.state.value = { phase: 'bonus' };
+    mockProgress.profile.value = { fullName: 'Ava Test' };
   });
 
-  describe('Feature Cards', () => {
-    it('should render profile feature card', () => {
-      const wrapper = mount(
-        {
-          template: `
-            <UPageCard to="/profile" :title="t('features.profile.title')" />
-          `,
-          setup() {
-            const { t } = i18n.global;
-            return { t };
-          },
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
+  it('renders header and feature cards without CV upload card', async () => {
+    mockExperienceList.mockResolvedValue([]);
+    const wrapper = await mountPage();
 
-      expect(wrapper.find('.u-page-card').exists()).toBe(true);
-      expect(wrapper.text()).toContain(i18n.global.t('features.profile.title'));
-    });
+    mockUserId.value = 'user-1';
+    await flushPromises();
 
-    it('should render jobs feature card', () => {
-      const wrapper = mount(
-        {
-          template: `
-            <UPageCard :title="t('features.jobs.title')" />
-          `,
-          setup() {
-            const { t } = i18n.global;
-            return { t };
-          },
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
-
-      expect(wrapper.text()).toContain(i18n.global.t('features.jobs.title'));
-    });
-
-    it('should render applications feature card', () => {
-      const wrapper = mount(
-        {
-          template: `
-            <UPageCard :title="t('features.applications.title')" />
-          `,
-          setup() {
-            const { t } = i18n.global;
-            return { t };
-          },
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
-
-      expect(wrapper.text()).toContain(i18n.global.t('features.applications.title'));
-    });
-
-    it('should render interview prep feature card', () => {
-      const wrapper = mount(
-        {
-          template: `
-            <UPageCard :title="t('features.interview.title')" />
-          `,
-          setup() {
-            const { t } = i18n.global;
-            return { t };
-          },
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
-
-      expect(wrapper.text()).toContain(i18n.global.t('features.interview.title'));
-    });
+    expect(wrapper.find('.u-page-header').text()).toContain(
+      i18n.global.t('home.title', { name: 'Ava Test' })
+    );
+    expect(wrapper.text()).toContain(i18n.global.t('features.profile.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('features.jobs.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('features.applications.title'));
+    expect(wrapper.text()).not.toContain(i18n.global.t('features.cvUpload.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('onboarding.actionBox.title'));
   });
 
-  describe('Responsive Layout', () => {
-    it('should use grid layout for feature cards', () => {
-      const wrapper = mount(
-        {
-          template: `
-            <UPageGrid>
-              <UPageCard title="Card 1" />
-              <UPageCard title="Card 2" />
-              <UPageCard title="Card 3" />
-            </UPageGrid>
-          `,
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
+  it('shows progress guidance and active jobs when onboarding is complete', async () => {
+    mockExperienceList.mockResolvedValue([{ id: 'exp-1' }]);
+    mockActiveJobs.states.value = [{ jobId: 'job-1' }];
+    const wrapper = await mountPage();
 
-      expect(wrapper.find('.u-page-grid').exists()).toBe(true);
-      expect(wrapper.findAll('.u-page-card')).toHaveLength(3);
-    });
+    mockUserId.value = 'user-1';
+    await flushPromises();
 
-    it('should render container for page content', () => {
-      const wrapper = mount(
-        {
-          template: `
-            <UContainer>
-              <div>Content</div>
-            </UContainer>
-          `,
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
-
-      expect(wrapper.find('.u-container').exists()).toBe(true);
-    });
+    expect(wrapper.find('.progress-guidance-section').exists()).toBe(true);
+    expect(wrapper.find('.active-jobs-card').exists()).toBe(true);
+    expect(wrapper.text()).not.toContain(i18n.global.t('onboarding.actionBox.title'));
   });
 
-  describe('Accessibility', () => {
-    it('should have proper semantic structure', () => {
-      const wrapper = mount(
-        {
-          template: `
-            <main>
-              <UPageHeader>
-                <template #title>Home</template>
-              </UPageHeader>
-              <UPageBody>
-                <UPageGrid>
-                  <UPageCard title="Feature" />
-                </UPageGrid>
-              </UPageBody>
-            </main>
-          `,
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
+  it('renders badge grid when badges are earned', async () => {
+    mockExperienceList.mockResolvedValue([{ id: 'exp-1' }]);
+    mockBadges.earnedBadgeDefinitions.value = [{ id: 'badge-1' }];
+    const wrapper = await mountPage();
 
-      expect(wrapper.find('main').exists()).toBe(true);
-      expect(wrapper.find('.u-page-header').exists()).toBe(true);
-      expect(wrapper.find('.u-page-body').exists()).toBe(true);
-    });
-  });
+    mockUserId.value = 'user-1';
+    await flushPromises();
 
-  describe('Empty State - CV Upload Feature', () => {
-    it('should show CV upload card when showCvUpload is true', () => {
-      const wrapper = mount(
-        {
-          template: `
-            <UPageGrid>
-              <UPageCard :title="t('features.profile.title')" />
-              <UPageCard
-                v-if="showCvUpload"
-                :title="t('features.cvUpload.title')"
-                :description="t('features.cvUpload.description')"
-                to="/profile/cv-upload"
-              />
-              <UPageCard :title="t('features.jobs.title')" />
-            </UPageGrid>
-          `,
-          setup() {
-            const { t } = i18n.global;
-            const showCvUpload = true;
-            return { t, showCvUpload };
-          },
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
-
-      const cards = wrapper.findAll('.u-page-card');
-      expect(cards).toHaveLength(3);
-      expect(wrapper.text()).toContain(i18n.global.t('features.cvUpload.title'));
-    });
-
-    it('should hide CV upload card when showCvUpload is false', () => {
-      const wrapper = mount(
-        {
-          template: `
-            <UPageGrid>
-              <UPageCard :title="t('features.profile.title')" />
-              <UPageCard
-                v-if="showCvUpload"
-                :title="t('features.cvUpload.title')"
-                to="/profile/cv-upload"
-              />
-              <UPageCard :title="t('features.jobs.title')" />
-            </UPageGrid>
-          `,
-          setup() {
-            const { t } = i18n.global;
-            const showCvUpload = false;
-            return { t, showCvUpload };
-          },
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
-
-      const cards = wrapper.findAll('.u-page-card');
-      expect(cards).toHaveLength(2);
-      expect(wrapper.text()).not.toContain(i18n.global.t('features.cvUpload.title'));
-    });
-
-    it('should render CV upload card with correct title and description when empty', () => {
-      const wrapper = mount(
-        {
-          template: `
-            <UPageCard
-              :title="t('features.cvUpload.title')"
-              :description="t('features.cvUpload.description')"
-              to="/profile/cv-upload"
-            />
-          `,
-          setup() {
-            const { t } = i18n.global;
-            return { t };
-          },
-        },
-        {
-          global: {
-            plugins: [i18n, router],
-            stubs,
-          },
-        }
-      );
-
-      expect(wrapper.text()).toContain(i18n.global.t('features.cvUpload.title'));
-      expect(wrapper.text()).toContain(i18n.global.t('features.cvUpload.description'));
-    });
+    expect(wrapper.find('.badge-grid-card').exists()).toBe(true);
   });
 });
