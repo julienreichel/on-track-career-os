@@ -120,6 +120,10 @@ const stubs = {
   UPageBody: {
     template: '<div class="u-page-body"><slot /></div>',
   },
+  GuidanceBanner: {
+    props: ['banner'],
+    template: '<div class="guidance-banner-stub"></div>',
+  },
 };
 
 describe('CV Listing Page - Empty State', () => {
@@ -164,21 +168,18 @@ describe('CV Listing Page - Empty State', () => {
     expect(wrapper.find('.guidance-empty-state-stub').exists()).toBe(true);
   });
 
-  it('shows locked guidance when prerequisites are missing', async () => {
+  it('shows banner guidance when recommendations are missing', async () => {
     guidanceRef.value = {
+      banner: {
+        titleKey: 'guidance.applications.banner.matchingSummary.title',
+        descriptionKey: 'guidance.applications.banner.matchingSummary.description',
+        cta: { labelKey: 'guidance.applications.banner.matchingSummary.cta', to: '/jobs' },
+      },
       emptyState: {
         titleKey: 'guidance.applications.cv.empty.title',
         descriptionKey: 'guidance.applications.cv.empty.description',
         cta: { labelKey: 'guidance.applications.cv.empty.cta', to: '/applications/cv/new' },
       },
-      lockedFeatures: [
-        {
-          id: 'cv-locked',
-          titleKey: 'guidance.applications.locked.title',
-          descriptionKey: 'guidance.applications.locked.description',
-          cta: { labelKey: 'guidance.applications.locked.cta', to: '/jobs' },
-        },
-      ],
     };
 
     const wrapper = mount(CvIndexPage, {
@@ -190,7 +191,7 @@ describe('CV Listing Page - Empty State', () => {
 
     await flushPromises();
 
-    expect(wrapper.find('.guidance-locked-stub').exists()).toBe(true);
+    expect(wrapper.find('.guidance-banner-stub').exists()).toBe(true);
   });
 
   it('should have page header with title and description', async () => {

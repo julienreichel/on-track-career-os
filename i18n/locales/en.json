@@ -666,6 +666,38 @@
       }
     },
     "applications": {
+      "banner": {
+        "profileDepth": {
+          "title": "Build your profile depth",
+          "description": "Add goals, aspirations, and values to improve tailored materials.",
+          "cta": "Update profile"
+        },
+        "stories": {
+          "title": "Add your stories",
+          "description": "Create STAR stories to enrich your tailored materials.",
+          "cta": "Create stories"
+        },
+        "canvas": {
+          "title": "Generate your canvas",
+          "description": "Create your personal canvas to strengthen tailored materials.",
+          "cta": "Open canvas"
+        },
+        "job": {
+          "title": "Upload a job",
+          "description": "Add a job description to personalize tailored materials.",
+          "cta": "Add a job"
+        },
+        "matchingSummary": {
+          "title": "Generate a match summary",
+          "description": "Analyze a job to unlock stronger tailored materials.",
+          "cta": "Analyze a job"
+        },
+        "default": {
+          "title": "Tailored materials need more context",
+          "description": "Complete your matching steps to personalize tailored materials.",
+          "cta": "Analyze a job"
+        }
+      },
       "locked": {
         "title": "Tailored materials are locked",
         "description": "Complete your matching summary to unlock tailored materials.",

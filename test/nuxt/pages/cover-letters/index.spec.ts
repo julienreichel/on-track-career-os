@@ -132,6 +132,10 @@ const stubs = {
   ConfirmModal: {
     template: '<div class="confirm-modal"></div>',
   },
+  GuidanceBanner: {
+    props: ['banner'],
+    template: '<div class="guidance-banner-stub"></div>',
+  },
 };
 
 async function mountPage() {

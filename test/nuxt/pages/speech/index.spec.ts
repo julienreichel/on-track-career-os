@@ -5,6 +5,7 @@ import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
 import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 import SpeechIndexPage from '@/pages/applications/speech/index.vue';
+import type { GuidanceModel } from '@/domain/onboarding';
 
 // Mock the SpeechBlockRepository to avoid Amplify client instantiation
 vi.mock('@/domain/speech-block/SpeechBlockRepository', () => ({
@@ -40,14 +41,18 @@ vi.mock('@/composables/useAuthUser', () => ({
   }),
 }));
 
+const guidanceRef = ref<GuidanceModel>({
+  emptyState: {
+    titleKey: 'guidance.applications.speech.empty.title',
+    descriptionKey: 'guidance.applications.speech.empty.description',
+    cta: { labelKey: 'guidance.applications.speech.empty.cta', to: '/applications/speech/new' },
+  },
+});
+
 // Mock useGuidance to avoid JobDescriptionRepository instantiation
 vi.mock('@/composables/useGuidance', () => ({
   useGuidance: () => ({
-    guidance: ref({
-      banner: null,
-      emptyState: null,
-      lockedFeatures: [],
-    }),
+    guidance: guidanceRef,
   }),
 }));
 
@@ -181,6 +186,10 @@ const stubs = {
   ConfirmModal: {
     template: '<div class="confirm-modal"></div>',
   },
+  GuidanceBanner: {
+    props: ['banner'],
+    template: '<div class="guidance-banner-stub"></div>',
+  },
 };
 
 async function mountPage() {
@@ -204,6 +213,13 @@ describe('Speech list page', () => {
     itemsRef.value = [];
     loadingRef.value = false;
     errorRef.value = null;
+    guidanceRef.value = {
+      emptyState: {
+        titleKey: 'guidance.applications.speech.empty.title',
+        descriptionKey: 'guidance.applications.speech.empty.description',
+        cta: { labelKey: 'guidance.applications.speech.empty.cta', to: '/applications/speech/new' },
+      },
+    };
     mockLoadAll.mockClear();
     mockCreateSpeechBlock.mockClear();
     generateMock.mockClear();

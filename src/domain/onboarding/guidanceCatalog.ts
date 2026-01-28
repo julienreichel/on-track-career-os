@@ -361,109 +361,93 @@ const getJobDetailGuidance = (
 };
 
 const getApplicationsLocked = (state: UserProgressState | null, id: string): LockedFeature[] => {
-  if (!state) {
+  if (!state || state.phase1.isComplete) {
     return [];
-  }
-
-  if (!state.phase1.isComplete) {
-    return [
-      {
-        id,
-        titleKey: 'guidance.applications.lockedPhase1.title',
-        descriptionKey: 'guidance.applications.lockedPhase1.description',
-        cta: {
-          labelKey: 'guidance.applications.lockedPhase1.cta',
-          to: '/profile/experiences',
-        },
-      },
-    ];
-  }
-
-  if (isPhase3Unlocked(state)) {
-    return [];
-  }
-
-  if (state.phase2B.missing.includes('profileDepth')) {
-    return [
-      {
-        id,
-        titleKey: 'guidance.applications.lockedProfileDepth.title',
-        descriptionKey: 'guidance.applications.lockedProfileDepth.description',
-        cta: {
-          labelKey: 'guidance.applications.lockedProfileDepth.cta',
-          to: '/profile/full?mode=edit',
-        },
-      },
-    ];
-  }
-
-  if (state.phase2B.missing.includes('stories')) {
-    return [
-      {
-        id,
-        titleKey: 'guidance.applications.lockedStories.title',
-        descriptionKey: 'guidance.applications.lockedStories.description',
-        cta: {
-          labelKey: 'guidance.applications.lockedStories.cta',
-          to: '/profile/stories',
-        },
-      },
-    ];
-  }
-
-  if (state.phase2B.missing.includes('personalCanvas')) {
-    return [
-      {
-        id,
-        titleKey: 'guidance.applications.lockedCanvas.title',
-        descriptionKey: 'guidance.applications.lockedCanvas.description',
-        cta: {
-          labelKey: 'guidance.applications.lockedCanvas.cta',
-          to: '/profile/canvas',
-        },
-      },
-    ];
-  }
-
-  if (state.phase2A.missing.includes('jobUploaded')) {
-    return [
-      {
-        id,
-        titleKey: 'guidance.applications.lockedJob.title',
-        descriptionKey: 'guidance.applications.lockedJob.description',
-        cta: {
-          labelKey: 'guidance.applications.lockedJob.cta',
-          to: '/jobs/new',
-        },
-      },
-    ];
-  }
-
-  if (state.phase2A.missing.includes('matchingSummary')) {
-    return [
-      {
-        id,
-        titleKey: 'guidance.applications.lockedMatchingSummary.title',
-        descriptionKey: 'guidance.applications.lockedMatchingSummary.description',
-        cta: {
-          labelKey: 'guidance.applications.lockedMatchingSummary.cta',
-          to: '/jobs',
-        },
-      },
-    ];
   }
 
   return [
     {
       id,
-      titleKey: 'guidance.applications.locked.title',
-      descriptionKey: 'guidance.applications.locked.description',
+      titleKey: 'guidance.applications.lockedPhase1.title',
+      descriptionKey: 'guidance.applications.lockedPhase1.description',
       cta: {
-        labelKey: 'guidance.applications.locked.cta',
-        to: '/jobs',
+        labelKey: 'guidance.applications.lockedPhase1.cta',
+        to: '/profile/experiences',
       },
     },
   ];
+};
+
+const getApplicationsPhase2Banner = (
+  state: UserProgressState | null
+): GuidanceBanner | undefined => {
+  if (!state || !state.phase1.isComplete || isPhase3Unlocked(state)) {
+    return undefined;
+  }
+
+  if (state.phase2B.missing.includes('profileDepth')) {
+    return {
+      titleKey: 'guidance.applications.banner.profileDepth.title',
+      descriptionKey: 'guidance.applications.banner.profileDepth.description',
+      cta: {
+        labelKey: 'guidance.applications.banner.profileDepth.cta',
+        to: '/profile/full?mode=edit',
+      },
+    };
+  }
+
+  if (state.phase2B.missing.includes('stories')) {
+    return {
+      titleKey: 'guidance.applications.banner.stories.title',
+      descriptionKey: 'guidance.applications.banner.stories.description',
+      cta: {
+        labelKey: 'guidance.applications.banner.stories.cta',
+        to: '/profile/stories',
+      },
+    };
+  }
+
+  if (state.phase2B.missing.includes('personalCanvas')) {
+    return {
+      titleKey: 'guidance.applications.banner.canvas.title',
+      descriptionKey: 'guidance.applications.banner.canvas.description',
+      cta: {
+        labelKey: 'guidance.applications.banner.canvas.cta',
+        to: '/profile/canvas',
+      },
+    };
+  }
+
+  if (state.phase2A.missing.includes('jobUploaded')) {
+    return {
+      titleKey: 'guidance.applications.banner.job.title',
+      descriptionKey: 'guidance.applications.banner.job.description',
+      cta: {
+        labelKey: 'guidance.applications.banner.job.cta',
+        to: '/jobs/new',
+      },
+    };
+  }
+
+  if (state.phase2A.missing.includes('matchingSummary')) {
+    return {
+      titleKey: 'guidance.applications.banner.matchingSummary.title',
+      descriptionKey: 'guidance.applications.banner.matchingSummary.description',
+      cta: {
+        labelKey: 'guidance.applications.banner.matchingSummary.cta',
+        to: '/jobs',
+      },
+    };
+  }
+
+  return {
+    titleKey: 'guidance.applications.banner.default.title',
+    descriptionKey: 'guidance.applications.banner.default.description',
+    cta: {
+      labelKey: 'guidance.applications.banner.default.cta',
+      to: '/jobs',
+    },
+  };
 };
 
 const getApplicationsCvGuidance = (
@@ -471,24 +455,27 @@ const getApplicationsCvGuidance = (
   context: GuidanceContext
 ): GuidanceModel => {
   const lockedFeatures = getApplicationsLocked(state, 'cv-locked');
+  const banner = getApplicationsPhase2Banner(state);
   if (context.cvCount !== 0) {
-    return { lockedFeatures: lockedFeatures.length ? lockedFeatures : undefined };
+    if (lockedFeatures.length) {
+      return { lockedFeatures };
+    }
+    return banner ? { banner } : {};
   }
 
   if (lockedFeatures.length) {
     return { lockedFeatures };
   }
-  return {
-    emptyState: {
-      titleKey: 'guidance.applications.cv.empty.title',
-      descriptionKey: 'guidance.applications.cv.empty.description',
-      icon: 'i-heroicons-document-text',
-      cta: {
-        labelKey: 'guidance.applications.cv.empty.cta',
-        to: '/applications/cv/new',
-      },
+  const emptyState = {
+    titleKey: 'guidance.applications.cv.empty.title',
+    descriptionKey: 'guidance.applications.cv.empty.description',
+    icon: 'i-heroicons-document-text',
+    cta: {
+      labelKey: 'guidance.applications.cv.empty.cta',
+      to: '/applications/cv/new',
     },
   };
+  return banner ? { banner, emptyState } : { emptyState };
 };
 
 const getApplicationsCoverLettersGuidance = (
@@ -496,25 +483,28 @@ const getApplicationsCoverLettersGuidance = (
   context: GuidanceContext
 ): GuidanceModel => {
   const lockedFeatures = getApplicationsLocked(state, 'cover-letters-locked');
+  const banner = getApplicationsPhase2Banner(state);
   if (context.coverLetterCount !== 0) {
-    return { lockedFeatures: lockedFeatures.length ? lockedFeatures : undefined };
+    if (lockedFeatures.length) {
+      return { lockedFeatures };
+    }
+    return banner ? { banner } : {};
   }
 
   if (lockedFeatures.length) {
     return { lockedFeatures };
   }
 
-  return {
-    emptyState: {
-      titleKey: 'guidance.applications.coverLetters.empty.title',
-      descriptionKey: 'guidance.applications.coverLetters.empty.description',
-      icon: 'i-heroicons-envelope',
-      cta: {
-        labelKey: 'guidance.applications.coverLetters.empty.cta',
-        to: '/applications/cover-letters/new',
-      },
+  const emptyState = {
+    titleKey: 'guidance.applications.coverLetters.empty.title',
+    descriptionKey: 'guidance.applications.coverLetters.empty.description',
+    icon: 'i-heroicons-envelope',
+    cta: {
+      labelKey: 'guidance.applications.coverLetters.empty.cta',
+      to: '/applications/cover-letters/new',
     },
   };
+  return banner ? { banner, emptyState } : { emptyState };
 };
 
 const getApplicationsSpeechGuidance = (
@@ -522,25 +512,28 @@ const getApplicationsSpeechGuidance = (
   context: GuidanceContext
 ): GuidanceModel => {
   const lockedFeatures = getApplicationsLocked(state, 'speech-locked');
+  const banner = getApplicationsPhase2Banner(state);
   if (context.speechCount !== 0) {
-    return { lockedFeatures: lockedFeatures.length ? lockedFeatures : undefined };
+    if (lockedFeatures.length) {
+      return { lockedFeatures };
+    }
+    return banner ? { banner } : {};
   }
 
   if (lockedFeatures.length) {
     return { lockedFeatures };
   }
 
-  return {
-    emptyState: {
-      titleKey: 'guidance.applications.speech.empty.title',
-      descriptionKey: 'guidance.applications.speech.empty.description',
-      icon: 'i-heroicons-chat-bubble-left-right',
-      cta: {
-        labelKey: 'guidance.applications.speech.empty.cta',
-        to: '/applications/speech/new',
-      },
+  const emptyState = {
+    titleKey: 'guidance.applications.speech.empty.title',
+    descriptionKey: 'guidance.applications.speech.empty.description',
+    icon: 'i-heroicons-chat-bubble-left-right',
+    cta: {
+      labelKey: 'guidance.applications.speech.empty.cta',
+      to: '/applications/speech/new',
     },
   };
+  return banner ? { banner, emptyState } : { emptyState };
 };
 
 const guidanceHandlers: Record<

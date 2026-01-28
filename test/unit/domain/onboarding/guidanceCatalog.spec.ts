@@ -77,25 +77,26 @@ describe('guidanceCatalog', () => {
     expect(guidance.banner?.cta?.to).toBe('/profile/canvas');
   });
 
-  it('returns locked applications guidance when phase 3 is locked', () => {
+  it('returns applications banner when phase 2 prerequisites are missing', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
       phase2A: { isComplete: false, missing: ['jobUploaded'] },
       phase2B: { isComplete: false, missing: ['profileDepth'] },
     });
     const guidance = getGuidance('applications-cv', state, { cvCount: 0 });
-    expect(guidance.lockedFeatures?.[0]?.id).toBe('cv-locked');
-    expect(guidance.lockedFeatures?.[0]?.cta.to).toBe('/profile/full?mode=edit');
+    expect(guidance.banner?.cta?.to).toBe('/profile/full?mode=edit');
+    expect(guidance.lockedFeatures).toBeUndefined();
   });
 
-  it('returns matching summary lock when jobs exist but match is missing', () => {
+  it('returns matching summary banner when jobs exist but match is missing', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
       phase2A: { isComplete: false, missing: ['matchingSummary'] },
       phase2B: { isComplete: true, missing: [] },
     });
     const guidance = getGuidance('applications-cv', state, { cvCount: 0 });
-    expect(guidance.lockedFeatures?.[0]?.cta.to).toBe('/jobs');
+    expect(guidance.banner?.cta?.to).toBe('/jobs');
+    expect(guidance.lockedFeatures).toBeUndefined();
   });
 
   it('returns CV empty state when unlocked and no CVs exist', () => {
@@ -140,14 +141,15 @@ describe('guidanceCatalog', () => {
     expect(guidance.emptyState).toBeUndefined();
   });
 
-  it('prioritizes missing stories for applications lock', () => {
+  it('prioritizes missing stories for applications banner', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
       phase2A: { isComplete: false, missing: [] },
       phase2B: { isComplete: false, missing: ['stories'] },
     });
     const guidance = getGuidance('applications-cover-letters', state, { coverLetterCount: 0 });
-    expect(guidance.lockedFeatures?.[0]?.cta.to).toBe('/profile/stories');
+    expect(guidance.banner?.cta?.to).toBe('/profile/stories');
+    expect(guidance.lockedFeatures).toBeUndefined();
   });
 
   it('returns empty jobs guidance when no jobs exist', () => {

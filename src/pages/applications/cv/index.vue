@@ -26,6 +26,8 @@
       />
 
       <UPageBody>
+        <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
+
         <LockedFeatureCard
           v-for="feature in guidance.lockedFeatures"
           :key="feature.id"
@@ -128,6 +130,7 @@ import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 import EmptyStateActionCard from '@/components/guidance/EmptyStateActionCard.vue';
 import LockedFeatureCard from '@/components/guidance/LockedFeatureCard.vue';
+import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
 import { formatListDate } from '@/utils/formatListDate';
 
 const { t } = useI18n();

@@ -19,6 +19,8 @@
       />
 
       <UPageBody>
+        <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
+
         <LockedFeatureCard
           v-for="feature in guidance.lockedFeatures"
           :key="feature.id"
@@ -120,6 +122,7 @@ import ConfirmModal from '@/components/ConfirmModal.vue';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 import EmptyStateActionCard from '@/components/guidance/EmptyStateActionCard.vue';
 import LockedFeatureCard from '@/components/guidance/LockedFeatureCard.vue';
+import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 import { formatListDate } from '@/utils/formatListDate';
