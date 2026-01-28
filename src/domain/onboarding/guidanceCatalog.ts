@@ -61,6 +61,24 @@ const isPhase3Unlocked = (state?: UserProgressState | null) =>
 const getCanvasUnlockCta = (
   state: UserProgressState
 ): { descriptionKey: string; cta: GuidanceCTA } => {
+  if (state.phase1.missing.includes('cvUploaded')) {
+    return {
+      descriptionKey: 'guidance.profile.banner.cv.title',
+      cta: {
+        labelKey: 'guidance.profile.banner.cv.cta',
+        to: '/onboarding',
+      },
+    };
+  }
+  if (state.phase1.missing.includes('experienceCount')) {
+    return {
+      descriptionKey: 'guidance.profile.banner.experiences.title',
+      cta: {
+        labelKey: 'guidance.profile.banner.experiences.cta',
+        to: '/profile/experiences/new',
+      },
+    };
+  }
   if (state.phase2A.missing.includes('profileDepth')) {
     return {
       descriptionKey: 'guidance.profileCanvas.locked.descriptionProfileDepth',
@@ -207,6 +225,21 @@ const getProfileStoriesGuidance = (
   state: UserProgressState | null,
   context: GuidanceContext
 ): GuidanceModel => {
+  if (state?.phase1.missing.includes('cvUploaded')) {
+    return {
+      lockedFeatures: [
+        {
+          id: 'stories-locked',
+          titleKey: 'guidance.profileStories.locked.title',
+          descriptionKey: 'guidance.profileExperiences.banner.cv.title',
+          cta: {
+            labelKey: 'guidance.profileExperiences.banner.cv.cta',
+            to: '/onboarding',
+          },
+        },
+      ],
+    };
+  }
   if (state?.phase1.missing.includes('experienceCount')) {
     return {
       lockedFeatures: [
