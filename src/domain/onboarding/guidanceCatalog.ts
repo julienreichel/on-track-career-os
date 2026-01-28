@@ -179,7 +179,7 @@ const getProfileExperiencesGuidance = (state: UserProgressState | null): Guidanc
         descriptionKey: 'guidance.profileExperiences.banner.cv.description',
         cta: {
           labelKey: 'guidance.profileExperiences.banner.cv.cta',
-          to: '/profile/cv-upload',
+          to: '/onboarding',
         },
       },
       emptyState,

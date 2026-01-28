@@ -35,7 +35,7 @@ describe('guidanceCatalog', () => {
       phase1: { isComplete: false, missing: ['cvUploaded'] },
     });
     const guidance = getGuidance('profile-experiences', state, { experiencesCount: 0 });
-    expect(guidance.banner?.cta?.to).toBe('/profile/cv-upload');
+    expect(guidance.banner?.cta?.to).toBe('/onboarding');
   });
 
   it('returns CV upload banner on profile when CV is missing', () => {
