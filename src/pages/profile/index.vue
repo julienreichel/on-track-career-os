@@ -53,20 +53,6 @@
             icon="i-heroicons-squares-2x2"
             to="/profile/canvas"
           />
-
-          <UPageCard
-            :title="t('profile.links.applications')"
-            :description="t('profile.links.applicationsDescription')"
-            icon="i-heroicons-document-duplicate"
-            to="/applications"
-          />
-
-          <UPageCard
-            :title="t('profile.links.communication')"
-            :description="t('profile.links.communicationDescription')"
-            icon="i-heroicons-chat-bubble-left-right"
-            disabled
-          />
         </UPageGrid>
       </UCard>
     </UPageBody>

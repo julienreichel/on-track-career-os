@@ -145,6 +145,8 @@ describe('Profile Index Page', () => {
     expect(summaryLink.find('.profile-summary-card').exists()).toBe(true);
     expect(wrapper.text()).toContain(i18n.global.t('profile.links.experiences'));
     expect(wrapper.text()).toContain(i18n.global.t('profile.links.personalCanvas'));
+    expect(wrapper.text()).not.toContain(i18n.global.t('profile.links.applications'));
+    expect(wrapper.text()).not.toContain(i18n.global.t('profile.links.communication'));
     expect(wrapper.text()).not.toContain(i18n.global.t('profile.links.uploadCv'));
   });
 
