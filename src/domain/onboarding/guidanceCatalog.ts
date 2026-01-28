@@ -475,6 +475,9 @@ const getApplicationsCvGuidance = (
     return { lockedFeatures: lockedFeatures.length ? lockedFeatures : undefined };
   }
 
+  if (lockedFeatures.length) {
+    return { lockedFeatures };
+  }
   return {
     emptyState: {
       titleKey: 'guidance.applications.cv.empty.title',
@@ -485,7 +488,6 @@ const getApplicationsCvGuidance = (
         to: '/applications/cv/new',
       },
     },
-    lockedFeatures: lockedFeatures.length ? lockedFeatures : undefined,
   };
 };
 
@@ -498,6 +500,10 @@ const getApplicationsCoverLettersGuidance = (
     return { lockedFeatures: lockedFeatures.length ? lockedFeatures : undefined };
   }
 
+  if (lockedFeatures.length) {
+    return { lockedFeatures };
+  }
+
   return {
     emptyState: {
       titleKey: 'guidance.applications.coverLetters.empty.title',
@@ -508,13 +514,33 @@ const getApplicationsCoverLettersGuidance = (
         to: '/applications/cover-letters/new',
       },
     },
-    lockedFeatures: lockedFeatures.length ? lockedFeatures : undefined,
   };
 };
 
-const getApplicationsSpeechGuidance = (state: UserProgressState | null): GuidanceModel => {
+const getApplicationsSpeechGuidance = (
+  state: UserProgressState | null,
+  context: GuidanceContext
+): GuidanceModel => {
   const lockedFeatures = getApplicationsLocked(state, 'speech-locked');
-  return { lockedFeatures: lockedFeatures.length ? lockedFeatures : undefined };
+  if (context.speechCount !== 0) {
+    return { lockedFeatures: lockedFeatures.length ? lockedFeatures : undefined };
+  }
+
+  if (lockedFeatures.length) {
+    return { lockedFeatures };
+  }
+
+  return {
+    emptyState: {
+      titleKey: 'guidance.applications.speech.empty.title',
+      descriptionKey: 'guidance.applications.speech.empty.description',
+      icon: 'i-heroicons-chat-bubble-left-right',
+      cta: {
+        labelKey: 'guidance.applications.speech.empty.cta',
+        to: '/applications/speech/new',
+      },
+    },
+  };
 };
 
 const guidanceHandlers: Record<
@@ -530,7 +556,7 @@ const guidanceHandlers: Record<
   'applications-cv': (state, context) => getApplicationsCvGuidance(state, context),
   'applications-cover-letters': (state, context) =>
     getApplicationsCoverLettersGuidance(state, context),
-  'applications-speech': (state) => getApplicationsSpeechGuidance(state),
+  'applications-speech': (state, context) => getApplicationsSpeechGuidance(state, context),
 };
 
 export function getGuidance(

@@ -59,7 +59,7 @@
         <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
 
         <!-- CV List -->
-        <UCard v-else-if="filteredItems.length === 0">
+        <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
           <UEmpty :title="$t('cvList.search.noResults')" icon="i-heroicons-magnifying-glass">
             <p class="text-sm text-gray-500">{{ $t('cvList.search.placeholder') }}</p>
           </UEmpty>

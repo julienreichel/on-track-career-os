@@ -48,7 +48,7 @@
 
         <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
 
-        <UCard v-else-if="filteredItems.length === 0">
+        <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
           <UEmpty
             :title="t('coverLetter.list.search.noResults')"
             icon="i-heroicons-magnifying-glass"

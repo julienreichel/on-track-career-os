@@ -46,13 +46,9 @@
 
         <ListSkeletonCards v-if="loading || !hasLoaded" />
 
-        <EmptyStateActionCard
-          v-else-if="items.length === 0"
-          :empty-state="emptyState"
-          :on-action="handleCreate"
-        />
+        <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
 
-        <UCard v-else-if="filteredItems.length === 0">
+        <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
           <UEmpty :title="t('speech.list.search.noResults')" icon="i-heroicons-magnifying-glass">
             <p class="text-sm text-gray-500">{{ t('speech.list.search.placeholder') }}</p>
           </UEmpty>
@@ -104,7 +100,6 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
 import { useGuidance } from '@/composables/useGuidance';
 import ItemCard from '@/components/ItemCard.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
@@ -116,20 +111,10 @@ import type { SpeechBlock } from '@/domain/speech-block/SpeechBlock';
 import { formatListDate } from '@/utils/formatListDate';
 
 const { t } = useI18n();
-const router = useRouter();
 const toast = useToast();
 const { items, loading, error, loadAll, deleteSpeechBlock } = useSpeechBlocks();
 const { guidance } = useGuidance('applications-speech', () => ({
   speechCount: items.value.length,
-}));
-const emptyState = computed(() => ({
-  titleKey: 'guidance.applications.speech.empty.title',
-  descriptionKey: 'guidance.applications.speech.empty.description',
-  icon: 'i-heroicons-chat-bubble-left-right',
-  cta: {
-    labelKey: 'guidance.applications.speech.empty.cta',
-    to: '/applications/speech/new',
-  },
 }));
 
 const deleteModalOpen = ref(false);
@@ -171,15 +156,6 @@ onMounted(async () => {
     hasLoaded.value = true;
   }
 });
-
-const handleCreate = async () => {
-  try {
-    await router.push({ name: 'applications-speech-new' });
-  } catch (err) {
-    console.error('[speechList] Failed to open speech creation', err);
-    toast.add({ title: t('speech.list.toast.createFailed'), color: 'error' });
-  }
-};
 
 const confirmDelete = (block: SpeechBlock) => {
   speechToDelete.value = block;
