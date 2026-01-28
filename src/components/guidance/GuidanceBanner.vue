@@ -21,6 +21,7 @@ const { t } = useI18n();
       <UButton
         color="primary"
         variant="outline"
+        icon="i-heroicons-arrow-right"
         :label="t(props.banner.cta.labelKey)"
         :to="props.banner.cta.to"
       />

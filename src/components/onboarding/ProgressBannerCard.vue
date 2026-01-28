@@ -35,6 +35,7 @@ const primary = computed(() => props.nextAction.primary);
       <div class="flex flex-col gap-2 sm:flex-row">
         <UButton
           color="primary"
+          variant="outline"
           icon="i-heroicons-arrow-right"
           :label="t(primary.labelKey)"
           :to="primary.to"
