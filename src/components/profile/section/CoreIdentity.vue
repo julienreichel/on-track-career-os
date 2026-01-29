@@ -22,7 +22,8 @@
         </p>
         <div v-if="isEditing" class="flex flex-wrap gap-2">
           <UButton
-            color="primary"
+            :color="form.profilePhotoKey ? 'neutral' : 'primary'"
+            :variant="form.profilePhotoKey ? 'soft' : undefined"
             icon="i-heroicons-arrow-up-on-square"
             :loading="uploadingPhoto"
             :disabled="uploadingPhoto"
