@@ -79,7 +79,7 @@ const getCanvasUnlockCta = (
       },
     };
   }
-  if (state.phase2A.missing.includes('profileDepth')) {
+  if (state.phase2B.missing.includes('profileDepth')) {
     return {
       descriptionKey: 'guidance.profileCanvas.locked.descriptionProfileDepth',
       cta: {
