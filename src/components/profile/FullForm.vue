@@ -452,16 +452,6 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
     },
   ];
 
-  if (!isEditing.value && !editingSection.value) {
-    links.push({
-      label: t('profile.actions.edit'),
-      icon: 'i-heroicons-pencil',
-      color: 'primary',
-      onClick: startEditing,
-      ariaLabel: t('canvas.aria.editProfile'),
-    });
-  }
-
   return links;
 });
 

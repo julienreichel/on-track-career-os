@@ -11,6 +11,7 @@
           color="neutral"
           variant="ghost"
           size="xs"
+          :aria-label="t('profile.actions.editSection')"
           @click="startSectionEditing('workPermit')"
         />
       </div>

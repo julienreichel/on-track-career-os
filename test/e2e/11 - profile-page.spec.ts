@@ -53,32 +53,18 @@ test.describe('Full Profile Page - Edit Mode', () => {
     await page.waitForLoadState('networkidle');
   });
 
-  test('should show save/cancel buttons in edit mode', async ({ page }) => {
-    const editButton = page
-      .locator('button:has-text("Edit Profile"), button:has-text("Edit")')
-      .first();
-    await editButton.click();
-    await page.waitForTimeout(500);
-
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(300);
-
-    await expect(page.locator('button[type="submit"]:has-text("Save")')).toBeVisible();
-    await expect(page.locator('button:has-text("Cancel")').first()).toBeVisible();
+  test('should show section edit icons', async ({ page }) => {
+    const editIcons = page.locator('button[aria-label="Edit section"]');
+    await expect(editIcons.first()).toBeVisible();
   });
 
-  test('should exit edit mode when cancel clicked', async ({ page }) => {
-    const editButton = page
-      .locator('button:has-text("Edit Profile"), button:has-text("Edit")')
-      .first();
-    await editButton.click();
+  test('should exit section edit mode when cancel clicked', async ({ page }) => {
+    const editIcon = page.locator('button[aria-label="Edit section"]').first();
+    await editIcon.click();
     await page.waitForTimeout(500);
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(300);
-
     await page.locator('button:has-text("Cancel")').first().click();
     await page.waitForTimeout(500);
-    await expect(editButton).toBeVisible();
+    await expect(editIcon).toBeVisible();
   });
 });
 
