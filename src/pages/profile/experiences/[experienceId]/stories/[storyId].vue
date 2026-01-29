@@ -289,7 +289,7 @@ onMounted(async () => {
                 @click="handleSelectManual"
               >
                 <div class="flex flex-col items-center text-center gap-3 p-4">
-                  <UIcon name="i-heroicons-pencil-square" class="w-8 h-8 text-primary" />
+                  <UIcon name="i-heroicons-pencil" class="w-8 h-8 text-primary" />
                   <h4 class="font-medium">{{ t('stories.builder.modeManual') }}</h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
                     {{ t('stories.builder.modeManualDescription') }}

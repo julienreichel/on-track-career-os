@@ -63,7 +63,7 @@ test.describe('Full Profile Page - Edit Mode', () => {
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(300);
 
-    await expect(page.locator('button[type="submit"]:has-text("Save Profile")')).toBeVisible();
+    await expect(page.locator('button[type="submit"]:has-text("Save")')).toBeVisible();
     await expect(page.locator('button:has-text("Cancel")').first()).toBeVisible();
   });
 

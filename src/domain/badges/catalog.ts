@@ -54,7 +54,7 @@ export const badgeCatalog: BadgeDefinition[] = [
     id: 'customApproach',
     titleKey: 'badges.customApproach.title',
     descriptionKey: 'badges.customApproach.description',
-    icon: 'i-heroicons-pencil-square',
+    icon: 'i-heroicons-pencil',
     phase: 'bonus',
   },
 ];
