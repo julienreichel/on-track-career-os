@@ -129,6 +129,7 @@ function getTextContent(input: string | string[] | null | undefined) {
           size="xs"
           color="primary"
           variant="outline"
+          class="cursor-pointer"
           @click.stop="handleEdit"
         />
         <UButton
@@ -137,6 +138,7 @@ function getTextContent(input: string | string[] | null | undefined) {
           size="xs"
           color="neutral"
           variant="outline"
+          class="cursor-pointer"
           @click.stop="handleViewStories"
         />
       </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import ItemCard from '@/components/ItemCard.vue';
 import type { JobApplicationState } from '@/composables/useActiveJobsDashboard';
 
 const props = defineProps<{
@@ -35,18 +36,14 @@ const materialItems = computed(() => [
 </script>
 
 <template>
-  <UCard data-testid="active-job-row">
-    <template #header>
-      <div>
-        <h3 class="truncate">{{ state.title }}</h3>
-        <UBadge :color="matchTone" variant="outline">
-          {{ t(state.matchLabelKey, state.matchLabelParams ?? {}) }}
-        </UBadge>
-        <p class="truncate">{{ companyLabel }}</p>
-      </div>
+  <ItemCard data-testid="active-job-row" :title="state.title" :subtitle="companyLabel">
+    <template #badges>
+      <UBadge :color="matchTone" variant="outline" size="xs">
+        {{ t(state.matchLabelKey, state.matchLabelParams ?? {}) }}
+      </UBadge>
     </template>
 
-    <div>
+    <div class="space-y-2">
       <div
         v-for="item in materialItems"
         :key="item.key"
@@ -60,23 +57,21 @@ const materialItems = computed(() => [
       </div>
     </div>
 
-    <template #footer>
-      <div class="flex gap-2">
-        <UButton
-          size="xs"
-          color="primary"
-          variant="outline"
-          :label="t(state.cta.labelKey)"
-          :to="state.cta.to"
-        />
-        <UButton
-          size="xs"
-          color="neutral"
-          variant="outline"
-          :label="t('dashboard.activeJobs.cta.viewJob')"
-          :to="jobLink"
-        />
-      </div>
+    <template #actions>
+      <UButton
+        size="xs"
+        color="primary"
+        variant="outline"
+        :label="t(state.cta.labelKey)"
+        :to="state.cta.to"
+      />
+      <UButton
+        size="xs"
+        color="neutral"
+        variant="outline"
+        :label="t('dashboard.activeJobs.cta.viewJob')"
+        :to="jobLink"
+      />
     </template>
-  </UCard>
+  </ItemCard>
 </template>

@@ -102,6 +102,7 @@ const cancelDelete = () => {
         size="xs"
         color="primary"
         variant="outline"
+        class="cursor-pointer"
         @click="handleView"
       />
       <UButton
@@ -110,6 +111,7 @@ const cancelDelete = () => {
         size="xs"
         color="neutral"
         variant="outline"
+        class="cursor-pointer"
         @click="handleEdit"
       />
     </template>
@@ -123,7 +125,13 @@ const cancelDelete = () => {
     :ui="{ footer: 'justify-end' }"
   >
     <template #footer>
-      <UButton :label="t('common.cancel')" color="neutral" variant="ghost" @click="cancelDelete" />
+      <UButton
+        :label="t('common.cancel')"
+        color="neutral"
+        variant="ghost"
+        class="cursor-pointer"
+        @click="cancelDelete"
+      />
       <UButton :label="t('common.delete')" color="error" @click="confirmDelete" />
     </template>
   </UModal>

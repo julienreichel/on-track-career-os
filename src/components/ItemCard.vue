@@ -79,7 +79,7 @@ const handleDelete = (event: Event) => {
     </div>
 
     <template #footer>
-      <div class="space-y-3">
+      <div class="space-y-3 [&_a]:cursor-pointer [&_button]:cursor-pointer">
         <!-- Action Buttons Row -->
         <div class="flex items-center justify-between gap-2">
           <!-- Left Side Actions -->
@@ -107,6 +107,7 @@ const handleDelete = (event: Event) => {
             color="error"
             variant="ghost"
             :aria-label="t('common.delete')"
+            class="cursor-pointer"
             @click="handleDelete"
           />
         </div>
