@@ -51,7 +51,7 @@
             :loading="loading"
             :disabled="!form.fullName || loading || hasValidationErrors"
           >
-            {{ loading ? t('profile.actions.saving') : t('profile.actions.save') }}
+            {{ loading ? t('profile.actions.saving') : t('common.save') }}
           </UButton>
         </div>
       </form>
@@ -108,6 +108,7 @@ const form = ref<ProfileForm>({
 
 const originalForm = ref<ProfileForm | null>(null);
 const isEditing = ref(false);
+const editingSection = ref<string | null>(null);
 const photoPreviewUrl = ref<string | null>(null);
 const uploadingPhoto = ref(false);
 const photoError = ref<string | null>(null);
@@ -192,6 +193,7 @@ const needsProfileBasics = computed(
   () => progress.state.value?.phase1?.missing?.includes('profileBasics') ?? false
 );
 const isLimitedEditing = computed(() => isEditing.value && needsProfileBasics.value);
+const sectionEditingEnabled = computed(() => !isEditing.value && !editingSection.value);
 
 let saveProfile: ((input: UserProfileUpdateInput) => Promise<boolean>) | null = null;
 
@@ -354,6 +356,7 @@ const startEditing = () => {
 
 const cancelEditing = () => {
   isEditing.value = false;
+  editingSection.value = null;
   error.value = null;
   saveSuccess.value = false;
   if (originalForm.value) {
@@ -362,7 +365,7 @@ const cancelEditing = () => {
   }
 };
 
-const handleSubmit = async () => {
+const saveProfileUpdates = async () => {
   if (!profile.value?.id || !saveProfile) return;
   if (hasValidationErrors.value) return;
 
@@ -390,22 +393,53 @@ const handleSubmit = async () => {
     };
 
     const success = await saveProfile(payload);
-    if (success) {
-      saveSuccess.value = true;
-      isEditing.value = false;
-      originalForm.value = JSON.parse(JSON.stringify(form.value));
-
-      // Track profile update
-      const { captureEvent } = useAnalytics();
-      captureEvent('profile_updated');
-    } else {
+    if (!success) {
       error.value = t('profile.messages.saveError');
+      return;
     }
+    saveSuccess.value = true;
+    originalForm.value = JSON.parse(JSON.stringify(form.value));
+
+    // Track profile update
+    const { captureEvent } = useAnalytics();
+    captureEvent('profile_updated');
   } catch (err) {
     console.error('[profile] Save failed:', err);
     error.value = t('profile.messages.saveError');
   } finally {
     loading.value = false;
+  }
+};
+
+const handleSubmit = async () => {
+  await saveProfileUpdates();
+  if (!error.value) {
+    isEditing.value = false;
+    editingSection.value = null;
+  }
+};
+
+const startSectionEditing = (section: string) => {
+  editingSection.value = section;
+  error.value = null;
+  saveSuccess.value = false;
+};
+
+const cancelSectionEditing = () => {
+  editingSection.value = null;
+  error.value = null;
+  saveSuccess.value = false;
+  if (originalForm.value) {
+    form.value = JSON.parse(JSON.stringify(originalForm.value));
+    void loadPhotoPreview(form.value.profilePhotoKey);
+  }
+};
+
+const saveSectionEditing = async () => {
+  if (!editingSection.value) return;
+  await saveProfileUpdates();
+  if (!error.value) {
+    editingSection.value = null;
   }
 };
 
@@ -418,7 +452,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
     },
   ];
 
-  if (!isEditing.value) {
+  if (!isEditing.value && !editingSection.value) {
     links.push({
       label: t('profile.actions.edit'),
       icon: 'i-heroicons-pencil',
@@ -434,6 +468,10 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
 provide(profileFormContextKey, {
   form,
   isEditing,
+  editingSection,
+  sectionEditingEnabled,
+  loading,
+  hasValidationErrors,
   photoPreviewUrl,
   uploadingPhoto,
   photoError,
@@ -447,6 +485,9 @@ provide(profileFormContextKey, {
   hasProfessionalAttributes,
   emailError,
   phoneError,
+  startSectionEditing,
+  cancelSectionEditing,
+  saveSectionEditing,
   triggerPhotoPicker,
   handlePhotoSelected,
   handleRemovePhoto,

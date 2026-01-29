@@ -1,9 +1,19 @@
 <template>
-  <UCard v-if="isEditing || hasCoreIdentity" class="mb-6">
+  <UCard v-if="isSectionEditing || hasCoreIdentity" class="mb-6">
     <template #header>
-      <h3 class="text-lg font-semibold">
-        {{ t('profile.sections.coreIdentity') }}
-      </h3>
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="text-lg font-semibold">
+          {{ t('profile.sections.coreIdentity') }}
+        </h3>
+        <UButton
+          v-if="showEditAction"
+          icon="i-heroicons-pencil"
+          color="neutral"
+          variant="ghost"
+          size="xs"
+          @click="startSectionEditing('coreIdentity')"
+        />
+      </div>
     </template>
 
     <div
@@ -20,10 +30,10 @@
         <p v-if="!photoPreviewUrl" class="text-sm text-gray-600 dark:text-gray-400">
           {{ t('profile.photo.empty') }}
         </p>
-        <div v-if="isEditing" class="flex flex-wrap gap-2">
+        <div v-if="isSectionEditing" class="flex flex-wrap gap-2">
           <UButton
             :color="form.profilePhotoKey ? 'neutral' : 'primary'"
-            :variant="form.profilePhotoKey ? 'soft' : undefined"
+            :variant="form.profilePhotoKey ? 'subtle' : undefined"
             icon="i-heroicons-arrow-up-on-square"
             :loading="uploadingPhoto"
             :disabled="uploadingPhoto"
@@ -60,7 +70,7 @@
       @change="handlePhotoSelected"
     />
 
-    <div v-if="!isEditing" class="space-y-4">
+    <div v-if="!isSectionEditing" class="space-y-4">
       <div v-if="form.fullName">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {{ t('profile.fields.fullName') }}
@@ -133,11 +143,28 @@
         />
       </UFormField>
     </div>
+    <template v-if="showSectionActions" #footer>
+      <div class="flex justify-end gap-2">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          :label="t('profile.actions.cancel')"
+          @click="cancelSectionEditing"
+        />
+        <UButton
+          color="primary"
+          :label="t('common.save')"
+          :loading="loading"
+          :disabled="loading || hasValidationErrors"
+          @click="saveSectionEditing"
+        />
+      </div>
+    </template>
   </UCard>
 </template>
 
 <script setup lang="ts">
-import { inject } from 'vue';
+import { computed, inject } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 
@@ -155,6 +182,10 @@ const { t } = useI18n();
 const {
   form,
   isEditing,
+  editingSection,
+  sectionEditingEnabled,
+  loading,
+  hasValidationErrors,
   hasCoreIdentity,
   photoPreviewUrl,
   uploadingPhoto,
@@ -163,5 +194,14 @@ const {
   triggerPhotoPicker,
   handlePhotoSelected,
   handleRemovePhoto,
+  startSectionEditing,
+  cancelSectionEditing,
+  saveSectionEditing,
 } = context;
+
+const isSectionEditing = computed(() => isEditing.value || editingSection.value === 'coreIdentity');
+const showEditAction = computed(() => sectionEditingEnabled.value && !isSectionEditing.value);
+const showSectionActions = computed(
+  () => !isEditing.value && editingSection.value === 'coreIdentity'
+);
 </script>

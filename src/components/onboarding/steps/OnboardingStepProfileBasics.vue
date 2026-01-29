@@ -168,6 +168,11 @@ const phoneError = computed(() => {
 });
 
 const hasValidationErrors = computed(() => Boolean(emailError.value || phoneError.value));
+const editingSection = ref<string | null>(null);
+const sectionEditingEnabled = computed(() => false);
+const startSectionEditing = () => {};
+const cancelSectionEditing = () => {};
+const saveSectionEditing = async () => {};
 
 const triggerPhotoPicker = () => {
   photoInputRef.value?.click();
@@ -284,6 +289,10 @@ const handleSave = async () => {
 provide(profileFormContextKey, {
   form,
   isEditing,
+  editingSection,
+  sectionEditingEnabled,
+  loading,
+  hasValidationErrors,
   photoPreviewUrl,
   uploadingPhoto,
   photoError,
@@ -297,6 +306,9 @@ provide(profileFormContextKey, {
   hasProfessionalAttributes,
   emailError,
   phoneError,
+  startSectionEditing,
+  cancelSectionEditing,
+  saveSectionEditing,
   triggerPhotoPicker,
   handlePhotoSelected,
   handleRemovePhoto,

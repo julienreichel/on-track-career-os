@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestI18n } from '../../../utils/createTestI18n';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import ProfileSectionIdentityValues from '@/components/profile/section/IdentityValues.vue';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 import type { ProfileForm } from '@/components/profile/types';
@@ -10,7 +10,7 @@ const i18n = createTestI18n();
 
 const stubs = {
   UCard: {
-    template: '<div class="u-card"><slot name="header" /><slot /></div>',
+    template: '<div class="u-card"><slot name="header" /><slot /><slot name="footer" /></div>',
   },
   UBadge: {
     template: '<span class="u-badge"><slot /></span>',
@@ -22,6 +22,9 @@ const stubs = {
   TagInput: {
     template: '<div class="tag-input">{{ modelValue?.join(", ") }}</div>',
     props: ['modelValue', 'label', 'testId', 'editable'],
+  },
+  UButton: {
+    template: '<button class="u-button" type="button"><slot /></button>',
   },
 };
 
@@ -53,7 +56,14 @@ const mountSection = (isEditing = false) => {
         [profileFormContextKey as symbol]: {
           form,
           isEditing: ref(isEditing),
+          editingSection: ref(null),
+          sectionEditingEnabled: computed(() => true),
+          loading: ref(false),
+          hasValidationErrors: computed(() => false),
           hasIdentityValues: ref(true),
+          startSectionEditing: () => {},
+          cancelSectionEditing: () => {},
+          saveSectionEditing: async () => {},
         },
       },
     },

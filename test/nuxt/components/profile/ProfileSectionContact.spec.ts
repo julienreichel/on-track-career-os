@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestI18n } from '../../../utils/createTestI18n';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import ProfileSectionContact from '@/components/profile/section/Contact.vue';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 import type { ProfileForm } from '@/components/profile/types';
@@ -10,7 +10,7 @@ const i18n = createTestI18n();
 
 const uiStubs = {
   UCard: {
-    template: '<div class="u-card"><slot name="header" /><slot /></div>',
+    template: '<div class="u-card"><slot name="header" /><slot /><slot name="footer" /></div>',
   },
   UFormField: {
     template: '<label class="u-form-field">{{ label }}<slot /></label>',
@@ -20,6 +20,9 @@ const uiStubs = {
     template:
       '<input class="u-input" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
     props: ['modelValue', 'type', 'placeholder'],
+  },
+  UButton: {
+    template: '<button class="u-button" type="button"><slot /></button>',
   },
 };
 
@@ -51,9 +54,16 @@ const mountSection = (isEditing = false) => {
         [profileFormContextKey as symbol]: {
           form,
           isEditing: ref(isEditing),
+          editingSection: ref(null),
+          sectionEditingEnabled: computed(() => true),
+          loading: ref(false),
+          hasValidationErrors: computed(() => false),
           hasContactInfo: ref(true),
           emailError: ref<string | undefined>(undefined),
           phoneError: ref<string | undefined>(undefined),
+          startSectionEditing: () => {},
+          cancelSectionEditing: () => {},
+          saveSectionEditing: async () => {},
         },
       },
     },

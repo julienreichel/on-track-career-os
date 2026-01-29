@@ -1,27 +1,54 @@
 <template>
-  <UCard v-if="isEditing || hasCareerDirection" class="mb-6">
+  <UCard v-if="isSectionEditing || hasCareerDirection" class="mb-6">
     <template #header>
-      <h3 class="text-lg font-semibold">
-        {{ t('profile.sections.careerDirection') }}
-      </h3>
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="text-lg font-semibold">
+          {{ t('profile.sections.careerDirection') }}
+        </h3>
+        <UButton
+          v-if="showEditAction"
+          icon="i-heroicons-pencil"
+          color="neutral"
+          variant="ghost"
+          size="xs"
+          @click="startSectionEditing('careerDirection')"
+        />
+      </div>
     </template>
 
     <div class="space-y-4">
       <TagInput
-        v-if="isEditing || form.aspirations.length > 0"
+        v-if="isSectionEditing || form.aspirations.length > 0"
         v-model="form.aspirations"
         :label="t('profile.fields.aspirations')"
-        :placeholder="isEditing ? t('profile.fields.aspirationsPlaceholder') : ''"
-        :hint="isEditing ? t('profile.fields.aspirationsHint') : ''"
+        :placeholder="isSectionEditing ? t('profile.fields.aspirationsPlaceholder') : ''"
+        :hint="isSectionEditing ? t('profile.fields.aspirationsHint') : ''"
         color="primary"
-        :editable="isEditing"
+        :editable="isSectionEditing"
       />
     </div>
+    <template v-if="showSectionActions" #footer>
+      <div class="flex justify-end gap-2">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          :label="t('profile.actions.cancel')"
+          @click="cancelSectionEditing"
+        />
+        <UButton
+          color="primary"
+          :label="t('common.save')"
+          :loading="loading"
+          :disabled="loading || hasValidationErrors"
+          @click="saveSectionEditing"
+        />
+      </div>
+    </template>
   </UCard>
 </template>
 
 <script setup lang="ts">
-import { inject } from 'vue';
+import { computed, inject } from 'vue';
 import { useI18n } from 'vue-i18n';
 import TagInput from '@/components/TagInput.vue';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
@@ -37,5 +64,24 @@ if (!context) {
 }
 
 const { t } = useI18n();
-const { form, isEditing, hasCareerDirection } = context;
+const {
+  form,
+  isEditing,
+  editingSection,
+  sectionEditingEnabled,
+  loading,
+  hasValidationErrors,
+  hasCareerDirection,
+  startSectionEditing,
+  cancelSectionEditing,
+  saveSectionEditing,
+} = context;
+
+const isSectionEditing = computed(
+  () => isEditing.value || editingSection.value === 'careerDirection'
+);
+const showEditAction = computed(() => sectionEditingEnabled.value && !isSectionEditing.value);
+const showSectionActions = computed(
+  () => !isEditing.value && editingSection.value === 'careerDirection'
+);
 </script>

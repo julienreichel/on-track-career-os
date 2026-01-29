@@ -1,12 +1,22 @@
 <template>
-  <UCard v-if="isEditing || hasContactInfo" class="mb-6">
+  <UCard v-if="isSectionEditing || hasContactInfo" class="mb-6">
     <template #header>
-      <h3 class="text-lg font-semibold">
-        {{ t('profile.sections.contactInfo') }}
-      </h3>
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="text-lg font-semibold">
+          {{ t('profile.sections.contactInfo') }}
+        </h3>
+        <UButton
+          v-if="showEditAction"
+          icon="i-heroicons-pencil"
+          color="neutral"
+          variant="ghost"
+          size="xs"
+          @click="startSectionEditing('contactInfo')"
+        />
+      </div>
     </template>
 
-    <div v-if="!isEditing" class="space-y-4">
+    <div v-if="!isSectionEditing" class="space-y-4">
       <div v-if="form.primaryEmail">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {{ t('profile.fields.primaryEmail') }}
@@ -43,11 +53,28 @@
         />
       </UFormField>
     </div>
+    <template v-if="showSectionActions" #footer>
+      <div class="flex justify-end gap-2">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          :label="t('profile.actions.cancel')"
+          @click="cancelSectionEditing"
+        />
+        <UButton
+          color="primary"
+          :label="t('common.save')"
+          :loading="loading"
+          :disabled="loading || hasValidationErrors"
+          @click="saveSectionEditing"
+        />
+      </div>
+    </template>
   </UCard>
 </template>
 
 <script setup lang="ts">
-import { inject } from 'vue';
+import { computed, inject } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 
@@ -62,5 +89,24 @@ if (!context) {
 }
 
 const { t } = useI18n();
-const { form, isEditing, hasContactInfo, emailError, phoneError } = context;
+const {
+  form,
+  isEditing,
+  editingSection,
+  sectionEditingEnabled,
+  loading,
+  hasValidationErrors,
+  hasContactInfo,
+  emailError,
+  phoneError,
+  startSectionEditing,
+  cancelSectionEditing,
+  saveSectionEditing,
+} = context;
+
+const isSectionEditing = computed(() => isEditing.value || editingSection.value === 'contactInfo');
+const showEditAction = computed(() => sectionEditingEnabled.value && !isSectionEditing.value);
+const showSectionActions = computed(
+  () => !isEditing.value && editingSection.value === 'contactInfo'
+);
 </script>

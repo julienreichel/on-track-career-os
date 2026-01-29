@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createTestI18n } from '../../../utils/createTestI18n';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import ProfileSectionWorkPermit from '@/components/profile/section/WorkPermit.vue';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
 import type { ProfileForm } from '@/components/profile/types';
@@ -10,7 +10,7 @@ const i18n = createTestI18n();
 
 const stubs = {
   UCard: {
-    template: '<div class="u-card"><slot name="header" /><slot /></div>',
+    template: '<div class="u-card"><slot name="header" /><slot /><slot name="footer" /></div>',
   },
   UFormField: {
     template: '<div class="u-form-field"><slot /></div>',
@@ -19,6 +19,9 @@ const stubs = {
     template:
       '<input class="u-input" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
     props: ['modelValue', 'placeholder'],
+  },
+  UButton: {
+    template: '<button class="u-button" type="button"><slot /></button>',
   },
 };
 
@@ -50,7 +53,14 @@ const mountSection = (isEditing = false, info = 'Swiss Citizen') => {
         [profileFormContextKey as symbol]: {
           form,
           isEditing: ref(isEditing),
+          editingSection: ref(null),
+          sectionEditingEnabled: computed(() => true),
+          loading: ref(false),
+          hasValidationErrors: computed(() => false),
           hasWorkPermit: ref(true),
+          startSectionEditing: () => {},
+          cancelSectionEditing: () => {},
+          saveSectionEditing: async () => {},
         },
       },
     },

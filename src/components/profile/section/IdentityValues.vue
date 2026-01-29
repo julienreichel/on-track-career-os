@@ -1,47 +1,74 @@
 <template>
-  <UCard v-if="isEditing || hasIdentityValues" class="mb-6">
+  <UCard v-if="isSectionEditing || hasIdentityValues" class="mb-6">
     <template #header>
-      <h3 class="text-lg font-semibold">
-        {{ t('profile.sections.identityValues') }}
-      </h3>
+      <div class="flex items-center justify-between gap-3">
+        <h3 class="text-lg font-semibold">
+          {{ t('profile.sections.identityValues') }}
+        </h3>
+        <UButton
+          v-if="showEditAction"
+          icon="i-heroicons-pencil"
+          color="neutral"
+          variant="ghost"
+          size="xs"
+          @click="startSectionEditing('identityValues')"
+        />
+      </div>
     </template>
 
     <div class="space-y-4">
       <TagInput
-        v-if="isEditing || form.personalValues.length > 0"
+        v-if="isSectionEditing || form.personalValues.length > 0"
         v-model="form.personalValues"
         :label="t('profile.fields.personalValues')"
-        :placeholder="isEditing ? t('profile.fields.personalValuesPlaceholder') : ''"
-        :hint="isEditing ? t('profile.fields.personalValuesHint') : ''"
+        :placeholder="isSectionEditing ? t('profile.fields.personalValuesPlaceholder') : ''"
+        :hint="isSectionEditing ? t('profile.fields.personalValuesHint') : ''"
         color="info"
-        :editable="isEditing"
+        :editable="isSectionEditing"
       />
 
       <TagInput
-        v-if="isEditing || form.strengths.length > 0"
+        v-if="isSectionEditing || form.strengths.length > 0"
         v-model="form.strengths"
         :label="t('profile.fields.strengths')"
-        :placeholder="isEditing ? t('profile.fields.strengthsPlaceholder') : ''"
-        :hint="isEditing ? t('profile.fields.strengthsHint') : ''"
+        :placeholder="isSectionEditing ? t('profile.fields.strengthsPlaceholder') : ''"
+        :hint="isSectionEditing ? t('profile.fields.strengthsHint') : ''"
         color="info"
-        :editable="isEditing"
+        :editable="isSectionEditing"
       />
 
       <TagInput
-        v-if="isEditing || form.interests.length > 0"
+        v-if="isSectionEditing || form.interests.length > 0"
         v-model="form.interests"
         :label="t('profile.fields.interests')"
-        :placeholder="isEditing ? t('profile.fields.interestsPlaceholder') : ''"
-        :hint="isEditing ? t('profile.fields.interestsHint') : ''"
+        :placeholder="isSectionEditing ? t('profile.fields.interestsPlaceholder') : ''"
+        :hint="isSectionEditing ? t('profile.fields.interestsHint') : ''"
         color="info"
-        :editable="isEditing"
+        :editable="isSectionEditing"
       />
     </div>
+    <template v-if="showSectionActions" #footer>
+      <div class="flex justify-end gap-2">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          :label="t('profile.actions.cancel')"
+          @click="cancelSectionEditing"
+        />
+        <UButton
+          color="primary"
+          :label="t('common.save')"
+          :loading="loading"
+          :disabled="loading || hasValidationErrors"
+          @click="saveSectionEditing"
+        />
+      </div>
+    </template>
   </UCard>
 </template>
 
 <script setup lang="ts">
-import { inject } from 'vue';
+import { computed, inject } from 'vue';
 import { useI18n } from 'vue-i18n';
 import TagInput from '@/components/TagInput.vue';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
@@ -57,5 +84,24 @@ if (!context) {
 }
 
 const { t } = useI18n();
-const { form, isEditing, hasIdentityValues } = context;
+const {
+  form,
+  isEditing,
+  editingSection,
+  sectionEditingEnabled,
+  loading,
+  hasValidationErrors,
+  hasIdentityValues,
+  startSectionEditing,
+  cancelSectionEditing,
+  saveSectionEditing,
+} = context;
+
+const isSectionEditing = computed(
+  () => isEditing.value || editingSection.value === 'identityValues'
+);
+const showEditAction = computed(() => sectionEditingEnabled.value && !isSectionEditing.value);
+const showSectionActions = computed(
+  () => !isEditing.value && editingSection.value === 'identityValues'
+);
 </script>
