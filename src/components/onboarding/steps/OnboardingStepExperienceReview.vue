@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import CvExperiencesPreview from '@/components/cv/ExperiencesPreview.vue';
+import StickyFooterCard from '@/components/common/StickyFooterCard.vue';
 import type { ExtractedExperience } from '@/domain/ai-operations/Experience';
 
 type Props = {
@@ -38,24 +39,20 @@ const experienceCount = computed(() => props.experiences.length);
       @update="(index, value) => emit('updateExperience', index, value)"
     />
 
-    <UCard class="sticky bottom-0 z-10">
-      <template #footer>
-        <div class="flex justify-end gap-2">
-          <UButton
-            variant="ghost"
-            color="neutral"
-            :label="t('common.back')"
-            @click="emit('back')"
-          />
-          <UButton
-            color="primary"
-            :label="t('onboarding.steps.experienceReview.import')"
-            :loading="isProcessing"
-            :disabled="isProcessing || experiences.length === 0"
-            @click="emit('importExperiences')"
-          />
-        </div>
-      </template>
-    </UCard>
+    <StickyFooterCard>
+      <UButton
+        variant="ghost"
+        color="neutral"
+        :label="t('common.back')"
+        @click="emit('back')"
+      />
+      <UButton
+        color="primary"
+        :label="t('onboarding.steps.experienceReview.import')"
+        :loading="isProcessing"
+        :disabled="isProcessing || experiences.length === 0"
+        @click="emit('importExperiences')"
+      />
+    </StickyFooterCard>
   </div>
 </template>

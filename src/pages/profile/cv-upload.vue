@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useCvUploadWorkflow } from '@/composables/useCvUploadWorkflow';
 import { useCvParsing } from '@/composables/useCvParsing';
 import { useExperienceImport } from '@/composables/useExperienceImport';
+import StickyFooterCard from '@/components/common/StickyFooterCard.vue';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -108,14 +109,10 @@ function viewExperiences() {
           />
 
           <!-- Actions -->
-          <UCard class="sticky bottom-0 z-10">
-            <template #footer>
-              <div class="flex justify-end gap-2">
-                <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
-                <UButton :label="t('cvUpload.confirmImport')" @click="handleImport" />
-              </div>
-            </template>
-          </UCard>
+          <StickyFooterCard>
+            <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
+            <UButton :label="t('cvUpload.confirmImport')" @click="handleImport" />
+          </StickyFooterCard>
         </div>
 
         <!-- Importing Step -->

@@ -14,6 +14,7 @@ import ProfileSectionWorkPermit from '@/components/profile/section/WorkPermit.vu
 import ProfileSectionContact from '@/components/profile/section/Contact.vue';
 import ProfileSectionSocialLinks from '@/components/profile/section/SocialLinks.vue';
 import ProfileSectionProfessionalAttributes from '@/components/profile/section/ProfessionalAttributes.vue';
+import StickyFooterCard from '@/components/common/StickyFooterCard.vue';
 
 const emit = defineEmits<{
   complete: [];
@@ -337,24 +338,20 @@ provide(profileFormContextKey, {
       <ProfileSectionProfessionalAttributes />
     </template>
 
-    <UCard class="sticky bottom-0 z-10">
-      <template #footer>
-        <div class="flex justify-end gap-2">
-          <UButton
-            variant="ghost"
-            color="neutral"
-            :label="t('common.back')"
-            @click="emit('back')"
-          />
-          <UButton
-            color="primary"
-            :label="t('onboarding.actions.continue')"
-            :loading="loading"
-            :disabled="loading || profileLoading"
-            @click="handleSave"
-          />
-        </div>
-      </template>
-    </UCard>
+    <StickyFooterCard>
+      <UButton
+        variant="ghost"
+        color="neutral"
+        :label="t('common.back')"
+        @click="emit('back')"
+      />
+      <UButton
+        color="primary"
+        :label="t('onboarding.actions.continue')"
+        :loading="loading"
+        :disabled="loading || profileLoading"
+        @click="handleSave"
+      />
+    </StickyFooterCard>
   </div>
 </template>
