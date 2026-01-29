@@ -31,7 +31,7 @@
         <p v-if="!photoPreviewUrl" class="text-sm text-gray-600 dark:text-gray-400">
           {{ t('profile.photo.empty') }}
         </p>
-        <div v-if="isSectionEditing" class="flex flex-wrap gap-2">
+        <div v-if="isSectionEditing || !photoPreviewUrl" class="flex flex-wrap gap-2">
           <UButton
             :color="form.profilePhotoKey ? 'neutral' : 'primary'"
             :variant="form.profilePhotoKey ? 'subtle' : undefined"
@@ -43,7 +43,7 @@
             {{ t('profile.photo.upload') }}
           </UButton>
           <UButton
-            v-if="form.profilePhotoKey"
+            v-if="isSectionEditing && form.profilePhotoKey"
             color="neutral"
             variant="ghost"
             icon="i-heroicons-trash"
@@ -54,7 +54,10 @@
             {{ t('profile.photo.remove') }}
           </UButton>
         </div>
-        <p class="text-xs text-gray-500 dark:text-gray-400">
+        <p
+          v-if="isSectionEditing || !photoPreviewUrl"
+          class="text-xs text-gray-500 dark:text-gray-400"
+        >
           {{ t('profile.photo.help') }}
         </p>
         <p v-if="photoError" class="text-sm text-red-500">

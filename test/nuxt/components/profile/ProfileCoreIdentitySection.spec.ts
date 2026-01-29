@@ -30,7 +30,13 @@ const stubs = {
   },
 };
 
-const createWrapper = (isEditing = false) => {
+const createWrapper = ({
+  isEditing = false,
+  photoPreviewUrl = null,
+}: {
+  isEditing?: boolean;
+  photoPreviewUrl?: string | null;
+} = {}) => {
   const form = ref<ProfileForm>({
     fullName: 'Ada Lovelace',
     headline: 'Mathematician',
@@ -69,7 +75,7 @@ const createWrapper = (isEditing = false) => {
           hasCareerDirection: ref(false),
           hasIdentityValues: ref(false),
           hasProfessionalAttributes: ref(false),
-          photoPreviewUrl: ref(null),
+          photoPreviewUrl: ref(photoPreviewUrl),
           uploadingPhoto: ref(false),
           photoError: ref<string | null>(null),
           photoInputRef: ref<HTMLInputElement | null>(null),
@@ -98,7 +104,12 @@ describe('ProfileCoreIdentitySection', () => {
   });
 
   it('renders edit mode with inputs', () => {
-    const wrapper = createWrapper(true);
+    const wrapper = createWrapper({ isEditing: true });
     expect(wrapper.findAll('.u-input')).toHaveLength(4);
+  });
+
+  it('shows upload action when no photo is set in view mode', () => {
+    const wrapper = createWrapper({ isEditing: false, photoPreviewUrl: null });
+    expect(wrapper.find('.u-button').text()).toContain(i18n.global.t('profile.photo.upload'));
   });
 });
