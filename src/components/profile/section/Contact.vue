@@ -11,6 +11,7 @@
           color="neutral"
           variant="ghost"
           size="xs"
+          class="cursor-pointer"
           :aria-label="t('profile.actions.editSection')"
           @click="startSectionEditing('contactInfo')"
         />

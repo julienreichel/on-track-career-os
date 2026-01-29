@@ -110,6 +110,10 @@ describe('ProfileCoreIdentitySection', () => {
 
   it('shows upload action when no photo is set in view mode', () => {
     const wrapper = createWrapper({ isEditing: false, photoPreviewUrl: null });
-    expect(wrapper.find('.u-button').text()).toContain(i18n.global.t('profile.photo.upload'));
+    const uploadLabel = i18n.global.t('profile.photo.upload');
+    const hasUploadAction = wrapper
+      .findAll('.u-button')
+      .some((button) => button.text().includes(uploadLabel));
+    expect(hasUploadAction).toBe(true);
   });
 });
