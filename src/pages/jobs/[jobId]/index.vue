@@ -662,6 +662,15 @@ function redirectToCompanyCreate() {
           </template>
 
           <template v-else>
+            <TailoredMaterialsCard
+              :job="job"
+              :matching-summary="matchingSummary"
+              :existing-materials="existingMaterials"
+              :match-link="matchLink"
+              :summary-loading="loading"
+              :summary-error="null"
+              description-key="description"
+            />
             <UCard class="mb-6">
               <div class="flex flex-col gap-6">
                 <div class="grid gap-4 md:grid-cols-2">
@@ -731,16 +740,6 @@ function redirectToCompanyCreate() {
               </template>
             </UCard>
           </template>
-
-          <TailoredMaterialsCard
-            :job="job"
-            :matching-summary="matchingSummary"
-            :existing-materials="existingMaterials"
-            :match-link="matchLink"
-            :summary-loading="loading"
-            :summary-error="null"
-            description-key="description"
-          />
         </template>
 
         <UCard v-else>
