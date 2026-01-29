@@ -55,12 +55,12 @@ const stubs = {
     template: '<div class="u-alert">{{ title }} {{ description }}</div>',
   },
   UCard: {
-    template: '<div class="u-card"><slot /></div>',
+    template: '<div class="u-card"><slot name="header" /><slot /></div>',
   },
   UButton: {
     props: ['label', 'icon', 'variant', 'color'],
     template:
-      '<button class="u-button" type="button" @click="$emit(\'click\')">{{ label }}<slot /></button>',
+      '<button class="u-button" type="button" :aria-label="$attrs[\'aria-label\']" @click="$emit(\'click\')">{{ label }}<slot /></button>',
   },
   UIcon: {
     template: '<span class="u-icon" />',
@@ -113,9 +113,9 @@ describe('Experience Detail Page', () => {
     expect(wrapper.find('h1').text()).toBe(sampleExperience.title);
 
     const editLabel = i18n.global.t('common.edit');
-    const editButton = wrapper.findAll('button').find((button) => button.text() === editLabel);
-    expect(editButton).toBeDefined();
-    await editButton?.trigger('click');
+    const editButton = wrapper.find(`button[aria-label="${editLabel}"]`);
+    expect(editButton.exists()).toBe(true);
+    await editButton.trigger('click');
 
     await flushPromises();
 

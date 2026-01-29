@@ -60,7 +60,7 @@ test.describe('Experience workflow', () => {
     await page.goto(`/profile/experiences/${manualExperienceId}`);
     await page.waitForLoadState('networkidle');
 
-    await page.getByRole('button', { name: /^Edit$/ }).click();
+    await page.getByRole('button', { name: 'Edit', exact: true }).click();
     await expect(page.getByLabel(/Company Name/i)).toBeVisible({ timeout: 10000 });
 
     await page.getByLabel(/Company Name/i).fill(updatedCompanyName);

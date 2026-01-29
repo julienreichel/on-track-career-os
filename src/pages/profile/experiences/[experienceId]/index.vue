@@ -193,7 +193,16 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
 
         <template v-else>
           <div v-if="!isEditing" class="space-y-6">
-            <UCard>
+            <UCard class="relative">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                icon="i-heroicons-pencil"
+                :aria-label="t('common.edit')"
+                class="absolute right-4 top-4 cursor-pointer"
+                @click="handleEdit"
+              />
               <div class="space-y-6">
                 <div>
                   <p class="text-sm text-gray-500">{{ t('experiences.form.title') }}</p>
@@ -258,16 +267,6 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
                 </div>
               </div>
             </UCard>
-
-            <div class="flex justify-end">
-              <UButton
-                color="primary"
-                variant="outline"
-                icon="i-heroicons-pencil"
-                :label="t('common.edit')"
-                @click="handleEdit"
-              />
-            </div>
           </div>
 
           <ExperienceForm
