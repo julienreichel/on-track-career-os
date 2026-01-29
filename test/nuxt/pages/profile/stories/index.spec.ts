@@ -10,14 +10,7 @@ import type { ComponentPublicInstance, Ref } from 'vue';
 import type { GuidanceModel } from '@/domain/onboarding';
 
 // Mock Nuxt composables
-const pushMock = vi.fn();
 vi.mock('#app', () => ({
-  useRouter: vi.fn(() => ({
-    push: pushMock,
-  })),
-  useRoute: vi.fn(() => ({
-    params: {},
-  })),
   definePageMeta: vi.fn(),
 }));
 
@@ -73,7 +66,6 @@ type StoriesPageExposed = {
 describe('Profile Stories Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    pushMock.mockReset();
     guidanceRef.value = {};
   });
 
@@ -97,15 +89,14 @@ describe('Profile Stories Page', () => {
             template: `
               <div class="u-page-header">
                 <slot />
-                <button
+                <a
                   v-for="(link, index) in links"
                   :key="index"
                   class="header-link"
-                  type="button"
-                  @click="link?.onClick && link.onClick()"
+                  :href="link?.to"
                 >
                   {{ link?.label || ('Link ' + index) }}
-                </button>
+                </a>
               </div>
             `,
             props: ['title', 'description', 'links'],
@@ -392,17 +383,13 @@ describe('Profile Stories Page', () => {
     expect(searchSpy).toHaveBeenCalledWith('AI');
   });
 
-  it('should navigate back to profile from header link', async () => {
-    const pushSpy = vi.spyOn(router, 'push');
+  it('should link back to profile from header', async () => {
     const wrapper = createWrapper();
     await wrapper.vm.$nextTick();
 
     const linkButton = wrapper.find('.header-link');
     expect(linkButton.exists()).toBe(true);
-
-    await linkButton.trigger('click');
-    expect(pushSpy).toHaveBeenCalledWith('/profile');
-    pushSpy.mockRestore();
+    expect(linkButton.attributes('href')).toBe('/profile');
   });
 
   it('should render error alert text when error exists', async () => {
