@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStoryList } from '@/composables/useStoryList';
 import { useGuidance } from '@/composables/useGuidance';
@@ -14,7 +13,6 @@ definePageMeta({
   breadcrumbLabel: 'All Stories',
 });
 
-const router = useRouter();
 const { t } = useI18n();
 
 // Use new story list composable
@@ -58,16 +56,12 @@ const handleRefresh = async () => {
   }
 };
 
-const handleBackToProfile = () => {
-  void router.push('/profile');
-};
-
 // Page header links
 const headerLinks = computed<PageHeaderLink[]>(() => [
   {
     label: t('common.backToProfile'),
     icon: 'i-heroicons-arrow-left',
-    onClick: handleBackToProfile,
+    to: '/profile',
   },
   {
     label: t('storyList.create'),

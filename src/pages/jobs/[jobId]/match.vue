@@ -51,6 +51,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     icon: 'i-heroicons-sparkles',
     color: 'primary',
     disabled: isGenerating.value || isLoading.value,
+    class: 'cursor-pointer',
     onClick: () => {
       void handleGenerate();
     },

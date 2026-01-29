@@ -51,7 +51,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
   {
     label: t('experiences.list.addNew'),
     icon: 'i-heroicons-plus',
-    onClick: handleNewExperience,
+    to: '/profile/experiences/new',
   },
 ]);
 
@@ -118,10 +118,6 @@ function handleEdit(id: string) {
   } else {
     void router.push('/profile/experiences/new');
   }
-}
-
-function handleNewExperience() {
-  void router.push('/profile/experiences/new');
 }
 
 function handleDelete(id: string) {
