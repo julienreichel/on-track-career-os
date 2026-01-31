@@ -33,13 +33,27 @@
       />
 
       <form @submit.prevent="handleSubmit">
-        <ProfileSectionCoreIdentity />
-        <ProfileSectionWorkPermit />
-        <ProfileSectionContact />
-        <ProfileSectionSocialLinks />
-        <ProfileSectionCareerDirection v-if="!isLimitedEditing || hasCareerDirection" />
-        <ProfileSectionIdentityValues v-if="!isLimitedEditing || hasIdentityValues" />
-        <ProfileSectionProfessionalAttributes />
+        <section ref="coreIdentityRef">
+          <ProfileSectionCoreIdentity />
+        </section>
+        <section ref="workPermitRef">
+          <ProfileSectionWorkPermit />
+        </section>
+        <section ref="contactRef">
+          <ProfileSectionContact />
+        </section>
+        <section ref="socialLinksRef">
+          <ProfileSectionSocialLinks />
+        </section>
+        <section v-if="!isLimitedEditing || hasCareerDirection" ref="careerDirectionRef">
+          <ProfileSectionCareerDirection />
+        </section>
+        <section v-if="!isLimitedEditing || hasIdentityValues" ref="identityValuesRef">
+          <ProfileSectionIdentityValues />
+        </section>
+        <section ref="professionalAttributesRef">
+          <ProfileSectionProfessionalAttributes />
+        </section>
 
         <div v-if="isEditing" class="flex justify-end gap-3">
           <UButton type="button" color="neutral" variant="ghost" @click="cancelEditing">
@@ -60,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, provide, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, provide, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthUser } from '@/composables/useAuthUser';
@@ -113,6 +127,13 @@ const photoPreviewUrl = ref<string | null>(null);
 const uploadingPhoto = ref(false);
 const photoError = ref<string | null>(null);
 const photoInputRef = ref<HTMLInputElement | null>(null);
+const coreIdentityRef = ref<HTMLElement | null>(null);
+const workPermitRef = ref<HTMLElement | null>(null);
+const contactRef = ref<HTMLElement | null>(null);
+const socialLinksRef = ref<HTMLElement | null>(null);
+const careerDirectionRef = ref<HTMLElement | null>(null);
+const identityValuesRef = ref<HTMLElement | null>(null);
+const professionalAttributesRef = ref<HTMLElement | null>(null);
 
 const profilePhotoService = new ProfilePhotoService();
 const directProfileService = new UserProfileService();
@@ -177,6 +198,13 @@ const hasContactInfo = computed(() => {
 
 const hasSocialLinks = computed(() => form.value.socialLinks.length > 0);
 const hasWorkPermit = computed(() => !!form.value.workPermitInfo);
+const missingCoreIdentity = computed(() => !hasCoreIdentity.value);
+const missingWorkPermit = computed(() => !hasWorkPermit.value);
+const missingContact = computed(() => !hasContactInfo.value);
+const missingSocialLinks = computed(() => !hasSocialLinks.value);
+const missingCareerDirection = computed(() => !hasCareerDirection.value);
+const missingIdentityValues = computed(() => !hasIdentityValues.value);
+const missingProfessionalAttributes = computed(() => !hasProfessionalAttributes.value);
 
 const emailError = computed<string | undefined>(() => {
   if (!form.value.primaryEmail) return undefined;
@@ -209,6 +237,10 @@ const initProfile = (id: string) => {
     loadProfileToForm();
     if (route.query.mode === 'edit') {
       startEditing();
+      const removeAfterEach = router.afterEach(() => {
+        void scrollToFirstMissingSection();
+        removeAfterEach();
+      });
       void router.replace({ path: route.path, query: {} });
     }
   });
@@ -363,6 +395,31 @@ const cancelEditing = () => {
     form.value = JSON.parse(JSON.stringify(originalForm.value));
     void loadPhotoPreview(form.value.profilePhotoKey);
   }
+};
+
+const scrollToFirstMissingSection = async () => {
+  await nextTick();
+
+  const targets: Array<[boolean, HTMLElement | null]> = [
+    [missingCoreIdentity.value, coreIdentityRef.value],
+    [missingWorkPermit.value, workPermitRef.value],
+    [missingContact.value, contactRef.value],
+    [missingSocialLinks.value, socialLinksRef.value],
+    [
+      missingCareerDirection.value && (!isLimitedEditing.value || hasCareerDirection.value),
+      careerDirectionRef.value,
+    ],
+    [
+      missingIdentityValues.value && (!isLimitedEditing.value || hasIdentityValues.value),
+      identityValuesRef.value,
+    ],
+    [missingProfessionalAttributes.value, professionalAttributesRef.value],
+  ];
+
+  const match = targets.find(([isMissing, element]) => isMissing && element);
+  if (!match) return;
+  const [, element] = match;
+  element?.scrollIntoView({ block: 'start', behavior: 'smooth' });
 };
 
 const saveProfileUpdates = async () => {
