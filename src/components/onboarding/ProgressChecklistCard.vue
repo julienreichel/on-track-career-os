@@ -25,11 +25,26 @@ const gateLabels: Record<ProgressGate, string> = {
   tailoredSpeech: 'progress.checklist.tailoredSpeech',
 };
 
+const gateRoutes: Record<ProgressGate, string> = {
+  cvUploaded: '/onboarding',
+  experienceCount: '/profile/experiences/new',
+  profileBasics: '/profile/full?mode=edit',
+  profileDepth: '/profile/full?mode=edit',
+  stories: '/profile/stories/new',
+  personalCanvas: '/profile/canvas',
+  jobUploaded: '/jobs/new',
+  matchingSummary: '/jobs',
+  tailoredCv: '/applications/cv',
+  tailoredCoverLetter: '/applications/cover-letters',
+  tailoredSpeech: '/applications/speech',
+};
+
 function buildItems(result: ProgressCheckResult, gates: ProgressGate[]) {
   return gates.map((gate) => ({
     gate,
     label: t(gateLabels[gate]),
     complete: !result.missing.includes(gate),
+    to: gateRoutes[gate],
   }));
 }
 
@@ -53,11 +68,13 @@ const activePhaseTitle = computed(() => t(`progress.phaseChecklistTitles.${props
 </script>
 
 <template>
-  <UCard class="space-y-4">
-    <div>
-      <h3 class="text-base font-semibold text-highlighted">{{ activePhaseTitle }}</h3>
-      <p class="text-sm text-dimmed">{{ t('progress.checklistHint') }}</p>
-    </div>
+  <UCard>
+    <template #header>
+      <div>
+        <h3 class="text-lg font-semibold">{{ activePhaseTitle }}</h3>
+        <p class="text-sm text-gray-500">{{ t('progress.checklistHint') }}</p>
+      </div>
+    </template>
 
     <ProgressChecklistItems v-if="state.phase === 'phase1'" :items="phase1Items" />
 
@@ -78,10 +95,8 @@ const activePhaseTitle = computed(() => t(`progress.phaseChecklistTitles.${props
 
     <ProgressChecklistItems v-else-if="state.phase === 'phase3'" :items="phase3Items" />
 
-    <div v-else class="space-y-2">
-      <p class="text-sm text-dimmed">
-        {{ t('progress.bonusHint') }}
-      </p>
-    </div>
+    <p v-else class="text-sm text-muted-foreground">
+      {{ t('progress.bonusHint') }}
+    </p>
   </UCard>
 </template>

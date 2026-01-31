@@ -8,6 +8,10 @@ const i18n = createTestI18n();
 const stubs = {
   UCard: { template: '<div class="u-card"><slot /></div>' },
   UIcon: { template: '<span class="u-icon"></span>' },
+  NuxtLink: {
+    props: ['to'],
+    template: '<a class="nuxt-link" :href="to"><slot /></a>',
+  },
 };
 
 describe('ProgressChecklistCard', () => {

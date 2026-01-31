@@ -7,6 +7,10 @@ const stubs = {
     props: ['name'],
     template: '<span class="u-icon" :data-name="name"></span>',
   },
+  NuxtLink: {
+    props: ['to'],
+    template: '<a class="nuxt-link" :href="to"><slot /></a>',
+  },
 };
 
 describe('ProgressChecklistItems', () => {
@@ -14,7 +18,7 @@ describe('ProgressChecklistItems', () => {
     const wrapper = mount(ProgressChecklistItems, {
       props: {
         items: [
-          { gate: 'cvUploaded', label: 'Upload a CV', complete: true },
+          { gate: 'cvUploaded', label: 'Upload a CV', complete: true, to: '/onboarding' },
           { gate: 'experienceCount', label: 'Add experiences', complete: false },
         ],
       },
@@ -29,5 +33,6 @@ describe('ProgressChecklistItems', () => {
     expect(icons).toHaveLength(2);
     expect(icons[0]?.attributes('data-name')).toBe('i-heroicons-check-circle');
     expect(icons[1]?.attributes('data-name')).toBe('i-heroicons-minus-circle');
+    expect(wrapper.find('.nuxt-link').attributes('href')).toBe('/onboarding');
   });
 });
