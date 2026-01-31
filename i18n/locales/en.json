@@ -1576,19 +1576,6 @@
     "errors": {
       "title": "Progress unavailable",
       "loadFailed": "We couldn't load your progress right now. Please refresh."
-    },
-    "gates": {
-      "cvUploaded": "progress.checklist.cvUploaded",
-      "experienceCount": "progress.checklist.experienceCount",
-      "profileBasics": "progress.checklist.profileBasics",
-      "profileDepth": "progress.checklist.profileDepth",
-      "stories": "progress.checklist.stories",
-      "personalCanvas": "progress.checklist.personalCanvas",
-      "jobUploaded": "progress.checklist.jobUploaded",
-      "matchingSummary": "progress.checklist.matchingSummary",
-      "tailoredCv": "progress.checklist.tailoredCv",
-      "tailoredCoverLetter": "progress.checklist.tailoredCoverLetter",
-      "tailoredSpeech": "progress.checklist.tailoredSpeech"
     }
   },
   "dashboard": {

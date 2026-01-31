@@ -244,7 +244,9 @@ I'm not just looking for a role; I'm seeking an opportunity where my skills and 
 
     // Career Story - THREE paragraphs
     expect(response.careerStory).toContain('dynamic blend of leadership');
-    expect(response.careerStory).toContain('proudest achievements was reducing support incidents by 40%');
+    expect(response.careerStory).toContain(
+      'proudest achievements was reducing support incidents by 40%'
+    );
     expect(response.careerStory).toContain('consistently focused on delivering value');
     expect(response.careerStory).toContain('What role do you see');
 
