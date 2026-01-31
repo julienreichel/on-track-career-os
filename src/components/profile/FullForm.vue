@@ -199,7 +199,6 @@ const hasContactInfo = computed(() => {
 const hasSocialLinks = computed(() => form.value.socialLinks.length > 0);
 const hasWorkPermit = computed(() => !!form.value.workPermitInfo);
 const missingCoreIdentity = computed(() => !hasCoreIdentity.value);
-const missingWorkPermit = computed(() => !hasWorkPermit.value);
 const missingContact = computed(() => !hasContactInfo.value);
 const missingSocialLinks = computed(() => !hasSocialLinks.value);
 const missingCareerDirection = computed(() => !hasCareerDirection.value);
@@ -402,7 +401,6 @@ const scrollToFirstMissingSection = async () => {
 
   const targets: Array<[boolean, HTMLElement | null]> = [
     [missingCoreIdentity.value, coreIdentityRef.value],
-    [missingWorkPermit.value, workPermitRef.value],
     [missingContact.value, contactRef.value],
     [missingSocialLinks.value, socialLinksRef.value],
     [
