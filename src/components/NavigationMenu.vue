@@ -60,6 +60,7 @@ const navigationLinks = computed<NavigationLink[]>(() => [
   },
   {
     label: t('navigation.applications'),
+    to: '/applications',
     icon: 'i-heroicons-document-text',
     children: [
       {

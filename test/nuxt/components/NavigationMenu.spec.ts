@@ -67,6 +67,7 @@ describe('NavigationMenu', () => {
     // Check Applications section
     const applicationsItem = links[2];
     expect(applicationsItem.label).toBe(i18n.global.t('navigation.applications'));
+    expect(applicationsItem.to).toBe('/applications');
     expect(applicationsItem.icon).toBe('i-heroicons-document-text');
     expect(applicationsItem.children).toHaveLength(3);
     expect(applicationsItem.children[0].label).toBe(i18n.global.t('navigation.cvs'));
