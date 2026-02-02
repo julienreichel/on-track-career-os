@@ -1,6 +1,6 @@
 <template>
   <UContainer>
-    <UHeader>
+    <UHeader toggle-side="left">
       <template #title>
         <NuxtLink to="/" class="font-semibold">
           {{ t('app.title') }}
@@ -28,10 +28,7 @@
     </UHeader>
 
     <UMain>
-      <div
-        v-if="showBreadcrumb"
-        class="mb-6 w-full max-w-(--ui-container) mx-auto px-4 sm:px-6 lg:px-8"
-      >
+      <div v-if="showBreadcrumb" class="mb-6">
         <UBreadcrumb :items="breadcrumbItems" />
       </div>
       <slot />
