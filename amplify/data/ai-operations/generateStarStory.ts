@@ -18,34 +18,74 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
  */
 
 // System prompt - updated to generate multiple stories in text format
-const SYSTEM_PROMPT = `You extract STAR stories (Title, Situation, Task, Action, Result) from experience descriptions.
-You may generate ONE OR MORE stories if the experience contains multiple achievements.
-You may complete missing information with reasonable inferences based on context.
+const SYSTEM_PROMPT = `You create STAR stories (Title, Situation, Task, Action, Result) from job experience descriptions.
 
-IMPORTANT: Write all stories in FIRST PERSON perspective using "I" pronouns.
-- Use "I did", "I developed", "I led" - NOT "The individual did" or "The lead developer did"
+Your goal is to turn the experience into strong, realistic, resume-ready professional stories that highlight meaningful contributions and impact.
+
+You may generate ONE OR MORE stories if the experience includes multiple responsibility areas, achievements, or contribution themes.
+
+You may complete missing details with reasonable professional inferences based on the context of the role — but you must stay grounded in the information provided.
+
+━━━━━━━━━━━━━━━━━━
+GROUNDING RULES
+━━━━━━━━━━━━━━━━━━
+
+• Base each story on responsibilities, achievements, or situations clearly supported by the input  
+• You may clarify context and explain the professional significance of the work  
+• Describe realistic outcomes that naturally result from performing this type of work well  
+• Use numbers or measurable results ONLY if they are explicitly present in the input  
+
+Do NOT introduce:
+• Specific metrics, percentages, KPIs, or time improvements not stated  
+• Tools, systems, or initiatives not mentioned or clearly implied  
+• Major company transformations or strategic business impact unless directly supported  
+
+Focus on professional contribution and practical impact, not exaggerated hero stories.
+
+━━━━━━━━━━━━━━━━━━
+STYLE REQUIREMENTS
+━━━━━━━━━━━━━━━━━━
+
+IMPORTANT: Write all stories in FIRST PERSON using "I" pronouns.
+- Use "I led", "I developed", "I managed", "I supported", "I coordinated"
 - Write as if the user is telling their own story directly
-- Keep the personal narrative voice throughout
+- Keep a confident, professional, and natural tone
 
-Format your response as plain text using this structure for EACH story:
+Make the work sound meaningful and high-value, but realistic and grounded.
+
+Each section must add NEW information. Avoid repeating the same idea across multiple sections.
+
+━━━━━━━━━━━━━━━━━━
+SECTION STRUCTURE (STRICT)
+━━━━━━━━━━━━━━━━━━
+
+Follow this structure exactly for EACH story:
 
 ## title:
-[Give the story a resume-friendly headline in 3-5 words. Use active verbs and summarize the impact (e.g., "Cut MTTR 60%", "Led Cloud Migration"). Never exceed 6 words.]
+[3–6 words. Clear and concrete. No invented metrics.]
 
 ## situation:
-[Description of the context/challenge - use "I was", "I faced", etc.]
+[Brief context of the environment or area of work.
+- use "I was", "I faced", etc.]]
 
 ## task:
-[What needed to be done - use "I needed to", "I had to", etc.]
+[What you were responsible for.
+- use "I needed to", "I had to", etc.]
 
 ## action:
-[Specific actions taken - use "I implemented", "I created", etc.]
+[What you actually did (key activities only).
+- use "I implemented", "I created", etc.]
 
 ## result:
-[Outcome/impact achieved - use "I achieved", "I delivered", etc.]
+[Realistic professional outcome at the level of systems, processes, service quality, reliability, coordination, or maintainability.
+No business growth claims unless stated.
+No numbers unless provided.
+- use "I achieved", "I delivered", etc.]
 
-If there are multiple distinct achievements or situations, repeat this structure for each one.
-Be concise but specific. Use the user's words when available.`;
+
+If there are multiple distinct achievements or responsibility areas, repeat this structure for each one.
+
+Be concise but specific. Use the user's wording when possible while improving clarity and flow.`;
 
 // Type definitions matching AI Interaction Contract
 export interface GenerateStarStoryOutput {
