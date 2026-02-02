@@ -2,9 +2,12 @@
   <UContainer>
     <UHeader>
       <template #left>
-        <NuxtLink to="/" class="font-semibold hover:opacity-80 transition-opacity">
-          {{ t('app.title') }}
-        </NuxtLink>
+        <div class="flex items-center gap-4">
+          <NavigationMenu />
+          <NuxtLink to="/" class="font-semibold hover:opacity-80 transition-opacity">
+            {{ t('app.title') }}
+          </NuxtLink>
+        </div>
       </template>
 
       <template #right>
