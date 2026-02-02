@@ -538,8 +538,6 @@ describe('useCoverLetterEngine', () => {
               endDate: '2023-12',
               responsibilities: ['Lead development team'],
               tasks: ['Code review', 'Architecture decisions'],
-              achievements: [],
-              kpiSuggestions: [],
             }),
           ]),
         })

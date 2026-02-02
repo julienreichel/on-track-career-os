@@ -147,7 +147,7 @@ French (Basic)
 `;
 
     // Invoke AI operation via repository
-    const parsedCv = await repository.parseCvText(cvText);
+    const parsedCv = await repository.parseCvText(cvText, 'en');
 
     // Validate structure (per AI Interaction Contract)
     expect(parsedCv).toHaveProperty('profile');
@@ -202,7 +202,7 @@ French (Basic)
   it('should handle empty CV text gracefully', async () => {
     // Test with empty input - per AI Interaction Contract fallback rules,
     // should return valid structure with empty arrays instead of throwing
-    const parsedCv = await repository.parseCvText('');
+    const parsedCv = await repository.parseCvText('', 'en');
 
     // Validate structure is returned (even if empty)
     expect(parsedCv).toHaveProperty('profile');
@@ -233,7 +233,7 @@ Led team of 5 engineers at TechCorp
 Skills: JavaScript, Python
 `;
 
-    const parsedCv = await repository.parseCvText(minimalCv);
+    const parsedCv = await repository.parseCvText(minimalCv, 'en');
 
     // Validate structure
     expect(parsedCv).toHaveProperty('profile');
@@ -260,7 +260,7 @@ Skills: JavaScript, Python
     try {
       // This should not throw even if user is not authenticated
       // (though it may return authorization error)
-      const parsedCv = await repository.parseCvText(minimalInput);
+      const parsedCv = await repository.parseCvText(minimalInput, 'en');
 
       // If we get here, the operation is deployed and accessible
       expect(parsedCv).toBeDefined();

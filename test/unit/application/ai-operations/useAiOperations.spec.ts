@@ -85,7 +85,7 @@ describe('useAiOperations', () => {
 
     // Act
     const { parsedCv, loading, error, parseCv } = useAiOperations();
-    await parseCv('Sample CV');
+    await parseCv('Sample CV', 'en');
 
     // Assert
     expect(loading.value).toBe(false);

@@ -296,7 +296,6 @@ function loadExperienceSignals(experiences: ExperienceWithStories[]) {
   const limited = experiences.slice(0, MAX_EXPERIENCE_SIGNALS);
 
   const signals = limited.map((exp) => {
-    const stories = (exp.stories ?? []).filter((story): story is STARStory => Boolean(story));
     return {
       title: exp.title || '',
       companyName: exp.companyName || '',
@@ -446,8 +445,4 @@ function normalizeStringArray(values?: (string | null)[] | null) {
     }
   });
   return output;
-}
-
-function flattenStrings(values: (string | null | undefined)[]) {
-  return normalizeStringArray(values as (string | null)[]);
 }

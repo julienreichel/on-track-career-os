@@ -45,7 +45,8 @@ CONTENT RULES FOR experienceItems:
 - Do not merge multiple roles into one item even if they are at the same company.
 
 NORMALIZATION:
-- Preserve original language; do not translate.
+- Output profile fields and list values in the target language.
+- Preserve the original language in rawBlock (do not translate rawBlock).
 - Keep line breaks inside rawBlock if they improve readability.
 `;
 
@@ -107,6 +108,7 @@ export interface ParseCvTextOutput {
 
 export interface ParseCvTextInput {
   cvText: string;
+  language: string;
 }
 
 const EXPERIENCE_TYPES = ['work', 'education', 'volunteer', 'project'] as const;
@@ -247,8 +249,10 @@ function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOu
 /**
  * Build user prompt from CV text
  */
-function buildUserPrompt(cvText: string): string {
+function buildUserPrompt(cvText: string, language: string): string {
   return `Extract structured profile information and experience items from this CV text:
+
+Target output language: ${language}
 
 ${cvText}
 
@@ -258,6 +262,7 @@ ${OUTPUT_SCHEMA}
 Important:
 - experienceItems: one entry per distinct item (one role / one education / one volunteer / one project). Never merge items.
 - rawBlock must contain the full text for that item (header + body).
+- rawBlock must preserve the original language (no translation).
 - If a profile field is not found: use "" for strings and [] for arrays.
 - Never output null (not as JSON null and not as the string "null").
 - confidence is a number between 0 and 1.`;
@@ -273,7 +278,7 @@ export const handler = async (event: {
     'parseCvText',
     event,
     async (args) => {
-      const userPrompt = buildUserPrompt(args.cvText);
+      const userPrompt = buildUserPrompt(args.cvText, args.language);
       return invokeAiWithRetry<ParseCvTextOutput>({
         systemPrompt: SYSTEM_PROMPT,
         userPrompt,
@@ -284,6 +289,7 @@ export const handler = async (event: {
     },
     (args) => ({
       cvText: truncateForLog(args.cvText),
+      language: args.language,
     })
   );
 };

@@ -174,7 +174,7 @@ function normalizeDateValue(value: string, treatPresentAsEmpty: boolean): string
   }
 
   const monthYearMatch = value.match(/^([A-Za-z]{3,9})\s+(\d{4})$/);
-  if (monthYearMatch) {
+  if (monthYearMatch?.[1]) {
     const month = MONTH_MAP[monthYearMatch[1].toLowerCase()];
     if (month) {
       return `${monthYearMatch[2]}-${month}-01`;

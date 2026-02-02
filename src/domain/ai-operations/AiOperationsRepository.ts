@@ -23,7 +23,7 @@ export interface IAiOperationsRepository {
    * @param cvText - Raw CV text content
    * @returns Structured CV data with confidence score
    */
-  parseCvText(cvText: string): Promise<ParsedCV>;
+  parseCvText(cvText: string, language: string): Promise<ParsedCV>;
 
   /**
    * Extract structured experience data from experience items
@@ -186,8 +186,8 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     return this._client;
   }
 
-  async parseCvText(cvText: string): Promise<ParsedCV> {
-    const { data, errors } = await this.client.parseCvText({ cvText }, gqlOptions());
+  async parseCvText(cvText: string, language: string): Promise<ParsedCV> {
+    const { data, errors } = await this.client.parseCvText({ cvText, language }, gqlOptions());
 
     if (errors && errors.length > 0) {
       throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);

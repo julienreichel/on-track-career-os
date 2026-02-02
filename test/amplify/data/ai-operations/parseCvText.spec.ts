@@ -17,7 +17,7 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => {
  * Tests the actual implementation with mocked Bedrock responses
  */
 describe('ai.parseCvText', () => {
-  let handler: (event: { arguments: { cvText: string } }) => Promise<unknown>;
+  let handler: (event: { arguments: { cvText: string; language: string } }) => Promise<unknown>;
   let mockSend: ReturnType<typeof vi.fn>;
 
   beforeEach(async () => {
@@ -167,13 +167,8 @@ English (Native), Spanish (Fluent)
           body: string;
         };
         const requestBody = JSON.parse(commandCall.body);
-        const userPrompt = requestBody.messages[0].content[0].text;
-
-        // Extract CV text from prompt (after "CV text to parse:")
-        const cvTextMatch = userPrompt.match(/CV text to parse:\n([\s\S]*)/);
-        const extractedCvText = cvTextMatch ? cvTextMatch[1].trim() : mockCvText;
-
-        const mockResponse = generateMockResponse(extractedCvText);
+        void requestBody;
+        const mockResponse = generateMockResponse(mockCvText);
 
         return {
           body: new TextEncoder().encode(
@@ -189,7 +184,7 @@ English (Native), Spanish (Fluent)
       });
 
       const result = await handler({
-        arguments: { cvText: mockCvText },
+        arguments: { cvText: mockCvText, language: 'en' },
       });
 
       const parsed = result as {
@@ -250,7 +245,7 @@ English (Native), Spanish (Fluent)
       });
 
       const result = await handler({
-        arguments: { cvText: mockCvText },
+        arguments: { cvText: mockCvText, language: 'en' },
       });
 
       const parsed = result as {
@@ -303,7 +298,7 @@ English (Native), Spanish (Fluent)
       });
 
       const resultString = await handler({
-        arguments: { cvText: mockCvText },
+        arguments: { cvText: mockCvText, language: 'en' },
       });
       const result = resultString as {
         profile: {
@@ -365,7 +360,7 @@ English (Native), Spanish (Fluent)
       });
 
       const result = (await handler({
-        arguments: { cvText: mockCvText },
+        arguments: { cvText: mockCvText, language: 'en' },
       })) as {
         profile: { languages: string[]; personalValues: string[] };
         experienceItems: { experienceType: string; rawBlock: string }[];

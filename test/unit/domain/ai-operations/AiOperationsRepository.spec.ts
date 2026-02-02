@@ -138,10 +138,10 @@ describe('AiOperationsRepository', () => {
         errors: undefined,
       });
 
-      const result = await repository.parseCvText(mockCvText);
+      const result = await repository.parseCvText(mockCvText, 'en');
 
       expect(mockClient.parseCvText).toHaveBeenCalledWith(
-        { cvText: mockCvText },
+        { cvText: mockCvText, language: 'en' },
         expect.objectContaining({ authMode: 'userPool' })
       );
       expect(result).toEqual(mockParsedData);
@@ -154,7 +154,9 @@ describe('AiOperationsRepository', () => {
         errors: mockErrors,
       });
 
-      await expect(repository.parseCvText('invalid text')).rejects.toThrow('AI operation failed');
+      await expect(repository.parseCvText('invalid text', 'en')).rejects.toThrow(
+        'AI operation failed'
+      );
     });
 
     it('should throw error when no data is returned', async () => {
@@ -163,7 +165,9 @@ describe('AiOperationsRepository', () => {
         errors: undefined,
       });
 
-      await expect(repository.parseCvText('test')).rejects.toThrow('AI operation returned no data');
+      await expect(repository.parseCvText('test', 'en')).rejects.toThrow(
+        'AI operation returned no data'
+      );
     });
   });
 

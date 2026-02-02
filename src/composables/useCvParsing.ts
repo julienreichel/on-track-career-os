@@ -93,7 +93,8 @@ export function useCvParsing() {
     extractedText.value = text;
 
     // Parse CV text to extract profile data and experience items
-    await aiOps.parseCv(text);
+    const language = locale.value || 'en';
+    await aiOps.parseCv(text, language);
 
     if (aiOps.error.value) {
       throw new Error(aiOps.error.value);
@@ -109,7 +110,6 @@ export function useCvParsing() {
     }
 
     const experienceItems = aiOps.parsedCv.value.experienceItems;
-    const language = locale.value || 'en';
     const allExperiences = await extractExperiencesFromSection(language, experienceItems);
 
     if (allExperiences.length === 0) {

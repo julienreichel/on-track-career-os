@@ -96,14 +96,17 @@ export class AiOperationsService {
    * @returns Structured CV data with confidence score
    * @throws Error if parsing fails or validation fails
    */
-  async parseCvText(cvText: string): Promise<ParsedCV> {
+  async parseCvText(cvText: string, language: string): Promise<ParsedCV> {
     // Validate input
     if (!cvText || cvText.trim().length === 0) {
       throw new Error('CV text cannot be empty');
     }
+    if (!language || language.trim().length === 0) {
+      throw new Error('Language cannot be empty');
+    }
 
     try {
-      const result = await this.repo.parseCvText(cvText);
+      const result = await this.repo.parseCvText(cvText, language);
 
       // Validate output structure
       if (!isParsedCV(result)) {

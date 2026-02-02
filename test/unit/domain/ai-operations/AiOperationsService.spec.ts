@@ -88,22 +88,22 @@ describe('AiOperationsService', () => {
       mockRepo.parseCvText.mockResolvedValue(mockParsedCv);
 
       // Act
-      const result = await service.parseCvText('Sample CV text');
+      const result = await service.parseCvText('Sample CV text', 'en');
 
       // Assert
       expect(result).toEqual(mockParsedCv);
-      expect(mockRepo.parseCvText).toHaveBeenCalledWith('Sample CV text');
+      expect(mockRepo.parseCvText).toHaveBeenCalledWith('Sample CV text', 'en');
     });
 
     it('should throw error for empty CV text', async () => {
       // Act & Assert
-      await expect(service.parseCvText('')).rejects.toThrow('CV text cannot be empty');
+      await expect(service.parseCvText('', 'en')).rejects.toThrow('CV text cannot be empty');
       expect(mockRepo.parseCvText).not.toHaveBeenCalled();
     });
 
     it('should throw error for whitespace-only CV text', async () => {
       // Act & Assert
-      await expect(service.parseCvText('   ')).rejects.toThrow('CV text cannot be empty');
+      await expect(service.parseCvText('   ', 'en')).rejects.toThrow('CV text cannot be empty');
       expect(mockRepo.parseCvText).not.toHaveBeenCalled();
     });
 
@@ -112,7 +112,7 @@ describe('AiOperationsService', () => {
       mockRepo.parseCvText.mockRejectedValue(new Error('AI operation failed'));
 
       // Act & Assert
-      await expect(service.parseCvText('Sample CV text')).rejects.toThrow(
+      await expect(service.parseCvText('Sample CV text', 'en')).rejects.toThrow(
         'Failed to parse CV text: AI operation failed'
       );
     });
@@ -122,7 +122,7 @@ describe('AiOperationsService', () => {
       mockRepo.parseCvText.mockResolvedValue({ invalid: 'structure' });
 
       // Act & Assert
-      await expect(service.parseCvText('Sample CV text')).rejects.toThrow(
+      await expect(service.parseCvText('Sample CV text', 'en')).rejects.toThrow(
         'Invalid CV parsing result structure'
       );
     });

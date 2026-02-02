@@ -173,7 +173,7 @@ describe('useCvParsing', () => {
       expect(mockParser.getText).toHaveBeenCalled();
       expect(mockParser.destroy).toHaveBeenCalled();
       expect(parsing.extractedText.value).toBe('Extracted PDF text');
-      expect(mockAiOps.parseCv).toHaveBeenCalledWith('Extracted PDF text');
+      expect(mockAiOps.parseCv).toHaveBeenCalledWith('Extracted PDF text', 'en');
       expect(parsing.extractedExperiences.value).toHaveLength(1);
       expect(parsing.extractedProfile.value).toEqual({
         ...baseProfile,
@@ -230,7 +230,7 @@ describe('useCvParsing', () => {
       await parsing.parseFile(textFile);
 
       expect(parsing.extractedText.value).toBe('Plain text CV');
-      expect(mockAiOps.parseCv).toHaveBeenCalledWith('Plain text CV');
+      expect(mockAiOps.parseCv).toHaveBeenCalledWith('Plain text CV', 'en');
     });
 
     it('should throw error for empty text file', async () => {

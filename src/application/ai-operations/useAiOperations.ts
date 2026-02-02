@@ -52,8 +52,8 @@ export function useAiOperations() {
   const error = ref<string | null>(null);
   const service = new AiOperationsService();
 
-  const parseCv = (cvText: string) =>
-    handleAsyncOperation(() => service.parseCvText(cvText), loading, error, parsedCv);
+  const parseCv = (cvText: string, language: string) =>
+    handleAsyncOperation(() => service.parseCvText(cvText, language), loading, error, parsedCv);
 
   const parseJobDescription = (jobText: string) =>
     handleAsyncOperation(

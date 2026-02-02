@@ -136,7 +136,7 @@ export const schemaLambdas = {
 
   parseCvText: a
     .query()
-    .arguments({ cvText: a.string().required() })
+    .arguments({ cvText: a.string().required(), language: a.string().required() })
     .returns(a.ref('ParseCvTextOutputType'))
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(parseCvTextFunction)),
