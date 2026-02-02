@@ -3,7 +3,7 @@
     <UDropdown
       v-for="link in navigationLinks"
       :key="link.label"
-      :items="[link.children || []]"
+      :items="link.children || []"
       :popper="{ placement: 'bottom-start' }"
     >
       <UButton
