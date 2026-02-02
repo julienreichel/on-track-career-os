@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import type { STARStory } from '@/domain/starstory/STARStory';
@@ -39,12 +39,16 @@ const experienceMap = computed(() => {
 
 const getCompanyName = (story: STARStory): string | undefined => {
   if (!story.experienceId || !props.showCompanyNames) return undefined;
-  return experienceMap.value[story.experienceId]?.companyName ?? undefined;
+  const experience = experienceMap.value[story.experienceId];
+  if (experience?.companyName) return experience.companyName;
+  return loadingExperiences.value ? t('common.loading') : undefined;
 };
 
 const getExperienceName = (story: STARStory): string | undefined => {
   if (!story.experienceId) return undefined;
-  return experienceMap.value[story.experienceId]?.title;
+  const experience = experienceMap.value[story.experienceId];
+  if (experience?.title) return experience.title;
+  return loadingExperiences.value ? t('common.loading') : undefined;
 };
 
 const loadExperiences = async () => {
@@ -86,9 +90,13 @@ const handleDelete = (story: STARStory) => {
   emit('delete', story);
 };
 
-onMounted(() => {
-  void loadExperiences();
-});
+watch(
+  () => [props.showCompanyNames, props.stories.map((story) => story.experienceId).join('|')],
+  () => {
+    void loadExperiences();
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
