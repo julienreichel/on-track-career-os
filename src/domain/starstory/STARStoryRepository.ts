@@ -2,7 +2,12 @@ import { gqlOptions } from '@/data/graphql/options';
 import type { AmplifyUserProfileModel } from '@/domain/user-profile/UserProfileRepository';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { AmplifyExperienceModel } from '@/domain/experience/ExperienceRepository';
-import type { STARStoryCreateInput, STARStoryUpdateInput, STARStory } from './STARStory';
+import type {
+  STARStoryCreateInput,
+  STARStoryUpdateInput,
+  STARStory,
+  STARStoryWithExperience,
+} from './STARStory';
 
 export type AmplifySTARStoryModel = {
   get: (
@@ -86,7 +91,7 @@ export class STARStoryRepository {
    * @param userId - User ID to load stories for
    * @returns Array of all stories for the user (flattened)
    */
-  async getAllStoriesByUser(userId: string): Promise<STARStory[]> {
+  async getAllStoriesByUser(userId: string): Promise<STARStoryWithExperience[]> {
     if (!userId) {
       return [];
     }
@@ -103,24 +108,26 @@ export class STARStoryRepository {
 
     const profile = data as UserProfileWithExperiences | null;
     const experiences = profile?.experiences ?? [];
-    const stories = experiences.flatMap((experience) => {
+    const stories: STARStoryWithExperience[] = [];
+
+    experiences.forEach((experience) => {
       if (!experience) {
-        return [];
+        return;
       }
       const experienceStories = experience.stories ?? [];
-      return experienceStories.map((story) => {
+      experienceStories.forEach((story) => {
         if (!story) {
-          return null;
+          return;
         }
-        return {
+        stories.push({
           ...story,
           experienceName: experience.title ?? undefined,
           companyName: experience.companyName ?? undefined,
-        };
+        });
       });
     });
 
-    return stories.filter((story): story is STARStory => Boolean(story));
+    return stories;
   }
 
   /**

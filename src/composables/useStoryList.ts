@@ -1,16 +1,13 @@
 import { ref, computed } from 'vue';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import { useAuthUser } from '@/composables/useAuthUser';
-import type { STARStory } from '@/domain/starstory/STARStory';
+import type { STARStory, STARStoryWithExperience } from '@/domain/starstory/STARStory';
 import type { Experience } from '@/domain/experience/Experience';
 
 /**
  * Story with Experience Context
  */
-export interface StoryWithExperience extends STARStory {
-  experienceName?: string;
-  companyName?: string;
-}
+export type StoryWithExperience = STARStoryWithExperience;
 
 /**
  * Grouped Stories by Experience

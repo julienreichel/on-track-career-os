@@ -2,12 +2,11 @@
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import type { STARStory } from '@/domain/starstory/STARStory';
-import type { StoryWithExperience } from '@/composables/useStoryList';
+import type { STARStory, STARStoryWithExperience } from '@/domain/starstory/STARStory';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 
 const props = defineProps<{
-  stories: StoryWithExperience[];
+  stories: STARStoryWithExperience[];
   loading?: boolean;
   showCompanyNames?: boolean;
   experienceId?: string;
@@ -28,12 +27,12 @@ const hasStories = computed(() => props.stories.length > 0);
 
 const getCompanyName = (story: STARStory): string | undefined => {
   if (!story.experienceId || !props.showCompanyNames) return undefined;
-  return (story as StoryWithExperience).companyName;
+  return (story as STARStoryWithExperience).companyName;
 };
 
 const getExperienceName = (story: STARStory): string | undefined => {
   if (!story.experienceId) return undefined;
-  return (story as StoryWithExperience).experienceName;
+  return (story as STARStoryWithExperience).experienceName;
 };
 
 const handleView = (story: STARStory) => {

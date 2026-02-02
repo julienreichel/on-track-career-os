@@ -1,6 +1,11 @@
 import { STARStoryRepository } from './STARStoryRepository';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
-import type { STARStory, STARStoryCreateInput, STARStoryUpdateInput } from './STARStory';
+import type {
+  STARStory,
+  STARStoryCreateInput,
+  STARStoryUpdateInput,
+  STARStoryWithExperience,
+} from './STARStory';
 import type { STARStory as AiSTARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 
@@ -43,7 +48,7 @@ export class STARStoryService {
    * @param userId - User identifier
    * @returns Array of all stories
    */
-  async getAllStories(userId: string): Promise<STARStory[]> {
+  async getAllStories(userId: string): Promise<STARStoryWithExperience[]> {
     return await this.repo.getAllStoriesByUser(userId);
   }
 
