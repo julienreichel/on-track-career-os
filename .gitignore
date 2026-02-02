@@ -35,3 +35,4 @@ logs
 .amplify
 amplify_outputs*
 amplifyconfiguration*
+amplify_outputs.json
