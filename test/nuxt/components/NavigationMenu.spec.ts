@@ -74,7 +74,7 @@ describe('NavigationMenu', () => {
     expect(applicationsItem.children[2].to).toBe('/applications/speech');
   });
 
-  it('uses horizontal orientation', () => {
+  it('passes horizontal orientation to UNavigationMenu', () => {
     const wrapper = mount(NavigationMenu, {
       global: {
         plugins: [i18n],
