@@ -297,9 +297,6 @@ function loadExperienceSignals(experiences: ExperienceWithStories[]) {
 
   const signals = limited.map((exp) => {
     const stories = (exp.stories ?? []).filter((story): story is STARStory => Boolean(story));
-    const achievements = flattenStrings(stories.flatMap((story) => story.achievements ?? []));
-    const kpiSuggestions = flattenStrings(stories.flatMap((story) => story.kpiSuggestions ?? []));
-
     return {
       title: exp.title || '',
       companyName: exp.companyName || '',
@@ -308,8 +305,6 @@ function loadExperienceSignals(experiences: ExperienceWithStories[]) {
       experienceType: exp.experienceType || 'work',
       responsibilities: normalizeStringArray(exp.responsibilities),
       tasks: normalizeStringArray(exp.tasks),
-      achievements,
-      kpiSuggestions,
     };
   });
 

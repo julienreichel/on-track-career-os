@@ -95,9 +95,10 @@ describe('AI Operations - Extract Experience Blocks (E2E Sandbox)', () => {
   }, 30000);
 
   it('should extract structured experience data from text blocks', async () => {
-    // Test input - experience text blocks
-    const experienceTextBlocks = [
-      `Senior Software Engineer at TechCorp
+    const experienceItems = [
+      {
+        experienceType: 'work',
+        rawBlock: `Senior Software Engineer at TechCorp
 January 2020 - December 2023
 
 Led development of microservices architecture for e-commerce platform serving 1M+ users.
@@ -112,8 +113,10 @@ Major Achievements:
 - Reduced deployment time from 2 hours to 15 minutes through CI/CD automation
 - Improved system reliability from 99.5% to 99.9% uptime
 - Decreased API response time by 40% through optimization`,
-
-      `Software Engineer at StartupInc
+      },
+      {
+        experienceType: 'work',
+        rawBlock: `Software Engineer at StartupInc
 June 2018 - December 2019
 
 Built e-commerce platform using React and Node.js for fashion retail startup.
@@ -128,30 +131,35 @@ Tasks:
 - Frontend development with React, TypeScript, Redux
 - Backend API development with Node.js and Express
 - Database design and optimization (PostgreSQL)
-- Unit and integration testing`,
+-- Unit and integration testing`,
+      },
     ];
 
     // Invoke AI operation via repository
-    const result = await repository.extractExperienceBlocks(experienceTextBlocks);
+    const result = await repository.extractExperienceBlocks('en', experienceItems);
 
     // Validate structure (per AI Interaction Contract)
-    expect(Array.isArray(result)).toBe(true);
+    expect(Array.isArray(result.experiences)).toBe(true);
 
     // Should extract both experiences
-    expect(result.length).toBeGreaterThanOrEqual(1);
+    expect(result.experiences.length).toBeGreaterThanOrEqual(1);
     console.log(result);
     // Validate first experience structure
-    const firstExp = result[0];
+    const firstExp = result.experiences[0];
     expect(firstExp).toHaveProperty('title');
     expect(firstExp).toHaveProperty('companyName');
     expect(firstExp).toHaveProperty('startDate');
+    expect(firstExp).toHaveProperty('endDate');
     expect(firstExp).toHaveProperty('responsibilities');
     expect(firstExp).toHaveProperty('tasks');
+    expect(firstExp).toHaveProperty('status');
+    expect(firstExp).toHaveProperty('experienceType');
 
     // Validate field types
     expect(typeof firstExp.title).toBe('string');
     expect(typeof firstExp.companyName).toBe('string');
     expect(typeof firstExp.startDate).toBe('string');
+    expect(typeof firstExp.endDate).toBe('string');
     expect(Array.isArray(firstExp.responsibilities)).toBe(true);
     expect(Array.isArray(firstExp.tasks)).toBe(true);
 
@@ -161,48 +169,54 @@ Tasks:
   }, 60000); // 60s timeout for AI operation
 
   it('should handle single experience block', async () => {
-    // Test with single experience
     const singleBlock = [
-      `Lead Developer at DevShop
+      {
+        experienceType: 'work',
+        rawBlock: `Lead Developer at DevShop
 2021-2023
 Managed development team and architected cloud solutions.
 Responsibilities: Team leadership, system architecture, code reviews.
 Tasks: AWS infrastructure, microservices development, DevOps automation.`,
+      },
     ];
 
-    const result = await repository.extractExperienceBlocks(singleBlock);
+    const result = await repository.extractExperienceBlocks('en', singleBlock);
 
     // Validate structure
-    expect(Array.isArray(result)).toBe(true);
-    expect(result.length).toBeGreaterThanOrEqual(1);
+    expect(Array.isArray(result.experiences)).toBe(true);
+    expect(result.experiences.length).toBeGreaterThanOrEqual(1);
 
     // Validate basic fields are present
-    const exp = result[0];
+    const exp = result.experiences[0];
     expect(exp.title).toBeDefined();
     expect(exp.companyName).toBeDefined();
   }, 60000);
 
   it('should extract experiences with varying formats', async () => {
-    // Test with different formatting styles
     const mixedBlocks = [
-      `Position: Technical Lead
+      {
+        experienceType: 'work',
+        rawBlock: `Position: Technical Lead
 Organization: CloudTech Inc
 Duration: 03/2022 - Present
 - Led architecture decisions
 - Mentored junior developers`,
-
-      `Backend Engineer | DataCorp | 2019-2021
+      },
+      {
+        experienceType: 'work',
+        rawBlock: `Backend Engineer | DataCorp | 2019-2021
 Built data processing pipelines
 Worked with Python, Spark, Kafka`,
+      },
     ];
 
-    const result = await repository.extractExperienceBlocks(mixedBlocks);
+    const result = await repository.extractExperienceBlocks('en', mixedBlocks);
 
     // Should handle both formats
-    expect(result.length).toBeGreaterThanOrEqual(1);
+    expect(result.experiences.length).toBeGreaterThanOrEqual(1);
 
     // Each experience should have required fields
-    result.forEach((exp) => {
+    result.experiences.forEach((exp) => {
       expect(exp.title).toBeDefined();
       expect(exp.companyName).toBeDefined();
       expect(Array.isArray(exp.responsibilities)).toBe(true);
@@ -212,16 +226,18 @@ Worked with Python, Spark, Kafka`,
 
   it('should handle minimal experience information', async () => {
     // Test with very minimal information
-    const minimalBlock = ['Software Engineer at TechCorp, 2020-2022'];
+    const minimalBlock = [
+      { experienceType: 'work', rawBlock: 'Software Engineer at TechCorp, 2020-2022' },
+    ];
 
-    const result = await repository.extractExperienceBlocks(minimalBlock);
+    const result = await repository.extractExperienceBlocks('en', minimalBlock);
 
     // Should still return valid structure even with minimal info
-    expect(Array.isArray(result)).toBe(true);
+    expect(Array.isArray(result.experiences)).toBe(true);
 
     // May have empty or placeholder values due to fallback rules
-    if (result.length > 0) {
-      const exp = result[0];
+    if (result.experiences.length > 0) {
+      const exp = result.experiences[0];
       expect(exp).toHaveProperty('title');
       expect(exp).toHaveProperty('companyName');
       expect(Array.isArray(exp.responsibilities)).toBe(true);
@@ -233,12 +249,14 @@ Worked with Python, Spark, Kafka`,
     // Simple smoke test: verify the operation exists and is callable
     // This catches deployment issues (Lambda not deployed, wrong permissions, etc.)
 
-    const minimalInput = ['Test experience: Developer at TestCorp'];
+    const minimalInput = [
+      { experienceType: 'work', rawBlock: 'Test experience: Developer at TestCorp' },
+    ];
 
     try {
       // This should not throw even if user is not authenticated
       // (though it may return authorization error)
-      const result = await repository.extractExperienceBlocks(minimalInput);
+      const result = await repository.extractExperienceBlocks('en', minimalInput);
 
       // If we get here, the operation is deployed and accessible
       expect(result).toBeDefined();

@@ -1,7 +1,7 @@
 import { AiOperationsRepository } from './AiOperationsRepository';
 import type { ParsedCV } from './ParsedCV';
 import { isParsedCV } from './ParsedCV';
-import type { ExperiencesResult } from './Experience';
+import type { ExperiencesResult, ExtractExperienceInput } from './Experience';
 import { isExperiencesResult } from './Experience';
 import type { STARStory } from './STARStory';
 import { isSTARStory } from './STARStory';
@@ -146,23 +146,31 @@ export class AiOperationsService {
   }
 
   /**
-   * Extract structured experience data from text blocks with validation
-   * @param experienceTextBlocks - Array of experience text sections
+   * Extract structured experience data from experience items with validation
+   * @param language - Target language for responsibilities and tasks
+   * @param experienceItems - Experience items with raw blocks and types
    * @returns Structured experience objects
    * @throws Error if extraction fails or validation fails
    */
-  async extractExperienceBlocks(experienceTextBlocks: string[]): Promise<ExperiencesResult> {
-    // Validate input
-    if (!experienceTextBlocks || experienceTextBlocks.length === 0) {
-      throw new Error('Experience text blocks cannot be empty');
+  async extractExperienceBlocks(
+    language: string,
+    experienceItems: ExtractExperienceInput['experienceItems']
+  ): Promise<ExperiencesResult> {
+    if (!language || language.trim().length === 0) {
+      throw new Error('Language cannot be empty');
     }
 
-    if (experienceTextBlocks.some((block) => !block || block.trim().length === 0)) {
-      throw new Error('Experience text blocks cannot contain empty strings');
+    if (!experienceItems || experienceItems.length === 0) {
+      throw new Error('Experience items cannot be empty');
+    }
+
+    const validTypes = new Set(['work', 'education', 'volunteer', 'project']);
+    if (experienceItems.some((item) => !item?.rawBlock?.trim() || !validTypes.has(item.experienceType))) {
+      throw new Error('Experience items must include raw text and a valid experience type');
     }
 
     try {
-      const result = await this.repo.extractExperienceBlocks(experienceTextBlocks);
+      const result = await this.repo.extractExperienceBlocks(language, experienceItems);
 
       // Validate output structure
       if (!isExperiencesResult(result)) {

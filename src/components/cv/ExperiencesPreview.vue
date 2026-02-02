@@ -32,7 +32,7 @@ watch(
   { immediate: true }
 );
 
-function formatDateRange(start?: string, end?: string | null): string {
+function formatDateRange(start?: string, end?: string): string {
   if (!start) return t('cvUpload.sections.experiences');
   if (!end) return `${start} - ${t('experiences.present')}`;
   return `${start} - ${end}`;
@@ -66,23 +66,26 @@ const toExperienceInput = (exp: ExtractedExperience): ExperienceCreateInput => (
   responsibilities: exp.responsibilities ?? [],
   tasks: exp.tasks ?? [],
   rawText: '',
-  status: 'draft',
-  experienceType: exp.experienceType ?? 'work',
+  status: exp.status,
+  experienceType: exp.experienceType,
   userId: '',
 });
 
 const handleSave = (data: ExperienceCreateInput) => {
   if (editIndex.value === null) return;
+  const currentExperience = localExperiences.value[editIndex.value];
+  if (!currentExperience) return;
   const normalizeList = (items?: Array<string | null> | null): string[] =>
     Array.isArray(items) ? items.filter((item): item is string => Boolean(item)) : [];
   const updatedExperience = {
     title: data.title,
     companyName: data.companyName || '',
-    startDate: data.startDate,
-    endDate: data.endDate ?? null,
+    startDate: data.startDate ?? '',
+    endDate: data.endDate ?? '',
     responsibilities: normalizeList(data.responsibilities),
     tasks: normalizeList(data.tasks),
-    experienceType: data.experienceType ?? 'work',
+    status: data.status ?? currentExperience.status,
+    experienceType: data.experienceType ?? currentExperience.experienceType,
   };
   localExperiences.value.splice(editIndex.value, 1, updatedExperience);
   emit('update', editIndex.value, updatedExperience);

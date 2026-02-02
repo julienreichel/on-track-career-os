@@ -5,179 +5,208 @@ import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
  * AWS Lambda handler for ai.extractExperienceBlocks
  *
  * PURPOSE:
- * Transform raw CV experience text into structured Experience entities.
- * Extract: title, companyName, dates, responsibilities, tasks.
- *
- * CONTRACT:
- * - Never infer seniority or technologies not present in the text
- * - Return ONLY structured JSON
- * - Use fallback strategies for missing/malformed fields
+ * Transform raw experience text into structured Experience entities.
+ * Extract: title, companyName, dates, responsibilities, tasks, status.
  *
  * @see docs/AI_Interaction_Contract.md - Operation 2
  */
 
-// System prompt - constant as per AIC
-const SYSTEM_PROMPT = `You transform experience text into structured experience blocks.
-Extract: title, companyName, dates, responsibilities, tasks & achievements, and experience type.
-Never infer seniority or technologies not present.
-Return JSON only.
+type ExperienceType = 'work' | 'education' | 'volunteer' | 'project';
+type ExperienceStatus = 'draft' | 'complete';
+
+export interface ExperienceItemInput {
+  experienceType: ExperienceType;
+  rawBlock: string;
+}
+
+export interface ExtractExperienceBlocksInput {
+  language: string;
+  experienceItems: ExperienceItemInput[];
+}
+
+export interface ExtractedExperience {
+  title: string;
+  companyName: string;
+  startDate: string;
+  endDate: string;
+  responsibilities: string[];
+  tasks: string[];
+  status: ExperienceStatus;
+  experienceType: ExperienceType;
+}
+
+export interface ExtractExperienceBlocksOutput {
+  experiences: ExtractedExperience[];
+}
+
+const EXPERIENCE_TYPES: ExperienceType[] = ['work', 'education', 'volunteer', 'project'];
+const PRESENT_END_DATE = /(present|current|aujourd'hui)/i;
+const MONTH_MAP: Record<string, string> = {
+  jan: '01',
+  january: '01',
+  feb: '02',
+  february: '02',
+  mar: '03',
+  march: '03',
+  apr: '04',
+  april: '04',
+  may: '05',
+  jun: '06',
+  june: '06',
+  jul: '07',
+  july: '07',
+  aug: '08',
+  august: '08',
+  sep: '09',
+  sept: '09',
+  september: '09',
+  oct: '10',
+  october: '10',
+  nov: '11',
+  november: '11',
+  dec: '12',
+  december: '12',
+};
+
+const SYSTEM_PROMPT = `You extract structured experience data from raw blocks.
+Return ONLY JSON matching the required schema. No markdown.
+Never invent missing data.
+Responsibilities and tasks must be written in the target language.
+Proper nouns must stay unchanged.
+Dates must be formatted as YYYY or YYYY-MM.`;
+
+const OUTPUT_SCHEMA = `{
+  "experiences": [
+    {
+      "title": "string",
+      "companyName": "string",
+      "startDate": "string",
+      "endDate": "string",
+      "responsibilities": ["string"],
+      "tasks": ["string"],
+      "status": "draft | complete",
+      "experienceType": "work | education | volunteer | project"
+    }
+  ]
+}`;
+
+function buildUserPrompt(language: string, items: ExperienceItemInput[]): string {
+  const blocks = items
+    .map((item, index) => `[Item ${index + 1} | ${item.experienceType}]\n${item.rawBlock}`)
+    .join('\n\n');
+
+  return `Extract experiences from the following blocks.
+Target language for responsibilities/tasks: ${language}
+
+${blocks}
 
 RULES:
 - Extract only information explicitly stated in the text
 - Do not invent or infer missing details
-- Dates should be in YYYY-MM-DD format or YYYY-MM if day is not specified
-- If endDate is "Present" or missing, leave it null
-- Responsibilities are high-level duties and roles
-- Tasks include specific actions, deliverables, achievements, and measurable results
-- Tasks should capture accomplishments, metrics, and outcomes (e.g., "Increased sales by 30%", "Led team of 5 developers")
-- experienceType must be one of: "work", "education", "volunteer", "project"
-  - "work": Professional employment experiences
-  - "education": Schools, universities, degrees, certifications
-  - "volunteer": Volunteering, community service, non-profit work
-  - "project": Personal or side projects, freelance work
-- Default to "work" if the type is ambiguous
-- Return ONLY valid JSON with no markdown wrappers`;
+- Title/companyName are copied as-is (no translation unless obvious)
+- Responsibilities/tasks must be translated to the target language without adding info
+- Dates: extract only if explicit. If only a year is present, return that year string
+- Date format must be YYYY or YYYY-MM (no month names)
+- If end date is explicitly "present/current/aujourd'hui", return an empty string
+- experienceType must match the input item type
+- status is computed in code, still include the field in output
 
-// Output schema for retry
-const OUTPUT_SCHEMA = `[
-  {
-    "title": "string",
-    "companyName": "string",
-    "startDate": "YYYY-MM-DD or YYYY-MM",
-    "endDate": "YYYY-MM-DD or YYYY-MM or null",
-    "responsibilities": ["string"],
-    "tasks": ["string"],
-    "experienceType": "work | education | volunteer | project"
-  }
-]`;
-
-// Experience block interface (matches output schema)
-export interface ExperienceBlock {
-  title: string;
-  companyName: string;
-  startDate: string;
-  endDate: string | null;
-  responsibilities: string[];
-  tasks: string[];
-  experienceType: 'work' | 'education' | 'volunteer' | 'project';
-}
-
-export interface ExtractExperienceBlocksInput {
-  experienceTextBlocks: string[];
-}
-
-/**
- * Build user prompt from experience text blocks
- */
-function buildUserPrompt(blocks: string[]): string {
-  const blocksText = blocks
-    .map((block, index) => `[Experience ${index + 1}]\n${block}`)
-    .join('\n\n');
-
-  return `Convert the following CV experience sections into experience blocks:
-
-${blocksText}
-
-IMPORTANT:
-- Responsibilities: High-level duties and roles
-- Tasks: Specific actions, deliverables, achievements, and measurable results (e.g., "Increased sales by 30%", "Managed team of 5", "Delivered project ahead of schedule")
-
-Return a JSON array with this exact structure:
+Return JSON with this exact structure:
 ${OUTPUT_SCHEMA}`;
 }
 
-/**
- * Normalize date to YYYY-MM-DD format
- * Handles YYYY-MM format by adding -01 for the day
- */
-function normalizeDate(date: string | null): string | null {
-  if (date === null || date === '') {
-    return null;
+function sanitizeString(value: unknown): string {
+  if (typeof value !== 'string') {
+    return '';
   }
 
-  // Already in YYYY-MM-DD format
-  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return date;
-  }
-
-  // YYYY-MM format - add -01 for first day of month
-  if (/^\d{4}-\d{2}$/.test(date)) {
-    return `${date}-01`;
-  }
-
-  // Invalid format - return null
-  return null;
+  return value.trim();
 }
 
-/**
- * Validate output and apply fallback rules per AIC
- */
-function validateOutput(output: unknown): ExperienceBlock[] {
-  if (!Array.isArray(output)) {
-    return [
-      {
-        title: 'Experience 1',
-        companyName: 'Unknown Company',
-        startDate: '2020-01-01',
-        endDate: null,
-        responsibilities: [],
-        tasks: [],
-        experienceType: 'work' as const,
-      },
-    ];
+function splitToArray(value: string): string[] {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return [];
   }
 
-  // Validate and clean each experience block
-  const validatedExperiences: ExperienceBlock[] = output.map((exp: unknown, index: number) => {
-    const expObj = exp as Record<string, unknown>;
+  const byNewline = trimmed.split(/\n+/).map((entry) => entry.trim()).filter(Boolean);
+  if (byNewline.length > 1) {
+    return byNewline;
+  }
 
-    // Required fields with fallbacks
-    const title = typeof expObj.title === 'string' ? expObj.title : `Experience ${index + 1}`;
-    const companyName =
-      typeof expObj.companyName === 'string'
-        ? expObj.companyName
-        : typeof expObj.company === 'string'
-          ? expObj.company
-          : 'Unknown Company';
-    // Support both camelCase and snake_case from AI response
-    const rawStartDate =
-      typeof expObj.startDate === 'string'
-        ? expObj.startDate
-        : typeof expObj.start_date === 'string'
-          ? expObj.start_date
-          : '';
-    const rawEndDate =
-      expObj.endDate === null || typeof expObj.endDate === 'string'
-        ? expObj.endDate
-        : expObj.end_date === null || typeof expObj.end_date === 'string'
-          ? expObj.end_date
-          : null;
+  return trimmed
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
 
-    // Normalize dates to YYYY-MM-DD format
-    const startDate = normalizeDate(rawStartDate) || '';
-    const endDate = normalizeDate(rawEndDate);
+function sanitizeStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((entry) => typeof entry === 'string').map((entry) => entry.trim()).filter(Boolean);
+  }
 
-    // Array fields with fallbacks
-    const responsibilities = Array.isArray(expObj.responsibilities) ? expObj.responsibilities : [];
-    const tasks = Array.isArray(expObj.tasks) ? expObj.tasks : [];
+  if (typeof value === 'string') {
+    return splitToArray(value);
+  }
 
-    // experienceType field with validation and fallback
-    const expType =
-      typeof expObj.experienceType === 'string'
-        ? expObj.experienceType
-        : typeof expObj.experience_type === 'string'
-          ? expObj.experience_type
-          : 'work';
-    const validTypes: Array<'work' | 'education' | 'volunteer' | 'project'> = [
-      'work',
-      'education',
-      'volunteer',
-      'project',
-    ];
-    const experienceType = validTypes.includes(
-      expType as 'work' | 'education' | 'volunteer' | 'project'
-    )
-      ? (expType as 'work' | 'education' | 'volunteer' | 'project')
+  return [];
+}
+
+function normalizeDateValue(value: string, treatPresentAsEmpty: boolean): string {
+  if (!value) {
+    return '';
+  }
+
+  if (treatPresentAsEmpty && PRESENT_END_DATE.test(value)) {
+    return '';
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return value;
+  }
+
+  if (/^\d{4}-\d{2}$/.test(value)) {
+    return `${value}-01`;
+  }
+
+  if (/^\d{4}$/.test(value)) {
+    return `${value}-01-01`;
+  }
+
+  const monthYearMatch = value.match(/^([A-Za-z]{3,9})\s+(\d{4})$/);
+  if (monthYearMatch) {
+    const month = MONTH_MAP[monthYearMatch[1].toLowerCase()];
+    if (month) {
+      return `${monthYearMatch[2]}-${month}-01`;
+    }
+  }
+
+  return '';
+}
+
+function computeStatus(): ExperienceStatus {
+  return 'draft';
+}
+
+function validateOutput(
+  output: unknown,
+  items: ExperienceItemInput[]
+): ExtractExperienceBlocksOutput {
+  const rawExperiences = Array.isArray((output as ExtractExperienceBlocksOutput)?.experiences)
+    ? (output as ExtractExperienceBlocksOutput).experiences
+    : [];
+
+  const experiences = items.map((item, index) => {
+    const raw = (rawExperiences[index] || {}) as Partial<ExtractedExperience>;
+    const title = sanitizeString(raw.title);
+    const companyName = sanitizeString(raw.companyName);
+    const startDate = normalizeDateValue(sanitizeString(raw.startDate), false);
+    const endDate = normalizeDateValue(sanitizeString(raw.endDate), true);
+    const responsibilities = sanitizeStringArray(raw.responsibilities);
+    const tasks = sanitizeStringArray(raw.tasks);
+    const status = computeStatus();
+    const experienceType = EXPERIENCE_TYPES.includes(item.experienceType)
+      ? item.experienceType
       : 'work';
 
     return {
@@ -185,53 +214,39 @@ function validateOutput(output: unknown): ExperienceBlock[] {
       companyName,
       startDate,
       endDate,
-      responsibilities: responsibilities.filter((r: unknown) => typeof r === 'string'),
-      tasks: tasks.filter((t: unknown) => typeof t === 'string'),
+      responsibilities,
+      tasks,
+      status,
       experienceType,
     };
   });
 
-  if (validatedExperiences.length === 0) {
-    return [
-      {
-        title: 'Experience 1',
-        companyName: 'Unknown Company',
-        startDate: '2020-01-01',
-        endDate: null,
-        responsibilities: [],
-        tasks: [],
-        experienceType: 'work' as const,
-      },
-    ];
-  }
-
-  return validatedExperiences;
+  return { experiences };
 }
 
-/**
- * Main Lambda handler
- */
 export const handler = async (event: {
   arguments: ExtractExperienceBlocksInput;
-}): Promise<ExperienceBlock[]> => {
+}): Promise<ExtractExperienceBlocksOutput> => {
   return withAiOperationHandlerObject(
     'extractExperienceBlocks',
     event,
     async (args: ExtractExperienceBlocksInput) => {
-      const userPrompt = buildUserPrompt(args.experienceTextBlocks);
-      return invokeAiWithRetry<ExperienceBlock[]>({
+      const userPrompt = buildUserPrompt(args.language, args.experienceItems);
+
+      return invokeAiWithRetry<ExtractExperienceBlocksOutput>({
         systemPrompt: SYSTEM_PROMPT,
         userPrompt,
         outputSchema: OUTPUT_SCHEMA,
-        validate: validateOutput,
+        validate: (output) => validateOutput(output, args.experienceItems),
         operationName: 'extractExperienceBlocks',
       });
     },
     (args: ExtractExperienceBlocksInput) => ({
-      experienceTextBlocks:
-        args.experienceTextBlocks.length > 1
-          ? `${args.experienceTextBlocks.length} experience blocks`
-          : truncateForLog(args.experienceTextBlocks[0] || ''),
+      language: args.language,
+      experienceItems:
+        args.experienceItems.length > 1
+          ? `${args.experienceItems.length} experience items`
+          : truncateForLog(args.experienceItems[0]?.rawBlock || ''),
     })
   );
 };

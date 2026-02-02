@@ -224,10 +224,17 @@ function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOu
       rawBlocks,
     ].reduce((count, items) => count + items.length, 0);
 
+  const DEFAULT_CONFIDENCE = 0.5;
+  const MIN_MEANINGFUL_COUNT = 2;
+  const LOW_CONFIDENCE_CAP = 0.3;
+
   const rawConfidence =
-    typeof parsedOutput.confidence === 'number' ? parsedOutput.confidence : 0.5;
+    typeof parsedOutput.confidence === 'number' ? parsedOutput.confidence : DEFAULT_CONFIDENCE;
   const boundedConfidence = Math.min(Math.max(rawConfidence, 0), 1);
-  const confidence = meaningfulCount < 2 ? Math.min(boundedConfidence, 0.3) : boundedConfidence;
+  const confidence =
+    meaningfulCount < MIN_MEANINGFUL_COUNT
+      ? Math.min(boundedConfidence, LOW_CONFIDENCE_CAP)
+      : boundedConfidence;
 
   return {
     profile,

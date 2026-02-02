@@ -24,6 +24,15 @@ export const schemaTypes = {
     rawBlock: a.string().required(),
   }),
 
+  ExperienceItemInputType: a.customType({
+    experienceType: a.enum(['work', 'education', 'volunteer', 'project']),
+    rawBlock: a.string().required(),
+  }),
+
+  ExtractExperienceBlocksOutputType: a.customType({
+    experiences: a.ref('ExperienceType').array().required(),
+  }),
+
   ParseCvTextOutputType: a.customType({
     profile: a.ref('ParseCvTextProfileType').required(),
     experienceItems: a.ref('ParseCvTextExperienceItemType').array().required(),
@@ -104,11 +113,11 @@ export const schemaTypes = {
     companyName: a.string().required(),
     startDate: a.string(),
     endDate: a.string(),
-    experienceType: a.string().required(),
+    experienceType: a.enum(['work', 'education', 'volunteer', 'project']),
     responsibilities: a.string().array().required(),
     tasks: a.string().array().required(),
-    achievements: a.string().array(),
-    kpiSuggestions: a.string().array(),
+    status: a.enum(['draft', 'complete']),
+    rawText: a.string(),
   }),
 
   SpeechStoryType: a.customType({

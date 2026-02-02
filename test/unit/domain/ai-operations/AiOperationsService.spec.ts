@@ -179,44 +179,53 @@ describe('AiOperationsService', () => {
   describe('extractExperienceBlocks', () => {
     it('should successfully extract experience blocks', async () => {
       // Arrange
-      const mockExperiences: ExperiencesResult = [
+      const mockExperiences: ExperiencesResult = {
+        experiences: [
+          {
+            title: 'Senior Developer',
+            companyName: 'TechCorp',
+            startDate: '2020-01',
+            endDate: '2023-12',
+            responsibilities: ['Lead team', 'Code review'],
+            tasks: ['Development', 'Mentoring'],
+            status: 'draft',
+            experienceType: 'work',
+          },
+        ],
+      };
+      const experienceItems = [
         {
-          title: 'Senior Developer',
-          companyName: 'TechCorp',
-          startDate: '2020-01',
-          endDate: '2023-12',
-          responsibilities: ['Lead team', 'Code review'],
-          tasks: ['Development', 'Mentoring'],
           experienceType: 'work',
+          rawBlock: 'Senior Developer at TechCorp',
         },
       ];
 
       mockRepo.extractExperienceBlocks.mockResolvedValue(mockExperiences);
 
       // Act
-      const result = await service.extractExperienceBlocks(['Experience 1', 'Experience 2']);
+      const result = await service.extractExperienceBlocks('en', experienceItems);
 
       // Assert
       expect(result).toEqual(mockExperiences);
-      expect(mockRepo.extractExperienceBlocks).toHaveBeenCalledWith([
-        'Experience 1',
-        'Experience 2',
-      ]);
+      expect(mockRepo.extractExperienceBlocks).toHaveBeenCalledWith('en', experienceItems);
     });
 
     it('should throw error for empty experience blocks array', async () => {
       // Act & Assert
-      await expect(service.extractExperienceBlocks([])).rejects.toThrow(
-        'Experience text blocks cannot be empty'
+      await expect(service.extractExperienceBlocks('en', [])).rejects.toThrow(
+        'Experience items cannot be empty'
       );
       expect(mockRepo.extractExperienceBlocks).not.toHaveBeenCalled();
     });
 
     it('should throw error for array with empty strings', async () => {
       // Act & Assert
-      await expect(service.extractExperienceBlocks(['Experience 1', ''])).rejects.toThrow(
-        'Experience text blocks cannot contain empty strings'
-      );
+      await expect(
+        service.extractExperienceBlocks('en', [
+          { experienceType: 'work', rawBlock: 'Experience 1' },
+          { experienceType: 'work', rawBlock: '' },
+        ])
+      ).rejects.toThrow('Experience items must include raw text and a valid experience type');
       expect(mockRepo.extractExperienceBlocks).not.toHaveBeenCalled();
     });
 
@@ -225,7 +234,9 @@ describe('AiOperationsService', () => {
       mockRepo.extractExperienceBlocks.mockRejectedValue(new Error('AI operation failed'));
 
       // Act & Assert
-      await expect(service.extractExperienceBlocks(['Experience 1'])).rejects.toThrow(
+      await expect(
+        service.extractExperienceBlocks('en', [{ experienceType: 'work', rawBlock: 'Experience 1' }])
+      ).rejects.toThrow(
         'Failed to extract experience blocks: AI operation failed'
       );
     });
@@ -235,9 +246,9 @@ describe('AiOperationsService', () => {
       mockRepo.extractExperienceBlocks.mockResolvedValue({ invalid: 'structure' } as never);
 
       // Act & Assert
-      await expect(service.extractExperienceBlocks(['Experience 1'])).rejects.toThrow(
-        'Invalid experience extraction result structure'
-      );
+      await expect(
+        service.extractExperienceBlocks('en', [{ experienceType: 'work', rawBlock: 'Experience 1' }])
+      ).rejects.toThrow('Invalid experience extraction result structure');
     });
   });
 

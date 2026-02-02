@@ -87,7 +87,7 @@ export const schemaModels = {
     .model({
       title: a.string().required(),
       companyName: a.string(),
-      startDate: a.date().required(),
+      startDate: a.date(),
       endDate: a.date(),
       responsibilities: a.string().array(),
       tasks: a.string().array(),

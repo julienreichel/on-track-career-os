@@ -37,14 +37,18 @@ describe('useExperienceImport', () => {
       endDate: '2023-12',
       responsibilities: ['Lead team', 'Architect solutions'],
       tasks: ['Code reviews', 'Design features'],
+      status: 'draft',
+      experienceType: 'work',
     },
     {
       title: 'Developer',
       companyName: 'StartUp Inc',
       startDate: '2018-06',
-      endDate: null,
+      endDate: '',
       responsibilities: ['Build features'],
       tasks: ['Write tests'],
+      status: 'draft',
+      experienceType: 'work',
     },
   ];
 
@@ -78,6 +82,7 @@ describe('useExperienceImport', () => {
       tasks: ['Code reviews', 'Design features'],
       rawText: 'raw CV text',
       status: 'draft',
+      experienceType: 'work',
       userId: 'user-123',
     });
 
@@ -90,8 +95,37 @@ describe('useExperienceImport', () => {
       tasks: ['Write tests'],
       rawText: 'raw CV text',
       status: 'draft',
+      experienceType: 'work',
       userId: 'user-123',
     });
+  });
+
+  it('should preserve experience type when creating records', async () => {
+    const { importExperiences } = useExperienceImport();
+
+    mockRepo.create.mockResolvedValue({ id: '1' });
+    mockRepo.list.mockResolvedValue([]);
+
+    const experiences: ExtractedExperience[] = [
+      {
+        title: 'BSc Computer Science',
+        companyName: 'MIT',
+        startDate: '2014-09',
+        endDate: '2018-06',
+        responsibilities: [],
+        tasks: [],
+        experienceType: 'education',
+        status: 'draft',
+      },
+    ];
+
+    await importExperiences(experiences, 'raw CV text', 'user-123');
+
+    expect(mockRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        experienceType: 'education',
+      })
+    );
   });
 
   it('should handle experiences with null endDate', async () => {
@@ -105,9 +139,11 @@ describe('useExperienceImport', () => {
         title: 'Current Position',
         companyName: 'Company',
         startDate: '2023-01',
-        endDate: null,
+        endDate: '',
         responsibilities: ['Responsibility'],
         tasks: ['Task'],
+        status: 'draft',
+        experienceType: 'work',
       },
     ];
 
@@ -147,6 +183,8 @@ describe('useExperienceImport', () => {
         endDate: '2021-01',
         responsibilities: [],
         tasks: [],
+        status: 'draft',
+        experienceType: 'work',
       },
       {
         title: 'Job 2',
@@ -155,14 +193,18 @@ describe('useExperienceImport', () => {
         endDate: '2022-01',
         responsibilities: [],
         tasks: [],
+        status: 'draft',
+        experienceType: 'work',
       },
       {
         title: 'Job 3',
         companyName: 'Company 3',
         startDate: '2022-01',
-        endDate: null,
+        endDate: '',
         responsibilities: [],
         tasks: [],
+        status: 'draft',
+        experienceType: 'work',
       },
     ];
 
@@ -172,7 +214,7 @@ describe('useExperienceImport', () => {
     expect(mockRepo.create).toHaveBeenCalledTimes(3);
   });
 
-  it('should set status to draft for all experiences', async () => {
+  it('should preserve status for all experiences', async () => {
     const { importExperiences } = useExperienceImport();
 
     mockRepo.create.mockResolvedValue({ id: '1' });
@@ -200,6 +242,8 @@ describe('useExperienceImport', () => {
         endDate: '2021-01',
         responsibilities: [],
         tasks: [],
+        status: 'draft',
+        experienceType: 'work',
       },
     ];
 
@@ -263,6 +307,8 @@ describe('useExperienceImport', () => {
             'Automated deployment pipelines with terraform scripts',
             'Reviewed pull requests',
           ],
+          status: 'draft',
+          experienceType: 'work',
         },
       ],
       'raw text',
@@ -306,9 +352,11 @@ describe('useExperienceImport', () => {
           title: 'Product Manager',
           companyName: 'Visionary Labs',
           startDate: '2021-02',
-          endDate: null,
+          endDate: '',
           responsibilities: ['Owned project roadmap and team alignment'],
           tasks: [],
+          status: 'draft',
+          experienceType: 'work',
         },
       ],
       'raw text',

@@ -1,7 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
-
-// Mock AWS SDK
 const mockSend = vi.fn();
 vi.mock('@aws-sdk/client-bedrock-runtime', () => ({
   BedrockRuntimeClient: vi.fn(() => ({
@@ -11,381 +8,85 @@ vi.mock('@aws-sdk/client-bedrock-runtime', () => ({
 }));
 
 describe('ai.extractExperienceBlocks', () => {
-  let handler: any;
+  let handler: (event: { arguments: unknown }) => Promise<unknown>;
 
   beforeEach(async () => {
     vi.clearAllMocks();
-
-    // Import handler after mocks are set up
     const module = await import('@amplify/data/ai-operations/extractExperienceBlocks');
     handler = module.handler;
   });
 
-  /**
-   * Mock AI response generator that simulates actual parsing of experience text
-   * Uses regex to extract structured data from input, mimicking real AI behavior
-   */
-  const generateMockResponse = (experienceBlocks: string[]) => {
-    const experiences = experienceBlocks.map((block, index) => {
-      // Extract title and company name: "Title at Company (dates)"
-      const titleCompanyMatch = block.match(/^(.*?)\s+at\s+(.*?)\s*\(/);
-      const title = titleCompanyMatch ? titleCompanyMatch[1].trim() : `Experience ${index + 1}`;
-      const companyName = titleCompanyMatch ? titleCompanyMatch[2].trim() : 'Unknown Company';
+  function mockAiResponse(payload: unknown) {
+    mockSend.mockImplementationOnce(async () => ({
+      body: new TextEncoder().encode(
+        JSON.stringify({
+          output: {
+            message: {
+              content: [{ text: JSON.stringify(payload) }],
+            },
+          },
+        })
+      ),
+    }));
+  }
 
-      // Extract dates: "(Month Year - Month Year)" or "(Year-present)"
-      const datesMatch = block.match(/\((.*?)\)/);
-      let startDate = '2020-01';
-      let endDate: string | null = null;
+  it('zips output to inputs and forces experienceType and status', async () => {
+    const experienceItems = [
+      { experienceType: 'work', rawBlock: 'Lead Engineer at TechCorp' },
+      { experienceType: 'education', rawBlock: 'BSc Computer Science' },
+    ];
 
-      if (datesMatch) {
-        const dateStr = datesMatch[1];
-        if (dateStr.includes('present')) {
-          endDate = null;
-        } else if (dateStr.includes('-')) {
-          const [startPart, endPart] = dateStr.split('-').map((d) => d.trim());
-          // Parse month and year from text like "March 2020"
-          const startMatch = startPart.match(/(\w+)\s+(\d{4})/);
-          if (startMatch) {
-            const monthMap: Record<string, string> = {
-              January: '01',
-              February: '02',
-              March: '03',
-              April: '04',
-              May: '05',
-              June: '06',
-              July: '07',
-              August: '08',
-              September: '09',
-              October: '10',
-              November: '11',
-              December: '12',
-            };
-            startDate = `${startMatch[2]}-${monthMap[startMatch[1]] || '01'}`;
-          }
-          if (endPart) {
-            const endMatch = endPart.match(/(\w+)\s+(\d{4})/);
-            if (endMatch) {
-              const monthMap: Record<string, string> = {
-                January: '01',
-                February: '02',
-                March: '03',
-                April: '04',
-                May: '05',
-                June: '06',
-                July: '07',
-                August: '08',
-                September: '09',
-                October: '10',
-                November: '11',
-                December: '12',
-              };
-              endDate = `${endMatch[2]}-${monthMap[endMatch[1]] || '12'}`;
-            } else if (/\d{4}/.test(endPart)) {
-              endDate = `${endPart}-12`;
-            }
-          }
-        }
-      }
-
-      // Extract responsibilities and tasks from bullet points
-      const bulletPoints = block.match(/^[-•]\s*(.+)$/gm) || [];
-      const responsibilities = bulletPoints
-        .slice(0, Math.ceil(bulletPoints.length / 2))
-        .map((b) => b.replace(/^[-•]\s*/, '').trim());
-      const tasks = bulletPoints
-        .slice(Math.ceil(bulletPoints.length / 2))
-        .map((b) => b.replace(/^[-•]\s*/, '').trim());
-
-      return {
-        title,
-        companyName,
-        startDate,
-        endDate,
-        responsibilities,
-        tasks,
-      };
-    });
-
-    return experiences;
-  };
-
-  describe('Handler Integration Tests', () => {
-    it('should successfully extract experience blocks with all fields', async () => {
-      const inputBlocks = [
-        'Senior Software Engineer at TechCorp Inc. (March 2020 - December 2023)\n- Lead development team\n- Architecture decisions\n- Implemented microservices\n- Mentored junior developers',
-      ];
-
-      mockSend.mockImplementationOnce(async () => {
-        // Get the command input from InvokeModelCommand constructor
-        const commandCall = (vi.mocked(InvokeModelCommand).mock.calls[0] as unknown[])[0] as {
-          body: string;
-        };
-        const requestBody = JSON.parse(commandCall.body);
-        const userPrompt = requestBody.messages[0].content[0].text;
-
-        // Extract experience blocks from prompt
-        const blocksMatch = userPrompt.match(/Experience blocks to parse:\n([\s\S]*)/);
-        const extractedBlocks = blocksMatch ? [blocksMatch[1].trim()] : inputBlocks;
-
-        const mockResponse = generateMockResponse(extractedBlocks);
-
-        return {
-          body: new TextEncoder().encode(
-            JSON.stringify({
-              output: {
-                message: {
-                  content: [{ text: JSON.stringify(mockResponse) }],
-                },
-              },
-            })
-          ),
-        };
-      });
-
-      const resultString = await handler({
-        arguments: {
-          experienceTextBlocks: inputBlocks,
+    mockAiResponse({
+      experiences: [
+        {
+          title: 'Lead Engineer',
+          companyName: 'TechCorp',
+          startDate: '2021',
+          endDate: '2023',
+          responsibilities: ['Led team'],
+          tasks: ['Shipped product'],
+          status: 'draft',
+          experienceType: 'project',
         },
-      });
-      const result = resultString as Array<{
-        title: string;
-        companyName: string;
-        startDate: string;
-        endDate: string | null;
-        responsibilities: string[];
-        tasks: string[];
-        experienceType?: string;
-      }>;
-
-      expect(result).toHaveLength(1);
-      expect(result[0].title).toBe('Senior Software Engineer');
-      expect(result[0].companyName).toBe('TechCorp Inc.');
-      expect(result[0].startDate).toBe('2020-03-01');
-      expect(result[0].endDate).toBe('2023-12-01');
-      expect(result[0].responsibilities).toContain('Lead development team');
-      expect(result[0].tasks).toContain('Implemented microservices');
+      ],
     });
 
-    it('should handle multiple experience blocks', async () => {
-      const inputBlocks = [
-        'Senior Developer at Company A (2020-present)\n- Team lead\n- Code reviews',
-        'Junior Developer at Company B (June 2018 - December 2019)\n- Development\n- Bug fixes',
-      ];
+    const result = (await handler({
+      arguments: { language: 'en', experienceItems },
+    })) as { experiences: Array<Record<string, unknown>> };
 
-      mockSend.mockImplementationOnce(async () => {
-        // Generate response from input blocks
-        const mockResponse = generateMockResponse(inputBlocks);
+    expect(result.experiences).toHaveLength(2);
+    expect(result.experiences[0]?.experienceType).toBe('work');
+    expect(result.experiences[0]?.status).toBe('draft');
+    expect(result.experiences[1]?.experienceType).toBe('education');
+    expect(result.experiences[1]?.status).toBe('draft');
+  });
 
-        return {
-          body: new TextEncoder().encode(
-            JSON.stringify({
-              output: {
-                message: {
-                  content: [{ text: JSON.stringify(mockResponse) }],
-                },
-              },
-            })
-          ),
-        };
-      });
+  it('coerces arrays and normalizes present end dates', async () => {
+    const experienceItems = [{ experienceType: 'work', rawBlock: 'Developer at Acme' }];
 
-      const resultString = await handler({
-        arguments: {
-          experienceTextBlocks: inputBlocks,
+    mockAiResponse({
+      experiences: [
+        {
+          title: 'Developer',
+          companyName: 'Acme',
+          startDate: '2022',
+          endDate: 'Present',
+          responsibilities: 'Built features,Reviewed code',
+          tasks: 'Shipped releases',
+          status: 'complete',
+          experienceType: 'work',
         },
-      });
-      const result = resultString as Array<{
-        title: string;
-        companyName: string;
-        startDate: string;
-        endDate: string | null;
-        responsibilities: string[];
-        tasks: string[];
-        experienceType?: string;
-      }>;
-
-      expect(result).toHaveLength(2);
-      expect(result[0].title).toBe('Senior Developer');
-      expect(result[0].companyName).toBe('Company A');
-      expect(result[0].endDate).toBeNull();
-      expect(result[1].title).toBe('Junior Developer');
-      expect(result[1].companyName).toBe('Company B');
-      expect(result[1].startDate).toBe('2018-06-01');
-      expect(result[1].endDate).toBe('2019-12-01');
+      ],
     });
 
-    it('should apply operation-specific validation fallbacks', async () => {
-      const inputBlocks = ['Incomplete experience'];
+    const result = (await handler({
+      arguments: { language: 'en', experienceItems },
+    })) as { experiences: Array<Record<string, unknown>> };
 
-      mockSend.mockImplementationOnce(async () => {
-        // Simulate incomplete response with missing fields - will trigger validation fallbacks
-        return {
-          body: new TextEncoder().encode(
-            JSON.stringify({
-              output: {
-                message: {
-                  content: [
-                    {
-                      text: JSON.stringify([
-                        {
-                          // Missing title and company name - will use fallbacks
-                          startDate: '2020-01',
-                          endDate: null,
-                          // Missing responsibilities and tasks - will default to []
-                        },
-                      ]),
-                    },
-                  ],
-                },
-              },
-            })
-          ),
-        };
-      });
-
-      const resultString = await handler({
-        arguments: {
-          experienceTextBlocks: inputBlocks,
-        },
-      });
-      const result = resultString as Array<{
-        title: string;
-        companyName: string;
-        startDate: string;
-        endDate: string | null;
-        responsibilities: string[];
-        tasks: string[];
-        experienceType?: string;
-      }>;
-
-      expect(result).toHaveLength(1);
-      expect(result[0].title).toBe('Experience 1'); // Fallback
-      expect(result[0].companyName).toBe('Unknown Company'); // Fallback
-      expect(result[0].responsibilities).toEqual([]); // Fallback
-      expect(result[0].tasks).toEqual([]); // Fallback
-    });
-
-    it('should apply fallback for missing experiences field', async () => {
-      mockSend.mockImplementationOnce(async () => {
-        return {
-          body: new TextEncoder().encode(
-            JSON.stringify({
-              output: {
-                message: {
-                  content: [
-                    {
-                      text: JSON.stringify({
-                        invalid_field: 'data',
-                      }),
-                    },
-                  ],
-                },
-              },
-            })
-          ),
-        };
-      });
-
-      const resultString = await handler({
-        arguments: {
-          experienceTextBlocks: ['Experience text'],
-        },
-      });
-      const result = resultString as Array<{
-        title: string;
-        companyName: string;
-        startDate: string;
-        endDate: string | null;
-        responsibilities: string[];
-        tasks: string[];
-        experienceType?: string;
-      }>;
-
-      // Should apply fallback for missing experiences field
-      expect(result).toBeDefined();
-      expect(result).toHaveLength(1);
-      expect(result[0].title).toBe('Experience 1');
-      expect(result[0].companyName).toBe('Unknown Company');
-    });
-
-    it('should normalize snake_case fields and invalid types', async () => {
-      mockSend.mockImplementationOnce(async () => {
-        return {
-          body: new TextEncoder().encode(
-            JSON.stringify({
-              output: {
-                message: {
-                  content: [
-                    {
-                      text: JSON.stringify([
-                        {
-                          title: 'Data Analyst',
-                          company: 'DataCorp',
-                          start_date: '2022-05',
-                          end_date: '2023-02-10',
-                          responsibilities: ['Built dashboards', 12],
-                          tasks: ['Analyzed trends', false],
-                          experience_type: 'invalid',
-                        },
-                      ]),
-                    },
-                  ],
-                },
-              },
-            })
-          ),
-        };
-      });
-
-      const resultString = await handler({
-        arguments: {
-          experienceTextBlocks: ['Data Analyst at DataCorp (May 2022 - Feb 2023)'],
-        },
-      });
-      const result = resultString as Array<{
-        title: string;
-        companyName: string;
-        startDate: string;
-        endDate: string | null;
-        responsibilities: string[];
-        tasks: string[];
-        experienceType?: string;
-      }>;
-
-      expect(result).toHaveLength(1);
-      expect(result[0].companyName).toBe('DataCorp');
-      expect(result[0].startDate).toBe('2022-05-01');
-      expect(result[0].endDate).toBe('2023-02-10');
-      expect(result[0].responsibilities).toEqual(['Built dashboards']);
-      expect(result[0].tasks).toEqual(['Analyzed trends']);
-      expect(result[0].experienceType).toBe('work');
-    });
-
-    it('should fall back when AI returns an empty array', async () => {
-      mockSend.mockImplementationOnce(async () => {
-        return {
-          body: new TextEncoder().encode(
-            JSON.stringify({
-              output: {
-                message: {
-                  content: [{ text: JSON.stringify([]) }],
-                },
-              },
-            })
-          ),
-        };
-      });
-
-      const resultString = await handler({
-        arguments: {
-          experienceTextBlocks: ['Empty result'],
-        },
-      });
-      const result = resultString as Array<{ title: string; companyName: string }>;
-
-      expect(result).toHaveLength(1);
-      expect(result[0].title).toBe('Experience 1');
-      expect(result[0].companyName).toBe('Unknown Company');
-    });
+    expect(result.experiences).toHaveLength(1);
+    expect(result.experiences[0]?.endDate).toBe('');
+    expect(result.experiences[0]?.responsibilities).toEqual(['Built features', 'Reviewed code']);
+    expect(result.experiences[0]?.tasks).toEqual(['Shipped releases']);
   });
 });

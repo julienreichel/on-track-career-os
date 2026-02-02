@@ -74,7 +74,6 @@ describe('AI Operations - Generate Matching Summary (E2E Sandbox)', () => {
           experienceType: 'work',
           responsibilities: ['Grow EMs', 'Drive strategy'],
           tasks: ['Mentor managers', 'Set delivery cadence'],
-          achievements: ['Reduced incidents by 30%'],
         },
       ],
       jobDescription: {

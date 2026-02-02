@@ -63,9 +63,12 @@ export function useAiOperations() {
       parsedJobDescription
     );
 
-  const extractExperiences = (experienceTextBlocks: string[]) =>
+  const extractExperiences = (
+    language: string,
+    experienceItems: Parameters<AiOperationsService['extractExperienceBlocks']>[1]
+  ) =>
     handleAsyncOperation(
-      () => service.extractExperienceBlocks(experienceTextBlocks),
+      () => service.extractExperienceBlocks(language, experienceItems),
       loading,
       error,
       experiences

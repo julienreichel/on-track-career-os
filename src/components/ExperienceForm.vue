@@ -44,7 +44,7 @@ watch(
       form.value = {
         title: experience.title,
         companyName: experience.companyName || '',
-        startDate: experience.startDate,
+        startDate: experience.startDate || '',
         endDate: experience.endDate || '',
         responsibilities: experience.responsibilities || [],
         tasks: experience.tasks || [],

@@ -123,12 +123,13 @@ export function useExperienceImport() {
         const created = await experienceRepo.create({
           title: exp.title,
           companyName: exp.companyName,
-          startDate: exp.startDate,
+          startDate: exp.startDate || undefined,
           endDate: exp.endDate || undefined,
           responsibilities: exp.responsibilities,
           tasks: exp.tasks,
           rawText,
-          status: 'draft',
+          status: exp.status,
+          experienceType: exp.experienceType,
           userId,
         });
 

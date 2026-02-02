@@ -46,15 +46,17 @@ const mockExperiences: ExtractedExperience[] = [
     endDate: '2023-12',
     responsibilities: ['Lead development team', 'Architect solutions'],
     tasks: ['Build features', 'Code reviews'],
+    status: 'draft',
   },
   {
     title: 'Software Engineer',
     companyName: 'StartUp Inc',
     experienceType: 'work',
     startDate: '2018-06',
-    endDate: null,
+    endDate: '',
     responsibilities: ['Develop web applications'],
     tasks: ['Implement features', 'Write tests'],
+    status: 'draft',
   },
 ];
 
@@ -127,7 +129,7 @@ describe('ExperiencesPreview', () => {
       title: 'Updated Role',
       companyName: 'Tech Corp',
       startDate: '2020-01',
-      endDate: null,
+      endDate: '',
       responsibilities: ['Updated responsibility'],
       tasks: [],
       rawText: '',
@@ -155,6 +157,7 @@ describe('ExperiencesPreview', () => {
         endDate: '2021-01',
         responsibilities: [],
         tasks: ['Task 1'],
+        status: 'draft',
       },
     ];
 
@@ -172,6 +175,7 @@ describe('ExperiencesPreview', () => {
         endDate: '2021-01',
         responsibilities: ['Responsibility 1'],
         tasks: [],
+        status: 'draft',
       },
     ];
 

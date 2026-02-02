@@ -169,55 +169,65 @@ describe('AiOperationsRepository', () => {
 
   describe('extractExperienceBlocks', () => {
     it('should extract structured experiences from text blocks', async () => {
-      const mockTextBlocks = [
-        'Senior Software Engineer at Tech Corp (2020-2023)',
-        'Software Engineer at StartupCo (2018-2020)',
-      ];
-      const mockExperiencesResult = [
+      const mockExperienceItems = [
         {
-          title: 'Senior Software Engineer',
-          companyName: 'Tech Corp',
-          startDate: '2020-01-01',
-          endDate: '2023-12-31',
-          responsibilities: ['Led team', 'Designed systems'],
-          tasks: ['Implemented features', 'Conducted reviews'],
           experienceType: 'work',
+          rawBlock: 'Senior Software Engineer at Tech Corp (2020-2023)',
         },
         {
-          title: 'Software Engineer',
-          companyName: 'StartupCo',
-          startDate: '2018-01-01',
-          endDate: '2020-12-31',
-          responsibilities: ['Developed features'],
-          tasks: ['Built APIs'],
           experienceType: 'work',
+          rawBlock: 'Software Engineer at StartupCo (2018-2020)',
         },
       ];
+      const mockExperiencesResult = {
+        experiences: [
+          {
+            title: 'Senior Software Engineer',
+            companyName: 'Tech Corp',
+            startDate: '2020-01-01',
+            endDate: '2023-12-31',
+            responsibilities: ['Led team', 'Designed systems'],
+            tasks: ['Implemented features', 'Conducted reviews'],
+            status: 'draft',
+            experienceType: 'work',
+          },
+          {
+            title: 'Software Engineer',
+            companyName: 'StartupCo',
+            startDate: '2018-01-01',
+            endDate: '2020-12-31',
+            responsibilities: ['Developed features'],
+            tasks: ['Built APIs'],
+            status: 'draft',
+            experienceType: 'work',
+          },
+        ],
+      };
 
       mockClient.extractExperienceBlocks.mockResolvedValue({
         data: mockExperiencesResult,
         errors: undefined,
       });
 
-      const result = await repository.extractExperienceBlocks(mockTextBlocks);
+      const result = await repository.extractExperienceBlocks('en', mockExperienceItems);
 
       expect(mockClient.extractExperienceBlocks).toHaveBeenCalledWith(
-        { experienceTextBlocks: mockTextBlocks },
+        { language: 'en', experienceItems: mockExperienceItems },
         expect.objectContaining({ authMode: 'userPool' })
       );
       expect(result).toEqual(mockExperiencesResult);
-      expect(result).toHaveLength(2);
+      expect(result.experiences).toHaveLength(2);
     });
 
     it('should handle empty experience blocks', async () => {
       mockClient.extractExperienceBlocks.mockResolvedValue({
-        data: [],
+        data: { experiences: [] },
         errors: undefined,
       });
 
-      const result = await repository.extractExperienceBlocks([]);
+      const result = await repository.extractExperienceBlocks('en', []);
 
-      expect(result).toHaveLength(0);
+      expect(result.experiences).toHaveLength(0);
     });
   });
 

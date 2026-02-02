@@ -111,8 +111,6 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
         'Reduced deployment time by 70%',
         'Increased system uptime to 99.9%',
       ],
-      achievements: [],
-      kpiSuggestions: [],
     },
   ];
 
@@ -244,8 +242,6 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
           endDate: '2023-01-01',
           responsibilities: ['Code'],
           tasks: ['Development'],
-          achievements: [],
-          kpiSuggestions: [],
         },
       ],
       stories: [],

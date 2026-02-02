@@ -26,11 +26,15 @@ export interface IAiOperationsRepository {
   parseCvText(cvText: string): Promise<ParsedCV>;
 
   /**
-   * Extract structured experience data from text blocks
-   * @param experienceTextBlocks - Array of experience text sections
+   * Extract structured experience data from experience items
+   * @param language - Target language for responsibilities and tasks
+   * @param experienceItems - Experience items with raw blocks and types
    * @returns Structured experience objects with dates, responsibilities, tasks
    */
-  extractExperienceBlocks(experienceTextBlocks: string[]): Promise<ExperiencesResult>;
+  extractExperienceBlocks(
+    language: string,
+    experienceItems: ExtractExperienceInput['experienceItems']
+  ): Promise<ExperiencesResult>;
 
   /**
    * Generate STAR story from experience text
@@ -196,9 +200,12 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     return data;
   }
 
-  async extractExperienceBlocks(experienceTextBlocks: string[]): Promise<ExperiencesResult> {
+  async extractExperienceBlocks(
+    language: string,
+    experienceItems: ExtractExperienceInput['experienceItems']
+  ): Promise<ExperiencesResult> {
     const { data, errors } = await this.client.extractExperienceBlocks(
-      { experienceTextBlocks },
+      { language, experienceItems },
       gqlOptions()
     );
 

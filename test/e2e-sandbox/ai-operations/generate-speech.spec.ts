@@ -72,7 +72,6 @@ describe('AI Operations - Generate Speech (E2E Sandbox)', () => {
           experienceType: 'work',
           responsibilities: ['Grow teams', 'Drive strategy'],
           tasks: ['Mentor leads', 'Define roadmaps'],
-          achievements: ['Reduced incidents by 30%'],
         },
       ],
       jobDescription: {

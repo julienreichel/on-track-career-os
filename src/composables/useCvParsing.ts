@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { PDFParse } from 'pdf-parse';
 import { useAiOperations } from '@/application/ai-operations/useAiOperations';
-import type { ExtractedExperience } from '@/domain/ai-operations/Experience';
+import type { ExtractedExperience, ExperienceItemInput } from '@/domain/ai-operations/Experience';
 import type { ParseCvTextOutput } from '@amplify/data/ai-operations/parseCvText';
 
 // Configure PDF.js worker
@@ -16,7 +16,7 @@ PDFParse.setWorker(
  */
 // eslint-disable-next-line max-lines-per-function
 export function useCvParsing() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const aiOps = useAiOperations();
 
   const extractedText = ref<string>('');
@@ -49,18 +49,34 @@ export function useCvParsing() {
   /**
    * Extract experiences from a section (work or education)
    */
-  async function extractExperiencesFromSection(sections: string[]): Promise<ExtractedExperience[]> {
-    if (sections.length === 0) {
+  async function extractExperiencesFromSection(
+    language: string,
+    experienceItems: ParseCvTextOutput['experienceItems']
+  ): Promise<ExtractedExperience[]> {
+    if (experienceItems.length === 0) {
       return [];
     }
 
-    await aiOps.extractExperiences(sections);
+    const validTypes = new Set<ExperienceItemInput['experienceType']>([
+      'work',
+      'education',
+      'volunteer',
+      'project',
+    ]);
+    const normalizedItems: ExperienceItemInput[] = experienceItems.map((item) => ({
+      ...item,
+      experienceType: validTypes.has(item.experienceType as ExperienceItemInput['experienceType'])
+        ? (item.experienceType as ExperienceItemInput['experienceType'])
+        : 'work',
+    }));
+
+    await aiOps.extractExperiences(language, normalizedItems);
 
     if (aiOps.error.value) {
       throw new Error(aiOps.error.value);
     }
 
-    return aiOps.experiences.value || [];
+    return aiOps.experiences.value?.experiences || [];
   }
 
   async function parseFile(file: File): Promise<void> {
@@ -92,8 +108,9 @@ export function useCvParsing() {
       extractedProfile.value = aiOps.parsedCv.value.profile;
     }
 
-    const experienceBlocks = aiOps.parsedCv.value.experienceItems.map((item) => item.rawBlock);
-    const allExperiences = await extractExperiencesFromSection(experienceBlocks);
+    const experienceItems = aiOps.parsedCv.value.experienceItems;
+    const language = locale.value || 'en';
+    const allExperiences = await extractExperiencesFromSection(language, experienceItems);
 
     if (allExperiences.length === 0) {
       throw new Error(t('cvUpload.errors.extractionFailed'));

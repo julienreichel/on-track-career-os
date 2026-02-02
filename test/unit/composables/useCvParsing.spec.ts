@@ -54,6 +54,7 @@ global.FileReader = class MockFileReader {
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     t: (key: string) => key,
+    locale: ref('en'),
   }),
 }));
 
@@ -152,16 +153,20 @@ describe('useCvParsing', () => {
         confidence: 0.6,
       };
 
-      mockAiOps.experiences.value = [
-        {
-          title: 'Developer',
-          companyName: 'Tech Corp',
-          startDate: '2020-01',
-          endDate: null,
-          responsibilities: [],
-          tasks: [],
-        },
-      ];
+      mockAiOps.experiences.value = {
+        experiences: [
+          {
+            title: 'Developer',
+            companyName: 'Tech Corp',
+            startDate: '2020-01',
+            endDate: '',
+            responsibilities: [],
+            tasks: [],
+            status: 'draft',
+            experienceType: 'work',
+          },
+        ],
+      };
 
       await parsing.parseFile(pdfFile);
 
@@ -207,17 +212,20 @@ describe('useCvParsing', () => {
         confidence: 0.5,
       };
 
-      mockAiOps.experiences.value = [
-        {
-          title: 'Software Engineer',
-          companyName: 'Tech Corp',
-          experienceType: 'work',
-          startDate: '2020-01',
-          endDate: '2023-12',
-          responsibilities: ['Build software'],
-          tasks: ['Code'],
-        },
-      ];
+      mockAiOps.experiences.value = {
+        experiences: [
+          {
+            title: 'Software Engineer',
+            companyName: 'Tech Corp',
+            experienceType: 'work',
+            startDate: '2020-01',
+            endDate: '2023-12',
+            responsibilities: ['Build software'],
+            tasks: ['Code'],
+            status: 'draft',
+          },
+        ],
+      };
 
       await parsing.parseFile(textFile);
 
@@ -309,19 +317,21 @@ describe('useCvParsing', () => {
           title: 'Job 1',
           companyName: 'Company 1',
           startDate: '2020-01',
-          endDate: null,
+          endDate: '',
           responsibilities: [],
           tasks: [],
           experienceType: 'work',
+          status: 'draft',
         },
         {
           title: 'Job 2',
           companyName: 'Company 2',
           startDate: '2021-01',
-          endDate: null,
+          endDate: '',
           responsibilities: [],
           tasks: [],
           experienceType: 'work',
+          status: 'draft',
         },
       ];
 
@@ -339,10 +349,11 @@ describe('useCvParsing', () => {
           title: 'Job 1',
           companyName: 'Company 1',
           startDate: '2020-01',
-          endDate: null,
+          endDate: '',
           responsibilities: [],
           tasks: [],
           experienceType: 'work',
+          status: 'draft',
         },
       ];
 
@@ -424,10 +435,11 @@ describe('useCvParsing', () => {
           title: 'Job',
           companyName: 'Company',
           startDate: '2020-01',
-          endDate: null,
+          endDate: '',
           responsibilities: [],
           tasks: [],
           experienceType: 'work',
+          status: 'draft',
         },
       ];
       parsing.extractedProfile.value = {
@@ -466,17 +478,20 @@ describe('useCvParsing', () => {
         confidence: 0.6,
       };
 
-      mockAiOps.experiences.value = [
-        {
-          title: 'Developer',
-          companyName: 'Tech',
-          startDate: '2020-01',
-          endDate: null,
-          responsibilities: [],
-          tasks: [],
-          experienceType: 'work',
-        },
-      ];
+      mockAiOps.experiences.value = {
+        experiences: [
+          {
+            title: 'Developer',
+            companyName: 'Tech',
+            startDate: '2020-01',
+            endDate: '',
+            responsibilities: [],
+            tasks: [],
+            experienceType: 'work',
+            status: 'draft',
+          },
+        ],
+      };
 
       await parsing.parseFile(textFile);
 
@@ -504,17 +519,20 @@ describe('useCvParsing', () => {
         confidence: 0.5,
       };
 
-      mockAiOps.experiences.value = [
-        {
-          title: 'Developer',
-          companyName: 'Tech',
-          startDate: '2020-01',
-          endDate: null,
-          responsibilities: [],
-          tasks: [],
-          experienceType: 'work',
-        },
-      ];
+      mockAiOps.experiences.value = {
+        experiences: [
+          {
+            title: 'Developer',
+            companyName: 'Tech',
+            startDate: '2020-01',
+            endDate: '',
+            responsibilities: [],
+            tasks: [],
+            experienceType: 'work',
+            status: 'draft',
+          },
+        ],
+      };
 
       await parsing.parseFile(textFile);
 

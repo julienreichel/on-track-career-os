@@ -128,22 +128,25 @@ describe('useAiOperations', () => {
 
   it('should successfully extract experiences', async () => {
     // Arrange
-    const mockExperiences: ExperiencesResult = [
-      {
-        title: 'Developer',
-        companyName: 'TechCorp',
-        startDate: '2020-01',
-        endDate: '2023-12',
-        responsibilities: [],
-        tasks: [],
-        experienceType: 'work',
-      },
-    ];
+    const mockExperiences: ExperiencesResult = {
+      experiences: [
+        {
+          title: 'Developer',
+          companyName: 'TechCorp',
+          startDate: '2020-01',
+          endDate: '2023-12',
+          responsibilities: [],
+          tasks: [],
+          status: 'draft',
+          experienceType: 'work',
+        },
+      ],
+    };
     mockService.extractExperienceBlocks.mockResolvedValue(mockExperiences);
 
     // Act
     const { experiences, loading, error, extractExperiences } = useAiOperations();
-    await extractExperiences(['Experience 1']);
+    await extractExperiences('en', [{ experienceType: 'work', rawBlock: 'Experience 1' }]);
 
     // Assert
     expect(loading.value).toBe(false);

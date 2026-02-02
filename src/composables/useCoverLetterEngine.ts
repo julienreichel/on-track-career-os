@@ -232,8 +232,6 @@ function mapExperienceToSpeechExperience(exp: Experience) {
     experienceType: exp.experienceType ?? 'work',
     responsibilities: filterNulls(exp.responsibilities) ?? [],
     tasks: filterNulls(exp.tasks) ?? [],
-    achievements: [],
-    kpiSuggestions: [],
   };
 }
 

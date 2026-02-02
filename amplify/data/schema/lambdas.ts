@@ -143,8 +143,11 @@ export const schemaLambdas = {
 
   extractExperienceBlocks: a
     .query()
-    .arguments({ experienceTextBlocks: a.string().array().required() })
-    .returns(a.ref('ExperienceType').array())
+    .arguments({
+      language: a.string().required(),
+      experienceItems: a.ref('ExperienceItemInputType').array().required(),
+    })
+    .returns(a.ref('ExtractExperienceBlocksOutputType'))
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(extractExperienceBlocksFunction)),
 
