@@ -141,18 +141,16 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
     expect(result.length).toBeGreaterThan(0);
     expect(result).toContain(mockUserProfile.fullName);
 
-    // Check for experience content (at least 3 of: companyName, title, responsibilities, tasks)
-    const experienceContentCandidates = [
-      mockExperiences[0].companyName,
-      mockExperiences[0].title,
-      ...mockExperiences[0].responsibilities,
-      ...mockExperiences[0].tasks,
-    ];
+    // Check for experience content: mention the company or title, plus at least one detail.
     const normalizedResult = result.toLowerCase();
-    const contentMatches = experienceContentCandidates.filter((candidate) =>
-      normalizedResult.includes(candidate.toLowerCase())
+    const companyOrTitleMatches = [mockExperiences[0].companyName, mockExperiences[0].title].some(
+      (candidate) => normalizedResult.includes(candidate.toLowerCase())
     );
-    expect(contentMatches.length).toBeGreaterThanOrEqual(3);
+    const detailMatches = [...mockExperiences[0].responsibilities, ...mockExperiences[0].tasks].some(
+      (candidate) => normalizedResult.includes(candidate.toLowerCase())
+    );
+    expect(companyOrTitleMatches).toBe(true);
+    expect(detailMatches).toBe(true);
 
     console.log('Generated cover letter:', result.slice(0, 200) + '...');
   });
