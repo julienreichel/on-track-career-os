@@ -1,32 +1,37 @@
 <template>
   <UContainer>
     <UHeader>
-      <template #left>
-        <div class="flex items-center gap-4">
-          <NavigationMenu />
-          <NuxtLink to="/" class="font-semibold hover:opacity-80 transition-opacity">
-            {{ t('app.title') }}
-          </NuxtLink>
-        </div>
+      <template #title>
+        <NuxtLink to="/" class="font-semibold">
+          {{ t('app.title') }}
+        </NuxtLink>
       </template>
 
+      <UNavigationMenu :items="navigationItems" content-orientation="vertical" />
+
       <template #right>
-        <div class="flex items-center gap-2">
-          <UButton
-            variant="ghost"
-            icon="i-heroicons-cog-6-tooth"
-            :label="t('navigation.settings')"
-            to="/settings/cv"
-          />
-          <UButton variant="ghost" @click="handleSignOut">
-            {{ t('auth.signOut') }}
-          </UButton>
-        </div>
+        <UButton
+          variant="ghost"
+          icon="i-heroicons-cog-6-tooth"
+          :label="t('navigation.settings')"
+          to="/settings/cv"
+          class="hidden sm:flex"
+        />
+        <UButton variant="ghost" @click="handleSignOut">
+          {{ t('auth.signOut') }}
+        </UButton>
+      </template>
+
+      <template #body>
+        <UNavigationMenu :items="navigationItems" orientation="vertical" class="-mx-2.5" />
       </template>
     </UHeader>
 
     <UMain>
-      <div v-if="showBreadcrumb" class="mb-6">
+      <div
+        v-if="showBreadcrumb"
+        class="mb-6 w-full max-w-(--ui-container) mx-auto px-4 sm:px-6 lg:px-8"
+      >
         <UBreadcrumb :items="breadcrumbItems" />
       </div>
       <slot />
@@ -38,10 +43,81 @@
 // Default layout with header and sign out
 import { computed, ref, watch } from 'vue';
 import { useBreadcrumbMapping } from '@/composables/useBreadcrumbMapping';
+import type { NavigationMenuItem } from '@nuxt/ui';
 
 const { t } = useI18n();
 const route = useRoute();
 const { resolveSegment, isUUID } = useBreadcrumbMapping();
+
+// Navigation items for UNavigationMenu
+const navigationItems = computed<NavigationMenuItem[]>(() => [
+  {
+    label: t('navigation.profile'),
+    to: '/profile',
+    icon: 'i-heroicons-user',
+    description: t('features.profile.description'),
+    defaultOpen: true,
+    children: [
+      {
+        label: t('navigation.experiences'),
+        to: '/profile/experiences',
+        description: t('features.experiences.description'),
+      },
+      {
+        label: t('stories.list.title'),
+        to: '/profile/stories',
+        description: t('stories.global.description'),
+      },
+      {
+        label: t('navigation.personalCanvas'),
+        to: '/profile/canvas',
+        description: t('canvas.page.description'),
+      },
+    ],
+  },
+  {
+    label: t('navigation.jobs'),
+    icon: 'i-heroicons-briefcase',
+    description: t('features.jobs.description'),
+    defaultOpen: true,
+    children: [
+      {
+        label: t('navigation.jobs'),
+        to: '/jobs',
+        description: t('features.jobs.description'),
+      },
+      {
+        label: t('navigation.companies'),
+        to: '/companies',
+        description: t('companies.list.description'),
+      },
+    ],
+  },
+  {
+    label: t('navigation.applications'),
+    to: '/applications',
+    icon: 'i-heroicons-document-text',
+    description: t('features.applications.description'),
+    defaultOpen: true,
+    children: [
+      {
+        label: t('navigation.cvs'),
+        to: '/applications/cv',
+        description: t('cvList.subtitle'),
+      },
+      {
+        label: t('navigation.coverLetters'),
+        to: '/applications/cover-letters',
+        description: t('coverLetter.list.subtitle'),
+      },
+      {
+        label: t('navigation.speeches'),
+        to: '/applications/speech',
+        description: t('speech.list.subtitle'),
+      },
+    ],
+  },
+]);
 
 // Reactive breadcrumb items that update when IDs are resolved
 const breadcrumbItems = ref<Array<{ label: string; to: string; icon?: string }>>([]);
