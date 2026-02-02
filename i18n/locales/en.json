@@ -287,7 +287,18 @@
       "delete": "Delete",
       "empty": "No experiences yet. Upload a CV or add one manually.",
       "viewStories": "View Stories",
-      "newStory": "New Story"
+      "newStory": "New Story",
+      "search": {
+        "placeholder": "Search experiences...",
+        "noResults": "No experiences match your search"
+      },
+      "filter": {
+        "all": "All",
+        "work": "Work",
+        "education": "Education",
+        "volunteer": "Volunteer",
+        "project": "Project"
+      }
     },
     "card": {
       "noTitle": "Untitled experience",

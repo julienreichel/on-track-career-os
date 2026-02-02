@@ -94,6 +94,7 @@ function cancelDelete() {
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
             size="lg"
+            class="w-1/3"
             :placeholder="t('companies.list.search.placeholder')"
           />
         </div>

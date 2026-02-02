@@ -33,6 +33,8 @@ const hasLoaded = ref(false);
 const errorMessage = ref<string | null>(null);
 const showDeleteModal = ref(false);
 const experienceToDelete = ref<string | null>(null);
+const searchQuery = ref('');
+const selectedFilter = ref<string>('all');
 const { guidance } = useGuidance('profile-experiences', () => ({
   experiencesCount: experiences.value.length,
 }));
@@ -54,6 +56,38 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     to: '/profile/experiences/new',
   },
 ]);
+
+const sortedExperiences = computed(() =>
+  [...experiences.value].sort((a, b) => {
+    const aTime = toTimestamp(a.startDate);
+    const bTime = toTimestamp(b.startDate);
+    return bTime - aTime;
+  })
+);
+
+const filteredByType = computed(() => {
+  if (selectedFilter.value === 'all') {
+    return sortedExperiences.value;
+  }
+  return sortedExperiences.value.filter((exp) => exp.experienceType === selectedFilter.value);
+});
+
+const filteredExperiences = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  const list = filteredByType.value;
+  if (!query) return list;
+
+  return list.filter((experience) => {
+    const fields = [
+      experience.title,
+      experience.companyName,
+      experience.experienceType,
+      ...(experience.responsibilities || []),
+      ...(experience.tasks || []),
+    ];
+    return fields.some((field) => field?.toLowerCase().includes(query));
+  });
+});
 
 // Load experiences when userId becomes available
 watch(
@@ -77,11 +111,7 @@ async function loadExperiences() {
 
   try {
     const result = await experienceRepo.list(userId.value);
-    experiences.value = (result || []).sort((a, b) => {
-      const aTime = toTimestamp(a.startDate);
-      const bTime = toTimestamp(b.startDate);
-      return bTime - aTime;
-    });
+    experiences.value = result || [];
     await loadStoryCounts();
   } catch (error) {
     errorMessage.value =
@@ -163,6 +193,57 @@ function handleViewStories(id: string) {
       <UPageBody>
         <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-4" />
 
+        <!-- Search and Filters -->
+        <div
+          v-if="hasLoaded && !loading && experiences.length > 0"
+          class="mb-6 flex flex-col gap-4 justify-between sm:flex-row sm:items-center"
+        >
+          <UInput
+            v-model="searchQuery"
+            icon="i-heroicons-magnifying-glass"
+            :placeholder="t('experiences.list.search.placeholder')"
+            size="lg"
+            class="w-1/3"
+          />
+          <div class="flex gap-2">
+            <UButton
+              :variant="selectedFilter === 'all' ? 'solid' : 'outline'"
+              color="primary"
+              @click="selectedFilter = 'all'"
+            >
+              {{ t('experiences.list.filter.all') }}
+            </UButton>
+            <UButton
+              :variant="selectedFilter === 'work' ? 'solid' : 'outline'"
+              color="primary"
+              @click="selectedFilter = 'work'"
+            >
+              {{ t('experiences.list.filter.work') }}
+            </UButton>
+            <UButton
+              :variant="selectedFilter === 'education' ? 'solid' : 'outline'"
+              color="primary"
+              @click="selectedFilter = 'education'"
+            >
+              {{ t('experiences.list.filter.education') }}
+            </UButton>
+            <UButton
+              :variant="selectedFilter === 'volunteer' ? 'solid' : 'outline'"
+              color="primary"
+              @click="selectedFilter = 'volunteer'"
+            >
+              {{ t('experiences.list.filter.volunteer') }}
+            </UButton>
+            <UButton
+              :variant="selectedFilter === 'project' ? 'solid' : 'outline'"
+              color="primary"
+              @click="selectedFilter = 'project'"
+            >
+              {{ t('experiences.list.filter.project') }}
+            </UButton>
+          </div>
+        </div>
+
         <!-- Error Alert -->
         <UAlert
           v-if="errorMessage"
@@ -181,10 +262,22 @@ function handleViewStories(id: string) {
         <!-- Empty State -->
         <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
 
+        <!-- No Results State -->
+        <UCard v-else-if="filteredExperiences.length === 0">
+          <UEmpty
+            :title="t('experiences.list.search.noResults')"
+            icon="i-heroicons-magnifying-glass"
+          >
+            <p class="text-sm text-gray-500">
+              {{ t('experiences.list.search.noResults') }}
+            </p>
+          </UEmpty>
+        </UCard>
+
         <!-- Experience Cards -->
         <UPageGrid v-else>
           <ExperienceCard
-            v-for="experience in experiences"
+            v-for="experience in filteredExperiences"
             :key="experience.id"
             :experience="experience"
             :story-count="storyCounts[experience.id] ?? 0"

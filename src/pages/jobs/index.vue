@@ -126,6 +126,7 @@ function cancelDelete() {
             icon="i-heroicons-magnifying-glass"
             :placeholder="t('jobList.search.placeholder')"
             size="lg"
+            class="w-1/3"
           />
         </div>
 
