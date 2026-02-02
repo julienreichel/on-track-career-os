@@ -6,13 +6,9 @@ import NavigationMenu from '@/components/NavigationMenu.vue';
 const i18n = createTestI18n();
 
 const stubs = {
-  UDropdown: {
-    props: ['items', 'popper'],
-    template: '<div class="u-dropdown"><slot /></div>',
-  },
-  UButton: {
-    props: ['label', 'variant', 'icon', 'to', 'trailingIcon'],
-    template: '<button class="u-button">{{ label }}</button>',
+  UNavigationMenu: {
+    props: ['items', 'orientation'],
+    template: '<nav class="u-navigation-menu"><slot /></nav>',
   },
 };
 
@@ -25,7 +21,7 @@ describe('NavigationMenu', () => {
       },
     });
 
-    expect(wrapper.find('.u-dropdown').exists()).toBe(true);
+    expect(wrapper.find('.u-navigation-menu').exists()).toBe(true);
   });
 
   it('passes navigation items with correct structure', () => {
@@ -78,7 +74,7 @@ describe('NavigationMenu', () => {
     expect(applicationsItem.children[2].to).toBe('/applications/speech');
   });
 
-  it('renders dropdown buttons for each navigation item', () => {
+  it('uses horizontal orientation', () => {
     const wrapper = mount(NavigationMenu, {
       global: {
         plugins: [i18n],
@@ -86,11 +82,20 @@ describe('NavigationMenu', () => {
       },
     });
 
-    const buttons = wrapper.findAllComponents({ name: 'UButton' });
-    expect(buttons).toHaveLength(3); // Profile, Jobs, Applications
+    const navMenu = wrapper.findComponent({ name: 'UNavigationMenu' });
+    expect(navMenu.props('orientation')).toBe('horizontal');
+  });
 
-    expect(buttons[0].props('label')).toBe(i18n.global.t('navigation.profile'));
-    expect(buttons[1].props('label')).toBe(i18n.global.t('navigation.jobs'));
-    expect(buttons[2].props('label')).toBe(i18n.global.t('navigation.applications'));
+  it('passes items prop to UNavigationMenu', () => {
+    const wrapper = mount(NavigationMenu, {
+      global: {
+        plugins: [i18n],
+        stubs,
+      },
+    });
+
+    const navMenu = wrapper.findComponent({ name: 'UNavigationMenu' });
+    expect(navMenu.props('items')).toBeDefined();
+    expect(navMenu.props('items')).toHaveLength(3);
   });
 });

@@ -1,20 +1,5 @@
 <template>
-  <div class="flex items-center gap-1">
-    <UDropdown
-      v-for="link in navigationLinks"
-      :key="link.label"
-      :items="link.children || []"
-      :popper="{ placement: 'bottom-start' }"
-    >
-      <UButton
-        :label="link.label"
-        variant="ghost"
-        :icon="link.icon"
-        :to="link.to"
-        trailing-icon="i-heroicons-chevron-down-20-solid"
-      />
-    </UDropdown>
-  </div>
+  <UNavigationMenu :items="navigationLinks" orientation="horizontal" />
 </template>
 
 <script setup lang="ts">
