@@ -73,57 +73,90 @@ Below is the **minimum viable version** of each operation, including purpose, pr
 
 ### Purpose
 
-Extract raw text sections from PDF-extracted CV text and normalize for downstream processing. Additionally, extract profile information such as name, headline, location, seniority level, goals, aspirations, values, strengths, interests, and languages.
+Extract **profile fields** and a **unified list of experience items** (work, education, volunteer, project) from PDF-extracted CV text, normalized for downstream processing. Produce clean raw blocks that can be parsed later into structured `Experience` records.
 
 ### System Prompt
 
 ```
-You are a CV text parser that extracts structured sections and profile information from CV text.
-Extract experiences, education, skills, certifications, and personal profile information.
-Never invent information not present in the text.
+You are a CV text parser that extracts structured profile information and splits a CV into experience items.
+
 Return ONLY valid JSON with no markdown wrappers.
 
-RULES:
-- Extract only information explicitly stated in the CV
-- Do not infer or invent missing details
-- Categorize text into appropriate sections
-- Extract profile information: full name, headline/title, location, seniority level, goals, aspirations, values, strengths, interests, languages
-- Skills should be extracted into the sections.skills array
-- Certifications should be extracted into the sections.certifications array
-- If a section has no content, return empty array or omit the field
-- Return ONLY valid JSON matching the specified schema
+HARD RULES:
+- Never invent information not explicitly present in the text.
+- Do not infer missing details (no guessing location from address unless explicitly written as location).
+- Output MUST match the schema exactly: all keys must exist, correct types only.
+- Strings must be "" when unknown (never undefined, never null, never "null").
+- Arrays must be [] when empty (never a string).
+- Each experience item must be a single, non-merged item (one role / one education entry / one volunteer entry / one project).
+
+EXTRACTION RULES:
+- Extract profile fields if explicitly present: full name, headline, location, seniority level, email, phone, work permit info, social links.
+- Extract lists: aspirations, personal values, strengths, interests, skills, certifications, languages.
+- Create experienceItems[] by identifying distinct items and assigning experienceType:
+  - "work": employment roles
+  - "education": degrees/diplomas/schools/universities/training programs
+  - "volunteer": volunteer roles, associations, non-paid civic engagement
+  - "project": personal/side projects, freelance missions without clear employer structure, portfolio work
+- When unsure between "work" and "project": choose "project".
+- If a block cannot be classified confidently: put it into rawBlocks instead of creating an experience item.
+
+CONTENT RULES FOR experienceItems:
+- Each rawBlock should include the header + dates + location (if present) + responsibilities/achievements.
+- Do not split one role into multiple items unless the CV clearly contains multiple distinct roles with different titles/dates.
+- Do not merge multiple roles into one item even if they are at the same company.
+
+NORMALIZATION:
+- Preserve original language; do not translate.
+- Keep line breaks inside rawBlock if they improve readability.
 ```
+
+---
 
 ### User Prompt
 
 ```
-Extract structured sections from this CV text:
+Extract structured profile information and experience items from this CV text:
 {{cvText}}
 
 Return a JSON object with this exact structure:
 {
-  "sections": {
-    "experiences": ["string"],
-    "education": ["string"],
-    "skills": ["string"],
-    "certifications": ["string"],
-    "rawBlocks": ["string"]
-  },
   "profile": {
     "fullName": "string",
     "headline": "string",
     "location": "string",
     "seniorityLevel": "string",
-    "goals": ["string"],
+    "primaryEmail": "string",
+    "primaryPhone": "string",
+    "workPermitInfo": "string",
+    "socialLinks": ["string"],
     "aspirations": ["string"],
     "personalValues": ["string"],
     "strengths": ["string"],
     "interests": ["string"],
+    "skills": ["string"],
+    "certifications": ["string"],
     "languages": ["string"]
   },
+  "experienceItems": [
+    {
+      "experienceType": "work|education|volunteer|project",
+      "rawBlock": "string"
+    }
+  ],
+  "rawBlocks": ["string"],
   "confidence": 0.95
 }
+
+Important:
+- experienceItems: one entry per distinct item (one role / one education / one volunteer / one project). Never merge items.
+- rawBlock must contain the full text for that item (header + body).
+- If a profile field is not found: use "" for strings and [] for arrays.
+- Never output null (not as JSON null and not as the string "null").
+- confidence is a number between 0 and 1.
 ```
+
+---
 
 ### Input Schema
 
@@ -133,40 +166,50 @@ Return a JSON object with this exact structure:
 }
 ```
 
+---
+
 ### Output Schema
 
 ```json
 {
-  "sections": {
-    "experiences": ["string"],
-    "education": ["string"],
-    "skills": ["string"],
-    "certifications": ["string"],
-    "rawBlocks": ["string"]
-  },
   "profile": {
-    "fullName": "string (optional)",
-    "headline": "string (optional)",
-    "location": "string (optional)",
-    "seniorityLevel": "string (optional)",
-    "goals": ["string"],
+    "fullName": "string",
+    "headline": "string",
+    "location": "string",
+    "seniorityLevel": "string",
+    "primaryEmail": "string",
+    "primaryPhone": "string",
+    "workPermitInfo": "string",
+    "socialLinks": ["string"],
     "aspirations": ["string"],
     "personalValues": ["string"],
     "strengths": ["string"],
     "interests": ["string"],
+    "skills": ["string"],
+    "certifications": ["string"],
     "languages": ["string"]
   },
-  "confidence": "number"
+  "experienceItems": [
+    {
+      "experienceType": "work|education|volunteer|project",
+      "rawBlock": "string"
+    }
+  ],
+  "rawBlocks": ["string"]
 }
 ```
 
+---
+
 ### Fallback Strategy
 
-- If `sections` is missing, create empty structure with all section arrays
-- If `profile` is missing, create empty structure with all profile arrays
-- If individual profile fields are missing, use `undefined` for strings or empty arrays for lists
-- If `confidence` is missing, use `0.5` as default
-- If no content extracted, override confidence to `0.3` (low confidence threshold)
+- If `profile` is missing: create it with all fields present, using `""` for strings and `[]` for arrays.
+- If `experienceItems` is missing: use `[]`.
+- If `rawBlocks` is missing: use `[]`.
+- If any profile key is missing: add it with the appropriate empty default (`""` or `[]`).
+- If an experience item is missing `experienceType` or `rawBlock`, discard that item and append its text to `rawBlocks`.
+- If `confidence` is missing: default to `0.5`.
+- If fewer than 2 meaningful fields are extracted overall (e.g., almost everything is empty): clamp `confidence` to `0.3`.
 
 ---
 
@@ -174,31 +217,104 @@ Return a JSON object with this exact structure:
 
 ### Purpose
 
-Transform raw CV experience text into structured Experience entities.
+Transform **typed raw experience items** (from `ai.parseCvText` v2) into structured `Experience` entities ready to be stored in the DB.
+
+Outputs **only fields needed by the `Experience` DB model**.
+
+The caller provides a `language` parameter, and the model must output **responsibilities** and **tasks** in that language (and keep `title/companyName` as found in the CV unless they are already in the target language).
+
+---
 
 ### System Prompt
 
 ```
-You transform experience text into structured experience blocks.
-Extract: title, company, dates, responsibilities, tasks.
-Never infer seniority or technologies not present.
-Return JSON only.
+You transform raw CV experience items into structured Experience records.
+
+Return ONLY valid JSON with no markdown wrappers.
+
+HARD RULES:
+- Never invent information not explicitly present in the text.
+- Do not guess missing dates, company names, titles, or locations.
+- If information is missing or unclear, return "" for strings and [] for arrays.
+- Never output null (not as JSON null and not as the string "null").
+- Output MUST match the schema exactly: all keys must exist, correct types only.
+
+LANGUAGE RULES:
+- The input provides a target language.
+- Output responsibilities[] and tasks[] MUST be written in the target language.
+- Do not add new information during translation; translate only what is present.
+- Keep proper nouns (company names, product names, locations) unchanged.
+- Keep title as written in the CV unless a direct, obvious translation exists without changing meaning. If unsure, keep it unchanged.
+
+EXTRACTION RULES:
+- For each input item, output exactly one Experience record.
+- experienceType must be exactly the provided type: one of "work", "education", "volunteer", "project".
+- status indicates completeness:
+  - "complete" if title is present AND at least one of (companyName OR startDate) is present.
+  - otherwise "draft".
+
+DATE RULES:
+- Extract dates only if explicitly present.
+- If only a year is present, use that year as a string (do not invent month/day).
+- If "present/current/aujourd’hui" is explicitly stated, set endDate to "".
+- If startDate is not present, set startDate to "".
 ```
+
+---
 
 ### User Prompt
 
 ```
-Convert the following CV experience sections into experience blocks:
-{{experienceTextBlocks}}
+Convert the following typed CV experience items into Experience records.
+
+Target output language:
+{{language}}
+
+Input items:
+{{experienceItems}}
+
+Return a JSON object with this exact structure:
+{
+  "experiences": [
+    {
+      "title": "string",
+      "companyName": "string",
+      "startDate": "string",
+      "endDate": "string",
+      "responsibilities": ["string"],
+      "tasks": ["string"],
+      "status": "draft|complete",
+      "experienceType": "work|education|volunteer|project"
+    }
+  ]
+}
+
+Important:
+- Return one experience per input item, in the same order.
+- Never invent missing details.
+- If a field is not found: use "" for strings and [] for arrays.
+- responsibilities and tasks must be in the target output language.
+- experienceType must equal the input experienceType for that item (do not change it).
+- Never output null.
 ```
+
+---
 
 ### Input Schema
 
 ```json
 {
-  "experienceTextBlocks": ["string"]
+  "language": "string",
+  "experienceItems": [
+    {
+      "experienceType": "work|education|volunteer|project",
+      "rawBlock": "string"
+    }
+  ]
 }
 ```
+
+---
 
 ### Output Schema
 
@@ -207,15 +323,29 @@ Convert the following CV experience sections into experience blocks:
   "experiences": [
     {
       "title": "string",
-      "company": "string",
+      "companyName": "string",
       "startDate": "string",
       "endDate": "string",
       "responsibilities": ["string"],
-      "tasks": ["string"]
+      "tasks": ["string"],
+      "status": "string",
+      "experienceType": "string"
     }
   ]
 }
 ```
+
+---
+
+### Fallback Strategy
+
+- If an input item cannot be parsed reliably:
+  - Return `title: ""`, `companyName: ""`, `startDate: ""`, `endDate: ""`,
+  - `responsibilities: []`, `tasks: []`,
+  - `status: "draft"`,
+  - `experienceType: <input experienceType>`.
+
+- If `experiences` is missing, return `{ "experiences": [] }`.
 
 ---
 
