@@ -69,9 +69,7 @@ const filteredByType = computed(() => {
   if (selectedFilter.value === 'all') {
     return sortedExperiences.value;
   }
-  return sortedExperiences.value.filter(
-    (exp) => exp.experienceType === selectedFilter.value
-  );
+  return sortedExperiences.value.filter((exp) => exp.experienceType === selectedFilter.value);
 });
 
 const filteredExperiences = computed(() => {
@@ -198,14 +196,14 @@ function handleViewStories(id: string) {
         <!-- Search and Filters -->
         <div
           v-if="hasLoaded && !loading && experiences.length > 0"
-          class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center"
+          class="mb-6 flex flex-col gap-4 justify-between sm:flex-row sm:items-center"
         >
           <UInput
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
             :placeholder="t('experiences.list.search.placeholder')"
             size="lg"
-            class="flex-1"
+            class="w-1/3"
           />
           <div class="flex gap-2">
             <UButton

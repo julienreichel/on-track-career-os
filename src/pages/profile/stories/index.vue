@@ -113,6 +113,7 @@ onMounted(async () => {
           icon="i-heroicons-magnifying-glass"
           :placeholder="t('common.search', 'Search stories...')"
           size="lg"
+          class="w-1/3"
           @input="handleSearch"
         />
       </div>
