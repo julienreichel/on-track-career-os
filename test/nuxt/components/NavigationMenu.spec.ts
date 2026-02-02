@@ -6,9 +6,13 @@ import NavigationMenu from '@/components/NavigationMenu.vue';
 const i18n = createTestI18n();
 
 const stubs = {
-  UNavigationMenu: {
-    props: ['items', 'orientation'],
-    template: '<nav class="u-navigation-menu"><slot /></nav>',
+  UDropdown: {
+    props: ['items', 'popper'],
+    template: '<div class="u-dropdown"><slot /></div>',
+  },
+  UButton: {
+    props: ['label', 'variant', 'icon', 'to', 'trailingIcon'],
+    template: '<button class="u-button">{{ label }}</button>',
   },
 };
 
@@ -21,7 +25,7 @@ describe('NavigationMenu', () => {
       },
     });
 
-    expect(wrapper.find('.u-navigation-menu').exists()).toBe(true);
+    expect(wrapper.find('.u-dropdown').exists()).toBe(true);
   });
 
   it('passes navigation items with correct structure', () => {
@@ -73,7 +77,7 @@ describe('NavigationMenu', () => {
     expect(applicationsItem.children[2].to).toBe('/applications/speech');
   });
 
-  it('uses horizontal orientation', () => {
+  it('renders dropdown buttons for each navigation item', () => {
     const wrapper = mount(NavigationMenu, {
       global: {
         plugins: [i18n],
@@ -81,7 +85,11 @@ describe('NavigationMenu', () => {
       },
     });
 
-    const navMenu = wrapper.findComponent({ name: 'UNavigationMenu' });
-    expect(navMenu.props('orientation')).toBe('horizontal');
+    const buttons = wrapper.findAllComponents({ name: 'UButton' });
+    expect(buttons).toHaveLength(3); // Profile, Jobs, Applications
+
+    expect(buttons[0].props('label')).toBe(i18n.global.t('navigation.profile'));
+    expect(buttons[1].props('label')).toBe(i18n.global.t('navigation.jobs'));
+    expect(buttons[2].props('label')).toBe(i18n.global.t('navigation.applications'));
   });
 });

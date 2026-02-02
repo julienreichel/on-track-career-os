@@ -1,8 +1,20 @@
 <template>
-  <UNavigationMenu 
-    :items="navigationLinks" 
-    orientation="horizontal"
-  />
+  <div class="flex items-center gap-1">
+    <UDropdown
+      v-for="link in navigationLinks"
+      :key="link.label"
+      :items="[link.children || []]"
+      :popper="{ placement: 'bottom-start' }"
+    >
+      <UButton
+        :label="link.label"
+        variant="ghost"
+        :icon="link.icon"
+        :to="link.to"
+        trailing-icon="i-heroicons-chevron-down-20-solid"
+      />
+    </UDropdown>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -11,7 +23,7 @@ const { t } = useI18n();
 interface NavigationLink {
   label: string;
   to?: string;
-  children?: NavigationLink[];
+  children?: Array<{ label: string; to: string }>;
   icon?: string;
 }
 
