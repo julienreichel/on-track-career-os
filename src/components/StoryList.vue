@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import type { STARStory } from '@/domain/starstory/STARStory';
-import { ExperienceService } from '@/domain/experience/ExperienceService';
-import type { Experience } from '@/domain/experience/Experience';
+import type { StoryWithExperience } from '@/composables/useStoryList';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 
 const props = defineProps<{
-  stories: STARStory[];
+  stories: StoryWithExperience[];
   loading?: boolean;
   showCompanyNames?: boolean;
   experienceId?: string;
@@ -22,55 +21,19 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const router = useRouter();
 
-const experiences = ref<Experience[]>([]);
-const loadingExperiences = ref(false);
 const selectedStory = ref<STARStory | null>(null);
 const showViewModal = ref(false);
 
 const hasStories = computed(() => props.stories.length > 0);
 
-const experienceMap = computed(() => {
-  const map: Record<string, Experience> = {};
-  experiences.value.forEach((exp) => {
-    map[exp.id] = exp;
-  });
-  return map;
-});
-
 const getCompanyName = (story: STARStory): string | undefined => {
   if (!story.experienceId || !props.showCompanyNames) return undefined;
-  const experience = experienceMap.value[story.experienceId];
-  if (experience?.companyName) return experience.companyName;
-  return loadingExperiences.value ? t('common.loading') : undefined;
+  return (story as StoryWithExperience).companyName;
 };
 
 const getExperienceName = (story: STARStory): string | undefined => {
   if (!story.experienceId) return undefined;
-  const experience = experienceMap.value[story.experienceId];
-  if (experience?.title) return experience.title;
-  return loadingExperiences.value ? t('common.loading') : undefined;
-};
-
-const loadExperiences = async () => {
-  if (!props.showCompanyNames) return;
-
-  loadingExperiences.value = true;
-  try {
-    const service = new ExperienceService();
-    // Get unique experience IDs from stories
-    const experienceIds = [...new Set(props.stories.map((s) => s.experienceId).filter(Boolean))];
-
-    // Load all experiences
-    const loadedExperiences = await Promise.all(
-      experienceIds.map((id) => service.getFullExperience(id))
-    );
-
-    experiences.value = loadedExperiences.filter((exp): exp is Experience => exp !== null);
-  } catch (error) {
-    console.error('[StoryList] Failed to load experiences:', error);
-  } finally {
-    loadingExperiences.value = false;
-  }
+  return (story as StoryWithExperience).experienceName;
 };
 
 const handleView = (story: STARStory) => {
@@ -89,20 +52,12 @@ const handleEdit = (story: STARStory) => {
 const handleDelete = (story: STARStory) => {
   emit('delete', story);
 };
-
-watch(
-  () => [props.showCompanyNames, props.stories.map((story) => story.experienceId).join('|')],
-  () => {
-    void loadExperiences();
-  },
-  { immediate: true }
-);
 </script>
 
 <template>
   <div>
     <!-- Loading State -->
-    <ListSkeletonCards v-if="loading || loadingExperiences" />
+    <ListSkeletonCards v-if="loading" />
 
     <!-- Empty State -->
     <UEmpty

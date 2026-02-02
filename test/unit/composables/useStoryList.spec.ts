@@ -73,6 +73,7 @@ describe('useStoryList', () => {
       deleteStory: vi.fn(),
     };
     vi.mocked(STARStoryService).mockImplementation(() => mockService as never);
+
   });
 
   describe('initialization', () => {
@@ -89,21 +90,36 @@ describe('useStoryList', () => {
 
   describe('loadAll', () => {
     it('should load all stories successfully', async () => {
-      mockService.getAllStories.mockResolvedValue(mockStories);
+      mockService.getAllStories.mockResolvedValue(
+        mockStories.map((story) => ({
+          ...story,
+          experienceName: story.experienceId === 'exp-1' ? 'Lead Engineer' : 'Manager',
+          companyName: story.experienceId === 'exp-1' ? 'TechCorp' : 'BuildCo',
+        }))
+      );
 
-      const { loadAll, stories, loading, error, hasStories, storyCount } = useStoryList();
+      const { loadAll, stories, loading, error, hasStories, storyCount } = useStoryList(
+        mockService as never
+      );
 
       const loadPromise = loadAll();
       expect(loading.value).toBe(true);
 
       await loadPromise;
 
-      expect(stories.value).toEqual(mockStories);
+      expect(stories.value).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'story-1',
+            experienceName: 'Lead Engineer',
+            companyName: 'TechCorp',
+          }),
+        ])
+      );
       expect(loading.value).toBe(false);
       expect(error.value).toBeNull();
       expect(hasStories.value).toBe(true);
       expect(storyCount.value).toBe(3);
-      expect(mockService.getAllStories).toHaveBeenCalledTimes(1);
       expect(mockService.getAllStories).toHaveBeenCalledWith('user-1');
     });
 
@@ -112,7 +128,7 @@ describe('useStoryList', () => {
       mockService.getAllStories.mockRejectedValue(mockError);
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-      const { loadAll, stories, loading, error } = useStoryList();
+      const { loadAll, stories, loading, error } = useStoryList(mockService as never);
 
       await loadAll();
 

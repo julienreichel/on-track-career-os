@@ -25,6 +25,8 @@ export type AmplifySTARStoryModel = {
 
 type ExperienceWithStories = {
   id: string;
+  title?: string | null;
+  companyName?: string | null;
   stories?: (STARStory | null)[] | null;
 };
 
@@ -89,13 +91,34 @@ export class STARStoryRepository {
       return [];
     }
 
-    const selectionSet = ['id', 'experiences.id', 'experiences.stories.*'];
+    const selectionSet = [
+      'id',
+      'experiences.id',
+      'experiences.title',
+      'experiences.companyName',
+      'experiences.stories.*',
+    ];
 
     const { data } = await this._userProfileModel.get({ id: userId }, gqlOptions({ selectionSet }));
 
     const profile = data as UserProfileWithExperiences | null;
     const experiences = profile?.experiences ?? [];
-    const stories = experiences.flatMap((experience) => experience?.stories ?? []);
+    const stories = experiences.flatMap((experience) => {
+      if (!experience) {
+        return [];
+      }
+      const experienceStories = experience.stories ?? [];
+      return experienceStories.map((story) => {
+        if (!story) {
+          return null;
+        }
+        return {
+          ...story,
+          experienceName: experience.title ?? undefined,
+          companyName: experience.companyName ?? undefined,
+        };
+      });
+    });
 
     return stories.filter((story): story is STARStory => Boolean(story));
   }

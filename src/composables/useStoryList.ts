@@ -9,6 +9,7 @@ import type { Experience } from '@/domain/experience/Experience';
  */
 export interface StoryWithExperience extends STARStory {
   experienceName?: string;
+  companyName?: string;
 }
 
 /**
@@ -32,7 +33,7 @@ export interface GroupedStories {
 // eslint-disable-next-line max-lines-per-function -- Composable requires comprehensive interface
 export function useStoryList(service = new STARStoryService()) {
   // State
-  const stories = ref<STARStory[]>([]);
+  const stories = ref<StoryWithExperience[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
   const auth = useAuthUser();
