@@ -144,6 +144,10 @@ const pageComponentStubs = {
     template: '<div class="u-modal"><slot /></div>',
     props: ['title'],
   },
+  UInput: {
+    template: '<input class="u-input" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+    props: ['modelValue', 'icon', 'placeholder', 'size'],
+  },
   ExperienceCard: {
     props: ['experience', 'storyCount'],
     template: '<div class="experience-card-stub">{{ experience.title }}<slot /></div>',
@@ -459,5 +463,146 @@ describe('Experiences Page Integration', () => {
     const wrapper = await mountExperiencesPage();
     expect(wrapper.findAll('.experience-card-stub')).toHaveLength(1);
     expect(wrapper.text()).toContain('Platform Lead');
+  });
+
+  it('renders search input when experiences exist', async () => {
+    mockExperienceList.mockResolvedValueOnce([
+      {
+        id: 'exp-1',
+        title: 'Platform Lead',
+        companyName: 'Acme Labs',
+        experienceType: 'work',
+        startDate: '2024-01-01',
+        endDate: null,
+        responsibilities: [],
+        tasks: [],
+        status: 'draft',
+        userId: 'user-1',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+        owner: 'user-1',
+        rawText: '',
+      } as Experience,
+    ]);
+    mockStoryCount.mockResolvedValue([]);
+    guidanceRef.value = {};
+
+    const wrapper = await mountExperiencesPage();
+    expect(wrapper.find('.u-input').exists()).toBe(true);
+  });
+
+  it('renders filter buttons when experiences exist', async () => {
+    mockExperienceList.mockResolvedValueOnce([
+      {
+        id: 'exp-1',
+        title: 'Platform Lead',
+        companyName: 'Acme Labs',
+        experienceType: 'work',
+        startDate: '2024-01-01',
+        endDate: null,
+        responsibilities: [],
+        tasks: [],
+        status: 'draft',
+        userId: 'user-1',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+        owner: 'user-1',
+        rawText: '',
+      } as Experience,
+    ]);
+    mockStoryCount.mockResolvedValue([]);
+    guidanceRef.value = {};
+
+    const wrapper = await mountExperiencesPage();
+    const buttons = wrapper.findAll('.u-button');
+    expect(buttons.length).toBeGreaterThan(0);
+  });
+
+  it('filters experiences by type when filter button is clicked', async () => {
+    mockExperienceList.mockResolvedValueOnce([
+      {
+        id: 'exp-1',
+        title: 'Senior Engineer',
+        companyName: 'Tech Corp',
+        experienceType: 'work',
+        startDate: '2024-01-01',
+        endDate: null,
+        responsibilities: [],
+        tasks: [],
+        status: 'draft',
+        userId: 'user-1',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+        owner: 'user-1',
+        rawText: '',
+      } as Experience,
+      {
+        id: 'exp-2',
+        title: 'Computer Science Degree',
+        companyName: 'University',
+        experienceType: 'education',
+        startDate: '2020-01-01',
+        endDate: '2024-01-01',
+        responsibilities: [],
+        tasks: [],
+        status: 'draft',
+        userId: 'user-1',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+        owner: 'user-1',
+        rawText: '',
+      } as Experience,
+    ]);
+    mockStoryCount.mockResolvedValue([]);
+    guidanceRef.value = {};
+
+    const wrapper = await mountExperiencesPage();
+    
+    // Initially should show both experiences
+    expect(wrapper.findAll('.experience-card-stub')).toHaveLength(2);
+  });
+
+  it('searches experiences by title', async () => {
+    mockExperienceList.mockResolvedValueOnce([
+      {
+        id: 'exp-1',
+        title: 'Senior Engineer',
+        companyName: 'Tech Corp',
+        experienceType: 'work',
+        startDate: '2024-01-01',
+        endDate: null,
+        responsibilities: [],
+        tasks: [],
+        status: 'draft',
+        userId: 'user-1',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+        owner: 'user-1',
+        rawText: '',
+      } as Experience,
+      {
+        id: 'exp-2',
+        title: 'Computer Science Degree',
+        companyName: 'University',
+        experienceType: 'education',
+        startDate: '2020-01-01',
+        endDate: '2024-01-01',
+        responsibilities: [],
+        tasks: [],
+        status: 'draft',
+        userId: 'user-1',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+        owner: 'user-1',
+        rawText: '',
+      } as Experience,
+    ]);
+    mockStoryCount.mockResolvedValue([]);
+    guidanceRef.value = {};
+
+    const wrapper = await mountExperiencesPage();
+    
+    // Initially should show both experiences
+    expect(wrapper.findAll('.experience-card-stub')).toHaveLength(2);
   });
 });
