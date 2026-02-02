@@ -219,7 +219,7 @@ onMounted(async () => {
         :links="[
           {
             label: t('stories.builder.backToStories'),
-            to: `/profile/experiences/${experienceId}/stories`,
+            to: `/profile/stories`,
             icon: 'i-heroicons-arrow-left',
           },
         ]"
