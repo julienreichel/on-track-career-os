@@ -76,17 +76,14 @@ export function useCvParsing() {
 
     extractedText.value = text;
 
-    // Parse CV text to extract sections
+    // Parse CV text to extract profile data and experience items
     await aiOps.parseCv(text);
 
     if (aiOps.error.value) {
       throw new Error(aiOps.error.value);
     }
 
-    if (
-      !aiOps.parsedCv.value?.sections?.experiencesBlocks ||
-      aiOps.parsedCv.value.sections.experiencesBlocks.length === 0
-    ) {
+    if (!aiOps.parsedCv.value?.experienceItems || aiOps.parsedCv.value.experienceItems.length === 0) {
       throw new Error(t('cvUpload.errors.parsingFailed'));
     }
 
@@ -95,15 +92,8 @@ export function useCvParsing() {
       extractedProfile.value = aiOps.parsedCv.value.profile;
     }
 
-    // Extract experiences from both work and education sections
-    const workExperiences = await extractExperiencesFromSection(
-      aiOps.parsedCv.value.sections.experiencesBlocks
-    );
-    const educationExperiences = await extractExperiencesFromSection(
-      aiOps.parsedCv.value.sections.educationBlocks || []
-    );
-
-    const allExperiences = [...workExperiences, ...educationExperiences];
+    const experienceBlocks = aiOps.parsedCv.value.experienceItems.map((item) => item.rawBlock);
+    const allExperiences = await extractExperiencesFromSection(experienceBlocks);
 
     if (allExperiences.length === 0) {
       throw new Error(t('cvUpload.errors.extractionFailed'));
@@ -123,7 +113,8 @@ export function useCvParsing() {
 
   function removeProfileField(field: keyof ParseCvTextOutput['profile']) {
     if (extractedProfile.value) {
-      extractedProfile.value[field] = undefined as never;
+      const currentValue = extractedProfile.value[field];
+      extractedProfile.value[field] = (Array.isArray(currentValue) ? [] : '') as never;
     }
   }
 
@@ -138,7 +129,7 @@ export function useCvParsing() {
     value: string | undefined
   ) {
     if (extractedProfile.value) {
-      extractedProfile.value[field] = (value || undefined) as never;
+      extractedProfile.value[field] = (value || '') as never;
     }
   }
 

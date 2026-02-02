@@ -30,7 +30,7 @@ export function useProfileMerge() {
   async function mergeProfile(
     userId: string,
     profile: ParseCvTextOutput['profile'],
-    parsedCv: ParsedCV | null
+    _parsedCv: ParsedCV | null
   ): Promise<void> {
     // Get existing profile
     const existingProfile = await userProfileRepo.get(userId);
@@ -66,18 +66,8 @@ export function useProfileMerge() {
     updateData.interests = mergeArrays(existingProfile.interests, profile.interests);
     updateData.languages = mergeArrays(existingProfile.languages, profile.languages);
 
-    // Merge skills from parsed CV sections
-    if (parsedCv?.sections?.skills) {
-      updateData.skills = mergeArrays(existingProfile.skills, parsedCv.sections.skills);
-    }
-
-    // Merge certifications from parsed CV sections
-    if (parsedCv?.sections?.certifications) {
-      updateData.certifications = mergeArrays(
-        existingProfile.certifications,
-        parsedCv.sections.certifications
-      );
-    }
+    updateData.skills = mergeArrays(existingProfile.skills, profile.skills);
+    updateData.certifications = mergeArrays(existingProfile.certifications, profile.certifications);
 
     await userProfileRepo.update(updateData as never);
   }

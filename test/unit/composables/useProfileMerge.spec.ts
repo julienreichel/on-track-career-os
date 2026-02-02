@@ -36,7 +36,26 @@ describe('useProfileMerge', () => {
     certifications: ['Cert 1'],
   });
 
+  const baseProfile: ParseCvTextOutput['profile'] = {
+    fullName: '',
+    headline: '',
+    location: '',
+    seniorityLevel: '',
+    primaryEmail: '',
+    primaryPhone: '',
+    workPermitInfo: '',
+    socialLinks: [],
+    aspirations: [],
+    personalValues: [],
+    strengths: [],
+    interests: [],
+    skills: [],
+    certifications: [],
+    languages: [],
+  };
+
   const mockExtractedProfile: ParseCvTextOutput['profile'] = {
+    ...baseProfile,
     fullName: 'John Updated',
     headline: 'Senior Software Engineer',
     location: 'San Francisco',
@@ -45,18 +64,16 @@ describe('useProfileMerge', () => {
     personalValues: ['Innovation'],
     strengths: ['Leadership'],
     interests: ['AI'],
+    skills: ['TypeScript', 'React'],
+    certifications: ['Cert 2'],
     languages: ['English', 'Spanish'],
   };
 
   const mockParsedCv: ParsedCV = {
-    sections: {
-      experiences: [],
-      education: [],
-      skills: ['TypeScript', 'React'],
-      certifications: ['Cert 2'],
-      rawBlocks: [],
-    },
     profile: mockExtractedProfile,
+    experienceItems: [],
+    rawBlocks: [],
+    confidence: 0.6,
   };
 
   it('should skip update if profile does not exist', async () => {
@@ -142,7 +159,7 @@ describe('useProfileMerge', () => {
     expect(updateCall.aspirations).toContain('Aspiration 1');
   });
 
-  it('should merge skills from parsed CV sections', async () => {
+  it('should merge skills from extracted profile', async () => {
     const { mergeProfile } = useProfileMerge();
 
     mockRepo.get.mockResolvedValue(getMockExistingProfile());
@@ -159,7 +176,7 @@ describe('useProfileMerge', () => {
     expect(updateCall.skills).toHaveLength(3);
   });
 
-  it('should merge certifications from parsed CV sections', async () => {
+  it('should merge certifications from extracted profile', async () => {
     const { mergeProfile } = useProfileMerge();
 
     mockRepo.get.mockResolvedValue(getMockExistingProfile());
@@ -185,11 +202,7 @@ describe('useProfileMerge', () => {
     mockRepo.update.mockResolvedValue({});
 
     const emptyProfile: ParseCvTextOutput['profile'] = {
-      aspirations: [],
-      personalValues: [],
-      strengths: [],
-      interests: [],
-      languages: [],
+      ...baseProfile,
     };
 
     await mergeProfile('user-123', emptyProfile, null);
@@ -237,8 +250,9 @@ describe('useProfileMerge', () => {
 
     // Should still merge profile data
     expect(updateCall.aspirations).toBeDefined();
-    // But skills/certifications from sections won't be added since parsedCv is null
-    expect(updateCall.skills).toBeUndefined();
+    expect(updateCall.skills).toContain('JavaScript');
+    expect(updateCall.skills).toContain('TypeScript');
+    expect(updateCall.skills).toContain('React');
   });
 
   it('should preserve existing values when new values are empty', async () => {
@@ -250,13 +264,9 @@ describe('useProfileMerge', () => {
     await mergeProfile(
       'user-123',
       {
+        ...baseProfile,
         fullName: '',
         headline: 'Updated Headline',
-        aspirations: [],
-        personalValues: [],
-        strengths: [],
-        interests: [],
-        languages: [],
       },
       mockParsedCv
     );
@@ -265,9 +275,8 @@ describe('useProfileMerge', () => {
 
     // Existing headline should be overridden
     expect(updateCall.headline).toBe('Updated Headline');
-    // Skills should still merge from existing + parsed CV
+    // Skills should still merge from existing + extracted profile
     expect(updateCall.skills).toContain('JavaScript');
-    expect(updateCall.skills).toContain('TypeScript');
   });
 
   it('should remove duplicate values in merged arrays', async () => {
@@ -282,11 +291,8 @@ describe('useProfileMerge', () => {
     await mergeProfile(
       'user-123',
       {
+        ...baseProfile,
         aspirations: ['Aspiration 2', 'Aspiration 3', 'Aspiration 2'],
-        personalValues: [],
-        strengths: [],
-        interests: [],
-        languages: [],
       },
       null
     );

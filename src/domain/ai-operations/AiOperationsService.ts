@@ -91,7 +91,7 @@ export class AiOperationsService {
   constructor(private repo = new AiOperationsRepository()) {}
 
   /**
-   * Parse CV text into structured sections with validation
+   * Parse CV text into structured profile data and experience items
    * @param cvText - Raw CV text content
    * @returns Structured CV data with confidence score
    * @throws Error if parsing fails or validation fails

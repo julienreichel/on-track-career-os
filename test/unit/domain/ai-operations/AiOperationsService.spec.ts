@@ -54,24 +54,35 @@ describe('AiOperationsService', () => {
     it('should successfully parse valid CV text', async () => {
       // Arrange
       const mockParsedCv: ParsedCV = {
-        sections: {
-          experiencesBlocks: ['Senior Developer at TechCorp (2020-2023)'],
-          educationBlocks: ['BSc Computer Science from MIT (2019)'],
-          skills: ['Python'],
-          certifications: ['AWS Certified'],
-          rawBlocks: ['Experience section...'],
-        },
         profile: {
           fullName: 'John Doe',
           headline: 'Senior Software Engineer',
           location: 'San Francisco, CA',
           seniorityLevel: 'Senior',
+          primaryEmail: '',
+          primaryPhone: '',
+          workPermitInfo: '',
+          socialLinks: [],
           aspirations: ['CTO'],
           personalValues: ['Innovation'],
           strengths: ['Problem solving'],
           interests: ['AI'],
+          skills: ['Python'],
+          certifications: ['AWS Certified'],
           languages: ['English'],
         },
+        experienceItems: [
+          {
+            experienceType: 'work',
+            rawBlock: 'Senior Developer at TechCorp (2020-2023)',
+          },
+          {
+            experienceType: 'education',
+            rawBlock: 'BSc Computer Science from MIT (2019)',
+          },
+        ],
+        rawBlocks: ['Experience section...'],
+        confidence: 0.7,
       };
 
       mockRepo.parseCvText.mockResolvedValue(mockParsedCv);

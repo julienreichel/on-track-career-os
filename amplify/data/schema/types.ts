@@ -1,29 +1,34 @@
 import { a } from '@aws-amplify/backend';
 
 export const schemaTypes = {
-  ParseCvTextSectionsType: a.customType({
-    experiencesBlocks: a.string().array().required(),
-    educationBlocks: a.string().array().required(),
+  ParseCvTextProfileType: a.customType({
+    fullName: a.string().required(),
+    headline: a.string().required(),
+    location: a.string().required(),
+    seniorityLevel: a.string().required(),
+    primaryEmail: a.string().required(),
+    primaryPhone: a.string().required(),
+    workPermitInfo: a.string().required(),
+    socialLinks: a.string().array().required(),
+    aspirations: a.string().array().required(),
+    personalValues: a.string().array().required(),
+    strengths: a.string().array().required(),
+    interests: a.string().array().required(),
     skills: a.string().array().required(),
     certifications: a.string().array().required(),
-    rawBlocks: a.string().array().required(),
+    languages: a.string().array().required(),
   }),
 
-  ParseCvTextProfileType: a.customType({
-    fullName: a.string(),
-    headline: a.string(),
-    location: a.string(),
-    seniorityLevel: a.string(),
-    aspirations: a.string().array(),
-    personalValues: a.string().array(),
-    strengths: a.string().array(),
-    interests: a.string().array(),
-    languages: a.string().array(),
+  ParseCvTextExperienceItemType: a.customType({
+    experienceType: a.string().required(),
+    rawBlock: a.string().required(),
   }),
 
   ParseCvTextOutputType: a.customType({
-    sections: a.ref('ParseCvTextSectionsType').required(),
     profile: a.ref('ParseCvTextProfileType').required(),
+    experienceItems: a.ref('ParseCvTextExperienceItemType').array().required(),
+    rawBlocks: a.string().array().required(),
+    confidence: a.float().required(),
   }),
 
   StarStoryType: a.customType({

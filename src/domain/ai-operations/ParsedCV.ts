@@ -9,6 +9,8 @@ import type { ParseCvTextInput, ParseCvTextOutput } from '@amplify/data/ai-opera
 export type ParseCvInput = ParseCvTextInput;
 export type ParsedCV = ParseCvTextOutput;
 
+export type ParsedCvExperienceType = 'work' | 'education' | 'volunteer' | 'project';
+
 /**
  * Type guard to validate ParsedCV structure
  */
@@ -17,16 +19,41 @@ export function isParsedCV(data: unknown): data is ParsedCV {
 
   const cv = data as Record<string, unknown>;
 
-  if (!cv.sections || typeof cv.sections !== 'object') return false;
   if (!cv.profile || typeof cv.profile !== 'object') return false;
+  if (!Array.isArray(cv.experienceItems)) return false;
+  if (!Array.isArray(cv.rawBlocks)) return false;
+  if (typeof cv.confidence !== 'number') return false;
 
-  const sections = cv.sections as Record<string, unknown>;
+  const profile = cv.profile as Record<string, unknown>;
+  const stringFields = [
+    'fullName',
+    'headline',
+    'location',
+    'seniorityLevel',
+    'primaryEmail',
+    'primaryPhone',
+    'workPermitInfo',
+  ];
+  const arrayFields = [
+    'socialLinks',
+    'aspirations',
+    'personalValues',
+    'strengths',
+    'interests',
+    'skills',
+    'certifications',
+    'languages',
+  ];
 
-  return (
-    Array.isArray(sections.experiencesBlocks) &&
-    Array.isArray(sections.educationBlocks) &&
-    Array.isArray(sections.skills) &&
-    Array.isArray(sections.certifications) &&
-    Array.isArray(sections.rawBlocks)
+  const hasStringFields = stringFields.every((key) => typeof profile[key] === 'string');
+  const hasArrayFields = arrayFields.every((key) => Array.isArray(profile[key]));
+  const hasExperienceItems = cv.experienceItems.every(
+    (item) =>
+      item &&
+      typeof item === 'object' &&
+      typeof (item as Record<string, unknown>).experienceType === 'string' &&
+      typeof (item as Record<string, unknown>).rawBlock === 'string'
   );
+
+  return hasStringFields && hasArrayFields && hasExperienceItems;
 }

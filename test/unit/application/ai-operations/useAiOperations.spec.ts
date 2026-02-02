@@ -60,13 +60,26 @@ describe('useAiOperations', () => {
   it('should successfully parse CV', async () => {
     // Arrange
     const mockParsedCv = {
-      sections: {
-        experiences: [],
-        education: [],
+      profile: {
+        fullName: '',
+        headline: '',
+        location: '',
+        seniorityLevel: '',
+        primaryEmail: '',
+        primaryPhone: '',
+        workPermitInfo: '',
+        socialLinks: [],
+        aspirations: [],
+        personalValues: [],
+        strengths: [],
+        interests: [],
         skills: [],
         certifications: [],
-        rawBlocks: [],
+        languages: [],
       },
+      experienceItems: [],
+      rawBlocks: [],
+      confidence: 0.5,
     } as ParsedCV;
     mockService.parseCvText.mockResolvedValue(mockParsedCv);
 
@@ -232,13 +245,26 @@ describe('useAiOperations', () => {
       reset,
     } = useAiOperations();
     parsedCv.value = {
-      sections: {
-        experiences: [],
-        education: [],
+      profile: {
+        fullName: '',
+        headline: '',
+        location: '',
+        seniorityLevel: '',
+        primaryEmail: '',
+        primaryPhone: '',
+        workPermitInfo: '',
+        socialLinks: [],
+        aspirations: [],
+        personalValues: [],
+        strengths: [],
+        interests: [],
         skills: [],
         certifications: [],
-        rawBlocks: [],
+        languages: [],
       },
+      experienceItems: [],
+      rawBlocks: [],
+      confidence: 0.5,
     } as ParsedCV;
     parsedJobDescription.value = {
       title: 'Example',

@@ -94,7 +94,7 @@ describe('AI Operations - Parse CV Text (E2E Sandbox)', () => {
     }
   }, 30000);
 
-  it('should parse CV text into structured sections', async () => {
+  it('should parse CV text into structured output', async () => {
     // Test input - realistic CV text
     const cvText = `
 John Doe
@@ -150,41 +150,37 @@ French (Basic)
     const parsedCv = await repository.parseCvText(cvText);
 
     // Validate structure (per AI Interaction Contract)
-    expect(parsedCv).toHaveProperty('sections');
     expect(parsedCv).toHaveProperty('profile');
-
-    // Validate sections
-    expect(parsedCv.sections).toHaveProperty('experiencesBlocks');
-    expect(parsedCv.sections).toHaveProperty('educationBlocks');
-    expect(parsedCv.sections).toHaveProperty('skills');
-    expect(parsedCv.sections).toHaveProperty('certifications');
-    expect(parsedCv.sections).toHaveProperty('rawBlocks');
+    expect(parsedCv).toHaveProperty('experienceItems');
+    expect(parsedCv).toHaveProperty('rawBlocks');
+    expect(parsedCv).toHaveProperty('confidence');
+    expect(typeof parsedCv.confidence).toBe('number');
 
     // All fields should be arrays
-    expect(Array.isArray(parsedCv.sections.experiencesBlocks)).toBe(true);
-    expect(Array.isArray(parsedCv.sections.educationBlocks)).toBe(true);
-    expect(Array.isArray(parsedCv.sections.skills)).toBe(true);
-    expect(Array.isArray(parsedCv.sections.certifications)).toBe(true);
-    expect(Array.isArray(parsedCv.sections.rawBlocks)).toBe(true);
+    expect(Array.isArray(parsedCv.experienceItems)).toBe(true);
+    expect(Array.isArray(parsedCv.rawBlocks)).toBe(true);
 
     // Validate profile object
     expect(parsedCv.profile).toBeDefined();
     expect(typeof parsedCv.profile).toBe('object');
 
     // Profile should have array fields
+    expect(Array.isArray(parsedCv.profile.socialLinks)).toBe(true);
     expect(Array.isArray(parsedCv.profile.aspirations)).toBe(true);
     expect(Array.isArray(parsedCv.profile.personalValues)).toBe(true);
     expect(Array.isArray(parsedCv.profile.strengths)).toBe(true);
     expect(Array.isArray(parsedCv.profile.interests)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.skills)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.certifications)).toBe(true);
     expect(Array.isArray(parsedCv.profile.languages)).toBe(true);
 
     console.log(parsedCv);
     // At least some content should be parsed
     const totalParsedItems =
-      parsedCv.sections.experiencesBlocks.length +
-      parsedCv.sections.educationBlocks.length +
-      parsedCv.sections.skills.length +
-      parsedCv.sections.certifications.length;
+      parsedCv.experienceItems.length +
+      parsedCv.rawBlocks.length +
+      parsedCv.profile.skills.length +
+      parsedCv.profile.certifications.length;
     expect(totalParsedItems).toBeGreaterThan(0);
 
     // Profile should have some extracted data (with real AI, not fake provider)
@@ -209,22 +205,23 @@ French (Basic)
     const parsedCv = await repository.parseCvText('');
 
     // Validate structure is returned (even if empty)
-    expect(parsedCv).toHaveProperty('sections');
     expect(parsedCv).toHaveProperty('profile');
+    expect(parsedCv).toHaveProperty('experienceItems');
+    expect(parsedCv).toHaveProperty('rawBlocks');
 
     // All section fields should be arrays (even if empty)
-    expect(Array.isArray(parsedCv.sections.experiencesBlocks)).toBe(true);
-    expect(Array.isArray(parsedCv.sections.educationBlocks)).toBe(true);
-    expect(Array.isArray(parsedCv.sections.skills)).toBe(true);
-    expect(Array.isArray(parsedCv.sections.certifications)).toBe(true);
-    expect(Array.isArray(parsedCv.sections.rawBlocks)).toBe(true);
+    expect(Array.isArray(parsedCv.experienceItems)).toBe(true);
+    expect(Array.isArray(parsedCv.rawBlocks)).toBe(true);
 
     // Profile should exist with empty/undefined fields
     expect(parsedCv.profile).toBeDefined();
+    expect(Array.isArray(parsedCv.profile.socialLinks)).toBe(true);
     expect(Array.isArray(parsedCv.profile.aspirations)).toBe(true);
     expect(Array.isArray(parsedCv.profile.personalValues)).toBe(true);
     expect(Array.isArray(parsedCv.profile.strengths)).toBe(true);
     expect(Array.isArray(parsedCv.profile.interests)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.skills)).toBe(true);
+    expect(Array.isArray(parsedCv.profile.certifications)).toBe(true);
     expect(Array.isArray(parsedCv.profile.languages)).toBe(true);
   }, 30000);
 
@@ -239,14 +236,15 @@ Skills: JavaScript, Python
     const parsedCv = await repository.parseCvText(minimalCv);
 
     // Validate structure
-    expect(parsedCv).toHaveProperty('sections');
     expect(parsedCv).toHaveProperty('profile');
+    expect(parsedCv).toHaveProperty('experienceItems');
+    expect(parsedCv).toHaveProperty('rawBlocks');
 
     // Should extract at least some information
     const hasContent =
-      parsedCv.sections.experiencesBlocks.length > 0 ||
-      parsedCv.sections.skills.length > 0 ||
-      parsedCv.sections.rawBlocks.length > 0;
+      parsedCv.experienceItems.length > 0 ||
+      parsedCv.profile.skills.length > 0 ||
+      parsedCv.rawBlocks.length > 0;
     expect(hasContent).toBe(true);
 
     // Profile should exist even if mostly empty

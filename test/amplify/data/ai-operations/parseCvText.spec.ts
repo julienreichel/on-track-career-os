@@ -126,24 +126,35 @@ English (Native), Spanish (Fluent)
       : [];
 
     return {
-      sections: {
-        experiencesBlocks: experiences,
-        educationBlocks: education,
-        skills,
-        certifications,
-        rawBlocks: [],
-      },
       profile: {
-        fullName,
-        headline,
-        location,
-        seniorityLevel: headline?.includes('Senior') ? 'Senior' : undefined,
+        fullName: fullName || '',
+        headline: headline || '',
+        location: location || '',
+        seniorityLevel: headline?.includes('Senior') ? 'Senior' : '',
+        primaryEmail: '',
+        primaryPhone: '',
+        workPermitInfo: '',
+        socialLinks: [],
         aspirations: [],
         personalValues: [],
         strengths: [],
         interests: [],
+        skills,
+        certifications,
         languages,
       },
+      experienceItems: [
+        ...experiences.map((rawBlock) => ({
+          experienceType: 'work',
+          rawBlock,
+        })),
+        ...education.map((rawBlock) => ({
+          experienceType: 'education',
+          rawBlock,
+        })),
+      ],
+      rawBlocks: [],
+      confidence: 0.78,
     };
   };
 
@@ -182,28 +193,26 @@ English (Native), Spanish (Fluent)
       });
 
       const parsed = result as {
-        sections: {
-          experiences: string[];
-          education: string[];
+        profile: {
+          fullName: string;
+          headline: string;
+          location: string;
+          seniorityLevel: string;
+          languages: string[];
           skills: string[];
           certifications: string[];
         };
-        profile: {
-          fullName?: string;
-          headline?: string;
-          location?: string;
-          seniorityLevel?: string;
-          languages: string[];
-        };
+        experienceItems: { experienceType: string; rawBlock: string }[];
+        rawBlocks: string[];
+        confidence: number;
       };
-      expect(parsed.sections.experiencesBlocks).toHaveLength(1);
-      expect(parsed.sections.experiencesBlocks[0]).toContain('TechCorp');
-      expect(parsed.sections.educationBlocks).toHaveLength(1);
-      expect(parsed.sections.educationBlocks[0]).toContain('MIT');
-      expect(parsed.sections.skills).toHaveLength(3);
-      expect(parsed.sections.skills).toContain('JavaScript');
-      expect(parsed.sections.certifications).toHaveLength(1);
-      expect(parsed.sections.certifications[0]).toContain('AWS Certified');
+      expect(parsed.experienceItems).toHaveLength(2);
+      expect(parsed.experienceItems[0]?.rawBlock).toContain('TechCorp');
+      expect(parsed.experienceItems[1]?.rawBlock).toContain('MIT');
+      expect(parsed.profile.skills).toHaveLength(3);
+      expect(parsed.profile.skills).toContain('JavaScript');
+      expect(parsed.profile.certifications).toHaveLength(1);
+      expect(parsed.profile.certifications[0]).toContain('AWS Certified');
 
       // Verify profile information extraction
       expect(parsed.profile).toBeDefined();
@@ -216,10 +225,12 @@ English (Native), Spanish (Fluent)
     });
     it('should validate output structure and apply operation-specific fallbacks', async () => {
       const mockBedrockResponse = {
-        sections: {
-          experiencesBlocks: ['Some experience'],
-          // Missing fields will be filled by operation-specific validation
-        },
+        experienceItems: [
+          {
+            experienceType: 'work',
+            rawBlock: 'Some experience',
+          },
+        ],
         profile: {
           fullName: 'Test User',
           // Missing profile fields will be filled by validation
@@ -243,28 +254,27 @@ English (Native), Spanish (Fluent)
       });
 
       const parsed = result as {
-        sections: {
-          experiences: string[];
-          education: string[];
-          skills: string[];
-          certifications: string[];
-          rawBlocks: string[];
-        };
         profile: {
-          fullName?: string;
+          fullName: string;
           aspirations: string[];
           personalValues: string[];
           strengths: string[];
           interests: string[];
           languages: string[];
+          skills: string[];
+          certifications: string[];
         };
+        experienceItems: { experienceType: string; rawBlock: string }[];
+        rawBlocks: string[];
+        confidence: number;
       };
-      expect(parsed.sections.experiencesBlocks).toEqual(['Some experience']);
+      expect(parsed.experienceItems).toEqual([
+        { experienceType: 'work', rawBlock: 'Some experience' },
+      ]);
       // Operation-specific validation fills missing fields
-      expect(parsed.sections.educationBlocks).toEqual([]);
-      expect(parsed.sections.skills).toEqual([]);
-      expect(parsed.sections.certifications).toEqual([]);
-      expect(parsed.sections.rawBlocks).toEqual([]);
+      expect(parsed.rawBlocks).toEqual([]);
+      expect(parsed.profile.skills).toEqual([]);
+      expect(parsed.profile.certifications).toEqual([]);
 
       // Verify profile validation
       expect(parsed.profile).toBeDefined();
@@ -273,7 +283,7 @@ English (Native), Spanish (Fluent)
       expect(parsed.profile.languages).toEqual([]);
     });
 
-    it('should apply fallback when sections field is missing', async () => {
+    it('should apply fallback when profile and experience items are missing', async () => {
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
@@ -282,7 +292,7 @@ English (Native), Spanish (Fluent)
                 content: [
                   {
                     text: JSON.stringify({
-                      // Missing required sections field
+                      // Missing required fields
                     }),
                   },
                 ],
@@ -296,37 +306,79 @@ English (Native), Spanish (Fluent)
         arguments: { cvText: mockCvText },
       });
       const result = resultString as {
-        sections: {
-          experiences: string[];
-          education: string[];
-          skills: string[];
-          certifications: string[];
-          rawBlocks: string[];
-        };
         profile: {
+          fullName: string;
           aspirations: string[];
           personalValues: string[];
           strengths: string[];
           interests: string[];
           languages: string[];
+          skills: string[];
+          certifications: string[];
         };
+        experienceItems: { experienceType: string; rawBlock: string }[];
+        rawBlocks: string[];
+        confidence: number;
       };
 
-      // Should apply fallback structure for missing sections
-      expect(result.sections).toBeDefined();
-      expect(result.sections.experiencesBlocks).toEqual([]);
-      expect(result.sections.educationBlocks).toEqual([]);
-      expect(result.sections.skills).toEqual([]);
-      expect(result.sections.certifications).toEqual([]);
-      expect(result.sections.rawBlocks).toEqual([]);
+      // Should apply fallback structure for missing fields
+      expect(result.experienceItems).toEqual([]);
+      expect(result.rawBlocks).toEqual([]);
 
       // Should apply fallback for missing profile
       expect(result.profile).toBeDefined();
+      expect(result.profile.fullName).toBe('');
       expect(result.profile.aspirations).toEqual([]);
       expect(result.profile.personalValues).toEqual([]);
       expect(result.profile.strengths).toEqual([]);
       expect(result.profile.interests).toEqual([]);
       expect(result.profile.languages).toEqual([]);
+    });
+
+    it('should repair string arrays and invalid experience items', async () => {
+      mockSend.mockResolvedValueOnce({
+        body: Buffer.from(
+          JSON.stringify({
+            output: {
+              message: {
+                content: [
+                  {
+                    text: JSON.stringify({
+                      profile: {
+                        fullName: 'Test User',
+                        languages: 'English, Spanish',
+                        personalValues: 'Integrity\nCollaboration',
+                      },
+                      experienceItems: [
+                        { experienceType: 'unknown', rawBlock: 'Unclassified block' },
+                        { experienceType: 'work', rawBlock: 'Valid work block' },
+                      ],
+                      rawBlocks: 'Loose block',
+                      confidence: 0.6,
+                    }),
+                  },
+                ],
+              },
+            },
+          })
+        ),
+      });
+
+      const result = (await handler({
+        arguments: { cvText: mockCvText },
+      })) as {
+        profile: { languages: string[]; personalValues: string[] };
+        experienceItems: { experienceType: string; rawBlock: string }[];
+        rawBlocks: string[];
+      };
+
+      expect(result.profile.languages).toEqual(['English', 'Spanish']);
+      expect(result.profile.personalValues).toEqual(['Integrity', 'Collaboration']);
+      expect(result.experienceItems).toEqual([
+        { experienceType: 'work', rawBlock: 'Valid work block' },
+      ]);
+      expect(result.rawBlocks).toContain('Unclassified block');
+      expect(result.rawBlocks).toContain('Loose block');
     });
   });
 });

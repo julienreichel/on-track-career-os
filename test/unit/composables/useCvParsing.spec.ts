@@ -98,6 +98,24 @@ describe('useCvParsing', () => {
     vi.mocked(useAiOperations).mockReturnValue(mockAiOps as never);
   });
 
+  const baseProfile = {
+    fullName: '',
+    headline: '',
+    location: '',
+    seniorityLevel: '',
+    primaryEmail: '',
+    primaryPhone: '',
+    workPermitInfo: '',
+    socialLinks: [],
+    aspirations: [],
+    personalValues: [],
+    strengths: [],
+    interests: [],
+    skills: [],
+    certifications: [],
+    languages: [],
+  };
+
   describe('initialization', () => {
     it('should initialize with empty values', () => {
       const parsing = useCvParsing();
@@ -120,16 +138,18 @@ describe('useCvParsing', () => {
       vi.mocked(PDFParse).mockImplementation(() => mockParser as never);
 
       mockAiOps.parsedCv.value = {
-        sections: {
-          experiencesBlocks: ['Experience 1'],
-          educationBlocks: [],
-          skills: [],
-          certifications: [],
-          rawBlocks: [],
-        },
         profile: {
+          ...baseProfile,
           fullName: 'John Doe',
         },
+        experienceItems: [
+          {
+            experienceType: 'work',
+            rawBlock: 'Experience 1',
+          },
+        ],
+        rawBlocks: [],
+        confidence: 0.6,
       };
 
       mockAiOps.experiences.value = [
@@ -150,7 +170,10 @@ describe('useCvParsing', () => {
       expect(parsing.extractedText.value).toBe('Extracted PDF text');
       expect(mockAiOps.parseCv).toHaveBeenCalledWith('Extracted PDF text');
       expect(parsing.extractedExperiences.value).toHaveLength(1);
-      expect(parsing.extractedProfile.value).toEqual({ fullName: 'John Doe' });
+      expect(parsing.extractedProfile.value).toEqual({
+        ...baseProfile,
+        fullName: 'John Doe',
+      });
     });
 
     it('should throw error for PDF with no text', async () => {
@@ -173,14 +196,15 @@ describe('useCvParsing', () => {
       const textFile = new File(['Plain text CV'], 'test.txt', { type: 'text/plain' });
 
       mockAiOps.parsedCv.value = {
-        sections: {
-          experiencesBlocks: ['Experience 1'],
-          educationBlocks: [],
-          skills: [],
-          certifications: [],
-          rawBlocks: [],
-        },
-        profile: {},
+        profile: { ...baseProfile },
+        experienceItems: [
+          {
+            experienceType: 'work',
+            rawBlock: 'Experience 1',
+          },
+        ],
+        rawBlocks: [],
+        confidence: 0.5,
       };
 
       mockAiOps.experiences.value = [
@@ -224,14 +248,10 @@ describe('useCvParsing', () => {
       const textFile = new File(['CV text'], 'test.txt', { type: 'text/plain' });
 
       mockAiOps.parsedCv.value = {
-        sections: {
-          experiencesBlocks: [],
-          educationBlocks: [],
-          skills: [],
-          certifications: [],
-          rawBlocks: [],
-        },
-        profile: {},
+        profile: { ...baseProfile },
+        experienceItems: [],
+        rawBlocks: [],
+        confidence: 0.2,
       };
 
       await expect(parsing.parseFile(textFile)).rejects.toThrow('cvUpload.errors.parsingFailed');
@@ -242,14 +262,15 @@ describe('useCvParsing', () => {
       const textFile = new File(['CV text'], 'test.txt', { type: 'text/plain' });
 
       mockAiOps.parsedCv.value = {
-        sections: {
-          experiencesBlocks: ['Experience 1'],
-          educationBlocks: [],
-          skills: [],
-          certifications: [],
-          rawBlocks: [],
-        },
-        profile: {},
+        profile: { ...baseProfile },
+        experienceItems: [
+          {
+            experienceType: 'work',
+            rawBlock: 'Experience 1',
+          },
+        ],
+        rawBlocks: [],
+        confidence: 0.4,
       };
 
       mockAiOps.error.value = 'Extraction error';
@@ -262,14 +283,15 @@ describe('useCvParsing', () => {
       const textFile = new File(['CV text'], 'test.txt', { type: 'text/plain' });
 
       mockAiOps.parsedCv.value = {
-        sections: {
-          experiencesBlocks: ['Experience 1'],
-          educationBlocks: [],
-          skills: [],
-          certifications: [],
-          rawBlocks: [],
-        },
-        profile: {},
+        profile: { ...baseProfile },
+        experienceItems: [
+          {
+            experienceType: 'work',
+            rawBlock: 'Experience 1',
+          },
+        ],
+        rawBlocks: [],
+        confidence: 0.4,
       };
 
       mockAiOps.experiences.value = null;
@@ -335,20 +357,16 @@ describe('useCvParsing', () => {
       const parsing = useCvParsing();
 
       parsing.extractedProfile.value = {
+        ...baseProfile,
         fullName: 'John Doe',
         headline: 'Developer',
         location: 'SF',
         seniorityLevel: 'Senior',
-        aspirations: [],
-        personalValues: [],
-        strengths: [],
-        interests: [],
-        languages: [],
       };
 
       parsing.removeProfileField('fullName');
 
-      expect(parsing.extractedProfile.value.fullName).toBeUndefined();
+      expect(parsing.extractedProfile.value.fullName).toBe('');
       expect(parsing.extractedProfile.value.headline).toBe('Developer');
     });
 
@@ -366,11 +384,8 @@ describe('useCvParsing', () => {
       const parsing = useCvParsing();
 
       parsing.extractedProfile.value = {
+        ...baseProfile,
         aspirations: ['Aspiration 1', 'Aspiration 2', 'Aspiration 3'],
-        personalValues: [],
-        strengths: [],
-        interests: [],
-        languages: [],
       };
 
       parsing.removeProfileArrayItem('aspirations', 1);
@@ -391,12 +406,8 @@ describe('useCvParsing', () => {
       const parsing = useCvParsing();
 
       parsing.extractedProfile.value = {
+        ...baseProfile,
         fullName: 'John',
-        aspirations: [],
-        personalValues: [],
-        strengths: [],
-        interests: [],
-        languages: [],
       };
 
       expect(() => parsing.removeProfileArrayItem('fullName' as never, 0)).not.toThrow();
@@ -420,12 +431,8 @@ describe('useCvParsing', () => {
         },
       ];
       parsing.extractedProfile.value = {
+        ...baseProfile,
         fullName: 'John',
-        aspirations: [],
-        personalValues: [],
-        strengths: [],
-        interests: [],
-        languages: [],
       };
 
       parsing.reset();
@@ -443,22 +450,20 @@ describe('useCvParsing', () => {
       const textFile = new File(['CV text'], 'test.txt', { type: 'text/plain' });
 
       mockAiOps.parsedCv.value = {
-        sections: {
-          experiencesBlocks: ['Experience 1'],
-          educationBlocks: [],
-          skills: [],
-          certifications: [],
-          rawBlocks: [],
-        },
         profile: {
+          ...baseProfile,
           fullName: 'Jane Smith',
           headline: 'Engineer',
           aspirations: ['Aspiration 1'],
-          personalValues: [],
-          strengths: [],
-          interests: [],
-          languages: [],
         },
+        experienceItems: [
+          {
+            experienceType: 'work',
+            rawBlock: 'Experience 1',
+          },
+        ],
+        rawBlocks: [],
+        confidence: 0.6,
       };
 
       mockAiOps.experiences.value = [
@@ -476,13 +481,10 @@ describe('useCvParsing', () => {
       await parsing.parseFile(textFile);
 
       expect(parsing.extractedProfile.value).toEqual({
+        ...baseProfile,
         fullName: 'Jane Smith',
         headline: 'Engineer',
         aspirations: ['Aspiration 1'],
-        personalValues: [],
-        strengths: [],
-        interests: [],
-        languages: [],
       });
     });
 
@@ -491,14 +493,15 @@ describe('useCvParsing', () => {
       const textFile = new File(['CV text'], 'test.txt', { type: 'text/plain' });
 
       mockAiOps.parsedCv.value = {
-        sections: {
-          experiencesBlocks: ['Experience 1'],
-          educationBlocks: [],
-          skills: [],
-          certifications: [],
-          rawBlocks: [],
-        },
         profile: undefined,
+        experienceItems: [
+          {
+            experienceType: 'work',
+            rawBlock: 'Experience 1',
+          },
+        ],
+        rawBlocks: [],
+        confidence: 0.5,
       };
 
       mockAiOps.experiences.value = [

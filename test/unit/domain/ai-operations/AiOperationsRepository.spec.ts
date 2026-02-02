@@ -107,14 +107,30 @@ describe('AiOperationsRepository', () => {
     it('should parse CV text and return structured data', async () => {
       const mockCvText = 'Senior Software Engineer at Tech Corp\n2020-2023';
       const mockParsedData = {
-        sections: {
-          experiences: ['Experience 1', 'Experience 2'],
-          education: ['Education 1'],
+        profile: {
+          fullName: '',
+          headline: '',
+          location: '',
+          seniorityLevel: '',
+          primaryEmail: '',
+          primaryPhone: '',
+          workPermitInfo: '',
+          socialLinks: [],
+          aspirations: [],
+          personalValues: [],
+          strengths: [],
+          interests: [],
           skills: ['Skill 1', 'Skill 2'],
           certifications: [],
-          rawBlocks: [],
+          languages: [],
         },
-        profile: {},
+        experienceItems: [
+          { experienceType: 'work', rawBlock: 'Experience 1' },
+          { experienceType: 'work', rawBlock: 'Experience 2' },
+          { experienceType: 'education', rawBlock: 'Education 1' },
+        ],
+        rawBlocks: [],
+        confidence: 0.5,
       };
 
       mockClient.parseCvText.mockResolvedValue({
