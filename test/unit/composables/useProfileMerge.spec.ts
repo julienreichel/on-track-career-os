@@ -34,6 +34,10 @@ describe('useProfileMerge', () => {
     aspirations: ['Aspiration 1'],
     skills: ['JavaScript'],
     certifications: ['Cert 1'],
+    socialLinks: ['https://example.com'],
+    primaryEmail: 'existing@example.com',
+    primaryPhone: '',
+    workPermitInfo: '',
   });
 
   const baseProfile: ParseCvTextOutput['profile'] = {
@@ -60,6 +64,10 @@ describe('useProfileMerge', () => {
     headline: 'Senior Software Engineer',
     location: 'San Francisco',
     seniorityLevel: 'Senior',
+    primaryEmail: 'john.updated@example.com',
+    primaryPhone: '+1 555 0101',
+    workPermitInfo: 'B Permit',
+    socialLinks: ['https://linkedin.com/in/john-updated'],
     aspirations: ['Aspiration 2', 'Aspiration 3'],
     personalValues: ['Innovation'],
     strengths: ['Leadership'],
@@ -210,6 +218,7 @@ describe('useProfileMerge', () => {
     const updateCall = mockRepo.update.mock.calls[0][0];
 
     expect(updateCall.aspirations).toEqual([]);
+    expect(updateCall.socialLinks).toEqual([]);
   });
 
   it('should update all profile fields', async () => {
@@ -229,6 +238,9 @@ describe('useProfileMerge', () => {
     expect(updateCall.headline).toBe('Senior Software Engineer');
     expect(updateCall.location).toBe('San Francisco');
     expect(updateCall.seniorityLevel).toBe('Senior');
+    expect(updateCall.primaryPhone).toBe('+1 555 0101');
+    expect(updateCall.workPermitInfo).toBe('B Permit');
+    expect(updateCall.socialLinks).toContain('https://linkedin.com/in/john-updated');
     expect(updateCall.aspirations).toContain('Aspiration 2');
     expect(updateCall.personalValues).toContain('Innovation');
     expect(updateCall.strengths).toContain('Leadership');
@@ -253,6 +265,8 @@ describe('useProfileMerge', () => {
     expect(updateCall.skills).toContain('JavaScript');
     expect(updateCall.skills).toContain('TypeScript');
     expect(updateCall.skills).toContain('React');
+    expect(updateCall.socialLinks).toContain('https://example.com');
+    expect(updateCall.socialLinks).toContain('https://linkedin.com/in/john-updated');
   });
 
   it('should preserve existing values when new values are empty', async () => {

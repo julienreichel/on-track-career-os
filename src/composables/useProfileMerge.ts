@@ -58,6 +58,15 @@ export function useProfileMerge() {
     if (profile.seniorityLevel) {
       updateData.seniorityLevel = profile.seniorityLevel || existingProfile.seniorityLevel;
     }
+    if (profile.primaryEmail && !existingProfile.primaryEmail) {
+      updateData.primaryEmail = profile.primaryEmail;
+    }
+    if (profile.primaryPhone && !existingProfile.primaryPhone) {
+      updateData.primaryPhone = profile.primaryPhone;
+    }
+    if (profile.workPermitInfo && !existingProfile.workPermitInfo) {
+      updateData.workPermitInfo = profile.workPermitInfo;
+    }
 
     // Merge arrays
     updateData.aspirations = mergeArrays(existingProfile.aspirations, profile.aspirations);
@@ -65,6 +74,7 @@ export function useProfileMerge() {
     updateData.strengths = mergeArrays(existingProfile.strengths, profile.strengths);
     updateData.interests = mergeArrays(existingProfile.interests, profile.interests);
     updateData.languages = mergeArrays(existingProfile.languages, profile.languages);
+    updateData.socialLinks = mergeArrays(existingProfile.socialLinks, profile.socialLinks);
 
     updateData.skills = mergeArrays(existingProfile.skills, profile.skills);
     updateData.certifications = mergeArrays(existingProfile.certifications, profile.certifications);
