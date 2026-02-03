@@ -492,8 +492,20 @@
           "label": "Result",
           "placeholder": "What was the result of your actions?",
           "hint": "What was the outcome or impact?"
+        },
+        "achievements": {
+          "label": "Achievements",
+          "list": "Achievements",
+          "placeholder": "Add achievement",
+          "hint": "Press Enter to add each achievement"
+        },
+        "kpis": {
+          "list": "KPI Suggestions",
+          "placeholder": "Add KPI",
+          "hint": "Press Enter to add each KPI"
         }
-      }
+      },
+      "generateAchievements": "Generate Achievements"
     }
   },
   "star": {

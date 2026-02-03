@@ -56,9 +56,9 @@ describe('Applications index page', () => {
 
   it('renders CV, cover letter, and speech cards', async () => {
     const wrapper = await mountPage();
-    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.list.title'));
-    expect(wrapper.text()).toContain(i18n.global.t('coverLetter.list.title'));
-    expect(wrapper.text()).toContain(i18n.global.t('speech.list.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.page.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('coverLetters.page.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('speeches.page.title'));
   });
 
   it('renders back to home link', async () => {

@@ -87,7 +87,7 @@ describe('Job Upload Page', () => {
   it('renders header and upload component', async () => {
     const wrapper = await mountPage();
     const header = wrapper.find('.u-page-header');
-    expect(header.text()).toContain(i18n.global.t('jobUpload.title'));
+    expect(header.text()).toContain(i18n.global.t('jobs.form.createTitle'));
     expect(wrapper.findComponent(JobUploadStepStub).exists()).toBe(true);
   });
 

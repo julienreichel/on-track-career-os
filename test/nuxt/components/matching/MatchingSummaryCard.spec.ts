@@ -63,6 +63,6 @@ describe('MatchingSummaryCard', () => {
     });
 
     expect(wrapper.text()).toContain('0');
-    expect(wrapper.text()).toContain('⚠️');
+    expect(wrapper.text()).toContain('Moderate Match - Consider');
   });
 });

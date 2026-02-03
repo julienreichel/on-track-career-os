@@ -109,20 +109,20 @@ describe('ExperienceList', () => {
 
   it('displays title', () => {
     const wrapper = createWrapper();
-    expect(wrapper.text()).toContain('Your Experiences');
+    expect(wrapper.text()).toContain(i18n.global.t('experiences.list.title'));
   });
 
   it('displays add new button', () => {
     const wrapper = createWrapper();
     const buttons = wrapper.findAllComponents({ name: 'UButton' });
-    expect(buttons.some((btn) => btn.props('label') === 'Add Experience')).toBe(true);
+    expect(buttons.some((btn) => btn.props('label') === i18n.global.t('experiences.list.addNew'))).toBe(true);
   });
 
   it('emits edit event with empty id when add new button clicked', async () => {
     const wrapper = createWrapper();
     const addButton = wrapper
       .findAllComponents({ name: 'UButton' })
-      .find((btn) => btn.props('label') === 'Add Experience');
+      .find((btn) => btn.props('label') === i18n.global.t('experiences.list.addNew'));
 
     await addButton?.trigger('click');
     expect(wrapper.emitted('edit')).toBeTruthy();

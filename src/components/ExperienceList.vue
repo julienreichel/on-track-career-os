@@ -156,10 +156,10 @@ function getTypeBadge(type: string) {
   <UCard>
     <template #header>
       <UPageHeader
-        :title="t('experiences.page.title')"
+        :title="t('experiences.list.title')"
         :links="[
           {
-            label: t('common.actions.add'),
+            label: t('experiences.list.addNew'),
             icon: 'i-heroicons-plus',
             onClick: () => emit('edit', ''),
           },
