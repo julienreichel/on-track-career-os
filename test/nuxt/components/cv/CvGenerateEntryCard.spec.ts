@@ -31,9 +31,15 @@ describe('CvGenerateEntryCard', () => {
 
     expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.generate.entry.title'));
     expect(wrapper.text()).toContain('Classic');
-    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.generate.entry.sections', { count: 5 }));
-    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.generate.entry.experiences', { count: 3 }));
-    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.generate.entry.showProfilePhotoDisabled'));
+    expect(wrapper.text()).toContain(
+      i18n.global.t('applications.cvs.generate.entry.sections', { count: 5 })
+    );
+    expect(wrapper.text()).toContain(
+      i18n.global.t('applications.cvs.generate.entry.experiences', { count: 3 })
+    );
+    expect(wrapper.text()).toContain(
+      i18n.global.t('applications.cvs.generate.entry.showProfilePhotoDisabled')
+    );
   });
 
   it('emits generate when button is clicked', async () => {
@@ -52,7 +58,9 @@ describe('CvGenerateEntryCard', () => {
 
     const generateButton = wrapper
       .findAll('button')
-      .find((button) => button.text() === i18n.global.t('applications.cvs.generate.actions.generate'));
+      .find(
+        (button) => button.text() === i18n.global.t('applications.cvs.generate.actions.generate')
+      );
     await generateButton?.trigger('click');
 
     expect(wrapper.emitted('generate')).toBeTruthy();

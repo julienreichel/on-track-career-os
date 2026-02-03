@@ -81,7 +81,9 @@ describe('CvGenerationModal', () => {
 
     expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.generate.modal.title'));
     expect(wrapper.text()).toContain('Classic');
-    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.generate.modal.sectionsLabel'));
+    expect(wrapper.text()).toContain(
+      i18n.global.t('applications.cvs.generate.modal.sectionsLabel')
+    );
   });
 
   it('emits confirm with selections', async () => {
@@ -102,14 +104,19 @@ describe('CvGenerationModal', () => {
 
     const sectionButton = wrapper
       .findAll('button')
-      .find((button) => button.text() === i18n.global.t('applications.cvs.settings.sectionLabels.skills'));
+      .find(
+        (button) =>
+          button.text() === i18n.global.t('applications.cvs.settings.sectionLabels.skills')
+      );
     await sectionButton?.trigger('click');
 
     await wrapper.find('[data-testid="experience"]').trigger('click');
 
     const confirmButton = wrapper
       .findAll('button')
-      .find((button) => button.text() === i18n.global.t('applications.cvs.generate.actions.generate'));
+      .find(
+        (button) => button.text() === i18n.global.t('applications.cvs.generate.actions.generate')
+      );
     await confirmButton?.trigger('click');
 
     const emitted = wrapper.emitted('confirm');

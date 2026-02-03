@@ -23,7 +23,9 @@ async function handleFileSelected(file: File) {
     await parsing.parseFile(file);
     workflow.setStep('preview');
   } catch (error) {
-    workflow.setError(error instanceof Error ? error.message : t('ingestion.cv.upload.errors.unknown'));
+    workflow.setError(
+      error instanceof Error ? error.message : t('ingestion.cv.upload.errors.unknown')
+    );
     workflow.reset();
   }
 }
@@ -47,7 +49,9 @@ async function handleImport() {
 
     workflow.setStep('complete');
   } catch (error) {
-    workflow.setError(error instanceof Error ? error.message : t('ingestion.cv.upload.errors.importFailed'));
+    workflow.setError(
+      error instanceof Error ? error.message : t('ingestion.cv.upload.errors.importFailed')
+    );
     workflow.setStep('preview');
   }
 }
@@ -66,7 +70,10 @@ function viewExperiences() {
 <template>
   <UContainer>
     <UPage>
-      <UPageHeader :title="t('ingestion.cv.upload.title')" :description="t('ingestion.cv.upload.description')">
+      <UPageHeader
+        :title="t('ingestion.cv.upload.title')"
+        :description="t('ingestion.cv.upload.description')"
+      >
         <template #actions>
           <UButton
             v-if="workflow.currentStep.value === 'upload'"

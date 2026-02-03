@@ -191,7 +191,9 @@ describe('useCvParsing', () => {
       };
       vi.mocked(PDFParse).mockImplementation(() => mockParser as never);
 
-      await expect(parsing.parseFile(pdfFile)).rejects.toThrow('ingestion.cv.upload.errors.noTextExtracted');
+      await expect(parsing.parseFile(pdfFile)).rejects.toThrow(
+        'ingestion.cv.upload.errors.noTextExtracted'
+      );
     });
   });
 
@@ -237,7 +239,9 @@ describe('useCvParsing', () => {
       const parsing = useCvParsing();
       const textFile = new File([''], 'test.txt', { type: 'text/plain' });
 
-      await expect(parsing.parseFile(textFile)).rejects.toThrow('ingestion.cv.upload.errors.noTextExtracted');
+      await expect(parsing.parseFile(textFile)).rejects.toThrow(
+        'ingestion.cv.upload.errors.noTextExtracted'
+      );
     });
   });
 
@@ -262,7 +266,9 @@ describe('useCvParsing', () => {
         confidence: 0.2,
       };
 
-      await expect(parsing.parseFile(textFile)).rejects.toThrow('ingestion.cv.upload.errors.parsingFailed');
+      await expect(parsing.parseFile(textFile)).rejects.toThrow(
+        'ingestion.cv.upload.errors.parsingFailed'
+      );
     });
 
     it('should throw error when experience extraction fails', async () => {
@@ -304,7 +310,9 @@ describe('useCvParsing', () => {
 
       mockAiOps.experiences.value = null;
 
-      await expect(parsing.parseFile(textFile)).rejects.toThrow('ingestion.cv.upload.errors.extractionFailed');
+      await expect(parsing.parseFile(textFile)).rejects.toThrow(
+        'ingestion.cv.upload.errors.extractionFailed'
+      );
     });
   });
 

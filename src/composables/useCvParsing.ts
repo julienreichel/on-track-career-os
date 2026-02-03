@@ -100,7 +100,10 @@ export function useCvParsing() {
       throw new Error(aiOps.error.value);
     }
 
-    if (!aiOps.parsedCv.value?.experienceItems || aiOps.parsedCv.value.experienceItems.length === 0) {
+    if (
+      !aiOps.parsedCv.value?.experienceItems ||
+      aiOps.parsedCv.value.experienceItems.length === 0
+    ) {
       throw new Error(t('ingestion.cv.upload.errors.parsingFailed'));
     }
 
