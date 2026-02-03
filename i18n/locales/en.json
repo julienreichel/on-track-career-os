@@ -114,8 +114,7 @@
       },
       "actions": {
         "save": "Save"
-      },
-      "fields": {}
+      }
     },
     "notes": {
       "label": "Research notes",
@@ -313,8 +312,7 @@
       "tasks": "Tasks & Achievements",
       "tasksPlaceholder": "Enter each task or achievement on a new line",
       "tasksHint": "One task per line",
-      "status": "Status",
-      "fields": {}
+      "status": "Status"
     },
     "delete": {
       "title": "Delete Experience",
@@ -323,8 +321,7 @@
     },
     "page": {
       "title": "Experiences"
-    },
-    "detail": {}
+    }
   },
   "profile": {
     "title": "Your Profile",
@@ -978,7 +975,6 @@
       "error": "An error occurred"
     }
   },
-  "templates": {},
   "settings": {
     "title": "Settings",
     "subtitle": "Configure defaults for your documents.",
@@ -989,7 +985,6 @@
     }
   },
   "cvNew": {
-    "step2": {},
     "generating": {
       "title": "Generating Your CV",
       "description": "AI is crafting your professional CV based on your experiences..."
@@ -1136,7 +1131,6 @@
       "none": "No company linked",
       "empty": "No companies found. Try another search or create one."
     },
-    "reanalyse": {},
     "errors": {
       "title": "Job details",
       "generic": "Unable to update the job. Please try again.",
@@ -1182,9 +1176,6 @@
       "actions": {
         "create": "Create cover letter"
       }
-    },
-    "new": {
-      "generate": {}
     },
     "display": {
       "description": "View and edit your cover letter",
@@ -1436,12 +1427,6 @@
         "noResults": "No CVs match your search."
       }
     },
-    "detail": {},
-    "form": {
-      "fields": {
-        "name": {}
-      }
-    },
     "delete": {
       "title": "Delete CV",
       "message": "Are you sure you want to delete this CV? This action cannot be undone."
@@ -1465,7 +1450,6 @@
         "noResults": "No cover letters match your search."
       }
     },
-    "detail": {},
     "form": {
       "createTitle": "Create Cover Letter",
       "setupTitle": "Setup Your Cover Letter",
