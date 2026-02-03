@@ -100,7 +100,7 @@ const navigationItems = computed<NavigationMenuItem[]>(() => [
       {
         label: t('navigation.cvs'),
         to: '/applications/cv',
-        description: t('cvs.page.description'),
+        description: t('applications.cvs.page.description'),
       },
       {
         label: t('navigation.coverLetters'),

@@ -8,7 +8,7 @@ const { t } = useI18n();
   <UCard>
     <template #header>
       <h2 class="text-xl font-semibold">
-        {{ t('cvNew.generating.title') }}
+        {{ t('applications.cvs.new.generating.title') }}
       </h2>
     </template>
 
@@ -20,7 +20,7 @@ const { t } = useI18n();
       <USkeleton class="h-16 w-full" />
 
       <p class="text-gray-600 dark:text-gray-400 text-center">
-        {{ t('cvNew.generating.description') }}
+        {{ t('applications.cvs.new.generating.description') }}
       </p>
     </div>
   </UCard>

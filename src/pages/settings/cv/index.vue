@@ -121,12 +121,12 @@ const handleSave = async () => {
       showProfilePhoto: formState.value.showProfilePhoto,
     });
     toast.add({
-      title: t('cvSettings.toast.saved'),
+      title: t('applications.cvs.settings.toast.saved'),
       color: 'primary',
     });
   } catch {
     toast.add({
-      title: t('cvSettings.toast.saveFailed'),
+      title: t('applications.cvs.settings.toast.saveFailed'),
       color: 'error',
     });
   } finally {
@@ -141,7 +141,7 @@ const handleCreateFromBase = async (template: SystemCvTemplate) => {
     const created = await createFromExemplar(template);
     if (created) {
       toast.add({
-        title: t('cvTemplates.toast.created'),
+        title: t('applications.cvs.templates.toast.created'),
         color: 'primary',
       });
       createModalOpen.value = false;
@@ -149,7 +149,7 @@ const handleCreateFromBase = async (template: SystemCvTemplate) => {
     }
   } catch {
     toast.add({
-      title: t('cvTemplates.toast.createFailed'),
+      title: t('applications.cvs.templates.toast.createFailed'),
       color: 'error',
     });
   } finally {
@@ -164,20 +164,20 @@ const handleEdit = (template: CVTemplate) => {
 const handleDuplicate = async (template: CVTemplate) => {
   try {
     const created = await createTemplate({
-      name: t('cvTemplates.list.duplicateName', { name: template.name }),
+      name: t('applications.cvs.templates.list.duplicateName', { name: template.name }),
       content: template.content,
       source: 'user',
     });
     if (created) {
       toast.add({
-        title: t('cvTemplates.toast.created'),
+        title: t('applications.cvs.templates.toast.created'),
         color: 'primary',
       });
       await router.push({ name: 'settings-cv-id', params: { id: created.id } });
     }
   } catch {
     toast.add({
-      title: t('cvTemplates.toast.createFailed'),
+      title: t('applications.cvs.templates.toast.createFailed'),
       color: 'error',
     });
   }
@@ -194,13 +194,13 @@ const handleDelete = async () => {
   try {
     await deleteTemplate(templateToDelete.value.id);
     toast.add({
-      title: t('cvTemplates.toast.deleted'),
+      title: t('applications.cvs.templates.toast.deleted'),
       color: 'primary',
     });
     deleteModalOpen.value = false;
   } catch {
     toast.add({
-      title: t('cvTemplates.toast.deleteFailed'),
+      title: t('applications.cvs.templates.toast.deleteFailed'),
       color: 'error',
     });
   } finally {
@@ -238,7 +238,7 @@ watch(
   <div>
     <UContainer>
       <UPage>
-        <UPageHeader :title="t('cvSettings.title')" :description="t('cvSettings.subtitle')" />
+        <UPageHeader :title="t('applications.cvs.settings.title')" :description="t('applications.cvs.settings.subtitle')" />
 
         <UPageBody>
           <UAlert
@@ -267,16 +267,16 @@ watch(
                   <div class="flex flex-wrap items-start justify-between gap-3">
                     <div class="space-y-1">
                       <h2 class="text-lg font-semibold text-default">
-                        {{ t('cvTemplates.list.title') }}
+                        {{ t('applications.cvs.templates.list.title') }}
                       </h2>
                       <p class="text-sm text-dimmed">
-                        {{ t('cvTemplates.list.subtitle') }}
+                        {{ t('applications.cvs.templates.list.subtitle') }}
                       </p>
                     </div>
                     <UButton
                       color="primary"
                       variant="outline"
-                      :label="t('cvTemplates.list.actions.create')"
+                      :label="t('applications.cvs.templates.list.actions.create')"
                       icon="i-heroicons-plus"
                       @click="createModalOpen = true"
                     />
@@ -285,16 +285,16 @@ watch(
 
                 <UEmpty
                   v-if="sortedTemplates.length === 0"
-                  :title="t('cvTemplates.list.empty.title')"
+                  :title="t('applications.cvs.templates.list.empty.title')"
                   icon="i-heroicons-document-text"
                 >
                   <p class="text-sm text-gray-500">
-                    {{ t('cvTemplates.list.empty.description') }}
+                    {{ t('applications.cvs.templates.list.empty.description') }}
                   </p>
                   <template #actions>
                     <UButton
                       color="primary"
-                      :label="t('cvTemplates.list.actions.create')"
+                      :label="t('applications.cvs.templates.list.actions.create')"
                       icon="i-heroicons-plus"
                       @click="createModalOpen = true"
                     />
@@ -310,7 +310,7 @@ watch(
                     :updated-at="formatTemplateDate(template)"
                     :primary-action-label="t('common.edit')"
                     primary-action-icon="i-heroicons-pencil"
-                    :secondary-action-label="t('cvTemplates.list.actions.duplicate')"
+                    :secondary-action-label="t('applications.cvs.templates.list.actions.duplicate')"
                     secondary-action-icon="i-heroicons-document-duplicate"
                     :show-delete="true"
                     :delete-label="t('common.delete')"
@@ -338,8 +338,8 @@ watch(
 
     <ConfirmModal
       v-model:open="deleteModalOpen"
-      :title="t('cvTemplates.delete.title', { name: templateToDelete?.name })"
-      :description="t('cvTemplates.delete.description')"
+      :title="t('applications.cvs.templates.delete.title', { name: templateToDelete?.name })"
+      :description="t('applications.cvs.templates.delete.description')"
       :confirm-label="t('common.delete')"
       :cancel-label="t('common.cancel')"
       confirm-color="error"
@@ -349,8 +349,8 @@ watch(
 
     <UModal
       v-model:open="createModalOpen"
-      :title="t('cvTemplates.list.system.title')"
-      :description="t('cvTemplates.list.system.description')"
+      :title="t('applications.cvs.templates.list.system.title')"
+      :description="t('applications.cvs.templates.list.system.description')"
     >
       <template #body>
         <div class="flex flex-col gap-3">

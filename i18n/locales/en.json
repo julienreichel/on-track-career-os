@@ -27,6 +27,33 @@
     "signOut": "Sign Out",
     "errorSigningOut": "Error signing out"
   },
+  "ingestion": {
+    "cv": {
+      "upload": {
+        "title": "Upload Your CV",
+        "description": "Upload your CV to extract your professional experience automatically.",
+        "dropzoneText": "Drop your CV here or click to browse",
+        "dropzoneHint": "Supports PDF and TXT files (max 5MB)",
+        "fileUploaded": "File uploaded: {fileName}",
+        "parsing": "Parsing your CV...",
+        "parsingDescription": "AI is extracting your experiences and information.",
+        "sections": {
+          "experiences": "Review and confirm your experiences"
+        },
+        "confirmImport": "Confirm & continue",
+        "importing": "Creating experiences...",
+        "successSummary": "Imported {created} experience(s), updated {updated} experience(s)",
+        "viewExperiences": "View Experiences",
+        "errors": {
+          "noTextExtracted": "No text could be extracted from the file.",
+          "unknown": "An unknown error occurred",
+          "parsingFailed": "Failed to parse CV. Please try again or enter experiences manually.",
+          "extractionFailed": "Failed to extract experiences. Please try again.",
+          "importFailed": "Failed to import experiences. Please try again."
+        }
+      }
+    }
+  },
   "home": {
     "title": "Welcome {name}",
     "description": "What do you want to do today?",
@@ -217,29 +244,6 @@
     "delete": {
       "title": "Delete company",
       "message": "Are you sure you want to delete this company? This action cannot be undone."
-    }
-  },
-  "cvUpload": {
-    "title": "Upload Your CV",
-    "description": "Upload your CV to extract your professional experience automatically.",
-    "dropzoneText": "Drop your CV here or click to browse",
-    "dropzoneHint": "Supports PDF and TXT files (max 5MB)",
-    "fileUploaded": "File uploaded: {fileName}",
-    "parsing": "Parsing your CV...",
-    "parsingDescription": "AI is extracting your experiences and information.",
-    "sections": {
-      "experiences": "Review and confirm your experiences"
-    },
-    "confirmImport": "Confirm & continue",
-    "importing": "Creating experiences...",
-    "successSummary": "Imported {created} experience(s), updated {updated} experience(s)",
-    "viewExperiences": "View Experiences",
-    "errors": {
-      "noTextExtracted": "No text could be extracted from the file.",
-      "unknown": "An unknown error occurred",
-      "parsingFailed": "Failed to parse CV. Please try again or enter experiences manually.",
-      "extractionFailed": "Failed to extract experiences. Please try again.",
-      "importFailed": "Failed to import experiences. Please try again."
     }
   },
   "experiences": {
@@ -825,156 +829,6 @@
       "error": "Error"
     }
   },
-  "cvList": {
-    "title": "My CVs"
-  },
-  "cvTemplates": {
-    "list": {
-      "title": "CV Templates",
-      "subtitle": "Manage reusable templates for CV generation.",
-      "system": {
-        "title": "System templates",
-        "description": "Start from a vetted exemplar and customize it."
-      },
-      "actions": {
-        "create": "Create template",
-        "duplicate": "Duplicate"
-      },
-      "empty": {
-        "title": "No templates yet",
-        "description": "Create a template or start from a system template."
-      },
-      "duplicateName": "{name} (Copy)"
-    },
-    "editor": {
-      "title": "Template editor",
-      "subtitle": "Edit your template markdown and preview the output.",
-      "backToList": "Back to templates",
-      "setDefault": "Set as default",
-      "nameLabel": "Template name",
-      "contentLabel": "Template markdown",
-      "preview": "Preview",
-      "showPreview": "Show preview",
-      "hidePreview": "Hide preview",
-      "regenerate": "Regenerate preview",
-      "previewFailed": "Unable to generate preview."
-    },
-    "labels": {
-      "default": "Default",
-      "updated": "Updated"
-    },
-    "system": {
-      "classic": {
-        "name": "Classic",
-        "description": "Clean, traditional layout with clear section hierarchy."
-      },
-      "modern": {
-        "name": "Modern",
-        "description": "Contemporary layout with compact summary and skills first."
-      },
-      "competency": {
-        "name": "Competency",
-        "description": "Competency-led layout for skills-forward roles."
-      }
-    },
-    "delete": {
-      "title": "Delete \"{name}\"?",
-      "description": "This action cannot be undone."
-    },
-    "toast": {
-      "created": "Template created",
-      "createFailed": "Unable to create template",
-      "saved": "Template saved",
-      "saveFailed": "Unable to save template",
-      "deleted": "Template deleted",
-      "deleteFailed": "Unable to delete template",
-      "defaultSet": "Default template updated",
-      "defaultFailed": "Unable to set default template"
-    },
-    "errors": {
-      "settings": "Unable to load CV settings.",
-      "notFound": "Template not found.",
-      "loadFailed": "Unable to load template."
-    }
-  },
-  "cvSettings": {
-    "title": "CV settings",
-    "subtitle": "Set defaults for every CV you create.",
-    "sections": {
-      "sections": {
-        "title": "Sections",
-        "description": "Choose which sections are included by default."
-      },
-      "experiences": {
-        "title": "Experiences",
-        "description": "Select which experiences are eligible by default."
-      },
-      "other": {
-        "title": "Other settings",
-        "description": "Defaults for templates, prompts, and profile photo."
-      }
-    },
-    "template": {
-      "none": "No default template",
-      "manage": "Manage templates"
-    },
-    "sectionLabels": {
-      "skills": "Skills"
-    },
-    "experiences": {
-      "title": "Included experiences",
-      "empty": "No experiences yet. Add one to include it in your CV defaults.",
-      "selectAll": "Select all",
-      "deselectAll": "Deselect all",
-      "selected": "{count} selected"
-    },
-    "other": {
-      "showProfilePhoto": "Include profile photo by default"
-    },
-    "toast": {
-      "saved": "Settings saved",
-      "saveFailed": "Could not save settings"
-    }
-  },
-  "cvGenerate": {
-    "title": "Generate CV",
-    "subtitle": "Create a new CV using your saved defaults.",
-    "defaultName": "CV — {date}",
-    "entry": {
-      "title": "CV generation",
-      "description": "Review the defaults that will be applied before generating a CV.",
-      "templateLabel": "Template",
-      "sectionsLabel": "Sections",
-      "experiencesLabel": "Experiences",
-      "otherLabel": "Other settings",
-      "templateFallback": "Classic template",
-      "sections": "{count} sections",
-      "experiences": "{count} experiences",
-      "showProfilePhotoEnabled": "Profile photo included",
-      "showProfilePhotoDisabled": "Profile photo hidden"
-    },
-    "modal": {
-      "title": "Confirm CV settings",
-      "description": "Adjust the template, sections, and experiences before generating.",
-      "templateLabel": "Template",
-      "sectionsLabel": "Sections",
-      "experiencesTitle": "Included experiences",
-      "experiencesEmpty": "No experiences yet. Add one to include it in your CV.",
-      "selectAll": "Select all",
-      "deselectAll": "Deselect all",
-      "selected": "{count} selected"
-    },
-    "actions": {
-      "generate": "Generate CV",
-      "settings": "Edit settings"
-    },
-    "toast": {
-      "created": "CV created successfully!",
-      "createFailed": "Failed to create CV",
-      "generationFailed": "Failed to generate CV content",
-      "error": "An error occurred"
-    }
-  },
   "settings": {
     "title": "Settings",
     "subtitle": "Configure defaults for your documents.",
@@ -983,42 +837,6 @@
       "description": "Set your default template, sections, and experiences.",
       "action": "Open CV settings"
     }
-  },
-  "cvNew": {
-    "generating": {
-      "title": "Generating Your CV",
-      "description": "AI is crafting your professional CV based on your experiences..."
-    }
-  },
-  "cvDisplay": {
-    "untitled": "Untitled CV",
-    "description": "Review and refine your CV details.",
-    "loading": "Loading CV...",
-    "saving": "Saving changes...",
-    "editMode": "Edit CV Content",
-    "contentLabel": "Markdown Content",
-    "markdownPlaceholder": "Enter your CV content in Markdown format...",
-    "markdownHelp": "Use Markdown syntax: # for headings, ** for bold, * for italic, - for lists",
-    "notFound": "CV Not Found",
-    "notFoundDescription": "The CV you're looking for doesn't exist or has been deleted.",
-    "actions": {
-      "edit": "Edit",
-      "retry": "Retry",
-      "exportPdf": "Export to PDF",
-      "print": "Print"
-    },
-    "toast": {
-      "saved": "CV saved successfully",
-      "saveFailed": "Failed to save CV"
-    },
-    "photoToggleLabel": "Profile photo",
-    "photoToggleDescription": "Show or hide your profile photo in the CV preview and print view",
-    "photoToggleOn": "Photo included",
-    "photoToggleOff": "Photo hidden",
-    "photoLoading": "Loading profile photo...",
-    "photoUnavailable": "No profile photo found. Upload one from your profile page.",
-    "photoPreviewHelp": "This preview shows how your profile photo will appear in the CV header.",
-    "photoAlt": "Profile photo"
   },
   "tailoredMaterials": {
     "targetJobLabel": "Target job",
@@ -1059,16 +877,6 @@
       "generateErrorTitle": "Unable to generate materials",
       "loadErrorTitle": "Unable to load materials"
     }
-  },
-  "cvExperiencePicker": {
-    "title": "Select Experiences",
-    "selectAll": "Select All",
-    "deselectAll": "Deselect All",
-    "noExperiences": "No experiences found",
-    "addExperience": "Add Experience",
-    "selected": "{count} experiences selected",
-    "unknown": "Unknown",
-    "present": "Present"
   },
   "jobUpload": {
     "title": "Analyze a New Job",
@@ -1411,31 +1219,6 @@
       "validationFailed": "Please fix the highlighted fields before continuing."
     }
   },
-  "cvs": {
-    "page": {
-      "title": "CVs",
-      "description": "Manage your CV documents and create new ones."
-    },
-    "list": {
-      "actions": {
-        "create": "Create New CV",
-        "settings": "Settings"
-      },
-      "tailored": "Tailored",
-      "search": {
-        "placeholder": "Search CVs...",
-        "noResults": "No CVs match your search."
-      }
-    },
-    "delete": {
-      "title": "Delete CV",
-      "message": "Are you sure you want to delete this CV? This action cannot be undone."
-    },
-    "toast": {
-      "deleted": "CV deleted successfully",
-      "deleteFailed": "Failed to delete CV"
-    }
-  },
   "coverLetters": {
     "page": {
       "title": "Cover Letters",
@@ -1616,6 +1399,227 @@
     "delete": {
       "title": "Delete job",
       "message": "Are you sure you want to delete this job? This action cannot be undone."
+    }
+  },
+  "applications": {
+    "cvs": {
+      "page": {
+        "title": "CVs",
+        "description": "Manage your CV documents and create new ones."
+      },
+      "list": {
+        "actions": {
+          "create": "Create New CV",
+          "settings": "Settings"
+        },
+        "tailored": "Tailored",
+        "search": {
+          "placeholder": "Search CVs...",
+          "noResults": "No CVs match your search."
+        },
+        "title": "My CVs"
+      },
+      "delete": {
+        "title": "Delete CV",
+        "message": "Are you sure you want to delete this CV? This action cannot be undone."
+      },
+      "toast": {
+        "deleted": "CV deleted successfully",
+        "deleteFailed": "Failed to delete CV"
+      },
+      "display": {
+        "untitled": "Untitled CV",
+        "description": "Review and refine your CV details.",
+        "loading": "Loading CV...",
+        "saving": "Saving changes...",
+        "editMode": "Edit CV Content",
+        "contentLabel": "Markdown Content",
+        "markdownPlaceholder": "Enter your CV content in Markdown format...",
+        "markdownHelp": "Use Markdown syntax: # for headings, ** for bold, * for italic, - for lists",
+        "notFound": "CV Not Found",
+        "notFoundDescription": "The CV you're looking for doesn't exist or has been deleted.",
+        "actions": {
+          "edit": "Edit",
+          "retry": "Retry",
+          "exportPdf": "Export to PDF",
+          "print": "Print"
+        },
+        "toast": {
+          "saved": "CV saved successfully",
+          "saveFailed": "Failed to save CV"
+        },
+        "photoToggleLabel": "Profile photo",
+        "photoToggleDescription": "Show or hide your profile photo in the CV preview and print view",
+        "photoToggleOn": "Photo included",
+        "photoToggleOff": "Photo hidden",
+        "photoLoading": "Loading profile photo...",
+        "photoUnavailable": "No profile photo found. Upload one from your profile page.",
+        "photoPreviewHelp": "This preview shows how your profile photo will appear in the CV header.",
+        "photoAlt": "Profile photo"
+      },
+      "generate": {
+        "title": "Generate CV",
+        "subtitle": "Create a new CV using your saved defaults.",
+        "defaultName": "CV — {date}",
+        "entry": {
+          "title": "CV generation",
+          "description": "Review the defaults that will be applied before generating a CV.",
+          "templateLabel": "Template",
+          "sectionsLabel": "Sections",
+          "experiencesLabel": "Experiences",
+          "otherLabel": "Other settings",
+          "templateFallback": "Classic template",
+          "sections": "{count} sections",
+          "experiences": "{count} experiences",
+          "showProfilePhotoEnabled": "Profile photo included",
+          "showProfilePhotoDisabled": "Profile photo hidden"
+        },
+        "modal": {
+          "title": "Confirm CV settings",
+          "description": "Adjust the template, sections, and experiences before generating.",
+          "templateLabel": "Template",
+          "sectionsLabel": "Sections",
+          "experiencesTitle": "Included experiences",
+          "experiencesEmpty": "No experiences yet. Add one to include it in your CV.",
+          "selectAll": "Select all",
+          "deselectAll": "Deselect all",
+          "selected": "{count} selected"
+        },
+        "actions": {
+          "generate": "Generate CV",
+          "settings": "Edit settings"
+        },
+        "toast": {
+          "created": "CV created successfully!",
+          "createFailed": "Failed to create CV",
+          "generationFailed": "Failed to generate CV content",
+          "error": "An error occurred"
+        }
+      },
+      "settings": {
+        "title": "CV settings",
+        "subtitle": "Set defaults for every CV you create.",
+        "sections": {
+          "sections": {
+            "title": "Sections",
+            "description": "Choose which sections are included by default."
+          },
+          "experiences": {
+            "title": "Experiences",
+            "description": "Select which experiences are eligible by default."
+          },
+          "other": {
+            "title": "Other settings",
+            "description": "Defaults for templates, prompts, and profile photo."
+          }
+        },
+        "template": {
+          "none": "No default template",
+          "manage": "Manage templates"
+        },
+        "sectionLabels": {
+          "skills": "Skills"
+        },
+        "experiences": {
+          "title": "Included experiences",
+          "empty": "No experiences yet. Add one to include it in your CV defaults.",
+          "selectAll": "Select all",
+          "deselectAll": "Deselect all",
+          "selected": "{count} selected"
+        },
+        "other": {
+          "showProfilePhoto": "Include profile photo by default"
+        },
+        "toast": {
+          "saved": "Settings saved",
+          "saveFailed": "Could not save settings"
+        }
+      },
+      "templates": {
+        "list": {
+          "title": "CV Templates",
+          "subtitle": "Manage reusable templates for CV generation.",
+          "system": {
+            "title": "System templates",
+            "description": "Start from a vetted exemplar and customize it."
+          },
+          "actions": {
+            "create": "Create template",
+            "duplicate": "Duplicate"
+          },
+          "empty": {
+            "title": "No templates yet",
+            "description": "Create a template or start from a system template."
+          },
+          "duplicateName": "{name} (Copy)"
+        },
+        "editor": {
+          "title": "Template editor",
+          "subtitle": "Edit your template markdown and preview the output.",
+          "backToList": "Back to templates",
+          "setDefault": "Set as default",
+          "nameLabel": "Template name",
+          "contentLabel": "Template markdown",
+          "preview": "Preview",
+          "showPreview": "Show preview",
+          "hidePreview": "Hide preview",
+          "regenerate": "Regenerate preview",
+          "previewFailed": "Unable to generate preview."
+        },
+        "labels": {
+          "default": "Default",
+          "updated": "Updated"
+        },
+        "system": {
+          "classic": {
+            "name": "Classic",
+            "description": "Clean, traditional layout with clear section hierarchy."
+          },
+          "modern": {
+            "name": "Modern",
+            "description": "Contemporary layout with compact summary and skills first."
+          },
+          "competency": {
+            "name": "Competency",
+            "description": "Competency-led layout for skills-forward roles."
+          }
+        },
+        "delete": {
+          "title": "Delete \"{name}\"?",
+          "description": "This action cannot be undone."
+        },
+        "toast": {
+          "created": "Template created",
+          "createFailed": "Unable to create template",
+          "saved": "Template saved",
+          "saveFailed": "Unable to save template",
+          "deleted": "Template deleted",
+          "deleteFailed": "Unable to delete template",
+          "defaultSet": "Default template updated",
+          "defaultFailed": "Unable to set default template"
+        },
+        "errors": {
+          "settings": "Unable to load CV settings.",
+          "notFound": "Template not found.",
+          "loadFailed": "Unable to load template."
+        }
+      },
+      "experiencePicker": {
+        "title": "Select Experiences",
+        "selectAll": "Select All",
+        "deselectAll": "Deselect All",
+        "noExperiences": "No experiences found",
+        "addExperience": "Add Experience",
+        "selected": "{count} experiences selected",
+        "unknown": "Unknown",
+        "present": "Present"
+      },
+      "new": {
+        "generating": {
+          "title": "Generating Your CV",
+          "description": "AI is crafting your professional CV based on your experiences..."
+        }
+      }
     }
   }
 }

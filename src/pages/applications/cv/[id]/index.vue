@@ -2,8 +2,8 @@
   <UContainer>
     <UPage>
       <UPageHeader
-        :title="document?.name || $t('cvDisplay.untitled')"
-        :description="$t('cvDisplay.description')"
+        :title="document?.name || $t('applications.cvs.display.untitled')"
+        :description="$t('applications.cvs.display.description')"
         :links="[
           {
             label: $t('common.backToList'),
@@ -51,7 +51,7 @@
           <div class="text-center">
             <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ $t('cvDisplay.loading') }}
+              {{ $t('applications.cvs.display.loading') }}
             </p>
           </div>
         </div>
@@ -61,7 +61,7 @@
           <div class="text-center">
             <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ $t('cvDisplay.saving') }}
+              {{ $t('applications.cvs.display.saving') }}
             </p>
           </div>
         </div>
@@ -73,18 +73,18 @@
             <div class="space-y-4">
               <div>
                 <h3 class="text-lg font-semibold mb-2">
-                  {{ $t('cvDisplay.editMode') }}
+                  {{ $t('applications.cvs.display.editMode') }}
                 </h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                  {{ $t('cvDisplay.markdownHelp') }}
+                  {{ $t('applications.cvs.display.markdownHelp') }}
                 </p>
               </div>
 
-              <UFormField :label="$t('cvDisplay.contentLabel')" required>
+              <UFormField :label="$t('applications.cvs.display.contentLabel')" required>
                 <UTextarea
                   v-model="editContent"
                   :rows="25"
-                  :placeholder="$t('cvDisplay.markdownPlaceholder')"
+                  :placeholder="$t('applications.cvs.display.markdownPlaceholder')"
                   class="font-mono text-sm w-full"
                 />
               </UFormField>
@@ -93,25 +93,25 @@
                 <div class="flex items-start justify-between gap-4">
                   <div>
                     <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {{ $t('cvDisplay.photoToggleLabel') }}
+                      {{ $t('applications.cvs.display.photoToggleLabel') }}
                     </p>
                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                      {{ $t('cvDisplay.photoToggleDescription') }}
+                      {{ $t('applications.cvs.display.photoToggleDescription') }}
                     </p>
                   </div>
                   <USwitch
                     v-model="showProfilePhotoSetting"
                     :label="
                       showProfilePhotoSetting
-                        ? $t('cvDisplay.photoToggleOn')
-                        : $t('cvDisplay.photoToggleOff')
+                        ? $t('applications.cvs.display.photoToggleOn')
+                        : $t('applications.cvs.display.photoToggleOff')
                     "
                   />
                 </div>
                 <div class="mt-3 text-sm text-gray-500 dark:text-gray-400">
-                  <span v-if="profilePhotoLoading">{{ $t('cvDisplay.photoLoading') }}</span>
+                  <span v-if="profilePhotoLoading">{{ $t('applications.cvs.display.photoLoading') }}</span>
                   <span v-else-if="profilePhotoError">{{ profilePhotoError }}</span>
-                  <span v-else-if="!profilePhotoUrl">{{ $t('cvDisplay.photoUnavailable') }}</span>
+                  <span v-else-if="!profilePhotoUrl">{{ $t('applications.cvs.display.photoUnavailable') }}</span>
                 </div>
                 <div
                   v-if="profilePhotoUrl"
@@ -119,11 +119,11 @@
                 >
                   <img
                     :src="profilePhotoUrl"
-                    :alt="$t('cvDisplay.photoAlt')"
+                    :alt="$t('applications.cvs.display.photoAlt')"
                     class="h-16 w-16 rounded-full object-cover border border-gray-200 dark:border-gray-700"
                   />
                   <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {{ $t('cvDisplay.photoPreviewHelp') }}
+                    {{ $t('applications.cvs.display.photoPreviewHelp') }}
                   </p>
                 </div>
               </div>
@@ -153,7 +153,7 @@
               <div v-if="previewShowsPhoto" class="cv-photo-badge">
                 <img
                   :src="profilePhotoUrl!"
-                  :alt="$t('cvDisplay.photoAlt')"
+                  :alt="$t('applications.cvs.display.photoAlt')"
                   class="cv-photo-image"
                 />
               </div>
@@ -166,13 +166,13 @@
                 </p>
                 <div class="flex justify-end gap-3">
                   <UButton
-                    :label="$t('cvDisplay.actions.exportPdf')"
+                    :label="$t('applications.cvs.display.actions.exportPdf')"
                     icon="i-heroicons-arrow-down-tray"
                     variant="outline"
                     @click="handlePrint"
                   />
                   <UButton
-                    :label="$t('cvDisplay.actions.edit')"
+                    :label="$t('applications.cvs.display.actions.edit')"
                     icon="i-heroicons-pencil"
                     variant="outline"
                     @click="toggleEdit"
@@ -188,8 +188,8 @@
           v-else-if="!loading"
           color="warning"
           icon="i-heroicons-exclamation-triangle"
-          :title="$t('cvDisplay.notFound')"
-          :description="$t('cvDisplay.notFoundDescription')"
+          :title="$t('applications.cvs.display.notFound')"
+          :description="$t('applications.cvs.display.notFoundDescription')"
         />
       </UPageBody>
     </UPage>
@@ -371,14 +371,14 @@ const saveEdit = async () => {
       originalShowProfilePhoto.value = showProfilePhotoSetting.value;
       isEditing.value = false;
       toast.add({
-        title: t('cvDisplay.toast.saved'),
+        title: t('applications.cvs.display.toast.saved'),
         color: 'primary',
       });
     }
   } catch (err) {
     console.error('[cvDisplay] Error saving CV:', err);
     toast.add({
-      title: t('cvDisplay.toast.saveFailed'),
+      title: t('applications.cvs.display.toast.saveFailed'),
       color: 'error',
     });
   } finally {

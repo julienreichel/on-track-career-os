@@ -50,9 +50,9 @@ const hasActions = computed(
 
 const resolvedDefaultLabel = computed(() => {
   const label = props.defaultBadgeLabel?.trim();
-  return label || t('cvTemplates.labels.default');
+  return label || t('applications.cvs.templates.labels.default');
 });
-const updatedLabel = computed(() => t('cvTemplates.labels.updated'));
+const updatedLabel = computed(() => t('applications.cvs.templates.labels.updated'));
 </script>
 
 <template>

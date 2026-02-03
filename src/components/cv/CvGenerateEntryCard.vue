@@ -24,14 +24,14 @@ const { t } = useI18n();
 
 const showProfilePhotoLabel = computed(() =>
   props.showProfilePhoto
-    ? t('cvGenerate.entry.showProfilePhotoEnabled')
-    : t('cvGenerate.entry.showProfilePhotoDisabled')
+    ? t('applications.cvs.generate.entry.showProfilePhotoEnabled')
+    : t('applications.cvs.generate.entry.showProfilePhotoDisabled')
 );
 
-const sectionLabel = computed(() => t('cvGenerate.entry.sections', { count: props.sectionCount }));
+const sectionLabel = computed(() => t('applications.cvs.generate.entry.sections', { count: props.sectionCount }));
 
 const experienceLabel = computed(() =>
-  t('cvGenerate.entry.experiences', { count: props.experienceCount })
+  t('applications.cvs.generate.entry.experiences', { count: props.experienceCount })
 );
 </script>
 
@@ -40,10 +40,10 @@ const experienceLabel = computed(() =>
     <template #header>
       <div class="space-y-1">
         <h2 class="text-lg font-semibold text-default">
-          {{ t('cvGenerate.entry.title') }}
+          {{ t('applications.cvs.generate.entry.title') }}
         </h2>
         <p class="text-sm text-dimmed">
-          {{ t('cvGenerate.entry.description') }}
+          {{ t('applications.cvs.generate.entry.description') }}
         </p>
       </div>
     </template>
@@ -52,7 +52,7 @@ const experienceLabel = computed(() =>
       <div class="grid gap-4 sm:grid-cols-2">
         <div>
           <p class="text-xs font-semibold uppercase text-dimmed">
-            {{ t('cvGenerate.entry.templateLabel') }}
+            {{ t('applications.cvs.generate.entry.templateLabel') }}
           </p>
           <p class="text-sm font-medium text-default">
             {{ props.templateName }}
@@ -60,7 +60,7 @@ const experienceLabel = computed(() =>
         </div>
         <div>
           <p class="text-xs font-semibold uppercase text-dimmed">
-            {{ t('cvGenerate.entry.sectionsLabel') }}
+            {{ t('applications.cvs.generate.entry.sectionsLabel') }}
           </p>
           <p class="text-sm font-medium text-default">
             {{ sectionLabel }}
@@ -68,7 +68,7 @@ const experienceLabel = computed(() =>
         </div>
         <div>
           <p class="text-xs font-semibold uppercase text-dimmed">
-            {{ t('cvGenerate.entry.experiencesLabel') }}
+            {{ t('applications.cvs.generate.entry.experiencesLabel') }}
           </p>
           <p class="text-sm font-medium text-default">
             {{ experienceLabel }}
@@ -76,7 +76,7 @@ const experienceLabel = computed(() =>
         </div>
         <div>
           <p class="text-xs font-semibold uppercase text-dimmed">
-            {{ t('cvGenerate.entry.otherLabel') }}
+            {{ t('applications.cvs.generate.entry.otherLabel') }}
           </p>
           <p class="text-sm font-medium text-default">
             {{ showProfilePhotoLabel }}
@@ -88,12 +88,12 @@ const experienceLabel = computed(() =>
         <UButton
           color="neutral"
           variant="outline"
-          :label="t('cvGenerate.actions.settings')"
+          :label="t('applications.cvs.generate.actions.settings')"
           @click="emit('edit-settings')"
         />
         <UButton
           color="primary"
-          :label="t('cvGenerate.actions.generate')"
+          :label="t('applications.cvs.generate.actions.generate')"
           :loading="props.generating"
           @click="emit('generate')"
         />

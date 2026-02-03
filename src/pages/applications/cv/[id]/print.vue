@@ -4,7 +4,7 @@
     <div v-if="loading" class="flex items-center justify-center min-h-screen">
       <div class="text-center">
         <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
-        <p class="text-sm text-gray-600">{{ $t('cvDisplay.loading') }}</p>
+        <p class="text-sm text-gray-600">{{ $t('applications.cvs.display.loading') }}</p>
       </div>
     </div>
 
@@ -13,7 +13,7 @@
       <div class="text-center">
         <UIcon name="i-heroicons-exclamation-triangle" class="text-2xl text-red-500 mb-4" />
         <p class="text-sm text-gray-600 mb-4">{{ error }}</p>
-        <UButton color="primary" @click="load">{{ $t('cvDisplay.actions.retry') }}</UButton>
+        <UButton color="primary" @click="load">{{ $t('applications.cvs.display.actions.retry') }}</UButton>
       </div>
     </div>
 
@@ -22,7 +22,7 @@
       <!-- Print Actions (hidden on print) -->
       <div class="print-actions no-print">
         <UButton
-          :label="$t('cvDisplay.actions.print')"
+          :label="$t('applications.cvs.display.actions.print')"
           icon="i-heroicons-printer"
           @click="handlePrint"
         />
@@ -32,7 +32,7 @@
       <!-- CV Content -->
       <div class="relative">
         <div v-if="showPhoto" class="print-photo">
-          <img :src="profilePhotoUrl!" :alt="$t('cvDisplay.photoAlt')" />
+          <img :src="profilePhotoUrl!" :alt="$t('applications.cvs.display.photoAlt')" />
         </div>
         <MarkdownContent :content="cvDocument.content" class="cv-printable doc-print" />
       </div>

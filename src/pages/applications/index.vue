@@ -16,8 +16,8 @@
       <UCard>
         <UPageGrid>
           <UPageCard
-            :title="t('cvs.page.title')"
-            :description="t('cvs.page.description')"
+            :title="t('applications.cvs.page.title')"
+            :description="t('applications.cvs.page.description')"
             icon="i-heroicons-document-text"
             :to="{ name: 'applications-cv' }"
           />

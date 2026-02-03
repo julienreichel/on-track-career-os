@@ -3,10 +3,10 @@
     <UPage>
       <UPageHeader
         :title="pageTitle"
-        :description="t('cvTemplates.editor.subtitle')"
+        :description="t('applications.cvs.templates.editor.subtitle')"
         :links="[
           {
-            label: t('cvTemplates.editor.backToList'),
+            label: t('applications.cvs.templates.editor.backToList'),
             icon: 'i-heroicons-arrow-left',
             to: { name: 'settings-cv' },
           },
@@ -25,7 +25,7 @@
 
         <div class="flex items-center gap-2 mb-6">
           <UBadge v-if="isDefault" color="secondary" variant="outline" icon="i-heroicons-star">
-            {{ t('cvTemplates.labels.default') }}
+            {{ t('applications.cvs.templates.labels.default') }}
           </UBadge>
         </div>
 
@@ -50,7 +50,7 @@
             v-if="template"
             size="sm"
             variant="ghost"
-            :label="t('cvTemplates.editor.setDefault')"
+            :label="t('applications.cvs.templates.editor.setDefault')"
             :disabled="isDefault || saving"
             @click="handleSetDefault"
           />
@@ -104,7 +104,7 @@ const previewContent = ref<string | null>(null);
 const previewLoading = ref(false);
 const previewError = ref<string | null>(null);
 
-const pageTitle = computed(() => name.value || t('cvTemplates.editor.title'));
+const pageTitle = computed(() => name.value || t('applications.cvs.templates.editor.title'));
 const isDirty = computed(
   () => name.value !== originalName.value || content.value !== originalContent.value
 );
@@ -117,7 +117,7 @@ const ensureSettings = async () => {
     await loadSettings();
   }
   if (!settings.value) {
-    throw new Error(t('cvTemplates.errors.settings'));
+    throw new Error(t('applications.cvs.templates.errors.settings'));
   }
   return settings.value;
 };
@@ -129,7 +129,7 @@ const loadTemplate = async () => {
     const id = route.params.id as string;
     const loaded = await service.get(id);
     if (!loaded) {
-      error.value = t('cvTemplates.errors.notFound');
+      error.value = t('applications.cvs.templates.errors.notFound');
       return;
     }
     template.value = loaded;
@@ -138,7 +138,7 @@ const loadTemplate = async () => {
     originalName.value = loaded.name;
     originalContent.value = loaded.content;
   } catch {
-    error.value = t('cvTemplates.errors.loadFailed');
+    error.value = t('applications.cvs.templates.errors.loadFailed');
   } finally {
     loading.value = false;
   }
@@ -159,13 +159,13 @@ const handleSave = async () => {
         originalName.value = updated.name;
         originalContent.value = updated.content;
         toast.add({
-          title: t('cvTemplates.toast.saved'),
+          title: t('applications.cvs.templates.toast.saved'),
           color: 'primary',
         });
       }
     } catch {
       toast.add({
-        title: t('cvTemplates.toast.saveFailed'),
+        title: t('applications.cvs.templates.toast.saveFailed'),
         color: 'error',
       });
     } finally {
@@ -245,10 +245,10 @@ const handlePreview = async () => {
 
     previewContent.value = result ?? '';
     if (!result) {
-      previewError.value = t('cvTemplates.editor.previewFailed');
+      previewError.value = t('applications.cvs.templates.editor.previewFailed');
     }
   } catch {
-    previewError.value = t('cvTemplates.editor.previewFailed');
+    previewError.value = t('applications.cvs.templates.editor.previewFailed');
   } finally {
     previewLoading.value = false;
   }
@@ -263,12 +263,12 @@ const handleSetDefault = async () => {
       defaultTemplateId: template.value.id,
     });
     toast.add({
-      title: t('cvTemplates.toast.defaultSet'),
+      title: t('applications.cvs.templates.toast.defaultSet'),
       color: 'primary',
     });
   } catch {
     toast.add({
-      title: t('cvTemplates.toast.defaultFailed'),
+      title: t('applications.cvs.templates.toast.defaultFailed'),
       color: 'error',
     });
   }
@@ -284,7 +284,7 @@ onMounted(async () => {
       });
     } catch {
       toast.add({
-        title: t('cvTemplates.toast.defaultFailed'),
+        title: t('applications.cvs.templates.toast.defaultFailed'),
         color: 'error',
       });
     }

@@ -4,10 +4,10 @@
       <template #header>
         <div class="space-y-1">
           <h2 class="text-lg font-semibold text-default">
-            {{ t('cvSettings.sections.sections.title') }}
+            {{ t('applications.cvs.settings.sections.sections.title') }}
           </h2>
           <p class="text-sm text-dimmed">
-            {{ t('cvSettings.sections.sections.description') }}
+            {{ t('applications.cvs.settings.sections.sections.description') }}
           </p>
         </div>
       </template>
@@ -27,10 +27,10 @@
       <template #header>
         <div class="space-y-1">
           <h2 class="text-lg font-semibold text-default">
-            {{ t('cvSettings.sections.experiences.title') }}
+            {{ t('applications.cvs.settings.sections.experiences.title') }}
           </h2>
           <p class="text-sm text-dimmed">
-            {{ t('cvSettings.sections.experiences.description') }}
+            {{ t('applications.cvs.settings.sections.experiences.description') }}
           </p>
         </div>
       </template>
@@ -39,12 +39,12 @@
         v-model="experienceSelection"
         :experiences="experiences"
         :loading="loadingExperiences"
-        :title="t('cvSettings.experiences.title')"
-        :empty-label="t('cvSettings.experiences.empty')"
-        :select-all-label="t('cvSettings.experiences.selectAll')"
-        :deselect-all-label="t('cvSettings.experiences.deselectAll')"
+        :title="t('applications.cvs.settings.experiences.title')"
+        :empty-label="t('applications.cvs.settings.experiences.empty')"
+        :select-all-label="t('applications.cvs.settings.experiences.selectAll')"
+        :deselect-all-label="t('applications.cvs.settings.experiences.deselectAll')"
         :selected-label="
-          t('cvSettings.experiences.selected', { count: experienceSelection.length })
+          t('applications.cvs.settings.experiences.selected', { count: experienceSelection.length })
         "
       />
     </UCard>
@@ -53,10 +53,10 @@
       <template #header>
         <div class="space-y-1">
           <h2 class="text-lg font-semibold text-default">
-            {{ t('cvSettings.sections.other.title') }}
+            {{ t('applications.cvs.settings.sections.other.title') }}
           </h2>
           <p class="text-sm text-dimmed">
-            {{ t('cvSettings.sections.other.description') }}
+            {{ t('applications.cvs.settings.sections.other.description') }}
           </p>
         </div>
       </template>
@@ -64,7 +64,7 @@
       <div class="space-y-4">
         <div class="flex items-center justify-between gap-4">
           <p class="text-sm font-medium text-default">
-            {{ t('cvSettings.other.showProfilePhoto') }}
+            {{ t('applications.cvs.settings.other.showProfilePhoto') }}
           </p>
           <USwitch v-model="showProfilePhoto" />
         </div>
@@ -123,7 +123,7 @@ const updateValue = (patch: Partial<CvSettingsFormState>) => {
 const sectionOptions = computed(() =>
   CV_SECTION_KEYS.map((section) => ({
     value: section,
-    label: t(`cvSettings.sectionLabels.${section}`),
+    label: t(`applications.cvs.settings.sectionLabels.${section}`),
   }))
 );
 

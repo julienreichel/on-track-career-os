@@ -26,15 +26,15 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const showPreview = ref(false);
 
-const resolvedNameLabel = computed(() => props.nameLabel ?? t('cvTemplates.editor.nameLabel'));
+const resolvedNameLabel = computed(() => props.nameLabel ?? t('applications.cvs.templates.editor.nameLabel'));
 const resolvedContentLabel = computed(
-  () => props.contentLabel ?? t('cvTemplates.editor.contentLabel')
+  () => props.contentLabel ?? t('applications.cvs.templates.editor.contentLabel')
 );
-const resolvedPreviewLabel = computed(() => props.previewLabel ?? t('cvTemplates.editor.preview'));
+const resolvedPreviewLabel = computed(() => props.previewLabel ?? t('applications.cvs.templates.editor.preview'));
 const resolvedToggleLabel = computed(() =>
   showPreview.value
-    ? (props.hidePreviewLabel ?? t('cvTemplates.editor.hidePreview'))
-    : (props.showPreviewLabel ?? t('cvTemplates.editor.showPreview'))
+    ? (props.hidePreviewLabel ?? t('applications.cvs.templates.editor.hidePreview'))
+    : (props.showPreviewLabel ?? t('applications.cvs.templates.editor.showPreview'))
 );
 
 const previewContent = computed(() => props.previewContent ?? contentInput.value);
@@ -88,7 +88,7 @@ watch(contentInput, (value) => emit('update:content', value));
           v-if="showPreview"
           size="sm"
           variant="soft"
-          :label="t('cvTemplates.editor.regenerate')"
+          :label="t('applications.cvs.templates.editor.regenerate')"
           :disabled="previewLoading"
           @click="emit('preview')"
         />

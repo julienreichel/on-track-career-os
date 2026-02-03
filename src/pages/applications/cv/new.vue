@@ -1,6 +1,6 @@
 <template>
   <UPage>
-    <UPageHeader :title="t('cvGenerate.title')" :description="t('cvGenerate.subtitle')" />
+    <UPageHeader :title="t('applications.cvs.generate.title')" :description="t('applications.cvs.generate.subtitle')" />
 
     <UPageBody>
       <CvGenerateEntryCard
@@ -95,7 +95,7 @@ const templateLabel = computed(() => {
   if (template?.name) {
     return template.name;
   }
-  return fallbackTemplate.value?.name ?? t('cvGenerate.entry.templateFallback');
+  return fallbackTemplate.value?.name ?? t('applications.cvs.generate.entry.templateFallback');
 });
 
 const isGenerating = computed(
@@ -146,7 +146,7 @@ const generateGenericCv = async (context: ReturnType<typeof resolveGenerationCon
 
   if (!cvMarkdown) {
     toast.add({
-      title: t('cvGenerate.toast.generationFailed'),
+      title: t('applications.cvs.generate.toast.generationFailed'),
       description: generationError.value || undefined,
       color: 'error',
     });
@@ -158,7 +158,7 @@ const generateGenericCv = async (context: ReturnType<typeof resolveGenerationCon
     year: 'numeric',
   }).format(new Date());
   const cvDocument = await createDocument({
-    name: t('cvGenerate.defaultName', { date: dateLabel }),
+    name: t('applications.cvs.generate.defaultName', { date: dateLabel }),
     userId: userId.value,
     isTailored: false,
     content: cvMarkdown,
@@ -168,7 +168,7 @@ const generateGenericCv = async (context: ReturnType<typeof resolveGenerationCon
 
   if (!cvDocument) {
     toast.add({
-      title: t('cvGenerate.toast.createFailed'),
+      title: t('applications.cvs.generate.toast.createFailed'),
       color: 'error',
     });
     return;
@@ -178,7 +178,7 @@ const generateGenericCv = async (context: ReturnType<typeof resolveGenerationCon
   captureEvent('cv_created');
 
   toast.add({
-    title: t('cvGenerate.toast.created'),
+    title: t('applications.cvs.generate.toast.created'),
     color: 'primary',
   });
 
@@ -195,7 +195,7 @@ const generateTailoredCv = async (
   const tailoringContext = await tailoredMaterials.loadTailoringContext(targetJobId);
   if (!tailoringContext.ok) {
     toast.add({
-      title: t('cvGenerate.toast.error'),
+      title: t('applications.cvs.generate.toast.error'),
       color: 'error',
     });
     await router.push('/jobs');
@@ -204,7 +204,7 @@ const generateTailoredCv = async (
 
   if (!tailoringContext.matchingSummary) {
     toast.add({
-      title: t('cvGenerate.toast.generationFailed'),
+      title: t('applications.cvs.generate.toast.generationFailed'),
       color: 'error',
     });
     await router.push(`/jobs/${targetJobId}/match`);
@@ -226,7 +226,7 @@ const generateTailoredCv = async (
 
   if (!created?.id) {
     toast.add({
-      title: t('cvGenerate.toast.createFailed'),
+      title: t('applications.cvs.generate.toast.createFailed'),
       color: 'error',
     });
     return;
@@ -259,7 +259,7 @@ const startGeneration = async (override?: {
 const handleGenerateClick = async () => {
   await prepareDefaults();
   if (!userId.value) {
-    toast.add({ title: t('cvGenerate.toast.error'), color: 'error' });
+    toast.add({ title: t('applications.cvs.generate.toast.error'), color: 'error' });
     return;
   }
   void startGeneration();

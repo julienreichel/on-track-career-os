@@ -2,7 +2,7 @@
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="font-semibold">
-        {{ $t('cvExperiencePicker.title') }}
+        {{ $t('applications.cvs.experiencePicker.title') }}
       </h3>
       <UButton
         v-if="experiences.length > 0"
@@ -12,7 +12,7 @@
         @click="toggleAll"
       >
         {{
-          allSelected ? $t('cvExperiencePicker.deselectAll') : $t('cvExperiencePicker.selectAll')
+          allSelected ? $t('applications.cvs.experiencePicker.deselectAll') : $t('applications.cvs.experiencePicker.selectAll')
         }}
       </UButton>
     </div>
@@ -23,9 +23,9 @@
 
     <div v-else-if="experiences.length === 0" class="text-center py-8">
       <UIcon name="i-heroicons-briefcase" class="size-16 mx-auto mb-2" />
-      <p class="mb-4">{{ $t('cvExperiencePicker.noExperiences') }}</p>
+      <p class="mb-4">{{ $t('applications.cvs.experiencePicker.noExperiences') }}</p>
       <UButton :to="{ name: 'profile-experiences' }" color="primary">
-        {{ $t('cvExperiencePicker.addExperience') }}
+        {{ $t('applications.cvs.experiencePicker.addExperience') }}
       </UButton>
     </div>
 
@@ -72,7 +72,7 @@
 
     <div v-if="modelValue.length > 0" class="pt-4 border-t">
       <p class="text-sm">
-        {{ $t('cvExperiencePicker.selected', { count: modelValue.length }) }}
+        {{ $t('applications.cvs.experiencePicker.selected', { count: modelValue.length }) }}
       </p>
     </div>
   </div>
@@ -134,8 +134,8 @@ const toggleAll = () => {
 const formatDateRange = (startDate?: string | null, endDate?: string | null): string => {
   if (!startDate && !endDate) return '';
 
-  const start = startDate || t('cvExperiencePicker.unknown');
-  const end = endDate || t('cvExperiencePicker.present');
+  const start = startDate || t('applications.cvs.experiencePicker.unknown');
+  const end = endDate || t('applications.cvs.experiencePicker.present');
 
   return `${start} - ${end}`;
 };
