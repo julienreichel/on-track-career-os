@@ -35,6 +35,7 @@ function getAllFilesInDir(dir: string, ext: string[]): string[] {
     }
   } catch (e) {
     // Skip directories we can't read
+    console.log(e);
   }
 
   return files;
@@ -63,6 +64,7 @@ function extractKeysFromCode(files: string[]): Set<string> {
       }
     } catch (e) {
       // Skip files we can't read
+      console.log(e);
     }
   }
 
@@ -114,19 +116,13 @@ describe('i18n - Missing Keys Detection', () => {
       .filter((key) => !definedKeys.has(key))
       .sort();
 
-    const message =
-      missingKeys.length > 0
-        ? `Missing i18n keys:\n${missingKeys.map((k) => `  - ${k}`).join('\n')}`
-        : '';
-
-    expect(missingKeys).toHaveLength(0, message);
+    expect(missingKeys).toHaveLength(0);
   });
 });
 it('should report keys found in source code', () => {
   // Verify we found a reasonable number of keys
   const storyKeys = Array.from(usedKeysFromCode).filter((k) => k.startsWith('stories'));
   const jobKeys = Array.from(usedKeysFromCode).filter((k) => k.startsWith('jobs'));
-  const appKeys = Array.from(usedKeysFromCode).filter((k) => k.startsWith('applications'));
 
   expect(usedKeysFromCode.size).toBeGreaterThan(100); // Should find at least 100 keys
   expect(storyKeys.length).toBeGreaterThan(5);
