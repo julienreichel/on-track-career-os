@@ -45,7 +45,7 @@ test.describe('CV Settings & Templates (EPIC 3C)', () => {
     await expect(createTemplateButton).toBeVisible();
     await createTemplateButton.click();
 
-    const systemTemplateButton = page.getByRole('button', { name: /^classic$/i });
+    const systemTemplateButton = page.getByRole('button', { name: /classic/i });
     await expect(systemTemplateButton).toBeVisible();
     await systemTemplateButton.click();
 

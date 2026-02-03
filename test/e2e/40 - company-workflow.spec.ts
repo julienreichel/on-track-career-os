@@ -40,7 +40,7 @@ test.describe('Company workflow', () => {
     await page.goto('/companies');
     await page.waitForLoadState('networkidle');
     await expect(page.getByRole('heading', { name: 'Companies', level: 1 })).toBeVisible();
-    await page.getByRole('link', { name: /add company/i }).click();
+    await page.getByRole('link', { name: /^add$/i }).click();
     await expect(page).toHaveURL('/companies/new');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(500);
@@ -111,7 +111,7 @@ test.describe('Company workflow', () => {
 
     await page.goto('/jobs');
     await page.waitForLoadState('networkidle');
-    await page.getByRole('link', { name: /add job/i }).click();
+    await page.getByRole('link', { name: /^add$/i }).click();
     await expect(page).toHaveURL('/jobs/new');
     await page.waitForLoadState('networkidle');
 

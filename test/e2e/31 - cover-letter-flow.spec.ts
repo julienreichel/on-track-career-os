@@ -53,7 +53,7 @@ test.describe('Cover Letter E2E Flow', () => {
     );
 
     // Generate the cover letter directly
-    const generateButton = page.getByRole('button', { name: /Generate Cover Letter/i });
+    const generateButton = page.getByRole('button', { name: /^generate$/i });
     await expect(generateButton).toBeVisible();
     await expect(generateButton).toBeEnabled();
 
@@ -228,7 +228,9 @@ test.describe('Cover Letter E2E Flow', () => {
     await expect(confirmDeleteButton).toBeVisible();
     await confirmDeleteButton.click();
 
-    await expect(page.getByText('Cover letter deleted', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('Cover letter deleted successfully', { exact: true })
+    ).toBeVisible();
 
     // Cover letter should no longer appear in list
     await expect(

@@ -54,7 +54,7 @@ test.describe('Speech Block E2E Flow', () => {
     const contextInput = page.getByTestId('speech-context-textarea');
     await contextInput.fill('Speaking context for a lead engineering role.');
 
-    const generateButton = page.getByRole('button', { name: /Generate speech/i });
+    const generateButton = page.getByRole('button', { name: /^generate$/i });
     await expect(generateButton).toBeEnabled();
     await generateButton.click();
 
@@ -83,7 +83,7 @@ test.describe('Speech Block E2E Flow', () => {
     await expect(page.getByRole('heading', { name: 'Why me' })).toBeVisible();
 
     // Generate button should be visible
-    const generateButton = page.getByRole('button', { name: /Generate speech|Regenerate speech/i });
+    const generateButton = page.getByRole('button', { name: /generate|regenerate/i });
     await expect(generateButton).toBeVisible();
     await expect(generateButton).toBeEnabled();
   });
@@ -98,7 +98,7 @@ test.describe('Speech Block E2E Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Trigger generation
-    const generateButton = page.getByRole('button', { name: /Generate speech|Regenerate speech/i });
+    const generateButton = page.getByRole('button', { name: /generate|regenerate/i });
     await expect(generateButton).toBeVisible();
     await expect(generateButton).toBeEnabled();
     await generateButton.click();
@@ -132,7 +132,9 @@ test.describe('Speech Block E2E Flow', () => {
     await elevatorPitchTextarea.fill(`${elevatorValue} ${Date.now()}`);
     await expect(saveButton).toBeEnabled();
     await saveButton.click();
-    await expect(page.getByText('Speech saved', { exact: true })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Speech generated successfully', { exact: true })).toBeVisible({
+      timeout: 5000,
+    });
     await expect(page.getByRole('button', { name: /^Edit$/ })).toBeVisible();
   });
 
@@ -168,9 +170,11 @@ test.describe('Speech Block E2E Flow', () => {
     await saveButton.click();
 
     // Wait for success toast and view mode to return
-    await expect(page.getByText('Speech saved', { exact: true })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Speech updated successfully', { exact: true })).toBeVisible({
+      timeout: 10000,
+    });
     await expect(page.getByRole('button', { name: /^Edit$/ })).toBeVisible();
-    await expect(page.getByText('Speech saved', { exact: true })).not.toBeVisible({
+    await expect(page.getByText('Speech updated successfully', { exact: true })).not.toBeVisible({
       timeout: 10000,
     });
 

@@ -53,13 +53,13 @@ test.describe('Story workflow', () => {
     await page.waitForLoadState('networkidle');
 
     await page
-      .getByRole('heading', { name: /Generate from Free Text/i })
+      .getByRole('heading', { name: /Free Text/i })
       .first()
       .click();
 
-    const freeTextTextarea = page.getByLabel(/Your Achievement Description/i);
+    const freeTextTextarea = page.getByLabel(/Your Achievement/i);
     await freeTextTextarea.fill(FREE_TEXT_INPUT);
-    await page.getByRole('button', { name: /Generate from Free Text/i }).click();
+    await page.getByRole('button', { name: /Generate from free text/i }).click();
 
     const storyTitleInput = page.getByLabel(/Story Title/i);
     await expect(storyTitleInput).not.toHaveValue('', { timeout: 60000 });
