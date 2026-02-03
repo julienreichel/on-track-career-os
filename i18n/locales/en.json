@@ -505,7 +505,25 @@
           "hint": "Press Enter to add each KPI"
         }
       },
-      "generateAchievements": "Generate Achievements"
+      "generateAchievements": "Generate Achievements",
+      "mode": {
+        "chooseTitle": "How do you want to create this story?",
+        "chooseDescription": "Select the method that works best for you. You can change modes anytime.",
+        "interview": {
+          "title": "Interview Mode",
+          "description": "Answer guided questions to build your STAR story."
+        },
+        "manual": {
+          "title": "Manual Entry",
+          "description": "Write your own STAR story with full control."
+        },
+        "freetext": {
+          "title": "Free Text",
+          "instructions": "Describe your achievement in your own words. Our AI will help structure it.",
+          "label": "Your Achievement",
+          "placeholder": "Tell us about your achievement, challenge, and the impact you made..."
+        }
+      }
     }
   },
   "star": {
