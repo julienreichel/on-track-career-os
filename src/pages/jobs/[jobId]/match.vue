@@ -187,13 +187,13 @@ onMounted(async () => {
                 </p>
               </div>
               <div v-if="linkedCompany">
-                <p class="text-sm text-dimmed">{{ t('jobDetail.meta.companyId') }}</p>
+                <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.companyId') }}</p>
                 <div class="mt-1">
                   <LinkedCompanyBadge :company="linkedCompany" />
                 </div>
               </div>
               <div v-else-if="companyLink">
-                <p class="text-sm text-dimmed">{{ t('jobDetail.meta.companyId') }}</p>
+                <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.companyId') }}</p>
                 <UButton
                   class="mt-1"
                   color="neutral"

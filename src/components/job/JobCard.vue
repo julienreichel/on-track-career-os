@@ -17,8 +17,8 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const title = computed(() => props.job.title || t('jobList.card.noTitle'));
-const subtitle = computed(() => props.job.seniorityLevel || t('jobList.card.noSeniority'));
+const title = computed(() => props.job.title || t('jobs.list.card.noTitle'));
+const subtitle = computed(() => props.job.seniorityLevel || t('jobs.list.card.noSeniority'));
 
 const lastUpdated = computed(() => formatListDate(props.job.updatedAt ?? props.job.createdAt));
 
@@ -50,7 +50,7 @@ function handleDelete() {
         {{ job.roleSummary }}
       </p>
       <p v-else class="text-gray-500">
-        {{ t('jobUpload.description') }}
+        {{ t('ingestion.job.upload.description') }}
       </p>
     </div>
 
@@ -64,7 +64,7 @@ function handleDelete() {
         @click.stop="handleOpen"
       />
       <UButton
-        :label="t('jobList.actions.match')"
+        :label="t('jobs.list.actions.match')"
         icon="i-heroicons-sparkles"
         size="xs"
         color="neutral"

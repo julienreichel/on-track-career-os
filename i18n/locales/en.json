@@ -61,6 +61,25 @@
           "importFailed": "Failed to import experiences. Please try again."
         }
       }
+    },
+    "job": {
+      "upload": {
+        "title": "Analyze a New Job",
+        "description": "Upload a job description and let AI structure the role automatically.",
+        "dropzone": {
+          "label": "Drop the job description here or click to upload",
+          "description": "Accepted formats: PDF (.pdf) or plain text (.txt)"
+        },
+        "fileUploaded": "Uploaded {fileName}",
+        "status": {
+          "extracting": "Extracting job description from the uploaded file…",
+          "analyzing": "Analyzing job description with AI…"
+        },
+        "errors": {
+          "tooShort": "The job description is too short. Please upload a complete document.",
+          "generic": "Unable to analyze this job description."
+        }
+      }
     }
   },
   "home": {
@@ -920,73 +939,6 @@
       "loadErrorTitle": "Unable to load materials"
     }
   },
-  "jobUpload": {
-    "title": "Analyze a New Job",
-    "description": "Upload a job description and let AI structure the role automatically.",
-    "dropzone": {
-      "label": "Drop the job description here or click to upload",
-      "description": "Accepted formats: PDF (.pdf) or plain text (.txt)"
-    },
-    "fileUploaded": "Uploaded {fileName}",
-    "status": {
-      "extracting": "Extracting job description from the uploaded file…",
-      "analyzing": "Analyzing job description with AI…"
-    },
-    "errors": {
-      "tooShort": "The job description is too short. Please upload a complete document.",
-      "generic": "Unable to analyze this job description."
-    }
-  },
-  "jobList": {
-    "actions": {
-      "add": "Add Job",
-      "match": "View match"
-    },
-    "search": {
-      "placeholder": "Search jobs...",
-      "noResults": "No jobs match your search."
-    },
-    "card": {
-      "noSeniority": "Seniority unknown",
-      "noTitle": "Untitled job"
-    }
-  },
-  "jobDetail": {
-    "description": "Review and refine the AI parsed job details.",
-    "fields": {
-      "title": "Job title",
-      "seniorityLevel": "Seniority level",
-      "roleSummary": "Role summary"
-    },
-    "placeholders": {
-      "title": "Enter or edit the job title",
-      "seniorityLevel": "Enter seniority (e.g., Senior, Director)",
-      "roleSummary": "Summarize the core responsibilities and mission for this role"
-    },
-    "sections": {
-      "parsedData": "AI parsed details",
-      "description": "Edit or extend the structured job data before preparing your application."
-    },
-    "meta": {
-      "status": "Status",
-      "createdAt": "Created at",
-      "companyId": "Company",
-      "notAvailable": "Not available"
-    },
-    "companyLink": {
-      "selectPlaceholder": "Search companies by name, industry, or market...",
-      "create": "Create company",
-      "clear": "Clear link",
-      "view": "View company",
-      "none": "No company linked",
-      "empty": "No companies found. Try another search or create one."
-    },
-    "errors": {
-      "title": "Job details",
-      "generic": "Unable to update the job. Please try again.",
-      "notFound": "Job description not found"
-    }
-  },
   "matching": {
     "page": {
       "description": "Compare your profile, experiences, and linked company context with this role.",
@@ -1388,13 +1340,20 @@
     "list": {
       "actions": {
         "view": "View job",
-        "viewCompanies": "View companies"
+        "viewCompanies": "View companies",
+        "add": "Add Job",
+        "match": "View match"
       },
       "search": {
-        "placeholder": "Search jobs..."
+        "placeholder": "Search jobs...",
+        "noResults": "No jobs match your search."
       },
       "errors": {
         "generic": "Something went wrong while loading your jobs."
+      },
+      "card": {
+        "noSeniority": "Seniority unknown",
+        "noTitle": "Untitled job"
       }
     },
     "detail": {
@@ -1407,13 +1366,40 @@
       "meta": {
         "status": "Status",
         "updatedAt": "Updated at",
-        "notAvailable": "Not available"
+        "notAvailable": "Not available",
+        "createdAt": "Created at",
+        "companyId": "Company"
       },
       "companyLink": {
-        "view": "View company"
+        "view": "View company",
+        "selectPlaceholder": "Search companies by name, industry, or market...",
+        "create": "Create company",
+        "clear": "Clear link",
+        "none": "No company linked",
+        "empty": "No companies found. Try another search or create one."
       },
       "actions": {
         "viewMatch": "View match"
+      },
+      "description": "Review and refine the AI parsed job details.",
+      "fields": {
+        "title": "Job title",
+        "seniorityLevel": "Seniority level",
+        "roleSummary": "Role summary"
+      },
+      "placeholders": {
+        "title": "Enter or edit the job title",
+        "seniorityLevel": "Enter seniority (e.g., Senior, Director)",
+        "roleSummary": "Summarize the core responsibilities and mission for this role"
+      },
+      "sections": {
+        "parsedData": "AI parsed details",
+        "description": "Edit or extend the structured job data before preparing your application."
+      },
+      "errors": {
+        "title": "Job details",
+        "generic": "Unable to update the job. Please try again.",
+        "notFound": "Job description not found"
       }
     },
     "form": {

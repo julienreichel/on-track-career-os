@@ -297,11 +297,11 @@ async function loadJob() {
   try {
     const result = await jobAnalysis.loadJobWithRelations(id);
     if (!result) {
-      throw new Error(t('jobDetail.errors.notFound'));
+      throw new Error(t('jobs.detail.errors.notFound'));
     }
     hydrateForm(result);
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : t('jobDetail.errors.generic');
+    errorMessage.value = error instanceof Error ? error.message : t('jobs.detail.errors.generic');
   } finally {
     loading.value = false;
   }
@@ -338,7 +338,7 @@ function updateListField(field: ListField, value: string[]) {
 }
 
 function updateBreadcrumb(title?: string | null) {
-  route.meta.breadcrumbLabel = title?.trim() || t('jobList.card.noTitle');
+  route.meta.breadcrumbLabel = title?.trim() || t('jobs.list.card.noTitle');
 }
 
 type DatedItem = {
@@ -425,7 +425,7 @@ async function handleSave() {
     hydrateForm(updated);
     isEditing.value = false;
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : t('jobDetail.errors.generic');
+    errorMessage.value = error instanceof Error ? error.message : t('jobs.detail.errors.generic');
   } finally {
     saving.value = false;
   }
@@ -471,7 +471,7 @@ async function handleCompanyLinkChange(nextCompanyId: string | null) {
     hydrateForm(updated);
   } catch (error) {
     selectedCompanyId.value = previousCompanyId;
-    errorMessage.value = error instanceof Error ? error.message : t('jobDetail.errors.generic');
+    errorMessage.value = error instanceof Error ? error.message : t('jobs.detail.errors.generic');
   } finally {
     linkingCompany.value = false;
   }
@@ -494,7 +494,7 @@ function redirectToCompanyCreate() {
     <UPage>
       <UPageHeader
         :title="displayTitle"
-        :description="t('jobDetail.description')"
+        :description="t('jobs.detail.description')"
         :links="headerLinks"
       />
 
@@ -506,7 +506,7 @@ function redirectToCompanyCreate() {
           icon="i-heroicons-exclamation-triangle"
           color="error"
           variant="soft"
-          :title="t('jobDetail.errors.title')"
+          :title="t('jobs.detail.errors.title')"
           :description="errorMessage"
           :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
           class="mb-6"
@@ -524,30 +524,30 @@ function redirectToCompanyCreate() {
             <UCard class="mb-6">
               <div class="flex flex-col gap-6">
                 <div class="grid gap-4 md:grid-cols-2">
-                  <UFormField :label="t('jobDetail.fields.title')">
+                  <UFormField :label="t('jobs.detail.fields.title')">
                     <UInput
                       v-model="form.title"
-                      :placeholder="t('jobDetail.placeholders.title')"
+                      :placeholder="t('jobs.detail.placeholders.title')"
                       :disabled="disableActions"
                       class="w-full"
                       data-testid="job-title-input"
                     />
                   </UFormField>
 
-                  <UFormField :label="t('jobDetail.fields.seniorityLevel')">
+                  <UFormField :label="t('jobs.detail.fields.seniorityLevel')">
                     <UInput
                       v-model="form.seniorityLevel"
-                      :placeholder="t('jobDetail.placeholders.seniorityLevel')"
+                      :placeholder="t('jobs.detail.placeholders.seniorityLevel')"
                       :disabled="disableActions"
                       data-testid="job-seniority-input"
                     />
                   </UFormField>
                 </div>
 
-                <UFormField :label="t('jobDetail.fields.roleSummary')">
+                <UFormField :label="t('jobs.detail.fields.roleSummary')">
                   <UTextarea
                     v-model="form.roleSummary"
-                    :placeholder="t('jobDetail.placeholders.roleSummary')"
+                    :placeholder="t('jobs.detail.placeholders.roleSummary')"
                     :disabled="disableActions"
                     :rows="4"
                     class="w-full"
@@ -558,7 +558,7 @@ function redirectToCompanyCreate() {
                 <div class="grid gap-4 sm:grid-cols-2">
                   <div>
                     <p class="text-sm text-gray-500">
-                      {{ t('jobDetail.meta.status') }}
+                      {{ t('jobs.detail.meta.status') }}
                     </p>
                     <UBadge color="neutral" variant="outline" class="mt-1">
                       {{ statusLabel }}
@@ -566,15 +566,15 @@ function redirectToCompanyCreate() {
                   </div>
                   <div>
                     <p class="text-sm text-gray-500">
-                      {{ t('jobDetail.meta.createdAt') }}
+                      {{ t('jobs.detail.meta.createdAt') }}
                     </p>
                     <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">
-                      {{ formattedCreatedAt || t('jobDetail.meta.notAvailable') }}
+                      {{ formattedCreatedAt || t('jobs.detail.meta.notAvailable') }}
                     </p>
                   </div>
                   <div v-if="linkedCompany">
                     <p class="text-sm text-gray-500">
-                      {{ t('jobDetail.meta.companyId') }}
+                      {{ t('jobs.detail.meta.companyId') }}
                     </p>
                     <div class="mt-1 flex items-center gap-2">
                       <LinkedCompanyBadge :company="linkedCompany" />
@@ -583,7 +583,7 @@ function redirectToCompanyCreate() {
                         variant="ghost"
                         color="neutral"
                         icon="i-heroicons-x-mark-20-solid"
-                        :aria-label="t('jobDetail.companyLink.clear')"
+                        :aria-label="t('jobs.detail.companyLink.clear')"
                         data-testid="job-company-clear"
                         :disabled="linkingCompany"
                         @click="handleCompanyLinkClear"
@@ -611,9 +611,9 @@ function redirectToCompanyCreate() {
             <UCard>
               <template #header>
                 <div>
-                  <h3 class="text-lg font-semibold">{{ t('jobDetail.sections.parsedData') }}</h3>
+                  <h3 class="text-lg font-semibold">{{ t('jobs.detail.sections.parsedData') }}</h3>
                   <p class="text-sm text-gray-500">
-                    {{ t('jobDetail.sections.description') }}
+                    {{ t('jobs.detail.sections.description') }}
                   </p>
                 </div>
               </template>
@@ -674,28 +674,28 @@ function redirectToCompanyCreate() {
             <UCard class="mb-6">
               <div class="flex flex-col gap-6">
                 <div class="grid gap-4 md:grid-cols-2">
-                  <UFormField :label="t('jobDetail.fields.title')">
-                    <p>{{ form.title || t('jobDetail.meta.notAvailable') }}</p>
+                  <UFormField :label="t('jobs.detail.fields.title')">
+                    <p>{{ form.title || t('jobs.detail.meta.notAvailable') }}</p>
                   </UFormField>
-                  <UFormField :label="t('jobDetail.fields.seniorityLevel')">
-                    <p>{{ form.seniorityLevel || t('jobDetail.meta.notAvailable') }}</p>
+                  <UFormField :label="t('jobs.detail.fields.seniorityLevel')">
+                    <p>{{ form.seniorityLevel || t('jobs.detail.meta.notAvailable') }}</p>
                   </UFormField>
                 </div>
-                <UFormField :label="t('jobDetail.fields.roleSummary')">
-                  <p>{{ form.roleSummary || t('jobDetail.meta.notAvailable') }}</p>
+                <UFormField :label="t('jobs.detail.fields.roleSummary')">
+                  <p>{{ form.roleSummary || t('jobs.detail.meta.notAvailable') }}</p>
                 </UFormField>
                 <div class="grid gap-4 sm:grid-cols-2">
-                  <UFormField :label="t('jobDetail.meta.status')">
+                  <UFormField :label="t('jobs.detail.meta.status')">
                     <UBadge color="neutral" variant="outline" icon="i-heroicons-briefcase">
                       {{ statusLabel }}
                     </UBadge>
                   </UFormField>
-                  <UFormField :label="t('jobDetail.meta.createdAt')">
-                    <p>{{ formattedCreatedAt || t('jobDetail.meta.notAvailable') }}</p>
+                  <UFormField :label="t('jobs.detail.meta.createdAt')">
+                    <p>{{ formattedCreatedAt || t('jobs.detail.meta.notAvailable') }}</p>
                   </UFormField>
-                  <UFormField :label="t('jobDetail.meta.companyId')">
+                  <UFormField :label="t('jobs.detail.meta.companyId')">
                     <LinkedCompanyBadge v-if="linkedCompany" :company="linkedCompany" />
-                    <p v-else>{{ t('jobDetail.meta.notAvailable') }}</p>
+                    <p v-else>{{ t('jobs.detail.meta.notAvailable') }}</p>
                   </UFormField>
                 </div>
               </div>
@@ -704,9 +704,9 @@ function redirectToCompanyCreate() {
             <UCard>
               <template #header>
                 <div>
-                  <h3 class="text-lg font-semibold">{{ t('jobDetail.sections.parsedData') }}</h3>
+                  <h3 class="text-lg font-semibold">{{ t('jobs.detail.sections.parsedData') }}</h3>
                   <p class="text-sm text-gray-500">
-                    {{ t('jobDetail.sections.description') }}
+                    {{ t('jobs.detail.sections.description') }}
                   </p>
                 </div>
               </template>
@@ -718,7 +718,7 @@ function redirectToCompanyCreate() {
                       {{ item }}
                     </li>
                   </ul>
-                  <p v-else>{{ t('jobDetail.meta.notAvailable') }}</p>
+                  <p v-else>{{ t('jobs.detail.meta.notAvailable') }}</p>
                 </template>
               </UTabs>
 
@@ -743,7 +743,7 @@ function redirectToCompanyCreate() {
         </template>
 
         <UCard v-else>
-          <UEmpty :title="t('jobDetail.errors.notFound')" icon="i-heroicons-briefcase">
+          <UEmpty :title="t('jobs.detail.errors.notFound')" icon="i-heroicons-briefcase">
             <template #actions>
               <UButton :label="t('common.backToList')" @click="router.push('/jobs')" />
             </template>

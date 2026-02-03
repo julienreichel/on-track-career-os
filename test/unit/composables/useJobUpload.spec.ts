@@ -93,7 +93,7 @@ describe('useJobUpload', () => {
     const job = await jobUpload.handleFileSelected(createPdfFile());
 
     expect(job).toBeNull();
-    expect(jobUpload.errorMessage.value).toBe('jobUpload.errors.tooShort');
+    expect(jobUpload.errorMessage.value).toBe('ingestion.job.upload.errors.tooShort');
     expect(jobUpload.selectedFile.value).toBeNull();
   });
 

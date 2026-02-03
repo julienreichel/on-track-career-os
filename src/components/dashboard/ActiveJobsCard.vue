@@ -23,7 +23,7 @@ const showEmpty = computed(() => !props.loading && props.states.length === 0);
           <p class="text-sm text-dimmed">{{ t('dashboard.activeJobs.description') }}</p>
         </div>
         <UButton
-          :label="t('jobList.actions.add')"
+          :label="t('jobs.list.actions.add')"
           icon="i-heroicons-plus"
           color="primary"
           variant="outline"

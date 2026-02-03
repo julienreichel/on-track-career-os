@@ -74,7 +74,7 @@ describe('JobUploadStep', () => {
   it('displays status skeleton when processing', () => {
     const wrapper = mountComponent({
       isProcessing: true,
-      statusMessage: 'jobUpload.status.analyzing',
+      statusMessage: 'ingestion.job.upload.status.analyzing',
     });
 
     expect(wrapper.findAll('.u-skeleton').length).toBeGreaterThan(0);

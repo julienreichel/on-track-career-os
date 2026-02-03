@@ -62,7 +62,7 @@ const triggerCreate = () => {
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
       <UInput
         v-model="searchQuery"
-        :placeholder="t('jobDetail.companyLink.selectPlaceholder')"
+        :placeholder="t('jobs.detail.companyLink.selectPlaceholder')"
         :disabled="disabled"
         icon="i-heroicons-magnifying-glass-20-solid"
         data-testid="company-selector-search"
@@ -70,7 +70,7 @@ const triggerCreate = () => {
       <UButton
         color="primary"
         icon="i-heroicons-plus"
-        :label="t('jobDetail.companyLink.create')"
+        :label="t('jobs.detail.companyLink.create')"
         :disabled="disabled"
         data-testid="company-selector-create"
         @click="triggerCreate"
@@ -105,13 +105,13 @@ const triggerCreate = () => {
               {{
                 company.industry ||
                 company.sizeRange ||
-                (company.productsServices?.[0] ?? t('jobDetail.companyLink.none'))
+                (company.productsServices?.[0] ?? t('jobs.detail.companyLink.none'))
               }}
             </span>
           </button>
         </div>
         <div v-else class="p-4 text-sm text-gray-500 dark:text-gray-400">
-          {{ t('jobDetail.companyLink.empty') }}
+          {{ t('jobs.detail.companyLink.empty') }}
         </div>
       </template>
     </div>

@@ -29,12 +29,12 @@ const companyLink = computed(() => (props.company ? `/companies/${props.company.
         color="primary"
         variant="ghost"
         icon="i-heroicons-arrow-top-right-on-square"
-        :label="t('jobDetail.companyLink.view')"
+        :label="t('jobs.detail.companyLink.view')"
         :to="companyLink"
       />
     </template>
     <p v-else class="text-sm text-gray-500 dark:text-gray-400">
-      {{ t('jobDetail.companyLink.none') }}
+      {{ t('jobs.detail.companyLink.none') }}
     </p>
   </div>
 </template>

@@ -26,8 +26,8 @@ function handleFileChange(file: File | null | undefined) {
     <div class="space-y-4">
       <UFileUpload
         :model-value="selectedFile"
-        :label="t('jobUpload.dropzone.label')"
-        :description="t('jobUpload.dropzone.description')"
+        :label="t('ingestion.job.upload.dropzone.label')"
+        :description="t('ingestion.job.upload.dropzone.description')"
         accept=".pdf,.txt"
         :clearable="false"
         :disabled="isProcessing"
@@ -42,7 +42,7 @@ function handleFileChange(file: File | null | undefined) {
 
       <UAlert
         v-else-if="selectedFile"
-        :title="t('jobUpload.fileUploaded', { fileName: selectedFile.name })"
+        :title="t('ingestion.job.upload.fileUploaded', { fileName: selectedFile.name })"
         color="primary"
       />
     </div>

@@ -25,9 +25,9 @@ export function useJobUpload() {
   const statusMessage = computed(() => {
     switch (status.value) {
       case 'extracting':
-        return t('jobUpload.status.extracting');
+        return t('ingestion.job.upload.status.extracting');
       case 'analyzing':
-        return t('jobUpload.status.analyzing');
+        return t('ingestion.job.upload.status.analyzing');
       default:
         return null;
     }
@@ -58,9 +58,9 @@ export function useJobUpload() {
     const sanitized = rawText?.trim();
     if (!sanitized || sanitized.length < MIN_TEXT_LENGTH) {
       status.value = 'idle';
-      errorMessage.value = t('jobUpload.errors.tooShort');
+      errorMessage.value = t('ingestion.job.upload.errors.tooShort');
       selectedFile.value = null;
-      throw new Error(t('jobUpload.errors.tooShort'));
+      throw new Error(t('ingestion.job.upload.errors.tooShort'));
     }
 
     status.value = 'analyzing';
@@ -71,7 +71,7 @@ export function useJobUpload() {
       captureEvent('job_uploaded');
       return analyzed;
     } catch (error) {
-      errorMessage.value = error instanceof Error ? error.message : t('jobUpload.errors.generic');
+      errorMessage.value = error instanceof Error ? error.message : t('ingestion.job.upload.errors.generic');
       selectedFile.value = null;
       throw error;
     } finally {
@@ -88,7 +88,7 @@ export function useJobUpload() {
       const job = await processFile(file);
       return job;
     } catch (error) {
-      errorMessage.value = error instanceof Error ? error.message : t('jobUpload.errors.generic');
+      errorMessage.value = error instanceof Error ? error.message : t('ingestion.job.upload.errors.generic');
       return null;
     }
   }

@@ -73,7 +73,7 @@ async function loadJobs() {
   try {
     await jobAnalysis.listJobs();
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : t('jobUpload.errors.generic');
+    errorMessage.value = error instanceof Error ? error.message : t('ingestion.job.upload.errors.generic');
   } finally {
     loading.value = false;
     hasLoaded.value = true;
@@ -98,7 +98,7 @@ async function confirmDelete() {
     showDeleteModal.value = false;
     jobToDelete.value = null;
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : t('jobUpload.errors.generic');
+    errorMessage.value = error instanceof Error ? error.message : t('ingestion.job.upload.errors.generic');
   }
 }
 
@@ -147,9 +147,9 @@ function cancelDelete() {
         <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
 
         <UCard v-else-if="filteredJobs.length === 0">
-          <UEmpty :title="t('jobList.search.noResults')" icon="i-heroicons-magnifying-glass">
+          <UEmpty :title="t('jobs.list.search.noResults')" icon="i-heroicons-magnifying-glass">
             <p class="text-sm text-gray-500">
-              {{ t('jobList.search.placeholder') }}
+              {{ t('jobs.list.search.placeholder') }}
             </p>
           </UEmpty>
         </UCard>
