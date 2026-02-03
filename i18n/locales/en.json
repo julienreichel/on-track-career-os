@@ -7,7 +7,6 @@
     "profile": "Profile",
     "cvUpload": "Upload CV",
     "experiences": "Experiences",
-    "stories": "Stories",
     "personalCanvas": "Personal Canvas",
     "jobs": "Jobs",
     "companies": "Companies",
@@ -43,8 +42,7 @@
       "description": "Build your professional profile and personal canvas"
     },
     "cvUpload": {
-      "title": "Upload CV",
-      "description": "Upload your CV to extract experiences automatically"
+      "title": "Upload CV"
     },
     "experiences": {
       "title": "Experiences",
@@ -57,17 +55,12 @@
     "applications": {
       "title": "Applications",
       "description": "Generate tailored CVs, cover letters, and speech"
-    },
-    "interview": {
-      "title": "Interview Prep"
     }
   },
   "companies": {
     "list": {
       "title": "Companies",
-      "description": "Track the organizations you are researching and their business models.",
       "actions": {
-        "add": "Add company",
         "viewJobs": "View jobs"
       },
       "search": {
@@ -81,21 +74,12 @@
       "empty": {
         "title": "No companies yet",
         "description": "Start by adding a company you'd like to research."
-      },
-      "delete": {
-        "title": "Delete company",
-        "message": "Are you sure you want to delete this company? This action cannot be undone.",
-        "confirm": "Delete",
-        "cancel": "Cancel"
       }
     },
     "card": {
       "noName": "Untitled company",
       "noIndustry": "Industry not specified",
-      "emptyDescription": "Add a short description or list of products to describe this company.",
-      "products": "{count} products/services",
-      "markets": "{count} markets",
-      "edit": "Edit"
+      "emptyDescription": "Add a short description or list of products to describe this company."
     },
     "form": {
       "title": "Add Company",
@@ -129,57 +113,9 @@
         "missingNotes": "Add research notes before running AI analysis."
       },
       "actions": {
-        "save": "Save",
-        "analyze": "Save & analyze"
+        "save": "Save"
       },
-      "createTitle": "Add Company",
-      "editTitle": "Edit Company",
-      "fields": {
-        "companyName": {
-          "label": "Company name",
-          "placeholder": "e.g., Atlas Robotics",
-          "hint": "Required"
-        },
-        "industry": {
-          "label": "Industry",
-          "placeholder": "e.g., Energy analytics",
-          "hint": "What category does this company operate in?"
-        },
-        "sizeRange": {
-          "label": "Size range",
-          "placeholder": "e.g., 201-500",
-          "hint": "Approximate employee count or stage"
-        },
-        "website": {
-          "label": "Website",
-          "placeholder": "https://example.com"
-        },
-        "productsServices": {
-          "label": "Products & services",
-          "placeholder": "Add a product or service and press Enter",
-          "hint": "List key offerings as tags"
-        },
-        "targetMarkets": {
-          "label": "Target markets",
-          "placeholder": "Add a market and press Enter",
-          "hint": "Regions or verticals served"
-        },
-        "customerSegments": {
-          "label": "Customer segments",
-          "placeholder": "Add a segment and press Enter",
-          "hint": "Key buyer personas or accounts"
-        },
-        "description": {
-          "label": "Company description",
-          "placeholder": "Describe what this company does...",
-          "hint": "Optional short description for your context"
-        },
-        "notes": {
-          "label": "Research notes",
-          "placeholder": "Paste raw research notes...",
-          "hint": "Paste any call notes, press articles, or observations. These will be used for AI analysis."
-        }
-      }
+      "fields": {}
     },
     "notes": {
       "label": "Research notes",
@@ -195,20 +131,11 @@
         "linkedJobsEmpty": "No jobs are linked to this company yet."
       },
       "lastUpdated": "Last updated {date}",
-      "actions": {
-        "analyze": "Analyze company info",
-        "save": "Save"
-      },
       "errors": {
         "title": "Company error",
         "generic": "Something went wrong while processing this company.",
-        "notFound": "This company could not be found.",
-        "missingNotes": "Add research notes before running analysis."
-      },
-      "title": "Company Details",
-      "notFound": "Company not found",
-      "notFoundDescription": "This company could not be found.",
-      "loading": "Loading company..."
+        "notFound": "This company could not be found."
+      }
     },
     "canvas": {
       "title": "Company Canvas",
@@ -220,8 +147,7 @@
       "lastGeneratedAt": "Last generated {date}",
       "lastGeneratedUnknown": "Unknown",
       "actions": {
-        "generate": "Generate canvas",
-        "save": "Save canvas"
+        "generate": "Generate canvas"
       },
       "errors": {
         "save": "Failed to save the canvas.",
@@ -292,14 +218,6 @@
     "delete": {
       "title": "Delete company",
       "message": "Are you sure you want to delete this company? This action cannot be undone."
-    },
-    "toast": {
-      "created": "Company created successfully",
-      "createFailed": "Failed to create company",
-      "updated": "Company updated successfully",
-      "updateFailed": "Failed to update company",
-      "deleted": "Company deleted successfully",
-      "deleteFailed": "Failed to delete company"
     }
   },
   "cvUpload": {
@@ -311,27 +229,12 @@
     "parsing": "Parsing your CV...",
     "parsingDescription": "AI is extracting your experiences and information.",
     "sections": {
-      "experiences": "Review and confirm your experiences",
-      "profile": "Profile Information"
-    },
-    "profile": {
-      "fullName": "Full Name",
-      "headline": "Headline",
-      "location": "Location",
-      "seniorityLevel": "Seniority Level",
-      "goals": "Goals",
-      "aspirations": "Aspirations",
-      "personalValues": "Personal Values",
-      "strengths": "Strengths",
-      "interests": "Interests",
-      "languages": "Languages"
+      "experiences": "Review and confirm your experiences"
     },
     "confirmImport": "Confirm & continue",
-    "cancel": "Cancel",
     "importing": "Creating experiences...",
     "successSummary": "Imported {created} experience(s), updated {updated} experience(s)",
     "viewExperiences": "View Experiences",
-    "viewProfile": "View Profile",
     "errors": {
       "noTextExtracted": "No text could be extracted from the file.",
       "unknown": "An unknown error occurred",
@@ -355,8 +258,6 @@
     "list": {
       "title": "Your Experiences",
       "addNew": "Add Experience",
-      "edit": "Edit",
-      "delete": "Delete",
       "empty": "No experiences yet. Upload a CV or add one manually.",
       "viewStories": "View Stories",
       "newStory": "New Story",
@@ -371,14 +272,8 @@
         "volunteer": "Volunteer",
         "project": "Project"
       },
-      "description": "Your professional experience history.",
       "actions": {
-        "add": "Add Experience",
         "viewStories": "View stories"
-      },
-      "errors": {
-        "title": "Unable to load experiences",
-        "generic": "Failed to load experiences."
       }
     },
     "card": {
@@ -404,7 +299,6 @@
     },
     "form": {
       "createTitle": "Add Experience",
-      "editTitle": "Edit Experience",
       "title": "Job Title",
       "titlePlaceholder": "e.g., Senior Software Engineer",
       "company": "Company Name",
@@ -420,73 +314,17 @@
       "tasksPlaceholder": "Enter each task or achievement on a new line",
       "tasksHint": "One task per line",
       "status": "Status",
-      "save": "Save Experience",
-      "cancel": "Cancel",
-      "fields": {
-        "title": {
-          "label": "Job Title",
-          "placeholder": "e.g., Senior Software Engineer"
-        },
-        "company": {
-          "label": "Company Name",
-          "placeholder": "e.g., Acme Corporation"
-        },
-        "type": {
-          "label": "Experience Type"
-        },
-        "startDate": {
-          "label": "Start Date"
-        },
-        "endDate": {
-          "label": "End Date",
-          "hint": "Leave empty if this is your current position"
-        },
-        "responsibilities": {
-          "label": "Responsibilities",
-          "placeholder": "Enter each responsibility on a new line",
-          "hint": "One responsibility per line"
-        },
-        "tasks": {
-          "label": "Tasks & Achievements",
-          "placeholder": "Enter each task or achievement on a new line",
-          "hint": "One task per line"
-        }
-      },
-      "errors": {
-        "title": "Unable to save experience",
-        "generic": "Something went wrong while saving this experience."
-      }
+      "fields": {}
     },
     "delete": {
       "title": "Delete Experience",
       "message": "Are you sure you want to delete this experience? This action cannot be undone.",
-      "confirm": "Delete",
-      "cancel": "Cancel"
+      "confirm": "Delete"
     },
     "page": {
-      "title": "Experiences",
-      "description": "Document your work experiences and achievements."
+      "title": "Experiences"
     },
-    "detail": {
-      "title": "Experience Details",
-      "description": "View and manage your experience.",
-      "notFound": "Experience not found",
-      "notFoundDescription": "This experience could not be found.",
-      "loading": "Loading experience...",
-      "errors": {
-        "title": "Unable to load experience",
-        "generic": "Failed to load experience.",
-        "notFound": "Experience not found."
-      }
-    },
-    "toast": {
-      "created": "Experience created successfully",
-      "createFailed": "Failed to create experience",
-      "updated": "Experience updated successfully",
-      "updateFailed": "Failed to update experience",
-      "deleted": "Experience deleted successfully",
-      "deleteFailed": "Failed to delete experience"
-    }
+    "detail": {}
   },
   "profile": {
     "title": "Your Profile",
@@ -498,8 +336,7 @@
       "professionalAttributes": "Professional Attributes",
       "contactInfo": "Contact Information",
       "socialLinks": "Social Links",
-      "workPermit": "Work Authorization",
-      "relatedPages": "Profile Management"
+      "workPermit": "Work Authorization"
     },
     "fields": {
       "fullName": "Full Name",
@@ -521,9 +358,6 @@
       "workPermitInfo": "Work Authorization",
       "workPermitPlaceholder": "e.g., B Permit, Swiss citizen, ...",
       "workPermitEmpty": "Work permit information not provided",
-      "goals": "Career Goals",
-      "goalsPlaceholder": "e.g., Become engineering manager",
-      "goalsHint": "Press Enter to add each goal",
       "aspirations": "Career Aspirations",
       "aspirationsPlaceholder": "e.g., Lead cross-functional teams",
       "aspirationsHint": "Press Enter to add each aspiration",
@@ -562,9 +396,7 @@
       "fullProfileDescription": "Update contact details, strengths, and complete career history."
     },
     "actions": {
-      "save": "Save Profile",
       "cancel": "Cancel",
-      "edit": "Edit Profile",
       "editSection": "Edit section",
       "saving": "Saving..."
     },
@@ -585,7 +417,6 @@
     },
     "links": {
       "uploadCv": "Upload CV",
-      "uploadCvDescription": "Import your experience from an existing resume",
       "experiences": "My Experiences",
       "experiencesDescription": "View and manage your work history",
       "starStories": "STAR Stories",
@@ -593,9 +424,7 @@
       "personalCanvas": "Personal Canvas",
       "personalCanvasDescription": "Your business model canvas",
       "applications": "Applications",
-      "applicationsDescription": "Access your CVs, cover letters, and speech materials",
       "communication": "Communication Profile",
-      "communicationDescription": "Your strengths and style (Coming soon)",
       "backToSummary": "Profile summary"
     }
   },
@@ -606,23 +435,9 @@
       "empty": "No stories yet for this experience.",
       "emptyDescription": "Create your first STAR story to document your achievements.",
       "autoGenerate": "Auto-generate Stories",
-      "generating": "Generating stories from experience...",
-      "description": "Your achievement stories structured using the STAR methodology.",
-      "actions": {
-        "add": "New Story",
-        "autoGenerate": "Auto-generate Stories"
-      },
-      "search": {
-        "placeholder": "Search stories...",
-        "noResults": "No stories match your search."
-      },
-      "errors": {
-        "title": "Unable to load stories",
-        "generic": "Something went wrong while loading your stories."
-      }
+      "generating": "Generating stories from experience..."
     },
     "global": {
-      "title": "All STAR Stories",
       "description": "Browse all your achievement stories across all experiences"
     },
     "new": {
@@ -630,67 +445,23 @@
       "description": "Select an experience to auto-generate STAR stories.",
       "selectTitle": "Choose an experience",
       "selectDescription": "We'll generate STAR stories based on the responsibilities and tasks.",
-      "cancel": "Cancel",
       "generate": "Generate stories"
     },
     "builder": {
-      "newTitle": "Create New Story",
-      "editTitle": "Edit Story",
-      "backToStories": "Back to Stories",
-      "chooseMode": "Choose how to create your story",
-      "chooseModeDescription": "Select the method that works best for you",
-      "modeFreetext": "Generate from Free Text",
-      "modeInterview": "Generate from Free Text",
-      "modeInterviewDescription": "Provide your own text and AI will structure it",
-      "modeManual": "Manual Entry",
-      "modeManualDescription": "Fill in the STAR fields yourself",
-      "freetextInstructions": "Describe your achievement or situation in your own words. The AI will analyze your text and structure it into a STAR story format.",
-      "freetextLabel": "Your Achievement Description",
-      "freetextPlaceholder": "Example: I led a project to migrate our monolithic application to microservices. The system was experiencing performance issues and our deployment process took hours. I designed a new architecture, trained the team on containerization, and implemented CI/CD pipelines. As a result, we reduced deployment time by 85% and improved system reliability to 99.9% uptime.",
-      "generateFromText": "Generate from Free Text",
-      "saving": "Saving your story...",
-      "title": "Story Title",
-      "titleHint": "Give this story a clear headline for CVs and recruiters.",
-      "titlePlaceholder": "e.g. Led cloud migration reducing deployment time by 85%",
-      "situation": "Situation",
-      "situationHint": "Describe the context or challenge you faced",
-      "situationPlaceholder": "What was the situation or challenge?",
-      "task": "Task",
-      "taskHint": "What was your specific responsibility or goal?",
-      "taskPlaceholder": "What were you asked to do?",
-      "action": "Action",
-      "actionHint": "What specific actions did you take?",
-      "actionPlaceholder": "What did you do to address the situation?",
-      "result": "Result",
-      "resultHint": "What was the outcome or impact?",
-      "resultPlaceholder": "What was the result of your actions?",
-      "achievements": "Achievements & KPIs",
-      "generateAchievements": "Generate Achievements",
       "achievementsList": "Achievements",
       "achievementsHint": "Press Enter to add each achievement",
       "achievementsPlaceholder": "Add achievement",
       "kpisList": "KPI Suggestions",
       "kpisHint": "Press Enter to add each KPI",
-      "kpisPlaceholder": "Add KPI",
-      "loading": "Loading story...",
-      "notFound": "Story Not Found",
-      "notFoundDescription": "The story you're looking for doesn't exist or has been deleted."
+      "kpisPlaceholder": "Add KPI"
     },
     "page": {
       "title": "Stories",
       "description": "Browse all your achievement stories across all experiences."
     },
     "detail": {
-      "title": "Story Details",
-      "description": "View and edit your STAR story.",
       "notFound": "Story not found",
-      "notFoundDescription": "The story you're looking for doesn't exist or has been deleted.",
-      "loading": "Loading story...",
-      "errors": {
-        "title": "Unable to load story",
-        "generic": "Something went wrong while loading this story.",
-        "notFound": "Story not found."
-      }
+      "notFoundDescription": "The story you're looking for doesn't exist or has been deleted."
     },
     "form": {
       "createTitle": "Create New Story",
@@ -721,24 +492,7 @@
           "placeholder": "What was the result of your actions?",
           "hint": "What was the outcome or impact?"
         }
-      },
-      "errors": {
-        "title": "Unable to save story",
-        "generic": "Something went wrong while saving this story."
       }
-    },
-    "delete": {
-      "title": "Delete Story",
-      "message": "Are you sure you want to delete this story? This action cannot be undone."
-    },
-    "toast": {
-      "created": "Story created successfully",
-      "createFailed": "Failed to create story",
-      "updated": "Story updated successfully",
-      "updateFailed": "Failed to update story",
-      "deleted": "Story deleted successfully",
-      "deleteFailed": "Failed to delete story",
-      "generating": "Generating story..."
     }
   },
   "star": {
@@ -783,8 +537,7 @@
   "storyList": {
     "emptyTitle": "No Stories Yet",
     "emptyDescription": "Create your first STAR story to document your achievements",
-    "createFirst": "Create Your First Story",
-    "create": "Create Stories"
+    "createFirst": "Create Your First Story"
   },
   "guidance": {
     "locked": {
@@ -1016,38 +769,14 @@
       "add": "Add",
       "create": "Create",
       "edit": "Edit",
-      "save": "Save",
-      "saveAndCreate": "Save & Create Another",
-      "cancel": "Cancel",
       "delete": "Delete",
-      "view": "View",
       "print": "Print",
-      "close": "Close",
-      "back": "Back",
-      "next": "Next",
-      "previous": "Previous",
-      "search": "Search",
-      "download": "Download",
-      "upload": "Upload",
-      "analyze": "Analyze",
       "generate": "Generate",
       "regenerate": "Regenerate"
     },
     "states": {
       "loading": "Loading...",
-      "saving": "Saving...",
-      "deleting": "Deleting...",
-      "error": "Error",
-      "success": "Success"
-    },
-    "messages": {
-      "requiredField": "This field is required",
-      "unsavedChanges": "You have unsaved changes",
-      "confirmDelete": "Are you sure you want to delete this? This action cannot be undone.",
-      "deletedSuccessfully": "Deleted successfully",
-      "savedSuccessfully": "Saved successfully",
-      "createdSuccessfully": "Created successfully",
-      "updatedSuccessfully": "Updated successfully"
+      "saving": "Saving..."
     }
   },
   "canvas": {
@@ -1090,8 +819,7 @@
     "aria": {
       "editSection": "Edit section",
       "saveSection": "Save section",
-      "cancelEdit": "Cancel edit",
-      "editProfile": "Edit profile"
+      "cancelEdit": "Cancel edit"
     },
     "messages": {
       "generated": "Canvas generated successfully!",
@@ -1101,30 +829,7 @@
     }
   },
   "cvList": {
-    "title": "My CVs",
-    "subtitle": "Manage your CV documents and create new ones",
-    "search": {
-      "placeholder": "Search CVs...",
-      "noResults": "No CVs match your search."
-    },
-    "untitled": "Untitled CV",
-    "tailored": "Tailored for job",
-    "confirmDelete": "Are you sure you want to delete \"{name}\"?",
-    "confirmDeleteDescription": "This action cannot be undone.",
-    "actions": {
-      "create": "Create New CV",
-      "settings": "CV Settings",
-      "print": "Print"
-    },
-    "emptyState": {
-      "title": "No CVs yet",
-      "description": "Create your first CV by selecting experiences and generating content with AI",
-      "action": "Create Your First CV"
-    },
-    "toast": {
-      "deleted": "CV deleted successfully",
-      "deleteFailed": "Failed to delete CV"
-    }
+    "title": "My CVs"
   },
   "cvTemplates": {
     "list": {
@@ -1134,21 +839,14 @@
         "title": "System templates",
         "description": "Start from a vetted exemplar and customize it."
       },
-      "user": {
-        "title": "Your templates",
-        "description": "Templates you've created or customized."
-      },
       "actions": {
         "create": "Create template",
-        "useTemplate": "Use",
-        "duplicate": "Duplicate",
-        "delete": "Delete"
+        "duplicate": "Duplicate"
       },
       "empty": {
         "title": "No templates yet",
         "description": "Create a template or start from a system template."
       },
-      "newTemplateName": "Untitled template",
       "duplicateName": "{name} (Copy)"
     },
     "editor": {
@@ -1182,10 +880,6 @@
         "description": "Competency-led layout for skills-forward roles."
       }
     },
-    "source": {
-      "system": "System-derived",
-      "user": "User"
-    },
     "delete": {
       "title": "Delete \"{name}\"?",
       "description": "This action cannot be undone."
@@ -1209,9 +903,6 @@
   "cvSettings": {
     "title": "CV settings",
     "subtitle": "Set defaults for every CV you create.",
-    "actions": {
-      "templates": "Edit templates"
-    },
     "sections": {
       "sections": {
         "title": "Sections",
@@ -1227,21 +918,11 @@
       }
     },
     "template": {
-      "label": "Template",
       "none": "No default template",
       "manage": "Manage templates"
     },
     "sectionLabels": {
-      "summary": "Summary",
-      "skills": "Skills",
-      "experience": "Experience",
-      "education": "Education",
-      "certifications": "Certifications",
-      "languages": "Languages",
-      "volunteer": "Volunteer",
-      "projects": "Projects",
-      "interests": "Interests",
-      "links": "Links"
+      "skills": "Skills"
     },
     "experiences": {
       "title": "Included experiences",
@@ -1297,17 +978,7 @@
       "error": "An error occurred"
     }
   },
-  "templates": {
-    "title": "Templates",
-    "subtitle": "Manage reusable documents and settings.",
-    "actions": {
-      "cvTemplates": "CV Templates"
-    },
-    "empty": {
-      "title": "Template library",
-      "description": "Start by managing your CV templates."
-    }
-  },
+  "templates": {},
   "settings": {
     "title": "Settings",
     "subtitle": "Configure defaults for your documents.",
@@ -1318,54 +989,10 @@
     }
   },
   "cvNew": {
-    "title": "Create New CV",
-    "subtitle": "Follow the wizard to create a tailored CV",
-    "steps": {
-      "selectExperiences": "Select Experiences",
-      "generate": "Generate CV"
-    },
-    "step1": {
-      "title": "Select Your Experiences",
-      "description": "Choose which experiences to include in your CV. The AI will generate content based on your selection."
-    },
-    "step2": {
-      "title": "Configure Your CV",
-      "description": "Provide details and optional sections for your CV generation",
-      "fields": {
-        "name": "CV Name",
-        "optionalSections": "Optional Sections",
-        "jobDescription": "Job Description (Optional)"
-      },
-      "placeholders": {
-        "name": "e.g., Senior Software Engineer CV",
-        "jobDescription": "Paste the job description here to tailor your CV..."
-      },
-      "sections": {
-        "skills": "Skills",
-        "languages": "Languages",
-        "certifications": "Certifications",
-        "interests": "Interests",
-        "profilePhoto": "Profile photo"
-      },
-      "help": {
-        "jobDescription": "Pasting a job description will tailor your CV to match the role requirements"
-      }
-    },
-    "actions": {
-      "cancel": "Cancel",
-      "next": "Next",
-      "back": "Back",
-      "generate": "Generate CV"
-    },
+    "step2": {},
     "generating": {
       "title": "Generating Your CV",
       "description": "AI is crafting your professional CV based on your experiences..."
-    },
-    "toast": {
-      "created": "CV created successfully!",
-      "createFailed": "Failed to create CV",
-      "generationFailed": "Failed to generate CV content",
-      "error": "An error occurred"
     }
   },
   "cvDisplay": {
@@ -1468,30 +1095,11 @@
   "jobList": {
     "actions": {
       "add": "Add Job",
-      "edit": "Edit",
-      "view": "View job",
-      "viewCompanies": "View companies",
       "match": "View match"
     },
     "search": {
       "placeholder": "Search jobs...",
       "noResults": "No jobs match your search."
-    },
-    "empty": {
-      "title": "No jobs yet",
-      "description": "Start by analyzing your first job description.",
-      "cta": "Analyze a job"
-    },
-    "delete": {
-      "title": "Delete job",
-      "message": "Are you sure you want to delete this job? This action cannot be undone.",
-      "cancel": "Cancel",
-      "confirm": "Delete"
-    },
-    "status": {
-      "draft": "Draft",
-      "analyzed": "Analyzed",
-      "complete": "Complete"
     },
     "card": {
       "noSeniority": "Seniority unknown",
@@ -1508,29 +1116,7 @@
     "placeholders": {
       "title": "Enter or edit the job title",
       "seniorityLevel": "Enter seniority (e.g., Senior, Director)",
-      "roleSummary": "Summarize the core responsibilities and mission for this role",
-      "responsibilities": "Add a responsibility and press Enter",
-      "requiredSkills": "Add a required skill and press Enter",
-      "behaviours": "Add a behaviour and press Enter",
-      "successCriteria": "Add success criteria and press Enter",
-      "explicitPains": "Add explicit pain points and press Enter",
-      "atsKeywords": "Add ATS keywords and press Enter"
-    },
-    "hints": {
-      "responsibilities": "Key responsibilities highlighted in the job description",
-      "requiredSkills": "Skills and capabilities explicitly mentioned",
-      "behaviours": "Behavioural traits and expectations",
-      "successCriteria": "How success is measured for the role",
-      "explicitPains": "Challenges or pain points the employer wants to solve",
-      "atsKeywords": "Important keywords and phrases that Applicant Tracking Systems look for"
-    },
-    "tabs": {
-      "responsibilities": "Responsibilities",
-      "requiredSkills": "Required skills",
-      "behaviours": "Behaviours",
-      "successCriteria": "Success criteria",
-      "explicitPains": "Explicit pains",
-      "atsKeywords": "ATS Keywords"
+      "roleSummary": "Summarize the core responsibilities and mission for this role"
     },
     "sections": {
       "parsedData": "AI parsed details",
@@ -1539,7 +1125,6 @@
     "meta": {
       "status": "Status",
       "createdAt": "Created at",
-      "updatedAt": "Updated at",
       "companyId": "Company",
       "notAvailable": "Not available"
     },
@@ -1552,10 +1137,6 @@
       "empty": "No companies found. Try another search or create one."
     },
     "reanalyse": {},
-    "match": {
-      "view": "View match",
-      "disabledTooltip": "Analyze the job first to unlock the matching summary."
-    },
     "errors": {
       "title": "Job details",
       "generic": "Unable to update the job. Please try again.",
@@ -1583,9 +1164,9 @@
       "interestFit": "Interest",
       "edge": "Edge",
       "recommendation": {
-        "apply": "✅ Recommended - Apply",
-        "maybe": "⚠️ Consider - Maybe Apply",
-        "skip": "❌ Not Recommended - Skip"
+        "apply": "Strong Match - Apply",
+        "maybe": "Moderate Match - Consider",
+        "skip": "Weak Match - Skip"
       },
       "reasoning": "Key Assessment Points",
       "strengths": "Your Strengths for This Role",
@@ -1593,63 +1174,17 @@
       "risks": "Risks & Mitigation Strategies",
       "impact": "Quick Impact Opportunities",
       "tailoring": "Application Tailoring Tips"
-    },
-    "score": {
-      "title": "Fit score",
-      "subtitle": "Overall alignment",
-      "badge": "AI generated",
-      "outOf": "Out of 100",
-      "description": "Use this score as a directional signal. Refresh whenever your profile, job, or company data changes."
     }
   },
   "coverLetter": {
     "list": {
       "title": "Cover Letters",
-      "subtitle": "Create professional cover letters tailored to your profile and experiences.",
-      "search": {
-        "placeholder": "Search cover letters...",
-        "noResults": "No cover letters match your search."
-      },
       "actions": {
         "create": "Create cover letter"
-      },
-      "emptyState": {
-        "title": "No cover letters yet",
-        "description": "Create a cover letter to introduce yourself to potential employers.",
-        "action": "Create cover letter"
-      },
-      "untitled": "Untitled cover letter",
-      "confirmDelete": "Delete cover letter",
-      "confirmDeleteDescription": "Are you sure you want to delete this cover letter? This action cannot be undone.",
-      "toast": {
-        "deleted": "Cover letter deleted",
-        "deleteFailed": "Unable to delete cover letter"
       }
     },
     "new": {
-      "title": "Create Cover Letter",
-      "subtitle": "Generate a professional cover letter with AI assistance",
-      "steps": {},
-      "setup": {
-        "title": "Cover Letter Details",
-        "description": "Provide basic information for your cover letter",
-        "nameLabel": "Cover Letter Name",
-        "namePlaceholder": "e.g., Software Engineer at Acme Corp",
-        "jobLabel": "Job Description (Optional)",
-        "jobDescription": "Paste the job description to tailor your cover letter",
-        "jobPlaceholder": "Paste the job description here to create a tailored cover letter..."
-      },
-      "generate": {
-        "summary": {},
-        "action": "Generate Cover Letter",
-        "error": "Failed to generate cover letter"
-      },
-      "toast": {
-        "created": "Cover letter created successfully!",
-        "createFailed": "Failed to create cover letter",
-        "generationFailed": "Failed to generate cover letter content",
-        "error": "An error occurred"
-      }
+      "generate": {}
     },
     "display": {
       "description": "View and edit your cover letter",
@@ -1662,11 +1197,8 @@
       "contentLabel": "Cover Letter Content",
       "contentPlaceholder": "Enter your cover letter content...",
       "emptyContent": "No content available. Click generate to create content.",
-      "profileRequiredTitle": "Profile required",
-      "profileRequiredDescription": "Complete your profile before generating a cover letter.",
       "states": {
         "errorTitle": "Unable to load cover letter",
-        "generateErrorTitle": "Unable to generate cover letter",
         "notFound": "Cover letter not found",
         "notFoundDescription": "We could not find that cover letter. Return to the list to create a new one."
       },
@@ -1689,69 +1221,19 @@
   "speech": {
     "list": {
       "title": "Speech",
-      "subtitle": "Draft concise narratives for introductions and interviews.",
-      "search": {
-        "placeholder": "Search speech blocks...",
-        "noResults": "No speech blocks match your search."
-      },
       "actions": {
         "create": "Create speech"
-      },
-      "emptyState": {
-        "title": "No speech yet",
-        "description": "Create a speech to draft your elevator pitch and career story.",
-        "action": "Create speech"
-      },
-      "untitled": "Untitled speech",
-      "emptyPreview": "Add content to preview your speech here.",
-      "confirmDelete": "Delete speech",
-      "confirmDeleteDescription": "Are you sure you want to delete this speech? This action cannot be undone.",
-      "toast": {
-        "deleted": "Speech deleted",
-        "deleteFailed": "Unable to delete speech",
-        "createFailed": "Unable to create speech"
       }
     },
     "new": {
-      "title": "Create Speech",
-      "subtitle": "Generate a speech or pitch with AI assistance",
-      "setup": {
-        "title": "Speech Details",
-        "description": "Provide a title and optional context for your speech",
-        "nameLabel": "Speech Name",
-        "namePlaceholder": "e.g., Engineering leadership pitch",
-        "contextLabel": "Context (Optional)",
-        "contextDescription": "Add context to tailor the tone and focus of your speech",
-        "contextPlaceholder": "Paste a role summary or context to tailor your speech...",
-        "contextTitleFallback": "Speech context"
-      },
-      "generate": {
-        "action": "Generate Speech",
-        "error": "Failed to generate speech"
-      },
       "toast": {
-        "created": "Speech created successfully!",
-        "createFailed": "Failed to create speech",
-        "generationFailed": "Failed to generate speech content",
-        "error": "An error occurred"
+        "generationFailed": "Failed to generate speech content"
       }
     },
     "detail": {
-      "description": "Build your elevator pitch, career story, and why-me narrative.",
-      "untitled": "Untitled speech",
-      "titleLabel": "Speech title",
-      "titlePlaceholder": "e.g., Engineering leadership speech",
-      "emptySection": "No content yet.",
       "states": {
         "errorTitle": "Unable to load speech",
-        "generateErrorTitle": "Unable to generate speech",
-        "notFound": "Speech not found",
-        "notFoundDescription": "We could not find that speech. Return to the list to create a new one."
-      },
-      "toast": {
-        "saved": "Speech saved",
-        "saveFailed": "Unable to save speech",
-        "generated": "Speech updated from AI"
+        "generateErrorTitle": "Unable to generate speech"
       }
     },
     "editor": {
@@ -1847,10 +1329,8 @@
       "title": "Active jobs",
       "description": "Track match readiness and materials for your most recent roles.",
       "empty": "No active jobs yet.",
-      "companyFallback": "Company not set",
       "match": {
-        "value": "Match {score}%",
-        "naValue": "Match N/A"
+        "value": "Match {score}%"
       },
       "materials": {
         "cv": "CV",
@@ -1858,20 +1338,14 @@
         "speech": "Speech"
       },
       "cta": {
-        "generateMatch": "Generate match",
+        "viewJob": "View job",
         "generateCv": "Generate CV",
         "generateCoverLetter": "Generate cover letter",
-        "generateSpeech": "Generate speech",
-        "reviewMatch": "Review match",
-        "viewJob": "View job"
+        "generateSpeech": "Generate speech"
       }
     }
   },
   "badges": {
-    "toast": {
-      "multiple": "Progress confirmed: {count} milestones reached",
-      "multipleDescription": "View your badge collection on the dashboard"
-    },
     "grid": {
       "title": "Your milestones",
       "description": "Key capability signals you've reached on your application journey"
@@ -1916,27 +1390,17 @@
     "steps": {
       "cvUpload": {
         "title": "Upload your CV",
-        "description": "Parse your CV to bootstrap your profile.",
         "hint": "We use your CV to extract experiences and profile basics."
       },
       "experienceReview": {
         "title": "Experiences",
-        "description": "Confirm your experiences and import them.",
         "hint": "Ensure at least three experiences for a strong foundation.",
         "count": "{count} experience(s) detected",
-        "needsMore": "Add at least 3 experiences to continue.",
-        "needsMoreHint": "You can add missing experiences manually.",
-        "addManual": "Add experience manually",
         "import": "Confirm & continue"
       },
       "profileBasics": {
         "title": "Confirm profile basics",
-        "description": "Verify your essential profile information.",
         "hint": "These basics unlock your personalized guidance."
-      },
-      "complete": {
-        "title": "Complete onboarding",
-        "description": "Choose your next path."
       }
     },
     "complete": {
@@ -1950,8 +1414,6 @@
     },
     "errors": {
       "title": "Onboarding issue",
-      "parseFailed": "We couldn't parse your CV. Try another file.",
-      "importFailed": "We couldn't import your experiences. Please try again.",
       "missingUser": "We couldn't identify your account. Please sign in again.",
       "saveFailed": "We couldn't save your profile basics.",
       "fullNameRequired": "Please add your full name to continue.",
@@ -1964,8 +1426,6 @@
       "description": "Manage your CV documents and create new ones."
     },
     "list": {
-      "title": "My CVs",
-      "description": "Manage your CV documents and create new ones.",
       "actions": {
         "create": "Create New CV",
         "settings": "Settings"
@@ -1974,40 +1434,12 @@
       "search": {
         "placeholder": "Search CVs...",
         "noResults": "No CVs match your search."
-      },
-      "empty": {
-        "title": "No CVs yet",
-        "description": "Create your first CV by selecting experiences and generating content with AI."
-      },
-      "errors": {
-        "title": "Unable to load CVs",
-        "generic": "Something went wrong while loading your CVs."
       }
     },
-    "detail": {
-      "title": "CV Details",
-      "description": "View and edit your CV.",
-      "notFound": "CV not found",
-      "notFoundDescription": "This CV could not be found.",
-      "loading": "Loading CV...",
-      "errors": {
-        "title": "Unable to load CV",
-        "generic": "Something went wrong while loading this CV.",
-        "notFound": "CV not found."
-      }
-    },
+    "detail": {},
     "form": {
-      "createTitle": "Create CV",
-      "editTitle": "Edit CV",
       "fields": {
-        "name": {
-          "label": "CV Name",
-          "placeholder": "e.g., Software Engineer Resume"
-        }
-      },
-      "errors": {
-        "title": "Unable to save CV",
-        "generic": "Something went wrong while saving this CV."
+        "name": {}
       }
     },
     "delete": {
@@ -2015,10 +1447,6 @@
       "message": "Are you sure you want to delete this CV? This action cannot be undone."
     },
     "toast": {
-      "created": "CV created successfully",
-      "createFailed": "Failed to create CV",
-      "updated": "CV updated successfully",
-      "updateFailed": "Failed to update CV",
       "deleted": "CV deleted successfully",
       "deleteFailed": "Failed to delete CV"
     }
@@ -2029,39 +1457,17 @@
       "description": "Create professional cover letters tailored to your profile and experiences."
     },
     "list": {
-      "title": "Cover Letters",
-      "description": "Create professional cover letters tailored to your profile and experiences.",
       "actions": {
         "create": "Create cover letter"
       },
       "search": {
         "placeholder": "Search cover letters...",
         "noResults": "No cover letters match your search."
-      },
-      "empty": {
-        "title": "No cover letters yet",
-        "description": "Create a cover letter to introduce yourself to potential employers."
-      },
-      "errors": {
-        "title": "Unable to load cover letters",
-        "generic": "Something went wrong while loading your cover letters."
       }
     },
-    "detail": {
-      "title": "Cover Letter",
-      "description": "View and edit your cover letter.",
-      "notFound": "Cover letter not found",
-      "notFoundDescription": "This cover letter could not be found.",
-      "loading": "Loading cover letter...",
-      "errors": {
-        "title": "Unable to load cover letter",
-        "generic": "Something went wrong while loading this cover letter.",
-        "notFound": "Cover letter not found."
-      }
-    },
+    "detail": {},
     "form": {
       "createTitle": "Create Cover Letter",
-      "editTitle": "Edit Cover Letter",
       "setupTitle": "Setup Your Cover Letter",
       "setupDescription": "Create professional cover letters tailored to your profile and experiences.",
       "createDescription": "Create a cover letter to introduce yourself to potential employers.",
@@ -2075,10 +1481,6 @@
           "placeholder": "Paste the job description here to create a tailored cover letter...",
           "description": "Paste the job description to tailor your cover letter"
         }
-      },
-      "errors": {
-        "title": "Unable to save cover letter",
-        "generic": "Something went wrong while saving this cover letter."
       }
     },
     "delete": {
@@ -2088,8 +1490,6 @@
     "toast": {
       "created": "Cover letter created successfully",
       "createFailed": "Failed to create cover letter",
-      "updated": "Cover letter updated successfully",
-      "updateFailed": "Failed to update cover letter",
       "deleted": "Cover letter deleted successfully",
       "deleteFailed": "Failed to delete cover letter"
     }
@@ -2100,40 +1500,22 @@
       "description": "Draft concise narratives for introductions and interviews."
     },
     "list": {
-      "title": "Speech",
-      "description": "Draft concise narratives for introductions and interviews.",
       "actions": {
         "create": "Create speech"
       },
       "search": {
         "placeholder": "Search speech blocks...",
         "noResults": "No speech blocks match your search."
-      },
-      "empty": {
-        "title": "No speech yet",
-        "description": "Create a speech to draft your elevator pitch and career story."
-      },
-      "errors": {
-        "title": "Unable to load speeches",
-        "generic": "Something went wrong while loading your speeches."
       }
     },
     "detail": {
-      "title": "Speech",
       "description": "Build your elevator pitch, career story, and why-me narrative.",
       "untitled": "Untitled speech",
       "notFound": "Speech not found",
-      "notFoundDescription": "This speech could not be found.",
-      "loading": "Loading speech...",
-      "errors": {
-        "title": "Unable to load speech",
-        "generic": "Something went wrong while loading this speech.",
-        "notFound": "Speech not found."
-      }
+      "notFoundDescription": "This speech could not be found."
     },
     "form": {
       "createTitle": "Create Speech",
-      "editTitle": "Edit Speech",
       "setupTitle": "Setup Your Speech",
       "setupDescription": "Build your elevator pitch, career story, and why-me narrative.",
       "createDescription": "Create a speech to draft your elevator pitch and career story.",
@@ -2158,10 +1540,6 @@
           "placeholder": "Paste a role summary or context to tailor your speech...",
           "description": "Add context to tailor the tone and focus of your speech"
         }
-      },
-      "errors": {
-        "title": "Unable to save speech",
-        "generic": "Something went wrong while saving this speech."
       }
     },
     "delete": {
@@ -2178,38 +1556,20 @@
     }
   },
   "jobs": {
-    "page": {
-      "title": "Jobs",
-      "description": "Research and analyze job opportunities."
-    },
     "list": {
-      "title": "Jobs",
-      "description": "Track job opportunities you're interested in.",
       "actions": {
-        "add": "Add Job",
         "view": "View job",
         "viewCompanies": "View companies"
       },
       "search": {
-        "placeholder": "Search jobs...",
-        "noResults": "No jobs match your search."
-      },
-      "empty": {
-        "title": "No jobs yet",
-        "description": "Start by adding a job opportunity you'd like to track."
+        "placeholder": "Search jobs..."
       },
       "errors": {
-        "title": "Unable to load jobs",
         "generic": "Something went wrong while loading your jobs."
       }
     },
     "detail": {
-      "title": "Job Details",
-      "description": "View and analyze this job opportunity.",
       "untitled": "Untitled job",
-      "notFound": "Job not found",
-      "notFoundDescription": "This job could not be found.",
-      "loading": "Loading job...",
       "status": {
         "draft": "Draft",
         "analyzed": "Analyzed",
@@ -2218,7 +1578,6 @@
       "meta": {
         "status": "Status",
         "updatedAt": "Updated at",
-        "companyId": "Company",
         "notAvailable": "Not available"
       },
       "companyLink": {
@@ -2226,35 +1585,15 @@
       },
       "actions": {
         "viewMatch": "View match"
-      },
-      "errors": {
-        "title": "Unable to load job",
-        "generic": "Something went wrong while loading this job.",
-        "notFound": "Job not found."
       }
     },
     "form": {
       "createTitle": "Add Job",
-      "editTitle": "Edit Job",
       "createDescription": "Upload a job description for analysis",
       "errors": {
-        "title": "Unable to save job",
         "generic": "Something went wrong while saving this job."
       },
       "fields": {
-        "title": {
-          "label": "Job Title",
-          "placeholder": "e.g., Senior Software Engineer"
-        },
-        "company": {
-          "label": "Company",
-          "placeholder": "Select or create a company"
-        },
-        "description": {
-          "label": "Job Description",
-          "placeholder": "Paste the full job description...",
-          "hint": "Copy and paste the complete job posting for AI analysis"
-        },
         "roleSummary": {
           "label": "Role summary"
         },
@@ -2293,14 +1632,6 @@
     "delete": {
       "title": "Delete job",
       "message": "Are you sure you want to delete this job? This action cannot be undone."
-    },
-    "toast": {
-      "created": "Job created successfully",
-      "createFailed": "Failed to create job",
-      "updated": "Job updated successfully",
-      "updateFailed": "Failed to update job",
-      "deleted": "Job deleted successfully",
-      "deleteFailed": "Failed to delete job"
     }
   }
 }
