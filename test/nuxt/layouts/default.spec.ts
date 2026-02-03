@@ -25,7 +25,7 @@ const stubs = {
   },
   UHeader: {
     template:
-      '<div class="u-header" data-testid="header"><div class="left"><slot name="left" /></div><div class="right"><slot name="right" /></div></div>',
+      '<div class="u-header" data-testid="header"><div class="title"><slot name="title" /></div><div class="left"><slot name="left" /></div><div class="right"><slot name="right" /></div><slot /></div>',
   },
   UMain: {
     template: '<div class="u-main" data-testid="main"><slot /></div>',
@@ -37,6 +37,12 @@ const stubs = {
   NuxtLink: {
     template: '<a data-testid="nuxt-link" :to="to"><slot /></a>',
     props: ['to'],
+  },
+  UNavigationMenu: {
+    template: '<div class="u-navigation-menu" data-testid="navigation-menu"><slot /></div>',
+  },
+  UBreadcrumb: {
+    template: '<div class="u-breadcrumb" data-testid="breadcrumb"><slot /></div>',
   },
 };
 
