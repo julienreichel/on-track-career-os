@@ -135,52 +135,52 @@ const isValid = () => {
       </UFormField>
 
       <UFormField
-        :label="t('stories.form.fields.situation.label')"
-        :hint="t('stories.form.fields.situation.hint')"
+        :label="t('star.situation.label')"
+        :hint="t('star.situation.hint')"
         required
       >
         <UTextarea
           v-model="situation"
-          :placeholder="t('stories.form.fields.situation.placeholder')"
+          :placeholder="t('star.situation.placeholder')"
           :rows="4"
           class="w-full"
         />
       </UFormField>
 
       <UFormField
-        :label="t('stories.form.fields.task.label')"
-        :hint="t('stories.form.fields.task.hint')"
+        :label="t('star.task.label')"
+        :hint="t('star.task.hint')"
         required
       >
         <UTextarea
           v-model="task"
-          :placeholder="t('stories.form.fields.task.placeholder')"
+          :placeholder="t('star.task.placeholder')"
           :rows="4"
           class="w-full"
         />
       </UFormField>
 
       <UFormField
-        :label="t('stories.form.fields.action.label')"
-        :hint="t('stories.form.fields.action.hint')"
+        :label="t('star.action.label')"
+        :hint="t('star.action.hint')"
         required
       >
         <UTextarea
           v-model="action"
-          :placeholder="t('stories.form.fields.action.placeholder')"
+          :placeholder="t('star.action.placeholder')"
           :rows="4"
           class="w-full"
         />
       </UFormField>
 
       <UFormField
-        :label="t('stories.form.fields.result.label')"
-        :hint="t('stories.form.fields.result.hint')"
+        :label="t('star.result.label')"
+        :hint="t('star.result.hint')"
         required
       >
         <UTextarea
           v-model="result"
-          :placeholder="t('stories.form.fields.result.placeholder')"
+          :placeholder="t('star.result.placeholder')"
           :rows="4"
           class="w-full"
         />

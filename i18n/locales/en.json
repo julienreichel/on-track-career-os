@@ -487,26 +487,6 @@
           "placeholder": "e.g. Led cloud migration reducing deployment time by 85%",
           "hint": "Give this story a clear headline for CVs and recruiters."
         },
-        "situation": {
-          "label": "Situation",
-          "placeholder": "What was the situation or challenge?",
-          "hint": "Describe the context or challenge you faced"
-        },
-        "task": {
-          "label": "Task",
-          "placeholder": "What were you asked to do?",
-          "hint": "What was your specific responsibility or goal?"
-        },
-        "action": {
-          "label": "Action",
-          "placeholder": "What did you do to address the situation?",
-          "hint": "What specific actions did you take?"
-        },
-        "result": {
-          "label": "Result",
-          "placeholder": "What was the result of your actions?",
-          "hint": "What was the outcome or impact?"
-        },
         "achievements": {
           "label": "Achievements",
           "list": "Achievements",
@@ -550,22 +530,26 @@
     "situation": {
       "label": "Situation",
       "description": "Describe the context or challenge you faced",
-      "placeholder": "What was the situation or problem?"
+      "placeholder": "What was the situation or problem?",
+      "hint": "Describe the context or challenge you faced"
     },
     "task": {
       "label": "Task",
       "description": "What was your specific responsibility or goal?",
-      "placeholder": "What were you asked or expected to do?"
+      "placeholder": "What were you asked or expected to do?",
+      "hint": "What was your specific responsibility or goal?"
     },
     "action": {
       "label": "Action",
       "description": "What specific actions did you take?",
-      "placeholder": "What steps did you take to address the situation?"
+      "placeholder": "What steps did you take to address the situation?",
+      "hint": "What specific actions did you take?"
     },
     "result": {
       "label": "Result",
       "description": "What was the outcome or impact?",
-      "placeholder": "What was the result of your actions? Include metrics if possible."
+      "placeholder": "What was the result of your actions? Include metrics if possible.",
+      "hint": "What was the outcome or impact?"
     }
   },
   "enhancer": {
