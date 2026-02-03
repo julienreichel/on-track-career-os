@@ -42,7 +42,7 @@ test.describe('Cover Letter E2E Flow', () => {
     await page.waitForURL('/applications/cover-letters/new', { timeout: 10000 });
 
     // Fill in the name
-    const nameInput = page.getByRole('textbox', { name: /Cover Letter Name/i });
+    const nameInput = page.getByRole('textbox', { name: /Cover Letter Title/i });
     await expect(nameInput).toBeVisible();
     await nameInput.fill('Test Cover Letter for Software Engineer');
 
@@ -81,7 +81,7 @@ test.describe('Cover Letter E2E Flow', () => {
     await page.goto(coverLetterUrl);
     await page.waitForLoadState('networkidle');
 
-    // Verify the cover letter name is displayed in the header
+    // Verify the cover letter title is displayed in the header
     await expect(
       page.getByRole('heading', { name: /Test Cover Letter for Software Engineer/i, level: 1 })
     ).toBeVisible();

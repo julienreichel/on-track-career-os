@@ -149,7 +149,10 @@ const handleDelete = async () => {
       toast.add({ title: t('applications.coverLetters.display.toast.deleted'), color: 'primary' });
       await router.push('/applications/cover-letters');
     } else {
-      toast.add({ title: t('applications.coverLetters.display.toast.deleteFailed'), color: 'error' });
+      toast.add({
+        title: t('applications.coverLetters.display.toast.deleteFailed'),
+        color: 'error',
+      });
     }
   } catch (err) {
     console.error('[coverLetterDisplay] Delete failed', err);

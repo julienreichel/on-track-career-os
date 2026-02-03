@@ -1468,7 +1468,7 @@
         },
         "fields": {
           "title": {
-            "label": "Cover Letter Name",
+            "label": "Cover Letter Title",
             "placeholder": "e.g., Software Engineer at Acme Corp"
           },
           "jobDescription": {
@@ -1571,7 +1571,7 @@
         },
         "fields": {
           "title": {
-            "label": "Speech Name",
+            "label": "Speech Title",
             "placeholder": "e.g., Engineering leadership pitch"
           },
           "context": {
