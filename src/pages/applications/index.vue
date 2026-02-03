@@ -1,8 +1,8 @@
 <template>
   <UPage>
     <UPageHeader
-      :title="t('applicationsPage.title')"
-      :description="t('applicationsPage.description')"
+      :title="t('applications.page.title')"
+      :description="t('applications.page.description')"
       :links="[
         {
           label: t('navigation.backToHome'),
@@ -22,14 +22,14 @@
             :to="{ name: 'applications-cv' }"
           />
           <UPageCard
-            :title="t('coverLetters.page.title')"
-            :description="t('coverLetters.page.description')"
+            :title="t('applications.coverLetters.page.title')"
+            :description="t('applications.coverLetters.page.description')"
             icon="i-heroicons-envelope"
             :to="{ name: 'applications-cover-letters' }"
           />
           <UPageCard
-            :title="t('speeches.page.title')"
-            :description="t('speeches.page.description')"
+            :title="t('applications.speeches.page.title')"
+            :description="t('applications.speeches.page.description')"
             icon="i-heroicons-chat-bubble-left-right"
             :to="{ name: 'applications-speech' }"
           />

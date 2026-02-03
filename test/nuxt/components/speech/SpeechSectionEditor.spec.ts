@@ -33,7 +33,7 @@ describe('SpeechSectionEditor', () => {
     expect(wrapper.text()).toContain('Elevator pitch');
     expect(wrapper.text()).toContain('Short summary');
     expect(wrapper.text()).toContain(
-      i18n.global.t('speech.editor.wordCount', { count: 1, max: 100 })
+      i18n.global.t('applications.speeches.editor.wordCount', { count: 1, max: 100 })
     );
   });
 

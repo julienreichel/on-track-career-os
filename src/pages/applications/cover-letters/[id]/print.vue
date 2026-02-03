@@ -4,7 +4,7 @@
     <div v-if="loading" class="flex items-center justify-center min-h-screen">
       <div class="text-center">
         <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
-        <p class="text-sm text-gray-600">{{ $t('coverLetter.display.loading') }}</p>
+        <p class="text-sm text-gray-600">{{ $t('applications.coverLetters.display.loading') }}</p>
       </div>
     </div>
 
@@ -22,7 +22,7 @@
       <!-- Print Actions (hidden on print) -->
       <div class="print-actions no-print">
         <UButton
-          :label="$t('coverLetter.display.actions.print')"
+          :label="$t('applications.coverLetters.display.actions.print')"
           icon="i-heroicons-printer"
           @click="handlePrint"
         />

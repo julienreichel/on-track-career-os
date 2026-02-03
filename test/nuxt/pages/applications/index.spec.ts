@@ -50,15 +50,15 @@ async function mountPage() {
 describe('Applications index page', () => {
   it('renders page header content', async () => {
     const wrapper = await mountPage();
-    expect(wrapper.text()).toContain(i18n.global.t('applicationsPage.title'));
-    expect(wrapper.text()).toContain(i18n.global.t('applicationsPage.description'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.page.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.page.description'));
   });
 
   it('renders CV, cover letter, and speech cards', async () => {
     const wrapper = await mountPage();
     expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.page.title'));
-    expect(wrapper.text()).toContain(i18n.global.t('coverLetters.page.title'));
-    expect(wrapper.text()).toContain(i18n.global.t('speeches.page.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.coverLetters.page.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.speeches.page.title'));
   });
 
   it('renders back to home link', async () => {

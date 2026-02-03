@@ -243,8 +243,8 @@ describe('Speech detail page', () => {
     const buttons = wrapper.findAll('button');
     const genericGenerate = buttons.find((button) =>
       [
-        i18n.global.t('speech.editor.actions.generate'),
-        i18n.global.t('speech.editor.actions.regenerate'),
+        i18n.global.t('applications.speeches.editor.actions.generate'),
+        i18n.global.t('applications.speeches.editor.actions.regenerate'),
       ].some((label) => button.text().includes(label))
     );
     expect(genericGenerate).toBeUndefined();

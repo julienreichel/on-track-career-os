@@ -2,8 +2,8 @@
   <UContainer>
     <UPage>
       <UPageHeader
-        :title="t('speeches.page.title')"
-        :description="t('speeches.page.description')"
+        :title="t('applications.speeches.page.title')"
+        :description="t('applications.speeches.page.description')"
         :links="[
           {
             label: t('navigation.backToApplications'),
@@ -11,7 +11,7 @@
             to: { name: 'applications' },
           },
           {
-            label: t('speeches.list.actions.create'),
+            label: t('applications.speeches.list.actions.create'),
             icon: 'i-heroicons-plus',
             to: { name: 'applications-speech-new' },
           },
@@ -32,7 +32,7 @@
           <UInput
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
-            :placeholder="t('speeches.list.search.placeholder')"
+            :placeholder="t('applications.speeches.list.search.placeholder')"
             size="lg"
             class="w-1/3"
           />
@@ -52,8 +52,8 @@
         <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
 
         <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
-          <UEmpty :title="t('speeches.list.search.noResults')" icon="i-heroicons-magnifying-glass">
-            <p class="text-sm text-gray-500">{{ t('speeches.list.search.placeholder') }}</p>
+          <UEmpty :title="t('applications.speeches.list.search.noResults')" icon="i-heroicons-magnifying-glass">
+            <p class="text-sm text-gray-500">{{ t('applications.speeches.list.search.placeholder') }}</p>
           </UEmpty>
         </UCard>
 
@@ -88,8 +88,8 @@
 
       <ConfirmModal
         v-model:open="deleteModalOpen"
-        :title="t('speeches.delete.title')"
-        :description="t('speeches.delete.message')"
+        :title="t('applications.speeches.delete.title')"
+        :description="t('applications.speeches.delete.message')"
         :confirm-label="t('common.delete')"
         :cancel-label="t('common.cancel')"
         confirm-color="error"
@@ -172,10 +172,10 @@ const handleDelete = async () => {
   try {
     const success = await deleteSpeechBlock(speechToDelete.value.id);
     if (success) {
-      toast.add({ title: t('speeches.toast.deleted'), color: 'primary' });
+      toast.add({ title: t('applications.speeches.toast.deleted'), color: 'primary' });
       deleteModalOpen.value = false;
     } else {
-      toast.add({ title: t('speeches.toast.deleteFailed'), color: 'error' });
+      toast.add({ title: t('applications.speeches.toast.deleteFailed'), color: 'error' });
     }
   } finally {
     deleting.value = false;
@@ -191,7 +191,7 @@ const resolveTitle = (block: SpeechBlock) => {
     block.whyMe?.trim() ||
     '';
   if (!raw) {
-    return t('speeches.detail.untitled');
+    return t('applications.speeches.detail.untitled');
   }
   return raw.length > TITLE_MAX_LENGTH ? `${raw.slice(0, TITLE_MAX_LENGTH)}...` : raw;
 };
@@ -199,7 +199,7 @@ const resolveTitle = (block: SpeechBlock) => {
 const resolvePreview = (block: SpeechBlock) => {
   const raw = block.careerStory?.trim() || block.elevatorPitch?.trim() || block.whyMe?.trim() || '';
   if (!raw) {
-    return t('speeches.list.empty.preview');
+    return t('applications.speeches.list.empty.preview');
   }
   return raw.length > PREVIEW_MAX_LENGTH ? `${raw.slice(0, PREVIEW_MAX_LENGTH)}...` : raw;
 };

@@ -87,10 +87,6 @@
     "description": "What do you want to do today?",
     "fallbackName": "there"
   },
-  "applicationsPage": {
-    "title": "Applications",
-    "description": "Manage your CVs, cover letters, and speech materials."
-  },
   "features": {
     "profile": {
       "title": "Profile",
@@ -972,90 +968,6 @@
       "tailoring": "Application Tailoring Tips"
     }
   },
-  "coverLetter": {
-    "list": {
-      "title": "Cover Letters",
-      "actions": {
-        "create": "Create cover letter"
-      }
-    },
-    "display": {
-      "description": "View and edit your cover letter",
-      "untitled": "Untitled Cover Letter",
-      "loading": "Loading cover letter...",
-      "titleLabel": "Cover letter title",
-      "titlePlaceholder": "e.g., Head of Engineering cover letter",
-      "editMode": "Edit Mode",
-      "editModeDescription": "Edit your cover letter content directly",
-      "contentLabel": "Cover Letter Content",
-      "contentPlaceholder": "Enter your cover letter content...",
-      "emptyContent": "No content available. Click generate to create content.",
-      "states": {
-        "errorTitle": "Unable to load cover letter",
-        "notFound": "Cover letter not found",
-        "notFoundDescription": "We could not find that cover letter. Return to the list to create a new one."
-      },
-      "actions": {
-        "print": "Print",
-        "edit": "Edit"
-      },
-      "delete": {
-        "title": "Delete cover letter",
-        "description": "Are you sure you want to delete this cover letter?"
-      },
-      "toast": {
-        "saved": "Cover letter saved",
-        "saveFailed": "Unable to save cover letter",
-        "deleted": "Cover letter deleted",
-        "deleteFailed": "Unable to delete cover letter"
-      }
-    }
-  },
-  "speech": {
-    "list": {
-      "title": "Speech",
-      "actions": {
-        "create": "Create speech"
-      }
-    },
-    "new": {
-      "toast": {
-        "generationFailed": "Failed to generate speech content"
-      }
-    },
-    "detail": {
-      "states": {
-        "errorTitle": "Unable to load speech",
-        "generateErrorTitle": "Unable to generate speech"
-      }
-    },
-    "editor": {
-      "actions": {
-        "generate": "Generate speech",
-        "regenerate": "Regenerate speech",
-        "generating": "Generating speech..."
-      },
-      "wordCount": "{count} / {max} words",
-      "wordCountSimple": "{count} words",
-      "sections": {
-        "elevatorPitch": {
-          "label": "Elevator pitch",
-          "description": "A concise introduction you can deliver in under a minute.",
-          "placeholder": "Write a short introduction that highlights your value."
-        },
-        "careerStory": {
-          "label": "Career story",
-          "description": "A narrative that connects your experiences to your current direction.",
-          "placeholder": "Outline the key chapters of your career journey."
-        },
-        "whyMe": {
-          "label": "Why me",
-          "description": "Explain why you are a compelling candidate for your target roles.",
-          "placeholder": "Summarize your strengths and the outcomes you deliver."
-        }
-      }
-    }
-  },
   "progress": {
     "phaseLabel": "Current phase",
     "nextActionLabel": "Next action",
@@ -1211,129 +1123,6 @@
       "saveFailed": "We couldn't save your profile basics.",
       "fullNameRequired": "Please add your full name to continue.",
       "validationFailed": "Please fix the highlighted fields before continuing."
-    }
-  },
-  "coverLetters": {
-    "page": {
-      "title": "Cover Letters",
-      "description": "Create professional cover letters tailored to your profile and experiences."
-    },
-    "list": {
-      "actions": {
-        "create": "Create cover letter"
-      },
-      "search": {
-        "placeholder": "Search cover letters...",
-        "noResults": "No cover letters match your search."
-      },
-      "empty": {
-        "content": "Start creating professional cover letters tailored to your profile."
-      }
-    },
-    "detail": {
-      "untitled": "Untitled Cover Letter"
-    },
-    "form": {
-      "createTitle": "Create Cover Letter",
-      "setupTitle": "Setup Your Cover Letter",
-      "setupDescription": "Create professional cover letters tailored to your profile and experiences.",
-      "createDescription": "Create a cover letter to introduce yourself to potential employers.",
-      "errors": {
-        "generation": "Failed to generate cover letter"
-      },
-      "fields": {
-        "title": {
-          "label": "Cover Letter Name",
-          "placeholder": "e.g., Software Engineer at Acme Corp"
-        },
-        "jobDescription": {
-          "label": "Job Description (Optional)",
-          "placeholder": "Paste the job description here to create a tailored cover letter...",
-          "description": "Paste the job description to tailor your cover letter"
-        }
-      }
-    },
-    "delete": {
-      "title": "Delete cover letter",
-      "message": "Are you sure you want to delete this cover letter? This action cannot be undone."
-    },
-    "toast": {
-      "created": "Cover letter created successfully",
-      "createFailed": "Failed to create cover letter",
-      "deleted": "Cover letter deleted successfully",
-      "deleteFailed": "Failed to delete cover letter",
-      "error": "An error occurred",
-      "generationFailed": "Failed to generate cover letter"
-    }
-  },
-  "speeches": {
-    "page": {
-      "title": "Speeches",
-      "description": "Draft concise narratives for introductions and interviews."
-    },
-    "list": {
-      "actions": {
-        "create": "Create speech"
-      },
-      "search": {
-        "placeholder": "Search speech blocks...",
-        "noResults": "No speech blocks match your search."
-      },
-      "empty": {
-        "preview": "Create your first speech to build your elevator pitch and career story."
-      }
-    },
-    "detail": {
-      "description": "Build your elevator pitch, career story, and why-me narrative.",
-      "untitled": "Untitled speech",
-      "notFound": "Speech not found",
-      "notFoundDescription": "This speech could not be found."
-    },
-    "form": {
-      "createTitle": "Create Speech",
-      "setupTitle": "Setup Your Speech",
-      "setupDescription": "Build your elevator pitch, career story, and why-me narrative.",
-      "createDescription": "Create a speech to draft your elevator pitch and career story.",
-      "errors": {
-        "generation": "Failed to generate speech"
-      },
-      "sections": {
-        "elevatorPitch": {
-          "label": "Elevator pitch"
-        },
-        "careerStory": {
-          "label": "Career story"
-        },
-        "whyMe": {
-          "label": "Why me"
-        }
-      },
-      "fields": {
-        "title": {
-          "label": "Speech Name",
-          "placeholder": "e.g., Engineering leadership pitch"
-        },
-        "context": {
-          "label": "Context (Optional)",
-          "placeholder": "Paste a role summary or context to tailor your speech...",
-          "description": "Add context to tailor the tone and focus of your speech"
-        }
-      }
-    },
-    "delete": {
-      "title": "Delete speech",
-      "message": "Are you sure you want to delete this speech? This action cannot be undone."
-    },
-    "toast": {
-      "created": "Speech created successfully",
-      "createFailed": "Failed to create speech",
-      "updated": "Speech updated successfully",
-      "updateFailed": "Failed to update speech",
-      "deleted": "Speech deleted successfully",
-      "deleteFailed": "Failed to delete speech",
-      "error": "An error occurred",
-      "generated": "Speech generated successfully",
-      "generationFailed": "Failed to generate speech"
     }
   },
   "jobs": {
@@ -1666,6 +1455,201 @@
         "generating": {
           "title": "Generating Your CV",
           "description": "AI is crafting your professional CV based on your experiences..."
+        }
+      }
+    },
+    "page": {
+      "title": "Applications",
+      "description": "Manage your CVs, cover letters, and speech materials."
+    },
+    "coverLetters": {
+      "page": {
+        "title": "Cover Letters",
+        "description": "Create professional cover letters tailored to your profile and experiences."
+      },
+      "list": {
+        "actions": {
+          "create": "Create cover letter"
+        },
+        "search": {
+          "placeholder": "Search cover letters...",
+          "noResults": "No cover letters match your search."
+        },
+        "empty": {
+          "content": "Start creating professional cover letters tailored to your profile."
+        },
+        "title": "Cover Letters"
+      },
+      "detail": {
+        "untitled": "Untitled Cover Letter"
+      },
+      "form": {
+        "createTitle": "Create Cover Letter",
+        "setupTitle": "Setup Your Cover Letter",
+        "setupDescription": "Create professional cover letters tailored to your profile and experiences.",
+        "createDescription": "Create a cover letter to introduce yourself to potential employers.",
+        "errors": {
+          "generation": "Failed to generate cover letter"
+        },
+        "fields": {
+          "title": {
+            "label": "Cover Letter Name",
+            "placeholder": "e.g., Software Engineer at Acme Corp"
+          },
+          "jobDescription": {
+            "label": "Job Description (Optional)",
+            "placeholder": "Paste the job description here to create a tailored cover letter...",
+            "description": "Paste the job description to tailor your cover letter"
+          }
+        }
+      },
+      "delete": {
+        "title": "Delete cover letter",
+        "message": "Are you sure you want to delete this cover letter? This action cannot be undone."
+      },
+      "toast": {
+        "created": "Cover letter created successfully",
+        "createFailed": "Failed to create cover letter",
+        "deleted": "Cover letter deleted successfully",
+        "deleteFailed": "Failed to delete cover letter",
+        "error": "An error occurred",
+        "generationFailed": "Failed to generate cover letter"
+      },
+      "display": {
+        "description": "View and edit your cover letter",
+        "untitled": "Untitled Cover Letter",
+        "loading": "Loading cover letter...",
+        "titleLabel": "Cover letter title",
+        "titlePlaceholder": "e.g., Head of Engineering cover letter",
+        "editMode": "Edit Mode",
+        "editModeDescription": "Edit your cover letter content directly",
+        "contentLabel": "Cover Letter Content",
+        "contentPlaceholder": "Enter your cover letter content...",
+        "emptyContent": "No content available. Click generate to create content.",
+        "states": {
+          "errorTitle": "Unable to load cover letter",
+          "notFound": "Cover letter not found",
+          "notFoundDescription": "We could not find that cover letter. Return to the list to create a new one."
+        },
+        "actions": {
+          "print": "Print",
+          "edit": "Edit"
+        },
+        "delete": {
+          "title": "Delete cover letter",
+          "description": "Are you sure you want to delete this cover letter?"
+        },
+        "toast": {
+          "saved": "Cover letter saved",
+          "saveFailed": "Unable to save cover letter",
+          "deleted": "Cover letter deleted",
+          "deleteFailed": "Unable to delete cover letter"
+        }
+      }
+    },
+    "speeches": {
+      "page": {
+        "title": "Speeches",
+        "description": "Draft concise narratives for introductions and interviews."
+      },
+      "list": {
+        "actions": {
+          "create": "Create speech"
+        },
+        "search": {
+          "placeholder": "Search speech blocks...",
+          "noResults": "No speech blocks match your search."
+        },
+        "empty": {
+          "preview": "Create your first speech to build your elevator pitch and career story."
+        },
+        "title": "Speech"
+      },
+      "detail": {
+        "description": "Build your elevator pitch, career story, and why-me narrative.",
+        "untitled": "Untitled speech",
+        "notFound": "Speech not found",
+        "notFoundDescription": "This speech could not be found.",
+        "states": {
+          "errorTitle": "Unable to load speech",
+          "generateErrorTitle": "Unable to generate speech"
+        }
+      },
+      "form": {
+        "createTitle": "Create Speech",
+        "setupTitle": "Setup Your Speech",
+        "setupDescription": "Build your elevator pitch, career story, and why-me narrative.",
+        "createDescription": "Create a speech to draft your elevator pitch and career story.",
+        "errors": {
+          "generation": "Failed to generate speech"
+        },
+        "sections": {
+          "elevatorPitch": {
+            "label": "Elevator pitch"
+          },
+          "careerStory": {
+            "label": "Career story"
+          },
+          "whyMe": {
+            "label": "Why me"
+          }
+        },
+        "fields": {
+          "title": {
+            "label": "Speech Name",
+            "placeholder": "e.g., Engineering leadership pitch"
+          },
+          "context": {
+            "label": "Context (Optional)",
+            "placeholder": "Paste a role summary or context to tailor your speech...",
+            "description": "Add context to tailor the tone and focus of your speech"
+          }
+        }
+      },
+      "delete": {
+        "title": "Delete speech",
+        "message": "Are you sure you want to delete this speech? This action cannot be undone."
+      },
+      "toast": {
+        "created": "Speech created successfully",
+        "createFailed": "Failed to create speech",
+        "updated": "Speech updated successfully",
+        "updateFailed": "Failed to update speech",
+        "deleted": "Speech deleted successfully",
+        "deleteFailed": "Failed to delete speech",
+        "error": "An error occurred",
+        "generated": "Speech generated successfully",
+        "generationFailed": "Failed to generate speech"
+      },
+      "new": {
+        "toast": {
+          "generationFailed": "Failed to generate speech content"
+        }
+      },
+      "editor": {
+        "actions": {
+          "generate": "Generate speech",
+          "regenerate": "Regenerate speech",
+          "generating": "Generating speech..."
+        },
+        "wordCount": "{count} / {max} words",
+        "wordCountSimple": "{count} words",
+        "sections": {
+          "elevatorPitch": {
+            "label": "Elevator pitch",
+            "description": "A concise introduction you can deliver in under a minute.",
+            "placeholder": "Write a short introduction that highlights your value."
+          },
+          "careerStory": {
+            "label": "Career story",
+            "description": "A narrative that connects your experiences to your current direction.",
+            "placeholder": "Outline the key chapters of your career journey."
+          },
+          "whyMe": {
+            "label": "Why me",
+            "description": "Explain why you are a compelling candidate for your target roles.",
+            "placeholder": "Summarize your strengths and the outcomes you deliver."
+          }
         }
       }
     }

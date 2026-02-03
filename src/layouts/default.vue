@@ -105,12 +105,12 @@ const navigationItems = computed<NavigationMenuItem[]>(() => [
       {
         label: t('navigation.coverLetters'),
         to: '/applications/cover-letters',
-        description: t('coverLetters.page.description'),
+        description: t('applications.coverLetters.page.description'),
       },
       {
         label: t('navigation.speeches'),
         to: '/applications/speech',
-        description: t('speeches.page.description'),
+        description: t('applications.speeches.page.description'),
       },
     ],
   },

@@ -33,9 +33,9 @@ const updateField = (field: keyof SpeechBlockForm, value: string) => {
   <div class="space-y-6">
     <SpeechSectionEditor
       :model-value="modelValue.elevatorPitch"
-      :label="t('speech.editor.sections.elevatorPitch.label')"
-      :description="t('speech.editor.sections.elevatorPitch.description')"
-      :placeholder="t('speech.editor.sections.elevatorPitch.placeholder')"
+      :label="t('applications.speeches.editor.sections.elevatorPitch.label')"
+      :description="t('applications.speeches.editor.sections.elevatorPitch.description')"
+      :placeholder="t('applications.speeches.editor.sections.elevatorPitch.placeholder')"
       :max-words="120"
       :disabled="disabled"
       :readonly="readonly"
@@ -45,9 +45,9 @@ const updateField = (field: keyof SpeechBlockForm, value: string) => {
 
     <SpeechSectionEditor
       :model-value="modelValue.careerStory"
-      :label="t('speech.editor.sections.careerStory.label')"
-      :description="t('speech.editor.sections.careerStory.description')"
-      :placeholder="t('speech.editor.sections.careerStory.placeholder')"
+      :label="t('applications.speeches.editor.sections.careerStory.label')"
+      :description="t('applications.speeches.editor.sections.careerStory.description')"
+      :placeholder="t('applications.speeches.editor.sections.careerStory.placeholder')"
       :max-words="360"
       :disabled="disabled"
       :readonly="readonly"
@@ -57,9 +57,9 @@ const updateField = (field: keyof SpeechBlockForm, value: string) => {
 
     <SpeechSectionEditor
       :model-value="modelValue.whyMe"
-      :label="t('speech.editor.sections.whyMe.label')"
-      :description="t('speech.editor.sections.whyMe.description')"
-      :placeholder="t('speech.editor.sections.whyMe.placeholder')"
+      :label="t('applications.speeches.editor.sections.whyMe.label')"
+      :description="t('applications.speeches.editor.sections.whyMe.description')"
+      :placeholder="t('applications.speeches.editor.sections.whyMe.placeholder')"
       :max-words="240"
       :disabled="disabled"
       :readonly="readonly"

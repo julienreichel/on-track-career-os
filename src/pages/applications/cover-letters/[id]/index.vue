@@ -77,7 +77,7 @@ const headerLinks: PageHeaderLink[] = [
 ];
 const displayTitle = computed(() => {
   const name = isEditing.value ? editTitle.value : (item.value?.name ?? '');
-  return name.trim() || t('coverLetter.display.untitled');
+  return name.trim() || t('applications.coverLetters.display.untitled');
 });
 const formattedUpdatedAt = computed(() => formatDetailDate(item.value?.updatedAt));
 
@@ -107,12 +107,12 @@ const handleSave = async () => {
       content: editContent.value,
     });
     if (updated) {
-      toast.add({ title: t('coverLetter.display.toast.saved'), color: 'primary' });
+      toast.add({ title: t('applications.coverLetters.display.toast.saved'), color: 'primary' });
       originalTitle.value = editTitle.value;
       originalContent.value = editContent.value;
       isEditing.value = false;
     } else {
-      toast.add({ title: t('coverLetter.display.toast.saveFailed'), color: 'error' });
+      toast.add({ title: t('applications.coverLetters.display.toast.saveFailed'), color: 'error' });
     }
   } finally {
     saving.value = false;
@@ -146,14 +146,14 @@ const handleDelete = async () => {
   try {
     const success = await remove();
     if (success) {
-      toast.add({ title: t('coverLetter.display.toast.deleted'), color: 'primary' });
+      toast.add({ title: t('applications.coverLetters.display.toast.deleted'), color: 'primary' });
       await router.push('/applications/cover-letters');
     } else {
-      toast.add({ title: t('coverLetter.display.toast.deleteFailed'), color: 'error' });
+      toast.add({ title: t('applications.coverLetters.display.toast.deleteFailed'), color: 'error' });
     }
   } catch (err) {
     console.error('[coverLetterDisplay] Delete failed', err);
-    toast.add({ title: t('coverLetter.display.toast.deleteFailed'), color: 'error' });
+    toast.add({ title: t('applications.coverLetters.display.toast.deleteFailed'), color: 'error' });
   } finally {
     deleting.value = false;
     deleteModalOpen.value = false;
@@ -250,7 +250,7 @@ watch(item, (newValue) => {
     editContent.value = content ? content : '';
     originalContent.value = editContent.value;
     // Update breadcrumb with cover letter name
-    route.meta.breadcrumbLabel = newValue.name || t('coverLetter.display.untitled');
+    route.meta.breadcrumbLabel = newValue.name || t('applications.coverLetters.display.untitled');
     void loadJobSummary(newValue.jobId);
   }
 });
@@ -262,7 +262,7 @@ watch(item, (newValue) => {
       <UPage>
         <UPageHeader
           :title="displayTitle"
-          :description="t('coverLetter.display.description')"
+          :description="t('applications.coverLetters.display.description')"
           :links="headerLinks"
         />
 
@@ -294,7 +294,7 @@ watch(item, (newValue) => {
             icon="i-heroicons-exclamation-triangle"
             color="error"
             variant="soft"
-            :title="t('coverLetter.display.states.errorTitle')"
+            :title="t('applications.coverLetters.display.states.errorTitle')"
             :description="error"
             class="mb-6"
             :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
@@ -312,27 +312,27 @@ watch(item, (newValue) => {
               <div class="space-y-4">
                 <div>
                   <h3 class="text-lg font-semibold mb-2">
-                    {{ t('coverLetter.display.editMode') }}
+                    {{ t('applications.coverLetters.display.editMode') }}
                   </h3>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('coverLetter.display.editModeDescription') }}
+                    {{ t('applications.coverLetters.display.editModeDescription') }}
                   </p>
                 </div>
 
-                <UFormField :label="t('coverLetter.display.titleLabel')">
+                <UFormField :label="t('applications.coverLetters.display.titleLabel')">
                   <UInput
                     v-model="editTitle"
-                    :placeholder="t('coverLetter.display.titlePlaceholder')"
+                    :placeholder="t('applications.coverLetters.display.titlePlaceholder')"
                     data-testid="cover-letter-title-input"
                     class="w-full"
                   />
                 </UFormField>
 
-                <UFormField :label="t('coverLetter.display.contentLabel')" required>
+                <UFormField :label="t('applications.coverLetters.display.contentLabel')" required>
                   <UTextarea
                     v-model="editContent"
                     :rows="25"
-                    :placeholder="t('coverLetter.display.contentPlaceholder')"
+                    :placeholder="t('applications.coverLetters.display.contentPlaceholder')"
                     class="w-full"
                     data-testid="cover-letter-content-textarea"
                   />
@@ -371,7 +371,7 @@ watch(item, (newValue) => {
               <div>
                 <MarkdownContent v-if="item.content" :content="item.content" class="doc-markdown" />
                 <div v-else class="text-gray-500 dark:text-gray-400 italic">
-                  {{ t('coverLetter.display.emptyContent') }}
+                  {{ t('applications.coverLetters.display.emptyContent') }}
                 </div>
               </div>
               <template #footer>
@@ -381,13 +381,13 @@ watch(item, (newValue) => {
                   </p>
                   <div class="flex justify-end gap-3">
                     <UButton
-                      :label="t('coverLetter.display.actions.print')"
+                      :label="t('applications.coverLetters.display.actions.print')"
                       icon="i-heroicons-arrow-down-tray"
                       variant="outline"
                       @click="handlePrint"
                     />
                     <UButton
-                      :label="t('coverLetter.display.actions.edit')"
+                      :label="t('applications.coverLetters.display.actions.edit')"
                       icon="i-heroicons-pencil"
                       variant="outline"
                       data-testid="edit-cover-letter-button"
@@ -404,8 +404,8 @@ watch(item, (newValue) => {
               icon="i-heroicons-exclamation-circle"
               color="warning"
               variant="soft"
-              :title="t('coverLetter.display.states.notFound')"
-              :description="t('coverLetter.display.states.notFoundDescription')"
+              :title="t('applications.coverLetters.display.states.notFound')"
+              :description="t('applications.coverLetters.display.states.notFoundDescription')"
             />
           </UCard>
         </UPageBody>
@@ -420,8 +420,8 @@ watch(item, (newValue) => {
 
     <ConfirmModal
       v-model:open="deleteModalOpen"
-      :title="t('coverLetter.display.delete.title')"
-      :description="t('coverLetter.display.delete.description')"
+      :title="t('applications.coverLetters.display.delete.title')"
+      :description="t('applications.coverLetters.display.delete.description')"
       :loading="deleting"
       @confirm="handleDelete"
       @cancel="deleteModalOpen = false"

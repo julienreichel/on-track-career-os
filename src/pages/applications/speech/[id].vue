@@ -40,7 +40,7 @@ const saving = ref(false);
 const cancelModalOpen = ref(false);
 const isGenerating = computed(() => engine.isGenerating.value);
 const hasJobContext = computed(() => Boolean(item.value?.jobId));
-const detailTitle = computed(() => item.value?.name?.trim() || t('speeches.detail.untitled'));
+const detailTitle = computed(() => item.value?.name?.trim() || t('applications.speeches.detail.untitled'));
 const formattedUpdatedAt = computed(() => formatDetailDate(item.value?.updatedAt));
 const targetJobTitle = computed(
   () => targetJob.value?.title?.trim() || t('tailoredMaterials.unknownJobTitle')
@@ -153,11 +153,11 @@ const handleSave = async () => {
       whyMe: formState.value.whyMe,
     });
     if (updated) {
-      toast.add({ title: t('speeches.toast.updated'), color: 'primary' });
+      toast.add({ title: t('applications.speeches.toast.updated'), color: 'primary' });
       originalState.value = { ...formState.value };
       isEditing.value = false;
     } else {
-      toast.add({ title: t('speeches.toast.updateFailed'), color: 'error' });
+      toast.add({ title: t('applications.speeches.toast.updateFailed'), color: 'error' });
     }
   } finally {
     saving.value = false;
@@ -168,7 +168,7 @@ const handleGenerate = async () => {
   try {
     const result = await engine.generate();
     applySpeechResult(result);
-    toast.add({ title: t('speeches.toast.generated'), color: 'primary' });
+    toast.add({ title: t('applications.speeches.toast.generated'), color: 'primary' });
   } catch (err) {
     console.error('[speechDetail] Failed to generate speech', err);
   }
@@ -258,7 +258,7 @@ watch(item, (newValue) => {
       <UPage>
         <UPageHeader
           :title="detailTitle"
-          :description="t('speeches.detail.description')"
+          :description="t('applications.speeches.detail.description')"
           :links="headerLinks"
         />
 
@@ -290,7 +290,7 @@ watch(item, (newValue) => {
             icon="i-heroicons-exclamation-triangle"
             color="error"
             variant="soft"
-            :title="t('speech.detail.states.errorTitle')"
+            :title="t('applications.speeches.detail.states.errorTitle')"
             :description="error"
             class="mb-6"
             :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
@@ -302,7 +302,7 @@ watch(item, (newValue) => {
             icon="i-heroicons-exclamation-triangle"
             color="warning"
             variant="soft"
-            :title="t('speech.detail.states.generateErrorTitle')"
+            :title="t('applications.speeches.detail.states.generateErrorTitle')"
             :description="engine.error.value"
             class="mb-6"
             :close-button="{
@@ -323,10 +323,10 @@ watch(item, (newValue) => {
             <template v-if="isEditing">
               <UCard>
                 <div class="mb-6">
-                  <UFormField :label="t('speeches.form.fields.title.label')">
+                  <UFormField :label="t('applications.speeches.form.fields.title.label')">
                     <UInput
                       v-model="formState.title"
-                      :placeholder="t('speeches.form.fields.title.placeholder')"
+                      :placeholder="t('applications.speeches.form.fields.title.placeholder')"
                       :disabled="loading || saving"
                       data-testid="speech-title-input"
                       class="w-full"
@@ -367,7 +367,7 @@ watch(item, (newValue) => {
                 <div class="space-y-2">
                   <div>
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                      {{ t('speeches.form.sections.elevatorPitch.label') }}
+                      {{ t('applications.speeches.form.sections.elevatorPitch.label') }}
                     </h3>
                     <MarkdownContent
                       v-if="hasElevatorPitch"
@@ -382,7 +382,7 @@ watch(item, (newValue) => {
                 <div class="space-y-2">
                   <div>
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                      {{ t('speeches.form.sections.careerStory.label') }}
+                      {{ t('applications.speeches.form.sections.careerStory.label') }}
                     </h3>
                     <MarkdownContent
                       v-if="hasCareerStory"
@@ -397,7 +397,7 @@ watch(item, (newValue) => {
                 <div class="space-y-2">
                   <div>
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                      {{ t('speeches.form.sections.whyMe.label') }}
+                      {{ t('applications.speeches.form.sections.whyMe.label') }}
                     </h3>
                     <MarkdownContent
                       v-if="hasWhyMe"
@@ -430,8 +430,8 @@ watch(item, (newValue) => {
             v-else
             color="warning"
             icon="i-heroicons-exclamation-triangle"
-            :title="t('speeches.detail.notFound')"
-            :description="t('speeches.detail.notFoundDescription')"
+            :title="t('applications.speeches.detail.notFound')"
+            :description="t('applications.speeches.detail.notFoundDescription')"
           />
         </UPageBody>
       </UPage>

@@ -23,11 +23,11 @@ const { t } = useI18n();
 
 const label = computed(() => {
   if (props.loading) {
-    return t('speech.editor.actions.generating');
+    return t('applications.speeches.editor.actions.generating');
   }
   return props.hasContent
-    ? t('speech.editor.actions.regenerate')
-    : t('speech.editor.actions.generate');
+    ? t('applications.speeches.editor.actions.regenerate')
+    : t('applications.speeches.editor.actions.generate');
 });
 </script>
 

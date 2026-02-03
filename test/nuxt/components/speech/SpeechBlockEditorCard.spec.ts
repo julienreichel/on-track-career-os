@@ -60,7 +60,7 @@ describe('SpeechBlockEditorCard', () => {
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
     const payload = wrapper.emitted('update:modelValue')?.[0]?.[0];
     expect(payload).toEqual({
-      elevatorPitch: i18n.global.t('speech.editor.sections.elevatorPitch.label'),
+      elevatorPitch: i18n.global.t('applications.speeches.editor.sections.elevatorPitch.label'),
       careerStory: '',
       whyMe: '',
     });

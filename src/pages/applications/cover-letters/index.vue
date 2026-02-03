@@ -2,8 +2,8 @@
   <UContainer>
     <UPage>
       <UPageHeader
-        :title="t('coverLetters.page.title')"
-        :description="t('coverLetters.page.description')"
+        :title="t('applications.coverLetters.page.title')"
+        :description="t('applications.coverLetters.page.description')"
         :links="[
           {
             label: t('navigation.backToApplications'),
@@ -11,7 +11,7 @@
             to: { name: 'applications' },
           },
           {
-            label: t('coverLetters.list.actions.create'),
+            label: t('applications.coverLetters.list.actions.create'),
             icon: 'i-heroicons-plus',
             to: { name: 'applications-cover-letters-new' },
           },
@@ -32,7 +32,7 @@
           <UInput
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
-            :placeholder="t('coverLetters.list.search.placeholder')"
+            :placeholder="t('applications.coverLetters.list.search.placeholder')"
             size="lg"
             class="w-1/3"
           />
@@ -53,10 +53,10 @@
 
         <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
           <UEmpty
-            :title="t('coverLetters.list.search.noResults')"
+            :title="t('applications.coverLetters.list.search.noResults')"
             icon="i-heroicons-magnifying-glass"
           >
-            <p class="text-sm text-gray-500">{{ t('coverLetters.list.search.placeholder') }}</p>
+            <p class="text-sm text-gray-500">{{ t('applications.coverLetters.list.search.placeholder') }}</p>
           </UEmpty>
         </UCard>
 
@@ -102,8 +102,8 @@
 
       <ConfirmModal
         v-model:open="deleteModalOpen"
-        :title="t('coverLetters.delete.title')"
-        :description="t('coverLetters.delete.message')"
+        :title="t('applications.coverLetters.delete.title')"
+        :description="t('applications.coverLetters.delete.message')"
         :confirm-label="t('common.delete')"
         :cancel-label="t('common.cancel')"
         confirm-color="error"
@@ -191,10 +191,10 @@ const handleDelete = async () => {
   try {
     const success = await deleteCoverLetter(letterToDelete.value.id);
     if (success) {
-      toast.add({ title: t('coverLetters.toast.deleted'), color: 'primary' });
+      toast.add({ title: t('applications.coverLetters.toast.deleted'), color: 'primary' });
       deleteModalOpen.value = false;
     } else {
-      toast.add({ title: t('coverLetters.toast.deleteFailed'), color: 'error' });
+      toast.add({ title: t('applications.coverLetters.toast.deleteFailed'), color: 'error' });
     }
   } finally {
     deleting.value = false;
@@ -213,11 +213,11 @@ const resolveTitle = (letter: CoverLetter): string => {
   // Fallback to old logic for letters created before name field
   const content = letter.content || '';
   if (content.length === 0) {
-    return t('coverLetters.detail.untitled');
+    return t('applications.coverLetters.detail.untitled');
   }
 
   const lines = content.split('\n').filter((line) => line.trim().length > 0);
-  const firstLine = lines[0] || t('coverLetters.detail.untitled');
+  const firstLine = lines[0] || t('applications.coverLetters.detail.untitled');
 
   if (firstLine.length > TITLE_MAX_LENGTH) {
     return firstLine.substring(0, TITLE_MAX_LENGTH) + '...';
@@ -233,7 +233,7 @@ const resolveSubtitle = (letter: CoverLetter): string => {
 const resolvePreview = (letter: CoverLetter): string => {
   const content = letter.content || '';
   if (content.length === 0) {
-    return t('coverLetters.list.empty.content');
+    return t('applications.coverLetters.list.empty.content');
   }
 
   // Get first few lines as preview
