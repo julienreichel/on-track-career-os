@@ -180,7 +180,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
           icon="i-heroicons-exclamation-triangle"
           color="error"
           variant="soft"
-          :title="t('cvUpload.errors.unknown')"
+          :title="t('ingestion.cv.upload.errors.unknown')"
           :description="errorMessage"
           :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
           @close="errorMessage = null"

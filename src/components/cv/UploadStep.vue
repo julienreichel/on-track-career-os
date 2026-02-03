@@ -24,15 +24,15 @@ function handleFileChange(file: File | null | undefined) {
       <UFileUpload
         v-if="!selectedFile"
         :model-value="selectedFile"
-        :label="t('cvUpload.dropzoneText')"
-        :description="t('cvUpload.dropzoneHint')"
+        :label="t('ingestion.cv.upload.dropzoneText')"
+        :description="t('ingestion.cv.upload.dropzoneHint')"
         accept=".pdf,.txt"
         @update:model-value="handleFileChange"
       />
 
       <UAlert
         v-if="selectedFile"
-        :title="t('cvUpload.fileUploaded', { fileName: selectedFile.name })"
+        :title="t('ingestion.cv.upload.fileUploaded', { fileName: selectedFile.name })"
         color="primary"
       />
     </div>

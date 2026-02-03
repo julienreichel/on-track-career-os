@@ -56,7 +56,7 @@ describe('Applications index page', () => {
 
   it('renders CV, cover letter, and speech cards', async () => {
     const wrapper = await mountPage();
-    expect(wrapper.text()).toContain(i18n.global.t('cvList.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.list.title'));
     expect(wrapper.text()).toContain(i18n.global.t('coverLetter.list.title'));
     expect(wrapper.text()).toContain(i18n.global.t('speech.list.title'));
   });

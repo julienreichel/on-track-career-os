@@ -214,8 +214,8 @@ describe('CV Settings page', () => {
 
     expect(mockLoadSettings).toHaveBeenCalled();
     expect(mockLoadTemplates).toHaveBeenCalled();
-    expect(wrapper.text()).toContain(i18n.global.t('cvSettings.sections.other.title'));
-    expect(wrapper.text()).toContain(i18n.global.t('cvTemplates.list.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.settings.sections.other.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.templates.list.title'));
     expect(wrapper.text()).toContain('Classic');
     expect(wrapper.text()).toContain('Engineer');
   });
@@ -263,7 +263,7 @@ describe('CV Settings page', () => {
 
     const createButton = wrapper
       .findAll('button')
-      .find((button) => button.text() === i18n.global.t('cvTemplates.list.actions.create'));
+      .find((button) => button.text() === i18n.global.t('applications.cvs.templates.list.actions.create'));
     expect(createButton).toBeTruthy();
     await createButton?.trigger('click');
     await flushPromises();

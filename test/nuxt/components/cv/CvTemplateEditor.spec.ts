@@ -48,9 +48,9 @@ describe('CvTemplateEditor', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(i18n.global.t('cvTemplates.editor.nameLabel'));
-    expect(wrapper.text()).toContain(i18n.global.t('cvTemplates.editor.contentLabel'));
-    expect(wrapper.text()).toContain(i18n.global.t('cvTemplates.editor.preview'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.templates.editor.nameLabel'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.templates.editor.contentLabel'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.templates.editor.preview'));
 
     const inputs = wrapper.findAll('input');
     await inputs[0]?.setValue('Updated name');
@@ -77,11 +77,11 @@ describe('CvTemplateEditor', () => {
 
     const toggle = wrapper
       .findAll('button')
-      .find((btn) => btn.text().includes(i18n.global.t('cvTemplates.editor.showPreview')));
+      .find((btn) => btn.text().includes(i18n.global.t('applications.cvs.templates.editor.showPreview')));
     await toggle?.trigger('click');
 
     expect(wrapper.find('.markdown').exists()).toBe(true);
-    expect(wrapper.text()).toContain(i18n.global.t('cvTemplates.editor.hidePreview'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.templates.editor.hidePreview'));
     expect(wrapper.emitted('preview')).toBeTruthy();
   });
 
@@ -100,7 +100,7 @@ describe('CvTemplateEditor', () => {
 
     const toggle = wrapper
       .findAll('button')
-      .find((btn) => btn.text().includes(i18n.global.t('cvTemplates.editor.showPreview')));
+      .find((btn) => btn.text().includes(i18n.global.t('applications.cvs.templates.editor.showPreview')));
     await toggle?.trigger('click');
 
     expect(wrapper.find('.markdown').text()).toContain('Preview content');

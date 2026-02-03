@@ -8,7 +8,7 @@ const { t } = useI18n();
   <UCard>
     <template #header>
       <h2 class="text-xl font-semibold">
-        {{ t('cvUpload.parsing') }}
+        {{ t('ingestion.cv.upload.parsing') }}
       </h2>
     </template>
 
@@ -18,7 +18,7 @@ const { t } = useI18n();
       <USkeleton class="h-16 w-full" />
 
       <p class="text-gray-600 dark:text-gray-400 text-center">
-        {{ t('cvUpload.parsingDescription') }}
+        {{ t('ingestion.cv.upload.parsingDescription') }}
       </p>
     </div>
   </UCard>

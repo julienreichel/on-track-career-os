@@ -87,7 +87,7 @@ export function useCvParsing() {
         : await extractTextFileContent(file);
 
     if (!text || text.trim().length === 0) {
-      throw new Error(t('cvUpload.errors.noTextExtracted'));
+      throw new Error(t('ingestion.cv.upload.errors.noTextExtracted'));
     }
 
     extractedText.value = text;
@@ -101,7 +101,7 @@ export function useCvParsing() {
     }
 
     if (!aiOps.parsedCv.value?.experienceItems || aiOps.parsedCv.value.experienceItems.length === 0) {
-      throw new Error(t('cvUpload.errors.parsingFailed'));
+      throw new Error(t('ingestion.cv.upload.errors.parsingFailed'));
     }
 
     // Extract profile information

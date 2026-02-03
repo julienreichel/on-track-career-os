@@ -23,7 +23,7 @@ async function handleFileSelected(file: File) {
     await parsing.parseFile(file);
     workflow.setStep('preview');
   } catch (error) {
-    workflow.setError(error instanceof Error ? error.message : t('cvUpload.errors.unknown'));
+    workflow.setError(error instanceof Error ? error.message : t('ingestion.cv.upload.errors.unknown'));
     workflow.reset();
   }
 }
@@ -47,7 +47,7 @@ async function handleImport() {
 
     workflow.setStep('complete');
   } catch (error) {
-    workflow.setError(error instanceof Error ? error.message : t('cvUpload.errors.importFailed'));
+    workflow.setError(error instanceof Error ? error.message : t('ingestion.cv.upload.errors.importFailed'));
     workflow.setStep('preview');
   }
 }
@@ -66,7 +66,7 @@ function viewExperiences() {
 <template>
   <UContainer>
     <UPage>
-      <UPageHeader :title="t('cvUpload.title')" :description="t('cvUpload.description')">
+      <UPageHeader :title="t('ingestion.cv.upload.title')" :description="t('ingestion.cv.upload.description')">
         <template #actions>
           <UButton
             v-if="workflow.currentStep.value === 'upload'"
@@ -84,7 +84,7 @@ function viewExperiences() {
           v-if="workflow.errorMessage.value"
           icon="i-lucide-alert-triangle"
           color="error"
-          :title="t('cvUpload.errors.unknown')"
+          :title="t('ingestion.cv.upload.errors.unknown')"
           :description="workflow.errorMessage.value"
           :close-button="{ icon: 'i-lucide-x', color: 'error', variant: 'link' }"
           @close="workflow.clearError()"
@@ -111,7 +111,7 @@ function viewExperiences() {
           <!-- Actions -->
           <StickyFooterCard>
             <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
-            <UButton :label="t('cvUpload.confirmImport')" @click="handleImport" />
+            <UButton :label="t('ingestion.cv.upload.confirmImport')" @click="handleImport" />
           </StickyFooterCard>
         </div>
 

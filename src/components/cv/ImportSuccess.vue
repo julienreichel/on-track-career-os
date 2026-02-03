@@ -22,7 +22,7 @@ const emit = defineEmits<{
       <div class="flex items-center gap-2">
         <UIcon name="i-lucide-check-circle" class="text-success" />
         <h2 class="text-xl font-semibold">
-          {{ t('cvUpload.importing') }}
+          {{ t('ingestion.cv.upload.importing') }}
         </h2>
       </div>
     </template>
@@ -31,7 +31,7 @@ const emit = defineEmits<{
       <UAlert
         color="primary"
         :title="
-          t('cvUpload.successSummary', {
+          t('ingestion.cv.upload.successSummary', {
             created: createdCount,
             updated: updatedCount,
           })
@@ -40,7 +40,7 @@ const emit = defineEmits<{
 
       <div class="flex flex-col sm:flex-row gap-3">
         <UButton
-          :label="t('cvUpload.viewExperiences')"
+          :label="t('ingestion.cv.upload.viewExperiences')"
           icon="i-lucide-briefcase"
           variant="outline"
           @click="emit('viewExperiences')"

@@ -33,7 +33,7 @@ watch(
 );
 
 function formatDateRange(start?: string, end?: string): string {
-  if (!start) return t('cvUpload.sections.experiences');
+  if (!start) return t('ingestion.cv.upload.sections.experiences');
   if (!end) return `${start} - ${t('experiences.present')}`;
   return `${start} - ${end}`;
 }
@@ -98,7 +98,7 @@ const handleSave = (data: ExperienceCreateInput) => {
     <template #header>
       <div class="flex items-center justify-between">
         <h3 class="text-lg font-semibold">
-          {{ t('cvUpload.sections.experiences') }}
+          {{ t('ingestion.cv.upload.sections.experiences') }}
         </h3>
         <UBadge color="primary">
           {{ localExperiences.length }}

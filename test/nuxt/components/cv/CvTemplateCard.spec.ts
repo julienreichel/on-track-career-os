@@ -55,8 +55,8 @@ describe('CvTemplateCard', () => {
 
     expect(wrapper.text()).toContain('Classic Template');
     expect(wrapper.text()).toContain('Clean layout');
-    expect(wrapper.text()).toContain(i18n.global.t('cvTemplates.labels.default'));
-    expect(wrapper.text()).toContain(i18n.global.t('cvTemplates.labels.updated'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.templates.labels.default'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.templates.labels.updated'));
   });
 
   it('emits actions from buttons', async () => {

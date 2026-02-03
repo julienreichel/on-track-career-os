@@ -1,9 +1,11 @@
 # CV Keys Consolidation - Complete Mapping
 
 ## Summary
+
 Successfully consolidated 8 root-level CV-related sections into a single `applications.cvs.*` namespace. All 200+ translation keys preserved with zero data loss.
 
 ## Consolidation Completed
+
 - **Removed sections**: cvs, cvList, cvDisplay, cvGenerate, cvSettings, cvTemplates, cvExperiencePicker, cvNew
 - **Created structure**: applications.cvs (unified subsections)
 - **Keys moved**: 200+ keys across all subsections
@@ -14,6 +16,7 @@ Successfully consolidated 8 root-level CV-related sections into a single `applic
 ## Detailed Key Mapping
 
 ### 1. Page Information
+
 ```
 cvs.page.* → applications.cvs.page.*
   ✓ title: "CVs"
@@ -21,6 +24,7 @@ cvs.page.* → applications.cvs.page.*
 ```
 
 ### 2. List (CV List) - MERGED
+
 ```
 cvList.title → applications.cvs.list.title
 cvs.list.* → applications.cvs.list.*
@@ -35,6 +39,7 @@ Result (cvList merged INTO cvs.list):
 ```
 
 ### 3. Delete Modal
+
 ```
 cvs.delete.* → applications.cvs.delete.*
   ✓ title: "Delete CV"
@@ -42,6 +47,7 @@ cvs.delete.* → applications.cvs.delete.*
 ```
 
 ### 4. Toast Notifications (root-level)
+
 ```
 cvs.toast.* → applications.cvs.toast.*
   ✓ deleted: "CV deleted successfully"
@@ -49,6 +55,7 @@ cvs.toast.* → applications.cvs.toast.*
 ```
 
 ### 5. Display CV Content
+
 ```
 cvDisplay.* → applications.cvs.display.*
   ✓ untitled: "Untitled CV"
@@ -78,6 +85,7 @@ cvDisplay.* → applications.cvs.display.*
 ```
 
 ### 6. Generate CV
+
 ```
 cvGenerate.* → applications.cvs.generate.*
   ✓ title: "Generate CV"
@@ -112,6 +120,7 @@ cvGenerate.* → applications.cvs.generate.*
 ```
 
 ### 7. CV Settings
+
 ```
 cvSettings.* → applications.cvs.settings.*
   ✓ title: "CV settings"
@@ -136,6 +145,7 @@ cvSettings.* → applications.cvs.settings.*
 ```
 
 ### 8. CV Templates
+
 ```
 cvTemplates.* → applications.cvs.templates.*
 
@@ -196,6 +206,7 @@ Templates.errors:
 ```
 
 ### 9. Experience Picker
+
 ```
 cvExperiencePicker.* → applications.cvs.experiencePicker.*
   ✓ title: "Select Experiences"
@@ -209,6 +220,7 @@ cvExperiencePicker.* → applications.cvs.experiencePicker.*
 ```
 
 ### 10. CV Generation Loading State
+
 ```
 cvNew.* → applications.cvs.new.*
   ✓ generating.title: "Generating Your CV"
@@ -220,10 +232,12 @@ cvNew.* → applications.cvs.new.*
 ## Conflict Resolution
 
 ### Single Conflict: cvList + cvs.list Merge
+
 **Source**: cvList.title ("My CVs") + existing cvs.list content  
 **Strategy**: Merged INTO cvs.list subsection without data loss
 
 **Result**:
+
 ```json
 "list": {
   "title": "My CVs",  // ← from cvList
@@ -242,8 +256,9 @@ cvNew.* → applications.cvs.new.*
 ---
 
 ## File Changes
+
 - **File**: i18n/locales/en.json
-- **Changes**: 
+- **Changes**:
   - Removed 8 root-level sections (cvs, cvList, cvDisplay, cvGenerate, cvSettings, cvTemplates, cvExperiencePicker, cvNew)
   - Created new `applications` root section (if not existed)
   - Added `applications.cvs` with all 10 subsections (page, list, delete, toast, display, generate, settings, templates, experiencePicker, new)
@@ -255,6 +270,7 @@ cvNew.* → applications.cvs.new.*
 ## Next Steps for Code Updates
 
 ### 1. Update Component References
+
 Need to search all Vue files and update translation key references:
 
 ```bash
@@ -263,6 +279,7 @@ grep -r "cvList\|cvDisplay\|cvGenerate\|cvSettings\|cvTemplates\|cvExperiencePic
 ```
 
 **Required changes**:
+
 - `cvList.*` → `applications.cvs.list.*`
 - `cvDisplay.*` → `applications.cvs.display.*`
 - `cvGenerate.*` → `applications.cvs.generate.*`
@@ -273,12 +290,15 @@ grep -r "cvList\|cvDisplay\|cvGenerate\|cvSettings\|cvTemplates\|cvExperiencePic
 - `cvs.*` → `applications.cvs.*`
 
 ### 2. Files Likely Affected
+
 - Any components in `src/components/` using CV-related keys
 - Any pages in `src/pages/` under Applications section
 - Any composables in `src/composables/` managing CV state
 
 ### 3. Validation
+
 After updating component references:
+
 ```bash
 npm run lint  # Check for i18n key errors
 npm run test  # Run test suite
@@ -287,12 +307,12 @@ npm run test  # Run test suite
 ---
 
 ## Summary Stats
-| Metric | Count |
-|--------|-------|
-| Root sections removed | 8 |
-| Root sections created | 1 (applications) |
-| Subsections in applications.cvs | 10 |
-| Total keys moved/consolidated | 200+ |
-| Conflicts resolved | 1 |
-| Data loss | 0 |
 
+| Metric                          | Count            |
+| ------------------------------- | ---------------- |
+| Root sections removed           | 8                |
+| Root sections created           | 1 (applications) |
+| Subsections in applications.cvs | 10               |
+| Total keys moved/consolidated   | 200+             |
+| Conflicts resolved              | 1                |
+| Data loss                       | 0                |

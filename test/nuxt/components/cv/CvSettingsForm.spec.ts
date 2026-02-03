@@ -62,7 +62,7 @@ describe('CvSettingsForm', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(i18n.global.t('cvSettings.sections.other.title'));
+    expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.settings.sections.other.title'));
   });
 
   it('emits updates when sections are toggled and saved', async () => {
@@ -84,7 +84,7 @@ describe('CvSettingsForm', () => {
 
     const sectionButton = wrapper
       .findAll('button')
-      .find((button) => button.text() === i18n.global.t('cvSettings.sectionLabels.skills'));
+      .find((button) => button.text() === i18n.global.t('applications.cvs.settings.sectionLabels.skills'));
     await sectionButton?.trigger('click');
 
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
