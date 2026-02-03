@@ -331,7 +331,7 @@ describe('Cover letter list page', () => {
   it('renders back to applications link', async () => {
     const wrapper = await mountPage();
     await wrapper.vm.$nextTick();
-    expect(wrapper.text()).toContain(i18n.global.t('navigation.backToApplications'));
+    expect(wrapper.text()).toContain(i18n.global.t('common.backToList'));
   });
 
   it('displays error when loading fails', async () => {

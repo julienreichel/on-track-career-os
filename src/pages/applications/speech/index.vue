@@ -6,7 +6,7 @@
         :description="t('applications.speeches.page.description')"
         :links="[
           {
-            label: t('navigation.backToApplications'),
+            label: t('common.backToList'),
             icon: 'i-heroicons-arrow-left',
             to: { name: 'applications' },
           },

@@ -104,7 +104,7 @@ async function mountPage() {
 describe('CV list page', () => {
   it('renders back to applications link', async () => {
     const wrapper = await mountPage();
-    expect(wrapper.text()).toContain(i18n.global.t('navigation.backToApplications'));
+    expect(wrapper.text()).toContain(i18n.global.t('common.backToList'));
   });
 
   it('orders CVs by newest updated date', async () => {

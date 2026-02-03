@@ -7,9 +7,6 @@
     "profile": "Profile",
     "cvUpload": "Upload CV",
     "experiences": "Experiences",
-    "errors": {
-      "generation": "Failed to generate"
-    },
     "personalCanvas": "Personal Canvas",
     "jobs": "Jobs",
     "companies": "Companies",
@@ -17,21 +14,14 @@
     "coverLetters": "Cover Letters",
     "cvs": "CVs",
     "speeches": "Speeches",
-    "speech": "Speech",
     "interview": "Interview Prep",
     "settings": "Settings",
     "cv": "CV",
-    "backToProfile": "Back to Profile",
-    "backToHome": "Back to Home",
-    "backToApplications": "Back to Applications",
     "new": "New"
   },
   "auth": {
     "signOut": "Sign Out",
     "errorSigningOut": "Error signing out"
-  },
-  "empty": {
-    "content": "Start creating professional cover letters tailored to your profile."
   },
   "ingestion": {
     "cv": {
@@ -835,7 +825,8 @@
       "saving": "Saving...",
       "generating": "Generating..."
     },
-    "retry": "Retry"
+    "retry": "Retry",
+    "empty": "Start creating professional cover letters tailored to your profile."
   },
   "canvas": {
     "needsUpdate": "Update recommended",

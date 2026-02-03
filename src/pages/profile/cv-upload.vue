@@ -79,7 +79,7 @@ function viewExperiences() {
             v-if="workflow.currentStep.value === 'upload'"
             icon="i-heroicons-arrow-left"
             variant="ghost"
-            :label="t('navigation.backToProfile')"
+            :label="t('common.backToProfile')"
             @click="router.push('/profile')"
           />
         </template>

@@ -237,7 +237,7 @@ describe('Speech list page', () => {
 
   it('renders back to applications link', async () => {
     const { wrapper } = await mountPage();
-    expect(wrapper.text()).toContain(i18n.global.t('navigation.backToApplications'));
+    expect(wrapper.text()).toContain(i18n.global.t('common.backToList'));
   });
 
   it('orders speech blocks by newest updated date', async () => {

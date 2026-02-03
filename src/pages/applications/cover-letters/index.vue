@@ -6,7 +6,7 @@
         :description="t('applications.coverLetters.page.description')"
         :links="[
           {
-            label: t('navigation.backToApplications'),
+            label: t('common.backToList'),
             icon: 'i-heroicons-arrow-left',
             to: { name: 'applications' },
           },
@@ -233,7 +233,7 @@ const resolveSubtitle = (letter: CoverLetter): string => {
 const resolvePreview = (letter: CoverLetter): string => {
   const content = letter.content || '';
   if (content.length === 0) {
-    return t('applications.coverLetters.list.empty.content');
+    return t('common.empty');
   }
 
   // Get first few lines as preview

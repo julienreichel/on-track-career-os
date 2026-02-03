@@ -5,7 +5,7 @@
       :description="t('applications.page.description')"
       :links="[
         {
-          label: t('navigation.backToHome'),
+          label: t('common.back'),
           icon: 'i-heroicons-arrow-left',
           to: { name: 'index' },
         },

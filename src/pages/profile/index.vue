@@ -84,7 +84,7 @@ const { guidance } = useGuidance('profile');
 
 const headerLinks = computed<PageHeaderLink[]>(() => [
   {
-    label: t('navigation.backToHome'),
+    label: t('common.back'),
     icon: 'i-heroicons-arrow-left',
     to: '/',
   },

@@ -63,6 +63,6 @@ describe('Applications index page', () => {
 
   it('renders back to home link', async () => {
     const wrapper = await mountPage();
-    expect(wrapper.text()).toContain(i18n.global.t('navigation.backToHome'));
+    expect(wrapper.text()).toContain(i18n.global.t('common.back'));
   });
 });

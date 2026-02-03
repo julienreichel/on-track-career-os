@@ -130,7 +130,7 @@ const getSegmentLabel = (segment: string): string => {
     companies: t('navigation.companies'),
     applications: t('navigation.applications'),
     'cover-letters': t('navigation.coverLetters'),
-    speech: t('navigation.speech'),
+    speech: t('navigation.speeches'),
     interview: t('navigation.interview'),
     cv: t('navigation.cv'),
     stories: t('stories.list.title'),
