@@ -8,7 +8,7 @@
     "cvUpload": "Upload CV",
     "experiences": "Experiences",
     "errors": {
-      "generation": "Failed to generate cover letter"
+      "generation": "Failed to generate"
     },
     "personalCanvas": "Personal Canvas",
     "jobs": "Jobs",
@@ -36,7 +36,7 @@
   "ingestion": {
     "cv": {
       "errors": {
-        "generation": "Failed to generate speech"
+        "generation": "Failed to parse CV"
       },
       "upload": {
         "title": "Upload Your CV",
@@ -520,8 +520,8 @@
         "chooseTitle": "How do you want to create this story?",
         "chooseDescription": "Select the method that works best for you. You can change modes anytime.",
         "interview": {
-          "title": "Interview Mode",
-          "description": "Answer guided questions to build your STAR story."
+          "title": "Generate from Free Text",
+          "description": "Provide your own text and AI will structure it."
         },
         "manual": {
           "title": "Manual Entry",
