@@ -1,8 +1,8 @@
 <template>
   <UPage>
     <UPageHeader
-      :title="$t('coverLetter.new.title')"
-      :description="$t('coverLetter.new.subtitle')"
+      :title="$t('coverLetters.form.createTitle')"
+      :description="$t('coverLetters.form.createDescription')"
     />
 
     <UPageBody>
@@ -10,29 +10,29 @@
         <div class="space-y-6">
           <div>
             <h3 class="text-lg font-semibold mb-2">
-              {{ $t('coverLetter.new.setup.title') }}
+              {{ $t('coverLetters.form.setupTitle') }}
             </h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ $t('coverLetter.new.setup.description') }}
+              {{ $t('coverLetters.form.setupDescription') }}
             </p>
           </div>
 
-          <UFormField :label="$t('coverLetter.new.setup.nameLabel')" required>
+          <UFormField :label="$t('coverLetters.form.fields.title.label')" required>
             <UInput
               v-model="coverLetterName"
-              :placeholder="$t('coverLetter.new.setup.namePlaceholder')"
+              :placeholder="$t('coverLetters.form.fields.title.placeholder')"
               data-testid="cover-letter-name-input"
               class="w-full"
             />
           </UFormField>
 
           <UFormField
-            :label="$t('coverLetter.new.setup.jobLabel')"
-            :description="$t('coverLetter.new.setup.jobDescription')"
+            :label="$t('coverLetters.form.fields.jobDescription.label')"
+            :description="$t('coverLetters.form.fields.jobDescription.description')"
           >
             <UTextarea
               v-model="jobDescription"
-              :placeholder="$t('coverLetter.new.setup.jobPlaceholder')"
+              :placeholder="$t('coverLetters.form.fields.jobDescription.placeholder')"
               :rows="6"
               data-testid="job-description-textarea"
               class="w-full"
@@ -44,7 +44,7 @@
             v-if="generationError"
             color="error"
             icon="i-heroicons-exclamation-triangle"
-            :title="$t('coverLetter.new.generate.error')"
+            :title="$t('coverLetters.form.errors.generation')"
             :description="generationError"
             class="mb-4"
           />
@@ -52,7 +52,7 @@
           <div class="flex justify-end gap-3">
             <UButton :label="$t('common.cancel')" variant="ghost" @click="cancel" />
             <UButton
-              :label="$t('coverLetter.new.generate.action')"
+              :label="$t('common.actions.generate')"
               icon="i-heroicons-sparkles"
               :disabled="!coverLetterName.trim() || generating"
               :loading="generating"
@@ -67,7 +67,7 @@
         <div class="space-y-6">
           <div>
             <h3 class="text-lg font-semibold mb-2">
-              {{ $t('coverLetter.new.generate.action') }}
+              {{ $t('common.actions.generate') }}
             </h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">
               {{ $t('common.loading') }}
@@ -159,7 +159,7 @@ const generateCoverLetter = async () => {
     }
     if (!userId.value) {
       toast.add({
-        title: t('coverLetter.new.toast.createFailed'),
+        title: t('coverLetters.toast.createFailed'),
         color: 'error',
       });
       return;
@@ -173,7 +173,7 @@ const generateCoverLetter = async () => {
 
     if (!content) {
       toast.add({
-        title: t('coverLetter.new.toast.generationFailed'),
+        title: t('coverLetters.toast.generationFailed'),
         description: engine.error.value || undefined,
         color: 'error',
       });
@@ -193,7 +193,7 @@ const generateCoverLetter = async () => {
       captureEvent('cover_letter_created');
 
       toast.add({
-        title: t('coverLetter.new.toast.created'),
+        title: t('coverLetters.toast.created'),
         color: 'primary',
       });
 
@@ -207,7 +207,7 @@ const generateCoverLetter = async () => {
         '[coverLetterNew] Failed to create cover letter - createCoverLetter returned null'
       );
       toast.add({
-        title: t('coverLetter.new.toast.createFailed'),
+        title: t('coverLetters.toast.createFailed'),
         color: 'error',
       });
     }
@@ -215,7 +215,7 @@ const generateCoverLetter = async () => {
     console.error('[coverLetterNew] Error generating cover letter:', err);
     generationError.value = err instanceof Error ? err.message : 'Unknown error';
     toast.add({
-      title: t('coverLetter.new.toast.error'),
+      title: t('coverLetters.toast.error'),
       color: 'error',
     });
   } finally {
@@ -235,7 +235,7 @@ const generateTailoredCoverLetter = async (jobId: string) => {
     const context = await tailoredMaterials.loadTailoringContext(jobId);
     if (!context.ok) {
       toast.add({
-        title: t('coverLetter.new.toast.error'),
+        title: t('coverLetters.toast.error'),
         color: 'error',
       });
       await router.push('/jobs');
@@ -243,7 +243,7 @@ const generateTailoredCoverLetter = async (jobId: string) => {
     }
     if (!context.matchingSummary) {
       toast.add({
-        title: t('coverLetter.new.toast.generationFailed'),
+        title: t('coverLetters.toast.generationFailed'),
         color: 'error',
       });
       await router.push(`/jobs/${jobId}/match`);
@@ -263,14 +263,14 @@ const generateTailoredCoverLetter = async (jobId: string) => {
     }
 
     toast.add({
-      title: t('coverLetter.new.toast.createFailed'),
+      title: t('coverLetters.toast.createFailed'),
       color: 'error',
     });
   } catch (err) {
     console.error('[coverLetterNew] Error generating tailored cover letter:', err);
     generationError.value = err instanceof Error ? err.message : 'Unknown error';
     toast.add({
-      title: t('coverLetter.new.toast.error'),
+      title: t('coverLetters.toast.error'),
       color: 'error',
     });
   } finally {

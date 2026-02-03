@@ -2,8 +2,8 @@
   <UContainer>
     <UPage>
       <UPageHeader
-        :title="$t('cvList.title')"
-        :description="$t('cvList.subtitle')"
+        :title="$t('cvs.page.title')"
+        :description="$t('cvs.page.description')"
         :links="[
           {
             label: $t('navigation.backToApplications'),
@@ -11,14 +11,14 @@
             to: { name: 'applications' },
           },
           {
-            label: $t('cvList.actions.settings'),
+            label: $t('cvs.list.actions.settings'),
             icon: 'i-heroicons-cog-6-tooth',
             to: '/settings/cv',
             color: 'neutral',
             variant: 'outline',
           },
           {
-            label: $t('cvList.actions.create'),
+            label: $t('cvs.list.actions.create'),
             icon: 'i-heroicons-plus',
             to: { name: 'applications-cv-new' },
           },
@@ -39,7 +39,7 @@
           <UInput
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
-            :placeholder="t('cvList.search.placeholder')"
+            :placeholder="t('cvs.list.search.placeholder')"
             size="lg"
             class="w-1/3"
           />
@@ -63,8 +63,8 @@
 
         <!-- CV List -->
         <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
-          <UEmpty :title="$t('cvList.search.noResults')" icon="i-heroicons-magnifying-glass">
-            <p class="text-sm text-gray-500">{{ $t('cvList.search.placeholder') }}</p>
+          <UEmpty :title="$t('cvs.list.search.noResults')" icon="i-heroicons-magnifying-glass">
+            <p class="text-sm text-gray-500">{{ $t('cvs.list.search.placeholder') }}</p>
           </UEmpty>
         </UCard>
 
@@ -72,7 +72,7 @@
           <ItemCard
             v-for="cv in filteredItems"
             :key="cv.id"
-            :title="cv.name || $t('cvList.untitled')"
+            :title="cv.name || $t('cvs.detail.untitled')"
             :subtitle="formatListDate(cv.updatedAt ?? cv.createdAt)"
             @edit="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
             @delete="confirmDelete(cv)"
@@ -81,7 +81,7 @@
             <div class="space-y-1 text-sm text-gray-600 dark:text-gray-400">
               <div v-if="cv.isTailored" class="flex items-center gap-1">
                 <UIcon name="i-heroicons-briefcase" class="flex-shrink-0" />
-                <span>{{ $t('cvList.tailored') }}</span>
+                <span>{{ $t('cvs.list.tailored') }}</span>
               </div>
             </div>
 
@@ -96,7 +96,7 @@
                 @click="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
               />
               <UButton
-                :label="$t('cvList.actions.print')"
+                :label="$t('common.actions.print')"
                 icon="i-heroicons-printer"
                 size="xs"
                 color="neutral"
@@ -111,8 +111,8 @@
       <!-- Delete Confirmation Modal -->
       <ConfirmModal
         v-model:open="deleteModalOpen"
-        :title="t('cvList.confirmDelete', { name: cvToDelete?.name || t('cvList.untitled') })"
-        :description="t('cvList.confirmDeleteDescription')"
+        :title="t('cvs.delete.title')"
+        :description="t('cvs.delete.message')"
         :confirm-label="t('common.delete')"
         :cancel-label="t('common.cancel')"
         confirm-color="error"
@@ -194,13 +194,13 @@ const handleDelete = async () => {
     const success = await deleteDocument(cvToDelete.value.id);
     if (success) {
       toast.add({
-        title: t('cvList.toast.deleted'),
+        title: t('cvs.toast.deleted'),
         color: 'primary',
       });
       deleteModalOpen.value = false;
     } else {
       toast.add({
-        title: t('cvList.toast.deleteFailed'),
+        title: t('cvs.toast.deleteFailed'),
         color: 'error',
       });
     }

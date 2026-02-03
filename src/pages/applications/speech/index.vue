@@ -2,8 +2,8 @@
   <UContainer>
     <UPage>
       <UPageHeader
-        :title="t('speech.list.title')"
-        :description="t('speech.list.subtitle')"
+        :title="t('speeches.page.title')"
+        :description="t('speeches.page.description')"
         :links="[
           {
             label: t('navigation.backToApplications'),
@@ -11,7 +11,7 @@
             to: { name: 'applications' },
           },
           {
-            label: t('speech.list.actions.create'),
+            label: t('speeches.list.actions.create'),
             icon: 'i-heroicons-plus',
             to: { name: 'applications-speech-new' },
           },
@@ -32,7 +32,7 @@
           <UInput
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
-            :placeholder="t('speech.list.search.placeholder')"
+            :placeholder="t('speeches.list.search.placeholder')"
             size="lg"
             class="w-1/3"
           />
@@ -52,8 +52,8 @@
         <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
 
         <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
-          <UEmpty :title="t('speech.list.search.noResults')" icon="i-heroicons-magnifying-glass">
-            <p class="text-sm text-gray-500">{{ t('speech.list.search.placeholder') }}</p>
+          <UEmpty :title="t('speeches.list.search.noResults')" icon="i-heroicons-magnifying-glass">
+            <p class="text-sm text-gray-500">{{ t('speeches.list.search.placeholder') }}</p>
           </UEmpty>
         </UCard>
 
@@ -88,8 +88,8 @@
 
       <ConfirmModal
         v-model:open="deleteModalOpen"
-        :title="t('speech.list.confirmDelete')"
-        :description="t('speech.list.confirmDeleteDescription')"
+        :title="t('speeches.delete.title')"
+        :description="t('speeches.delete.message')"
         :confirm-label="t('common.delete')"
         :cancel-label="t('common.cancel')"
         confirm-color="error"
@@ -172,10 +172,10 @@ const handleDelete = async () => {
   try {
     const success = await deleteSpeechBlock(speechToDelete.value.id);
     if (success) {
-      toast.add({ title: t('speech.list.toast.deleted'), color: 'primary' });
+      toast.add({ title: t('speeches.toast.deleted'), color: 'primary' });
       deleteModalOpen.value = false;
     } else {
-      toast.add({ title: t('speech.list.toast.deleteFailed'), color: 'error' });
+      toast.add({ title: t('speeches.toast.deleteFailed'), color: 'error' });
     }
   } finally {
     deleting.value = false;
@@ -191,7 +191,7 @@ const resolveTitle = (block: SpeechBlock) => {
     block.whyMe?.trim() ||
     '';
   if (!raw) {
-    return t('speech.list.untitled');
+    return t('speeches.detail.untitled');
   }
   return raw.length > TITLE_MAX_LENGTH ? `${raw.slice(0, TITLE_MAX_LENGTH)}...` : raw;
 };
@@ -199,7 +199,7 @@ const resolveTitle = (block: SpeechBlock) => {
 const resolvePreview = (block: SpeechBlock) => {
   const raw = block.careerStory?.trim() || block.elevatorPitch?.trim() || block.whyMe?.trim() || '';
   if (!raw) {
-    return t('speech.list.emptyPreview');
+    return t('speeches.list.empty.preview');
   }
   return raw.length > PREVIEW_MAX_LENGTH ? `${raw.slice(0, PREVIEW_MAX_LENGTH)}...` : raw;
 };

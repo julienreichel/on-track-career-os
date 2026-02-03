@@ -1,0 +1,589 @@
+{
+  "common": {
+    "actions": {
+      "add": "Add",
+      "create": "Create",
+      "edit": "Edit",
+      "save": "Save",
+      "saveAndCreate": "Save & Create Another",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "view": "View",
+      "print": "Print",
+      "close": "Close",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "search": "Search",
+      "download": "Download",
+      "upload": "Upload",
+      "analyze": "Analyze",
+      "generate": "Generate"
+    },
+    "states": {
+      "loading": "Loading...",
+      "saving": "Saving...",
+      "deleting": "Deleting...",
+      "error": "Error",
+      "success": "Success"
+    },
+    "messages": {
+      "requiredField": "This field is required",
+      "unsavedChanges": "You have unsaved changes",
+      "confirmDelete": "Are you sure you want to delete this? This action cannot be undone.",
+      "deletedSuccessfully": "Deleted successfully",
+      "savedSuccessfully": "Saved successfully",
+      "createdSuccessfully": "Created successfully",
+      "updatedSuccessfully": "Updated successfully"
+    }
+  },
+  "companies": {
+    "page": {
+      "title": "Companies",
+      "description": "Track the organizations you are researching and their business models."
+    },
+    "list": {
+      "title": "Companies",
+      "description": "Track the organizations you are researching and their business models.",
+      "actions": {
+        "add": "Add company",
+        "viewJobs": "View jobs"
+      },
+      "search": {
+        "placeholder": "Search by name, industry, or market",
+        "noResults": "No companies match your search."
+      },
+      "empty": {
+        "title": "No companies yet",
+        "description": "Start by adding a company you'd like to research."
+      },
+      "errors": {
+        "title": "Unable to load companies",
+        "generic": "Something went wrong while loading your companies."
+      }
+    },
+    "detail": {
+      "title": "Company Details",
+      "description": "Update the company profile, run AI analysis, and manage the Business Model Canvas.",
+      "notFound": "Company not found",
+      "notFoundDescription": "This company could not be found.",
+      "loading": "Loading company...",
+      "errors": {
+        "title": "Unable to load company",
+        "generic": "Something went wrong while processing this company.",
+        "notFound": "This company could not be found."
+      }
+    },
+    "form": {
+      "createTitle": "Add Company",
+      "editTitle": "Edit Company",
+      "fields": {
+        "companyName": {
+          "label": "Company name",
+          "placeholder": "e.g., Atlas Robotics",
+          "hint": "Required"
+        },
+        "industry": {
+          "label": "Industry",
+          "placeholder": "e.g., Energy analytics",
+          "hint": "What category does this company operate in?"
+        },
+        "sizeRange": {
+          "label": "Size range",
+          "placeholder": "e.g., 201-500",
+          "hint": "Approximate employee count or stage"
+        },
+        "website": {
+          "label": "Website",
+          "placeholder": "https://example.com"
+        },
+        "productsServices": {
+          "label": "Products & services",
+          "placeholder": "Add a product or service and press Enter",
+          "hint": "List key offerings as tags"
+        },
+        "targetMarkets": {
+          "label": "Target markets",
+          "placeholder": "Add a market and press Enter",
+          "hint": "Regions or verticals served"
+        },
+        "customerSegments": {
+          "label": "Customer segments",
+          "placeholder": "Add a segment and press Enter",
+          "hint": "Key buyer personas or accounts"
+        },
+        "description": {
+          "label": "Company description",
+          "placeholder": "Describe what this company does...",
+          "hint": "Optional short description for your context"
+        },
+        "notes": {
+          "label": "Research notes",
+          "placeholder": "Paste raw research notes...",
+          "hint": "Paste any call notes, press articles, or observations. These will be used for AI analysis."
+        }
+      },
+      "errors": {
+        "title": "Unable to save company",
+        "generic": "Something went wrong while saving this company.",
+        "missingName": "Add a company name before saving."
+      }
+    },
+    "delete": {
+      "title": "Delete company",
+      "message": "Are you sure you want to delete this company? This action cannot be undone."
+    },
+    "toast": {
+      "created": "Company created successfully",
+      "createFailed": "Failed to create company",
+      "updated": "Company updated successfully",
+      "updateFailed": "Failed to update company",
+      "deleted": "Company deleted successfully",
+      "deleteFailed": "Failed to delete company"
+    }
+  },
+  "experiences": {
+    "page": {
+      "title": "Experiences",
+      "description": "Document your work experiences and achievements."
+    },
+    "list": {
+      "title": "Your Experiences",
+      "description": "Your professional experience history.",
+      "actions": {
+        "add": "Add Experience"
+      },
+      "search": {
+        "placeholder": "Search experiences...",
+        "noResults": "No experiences match your search."
+      },
+      "empty": {
+        "title": "No experiences yet",
+        "description": "Upload a CV or add one manually."
+      },
+      "errors": {
+        "title": "Unable to load experiences",
+        "generic": "Failed to load experiences."
+      }
+    },
+    "detail": {
+      "title": "Experience Details",
+      "description": "View and manage your experience.",
+      "notFound": "Experience not found",
+      "notFoundDescription": "This experience could not be found.",
+      "loading": "Loading experience...",
+      "errors": {
+        "title": "Unable to load experience",
+        "generic": "Failed to load experience.",
+        "notFound": "Experience not found."
+      }
+    },
+    "form": {
+      "createTitle": "Add Experience",
+      "editTitle": "Edit Experience",
+      "fields": {
+        "title": {
+          "label": "Job Title",
+          "placeholder": "e.g., Senior Software Engineer"
+        },
+        "company": {
+          "label": "Company Name",
+          "placeholder": "e.g., Acme Corporation"
+        },
+        "type": {
+          "label": "Experience Type"
+        },
+        "startDate": {
+          "label": "Start Date"
+        },
+        "endDate": {
+          "label": "End Date",
+          "hint": "Leave empty if this is your current position"
+        },
+        "responsibilities": {
+          "label": "Responsibilities",
+          "placeholder": "Enter each responsibility on a new line",
+          "hint": "One responsibility per line"
+        },
+        "tasks": {
+          "label": "Tasks & Achievements",
+          "placeholder": "Enter each task or achievement on a new line",
+          "hint": "One task per line"
+        }
+      },
+      "errors": {
+        "title": "Unable to save experience",
+        "generic": "Something went wrong while saving this experience."
+      }
+    },
+    "delete": {
+      "title": "Delete Experience",
+      "message": "Are you sure you want to delete this experience? This action cannot be undone."
+    },
+    "toast": {
+      "created": "Experience created successfully",
+      "createFailed": "Failed to create experience",
+      "updated": "Experience updated successfully",
+      "updateFailed": "Failed to update experience",
+      "deleted": "Experience deleted successfully",
+      "deleteFailed": "Failed to delete experience"
+    }
+  },
+  "stories": {
+    "page": {
+      "title": "Stories",
+      "description": "Browse all your achievement stories across all experiences."
+    },
+    "list": {
+      "title": "STAR Stories",
+      "description": "Your achievement stories structured using the STAR methodology.",
+      "actions": {
+        "add": "New Story",
+        "autoGenerate": "Auto-generate Stories"
+      },
+      "search": {
+        "placeholder": "Search stories...",
+        "noResults": "No stories match your search."
+      },
+      "empty": {
+        "title": "No stories yet",
+        "description": "Create your first STAR story to document your achievements."
+      },
+      "errors": {
+        "title": "Unable to load stories",
+        "generic": "Something went wrong while loading your stories."
+      }
+    },
+    "detail": {
+      "title": "Story Details",
+      "description": "View and edit your STAR story.",
+      "notFound": "Story not found",
+      "notFoundDescription": "The story you're looking for doesn't exist or has been deleted.",
+      "loading": "Loading story...",
+      "errors": {
+        "title": "Unable to load story",
+        "generic": "Something went wrong while loading this story.",
+        "notFound": "Story not found."
+      }
+    },
+    "form": {
+      "createTitle": "Create New Story",
+      "editTitle": "Edit Story",
+      "fields": {
+        "title": {
+          "label": "Story Title",
+          "placeholder": "e.g. Led cloud migration reducing deployment time by 85%",
+          "hint": "Give this story a clear headline for CVs and recruiters."
+        },
+        "situation": {
+          "label": "Situation",
+          "placeholder": "What was the situation or challenge?",
+          "hint": "Describe the context or challenge you faced"
+        },
+        "task": {
+          "label": "Task",
+          "placeholder": "What were you asked to do?",
+          "hint": "What was your specific responsibility or goal?"
+        },
+        "action": {
+          "label": "Action",
+          "placeholder": "What did you do to address the situation?",
+          "hint": "What specific actions did you take?"
+        },
+        "result": {
+          "label": "Result",
+          "placeholder": "What was the result of your actions?",
+          "hint": "What was the outcome or impact?"
+        }
+      },
+      "errors": {
+        "title": "Unable to save story",
+        "generic": "Something went wrong while saving this story."
+      }
+    },
+    "delete": {
+      "title": "Delete Story",
+      "message": "Are you sure you want to delete this story? This action cannot be undone."
+    },
+    "toast": {
+      "created": "Story created successfully",
+      "createFailed": "Failed to create story",
+      "updated": "Story updated successfully",
+      "updateFailed": "Failed to update story",
+      "deleted": "Story deleted successfully",
+      "deleteFailed": "Failed to delete story",
+      "generating": "Generating story..."
+    }
+  },
+  "cvs": {
+    "page": {
+      "title": "CVs",
+      "description": "Manage your CV documents and create new ones."
+    },
+    "list": {
+      "title": "My CVs",
+      "description": "Manage your CV documents and create new ones.",
+      "actions": {
+        "create": "Create New CV"
+      },
+      "search": {
+        "placeholder": "Search CVs...",
+        "noResults": "No CVs match your search."
+      },
+      "empty": {
+        "title": "No CVs yet",
+        "description": "Create your first CV by selecting experiences and generating content with AI."
+      },
+      "errors": {
+        "title": "Unable to load CVs",
+        "generic": "Something went wrong while loading your CVs."
+      }
+    },
+    "detail": {
+      "title": "CV Details",
+      "description": "View and edit your CV.",
+      "notFound": "CV not found",
+      "notFoundDescription": "This CV could not be found.",
+      "loading": "Loading CV...",
+      "errors": {
+        "title": "Unable to load CV",
+        "generic": "Something went wrong while loading this CV.",
+        "notFound": "CV not found."
+      }
+    },
+    "form": {
+      "createTitle": "Create CV",
+      "editTitle": "Edit CV",
+      "fields": {
+        "name": {
+          "label": "CV Name",
+          "placeholder": "e.g., Software Engineer Resume"
+        }
+      },
+      "errors": {
+        "title": "Unable to save CV",
+        "generic": "Something went wrong while saving this CV."
+      }
+    },
+    "delete": {
+      "title": "Delete CV",
+      "message": "Are you sure you want to delete this CV? This action cannot be undone."
+    },
+    "toast": {
+      "created": "CV created successfully",
+      "createFailed": "Failed to create CV",
+      "updated": "CV updated successfully",
+      "updateFailed": "Failed to update CV",
+      "deleted": "CV deleted successfully",
+      "deleteFailed": "Failed to delete CV"
+    }
+  },
+  "coverLetters": {
+    "page": {
+      "title": "Cover Letters",
+      "description": "Create professional cover letters tailored to your profile and experiences."
+    },
+    "list": {
+      "title": "Cover Letters",
+      "description": "Create professional cover letters tailored to your profile and experiences.",
+      "actions": {
+        "create": "Create cover letter"
+      },
+      "search": {
+        "placeholder": "Search cover letters...",
+        "noResults": "No cover letters match your search."
+      },
+      "empty": {
+        "title": "No cover letters yet",
+        "description": "Create a cover letter to introduce yourself to potential employers."
+      },
+      "errors": {
+        "title": "Unable to load cover letters",
+        "generic": "Something went wrong while loading your cover letters."
+      }
+    },
+    "detail": {
+      "title": "Cover Letter",
+      "description": "View and edit your cover letter.",
+      "notFound": "Cover letter not found",
+      "notFoundDescription": "This cover letter could not be found.",
+      "loading": "Loading cover letter...",
+      "errors": {
+        "title": "Unable to load cover letter",
+        "generic": "Something went wrong while loading this cover letter.",
+        "notFound": "Cover letter not found."
+      }
+    },
+    "form": {
+      "createTitle": "Create Cover Letter",
+      "editTitle": "Edit Cover Letter",
+      "fields": {
+        "name": {
+          "label": "Cover Letter Name",
+          "placeholder": "e.g., Software Engineer at Acme Corp"
+        },
+        "jobDescription": {
+          "label": "Job Description (Optional)",
+          "placeholder": "Paste the job description here to create a tailored cover letter...",
+          "hint": "Paste the job description to tailor your cover letter"
+        }
+      },
+      "errors": {
+        "title": "Unable to save cover letter",
+        "generic": "Something went wrong while saving this cover letter."
+      }
+    },
+    "delete": {
+      "title": "Delete cover letter",
+      "message": "Are you sure you want to delete this cover letter? This action cannot be undone."
+    },
+    "toast": {
+      "created": "Cover letter created successfully",
+      "createFailed": "Failed to create cover letter",
+      "updated": "Cover letter updated successfully",
+      "updateFailed": "Failed to update cover letter",
+      "deleted": "Cover letter deleted successfully",
+      "deleteFailed": "Failed to delete cover letter"
+    }
+  },
+  "speeches": {
+    "page": {
+      "title": "Speeches",
+      "description": "Draft concise narratives for introductions and interviews."
+    },
+    "list": {
+      "title": "Speech",
+      "description": "Draft concise narratives for introductions and interviews.",
+      "actions": {
+        "create": "Create speech"
+      },
+      "search": {
+        "placeholder": "Search speech blocks...",
+        "noResults": "No speech blocks match your search."
+      },
+      "empty": {
+        "title": "No speech yet",
+        "description": "Create a speech to draft your elevator pitch and career story."
+      },
+      "errors": {
+        "title": "Unable to load speeches",
+        "generic": "Something went wrong while loading your speeches."
+      }
+    },
+    "detail": {
+      "title": "Speech",
+      "description": "Build your elevator pitch, career story, and why-me narrative.",
+      "notFound": "Speech not found",
+      "notFoundDescription": "This speech could not be found.",
+      "loading": "Loading speech...",
+      "errors": {
+        "title": "Unable to load speech",
+        "generic": "Something went wrong while loading this speech.",
+        "notFound": "Speech not found."
+      }
+    },
+    "form": {
+      "createTitle": "Create Speech",
+      "editTitle": "Edit Speech",
+      "fields": {
+        "name": {
+          "label": "Speech Name",
+          "placeholder": "e.g., Engineering leadership pitch"
+        },
+        "context": {
+          "label": "Context (Optional)",
+          "placeholder": "Paste a role summary or context to tailor your speech...",
+          "hint": "Add context to tailor the tone and focus of your speech"
+        }
+      },
+      "errors": {
+        "title": "Unable to save speech",
+        "generic": "Something went wrong while saving this speech."
+      }
+    },
+    "delete": {
+      "title": "Delete speech",
+      "message": "Are you sure you want to delete this speech? This action cannot be undone."
+    },
+    "toast": {
+      "created": "Speech created successfully",
+      "createFailed": "Failed to create speech",
+      "updated": "Speech updated successfully",
+      "updateFailed": "Failed to update speech",
+      "deleted": "Speech deleted successfully",
+      "deleteFailed": "Failed to delete speech"
+    }
+  },
+  "jobs": {
+    "page": {
+      "title": "Jobs",
+      "description": "Research and analyze job opportunities."
+    },
+    "list": {
+      "title": "Jobs",
+      "description": "Track job opportunities you're interested in.",
+      "actions": {
+        "add": "Add Job"
+      },
+      "search": {
+        "placeholder": "Search jobs...",
+        "noResults": "No jobs match your search."
+      },
+      "empty": {
+        "title": "No jobs yet",
+        "description": "Start by adding a job opportunity you'd like to track."
+      },
+      "errors": {
+        "title": "Unable to load jobs",
+        "generic": "Something went wrong while loading your jobs."
+      }
+    },
+    "detail": {
+      "title": "Job Details",
+      "description": "View and analyze this job opportunity.",
+      "notFound": "Job not found",
+      "notFoundDescription": "This job could not be found.",
+      "loading": "Loading job...",
+      "errors": {
+        "title": "Unable to load job",
+        "generic": "Something went wrong while loading this job.",
+        "notFound": "Job not found."
+      }
+    },
+    "form": {
+      "createTitle": "Add Job",
+      "editTitle": "Edit Job",
+      "fields": {
+        "title": {
+          "label": "Job Title",
+          "placeholder": "e.g., Senior Software Engineer"
+        },
+        "company": {
+          "label": "Company",
+          "placeholder": "Select or create a company"
+        },
+        "description": {
+          "label": "Job Description",
+          "placeholder": "Paste the full job description...",
+          "hint": "Copy and paste the complete job posting for AI analysis"
+        }
+      },
+      "errors": {
+        "title": "Unable to save job",
+        "generic": "Something went wrong while saving this job."
+      }
+    },
+    "delete": {
+      "title": "Delete job",
+      "message": "Are you sure you want to delete this job? This action cannot be undone."
+    },
+    "toast": {
+      "created": "Job created successfully",
+      "createFailed": "Failed to create job",
+      "updated": "Job updated successfully",
+      "updateFailed": "Failed to update job",
+      "deleted": "Job deleted successfully",
+      "deleteFailed": "Failed to delete job"
+    }
+  }
+}

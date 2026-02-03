@@ -133,7 +133,7 @@ function getTextContent(input: string | string[] | null | undefined) {
           @click.stop="handleEdit"
         />
         <UButton
-          :label="t('experiences.list.viewStories')"
+          :label="t('experiences.list.actions.viewStories')"
           icon="i-heroicons-document-text"
           size="xs"
           color="neutral"

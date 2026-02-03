@@ -16,20 +16,20 @@
       <UCard>
         <UPageGrid>
           <UPageCard
-            :title="t('cvList.title')"
-            :description="t('cvList.subtitle')"
+            :title="t('cvs.page.title')"
+            :description="t('cvs.page.description')"
             icon="i-heroicons-document-text"
             :to="{ name: 'applications-cv' }"
           />
           <UPageCard
-            :title="t('coverLetter.list.title')"
-            :description="t('coverLetter.list.subtitle')"
+            :title="t('coverLetters.page.title')"
+            :description="t('coverLetters.page.description')"
             icon="i-heroicons-envelope"
             :to="{ name: 'applications-cover-letters' }"
           />
           <UPageCard
-            :title="t('speech.list.title')"
-            :description="t('speech.list.subtitle')"
+            :title="t('speeches.page.title')"
+            :description="t('speeches.page.description')"
             icon="i-heroicons-chat-bubble-left-right"
             :to="{ name: 'applications-speech' }"
           />

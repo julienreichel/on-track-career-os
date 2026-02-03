@@ -214,11 +214,11 @@ onMounted(async () => {
   <UContainer>
     <UPage>
       <UPageHeader
-        :title="isNew ? t('stories.builder.newTitle') : t('stories.builder.editTitle')"
+        :title="isNew ? t('stories.form.createTitle') : t('stories.form.editTitle')"
         :description="companyName"
         :links="[
           {
-            label: t('stories.builder.backToStories'),
+            label: t('common.backToList'),
             to: `/profile/stories`,
             icon: 'i-heroicons-arrow-left',
           },
@@ -241,7 +241,7 @@ onMounted(async () => {
           <div class="text-center">
             <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ t('stories.builder.loading') }}
+              {{ t('common.states.loading') }}
             </p>
           </div>
         </div>
@@ -251,7 +251,7 @@ onMounted(async () => {
           <div class="text-center">
             <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ t('stories.builder.saving') }}
+              {{ t('common.states.saving') }}
             </p>
           </div>
         </div>
@@ -261,10 +261,10 @@ onMounted(async () => {
           <div class="space-y-6">
             <div>
               <h3 class="text-lg font-semibold mb-2">
-                {{ t('stories.builder.chooseMode') }}
+                {{ t('stories.form.mode.chooseTitle') }}
               </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ t('stories.builder.chooseModeDescription') }}
+                {{ t('stories.form.mode.chooseDescription') }}
               </p>
             </div>
 
@@ -276,9 +276,9 @@ onMounted(async () => {
               >
                 <div class="flex flex-col items-center text-center gap-3 p-4">
                   <UIcon name="i-heroicons-chat-bubble-left-right" class="w-8 h-8 text-primary" />
-                  <h4 class="font-medium">{{ t('stories.builder.modeInterview') }}</h4>
+                  <h4 class="font-medium">{{ t('stories.form.mode.interview.title') }}</h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('stories.builder.modeInterviewDescription') }}
+                    {{ t('stories.form.mode.interview.description') }}
                   </p>
                 </div>
               </UCard>
@@ -290,9 +290,9 @@ onMounted(async () => {
               >
                 <div class="flex flex-col items-center text-center gap-3 p-4">
                   <UIcon name="i-heroicons-pencil" class="w-8 h-8 text-primary" />
-                  <h4 class="font-medium">{{ t('stories.builder.modeManual') }}</h4>
+                  <h4 class="font-medium">{{ t('stories.form.mode.manual.title') }}</h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('stories.builder.modeManualDescription') }}
+                    {{ t('stories.form.mode.manual.description') }}
                   </p>
                 </div>
               </UCard>
@@ -305,17 +305,17 @@ onMounted(async () => {
           <div class="space-y-6">
             <div>
               <h3 class="text-lg font-semibold mb-2">
-                {{ t('stories.builder.modeFreetext') }}
+                {{ t('stories.form.mode.freetext.title') }}
               </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ t('stories.builder.freetextInstructions') }}
+                {{ t('stories.form.mode.freetext.instructions') }}
               </p>
             </div>
 
-            <UFormField :label="t('stories.builder.freetextLabel')" required>
+            <UFormField :label="t('stories.form.mode.freetext.label')" required>
               <UTextarea
                 v-model="freeTextInput"
-                :placeholder="t('stories.builder.freetextPlaceholder')"
+                :placeholder="t('stories.form.mode.freetext.placeholder')"
                 :rows="10"
                 :disabled="interviewGenerating"
                 class="w-full"
@@ -325,7 +325,7 @@ onMounted(async () => {
             <div class="flex justify-end gap-3">
               <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
               <UButton
-                :label="t('stories.builder.generateFromText')"
+                :label="t('stories.form.generateFromText')"
                 icon="i-heroicons-sparkles"
                 :disabled="!freeTextInput.trim() || interviewGenerating"
                 :loading="interviewGenerating"
@@ -347,7 +347,7 @@ onMounted(async () => {
             class="flex justify-center"
           >
             <UButton
-              :label="t('stories.builder.generateAchievements')"
+              :label="t('stories.form.generateAchievements')"
               icon="i-heroicons-sparkles"
               :disabled="!canSave || enhancerGenerating"
               :loading="enhancerGenerating"
@@ -385,8 +385,8 @@ onMounted(async () => {
           v-else-if="!isNew && !formState && !loading"
           color="warning"
           icon="i-heroicons-exclamation-triangle"
-          :title="t('stories.builder.notFound')"
-          :description="t('stories.builder.notFoundDescription')"
+          :title="t('stories.detail.notFound')"
+          :description="t('stories.detail.notFoundDescription')"
         />
       </UPageBody>
     </UPage>

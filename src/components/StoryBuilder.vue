@@ -123,60 +123,64 @@ const isValid = () => {
     <!-- STAR Form Fields -->
     <div class="space-y-6">
       <UFormField
-        :label="t('stories.builder.title')"
-        :hint="t('stories.builder.titleHint')"
+        :label="t('stories.form.fields.title.label')"
+        :hint="t('stories.form.fields.title.hint')"
         required
       >
         <UInput
           v-model="title"
-          :placeholder="t('stories.builder.titlePlaceholder')"
+          :placeholder="t('stories.form.fields.title.placeholder')"
           class="w-full"
         />
       </UFormField>
 
       <UFormField
-        :label="t('stories.builder.situation')"
-        :hint="t('stories.builder.situationHint')"
+        :label="t('stories.form.fields.situation.label')"
+        :hint="t('stories.form.fields.situation.hint')"
         required
       >
         <UTextarea
           v-model="situation"
-          :placeholder="t('stories.builder.situationPlaceholder')"
-          :rows="4"
-          class="w-full"
-        />
-      </UFormField>
-
-      <UFormField :label="t('stories.builder.task')" :hint="t('stories.builder.taskHint')" required>
-        <UTextarea
-          v-model="task"
-          :placeholder="t('stories.builder.taskPlaceholder')"
+          :placeholder="t('stories.form.fields.situation.placeholder')"
           :rows="4"
           class="w-full"
         />
       </UFormField>
 
       <UFormField
-        :label="t('stories.builder.action')"
-        :hint="t('stories.builder.actionHint')"
+        :label="t('stories.form.fields.task.label')"
+        :hint="t('stories.form.fields.task.hint')"
+        required
+      >
+        <UTextarea
+          v-model="task"
+          :placeholder="t('stories.form.fields.task.placeholder')"
+          :rows="4"
+          class="w-full"
+        />
+      </UFormField>
+
+      <UFormField
+        :label="t('stories.form.fields.action.label')"
+        :hint="t('stories.form.fields.action.hint')"
         required
       >
         <UTextarea
           v-model="action"
-          :placeholder="t('stories.builder.actionPlaceholder')"
+          :placeholder="t('stories.form.fields.action.placeholder')"
           :rows="4"
           class="w-full"
         />
       </UFormField>
 
       <UFormField
-        :label="t('stories.builder.result')"
-        :hint="t('stories.builder.resultHint')"
+        :label="t('stories.form.fields.result.label')"
+        :hint="t('stories.form.fields.result.hint')"
         required
       >
         <UTextarea
           v-model="result"
-          :placeholder="t('stories.builder.resultPlaceholder')"
+          :placeholder="t('stories.form.fields.result.placeholder')"
           :rows="4"
           class="w-full"
         />
@@ -186,10 +190,10 @@ const isValid = () => {
       <div class="border-t pt-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold">
-            {{ t('stories.builder.achievements') }}
+            {{ t('stories.form.fields.achievements.label') }}
           </h3>
           <UButton
-            :label="t('stories.builder.generateAchievements')"
+            :label="t('stories.form.generateAchievements')"
             icon="i-heroicons-sparkles"
             variant="outline"
             size="sm"
@@ -200,16 +204,16 @@ const isValid = () => {
 
         <TagInput
           v-model="achievements"
-          :label="t('stories.builder.achievementsList')"
-          :hint="t('stories.builder.achievementsHint')"
-          :placeholder="t('stories.builder.achievementsPlaceholder')"
+          :label="t('stories.form.fields.achievements.list')"
+          :hint="t('stories.form.fields.achievements.hint')"
+          :placeholder="t('stories.form.fields.achievements.placeholder')"
         />
 
         <TagInput
           v-model="kpiSuggestions"
-          :label="t('stories.builder.kpisList')"
-          :hint="t('stories.builder.kpisHint')"
-          :placeholder="t('stories.builder.kpisPlaceholder')"
+          :label="t('stories.form.fields.kpis.list')"
+          :hint="t('stories.form.fields.kpis.hint')"
+          :placeholder="t('stories.form.fields.kpis.placeholder')"
         />
       </div>
     </div>

@@ -86,7 +86,7 @@ const navigationItems = computed<NavigationMenuItem[]>(() => [
       {
         label: t('navigation.companies'),
         to: '/companies',
-        description: t('companies.list.description'),
+        description: t('companies.page.description'),
       },
     ],
   },
@@ -100,17 +100,17 @@ const navigationItems = computed<NavigationMenuItem[]>(() => [
       {
         label: t('navigation.cvs'),
         to: '/applications/cv',
-        description: t('cvList.subtitle'),
+        description: t('cvs.page.description'),
       },
       {
         label: t('navigation.coverLetters'),
         to: '/applications/cover-letters',
-        description: t('coverLetter.list.subtitle'),
+        description: t('coverLetters.page.description'),
       },
       {
         label: t('navigation.speeches'),
         to: '/applications/speech',
-        description: t('speech.list.subtitle'),
+        description: t('speeches.page.description'),
       },
     ],
   },

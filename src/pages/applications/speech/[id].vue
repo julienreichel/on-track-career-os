@@ -40,7 +40,7 @@ const saving = ref(false);
 const cancelModalOpen = ref(false);
 const isGenerating = computed(() => engine.isGenerating.value);
 const hasJobContext = computed(() => Boolean(item.value?.jobId));
-const detailTitle = computed(() => item.value?.name?.trim() || t('speech.detail.untitled'));
+const detailTitle = computed(() => item.value?.name?.trim() || t('speeches.detail.untitled'));
 const formattedUpdatedAt = computed(() => formatDetailDate(item.value?.updatedAt));
 const targetJobTitle = computed(
   () => targetJob.value?.title?.trim() || t('tailoredMaterials.unknownJobTitle')
@@ -93,10 +93,10 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
   if (!hasJobContext.value) {
     links.push({
       label: isGenerating.value
-        ? t('speech.editor.actions.generating')
+        ? t('common.states.generating')
         : hasContent.value
-          ? t('speech.editor.actions.regenerate')
-          : t('speech.editor.actions.generate'),
+          ? t('common.actions.regenerate')
+          : t('common.actions.generate'),
       icon: 'i-heroicons-sparkles',
       color: 'primary',
       disabled: loading.value || saving.value || isGenerating.value,
@@ -153,11 +153,11 @@ const handleSave = async () => {
       whyMe: formState.value.whyMe,
     });
     if (updated) {
-      toast.add({ title: t('speech.detail.toast.saved'), color: 'primary' });
+      toast.add({ title: t('speeches.toast.updated'), color: 'primary' });
       originalState.value = { ...formState.value };
       isEditing.value = false;
     } else {
-      toast.add({ title: t('speech.detail.toast.saveFailed'), color: 'error' });
+      toast.add({ title: t('speeches.toast.updateFailed'), color: 'error' });
     }
   } finally {
     saving.value = false;
@@ -168,7 +168,7 @@ const handleGenerate = async () => {
   try {
     const result = await engine.generate();
     applySpeechResult(result);
-    toast.add({ title: t('speech.detail.toast.generated'), color: 'primary' });
+    toast.add({ title: t('speeches.toast.generated'), color: 'primary' });
   } catch (err) {
     console.error('[speechDetail] Failed to generate speech', err);
   }
@@ -258,7 +258,7 @@ watch(item, (newValue) => {
       <UPage>
         <UPageHeader
           :title="detailTitle"
-          :description="t('speech.detail.description')"
+          :description="t('speeches.detail.description')"
           :links="headerLinks"
         />
 
@@ -323,10 +323,10 @@ watch(item, (newValue) => {
             <template v-if="isEditing">
               <UCard>
                 <div class="mb-6">
-                  <UFormField :label="t('speech.detail.titleLabel')">
+                  <UFormField :label="t('speeches.form.fields.title.label')">
                     <UInput
                       v-model="formState.title"
-                      :placeholder="t('speech.detail.titlePlaceholder')"
+                      :placeholder="t('speeches.form.fields.title.placeholder')"
                       :disabled="loading || saving"
                       data-testid="speech-title-input"
                       class="w-full"
@@ -367,7 +367,7 @@ watch(item, (newValue) => {
                 <div class="space-y-2">
                   <div>
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                      {{ t('speech.editor.sections.elevatorPitch.label') }}
+                      {{ t('speeches.form.sections.elevatorPitch.label') }}
                     </h3>
                     <MarkdownContent
                       v-if="hasElevatorPitch"
@@ -382,7 +382,7 @@ watch(item, (newValue) => {
                 <div class="space-y-2">
                   <div>
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                      {{ t('speech.editor.sections.careerStory.label') }}
+                      {{ t('speeches.form.sections.careerStory.label') }}
                     </h3>
                     <MarkdownContent
                       v-if="hasCareerStory"
@@ -397,7 +397,7 @@ watch(item, (newValue) => {
                 <div class="space-y-2">
                   <div>
                     <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                      {{ t('speech.editor.sections.whyMe.label') }}
+                      {{ t('speeches.form.sections.whyMe.label') }}
                     </h3>
                     <MarkdownContent
                       v-if="hasWhyMe"
@@ -430,8 +430,8 @@ watch(item, (newValue) => {
             v-else
             color="warning"
             icon="i-heroicons-exclamation-triangle"
-            :title="t('speech.detail.states.notFound')"
-            :description="t('speech.detail.states.notFoundDescription')"
+            :title="t('speeches.detail.notFound')"
+            :description="t('speeches.detail.notFoundDescription')"
           />
         </UPageBody>
       </UPage>

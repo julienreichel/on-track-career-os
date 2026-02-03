@@ -89,39 +89,39 @@ const listSections = computed(
     [
       {
         key: 'responsibilities',
-        label: t('jobDetail.tabs.responsibilities'),
-        placeholder: t('jobDetail.placeholders.responsibilities'),
-        hint: t('jobDetail.hints.responsibilities'),
+        label: t('jobs.form.fields.responsibilities.label'),
+        placeholder: t('jobs.form.fields.responsibilities.placeholder'),
+        hint: t('jobs.form.fields.responsibilities.hint'),
       },
       {
         key: 'requiredSkills',
-        label: t('jobDetail.tabs.requiredSkills'),
-        placeholder: t('jobDetail.placeholders.requiredSkills'),
-        hint: t('jobDetail.hints.requiredSkills'),
+        label: t('jobs.form.fields.requiredSkills.label'),
+        placeholder: t('jobs.form.fields.requiredSkills.placeholder'),
+        hint: t('jobs.form.fields.requiredSkills.hint'),
       },
       {
         key: 'behaviours',
-        label: t('jobDetail.tabs.behaviours'),
-        placeholder: t('jobDetail.placeholders.behaviours'),
-        hint: t('jobDetail.hints.behaviours'),
+        label: t('jobs.form.fields.behaviours.label'),
+        placeholder: t('jobs.form.fields.behaviours.placeholder'),
+        hint: t('jobs.form.fields.behaviours.hint'),
       },
       {
         key: 'successCriteria',
-        label: t('jobDetail.tabs.successCriteria'),
-        placeholder: t('jobDetail.placeholders.successCriteria'),
-        hint: t('jobDetail.hints.successCriteria'),
+        label: t('jobs.form.fields.successCriteria.label'),
+        placeholder: t('jobs.form.fields.successCriteria.placeholder'),
+        hint: t('jobs.form.fields.successCriteria.hint'),
       },
       {
         key: 'explicitPains',
-        label: t('jobDetail.tabs.explicitPains'),
-        placeholder: t('jobDetail.placeholders.explicitPains'),
-        hint: t('jobDetail.hints.explicitPains'),
+        label: t('jobs.form.fields.explicitPains.label'),
+        placeholder: t('jobs.form.fields.explicitPains.placeholder'),
+        hint: t('jobs.form.fields.explicitPains.hint'),
       },
       {
         key: 'atsKeywords',
-        label: t('jobDetail.tabs.atsKeywords'),
-        placeholder: t('jobDetail.placeholders.atsKeywords'),
-        hint: t('jobDetail.hints.atsKeywords'),
+        label: t('jobs.form.fields.atsKeywords.label'),
+        placeholder: t('jobs.form.fields.atsKeywords.placeholder'),
+        hint: t('jobs.form.fields.atsKeywords.hint'),
       },
     ] satisfies Array<{
       key: ListField;
@@ -147,7 +147,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     to: '/jobs',
   },
   {
-    label: t('jobDetail.match.view'),
+    label: t('jobs.detail.actions.viewMatch'),
     icon: 'i-heroicons-sparkles',
     to: matchLink.value,
   },
@@ -155,7 +155,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
 
 const statusLabel = computed(() => {
   const status = job.value?.status ?? 'draft';
-  return t(`jobList.status.${status}`);
+  return t(`jobs.detail.status.${status}`);
 });
 
 const viewListSections = computed(() =>
@@ -167,7 +167,7 @@ const viewListSections = computed(() =>
 
 const formattedCreatedAt = computed(() => formatDetailDate(job.value?.createdAt));
 const formattedUpdatedAt = computed(() => formatDetailDate(job.value?.updatedAt));
-const displayTitle = computed(() => form.title.trim() || t('jobList.card.noTitle'));
+const displayTitle = computed(() => form.title.trim() || t('jobs.detail.untitled'));
 const matchingSummary = computed(() => selectMatchingSummary(jobWithRelations.value));
 const { guidance } = useGuidance('job-detail', () => ({
   jobId: jobId.value,

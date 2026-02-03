@@ -1,35 +1,38 @@
 <template>
   <UPage>
-    <UPageHeader :title="t('speech.new.title')" :description="t('speech.new.subtitle')" />
+    <UPageHeader
+      :title="t('speeches.form.createTitle')"
+      :description="t('speeches.form.createDescription')"
+    />
 
     <UPageBody>
       <UCard v-if="!isAutoFlow">
         <div class="space-y-6">
           <div>
             <h3 class="text-lg font-semibold mb-2">
-              {{ t('speech.new.setup.title') }}
+              {{ t('speeches.form.setupTitle') }}
             </h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ t('speech.new.setup.description') }}
+              {{ t('speeches.form.setupDescription') }}
             </p>
           </div>
 
-          <UFormField :label="t('speech.new.setup.nameLabel')" required>
+          <UFormField :label="t('speeches.form.fields.title.label')" required>
             <UInput
               v-model="speechName"
-              :placeholder="t('speech.new.setup.namePlaceholder')"
+              :placeholder="t('speeches.form.fields.title.placeholder')"
               data-testid="speech-name-input"
               class="w-full"
             />
           </UFormField>
 
           <UFormField
-            :label="t('speech.new.setup.contextLabel')"
-            :description="t('speech.new.setup.contextDescription')"
+            :label="t('speeches.form.fields.context.label')"
+            :description="t('speeches.form.fields.context.description')"
           >
             <UTextarea
               v-model="speechContext"
-              :placeholder="t('speech.new.setup.contextPlaceholder')"
+              :placeholder="t('speeches.form.fields.context.placeholder')"
               :rows="6"
               data-testid="speech-context-textarea"
               class="w-full"
@@ -40,7 +43,7 @@
             v-if="generationError"
             color="error"
             icon="i-heroicons-exclamation-triangle"
-            :title="t('speech.new.generate.error')"
+            :title="t('speeches.form.errors.generation')"
             :description="generationError"
             class="mb-4"
           />
@@ -48,7 +51,7 @@
           <div class="flex justify-end gap-3">
             <UButton :label="t('common.cancel')" variant="ghost" @click="cancel" />
             <UButton
-              :label="t('speech.new.generate.action')"
+              :label="t('common.actions.generate')"
               icon="i-heroicons-sparkles"
               :disabled="!speechName.trim() || generating"
               :loading="generating"
@@ -63,7 +66,7 @@
         <div class="space-y-6">
           <div>
             <h3 class="text-lg font-semibold mb-2">
-              {{ t('speech.new.generate.action') }}
+              {{ t('common.actions.generate') }}
             </h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">
               {{ t('common.loading') }}
@@ -108,7 +111,7 @@ const speechContext = ref('');
 const jobDescriptionObj = computed<SpeechInput['jobDescription'] | undefined>(() => {
   if (!speechContext.value.trim()) return undefined;
   return {
-    title: speechName.value.trim() || t('speech.new.setup.contextTitleFallback'),
+    title: speechName.value.trim() || t('speeches.detail.untitled'),
     seniorityLevel: '',
     roleSummary: speechContext.value.trim(),
     responsibilities: [],
@@ -153,7 +156,7 @@ const generateSpeech = async () => {
     }
     if (!userId.value) {
       toast.add({
-        title: t('speech.new.toast.createFailed'),
+        title: t('speeches.toast.createFailed'),
         color: 'error',
       });
       return;
@@ -186,7 +189,7 @@ const generateSpeech = async () => {
 
     if (created?.id) {
       toast.add({
-        title: t('speech.new.toast.created'),
+        title: t('speeches.toast.created'),
         color: 'primary',
       });
       await router.push({
@@ -194,13 +197,13 @@ const generateSpeech = async () => {
         params: { id: created.id },
       });
     } else {
-      toast.add({ title: t('speech.new.toast.createFailed'), color: 'error' });
+      toast.add({ title: t('speeches.toast.createFailed'), color: 'error' });
     }
   } catch (err) {
     console.error('[speechNew] Error generating speech:', err);
     generationError.value = err instanceof Error ? err.message : 'Unknown error';
     toast.add({
-      title: t('speech.new.toast.error'),
+      title: t('speeches.toast.error'),
       color: 'error',
     });
   } finally {
@@ -220,7 +223,7 @@ const generateTailoredSpeech = async (jobId: string) => {
     const context = await tailoredMaterials.loadTailoringContext(jobId);
     if (!context.ok) {
       toast.add({
-        title: t('speech.new.toast.error'),
+        title: t('speeches.toast.error'),
         color: 'error',
       });
       await router.push('/jobs');
@@ -228,7 +231,7 @@ const generateTailoredSpeech = async (jobId: string) => {
     }
     if (!context.matchingSummary) {
       toast.add({
-        title: t('speech.new.toast.generationFailed'),
+        title: t('speeches.toast.generationFailed'),
         color: 'error',
       });
       await router.push(`/jobs/${jobId}/match`);
@@ -248,14 +251,14 @@ const generateTailoredSpeech = async (jobId: string) => {
     }
 
     toast.add({
-      title: t('speech.new.toast.createFailed'),
+      title: t('speeches.toast.createFailed'),
       color: 'error',
     });
   } catch (err) {
     console.error('[speechNew] Error generating tailored speech:', err);
     generationError.value = err instanceof Error ? err.message : 'Unknown error';
     toast.add({
-      title: t('speech.new.toast.error'),
+      title: t('speeches.toast.error'),
       color: 'error',
     });
   } finally {

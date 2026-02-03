@@ -25,7 +25,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     variant: 'ghost',
   },
   {
-    label: t('companies.list.actions.add'),
+    label: t('common.actions.add'),
     icon: 'i-heroicons-plus',
     to: '/companies/new',
   },
@@ -83,8 +83,8 @@ function cancelDelete() {
   <UContainer>
     <UPage>
       <UPageHeader
-        :title="t('companies.list.title')"
-        :description="t('companies.list.description')"
+        :title="t('companies.page.title')"
+        :description="t('companies.page.description')"
         :links="headerLinks"
       />
 
@@ -118,7 +118,7 @@ function cancelDelete() {
             <p class="text-sm text-gray-500">{{ t('companies.list.empty.description') }}</p>
             <template #actions>
               <UButton
-                :label="t('companies.list.actions.add')"
+                :label="t('common.actions.add')"
                 icon="i-heroicons-plus"
                 @click="router.push('/companies/new')"
               />
@@ -148,8 +148,8 @@ function cancelDelete() {
 
     <UModal
       v-model:open="showDeleteModal"
-      :title="t('companies.list.delete.title')"
-      :description="t('companies.list.delete.message')"
+      :title="t('companies.delete.title')"
+      :description="t('companies.delete.message')"
     >
       <template #footer>
         <UButton
@@ -158,7 +158,7 @@ function cancelDelete() {
           :label="t('common.cancel')"
           @click="cancelDelete"
         />
-        <UButton color="error" :label="t('companies.list.delete.confirm')" @click="confirmDelete" />
+        <UButton color="error" :label="t('common.actions.delete')" @click="confirmDelete" />
       </template>
     </UModal>
   </UContainer>

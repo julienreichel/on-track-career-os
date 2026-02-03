@@ -51,7 +51,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     to: '/profile/cv-upload',
   },
   {
-    label: t('experiences.list.addNew'),
+    label: t('common.actions.add'),
     icon: 'i-heroicons-plus',
     to: '/profile/experiences/new',
   },

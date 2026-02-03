@@ -38,7 +38,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     to: '/jobs',
   },
   {
-    label: t('jobList.actions.view'),
+    label: t('jobs.list.actions.view'),
     icon: 'i-heroicons-briefcase',
     to: jobId.value ? `/jobs/${jobId.value}` : undefined,
   },
@@ -58,8 +58,8 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
   },
 ]);
 
-const jobTitle = computed(() => job.value?.title?.trim() || t('jobList.card.noTitle'));
-const jobStatus = computed(() => t(`jobList.status.${job.value?.status ?? 'draft'}`));
+const jobTitle = computed(() => job.value?.title?.trim() || t('jobs.detail.untitled'));
+const jobStatus = computed(() => t(`jobs.detail.status.${job.value?.status ?? 'draft'}`));
 const formattedUpdatedAt = computed(() => formatDetailDate(job.value?.updatedAt));
 const isLoading = computed(() => engine.isLoading.value);
 const isGenerating = computed(() => engine.isGenerating.value);
@@ -175,15 +175,15 @@ onMounted(async () => {
           <UCard class="mb-6 space-y-4">
             <div class="grid gap-4 sm:grid-cols-2">
               <div>
-                <p class="text-sm text-dimmed">{{ t('jobDetail.meta.status') }}</p>
+                <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.status') }}</p>
                 <UBadge color="neutral" variant="outline" class="mt-1">
                   {{ jobStatus }}
                 </UBadge>
               </div>
               <div>
-                <p class="text-sm text-dimmed">{{ t('jobDetail.meta.updatedAt') }}</p>
+                <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.updatedAt') }}</p>
                 <p class="mt-1 text-sm text-default">
-                  {{ formattedUpdatedAt || t('jobDetail.meta.notAvailable') }}
+                  {{ formattedUpdatedAt || t('jobs.detail.meta.notAvailable') }}
                 </p>
               </div>
               <div v-if="linkedCompany">
@@ -200,7 +200,7 @@ onMounted(async () => {
                   variant="ghost"
                   size="xs"
                   icon="i-heroicons-arrow-top-right-on-square"
-                  :label="t('jobDetail.companyLink.view')"
+                  :label="t('jobs.detail.companyLink.view')"
                   :to="companyLink"
                 />
               </div>
@@ -208,7 +208,7 @@ onMounted(async () => {
 
             <div v-if="job?.roleSummary" class="rounded-lg bg-muted/30 p-4">
               <p class="text-sm font-medium text-highlighted">
-                {{ t('jobDetail.fields.roleSummary') }}
+                {{ t('jobs.form.fields.roleSummary.label') }}
               </p>
               <p class="mt-2 text-sm text-default">
                 {{ job.roleSummary }}

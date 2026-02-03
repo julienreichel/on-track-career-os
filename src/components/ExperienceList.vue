@@ -109,7 +109,7 @@ const columns: TableColumn<Experience>[] = [
           size: 'xs',
           color: 'neutral',
           variant: 'ghost',
-          'aria-label': t('experiences.list.edit'),
+          'aria-label': t('common.actions.edit'),
           onClick: () => emit('edit', row.original.id),
         }),
         h(UButton, {
@@ -117,7 +117,7 @@ const columns: TableColumn<Experience>[] = [
           size: 'xs',
           color: 'error',
           variant: 'ghost',
-          'aria-label': t('experiences.list.delete'),
+          'aria-label': t('common.actions.delete'),
           onClick: () => emit('delete', row.original.id),
         }),
       ]);
@@ -156,10 +156,10 @@ function getTypeBadge(type: string) {
   <UCard>
     <template #header>
       <UPageHeader
-        :title="t('experiences.list.title')"
+        :title="t('experiences.page.title')"
         :links="[
           {
-            label: t('experiences.list.addNew'),
+            label: t('common.actions.add'),
             icon: 'i-heroicons-plus',
             onClick: () => emit('edit', ''),
           },

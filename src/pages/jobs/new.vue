@@ -26,14 +26,17 @@ async function handleFileSelected(file: File | null | undefined) {
 <template>
   <UContainer>
     <UPage>
-      <UPageHeader :title="t('jobUpload.title')" :description="t('jobUpload.description')" />
+      <UPageHeader
+        :title="t('jobs.form.createTitle')"
+        :description="t('jobs.form.createDescription')"
+      />
 
       <UPageBody>
         <UAlert
           v-if="errorMessage"
           color="error"
           icon="i-lucide-alert-triangle"
-          :title="t('jobUpload.errors.generic')"
+          :title="t('jobs.form.errors.generic')"
           :description="errorMessage"
           :close-button="{ icon: 'i-lucide-x', color: 'error', variant: 'link' }"
           class="mb-6"

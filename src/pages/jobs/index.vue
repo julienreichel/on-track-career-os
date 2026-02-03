@@ -31,13 +31,13 @@ const searchQuery = ref('');
 
 const headerLinks = computed(() => [
   {
-    label: t('jobList.actions.viewCompanies'),
+    label: t('jobs.list.actions.viewCompanies'),
     icon: 'i-heroicons-building-office-2',
     to: '/companies',
     variant: 'ghost' as const,
   },
   {
-    label: t('jobList.actions.add'),
+    label: t('common.actions.add'),
     icon: 'i-heroicons-plus',
     to: '/jobs/new',
   },
@@ -124,7 +124,7 @@ function cancelDelete() {
           <UInput
             v-model="searchQuery"
             icon="i-heroicons-magnifying-glass"
-            :placeholder="t('jobList.search.placeholder')"
+            :placeholder="t('jobs.list.search.placeholder')"
             size="lg"
             class="w-1/3"
           />
@@ -135,7 +135,7 @@ function cancelDelete() {
           icon="i-heroicons-exclamation-triangle"
           color="error"
           variant="soft"
-          :title="t('jobUpload.errors.generic')"
+          :title="t('jobs.list.errors.generic')"
           :description="errorMessage"
           :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
           class="mb-6"
@@ -169,8 +169,8 @@ function cancelDelete() {
 
     <UModal
       v-model:open="showDeleteModal"
-      :title="t('jobList.delete.title')"
-      :description="t('jobList.delete.message')"
+      :title="t('jobs.delete.title')"
+      :description="t('jobs.delete.message')"
     >
       <template #footer>
         <UButton
@@ -179,7 +179,7 @@ function cancelDelete() {
           :label="t('common.cancel')"
           @click="cancelDelete"
         />
-        <UButton color="error" :label="t('jobList.delete.confirm')" @click="confirmDelete" />
+        <UButton color="error" :label="t('common.actions.delete')" @click="confirmDelete" />
       </template>
     </UModal>
   </UContainer>

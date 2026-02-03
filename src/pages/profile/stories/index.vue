@@ -64,7 +64,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
     to: '/profile',
   },
   {
-    label: t('storyList.create'),
+    label: t('common.actions.create'),
     icon: 'i-heroicons-sparkles',
     to: '/profile/stories/new',
   },
@@ -85,8 +85,8 @@ onMounted(async () => {
 <template>
   <UPage>
     <UPageHeader
-      :title="t('stories.global.title')"
-      :description="t('stories.global.description')"
+      :title="t('stories.page.title')"
+      :description="t('stories.page.description')"
       :links="headerLinks"
     />
 
