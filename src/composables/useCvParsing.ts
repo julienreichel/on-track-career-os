@@ -116,7 +116,7 @@ export function useCvParsing() {
     const allExperiences = await extractExperiencesFromSection(language, experienceItems);
 
     if (allExperiences.length === 0) {
-      throw new Error(t('cvUpload.errors.extractionFailed'));
+      throw new Error(t('ingestion.cv.upload.errors.extractionFailed'));
     }
 
     extractedExperiences.value = allExperiences;
