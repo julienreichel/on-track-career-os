@@ -115,7 +115,9 @@ describe('ExperienceList', () => {
   it('displays add new button', () => {
     const wrapper = createWrapper();
     const buttons = wrapper.findAllComponents({ name: 'UButton' });
-    expect(buttons.some((btn) => btn.props('label') === i18n.global.t('experiences.list.addNew'))).toBe(true);
+    expect(
+      buttons.some((btn) => btn.props('label') === i18n.global.t('experiences.list.addNew'))
+    ).toBe(true);
   });
 
   it('emits edit event with empty id when add new button clicked', async () => {

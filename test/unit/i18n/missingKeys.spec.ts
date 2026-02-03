@@ -1,17 +1,83 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
+import fs from 'fs';
+import path from 'path';
 import enLocale from '../../../i18n/locales/en.json';
 
 /**
- * Recursively collect all translation keys used in the codebase
+ * Extracts actual i18n keys from source code by scanning for t('...')
  * This test ensures that all i18n keys used in components/pages are defined in the locale files
  */
 
-const MISSING_KEYS: string[] = [];
-const USED_KEYS = new Set<string>();
+let usedKeysFromCode: Set<string>;
 
 /**
- * Extracts all i18n keys from the locale file
+ * Recursively scans directory for Vue and TypeScript files
  */
+function getAllFilesInDir(dir: string, ext: string[]): string[] {
+  let files: string[] = [];
+
+  try {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+
+      // Skip node_modules, .nuxt, dist, coverage
+      if (['node_modules', '.nuxt', 'dist', 'coverage', '.git'].includes(entry.name)) {
+        continue;
+      }
+
+      if (entry.isDirectory()) {
+        files = files.concat(getAllFilesInDir(fullPath, ext));
+      } else if (ext.some((e) => entry.name.endsWith(e))) {
+        files.push(fullPath);
+      }
+    }
+  } catch (e) {
+    // Skip directories we can't read
+  }
+
+  return files;
+}
+
+/**
+ * Extracts i18n keys from source code by finding t('key') patterns
+ */
+function extractKeysFromCode(files: string[]): Set<string> {
+  const keys = new Set<string>();
+  // Match patterns like t('key.path') or t("key.path")
+  // Must start with lowercase letter and contain at least one dot (i18n convention)
+  const keyRegex = /t\(['"`]([a-z][a-zA-Z0-9._-]*\.[a-zA-Z0-9._-]+)['"`]\)/g;
+
+  for (const file of files) {
+    try {
+      const content = fs.readFileSync(file, 'utf-8');
+      let match;
+
+      while ((match = keyRegex.exec(content)) !== null) {
+        const key = match[1];
+        // Filter out common false positives
+        if (!['v.', '$t.', 'i18n.'].some((prefix) => key.startsWith(prefix))) {
+          keys.add(key);
+        }
+      }
+    } catch (e) {
+      // Skip files we can't read
+    }
+  }
+
+  return keys;
+}
+beforeAll(() => {
+  // Extract keys from actual source code
+  const srcFiles = getAllFilesInDir(path.resolve(__dirname, '../../../src'), [
+    '.vue',
+    '.ts',
+    '.tsx',
+    '.js',
+  ]);
+  usedKeysFromCode = extractKeysFromCode(srcFiles);
+});
 function getAllDefinedKeys(obj: any, prefix = ''): Set<string> {
   const keys = new Set<string>();
 
@@ -35,110 +101,37 @@ function getAllDefinedKeys(obj: any, prefix = ''): Set<string> {
   return keys;
 }
 
-/**
- * List of known i18n keys used in the codebase.
- * This list is manually maintained and should be updated when new keys are used.
- */
-const KNOWN_USED_KEYS = [
-  // Navigation
-  'navigation.backToHome',
-  'navigation.profile',
-  'navigation.jobs',
-  'navigation.applications',
-  'navigation.companies',
-
-  // Stories
-  'stories.list.title',
-  'stories.list.addNew',
-  'stories.list.empty',
-  'stories.form.fields.title.label',
-  'stories.form.fields.situation.label',
-  'stories.form.fields.task.label',
-  'stories.form.fields.action.label',
-  'stories.form.fields.result.label',
-  'stories.form.fields.achievements.label',
-  'stories.form.fields.kpis.list',
-  'stories.form.generateAchievements',
-  'stories.form.mode.chooseTitle',
-  'stories.form.mode.chooseDescription',
-  'stories.form.mode.interview.title',
-  'stories.form.mode.interview.description',
-  'stories.form.mode.manual.title',
-  'stories.form.mode.manual.description',
-  'stories.form.mode.freetext.title',
-  'stories.form.mode.freetext.instructions',
-  'stories.form.mode.freetext.label',
-  'stories.form.mode.freetext.placeholder',
-
-  // Jobs
-  'jobs.form.createTitle',
-  'jobs.form.createDescription',
-  'jobs.form.errors.generic',
-  'jobs.list.errors.generic',
-
-  // Applications
-  'applicationsPage.title',
-  'applicationsPage.description',
-  'applications.cvs.page.title',
-  'applications.cvs.page.description',
-  'applications.cvs.list.title',
-  'coverLetters.page.title',
-  'coverLetters.page.description',
-  'speeches.page.title',
-  'speeches.page.description',
-
-  // Matching
-  'matching.summaryCard.overallScore',
-  'matching.summaryCard.recommendation.maybe',
-  'matching.summaryCard.recommendation.apply',
-  'matching.summaryCard.recommendation.skip',
-
-  // Common
-  'common.save',
-  'common.cancel',
-  'common.delete',
-  'common.loading',
-];
-
 describe('i18n - Missing Keys Detection', () => {
-  it('should have all required story form mode keys defined', () => {
-    const definedKeys = getAllDefinedKeys(enLocale);
-
-    const requiredKeys = [
-      'stories.form.mode.chooseTitle',
-      'stories.form.mode.chooseDescription',
-      'stories.form.mode.interview.title',
-      'stories.form.mode.interview.description',
-      'stories.form.mode.manual.title',
-      'stories.form.mode.manual.description',
-      'stories.form.mode.freetext.title',
-      'stories.form.mode.freetext.instructions',
-      'stories.form.mode.freetext.label',
-      'stories.form.mode.freetext.placeholder',
-    ];
-
-    const missingKeys = requiredKeys.filter((key) => !definedKeys.has(key));
-
-    expect(missingKeys, `Missing i18n keys: ${missingKeys.join(', ')}`).toHaveLength(0);
+  it('should extract keys from source code', () => {
+    // Verify we actually found keys from source code
+    expect(usedKeysFromCode.size).toBeGreaterThan(0);
+    expect(usedKeysFromCode.size).toBeGreaterThan(50); // Should find at least 50 keys
   });
 
-  it('should have all used keys defined in locale file', () => {
+  it('should have all keys used in code defined in locale file', () => {
     const definedKeys = getAllDefinedKeys(enLocale);
+    const missingKeys = Array.from(usedKeysFromCode)
+      .filter((key) => !definedKeys.has(key))
+      .sort();
 
-    const missingKeys = KNOWN_USED_KEYS.filter((key) => !definedKeys.has(key));
+    const message =
+      missingKeys.length > 0
+        ? `Missing i18n keys:\n${missingKeys.map((k) => `  - ${k}`).join('\n')}`
+        : '';
 
-    expect(missingKeys, `Missing i18n keys that are used in components: ${missingKeys.join(', ')}`).toHaveLength(0);
-  });
-
-  it('should report defined keys structure', () => {
-    const definedKeys = getAllDefinedKeys(enLocale);
-
-    // This is informational - it helps understand what keys are available
-    const storyKeys = Array.from(definedKeys).filter((k) => k.startsWith('stories.form'));
-    expect(storyKeys.length).toBeGreaterThan(10);
+    expect(missingKeys).toHaveLength(0, message);
   });
 });
+it('should report keys found in source code', () => {
+  // Verify we found a reasonable number of keys
+  const storyKeys = Array.from(usedKeysFromCode).filter((k) => k.startsWith('stories'));
+  const jobKeys = Array.from(usedKeysFromCode).filter((k) => k.startsWith('jobs'));
+  const appKeys = Array.from(usedKeysFromCode).filter((k) => k.startsWith('applications'));
 
+  expect(usedKeysFromCode.size).toBeGreaterThan(100); // Should find at least 100 keys
+  expect(storyKeys.length).toBeGreaterThan(5);
+  expect(jobKeys.length).toBeGreaterThan(5);
+});
 describe('i18n - Locale File Validation', () => {
   it('should have valid JSON structure', () => {
     expect(enLocale).toBeDefined();
@@ -170,6 +163,8 @@ describe('i18n - Locale File Validation', () => {
       }
     });
 
-    expect(problematicKeys, `Keys with empty values: ${problematicKeys.join(', ')}`).toHaveLength(0);
+    expect(problematicKeys, `Keys with empty values: ${problematicKeys.join(', ')}`).toHaveLength(
+      0
+    );
   });
 });

@@ -63,8 +63,13 @@
 
         <!-- CV List -->
         <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
-          <UEmpty :title="$t('applications.cvs.list.search.noResults')" icon="i-heroicons-magnifying-glass">
-            <p class="text-sm text-gray-500">{{ $t('applications.cvs.list.search.placeholder') }}</p>
+          <UEmpty
+            :title="$t('applications.cvs.list.search.noResults')"
+            icon="i-heroicons-magnifying-glass"
+          >
+            <p class="text-sm text-gray-500">
+              {{ $t('applications.cvs.list.search.placeholder') }}
+            </p>
           </UEmpty>
         </UCard>
 
@@ -72,7 +77,7 @@
           <ItemCard
             v-for="cv in filteredItems"
             :key="cv.id"
-            :title="cv.name || $t('applications.applications.cvs.detail.untitled')"
+            :title="cv.name || $t('applications.cvs.display.untitled')"
             :subtitle="formatListDate(cv.updatedAt ?? cv.createdAt)"
             @edit="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
             @delete="confirmDelete(cv)"

@@ -7,6 +7,9 @@
     "profile": "Profile",
     "cvUpload": "Upload CV",
     "experiences": "Experiences",
+    "errors": {
+      "generation": "Failed to generate cover letter"
+    },
     "personalCanvas": "Personal Canvas",
     "jobs": "Jobs",
     "companies": "Companies",
@@ -27,8 +30,14 @@
     "signOut": "Sign Out",
     "errorSigningOut": "Error signing out"
   },
+  "empty": {
+    "content": "Start creating professional cover letters tailored to your profile."
+  },
   "ingestion": {
     "cv": {
+      "errors": {
+        "generation": "Failed to generate speech"
+      },
       "upload": {
         "title": "Upload Your CV",
         "description": "Upload your CV to extract your professional experience automatically.",
@@ -506,6 +515,7 @@
         }
       },
       "generateAchievements": "Generate Achievements",
+      "generateFromText": "Generate from free text",
       "mode": {
         "chooseTitle": "How do you want to create this story?",
         "chooseDescription": "Select the method that works best for you. You can change modes anytime.",
@@ -807,8 +817,10 @@
     },
     "states": {
       "loading": "Loading...",
-      "saving": "Saving..."
-    }
+      "saving": "Saving...",
+      "generating": "Generating..."
+    },
+    "retry": "Retry"
   },
   "canvas": {
     "needsUpdate": "Update recommended",
@@ -1261,13 +1273,22 @@
       "search": {
         "placeholder": "Search cover letters...",
         "noResults": "No cover letters match your search."
+      },
+      "empty": {
+        "content": "Start creating professional cover letters tailored to your profile."
       }
+    },
+    "detail": {
+      "untitled": "Untitled Cover Letter"
     },
     "form": {
       "createTitle": "Create Cover Letter",
       "setupTitle": "Setup Your Cover Letter",
       "setupDescription": "Create professional cover letters tailored to your profile and experiences.",
       "createDescription": "Create a cover letter to introduce yourself to potential employers.",
+      "errors": {
+        "generation": "Failed to generate cover letter"
+      },
       "fields": {
         "title": {
           "label": "Cover Letter Name",
@@ -1288,7 +1309,9 @@
       "created": "Cover letter created successfully",
       "createFailed": "Failed to create cover letter",
       "deleted": "Cover letter deleted successfully",
-      "deleteFailed": "Failed to delete cover letter"
+      "deleteFailed": "Failed to delete cover letter",
+      "error": "An error occurred",
+      "generationFailed": "Failed to generate cover letter"
     }
   },
   "speeches": {
@@ -1303,6 +1326,9 @@
       "search": {
         "placeholder": "Search speech blocks...",
         "noResults": "No speech blocks match your search."
+      },
+      "empty": {
+        "preview": "Create your first speech to build your elevator pitch and career story."
       }
     },
     "detail": {
@@ -1316,6 +1342,9 @@
       "setupTitle": "Setup Your Speech",
       "setupDescription": "Build your elevator pitch, career story, and why-me narrative.",
       "createDescription": "Create a speech to draft your elevator pitch and career story.",
+      "errors": {
+        "generation": "Failed to generate speech"
+      },
       "sections": {
         "elevatorPitch": {
           "label": "Elevator pitch"
@@ -1349,7 +1378,10 @@
       "updated": "Speech updated successfully",
       "updateFailed": "Failed to update speech",
       "deleted": "Speech deleted successfully",
-      "deleteFailed": "Failed to delete speech"
+      "deleteFailed": "Failed to delete speech",
+      "error": "An error occurred",
+      "generated": "Speech generated successfully",
+      "generationFailed": "Failed to generate speech"
     }
   },
   "jobs": {
@@ -1651,5 +1683,8 @@
         }
       }
     }
+  },
+  "errors": {
+    "unknown": "An unknown error occurred. Please try again."
   }
 }
