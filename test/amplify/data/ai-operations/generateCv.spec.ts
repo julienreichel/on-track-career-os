@@ -385,12 +385,13 @@ Seeking opportunities`;
     const payload = JSON.parse(commandInput.body);
     const userPrompt = payload.messages[0].content[0].text as string;
 
-    expect(userPrompt).toContain('## WORK EXPERIENCE');
-    expect(userPrompt).toContain('## EDUCATION');
-    expect(userPrompt).toContain('## VOLUNTEER EXPERIENCE');
-    expect(userPrompt).toContain('## PROJECTS');
-    expect(userPrompt).toContain('Key Achievements (from STAR stories)');
-    expect(userPrompt).toContain('Highlights');
+    expect(userPrompt).toContain('## EXPERIENCES');
+    expect(userPrompt).toContain('(work)');
+    expect(userPrompt).toContain('(education)');
+    expect(userPrompt).toContain('(volunteer)');
+    expect(userPrompt).toContain('(project)');
+    expect(userPrompt).toContain('## STORIES');
+    expect(userPrompt).toContain('Achievements: Cut incidents by 40%');
   });
 
   it('warns and skips tailoring when matching summary is invalid', async () => {
@@ -507,15 +508,12 @@ Skills list`;
     const payload = JSON.parse(commandInput.body);
     const userPrompt = payload.messages[0].content[0].text as string;
 
-    expect(userPrompt).toContain('SKILLS (RAW LIST - SYNTHESIZE INTO CATEGORIES)');
-    expect(userPrompt).toContain('TypeScript, Python, AWS');
-    expect(userPrompt).toContain('## LANGUAGES');
-    expect(userPrompt).toContain('English, Spanish');
-    expect(userPrompt).toContain('## CERTIFICATIONS');
-    expect(userPrompt).toContain('AWS Certified');
-    expect(userPrompt).toContain('PMP');
-    expect(userPrompt).toContain('INTERESTS (RAW LIST - SELECT 3-5 MOST PROFESSIONAL)');
-    expect(userPrompt).toContain('Open Source, Mentoring, Public Speaking');
+    expect(userPrompt).toContain('Skills: TypeScript, Python, AWS');
+    expect(userPrompt).toContain('Languages: English, Spanish');
+    expect(userPrompt).toContain('Certifications: AWS Certified, PMP');
+    expect(userPrompt).toContain('Interests: Open Source, Mentoring, Public Speaking');
+    expect(userPrompt).toContain('SKILL CURATION:');
+    expect(userPrompt).toContain('INTERESTS:');
   });
 
   it('should strip trailing notes from AI response', async () => {

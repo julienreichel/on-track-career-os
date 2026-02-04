@@ -167,35 +167,34 @@ function formatCompanyProfile(company?: CompanyProfile | null): string | null {
     formatList('Products/services', company.productsServices),
     formatList('Target markets', company.targetMarkets),
     formatList('Customer segments', company.customerSegments),
-    isNonEmpty(company.rawNotes) ? `Notes: ${company.rawNotes}` : null,
   ].filter(Boolean);
 
   return lines.length ? lines.join('\n') : null;
 }
 
 export function formatAiInputContext(input: PromptInput): string {
-  const sections: string[] = [`LANGUAGE\n${input.language}`];
+  const sections: string[] = [`## LANGUAGE\n${input.language}`];
 
   const profile = formatProfile(input.profile);
-  if (profile) sections.push(`PROFILE\n${profile}`);
+  if (profile) sections.push(`## PROFILE\n${profile}`);
 
   const experiences = formatExperiences(input.experiences);
-  if (experiences) sections.push(`EXPERIENCES\n${experiences}`);
+  if (experiences) sections.push(`## EXPERIENCES\n${experiences}`);
 
   const stories = formatStories(input.stories);
-  if (stories) sections.push(`STORIES\n${stories}`);
+  if (stories) sections.push(`## STORIES\n${stories}`);
 
   const canvas = formatPersonalCanvas(input.personalCanvas);
-  if (canvas) sections.push(`PERSONAL CANVAS\n${canvas}`);
+  if (canvas) sections.push(`## PERSONAL CANVAS\n${canvas}`);
 
   const job = formatJobDescription(input.jobDescription);
-  if (job) sections.push(`TARGET JOB DESCRIPTION\n${job}`);
+  if (job) sections.push(`## TARGET JOB DESCRIPTION\n${job}`);
 
   const summary = formatMatchingSummary(input.matchingSummary);
-  if (summary) sections.push(`MATCHING SUMMARY\n${summary}`);
+  if (summary) sections.push(`## MATCHING SUMMARY\n${summary}`);
 
   const company = formatCompanyProfile(input.company);
-  if (company) sections.push(`COMPANY SUMMARY\n${company}`);
+  if (company) sections.push(`## COMPANY SUMMARY\n${company}`);
 
   return sections.join('\n\n');
 }

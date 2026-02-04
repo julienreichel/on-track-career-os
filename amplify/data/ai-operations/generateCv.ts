@@ -1,5 +1,6 @@
 import { invokeBedrock } from './utils/bedrock';
 import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
+import { formatAiInputContext } from './utils/promptFormat';
 import type {
   JobDescription,
   MatchingSummaryContext,
@@ -154,149 +155,10 @@ Target: 2 pages max of Markdown content, i,e, 70 lignes of text.
 `;
 
 /**
- * Format user profile section
- */
-function formatUserProfile(profile: Profile): string {
-  let section = `## USER PROFILE\n`;
-  section += `Name: ${profile.fullName || 'Not provided'}\n`;
-  if (profile.headline) section += `Professional Title: ${profile.headline}\n`;
-  if (profile.location) section += `Location: ${profile.location}\n`;
-  if (profile.seniorityLevel) section += `Seniority: ${profile.seniorityLevel}\n`;
-  if (profile.primaryEmail) section += `Email: ${profile.primaryEmail}\n`;
-  if (profile.primaryPhone) section += `Phone: ${profile.primaryPhone}\n`;
-
-  if (profile.strengths && profile.strengths.length > 0) {
-    section += `\nKey Strengths:\n${profile.strengths.map((s: string) => `- ${s}`).join('\n')}\n`;
-  }
-  if (profile.socialLinks && profile.socialLinks.length > 0) {
-    section += `\nSocial Links:\n`;
-    section += profile.socialLinks.map((link: string) => `- ${link}`).join('\n');
-    section += '\n';
-  }
-  if (profile.workPermitInfo) {
-    section += `\nWork Authorization:\n- ${profile.workPermitInfo}\n`;
-  }
-  return section + '\n';
-}
-
-/**
- * Format a single experience with its related stories
- */
-function formatSingleExperience(exp: Experience, stories: SpeechStory[] | undefined): string {
-  let output = `\n### ${exp.title || 'Position'}\n`;
-  const companyName = exp.companyName;
-  if (companyName) output += `**${companyName}**\n`;
-  if (exp.startDate) {
-    const endDate = exp.endDate || 'Present';
-    output += `${exp.startDate} - ${endDate}\n`;
-  }
-
-  // Add responsibilities
-  if (exp.responsibilities?.length) {
-    output += `\nResponsibilities:\n${exp.responsibilities.map((r) => `- ${r}`).join('\n')}\n`;
-  }
-
-  // Add tasks
-  if (exp.tasks?.length) {
-    output += `\nKey Tasks:\n${exp.tasks.map((t) => `- ${t}`).join('\n')}\n`;
-  }
-
-  // Add related stories
-  const relatedStories = exp.id
-    ? stories?.filter((s) => s.experienceId && s.experienceId === exp.id) || []
-    : [];
-  if (relatedStories.length > 0) {
-    output += `\nKey Achievements (from STAR stories):\n`;
-    relatedStories.forEach((story) => {
-      output += `- **Situation:** ${story.situation}\n`;
-      output += `  **Task:** ${story.task}\n`;
-      output += `  **Action:** ${story.action}\n`;
-      output += `  **Result:** ${story.result}\n`;
-      if (story.achievements?.length) {
-        output += `  **Highlights:** ${story.achievements.join('; ')}\n`;
-      }
-    });
-  }
-
-  return output;
-}
-
-/**
- * Sort experiences by start date (most recent first)
- */
-function sortExperiencesByDate(experiences: Experience[]): Experience[] {
-  return [...experiences].sort((a, b) => {
-    const dateA = a.startDate || '';
-    const dateB = b.startDate || '';
-    // Sort descending (most recent first)
-    return dateB.localeCompare(dateA);
-  });
-}
-
-/**
- * Format experiences section - grouped by type with related stories
- */
-function formatExperiencesWithStories(
-  experiences: Experience[],
-  stories: SpeechStory[] | undefined
-): string {
-  if (experiences.length === 0) return '';
-
-  // Group experiences by type
-  const workExperiences = experiences.filter(
-    (exp) => !exp.experienceType || exp.experienceType === 'work'
-  );
-  const educationExperiences = experiences.filter((exp) => exp.experienceType === 'education');
-  const volunteerExperiences = experiences.filter((exp) => exp.experienceType === 'volunteer');
-  const projectExperiences = experiences.filter((exp) => exp.experienceType === 'project');
-
-  let output = '';
-
-  // Format work experiences (sorted by most recent first)
-  if (workExperiences.length > 0) {
-    output += `## WORK EXPERIENCE\n`;
-    sortExperiencesByDate(workExperiences).forEach((exp) => {
-      output += formatSingleExperience(exp, stories);
-    });
-    output += '\n';
-  }
-
-  // Format education (sorted by most recent first)
-  if (educationExperiences.length > 0) {
-    output += `## EDUCATION\n`;
-    sortExperiencesByDate(educationExperiences).forEach((exp) => {
-      output += formatSingleExperience(exp, stories);
-    });
-    output += '\n';
-  }
-
-  // Format volunteer work (sorted by most recent first)
-  if (volunteerExperiences.length > 0) {
-    output += `## VOLUNTEER EXPERIENCE\n`;
-    sortExperiencesByDate(volunteerExperiences).forEach((exp) => {
-      output += formatSingleExperience(exp, stories);
-    });
-    output += '\n';
-  }
-
-  // Format projects (sorted by most recent first)
-  if (projectExperiences.length > 0) {
-    output += `## PROJECTS\n`;
-    sortExperiencesByDate(projectExperiences).forEach((exp) => {
-      output += formatSingleExperience(exp, stories);
-    });
-    output += '\n';
-  }
-
-  return output;
-}
-
-/**
  * Build the user prompt for CV generation
  */
 // eslint-disable-next-line complexity
 function buildUserPrompt(input: GenerateCvInput): string {
-  const JSON_INDENT = 2;
   const tailoring = resolveTailoringContext(input);
   const jobDescription = tailoring?.jobDescription ?? null;
   const matchingSummary = tailoring?.matchingSummary ?? null;
@@ -311,48 +173,26 @@ function buildUserPrompt(input: GenerateCvInput): string {
   prompt += '- COMBINE similar responsibilities into single points\n';
   prompt += '- Professional summary: 2-3 lines maximum\n\n';
 
-  prompt += `LANGUAGE:\n${input.language}\n\n`;
+  prompt += `${formatAiInputContext({
+    language: input.language,
+    profile: input.profile,
+    experiences: input.experiences,
+    stories: input.stories,
+    personalCanvas: input.personalCanvas,
+    jobDescription,
+    matchingSummary,
+    company,
+  })}\n\n`;
 
-  prompt += formatUserProfile(input.profile);
-  prompt += formatExperiencesWithStories(input.experiences, input.stories);
+  prompt += `SKILL CURATION:\n`;
+  prompt += `- Organize skills into 2-4 categories (e.g., Technical, Languages, Soft Skills)\n`;
+  prompt += `- Select only relevant skills; omit casual or redundant ones\n\n`;
 
-  // Add skills with guidance
-  if (input.profile.skills?.length) {
-    prompt += `## SKILLS (RAW LIST - SYNTHESIZE INTO CATEGORIES)\n`;
-    prompt += `Available skills: ${input.profile.skills.join(', ')}\n`;
-    prompt += `Instructions: Organize into 2-4 categories (e.g., Technical, Languages, Soft Skills). Select only relevant skills.\n\n`;
-  }
+  prompt += `INTERESTS:\n`;
+  prompt += `- If interests are provided, choose only 3-5 professional/relevant ones\n`;
+  prompt += `- Omit casual hobbies\n\n`;
 
-  // Add languages
-  if (input.profile.languages?.length) {
-    prompt += `## LANGUAGES\n${input.profile.languages.join(', ')}\n\n`;
-  }
-
-  // Add certifications
-  if (input.profile.certifications?.length) {
-    prompt += `## CERTIFICATIONS\n${input.profile.certifications
-      .map((c) => `- ${c}`)
-      .join('\n')}\n\n`;
-  }
-
-  // Add interests with guidance
-  if (input.profile.interests?.length) {
-    prompt += `## INTERESTS (RAW LIST - SELECT 3-5 MOST PROFESSIONAL)\n`;
-    prompt += `Available interests: ${input.profile.interests.join(', ')}\n`;
-    prompt += `Instructions: Choose only 3-5 professional/relevant interests. Omit casual hobbies.\n\n`;
-  }
-
-  if (input.personalCanvas) {
-    prompt += `## PERSONAL CANVAS\n${JSON.stringify(input.personalCanvas, null, JSON_INDENT)}\n\n`;
-  }
-
-  // Add job description for tailoring
   if (jobDescription) {
-    prompt += `## TARGET JOB DESCRIPTION\n${JSON.stringify(jobDescription, null, JSON_INDENT)}\n\n`;
-    prompt += `## MATCHING SUMMARY\n${JSON.stringify(matchingSummary, null, JSON_INDENT)}\n\n`;
-    if (company) {
-      prompt += `## COMPANY SUMMARY\n${JSON.stringify(company, null, JSON_INDENT)}\n\n`;
-    }
     prompt += `TAILORING INSTRUCTIONS:\n`;
     prompt += `- Prioritize experiences and skills matching this job description\n`;
     prompt += `- Use keywords from the job posting\n`;
@@ -364,10 +204,10 @@ function buildUserPrompt(input: GenerateCvInput): string {
   prompt += `- Use ONLY the information provided above - do not invent data\n`;
   prompt += `- Keep the CV CONCISE (1-2 pages worth)\n`;
   prompt += `- Separate Education from Work Experience\n`;
-  prompt += `- Transform verbose input into professional, impactful output`;
+  prompt += `- Transform verbose input into professional, impactful output\n`;
 
   if (input.templateMarkdown?.trim()) {
-    prompt += `## TEMPLATE EXEMPLAR (MARKDOWN)\n${input.templateMarkdown.trim()}\n\n`;
+    prompt += `\n## TEMPLATE EXEMPLAR (MARKDOWN)\n\n---\n\n${input.templateMarkdown.trim()}\n\n---\n\n`;
     prompt += `Instructions: Use this exemplar as a guide for structure and tone. Do not copy verbatim.\n\n`;
   }
   return prompt;
