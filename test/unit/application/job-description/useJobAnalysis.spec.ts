@@ -104,7 +104,7 @@ describe('useJobAnalysis', () => {
   });
 
   it('should reanalyse job and update lists', async () => {
-    const updated = { id: 'job-1', title: 'Analysed', status: 'analyzed' } as JobDescription;
+    const updated = { id: 'job-1', title: 'Analyzed', status: 'analyzed' } as JobDescription;
     mockService.reanalyseJob.mockResolvedValue(updated);
 
     const { jobs, selectedJob, reanalyseJob } = useJobAnalysis();
