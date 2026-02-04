@@ -26,7 +26,7 @@ test.describe('Cover Letter E2E Flow', () => {
     await expect(page.getByRole('heading', { name: /cover letters/i, level: 1 })).toBeVisible();
 
     // Create link should be visible (using first since there may be multiple)
-    const createButton = page.getByRole('link', { name: /Create cover letter/i }).first();
+    const createButton = page.getByRole('link', { name: /Generate cover letter/i }).first();
     await expect(createButton).toBeVisible();
   });
 
@@ -34,7 +34,7 @@ test.describe('Cover Letter E2E Flow', () => {
     await page.goto('/applications/cover-letters');
     await page.waitForLoadState('networkidle');
 
-    const createButton = page.getByRole('link', { name: /Create cover letter/i }).first();
+    const createButton = page.getByRole('link', { name: /Generate cover letter/i }).first();
     await expect(createButton).toBeVisible();
     await createButton.click();
 

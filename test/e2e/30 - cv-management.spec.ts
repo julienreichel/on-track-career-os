@@ -23,7 +23,7 @@ test.describe('CV Generation Workflow', () => {
 
     await page.goto('/applications/cv', { waitUntil: 'networkidle' });
 
-    const createCvLink = page.getByRole('link', { name: /create (new|your first) cv/i }).first();
+    const createCvLink = page.getByRole('link', { name: /Generate cv/i }).first();
     await expect(createCvLink).toBeVisible();
     await createCvLink.click();
 

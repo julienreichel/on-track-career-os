@@ -123,7 +123,7 @@
       "emptyDescription": "Add a short description or list of products to describe this company."
     },
     "form": {
-      "title": "Add Company",
+      "title": "Analyse Company",
       "companyName": "Company name",
       "companyNameHint": "Required",
       "companyNamePlaceholder": "e.g., Atlas Robotics",
@@ -659,7 +659,7 @@
       "empty": {
         "title": "No jobs yet",
         "description": "Upload a job to start matching and tailored materials.",
-        "cta": "Add a job"
+        "cta": "Analyse Job"
       }
     },
     "jobMatch": {
@@ -695,8 +695,8 @@
         },
         "job": {
           "title": "Upload a job",
-          "description": "Add a job description to personalize tailored materials.",
-          "cta": "Add a job"
+          "description": "Analyse a job description to personalize tailored materials.",
+          "cta": "Analyse Job"
         },
         "matchingSummary": {
           "title": "Generate a match summary",
@@ -736,8 +736,8 @@
       },
       "lockedJob": {
         "title": "Upload a job",
-        "description": "Add a job description to unlock tailored materials.",
-        "cta": "Add a job"
+        "description": "Analyse a job description to unlock tailored materials.",
+        "cta": "Analyse Job"
       },
       "lockedMatchingSummary": {
         "title": "Generate a match summary",
@@ -748,21 +748,21 @@
         "empty": {
           "title": "No CVs yet",
           "description": "Generate a tailored CV for a specific job.",
-          "cta": "Create CV"
+          "cta": "Generate CV"
         }
       },
       "coverLetters": {
         "empty": {
           "title": "No cover letters yet",
           "description": "Generate a cover letter to match a job.",
-          "cta": "Create cover letter"
+          "cta": "Generate cover letter"
         }
       },
       "speech": {
         "empty": {
           "title": "No speech blocks yet",
           "description": "Generate interview-ready talking points.",
-          "cta": "Create speech"
+          "cta": "Generate speech"
         }
       }
     }
@@ -971,9 +971,9 @@
       "personalCanvas": "Build your personal canvas",
       "jobUploaded": "Upload your first job description",
       "matchingSummary": "Generate a matching summary",
-      "tailoredCv": "Create a job-specific CV",
+      "tailoredCv": "Generate a job-specific CV",
       "tailoredCoverLetter": "Create a job-specific cover letter",
-      "tailoredSpeech": "Create a speech/pitch"
+      "tailoredSpeech": "Generate a speech/pitch"
     },
     "actions": {
       "uploadCv": "Upload your CV",
@@ -1105,7 +1105,7 @@
       "actions": {
         "view": "View job",
         "viewCompanies": "View companies",
-        "add": "Add Job",
+        "add": "Analyse Job",
         "match": "View match"
       },
       "search": {
@@ -1167,7 +1167,7 @@
       }
     },
     "form": {
-      "createTitle": "Add Job",
+      "createTitle": "Analyse Job",
       "createDescription": "Upload a job description for analysis",
       "errors": {
         "generic": "Something went wrong while saving this job."
@@ -1221,7 +1221,7 @@
       },
       "list": {
         "actions": {
-          "create": "Create New CV",
+          "create": "Generate CV",
           "settings": "Settings"
         },
         "tailored": "Tailored",
@@ -1271,7 +1271,7 @@
       },
       "generate": {
         "title": "Generate CV",
-        "subtitle": "Create a new CV using your saved defaults.",
+        "subtitle": "Generate a new CV using your saved defaults.",
         "defaultName": "CV — {date}",
         "entry": {
           "title": "CV generation",
@@ -1440,11 +1440,11 @@
     "coverLetters": {
       "page": {
         "title": "Cover Letters",
-        "description": "Create professional cover letters tailored to your profile and experiences."
+        "description": "Generate professional cover letters tailored to your profile and experiences."
       },
       "list": {
         "actions": {
-          "create": "Create cover letter"
+          "create": "Generate cover letter"
         },
         "search": {
           "placeholder": "Search cover letters...",
@@ -1459,10 +1459,10 @@
         "untitled": "Untitled Cover Letter"
       },
       "form": {
-        "createTitle": "Create Cover Letter",
+        "createTitle": "Generate Cover Letter",
         "setupTitle": "Setup Your Cover Letter",
-        "setupDescription": "Create professional cover letters tailored to your profile and experiences.",
-        "createDescription": "Create a cover letter to introduce yourself to potential employers.",
+        "setupDescription": "Generate professional cover letters tailored to your profile and experiences.",
+        "createDescription": "Generate a cover letter to introduce yourself to potential employers.",
         "errors": {
           "generation": "Failed to generate cover letter"
         },
@@ -1529,14 +1529,14 @@
       },
       "list": {
         "actions": {
-          "create": "Create speech"
+          "create": "Generate speech"
         },
         "search": {
           "placeholder": "Search speech blocks...",
           "noResults": "No speech blocks match your search."
         },
         "empty": {
-          "preview": "Create your first speech to build your elevator pitch and career story."
+          "preview": "Generate your first speech to build your elevator pitch and career story."
         },
         "title": "Speech"
       },
@@ -1551,10 +1551,10 @@
         }
       },
       "form": {
-        "createTitle": "Create Speech",
+        "createTitle": "Generate Speech",
         "setupTitle": "Setup Your Speech",
         "setupDescription": "Build your elevator pitch, career story, and why-me narrative.",
-        "createDescription": "Create a speech to draft your elevator pitch and career story.",
+        "createDescription": "Generate a speech to draft your elevator pitch and career story.",
         "errors": {
           "generation": "Failed to generate speech"
         },
