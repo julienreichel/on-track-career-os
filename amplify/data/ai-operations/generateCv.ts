@@ -157,7 +157,6 @@ Target: 2 pages max of Markdown content, i,e, 70 lignes of text.
 /**
  * Build the user prompt for CV generation
  */
-// eslint-disable-next-line complexity
 function buildUserPrompt(input: GenerateCvInput): string {
   const tailoring = resolveTailoringContext(input);
   const jobDescription = tailoring?.jobDescription ?? null;
