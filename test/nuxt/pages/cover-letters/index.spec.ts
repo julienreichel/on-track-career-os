@@ -324,7 +324,9 @@ describe('Cover letter list page', () => {
     // The create button is a link (router-link), not a button that calls createCoverLetter
     // Check that the page renders correctly with the create link
     expect(wrapper.find('.u-page-header').exists()).toBe(true);
-    expect(wrapper.text()).toContain(i18n.global.t('applications.coverLetters.list.actions.create'));
+    expect(wrapper.text()).toContain(
+      i18n.global.t('applications.coverLetters.list.actions.create')
+    );
   });
 
   it('renders back to applications link', async () => {

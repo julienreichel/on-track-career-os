@@ -73,7 +73,6 @@ describe('useStoryList', () => {
       deleteStory: vi.fn(),
     };
     vi.mocked(STARStoryService).mockImplementation(() => mockService as never);
-
   });
 
   describe('initialization', () => {

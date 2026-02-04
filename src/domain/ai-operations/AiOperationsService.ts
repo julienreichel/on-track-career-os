@@ -168,7 +168,11 @@ export class AiOperationsService {
     }
 
     const validTypes = new Set(['work', 'education', 'volunteer', 'project']);
-    if (experienceItems.some((item) => !item?.rawBlock?.trim() || !validTypes.has(item.experienceType))) {
+    if (
+      experienceItems.some(
+        (item) => !item?.rawBlock?.trim() || !validTypes.has(item.experienceType)
+      )
+    ) {
       throw new Error('Experience items must include raw text and a valid experience type');
     }
 

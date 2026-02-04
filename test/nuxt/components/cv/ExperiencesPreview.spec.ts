@@ -25,8 +25,7 @@ const stubs = {
   },
   UButton: {
     name: 'UButton',
-    template:
-      '<button class="u-button" v-bind="$attrs" @click="$attrs.onClick"><slot /></button>',
+    template: '<button class="u-button" v-bind="$attrs" @click="$attrs.onClick"><slot /></button>',
     props: ['icon', 'color', 'variant', 'size'],
   },
   ExperienceForm: {

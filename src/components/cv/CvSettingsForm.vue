@@ -158,7 +158,9 @@ const sectionGroups = computed(() => {
   ];
 });
 
-const excludedExperienceIds = computed(() => new Set(props.modelValue.defaultExcludedExperienceIds));
+const excludedExperienceIds = computed(
+  () => new Set(props.modelValue.defaultExcludedExperienceIds)
+);
 const experienceIds = computed(() => props.experiences.map((experience) => experience.id));
 
 const experienceSelection = computed({

@@ -264,7 +264,9 @@ describe('useCvGenerator', () => {
     it(
       'should handle repository errors during input building',
       withMockedConsoleError(async () => {
-        mockUserProfileService.getProfileForTailoring.mockRejectedValue(new Error('Database error'));
+        mockUserProfileService.getProfileForTailoring.mockRejectedValue(
+          new Error('Database error')
+        );
 
         const { generateCv, error } = useCvGenerator();
         const result = await generateCv('user-123', ['exp-1']);

@@ -351,12 +351,7 @@ provide(profileFormContextKey, {
     </template>
 
     <StickyFooterCard>
-      <UButton
-        variant="ghost"
-        color="neutral"
-        :label="t('common.back')"
-        @click="emit('back')"
-      />
+      <UButton variant="ghost" color="neutral" :label="t('common.back')" @click="emit('back')" />
       <UButton
         color="primary"
         :label="t('onboarding.actions.continue')"

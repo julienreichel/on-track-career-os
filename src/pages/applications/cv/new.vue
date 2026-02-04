@@ -1,6 +1,9 @@
 <template>
   <UPage>
-    <UPageHeader :title="t('applications.cvs.generate.title')" :description="t('applications.cvs.generate.subtitle')" />
+    <UPageHeader
+      :title="t('applications.cvs.generate.title')"
+      :description="t('applications.cvs.generate.subtitle')"
+    />
 
     <UPageBody>
       <CvGenerateEntryCard

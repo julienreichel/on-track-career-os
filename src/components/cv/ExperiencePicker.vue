@@ -12,7 +12,9 @@
         @click="toggleAll"
       >
         {{
-          allSelected ? $t('applications.cvs.experiencePicker.deselectAll') : $t('applications.cvs.experiencePicker.selectAll')
+          allSelected
+            ? $t('applications.cvs.experiencePicker.deselectAll')
+            : $t('applications.cvs.experiencePicker.selectAll')
         }}
       </UButton>
     </div>
@@ -54,12 +56,7 @@
               {{ formatDateRange(experience.startDate, experience.endDate) }}
             </div>
             <div v-if="experience.experienceType" class="mt-2">
-              <UBadge
-                size="xs"
-                color="neutral"
-                variant="outline"
-                icon="i-heroicons-briefcase"
-              >
+              <UBadge size="xs" color="neutral" variant="outline" icon="i-heroicons-briefcase">
                 {{
                   $t(`experiences.types.${experience.experienceType}`, experience.experienceType)
                 }}

@@ -66,7 +66,8 @@ const stubs = {
   },
   UFormField: {
     props: ['label', 'description'],
-    template: '<div class="u-form-field"><label>{{ label }}</label><p>{{ description }}</p><slot /></div>',
+    template:
+      '<div class="u-form-field"><label>{{ label }}</label><p>{{ description }}</p><slot /></div>',
   },
   UTextarea: {
     props: ['modelValue'],
@@ -81,7 +82,8 @@ const stubs = {
   },
   UButton: {
     props: ['disabled'],
-    template: '<button class="u-button" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+    template:
+      '<button class="u-button" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
   },
   JobUploadStep: JobUploadStepStub,
 };

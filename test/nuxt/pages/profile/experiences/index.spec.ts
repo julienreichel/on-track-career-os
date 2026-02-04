@@ -142,7 +142,8 @@ const pageComponentStubs = {
     props: ['title'],
   },
   UInput: {
-    template: '<input class="u-input" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+    template:
+      '<input class="u-input" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
     props: ['modelValue', 'icon', 'placeholder', 'size'],
   },
   ExperienceCard: {
@@ -554,7 +555,7 @@ describe('Experiences Page Integration', () => {
     guidanceRef.value = {};
 
     const wrapper = await mountExperiencesPage();
-    
+
     // Initially should show both experiences
     expect(wrapper.findAll('.experience-card-stub')).toHaveLength(2);
   });
@@ -598,7 +599,7 @@ describe('Experiences Page Integration', () => {
     guidanceRef.value = {};
 
     const wrapper = await mountExperiencesPage();
-    
+
     // Initially should show both experiences
     expect(wrapper.findAll('.experience-card-stub')).toHaveLength(2);
   });

@@ -26,11 +26,15 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const showPreview = ref(false);
 
-const resolvedNameLabel = computed(() => props.nameLabel ?? t('applications.cvs.templates.editor.nameLabel'));
+const resolvedNameLabel = computed(
+  () => props.nameLabel ?? t('applications.cvs.templates.editor.nameLabel')
+);
 const resolvedContentLabel = computed(
   () => props.contentLabel ?? t('applications.cvs.templates.editor.contentLabel')
 );
-const resolvedPreviewLabel = computed(() => props.previewLabel ?? t('applications.cvs.templates.editor.preview'));
+const resolvedPreviewLabel = computed(
+  () => props.previewLabel ?? t('applications.cvs.templates.editor.preview')
+);
 const resolvedToggleLabel = computed(() =>
   showPreview.value
     ? (props.hidePreviewLabel ?? t('applications.cvs.templates.editor.hidePreview'))

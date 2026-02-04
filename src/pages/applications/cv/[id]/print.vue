@@ -13,7 +13,9 @@
       <div class="text-center">
         <UIcon name="i-heroicons-exclamation-triangle" class="text-2xl text-red-500 mb-4" />
         <p class="text-sm text-gray-600 mb-4">{{ error }}</p>
-        <UButton color="primary" @click="load">{{ $t('applications.cvs.display.actions.retry') }}</UButton>
+        <UButton color="primary" @click="load">{{
+          $t('applications.cvs.display.actions.retry')
+        }}</UButton>
       </div>
     </div>
 

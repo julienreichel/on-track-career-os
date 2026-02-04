@@ -129,7 +129,10 @@ function splitToArray(value: string): string[] {
     return [];
   }
 
-  const byNewline = trimmed.split(/\n+/).map((entry) => entry.trim()).filter(Boolean);
+  const byNewline = trimmed
+    .split(/\n+/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
   if (byNewline.length > 1) {
     return byNewline;
   }
@@ -142,7 +145,10 @@ function splitToArray(value: string): string[] {
 
 function sanitizeStringArray(value: unknown): string[] {
   if (Array.isArray(value)) {
-    return value.filter((entry) => typeof entry === 'string').map((entry) => entry.trim()).filter(Boolean);
+    return value
+      .filter((entry) => typeof entry === 'string')
+      .map((entry) => entry.trim())
+      .filter(Boolean);
   }
 
   if (typeof value === 'string') {

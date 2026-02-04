@@ -34,7 +34,10 @@ const countWords = (value: string | null | undefined) =>
 const wordCount = computed(() => countWords(props.modelValue));
 const countLabel = computed(() => {
   if (props.maxWords) {
-    return t('applications.speeches.editor.wordCount', { count: wordCount.value, max: props.maxWords });
+    return t('applications.speeches.editor.wordCount', {
+      count: wordCount.value,
+      max: props.maxWords,
+    });
   }
   return t('applications.speeches.editor.wordCountSimple', { count: wordCount.value });
 });

@@ -170,7 +170,17 @@ describe('CV new page', () => {
     await flushPromises();
 
     expect(mockGenerateCv).toHaveBeenCalledWith('user-1', ['exp-1'], {
-      enabledSections: ['summary', 'skills', 'experience', 'education', 'certifications', 'volunteer', 'projects', 'interests', 'links'],
+      enabledSections: [
+        'summary',
+        'skills',
+        'experience',
+        'education',
+        'certifications',
+        'volunteer',
+        'projects',
+        'interests',
+        'links',
+      ],
       templateMarkdown: '# Template',
     });
 

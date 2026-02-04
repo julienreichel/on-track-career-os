@@ -144,9 +144,10 @@ describe('AI Operations - Generate Cover Letter (E2E Sandbox)', () => {
     const companyOrTitleMatches = [mockExperiences[0].companyName, mockExperiences[0].title].some(
       (candidate) => normalizedResult.includes(candidate.toLowerCase())
     );
-    const detailMatches = [...mockExperiences[0].responsibilities, ...mockExperiences[0].tasks].some(
-      (candidate) => normalizedResult.includes(candidate.toLowerCase())
-    );
+    const detailMatches = [
+      ...mockExperiences[0].responsibilities,
+      ...mockExperiences[0].tasks,
+    ].some((candidate) => normalizedResult.includes(candidate.toLowerCase()));
     expect(companyOrTitleMatches).toBe(true);
     expect(detailMatches).toBe(true);
 

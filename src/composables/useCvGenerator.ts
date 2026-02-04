@@ -316,10 +316,7 @@ function filterStoriesByExperiences(stories: STARStory[], experiences: Experienc
   );
 }
 
-function filterExperiencesBySelection(
-  experiences: Experience[],
-  selectedExperienceIds: string[]
-) {
+function filterExperiencesBySelection(experiences: Experience[], selectedExperienceIds: string[]) {
   if (selectedExperienceIds.length === 0) {
     return experiences;
   }

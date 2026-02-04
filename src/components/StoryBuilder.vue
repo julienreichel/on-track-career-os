@@ -134,11 +134,7 @@ const isValid = () => {
         />
       </UFormField>
 
-      <UFormField
-        :label="t('star.situation.label')"
-        :hint="t('star.situation.hint')"
-        required
-      >
+      <UFormField :label="t('star.situation.label')" :hint="t('star.situation.hint')" required>
         <UTextarea
           v-model="situation"
           :placeholder="t('star.situation.placeholder')"
@@ -147,11 +143,7 @@ const isValid = () => {
         />
       </UFormField>
 
-      <UFormField
-        :label="t('star.task.label')"
-        :hint="t('star.task.hint')"
-        required
-      >
+      <UFormField :label="t('star.task.label')" :hint="t('star.task.hint')" required>
         <UTextarea
           v-model="task"
           :placeholder="t('star.task.placeholder')"
@@ -160,11 +152,7 @@ const isValid = () => {
         />
       </UFormField>
 
-      <UFormField
-        :label="t('star.action.label')"
-        :hint="t('star.action.hint')"
-        required
-      >
+      <UFormField :label="t('star.action.label')" :hint="t('star.action.hint')" required>
         <UTextarea
           v-model="action"
           :placeholder="t('star.action.placeholder')"
@@ -173,11 +161,7 @@ const isValid = () => {
         />
       </UFormField>
 
-      <UFormField
-        :label="t('star.result.label')"
-        :hint="t('star.result.hint')"
-        required
-      >
+      <UFormField :label="t('star.result.label')" :hint="t('star.result.hint')" required>
         <UTextarea
           v-model="result"
           :placeholder="t('star.result.placeholder')"

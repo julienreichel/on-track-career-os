@@ -298,7 +298,9 @@ describe('useCoverLetterEngine', () => {
       await engine.load();
 
       expect(auth.loadUserId).toHaveBeenCalled();
-      expect(deps.userProfileService.getProfileForTailoring).toHaveBeenCalledWith('loaded-user-789');
+      expect(deps.userProfileService.getProfileForTailoring).toHaveBeenCalledWith(
+        'loaded-user-789'
+      );
     });
 
     it('should throw error if user is not authenticated', async () => {

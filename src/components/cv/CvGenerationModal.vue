@@ -188,7 +188,9 @@ watch(
           :empty-label="t('applications.cvs.generate.modal.experiencesEmpty')"
           :select-all-label="t('applications.cvs.generate.modal.selectAll')"
           :deselect-all-label="t('applications.cvs.generate.modal.deselectAll')"
-          :selected-label="t('applications.cvs.generate.modal.selected', { count: selectedExperienceIds.length })"
+          :selected-label="
+            t('applications.cvs.generate.modal.selected', { count: selectedExperienceIds.length })
+          "
         />
       </div>
     </template>

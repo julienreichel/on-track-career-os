@@ -316,7 +316,9 @@ describe('Speech list page', () => {
 
     const createButton = wrapper
       .findAll('button')
-      .find((button) => button.text().includes(i18n.global.t('applications.speeches.list.actions.create')));
+      .find((button) =>
+        button.text().includes(i18n.global.t('applications.speeches.list.actions.create'))
+      );
     expect(createButton).toBeDefined();
 
     await createButton?.trigger('click');

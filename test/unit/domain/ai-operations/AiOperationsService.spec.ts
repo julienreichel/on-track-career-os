@@ -235,10 +235,10 @@ describe('AiOperationsService', () => {
 
       // Act & Assert
       await expect(
-        service.extractExperienceBlocks('en', [{ experienceType: 'work', rawBlock: 'Experience 1' }])
-      ).rejects.toThrow(
-        'Failed to extract experience blocks: AI operation failed'
-      );
+        service.extractExperienceBlocks('en', [
+          { experienceType: 'work', rawBlock: 'Experience 1' },
+        ])
+      ).rejects.toThrow('Failed to extract experience blocks: AI operation failed');
     });
 
     it('should throw error when result structure is invalid', async () => {
@@ -247,7 +247,9 @@ describe('AiOperationsService', () => {
 
       // Act & Assert
       await expect(
-        service.extractExperienceBlocks('en', [{ experienceType: 'work', rawBlock: 'Experience 1' }])
+        service.extractExperienceBlocks('en', [
+          { experienceType: 'work', rawBlock: 'Experience 1' },
+        ])
       ).rejects.toThrow('Invalid experience extraction result structure');
     });
   });

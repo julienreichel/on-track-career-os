@@ -28,7 +28,9 @@ const showProfilePhotoLabel = computed(() =>
     : t('applications.cvs.generate.entry.showProfilePhotoDisabled')
 );
 
-const sectionLabel = computed(() => t('applications.cvs.generate.entry.sections', { count: props.sectionCount }));
+const sectionLabel = computed(() =>
+  t('applications.cvs.generate.entry.sections', { count: props.sectionCount })
+);
 
 const experienceLabel = computed(() =>
   t('applications.cvs.generate.entry.experiences', { count: props.experienceCount })
