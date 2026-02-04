@@ -157,7 +157,7 @@ test.describe('Discovery flow', () => {
     await page.waitForLoadState('networkidle');
 
     await expect(page.getByTestId('guidance-empty-state')).toBeVisible({ timeout: 10000 });
-    await page.getByRole('link', { name: /Add a job/i }).click();
+    await page.getByRole('link', { name: /Analyse Job/i }).click();
     await expect(page).toHaveURL(/\/jobs\/new/);
 
     const jobInput = page.locator('input[type="file"]').first();

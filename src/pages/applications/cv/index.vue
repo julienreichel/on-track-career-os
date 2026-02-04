@@ -77,7 +77,7 @@
           <ItemCard
             v-for="cv in filteredItems"
             :key="cv.id"
-            :title="cv.name || $t('applications.cvs.display.untitled')"
+            :title="cv.name || `${$t('common.untitled')} ${$t('navigation.cv')}`"
             :subtitle="formatListDate(cv.updatedAt ?? cv.createdAt)"
             @edit="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
             @delete="confirmDelete(cv)"

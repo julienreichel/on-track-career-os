@@ -180,7 +180,7 @@ const generateCoverLetter = async () => {
       return;
     }
 
-    // Create cover letter document
+    // Generate cover letter document
     const coverLetter = await createCoverLetter({
       name: coverLetterName.value,
       content,

@@ -27,8 +27,8 @@ test.describe('Speech Block E2E Flow', () => {
 
     // Create button should be visible (using first since there may be multiple)
     const createButton = page
-      .getByRole('link', { name: /Create speech/i })
-      .or(page.getByRole('button', { name: /Create speech/i }))
+      .getByRole('link', { name: /Generate speech/i })
+      .or(page.getByRole('button', { name: /Generate speech/i }))
       .first();
     await expect(createButton).toBeVisible();
   });
@@ -38,8 +38,8 @@ test.describe('Speech Block E2E Flow', () => {
     await page.waitForLoadState('networkidle');
 
     const createButton = page
-      .getByRole('link', { name: /Create speech/i })
-      .or(page.getByRole('button', { name: /Create speech/i }))
+      .getByRole('link', { name: /Generate speech/i })
+      .or(page.getByRole('button', { name: /Generate speech/i }))
       .first();
     await expect(createButton).toBeVisible();
     await createButton.click();

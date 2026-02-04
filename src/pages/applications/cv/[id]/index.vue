@@ -2,7 +2,7 @@
   <UContainer>
     <UPage>
       <UPageHeader
-        :title="document?.name || $t('applications.cvs.display.untitled')"
+        :title="document?.name || `${$t('common.untitled')} ${$t('navigation.cv')}`"
         :description="$t('applications.cvs.display.description')"
         :links="[
           {

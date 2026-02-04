@@ -810,7 +810,8 @@
       "generating": "Generating..."
     },
     "retry": "Retry",
-    "empty": "Start creating professional cover letters tailored to your profile."
+    "empty": "Start creating professional cover letters tailored to your profile.",
+    "untitled": "Untitled"
   },
   "canvas": {
     "needsUpdate": "Update recommended",
@@ -1240,7 +1241,7 @@
         "deleteFailed": "Failed to delete CV"
       },
       "display": {
-        "untitled": "Untitled CV",
+        "untitled": "Untitled",
         "description": "Review and refine your CV details.",
         "loading": "Loading CV...",
         "saving": "Saving changes...",
@@ -1456,7 +1457,7 @@
         "title": "Cover Letters"
       },
       "detail": {
-        "untitled": "Untitled Cover Letter"
+        "untitled": "Untitled"
       },
       "form": {
         "createTitle": "Generate Cover Letter",
@@ -1492,7 +1493,7 @@
       },
       "display": {
         "description": "View and edit your cover letter",
-        "untitled": "Untitled Cover Letter",
+        "untitled": "Untitled",
         "loading": "Loading cover letter...",
         "titleLabel": "Cover letter title",
         "titlePlaceholder": "e.g., Head of Engineering cover letter",
@@ -1542,7 +1543,7 @@
       },
       "detail": {
         "description": "Build your elevator pitch, career story, and why-me narrative.",
-        "untitled": "Untitled speech",
+        "untitled": "Untitled",
         "notFound": "Speech not found",
         "notFoundDescription": "This speech could not be found.",
         "states": {
