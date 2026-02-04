@@ -1,8 +1,6 @@
 import { ref } from 'vue';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
-import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
-import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import { STARStoryService } from '@/domain/starstory/STARStoryService';
+import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import type { GenerateCvInput, GenerateCvResult } from '@/domain/ai-operations/types/generateCv';
 import type { CvSectionKey } from '@/domain/cvsettings/CvSectionKey';
 import type { Experience } from '@/domain/experience/Experience';
@@ -22,39 +20,7 @@ export function useCvGenerator() {
   const error = ref<string | null>(null);
 
   const aiService = new AiOperationsService();
-  const userProfileRepo = new UserProfileRepository();
-  const experienceRepo = new ExperienceRepository();
-  const storyService = new STARStoryService();
-
-  /**
-   * Load experiences and stories for selected experience IDs
-   */
-  const loadExperiencesAndStories = async (
-    userId: string,
-    selectedExperienceIds: string[]
-  ): Promise<{ experiences: Experience[]; allStories: STARStory[] }> => {
-    if (!userId) {
-      return { experiences: [], allStories: [] };
-    }
-
-    const allExperiences = await experienceRepo.list(userId);
-    const experiences = allExperiences.filter((exp) => selectedExperienceIds.includes(exp.id));
-
-    const storyResponses = await Promise.all(
-      experiences.map(async (exp) => {
-        try {
-          return await storyService.getStoriesByExperience(exp.id);
-        } catch (err) {
-          console.error('[useCvGenerator] Failed to load stories for experience:', exp.id, err);
-          return [];
-        }
-      })
-    );
-
-    const allStories = storyResponses.flat();
-
-    return { experiences, allStories };
-  };
+  const userProfileService = new UserProfileService();
 
   /**
    * Build AI input from user data
@@ -75,8 +41,7 @@ export function useCvGenerator() {
   ): Promise<GenerateCvInput | null> => {
     try {
       return await buildGenerationInputInternal(userId, selectedExperienceIds, options, {
-        userProfileRepo,
-        loadExperiencesAndStories,
+        userProfileService,
       });
     } catch (err) {
       if (err instanceof Error && err.message === 'cvGenerator.errors.profileNotFound') {
@@ -190,38 +155,32 @@ async function buildGenerationInputInternal(
     templateMarkdown?: string;
   },
   deps: {
-    userProfileRepo: UserProfileRepository;
-    loadExperiencesAndStories: (
-      userId: string,
-      selectedExperienceIds: string[]
-    ) => Promise<{ experiences: Experience[]; allStories: STARStory[] }>;
+    userProfileService: UserProfileService;
   }
 ): Promise<GenerateCvInput | null> {
-  const profile = await deps.userProfileRepo.get(userId);
-
+  const profile = await deps.userProfileService.getProfileForTailoring(userId);
   if (!profile) {
     throw new Error('cvGenerator.errors.profileNotFound');
   }
 
-  const { experiences: loadedExperiences, allStories: loadedStories } =
-    await deps.loadExperiencesAndStories(profile.id, selectedExperienceIds);
+  const { experiences: allExperiences, stories: allStories } = extractTailoringData(profile);
 
   const { sections: enabledSections, hasExplicit: hasExplicitSections } = resolveEnabledSections(
     options.enabledSections
   );
   const sectionFlags = resolveSectionFlags(options, enabledSections, hasExplicitSections);
   const experiences = filterExperiencesBySections(
-    loadedExperiences,
+    filterExperiencesBySelection(allExperiences, selectedExperienceIds),
     enabledSections,
     hasExplicitSections
   );
-  const allStories = filterStoriesByExperiences(loadedStories, experiences);
+  const filteredStories = filterStoriesByExperiences(allStories, experiences);
 
   const input: GenerateCvInput = {
     language: 'en',
     profile: buildProfileBase(profile, sectionFlags.includeLinks),
     experiences: buildExperienceInputs(experiences),
-    stories: buildStoryInputs(allStories),
+    stories: buildStoryInputs(filteredStories),
   };
 
   applyOptionalProfileSections(input.profile, profile, sectionFlags);
@@ -355,6 +314,38 @@ function filterStoriesByExperiences(stories: STARStory[], experiences: Experienc
   return stories.filter(
     (story) => !story.experienceId || allowedExperienceIds.has(story.experienceId)
   );
+}
+
+function filterExperiencesBySelection(
+  experiences: Experience[],
+  selectedExperienceIds: string[]
+) {
+  if (selectedExperienceIds.length === 0) {
+    return experiences;
+  }
+  const allowed = new Set(selectedExperienceIds);
+  return experiences.filter((exp) => allowed.has(exp.id));
+}
+
+function extractTailoringData(profile: UserProfile): {
+  experiences: Experience[];
+  stories: STARStory[];
+} {
+  const data = profile as UserProfile & {
+    experiences?: (Experience & { stories?: (STARStory | null)[] | null })[] | null;
+  };
+
+  const experiences = (data.experiences ?? []).filter(
+    (exp): exp is Experience & { stories?: (STARStory | null)[] | null } => Boolean(exp)
+  );
+  const stories = experiences
+    .flatMap((experience) => experience.stories ?? [])
+    .filter((story): story is STARStory => Boolean(story));
+
+  return {
+    experiences,
+    stories,
+  };
 }
 
 function applyOptionalProfileSections(

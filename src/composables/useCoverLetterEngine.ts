@@ -5,16 +5,12 @@ import type { SpeechInput } from '@/domain/ai-operations/SpeechResult';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
-import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
-import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { STARStory } from '@/domain/starstory/STARStory';
 
 type CoverLetterEngineDependencies = {
   aiService: AiOperationsService;
   userProfileService: UserProfileService;
-  experienceRepo: ExperienceRepository;
-  storyService: STARStoryService;
 };
 
 type AuthComposable = {
@@ -34,8 +30,6 @@ function createDependencies(
   return {
     aiService: overrides.aiService ?? new AiOperationsService(),
     userProfileService: overrides.userProfileService ?? new UserProfileService(),
-    experienceRepo: overrides.experienceRepo ?? new ExperienceRepository(),
-    storyService: overrides.storyService ?? new STARStoryService(),
   };
 }
 
@@ -74,9 +68,10 @@ function createCoverLetterEngineState({ providedUserId, deps, auth }: EngineStat
     runWithState(isLoading, async () => {
       const userId = await resolveUserId();
       userProfile.value = await ensureProfile(userId, deps.userProfileService);
-      personalCanvas.value = await loadCanvas(userId, deps.userProfileService);
-      experiences.value = await deps.experienceRepo.list(userId);
-      stories.value = await loadStories(experiences.value, deps.storyService);
+      const context = extractTailoringData(userProfile.value);
+      personalCanvas.value = context.personalCanvas;
+      experiences.value = context.experiences;
+      stories.value = context.stories;
       return {
         userProfile: userProfile.value,
         personalCanvas: personalCanvas.value,
@@ -169,7 +164,7 @@ function createStateRunner(errorRef: Ref<string | null>) {
 }
 
 async function ensureProfile(userId: string, service: UserProfileService): Promise<UserProfile> {
-  const profile = await service.getFullUserProfile(userId);
+  const profile = await service.getProfileForTailoring(userId);
   if (!profile) {
     throw new Error('User profile not found');
   }
@@ -179,24 +174,28 @@ async function ensureProfile(userId: string, service: UserProfileService): Promi
   return profile;
 }
 
-async function loadCanvas(
-  userId: string,
-  service: UserProfileService
-): Promise<PersonalCanvas | null> {
-  try {
-    return await service.getCanvasForUser(userId);
-  } catch {
-    return null;
-  }
-}
+function extractTailoringData(profile: UserProfile): {
+  personalCanvas: PersonalCanvas | null;
+  experiences: Experience[];
+  stories: STARStory[];
+} {
+  const data = profile as UserProfile & {
+    experiences?: (Experience & { stories?: (STARStory | null)[] | null })[] | null;
+    canvas?: PersonalCanvas | null;
+  };
 
-async function loadStories(
-  experiences: Experience[],
-  service: STARStoryService
-): Promise<STARStory[]> {
-  const storyPromises = experiences.map((exp) => service.getStoriesByExperience(exp.id));
-  const storyArrays = await Promise.all(storyPromises);
-  return storyArrays.flat();
+  const experiences = (data.experiences ?? []).filter(
+    (exp): exp is Experience & { stories?: (STARStory | null)[] | null } => Boolean(exp)
+  );
+  const stories = experiences
+    .flatMap((experience) => experience.stories ?? [])
+    .filter((story): story is STARStory => Boolean(story));
+
+  return {
+    personalCanvas: (data.canvas ?? null) as PersonalCanvas | null,
+    experiences,
+    stories,
+  };
 }
 
 // Mapping functions (reuse from Speech)

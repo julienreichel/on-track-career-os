@@ -1,9 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useCvGenerator } from '@/composables/useCvGenerator';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
-import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
-import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import { STARStoryService } from '@/domain/starstory/STARStoryService';
+import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { Experience } from '@/domain/experience/Experience';
 import type { STARStory } from '@/domain/starstory/STARStory';
@@ -11,25 +9,15 @@ import { withMockedConsoleError } from '../../utils/withMockedConsole';
 
 // Mock dependencies
 vi.mock('@/domain/ai-operations/AiOperationsService');
-vi.mock('@/domain/user-profile/UserProfileRepository');
-vi.mock('@/domain/experience/ExperienceRepository');
-vi.mock('@/domain/starstory/STARStoryService');
+vi.mock('@/domain/user-profile/UserProfileService');
 
 describe('useCvGenerator', () => {
   let mockAiService: {
     generateCv: ReturnType<typeof vi.fn>;
   };
 
-  let mockUserProfileRepo: {
-    get: ReturnType<typeof vi.fn>;
-  };
-
-  let mockExperienceRepo: {
-    list: ReturnType<typeof vi.fn>;
-  };
-
-  let mockStoryService: {
-    getStoriesByExperience: ReturnType<typeof vi.fn>;
+  let mockUserProfileService: {
+    getProfileForTailoring: ReturnType<typeof vi.fn>;
   };
 
   const mockUserProfile = {
@@ -115,24 +103,20 @@ describe('useCvGenerator', () => {
       generateCv: vi.fn().mockResolvedValue('# John Doe\n\nSenior Software Engineer'),
     };
 
-    mockUserProfileRepo = {
-      get: vi.fn().mockResolvedValue(mockUserProfile),
+    const profileWithExperiences = {
+      ...mockUserProfile,
+      experiences: mockExperiences.map((experience) => ({
+        ...experience,
+        stories: mockStories.filter((story) => story.experienceId === experience.id),
+      })),
     };
 
-    mockExperienceRepo = {
-      list: vi.fn().mockResolvedValue(mockExperiences),
-    };
-
-    mockStoryService = {
-      getStoriesByExperience: vi.fn().mockImplementation((experienceId: string) => {
-        return Promise.resolve(mockStories.filter((s) => s.experienceId === experienceId));
-      }),
+    mockUserProfileService = {
+      getProfileForTailoring: vi.fn().mockResolvedValue(profileWithExperiences),
     };
 
     vi.mocked(AiOperationsService).mockImplementation(() => mockAiService as never);
-    vi.mocked(UserProfileRepository).mockImplementation(() => mockUserProfileRepo as never);
-    vi.mocked(ExperienceRepository).mockImplementation(() => mockExperienceRepo as never);
-    vi.mocked(STARStoryService).mockImplementation(() => mockStoryService as never);
+    vi.mocked(UserProfileService).mockImplementation(() => mockUserProfileService as never);
   });
 
   describe('initialization', () => {
@@ -153,9 +137,7 @@ describe('useCvGenerator', () => {
       expect(generating.value).toBe(false);
       expect(error.value).toBeNull();
       expect(result).toBe('# John Doe\n\nSenior Software Engineer');
-      expect(mockUserProfileRepo.get).toHaveBeenCalledWith('user-123');
-      expect(mockExperienceRepo.list).toHaveBeenCalledWith('user-123');
-      expect(mockStoryService.getStoriesByExperience).toHaveBeenCalledWith('exp-1');
+      expect(mockUserProfileService.getProfileForTailoring).toHaveBeenCalledWith('user-123');
       expect(mockAiService.generateCv).toHaveBeenCalled();
     });
 
@@ -220,8 +202,6 @@ describe('useCvGenerator', () => {
 
       await generateCv('user-123', ['exp-1', 'exp-2']);
 
-      expect(mockStoryService.getStoriesByExperience).toHaveBeenCalledTimes(2);
-
       const aiInput = mockAiService.generateCv.mock.calls[0][0];
       expect(aiInput.experiences).toHaveLength(2);
       expect(aiInput.experiences[0].id).toBe('exp-1');
@@ -238,7 +218,10 @@ describe('useCvGenerator', () => {
         skills: ['Skill 1', null],
         socialLinks: ['https://example.com', '', null as unknown as string],
       };
-      mockUserProfileRepo.get.mockResolvedValue(profileWithNulls);
+      mockUserProfileService.getProfileForTailoring.mockResolvedValue({
+        ...profileWithNulls,
+        experiences: [],
+      });
 
       const { generateCv } = useCvGenerator();
       await generateCv('user-123', ['exp-1'], { includeSkills: true });
@@ -253,7 +236,7 @@ describe('useCvGenerator', () => {
     it(
       'should handle profile not found',
       withMockedConsoleError(async () => {
-        mockUserProfileRepo.get.mockResolvedValue(null);
+        mockUserProfileService.getProfileForTailoring.mockResolvedValue(null);
 
         const { generateCv, error } = useCvGenerator();
         const result = await generateCv('user-123', ['exp-1']);
@@ -281,7 +264,7 @@ describe('useCvGenerator', () => {
     it(
       'should handle repository errors during input building',
       withMockedConsoleError(async () => {
-        mockExperienceRepo.list.mockRejectedValue(new Error('Database error'));
+        mockUserProfileService.getProfileForTailoring.mockRejectedValue(new Error('Database error'));
 
         const { generateCv, error } = useCvGenerator();
         const result = await generateCv('user-123', ['exp-1']);
@@ -292,23 +275,21 @@ describe('useCvGenerator', () => {
     );
 
     it(
-      'should handle story loading errors gracefully',
+      'should handle experiences without stories',
       withMockedConsoleError(async () => {
-        mockStoryService.getStoriesByExperience.mockRejectedValue(new Error('Story load failed'));
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        mockUserProfileService.getProfileForTailoring.mockResolvedValue({
+          ...mockUserProfile,
+          experiences: mockExperiences.map((experience) => ({
+            ...experience,
+            stories: null,
+          })),
+        });
 
         const { generateCv, error } = useCvGenerator();
         const result = await generateCv('user-123', ['exp-1']);
 
         expect(result).toBe('# John Doe\n\nSenior Software Engineer');
         expect(error.value).toBeNull();
-        expect(consoleSpy).toHaveBeenCalledWith(
-          '[useCvGenerator] Failed to load stories for experience:',
-          'exp-1',
-          expect.any(Error)
-        );
-
-        consoleSpy.mockRestore();
       })
     );
 
@@ -413,7 +394,10 @@ describe('useCvGenerator', () => {
     });
 
     it('should handle empty experiences list', async () => {
-      mockExperienceRepo.list.mockResolvedValue([]);
+      mockUserProfileService.getProfileForTailoring.mockResolvedValue({
+        ...mockUserProfile,
+        experiences: [],
+      });
 
       const { buildGenerationInput } = useCvGenerator();
       const input = await buildGenerationInput('user-123', ['exp-1']);
@@ -423,7 +407,10 @@ describe('useCvGenerator', () => {
     });
 
     it('should handle experiences without stories', async () => {
-      mockStoryService.getStoriesByExperience.mockResolvedValue([]);
+      mockUserProfileService.getProfileForTailoring.mockResolvedValue({
+        ...mockUserProfile,
+        experiences: mockExperiences.map((experience) => ({ ...experience, stories: [] })),
+      });
 
       const { buildGenerationInput } = useCvGenerator();
       const input = await buildGenerationInput('user-123', ['exp-1']);
@@ -440,7 +427,10 @@ describe('useCvGenerator', () => {
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',
       };
-      mockUserProfileRepo.get.mockResolvedValue(minimalProfile);
+      mockUserProfileService.getProfileForTailoring.mockResolvedValue({
+        ...minimalProfile,
+        experiences: [],
+      });
 
       const { buildGenerationInput } = useCvGenerator();
       const input = await buildGenerationInput('user-123', ['exp-1']);
@@ -483,7 +473,7 @@ describe('useCvGenerator', () => {
     it(
       'should return null when profile not found',
       withMockedConsoleError(async () => {
-        mockUserProfileRepo.get.mockResolvedValue(null);
+        mockUserProfileService.getProfileForTailoring.mockResolvedValue(null);
 
         const { buildGenerationInput, error } = useCvGenerator();
         const input = await buildGenerationInput('user-123', ['exp-1']);
@@ -496,7 +486,7 @@ describe('useCvGenerator', () => {
     it(
       'should handle errors during input building',
       withMockedConsoleError(async () => {
-        mockExperienceRepo.list.mockRejectedValue(new Error('List failed'));
+        mockUserProfileService.getProfileForTailoring.mockRejectedValue(new Error('List failed'));
 
         const { buildGenerationInput, error } = useCvGenerator();
         const input = await buildGenerationInput('user-123', ['exp-1']);
@@ -514,8 +504,8 @@ describe('useCvGenerator', () => {
       const result = await generateCv('user-123', []);
 
       const aiInput = mockAiService.generateCv.mock.calls[0][0];
-      expect(aiInput.experiences).toEqual([]);
-      expect(aiInput.stories).toEqual([]);
+      expect(aiInput.experiences).toHaveLength(2);
+      expect(aiInput.stories).toHaveLength(2);
       expect(result).toBe('# John Doe\n\nSenior Software Engineer');
     });
 
@@ -547,7 +537,10 @@ describe('useCvGenerator', () => {
         responsibilities: ['Task 1', null, 'Task 2'],
         tasks: [null, 'Task 3'],
       };
-      mockExperienceRepo.list.mockResolvedValue([expWithNulls]);
+      mockUserProfileService.getProfileForTailoring.mockResolvedValue({
+        ...mockUserProfile,
+        experiences: [{ ...expWithNulls, stories: [] }],
+      });
 
       const { buildGenerationInput } = useCvGenerator();
       const input = await buildGenerationInput('user-123', ['exp-1']);
@@ -561,7 +554,15 @@ describe('useCvGenerator', () => {
         ...mockStories[0],
         achievements: ['Achievement 1', null, 'Achievement 2'],
       };
-      mockStoryService.getStoriesByExperience.mockResolvedValue([storyWithNulls]);
+      mockUserProfileService.getProfileForTailoring.mockResolvedValue({
+        ...mockUserProfile,
+        experiences: [
+          {
+            ...mockExperiences[0],
+            stories: [storyWithNulls],
+          },
+        ],
+      });
 
       const { buildGenerationInput } = useCvGenerator();
       const input = await buildGenerationInput('user-123', ['exp-1']);

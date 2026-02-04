@@ -9,8 +9,6 @@ import type { Experience } from '@/domain/experience/Experience';
 import type { STARStory } from '@/domain/starstory/STARStory';
 import type { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { UserProfileService } from '@/domain/user-profile/UserProfileService';
-import type { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import type { STARStoryService } from '@/domain/starstory/STARStoryService';
 
 const buildAuthStub = () => ({
   userId: ref<string | null>('user-1'),
@@ -101,15 +99,12 @@ describe('useCoverLetterEngine', () => {
         generateCoverLetter: vi.fn().mockResolvedValue(coverLetterResult),
       } as unknown as AiOperationsService,
       userProfileService: {
-        getFullUserProfile: vi.fn().mockResolvedValue(profile),
-        getCanvasForUser: vi.fn().mockResolvedValue(canvas),
+        getProfileForTailoring: vi.fn().mockResolvedValue({
+          ...profile,
+          experiences: [{ ...experiences[0], stories: [story] }],
+          canvas,
+        }),
       } as unknown as UserProfileService,
-      experienceRepo: {
-        list: vi.fn().mockResolvedValue(experiences),
-      } as unknown as ExperienceRepository,
-      storyService: {
-        getStoriesByExperience: vi.fn().mockResolvedValue([story]),
-      } as unknown as STARStoryService,
     };
   }
 
@@ -182,7 +177,7 @@ describe('useCoverLetterEngine', () => {
       const errorMessage = 'Failed to load profile';
       const deps = createDeps({
         userProfileService: {
-          getFullUserProfile: vi.fn().mockRejectedValue(new Error(errorMessage)),
+          getProfileForTailoring: vi.fn().mockRejectedValue(new Error(errorMessage)),
         } as unknown as UserProfileService,
       });
       const auth = buildAuthStub();
@@ -197,11 +192,14 @@ describe('useCoverLetterEngine', () => {
       expect(engine.error.value).toBe(errorMessage);
     });
 
-    it('should load canvas even if it does not exist (returns null)', async () => {
+    it('should load with no canvas data', async () => {
       const deps = createDeps({
         userProfileService: {
-          getFullUserProfile: vi.fn().mockResolvedValue(profile),
-          getCanvasForUser: vi.fn().mockResolvedValue(null),
+          getProfileForTailoring: vi.fn().mockResolvedValue({
+            ...profile,
+            experiences: [{ ...experiences[0], stories: [story] }],
+            canvas: null,
+          }),
         } as unknown as UserProfileService,
       });
       const auth = buildAuthStub();
@@ -211,22 +209,6 @@ describe('useCoverLetterEngine', () => {
 
       expect(engine.personalCanvas.value).toBeNull();
       expect(engine.error.value).toBeNull();
-    });
-
-    it('should handle canvas repository errors gracefully', async () => {
-      const deps = createDeps({
-        userProfileService: {
-          getFullUserProfile: vi.fn().mockResolvedValue(profile),
-          getCanvasForUser: vi.fn().mockRejectedValue(new Error('Canvas not found')),
-        } as unknown as UserProfileService,
-      });
-      const auth = buildAuthStub();
-      const engine = useCoverLetterEngine({ auth, dependencies: deps });
-
-      await engine.load();
-
-      expect(engine.personalCanvas.value).toBeNull();
-      expect(engine.error.value).toBeNull(); // Canvas errors are silently handled
     });
 
     it('should load stories for all experiences', async () => {
@@ -248,18 +230,17 @@ describe('useCoverLetterEngine', () => {
       const story1: STARStory = { id: 'story-1', experienceId: 'exp-1' } as STARStory;
       const story2: STARStory = { id: 'story-2', experienceId: 'exp-2' } as STARStory;
 
-      const mockGetStories = vi
-        .fn()
-        .mockResolvedValueOnce([story1])
-        .mockResolvedValueOnce([story2]);
-
       const deps = createDeps({
-        experienceRepo: {
-          list: vi.fn().mockResolvedValue(experiences2),
-        } as unknown as ExperienceRepository,
-        storyService: {
-          getStoriesByExperience: mockGetStories,
-        } as unknown as STARStoryService,
+        userProfileService: {
+          getProfileForTailoring: vi.fn().mockResolvedValue({
+            ...profile,
+            experiences: [
+              { ...experiences2[0], stories: [story1] },
+              { ...experiences2[1], stories: [story2] },
+            ],
+            canvas,
+          }),
+        } as unknown as UserProfileService,
       });
       const auth = buildAuthStub();
       const engine = useCoverLetterEngine({ auth, dependencies: deps });
@@ -267,8 +248,6 @@ describe('useCoverLetterEngine', () => {
       await engine.load();
 
       expect(engine.stories.value).toEqual([story1, story2]);
-      expect(mockGetStories).toHaveBeenCalledWith('exp-1');
-      expect(mockGetStories).toHaveBeenCalledWith('exp-2');
     });
 
     it('should use provided userId instead of auth', async () => {
@@ -283,7 +262,7 @@ describe('useCoverLetterEngine', () => {
 
       await engine.load();
 
-      expect(deps.userProfileService.getFullUserProfile).toHaveBeenCalledWith(customUserId);
+      expect(deps.userProfileService.getProfileForTailoring).toHaveBeenCalledWith(customUserId);
       expect(auth.loadUserId).not.toHaveBeenCalled();
     });
 
@@ -296,7 +275,7 @@ describe('useCoverLetterEngine', () => {
 
       await engine.load();
 
-      expect(deps.userProfileService.getFullUserProfile).toHaveBeenCalledWith('auth-user-456');
+      expect(deps.userProfileService.getProfileForTailoring).toHaveBeenCalledWith('auth-user-456');
     });
 
     it('should call loadUserId if auth userId is not set', async () => {
@@ -313,7 +292,7 @@ describe('useCoverLetterEngine', () => {
       await engine.load();
 
       expect(auth.loadUserId).toHaveBeenCalled();
-      expect(deps.userProfileService.getFullUserProfile).toHaveBeenCalledWith('loaded-user-789');
+      expect(deps.userProfileService.getProfileForTailoring).toHaveBeenCalledWith('loaded-user-789');
     });
 
     it('should throw error if user is not authenticated', async () => {
@@ -335,7 +314,7 @@ describe('useCoverLetterEngine', () => {
     it('should throw error if profile is not found', async () => {
       const deps = createDeps({
         userProfileService: {
-          getFullUserProfile: vi.fn().mockResolvedValue(null),
+          getProfileForTailoring: vi.fn().mockResolvedValue(null),
         } as unknown as UserProfileService,
       });
       const auth = buildAuthStub();
@@ -353,7 +332,7 @@ describe('useCoverLetterEngine', () => {
       const profileWithoutName = { ...profile, fullName: '' };
       const deps = createDeps({
         userProfileService: {
-          getFullUserProfile: vi.fn().mockResolvedValue(profileWithoutName),
+          getProfileForTailoring: vi.fn().mockResolvedValue(profileWithoutName),
         } as unknown as UserProfileService,
       });
       const auth = buildAuthStub();
@@ -443,7 +422,7 @@ describe('useCoverLetterEngine', () => {
 
       expect(engine.userProfile.value).toEqual(profile);
       expect(result).toEqual(coverLetterResult);
-      expect(deps.userProfileService.getFullUserProfile).toHaveBeenCalled();
+      expect(deps.userProfileService.getProfileForTailoring).toHaveBeenCalled();
     });
 
     it('should set generating state during generation', async () => {
@@ -483,7 +462,7 @@ describe('useCoverLetterEngine', () => {
       const profileWithoutName = { ...profile, fullName: '' };
       const deps = createDeps({
         userProfileService: {
-          getFullUserProfile: vi.fn().mockResolvedValue(profileWithoutName),
+          getProfileForTailoring: vi.fn().mockResolvedValue(profileWithoutName),
         } as unknown as UserProfileService,
       });
       const auth = buildAuthStub();
@@ -547,8 +526,11 @@ describe('useCoverLetterEngine', () => {
     it('should generate without canvas if not available', async () => {
       const deps = createDeps({
         userProfileService: {
-          getFullUserProfile: vi.fn().mockResolvedValue(profile),
-          getCanvasForUser: vi.fn().mockResolvedValue(null),
+          getProfileForTailoring: vi.fn().mockResolvedValue({
+            ...profile,
+            experiences: [{ ...experiences[0], stories: [story] }],
+            canvas: null,
+          }),
         } as unknown as UserProfileService,
       });
       const auth = buildAuthStub();
@@ -572,7 +554,11 @@ describe('useCoverLetterEngine', () => {
 
       const deps = createDeps({
         userProfileService: {
-          getFullUserProfile: vi.fn().mockResolvedValue(profileWithNulls),
+          getProfileForTailoring: vi.fn().mockResolvedValue({
+            ...profileWithNulls,
+            experiences: [{ ...experiences[0], stories: [story] }],
+            canvas,
+          }),
         } as unknown as UserProfileService,
       });
       const auth = buildAuthStub();
@@ -614,7 +600,7 @@ describe('useCoverLetterEngine', () => {
       const profileWithoutName = { ...profile, fullName: '' };
       const deps = createDeps({
         userProfileService: {
-          getFullUserProfile: vi.fn().mockResolvedValue(profileWithoutName),
+          getProfileForTailoring: vi.fn().mockResolvedValue(profileWithoutName),
         } as unknown as UserProfileService,
       });
       const auth = buildAuthStub();

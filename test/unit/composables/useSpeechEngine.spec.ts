@@ -8,8 +8,6 @@ import type { Experience } from '@/domain/experience/Experience';
 import type { STARStory } from '@/domain/starstory/STARStory';
 import type { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import type { UserProfileService } from '@/domain/user-profile/UserProfileService';
-import type { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import type { STARStoryService } from '@/domain/starstory/STARStoryService';
 
 const buildAuthStub = () => ({
   userId: ref<string | null>('user-1'),
@@ -94,15 +92,12 @@ describe('useSpeechEngine', () => {
         generateSpeech: vi.fn().mockResolvedValue(speechResult),
       } as unknown as AiOperationsService,
       userProfileService: {
-        getFullUserProfile: vi.fn().mockResolvedValue(profile),
-        getCanvasForUser: vi.fn().mockResolvedValue(canvas),
+        getProfileForTailoring: vi.fn().mockResolvedValue({
+          ...profile,
+          experiences: [{ ...experiences[0], stories: [story] }],
+          canvas,
+        }),
       } as unknown as UserProfileService,
-      experienceRepo: {
-        list: vi.fn().mockResolvedValue(experiences),
-      } as unknown as ExperienceRepository,
-      storyService: {
-        getStoriesByExperience: vi.fn().mockResolvedValue([story]),
-      } as unknown as STARStoryService,
     };
   }
 
@@ -117,7 +112,7 @@ describe('useSpeechEngine', () => {
     const result = await engine.generate();
 
     expect(result).toEqual(speechResult);
-    expect(deps.userProfileService.getFullUserProfile).toHaveBeenCalledWith(userId);
+    expect(deps.userProfileService.getProfileForTailoring).toHaveBeenCalledWith(userId);
     expect(deps.aiService.generateSpeech).toHaveBeenCalledTimes(1);
 
     const input = (deps.aiService.generateSpeech as ReturnType<typeof vi.fn>).mock.calls[0][0];
@@ -131,7 +126,7 @@ describe('useSpeechEngine', () => {
   it('throws when profile is missing', async () => {
     const deps = createDeps({
       userProfileService: {
-        getFullUserProfile: vi.fn().mockResolvedValue(null),
+        getProfileForTailoring: vi.fn().mockResolvedValue(null),
       } as unknown as UserProfileService,
     });
 
