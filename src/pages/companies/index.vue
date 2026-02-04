@@ -143,21 +143,21 @@ function cancelDelete() {
         />
       </UPageGrid>
     </UPageBody>
-  </UPage>
 
-  <UModal
-    v-model:open="showDeleteModal"
-    :title="t('companies.delete.title')"
-    :description="t('companies.delete.message')"
-  >
-    <template #footer>
-      <UButton
-        color="neutral"
-        variant="ghost"
-        :label="t('common.actions.cancel')"
-        @click="cancelDelete"
-      />
-      <UButton color="error" :label="t('common.actions.delete')" @click="confirmDelete" />
-    </template>
-  </UModal>
+    <UModal
+      v-model:open="showDeleteModal"
+      :title="t('companies.delete.title')"
+      :description="t('companies.delete.message')"
+    >
+      <template #footer>
+        <UButton
+          color="neutral"
+          variant="ghost"
+          :label="t('common.actions.cancel')"
+          @click="cancelDelete"
+        />
+        <UButton color="error" :label="t('common.actions.delete')" @click="confirmDelete" />
+      </template>
+    </UModal>
+  </UPage>
 </template>

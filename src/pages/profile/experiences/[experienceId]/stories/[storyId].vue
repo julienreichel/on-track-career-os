@@ -385,8 +385,8 @@ onMounted(async () => {
         :description="t('stories.detail.notFoundDescription')"
       />
     </UPageBody>
-  </UPage>
 
-  <!-- Unsaved Changes Modal -->
-  <UnsavedChangesModal v-model:open="showCancelConfirm" @discard="handleConfirmCancel" />
+    <!-- Unsaved Changes Modal -->
+    <UnsavedChangesModal v-model:open="showCancelConfirm" @discard="handleConfirmCancel" />
+  </UPage>
 </template>

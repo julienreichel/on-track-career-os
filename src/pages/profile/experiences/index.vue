@@ -283,22 +283,22 @@ function handleViewStories(id: string) {
         />
       </UPageGrid>
     </UPageBody>
-  </UPage>
 
-  <!-- Delete Confirmation Modal -->
-  <UModal
-    v-model:open="showDeleteModal"
-    :title="t('experiences.delete.title')"
-    :description="t('experiences.delete.message')"
-  >
-    <template #footer>
-      <UButton
-        color="neutral"
-        variant="ghost"
-        :label="t('common.actions.cancel')"
-        @click="cancelDelete"
-      />
-      <UButton color="error" :label="t('experiences.delete.confirm')" @click="confirmDelete" />
-    </template>
-  </UModal>
+    <!-- Delete Confirmation Modal -->
+    <UModal
+      v-model:open="showDeleteModal"
+      :title="t('experiences.delete.title')"
+      :description="t('experiences.delete.message')"
+    >
+      <template #footer>
+        <UButton
+          color="neutral"
+          variant="ghost"
+          :label="t('common.actions.cancel')"
+          @click="cancelDelete"
+        />
+        <UButton color="error" :label="t('experiences.delete.confirm')" @click="confirmDelete" />
+      </template>
+    </UModal>
+  </UPage>
 </template>
