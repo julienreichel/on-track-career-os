@@ -13,6 +13,7 @@ const MIN_TEXT_LENGTH = 400;
 
 type UploadStatus = 'idle' | 'extracting' | 'analyzing';
 
+// eslint-disable-next-line max-lines-per-function -- Composable API requires comprehensive interface
 export function useJobUpload() {
   const { t } = useI18n();
   const jobAnalysis = useJobAnalysis();
@@ -45,16 +46,7 @@ export function useJobUpload() {
     return file.text();
   }
 
-  async function processFile(file: File): Promise<JobDescription> {
-    selectedFile.value = file;
-    errorMessage.value = null;
-    status.value = 'extracting';
-
-    const rawText =
-      file.type === 'application/pdf'
-        ? await extractPdfText(file)
-        : await extractTextFromFile(file);
-
+  async function analyzeRawText(rawText: string): Promise<JobDescription> {
     const sanitized = rawText?.trim();
     if (!sanitized || sanitized.length < MIN_TEXT_LENGTH) {
       status.value = 'idle';
@@ -71,12 +63,26 @@ export function useJobUpload() {
       captureEvent('job_uploaded');
       return analyzed;
     } catch (error) {
-      errorMessage.value = error instanceof Error ? error.message : t('ingestion.job.upload.errors.generic');
+      errorMessage.value =
+        error instanceof Error ? error.message : t('ingestion.job.upload.errors.generic');
       selectedFile.value = null;
       throw error;
     } finally {
       status.value = 'idle';
     }
+  }
+
+  async function processFile(file: File): Promise<JobDescription> {
+    selectedFile.value = file;
+    errorMessage.value = null;
+    status.value = 'extracting';
+
+    const rawText =
+      file.type === 'application/pdf'
+        ? await extractPdfText(file)
+        : await extractTextFromFile(file);
+
+    return analyzeRawText(rawText);
   }
 
   async function handleFileSelected(file: File | null | undefined): Promise<JobDescription | null> {
@@ -88,7 +94,24 @@ export function useJobUpload() {
       const job = await processFile(file);
       return job;
     } catch (error) {
-      errorMessage.value = error instanceof Error ? error.message : t('ingestion.job.upload.errors.generic');
+      errorMessage.value =
+        error instanceof Error ? error.message : t('ingestion.job.upload.errors.generic');
+      return null;
+    }
+  }
+
+  async function handleTextSubmitted(rawText: string): Promise<JobDescription | null> {
+    const sanitized = rawText?.trim();
+    if (!sanitized) {
+      return null;
+    }
+
+    selectedFile.value = null;
+    errorMessage.value = null;
+
+    try {
+      return await analyzeRawText(sanitized);
+    } catch {
       return null;
     }
   }
@@ -106,6 +129,7 @@ export function useJobUpload() {
     isProcessing,
     statusMessage,
     handleFileSelected,
+    handleTextSubmitted,
     reset,
   };
 }

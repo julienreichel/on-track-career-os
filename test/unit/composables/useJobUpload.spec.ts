@@ -108,4 +108,18 @@ describe('useJobUpload', () => {
     expect(job).toBeNull();
     expect(jobUpload.errorMessage.value).toBe('analysis failed');
   });
+
+  it('processes pasted text and returns analyzed job', async () => {
+    const analyzedJob = { id: 'job-555', title: 'Role' };
+    mockCreateJob.mockResolvedValueOnce({ id: 'draft-4' });
+    mockReanalyseJob.mockResolvedValueOnce(analyzedJob);
+
+    const jobUpload = useJobUpload();
+    const job = await jobUpload.handleTextSubmitted('C'.repeat(500));
+
+    expect(job).toEqual(analyzedJob);
+    expect(mockCreateJob).toHaveBeenCalled();
+    expect(mockReanalyseJob).toHaveBeenCalled();
+    expect(jobUpload.errorMessage.value).toBeNull();
+  });
 });

@@ -10,6 +10,7 @@ const errorMessage = ref<string | null>(null);
 const isProcessing = ref(false);
 const statusMessage = ref<string | null>(null);
 const mockHandleFileSelected = vi.fn();
+const mockHandleTextSubmitted = vi.fn();
 const mockReset = vi.fn();
 
 vi.mock('@/composables/useJobUpload', () => ({
@@ -19,6 +20,7 @@ vi.mock('@/composables/useJobUpload', () => ({
     isProcessing,
     statusMessage,
     handleFileSelected: mockHandleFileSelected,
+    handleTextSubmitted: mockHandleTextSubmitted,
     reset: mockReset,
   }),
 }));
@@ -56,6 +58,30 @@ const stubs = {
   UAlert: {
     props: ['title', 'description'],
     template: '<div class="u-alert">{{ title }} {{ description }}<slot /></div>',
+  },
+  UCard: { template: '<div class="u-card"><slot /><slot name="footer" /></div>' },
+  USeparator: {
+    props: ['label'],
+    template: '<div class="u-separator">{{ label }}</div>',
+  },
+  UFormField: {
+    props: ['label', 'description'],
+    template: '<div class="u-form-field"><label>{{ label }}</label><p>{{ description }}</p><slot /></div>',
+  },
+  UTextarea: {
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    template: '<textarea class="u-textarea" :value="modelValue" @input="onInput" />',
+    setup(props: any, { emit }: any) {
+      const onInput = (event: Event) => {
+        emit('update:modelValue', (event.target as HTMLTextAreaElement).value);
+      };
+      return { onInput };
+    },
+  },
+  UButton: {
+    props: ['disabled'],
+    template: '<button class="u-button" :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
   },
   JobUploadStep: JobUploadStepStub,
 };
@@ -100,5 +126,14 @@ describe('Job Upload Page', () => {
     const wrapper = await mountPage();
     await wrapper.find('.upload-trigger').trigger('click');
     expect(mockHandleFileSelected).toHaveBeenCalledWith({ name: 'sample.txt' });
+  });
+
+  it('submits pasted text to the composable handler', async () => {
+    const wrapper = await mountPage();
+    const textArea = wrapper.find('.u-textarea');
+    await textArea.setValue('Pasted job description');
+    await wrapper.find('.u-button').trigger('click');
+
+    expect(mockHandleTextSubmitted).toHaveBeenCalledWith('Pasted job description');
   });
 });

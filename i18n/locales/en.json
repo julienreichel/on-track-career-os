@@ -57,6 +57,13 @@
           "label": "Drop the job description here or click to upload",
           "description": "Accepted formats: PDF (.pdf) or plain text (.txt)"
         },
+        "orManual": "Or paste a job description",
+        "text": {
+          "label": "Job description",
+          "description": "Paste a job description if you do not have a file.",
+          "placeholder": "Paste the description here...",
+          "submit": "Analyze job"
+        },
         "fileUploaded": "Uploaded {fileName}",
         "status": {
           "extracting": "Extracting job description from the uploaded file…",
