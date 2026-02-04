@@ -1,4 +1,3 @@
-import { CV_SECTION_KEYS } from './CvSectionKey';
 import type { CVSettings } from './CVSettings';
 import type { Experience } from '@/domain/experience/Experience';
 
@@ -8,39 +7,38 @@ type DefaultCvSettingsInput = {
 };
 
 export type DefaultCvSettings = {
-  askEachTime: boolean;
   defaultTemplateId: string | null;
-  defaultEnabledSections: string[];
-  defaultIncludedExperienceIds: string[];
+  defaultDisabledSections: string[];
+  defaultExcludedExperienceIds: string[];
   showProfilePhoto: boolean;
 };
 
 const normalizeStringArray = (values?: (string | null)[] | null): string[] =>
   (values ?? []).filter((value): value is string => Boolean(value));
 
-const resolveEnabledSections = (settings?: CVSettings | null) => {
-  const sections = normalizeStringArray(settings?.defaultEnabledSections ?? null);
-  return sections.length > 0 ? sections : CV_SECTION_KEYS;
-};
+const resolveDisabledSections = (settings?: CVSettings | null) =>
+  normalizeStringArray(settings?.defaultDisabledSections ?? null);
 
-const resolveIncludedExperiences = (
-  settings: CVSettings | null | undefined,
-  experiences?: Experience[]
-) => {
-  const explicitIds = normalizeStringArray(settings?.defaultIncludedExperienceIds ?? null);
-  if (explicitIds.length > 0) return explicitIds;
-  return (experiences ?? []).map((experience) => experience.id);
-};
+const resolveExcludedExperiences = (settings?: CVSettings | null | undefined) =>
+  normalizeStringArray(settings?.defaultExcludedExperienceIds ?? null);
 
 export const getDefaultCvSettings = ({
   settings,
   experiences,
 }: DefaultCvSettingsInput): DefaultCvSettings => {
-  return {
-    askEachTime: settings?.askEachTime ?? false,
+  const defaults = {
     defaultTemplateId: settings?.defaultTemplateId ?? null,
-    defaultEnabledSections: resolveEnabledSections(settings),
-    defaultIncludedExperienceIds: resolveIncludedExperiences(settings, experiences),
+    defaultDisabledSections: resolveDisabledSections(settings),
+    defaultExcludedExperienceIds: resolveExcludedExperiences(settings),
     showProfilePhoto: settings?.showProfilePhoto ?? true,
   };
+
+  if (experiences?.length) {
+    const experienceIds = new Set(experiences.map((experience) => experience.id));
+    defaults.defaultExcludedExperienceIds = defaults.defaultExcludedExperienceIds.filter((id) =>
+      experienceIds.has(id)
+    );
+  }
+
+  return defaults;
 };

@@ -253,9 +253,8 @@ export const schemaModels = {
   CVSettings: a
     .model({
       defaultTemplateId: a.string(),
-      askEachTime: a.boolean().default(false),
-      defaultIncludedExperienceIds: a.string().array(),
-      defaultEnabledSections: a.string().array(),
+    defaultExcludedExperienceIds: a.string().array(),
+    defaultDisabledSections: a.string().array(),
       showProfilePhoto: a.boolean().default(true),
 
       userId: a.id().required(),

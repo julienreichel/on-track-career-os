@@ -84,8 +84,8 @@ const initializeForm = () => {
 
   formState.value = {
     defaultTemplateId: defaults.defaultTemplateId,
-    defaultEnabledSections: defaults.defaultEnabledSections,
-    defaultIncludedExperienceIds: defaults.defaultIncludedExperienceIds,
+    defaultDisabledSections: defaults.defaultDisabledSections,
+    defaultExcludedExperienceIds: defaults.defaultExcludedExperienceIds,
     showProfilePhoto: defaults.showProfilePhoto,
   };
   initialized.value = true;
@@ -116,8 +116,8 @@ const handleSave = async () => {
     await saveSettings({
       id: settings.value.id,
       defaultTemplateId: formState.value.defaultTemplateId,
-      defaultEnabledSections: formState.value.defaultEnabledSections,
-      defaultIncludedExperienceIds: formState.value.defaultIncludedExperienceIds,
+      defaultDisabledSections: formState.value.defaultDisabledSections,
+      defaultExcludedExperienceIds: formState.value.defaultExcludedExperienceIds,
       showProfilePhoto: formState.value.showProfilePhoto,
     });
     toast.add({

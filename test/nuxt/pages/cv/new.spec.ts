@@ -12,8 +12,8 @@ const settingsRef = ref({
   id: 'settings-1',
   userId: 'user-1',
   defaultTemplateId: 'template-1',
-  defaultEnabledSections: ['summary', 'experience', 'skills'],
-  defaultIncludedExperienceIds: ['exp-1'],
+  defaultDisabledSections: ['languages'],
+  defaultExcludedExperienceIds: [],
   showProfilePhoto: true,
 });
 
@@ -170,7 +170,7 @@ describe('CV new page', () => {
     await flushPromises();
 
     expect(mockGenerateCv).toHaveBeenCalledWith('user-1', ['exp-1'], {
-      enabledSections: ['summary', 'experience', 'skills'],
+      enabledSections: ['summary', 'skills', 'experience', 'education', 'certifications', 'volunteer', 'projects', 'interests', 'links'],
       templateMarkdown: '# Template',
     });
 

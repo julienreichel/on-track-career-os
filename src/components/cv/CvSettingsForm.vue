@@ -12,14 +12,21 @@
         </div>
       </template>
 
-      <div class="grid gap-2 sm:grid-cols-2">
-        <UCheckbox
-          v-for="section in sectionOptions"
-          :key="section.value"
-          :model-value="modelValue.defaultEnabledSections.includes(section.value)"
-          :label="section.label"
-          @update:model-value="toggleSection(section.value)"
-        />
+      <div class="grid gap-6 sm:grid-cols-2">
+        <div v-for="group in sectionGroups" :key="group.key" class="space-y-3">
+          <p class="text-xs font-semibold uppercase tracking-wide text-dimmed">
+            {{ group.label }}
+          </p>
+          <div class="grid gap-2">
+            <UCheckbox
+              v-for="section in group.sections"
+              :key="section.value"
+              :model-value="!modelValue.defaultDisabledSections.includes(section.value)"
+              :label="section.label"
+              @update:model-value="toggleSection(section.value)"
+            />
+          </div>
+        </div>
       </div>
     </UCard>
 
@@ -92,8 +99,8 @@ import CvExperienceMultiSelect from '@/components/cv/CvExperienceMultiSelect.vue
 
 export type CvSettingsFormState = {
   defaultTemplateId: string | null;
-  defaultEnabledSections: string[];
-  defaultIncludedExperienceIds: string[];
+  defaultDisabledSections: string[];
+  defaultExcludedExperienceIds: string[];
   showProfilePhoto: boolean;
 };
 
@@ -127,9 +134,40 @@ const sectionOptions = computed(() =>
   }))
 );
 
+const experienceSectionKeys = new Set(['experience', 'education', 'volunteer', 'projects']);
+
+const sectionGroups = computed(() => {
+  const experienceSections = sectionOptions.value.filter((section) =>
+    experienceSectionKeys.has(section.value)
+  );
+  const otherSections = sectionOptions.value.filter(
+    (section) => !experienceSectionKeys.has(section.value)
+  );
+
+  return [
+    {
+      key: 'experience',
+      label: t('applications.cvs.settings.sections.sections.groupLabels.experience'),
+      sections: experienceSections,
+    },
+    {
+      key: 'profile',
+      label: t('applications.cvs.settings.sections.sections.groupLabels.profile'),
+      sections: otherSections,
+    },
+  ];
+});
+
+const excludedExperienceIds = computed(() => new Set(props.modelValue.defaultExcludedExperienceIds));
+const experienceIds = computed(() => props.experiences.map((experience) => experience.id));
+
 const experienceSelection = computed({
-  get: () => props.modelValue.defaultIncludedExperienceIds,
-  set: (value: string[]) => updateValue({ defaultIncludedExperienceIds: value }),
+  get: () => experienceIds.value.filter((id) => !excludedExperienceIds.value.has(id)),
+  set: (value: string[]) => {
+    const selected = new Set(value);
+    const excluded = experienceIds.value.filter((id) => !selected.has(id));
+    updateValue({ defaultExcludedExperienceIds: excluded });
+  },
 });
 
 const showProfilePhoto = computed({
@@ -138,12 +176,12 @@ const showProfilePhoto = computed({
 });
 
 const toggleSection = (key: string) => {
-  const next = new Set(props.modelValue.defaultEnabledSections);
+  const next = new Set(props.modelValue.defaultDisabledSections);
   if (next.has(key)) {
     next.delete(key);
   } else {
     next.add(key);
   }
-  updateValue({ defaultEnabledSections: Array.from(next) });
+  updateValue({ defaultDisabledSections: Array.from(next) });
 };
 </script>

@@ -38,9 +38,9 @@ export function useCvSettings(options: UseCvSettingsOptions = {}) {
         const defaults = getDefaultCvSettings({ settings: result });
         settings.value = {
           ...result,
-          askEachTime: defaults.askEachTime,
           defaultTemplateId: defaults.defaultTemplateId,
-          defaultEnabledSections: defaults.defaultEnabledSections,
+          defaultDisabledSections: defaults.defaultDisabledSections,
+          defaultExcludedExperienceIds: defaults.defaultExcludedExperienceIds,
           showProfilePhoto: defaults.showProfilePhoto,
         };
       } else {
@@ -55,7 +55,18 @@ export function useCvSettings(options: UseCvSettingsOptions = {}) {
   };
 
   const saveSettings = async (input: CVSettingsUpdateInput) => {
-    settings.value = await service.saveSettings(input);
+    const result = await service.saveSettings(input);
+    if (!result) {
+      throw new Error('Failed to save CV settings');
+    }
+    const defaults = getDefaultCvSettings({ settings: result });
+    settings.value = {
+      ...result,
+      defaultTemplateId: defaults.defaultTemplateId,
+      defaultDisabledSections: defaults.defaultDisabledSections,
+      defaultExcludedExperienceIds: defaults.defaultExcludedExperienceIds,
+      showProfilePhoto: defaults.showProfilePhoto,
+    };
     return settings.value;
   };
 

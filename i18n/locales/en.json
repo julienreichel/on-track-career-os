@@ -1313,10 +1313,14 @@
         "title": "CV settings",
         "subtitle": "Set defaults for every CV you create.",
         "sections": {
-          "sections": {
-            "title": "Sections",
-            "description": "Choose which sections are included by default."
-          },
+        "sections": {
+          "title": "Sections",
+          "description": "Choose which sections are included by default.",
+          "groupLabels": {
+            "experience": "Experience blocks",
+            "profile": "Profile sections"
+          }
+        },
           "experiences": {
             "title": "Experiences",
             "description": "Select which experiences are eligible by default."
@@ -1331,6 +1335,15 @@
           "manage": "Manage templates"
         },
         "sectionLabels": {
+          "summary": "Summary",
+          "experience": "Experience",
+          "education": "Education",
+          "certifications": "Certifications",
+          "languages": "Languages",
+          "volunteer": "Volunteer",
+          "projects": "Projects",
+          "interests": "Interests",
+          "links": "Links",
           "skills": "Skills"
         },
         "experiences": {

@@ -77,7 +77,7 @@ import { useCvGenerator } from '@/composables/useCvGenerator';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
-import type { CvSectionKey } from '@/domain/cvsettings/CvSectionKey';
+import { CV_SECTION_KEYS } from '@/domain/cvsettings/CvSectionKey';
 
 const { t } = useI18n();
 const toast = useToast();
@@ -224,12 +224,11 @@ const handlePreview = async () => {
       return;
     }
 
-    const enabledSections =
-      settings.value?.defaultEnabledSections && settings.value.defaultEnabledSections.length > 0
-        ? settings.value.defaultEnabledSections.filter(
-            (section): section is CvSectionKey => typeof section === 'string'
-          )
-        : undefined;
+    const enabledSections = settings.value?.defaultDisabledSections?.length
+      ? CV_SECTION_KEYS.filter(
+          (section) => !settings.value?.defaultDisabledSections?.includes(section)
+        )
+      : undefined;
 
     const result = await generateCv(userId.value, previewExperienceIds, {
       templateMarkdown: content.value,

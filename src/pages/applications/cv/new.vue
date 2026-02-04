@@ -42,7 +42,7 @@ import { useAnalytics } from '@/composables/useAnalytics';
 import { getDefaultCvSettings } from '@/domain/cvsettings/getDefaultCvSettings';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
-import type { CvSectionKey } from '@/domain/cvsettings/CvSectionKey';
+import { CV_SECTION_KEYS, type CvSectionKey } from '@/domain/cvsettings/CvSectionKey';
 import { resolveSystemCvTemplates } from '@/domain/cvtemplate/systemTemplates';
 import CvGenerateEntryCard from '@/components/cv/CvGenerateEntryCard.vue';
 import CvGenerationModal from '@/components/cv/CvGenerationModal.vue';
@@ -104,8 +104,12 @@ const isGenerating = computed(
 
 const setDefaults = () => {
   selectedTemplateId.value = defaults.value.defaultTemplateId;
-  selectedSections.value = [...defaults.value.defaultEnabledSections] as CvSectionKey[];
-  selectedExperienceIds.value = [...defaults.value.defaultIncludedExperienceIds];
+  selectedSections.value = CV_SECTION_KEYS.filter(
+    (section) => !defaults.value.defaultDisabledSections.includes(section)
+  );
+  selectedExperienceIds.value = experiences.value
+    .map((experience) => experience.id)
+    .filter((id) => !defaults.value.defaultExcludedExperienceIds.includes(id));
 };
 
 const resolveTemplateMarkdown = (templateId: string | null) => {

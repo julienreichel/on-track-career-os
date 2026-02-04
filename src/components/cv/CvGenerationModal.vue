@@ -63,6 +63,30 @@ const sectionOptions = computed(() =>
   }))
 );
 
+const experienceSectionKeys = new Set(['experience', 'education', 'volunteer', 'projects']);
+
+const sectionGroups = computed(() => {
+  const experienceSections = sectionOptions.value.filter((section) =>
+    experienceSectionKeys.has(section.value)
+  );
+  const otherSections = sectionOptions.value.filter(
+    (section) => !experienceSectionKeys.has(section.value)
+  );
+
+  return [
+    {
+      key: 'experience',
+      label: t('applications.cvs.settings.sections.sections.groupLabels.experience'),
+      sections: experienceSections,
+    },
+    {
+      key: 'profile',
+      label: t('applications.cvs.settings.sections.sections.groupLabels.profile'),
+      sections: otherSections,
+    },
+  ];
+});
+
 const syncStateFromProps = () => {
   selectedTemplate.value = props.initialTemplateId ?? NO_TEMPLATE_VALUE;
   enabledSections.value = [...props.initialEnabledSections];
@@ -134,18 +158,25 @@ watch(
           class="w-fit"
         />
 
-        <div class="space-y-2">
+        <div class="space-y-3">
           <p class="text-sm font-medium text-default">
             {{ t('applications.cvs.generate.modal.sectionsLabel') }}
           </p>
-          <div class="grid gap-2 sm:grid-cols-2">
-            <UCheckbox
-              v-for="section in sectionOptions"
-              :key="section.value"
-              :model-value="enabledSections.includes(section.value)"
-              :label="section.label"
-              @update:model-value="toggleSection(section.value)"
-            />
+          <div class="grid gap-6 sm:grid-cols-2">
+            <div v-for="group in sectionGroups" :key="group.key" class="space-y-3">
+              <p class="text-xs font-semibold uppercase tracking-wide text-dimmed">
+                {{ group.label }}
+              </p>
+              <div class="grid gap-2">
+                <UCheckbox
+                  v-for="section in group.sections"
+                  :key="section.value"
+                  :model-value="enabledSections.includes(section.value)"
+                  :label="section.label"
+                  @update:model-value="toggleSection(section.value)"
+                />
+              </div>
+            </div>
           </div>
         </div>
 

@@ -342,9 +342,8 @@ System exemplars can live in code; `source` preserves origin while storing only 
 
 - userId (PK or unique FK)
 - defaultTemplateId (optional)
-- askEachTime (boolean)
-- defaultIncludedExperienceIds (list)
-- defaultEnabledSections (list)
+- defaultExcludedExperienceIds (list)
+- defaultDisabledSections (list)
 - showProfilePhoto (boolean, optional)
 - createdAt
 - updatedAt

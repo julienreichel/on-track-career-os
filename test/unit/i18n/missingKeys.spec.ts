@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import enLocale from '../../../i18n/locales/en.json';
+import { CV_SECTION_KEYS } from '@/domain/cvsettings/CvSectionKey';
 
 /**
  * Extracts actual i18n keys from source code by scanning for t('...')
@@ -115,6 +116,15 @@ describe('i18n - Missing Keys Detection', () => {
     const missingKeys = Array.from(usedKeysFromCode)
       .filter((key) => !definedKeys.has(key))
       .sort();
+
+    expect(missingKeys).toEqual([]);
+  });
+
+  it('should include section label keys for all CV sections', () => {
+    const definedKeys = getAllDefinedKeys(enLocale);
+    const missingKeys = CV_SECTION_KEYS.filter(
+      (key) => !definedKeys.has(`applications.cvs.settings.sectionLabels.${key}`)
+    );
 
     expect(missingKeys).toEqual([]);
   });

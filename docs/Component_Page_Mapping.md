@@ -509,7 +509,7 @@ Each page includes:
 ### Components
 
 - `CvGenerateEntryCard` - displays current settings summary (template, sections, experiences)
-- `CvGenerationModal` - optional modal (when `askEachTime=true`) to confirm/override settings
+- `CvGenerationModal` - optional modal to confirm/override settings
 - `CvExperienceMultiSelect` - multi-select component for experiences (in modal)
 
 ### Composables
@@ -624,7 +624,7 @@ Each page includes:
 ### Composables
 
 - `useCvTemplates()` - list, delete, clone system templates
-- `useCvSettings()` - read/write user defaults (template, sections, experiences, askEachTime)
+- `useCvSettings()` - read/write user defaults (template, sections, experiences)
 - `getDefaultCvSettings()` - get or create user settings
 
 ### CDM Entities

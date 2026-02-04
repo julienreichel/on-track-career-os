@@ -50,8 +50,8 @@ describe('CvSettingsForm', () => {
       props: {
         modelValue: {
           defaultTemplateId: null,
-          defaultEnabledSections: ['summary'],
-          defaultIncludedExperienceIds: [],
+          defaultDisabledSections: ['skills'],
+          defaultExcludedExperienceIds: [],
           showProfilePhoto: true,
         },
         experiences,
@@ -72,8 +72,8 @@ describe('CvSettingsForm', () => {
       props: {
         modelValue: {
           defaultTemplateId: null,
-          defaultEnabledSections: ['summary'],
-          defaultIncludedExperienceIds: [],
+          defaultDisabledSections: ['skills'],
+          defaultExcludedExperienceIds: [],
           showProfilePhoto: true,
         },
         experiences,

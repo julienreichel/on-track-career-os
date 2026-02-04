@@ -27,12 +27,22 @@ describe('CVSettingsService', () => {
   });
 
   it('updates settings via saveSettings', async () => {
-    const updated = { id: 'user-1', userId: 'user-1', askEachTime: true } as CVSettings;
+    const updated = {
+      id: 'user-1',
+      userId: 'user-1',
+      defaultDisabledSections: ['skills'],
+    } as CVSettings;
     (mockRepository.update as ReturnType<typeof vi.fn>).mockResolvedValue(updated);
 
-    const result = await service.saveSettings({ id: 'user-1', askEachTime: true });
+    const result = await service.saveSettings({
+      id: 'user-1',
+      defaultDisabledSections: ['skills'],
+    });
 
-    expect(mockRepository.update).toHaveBeenCalledWith({ id: 'user-1', askEachTime: true });
+    expect(mockRepository.update).toHaveBeenCalledWith({
+      id: 'user-1',
+      defaultDisabledSections: ['skills'],
+    });
     expect(result).toEqual(updated);
   });
 });

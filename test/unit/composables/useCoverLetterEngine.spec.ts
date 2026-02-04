@@ -23,6 +23,10 @@ describe('useCoverLetterEngine', () => {
   let experiences: Experience[];
   let story: STARStory;
   let coverLetterResult: CoverLetterResult;
+  let tailoringProfile: UserProfile & {
+    experiences: (Experience & { stories?: STARStory[] })[];
+    canvas: PersonalCanvas;
+  };
 
   beforeEach(() => {
     profile = {
@@ -78,6 +82,12 @@ describe('useCoverLetterEngine', () => {
     coverLetterResult = {
       content: 'Dear Hiring Manager,\n\nI am excited to apply...',
     };
+
+    tailoringProfile = {
+      ...profile,
+      experiences: [{ ...experiences[0], stories: [story] }],
+      canvas,
+    };
   });
 
   type DepsStub = ReturnType<typeof createDepsBase>;
@@ -99,11 +109,7 @@ describe('useCoverLetterEngine', () => {
         generateCoverLetter: vi.fn().mockResolvedValue(coverLetterResult),
       } as unknown as AiOperationsService,
       userProfileService: {
-        getProfileForTailoring: vi.fn().mockResolvedValue({
-          ...profile,
-          experiences: [{ ...experiences[0], stories: [story] }],
-          canvas,
-        }),
+        getProfileForTailoring: vi.fn().mockResolvedValue(tailoringProfile),
       } as unknown as UserProfileService,
     };
   }
@@ -145,16 +151,16 @@ describe('useCoverLetterEngine', () => {
 
       expect(engine.isLoading.value).toBe(false);
       expect(engine.error.value).toBeNull();
-      expect(engine.userProfile.value).toEqual(profile);
+      expect(engine.userProfile.value).toEqual(tailoringProfile);
       expect(engine.personalCanvas.value).toEqual(canvas);
-      expect(engine.experiences.value).toEqual(experiences);
+      expect(engine.experiences.value).toEqual(tailoringProfile.experiences);
       expect(engine.stories.value).toEqual([story]);
       expect(engine.hasProfile.value).toBe(true);
 
       expect(result).toEqual({
-        userProfile: profile,
+        userProfile: tailoringProfile,
         personalCanvas: canvas,
-        experiences: experiences,
+        experiences: tailoringProfile.experiences,
         stories: [story],
       });
     });
@@ -420,7 +426,7 @@ describe('useCoverLetterEngine', () => {
       // Don't call load(), call generate() directly
       const result = await engine.generate();
 
-      expect(engine.userProfile.value).toEqual(profile);
+      expect(engine.userProfile.value).toEqual(tailoringProfile);
       expect(result).toEqual(coverLetterResult);
       expect(deps.userProfileService.getProfileForTailoring).toHaveBeenCalled();
     });

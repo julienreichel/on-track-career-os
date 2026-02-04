@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { useCvSettings } from '@/application/cvsettings/useCvSettings';
-import { CV_SECTION_KEYS } from '@/domain/cvsettings/CvSectionKey';
 import type { CVSettingsService } from '@/domain/cvsettings/CVSettingsService';
 
 describe('useCvSettings', () => {
@@ -30,20 +29,23 @@ describe('useCvSettings', () => {
 
     expect(service.getOrCreate).toHaveBeenCalledWith('user-1');
     expect(settings.value?.id).toBe('user-1');
-    expect(settings.value?.defaultEnabledSections).toEqual(CV_SECTION_KEYS);
+    expect(settings.value?.defaultDisabledSections).toEqual([]);
   });
 
   it('saves settings updates', async () => {
     (service.saveSettings as ReturnType<typeof vi.fn>).mockResolvedValue({
       id: 'user-1',
       userId: 'user-1',
-      askEachTime: true,
+      defaultDisabledSections: ['skills'],
     });
 
     const { settings, saveSettings } = useCvSettings({ auth, service });
-    await saveSettings({ id: 'user-1', askEachTime: true });
+    await saveSettings({ id: 'user-1', defaultDisabledSections: ['skills'] });
 
-    expect(service.saveSettings).toHaveBeenCalledWith({ id: 'user-1', askEachTime: true });
-    expect(settings.value?.askEachTime).toBe(true);
+    expect(service.saveSettings).toHaveBeenCalledWith({
+      id: 'user-1',
+      defaultDisabledSections: ['skills'],
+    });
+    expect(settings.value?.defaultDisabledSections).toEqual(['skills']);
   });
 });
