@@ -123,7 +123,7 @@ const breadcrumbItems = ref<Array<{ label: string; to: string; icon?: string }>>
 const getSegmentLabel = (segment: string): string => {
   const segmentMap: Record<string, string> = {
     profile: t('navigation.profile'),
-    'cv-upload': t('navigation.cvUpload'),
+    'cv-upload': t('ingestion.cv.upload.title'),
     experiences: t('navigation.experiences'),
     settings: t('navigation.settings'),
     jobs: t('navigation.jobs'),

@@ -183,7 +183,7 @@ onMounted(async () => {
               <div>
                 <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.updatedAt') }}</p>
                 <p class="mt-1 text-sm text-default">
-                  {{ formattedUpdatedAt || t('jobs.detail.meta.notAvailable') }}
+                  {{ formattedUpdatedAt || t('common.notAvailable') }}
                 </p>
               </div>
               <div v-if="linkedCompany">

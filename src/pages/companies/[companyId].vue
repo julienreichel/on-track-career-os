@@ -339,7 +339,7 @@ function clearJobsError() {
             <template #footer>
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p v-if="formattedMeta" class="text-xs text-gray-400">
-                  {{ t('companies.detail.lastUpdated', { date: formattedMeta }) }}
+                  {{ t('common.lastUpdated', { date: formattedMeta }) }}
                 </p>
                 <div v-if="isEditing" class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                   <UButton

@@ -5,7 +5,6 @@
   "navigation": {
     "home": "Home",
     "profile": "Profile",
-    "cvUpload": "Upload CV",
     "experiences": "Experiences",
     "personalCanvas": "Personal Canvas",
     "jobs": "Jobs",
@@ -168,7 +167,6 @@
         "linkedJobsDescription": "Jobs currently associated with this company.",
         "linkedJobsEmpty": "No jobs are linked to this company yet."
       },
-      "lastUpdated": "Last updated {date}",
       "errors": {
         "title": "Company error",
         "generic": "Something went wrong while processing this company.",
@@ -185,7 +183,7 @@
       "lastGeneratedAt": "Last generated {date}",
       "lastGeneratedUnknown": "Unknown",
       "actions": {
-        "generate": "Generate canvas"
+        "generate": "Generate Canvas"
       },
       "errors": {
         "save": "Failed to save the canvas.",
@@ -1127,7 +1125,6 @@
       "meta": {
         "status": "Status",
         "updatedAt": "Updated at",
-        "notAvailable": "Not available",
         "createdAt": "Created at",
         "companyId": "Company"
       },

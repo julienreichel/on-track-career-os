@@ -569,7 +569,7 @@ function redirectToCompanyCreate() {
                       {{ t('jobs.detail.meta.createdAt') }}
                     </p>
                     <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">
-                      {{ formattedCreatedAt || t('jobs.detail.meta.notAvailable') }}
+                      {{ formattedCreatedAt || t('common.notAvailable') }}
                     </p>
                   </div>
                   <div v-if="linkedCompany">
@@ -675,14 +675,14 @@ function redirectToCompanyCreate() {
               <div class="flex flex-col gap-6">
                 <div class="grid gap-4 md:grid-cols-2">
                   <UFormField :label="t('jobs.detail.fields.title')">
-                    <p>{{ form.title || t('jobs.detail.meta.notAvailable') }}</p>
+                    <p>{{ form.title || t('common.notAvailable') }}</p>
                   </UFormField>
                   <UFormField :label="t('jobs.detail.fields.seniorityLevel')">
-                    <p>{{ form.seniorityLevel || t('jobs.detail.meta.notAvailable') }}</p>
+                    <p>{{ form.seniorityLevel || t('common.notAvailable') }}</p>
                   </UFormField>
                 </div>
                 <UFormField :label="t('jobs.detail.fields.roleSummary')">
-                  <p>{{ form.roleSummary || t('jobs.detail.meta.notAvailable') }}</p>
+                  <p>{{ form.roleSummary || t('common.notAvailable') }}</p>
                 </UFormField>
                 <div class="grid gap-4 sm:grid-cols-2">
                   <UFormField :label="t('jobs.detail.meta.status')">
@@ -691,11 +691,11 @@ function redirectToCompanyCreate() {
                     </UBadge>
                   </UFormField>
                   <UFormField :label="t('jobs.detail.meta.createdAt')">
-                    <p>{{ formattedCreatedAt || t('jobs.detail.meta.notAvailable') }}</p>
+                    <p>{{ formattedCreatedAt || t('common.notAvailable') }}</p>
                   </UFormField>
                   <UFormField :label="t('jobs.detail.meta.companyId')">
                     <LinkedCompanyBadge v-if="linkedCompany" :company="linkedCompany" />
-                    <p v-else>{{ t('jobs.detail.meta.notAvailable') }}</p>
+                    <p v-else>{{ t('common.notAvailable') }}</p>
                   </UFormField>
                 </div>
               </div>
@@ -718,7 +718,7 @@ function redirectToCompanyCreate() {
                       {{ item }}
                     </li>
                   </ul>
-                  <p v-else>{{ t('jobs.detail.meta.notAvailable') }}</p>
+                  <p v-else>{{ t('common.notAvailable') }}</p>
                 </template>
               </UTabs>
 
