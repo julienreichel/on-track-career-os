@@ -83,7 +83,7 @@ describe('CvTemplateCard', () => {
 
     await findButton('Edit template')?.trigger('click');
     await findButton('Set as default')?.trigger('click');
-    await findButtonByAria(i18n.global.t('common.delete'))?.trigger('click');
+    await findButtonByAria(i18n.global.t('common.actions.delete'))?.trigger('click');
 
     expect(wrapper.emitted('primary')).toBeTruthy();
     expect(wrapper.emitted('secondary')).toBeTruthy();

@@ -124,7 +124,7 @@ function getTextContent(input: string | string[] | null | undefined) {
 
       <template #actions>
         <UButton
-          :label="t('common.view')"
+          :label="t('common.actions.view')"
           icon="i-heroicons-eye"
           size="xs"
           color="primary"

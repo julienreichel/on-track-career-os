@@ -641,14 +641,14 @@ function redirectToCompanyCreate() {
                     <UButton
                       color="neutral"
                       variant="ghost"
-                      :label="t('common.cancel')"
+                      :label="t('common.actions.cancel')"
                       :disabled="disableActions"
                       data-testid="job-cancel-button"
                       @click="handleCancel"
                     />
                     <UButton
                       color="primary"
-                      :label="t('common.save')"
+                      :label="t('common.actions.save')"
                       icon="i-heroicons-check"
                       :disabled="disableActions"
                       :loading="saving"
@@ -731,7 +731,7 @@ function redirectToCompanyCreate() {
                     <UButton
                       color="primary"
                       variant="outline"
-                      :label="t('common.edit')"
+                      :label="t('common.actions.edit')"
                       icon="i-heroicons-pencil"
                       @click="handleEdit"
                     />

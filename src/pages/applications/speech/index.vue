@@ -74,7 +74,7 @@
 
             <template #actions>
               <UButton
-                :label="t('common.view')"
+                :label="t('common.actions.view')"
                 icon="i-heroicons-eye"
                 size="xs"
                 color="primary"
@@ -90,8 +90,8 @@
         v-model:open="deleteModalOpen"
         :title="t('applications.speeches.delete.title')"
         :description="t('applications.speeches.delete.message')"
-        :confirm-label="t('common.delete')"
-        :cancel-label="t('common.cancel')"
+        :confirm-label="t('common.actions.delete')"
+        :cancel-label="t('common.actions.cancel')"
         confirm-color="error"
         :loading="deleting"
         @confirm="handleDelete"

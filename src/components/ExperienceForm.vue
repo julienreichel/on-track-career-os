@@ -208,13 +208,13 @@ const experienceTypeValue = computed<string>({
           type="button"
           color="neutral"
           variant="ghost"
-          :label="t('common.cancel')"
+          :label="t('common.actions.cancel')"
           @click="handleCancel"
         />
         <UButton
           type="submit"
           icon="i-heroicons-check"
-          :label="submitLabel || t('common.save')"
+          :label="submitLabel || t('common.actions.save')"
           :loading="loading"
           :disabled="!form.title || !form.startDate"
         />

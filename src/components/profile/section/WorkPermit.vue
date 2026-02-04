@@ -46,7 +46,7 @@
         />
         <UButton
           color="primary"
-          :label="t('common.save')"
+          :label="t('common.actions.save')"
           :loading="loading"
           :disabled="loading || hasValidationErrors"
           @click="saveSectionEditing"

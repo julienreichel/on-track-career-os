@@ -314,7 +314,7 @@ describe('Job Detail Page', () => {
     const wrapper = await mountPage();
     const editButton = wrapper
       .findAll('.u-button')
-      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+      .find((button) => button.text().includes(i18n.global.t('common.actions.edit')));
     await editButton?.trigger('click');
     await flushPromises();
 
@@ -347,7 +347,7 @@ describe('Job Detail Page', () => {
     const wrapper = await mountPage();
     const editButton = wrapper
       .findAll('.u-button')
-      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+      .find((button) => button.text().includes(i18n.global.t('common.actions.edit')));
     await editButton?.trigger('click');
     await flushPromises();
 
@@ -379,7 +379,7 @@ describe('Job Detail Page', () => {
     const wrapper = await mountPage();
     const editButton = wrapper
       .findAll('.u-button')
-      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+      .find((button) => button.text().includes(i18n.global.t('common.actions.edit')));
     await editButton?.trigger('click');
     await flushPromises();
 
@@ -408,7 +408,7 @@ describe('Job Detail Page', () => {
     const wrapper = await mountPage();
     const editButton = wrapper
       .findAll('.u-button')
-      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+      .find((button) => button.text().includes(i18n.global.t('common.actions.edit')));
     await editButton?.trigger('click');
     await flushPromises();
     const linkButton = wrapper.find('.select-company');
@@ -426,7 +426,7 @@ describe('Job Detail Page', () => {
     const wrapper = await mountPage();
     const editButton = wrapper
       .findAll('.u-button')
-      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+      .find((button) => button.text().includes(i18n.global.t('common.actions.edit')));
     await editButton?.trigger('click');
     await flushPromises();
     const clearButton = wrapper.find('[data-testid="job-company-clear"]');
@@ -461,7 +461,7 @@ describe('Job Detail Page', () => {
     // Enter edit mode and select company
     const editButton = wrapper
       .findAll('.u-button')
-      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+      .find((button) => button.text().includes(i18n.global.t('common.actions.edit')));
     await editButton?.trigger('click');
     await flushPromises();
 
@@ -501,7 +501,7 @@ describe('Job Detail Page', () => {
     // Enter edit mode and clear company
     const editButton = wrapper
       .findAll('.u-button')
-      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+      .find((button) => button.text().includes(i18n.global.t('common.actions.edit')));
     await editButton?.trigger('click');
     await flushPromises();
 

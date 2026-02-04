@@ -83,7 +83,7 @@ const close = () => {
     </template>
 
     <template #footer>
-      <UButton :label="t('common.close')" @click="close" />
+      <UButton :label="t('common.actions.close')" @click="close" />
     </template>
   </UModal>
 </template>

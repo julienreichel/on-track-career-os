@@ -117,7 +117,7 @@ function viewExperiences() {
 
           <!-- Actions -->
           <StickyFooterCard>
-            <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
+            <UButton :label="t('common.actions.cancel')" variant="ghost" @click="handleCancel" />
             <UButton :label="t('ingestion.cv.upload.confirmImport')" @click="handleImport" />
           </StickyFooterCard>
         </div>

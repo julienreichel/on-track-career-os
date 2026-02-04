@@ -200,14 +200,14 @@ const formattedLastGeneratedAt = computed(() => {
             <UButton
               color="neutral"
               variant="ghost"
-              :label="t('common.cancel')"
+              :label="t('common.actions.cancel')"
               :disabled="disableEdit"
               @click="isEditing = false"
             />
             <UButton
               color="primary"
               icon="i-heroicons-check"
-              :label="t('common.save')"
+              :label="t('common.actions.save')"
               :loading="saving"
               :disabled="regenerating"
               @click="emit('save')"
@@ -226,7 +226,7 @@ const formattedLastGeneratedAt = computed(() => {
               color="primary"
               variant="outline"
               icon="i-heroicons-pencil"
-              :label="t('common.edit')"
+              :label="t('common.actions.edit')"
               :disabled="disableEdit"
               data-testid="company-canvas-edit"
               @click="isEditing = true"

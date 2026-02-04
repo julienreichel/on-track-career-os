@@ -49,7 +49,7 @@
           />
 
           <div class="flex justify-end gap-3">
-            <UButton :label="t('common.cancel')" variant="ghost" @click="cancel" />
+            <UButton :label="t('common.actions.cancel')" variant="ghost" @click="cancel" />
             <UButton
               :label="t('common.actions.generate')"
               icon="i-heroicons-sparkles"
@@ -69,7 +69,7 @@
               {{ t('common.actions.generate') }}
             </h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ t('common.loading') }}
+              {{ t('common.states.loading') }}
             </p>
           </div>
           <div class="space-y-3">

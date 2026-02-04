@@ -77,7 +77,7 @@
           <ItemCard
             v-for="cv in filteredItems"
             :key="cv.id"
-            :title="cv.name || `${$t('common.untitled')} ${$t('navigation.cv')}`"
+            :title="cv.name || `${$t('common.untitled')} ${$t('common.labels.cv')}`"
             :subtitle="formatListDate(cv.updatedAt ?? cv.createdAt)"
             @edit="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
             @delete="confirmDelete(cv)"
@@ -93,7 +93,7 @@
             <!-- Custom Actions -->
             <template #actions>
               <UButton
-                :label="$t('common.view')"
+                :label="$t('common.actions.view')"
                 icon="i-heroicons-eye"
                 size="xs"
                 color="primary"
@@ -118,8 +118,8 @@
         v-model:open="deleteModalOpen"
         :title="t('applications.cvs.delete.title')"
         :description="t('applications.cvs.delete.message')"
-        :confirm-label="t('common.delete')"
-        :cancel-label="t('common.cancel')"
+        :confirm-label="t('common.actions.delete')"
+        :cancel-label="t('common.actions.cancel')"
         confirm-color="error"
         :loading="deleting"
         @confirm="handleDelete"

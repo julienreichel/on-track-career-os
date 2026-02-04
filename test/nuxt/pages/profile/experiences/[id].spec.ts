@@ -112,7 +112,7 @@ describe('Experience Detail Page', () => {
     expect(wrapper.text()).toContain(sampleExperience.title);
     expect(wrapper.find('h1').text()).toBe(sampleExperience.title);
 
-    const editLabel = i18n.global.t('common.edit');
+    const editLabel = i18n.global.t('common.actions.edit');
     const editButton = wrapper.find(`button[aria-label="${editLabel}"]`);
     expect(editButton.exists()).toBe(true);
     await editButton.trigger('click');

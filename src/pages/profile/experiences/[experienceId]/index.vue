@@ -33,7 +33,7 @@ watch(
       // Update route meta for breadcrumb
       route.meta.breadcrumbLabel = exp.companyName;
     } else if (isNewExperience.value) {
-      route.meta.breadcrumbLabel = t('navigation.new');
+      route.meta.breadcrumbLabel = t('common.labels.new');
     }
   },
   { immediate: true }
@@ -45,7 +45,7 @@ onMounted(async () => {
     await loadExperience(experienceId.value);
     isEditing.value = false;
   } else if (isNewExperience.value) {
-    route.meta.breadcrumbLabel = t('navigation.new');
+    route.meta.breadcrumbLabel = t('common.labels.new');
     isEditing.value = true;
   }
 });
@@ -199,7 +199,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
                 variant="ghost"
                 size="xs"
                 icon="i-heroicons-pencil"
-                :aria-label="t('common.edit')"
+                :aria-label="t('common.actions.edit')"
                 class="absolute right-4 top-4 cursor-pointer"
                 @click="handleEdit"
               />

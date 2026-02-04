@@ -221,10 +221,10 @@ const isValid = () => {
     <!-- Actions -->
     <template #footer>
       <div class="flex justify-end gap-3">
-        <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
+        <UButton :label="t('common.actions.cancel')" variant="ghost" @click="handleCancel" />
         <UButton
           icon="i-heroicons-check"
-          :label="t('common.save')"
+          :label="t('common.actions.save')"
           color="primary"
           :disabled="!isValid()"
           @click="handleSave"

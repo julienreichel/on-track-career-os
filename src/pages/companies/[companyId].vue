@@ -345,7 +345,7 @@ function clearJobsError() {
                   <UButton
                     color="neutral"
                     variant="ghost"
-                    :label="t('common.cancel')"
+                    :label="t('common.actions.cancel')"
                     :disabled="disableActions"
                     data-testid="company-cancel-button"
                     @click="handleCancel"
@@ -353,7 +353,7 @@ function clearJobsError() {
                   <UButton
                     color="primary"
                     icon="i-heroicons-check"
-                    :label="t('common.save')"
+                    :label="t('common.actions.save')"
                     :loading="savingCompany"
                     :disabled="!canSaveCompany"
                     data-testid="company-save-button"
@@ -365,7 +365,7 @@ function clearJobsError() {
                     color="primary"
                     variant="outline"
                     icon="i-heroicons-pencil"
-                    :label="t('common.edit')"
+                    :label="t('common.actions.edit')"
                     data-testid="company-edit-button"
                     @click="handleEdit"
                   />

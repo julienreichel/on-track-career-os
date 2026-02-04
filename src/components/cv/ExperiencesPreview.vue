@@ -111,7 +111,7 @@ const handleSave = (data: ExperienceCreateInput) => {
         <ExperienceForm
           v-if="editIndex === index"
           :experience="toExperienceInput(exp)"
-          :submit-label="t('common.apply')"
+          :submit-label="t('common.actions.apply')"
           @save="handleSave"
           @cancel="handleClose"
         />
@@ -130,7 +130,7 @@ const handleSave = (data: ExperienceCreateInput) => {
                   color="neutral"
                   variant="ghost"
                   size="xs"
-                  :aria-label="t('common.edit')"
+                  :aria-label="t('common.actions.edit')"
                   :data-testid="`experience-edit-${index}`"
                   @click="handleEdit(index)"
                 />
@@ -139,7 +139,7 @@ const handleSave = (data: ExperienceCreateInput) => {
                   color="neutral"
                   variant="ghost"
                   size="xs"
-                  :aria-label="t('common.delete')"
+                  :aria-label="t('common.actions.delete')"
                   :data-testid="`experience-remove-${index}`"
                   @click="handleRemove(index)"
                 />

@@ -2,7 +2,7 @@
   <UContainer>
     <UPage>
       <UPageHeader
-        :title="document?.name || `${$t('common.untitled')} ${$t('navigation.cv')}`"
+        :title="document?.name || `${$t('common.untitled')} ${$t('common.labels.cv')}`"
         :description="$t('applications.cvs.display.description')"
         :links="[
           {
@@ -134,9 +134,9 @@
                   {{ $t('common.lastUpdated', { date: formattedUpdatedAt }) }}
                 </p>
                 <div class="flex justify-end gap-3">
-                  <UButton :label="$t('common.cancel')" variant="ghost" @click="handleCancel" />
+                  <UButton :label="$t('common.actions.cancel')" variant="ghost" @click="handleCancel" />
                   <UButton
-                    :label="$t('common.save')"
+                    :label="$t('common.actions.save')"
                     icon="i-heroicons-check"
                     :disabled="!hasChanges || saving"
                     :loading="saving"

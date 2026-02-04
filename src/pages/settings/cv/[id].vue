@@ -57,7 +57,7 @@
           <UButton
             size="sm"
             color="primary"
-            :label="t('common.save')"
+            :label="t('common.actions.save')"
             :loading="saving"
             :disabled="saving || !template"
             @click="handleSave"

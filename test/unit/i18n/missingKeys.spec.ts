@@ -116,7 +116,7 @@ describe('i18n - Missing Keys Detection', () => {
       .filter((key) => !definedKeys.has(key))
       .sort();
 
-    expect(missingKeys).toHaveLength(0);
+    expect(missingKeys).toEqual([]);
   });
 });
 it('should report keys found in source code', () => {

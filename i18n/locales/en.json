@@ -15,9 +15,7 @@
     "cvs": "CVs",
     "speeches": "Speeches",
     "interview": "Interview Prep",
-    "settings": "Settings",
-    "cv": "CV",
-    "new": "New"
+    "settings": "Settings"
   },
   "auth": {
     "signOut": "Sign Out",
@@ -26,7 +24,7 @@
   "ingestion": {
     "cv": {
       "errors": {
-        "generation": "Failed to parse CV"
+        "parsingFailed": "Failed to parse CV"
       },
       "upload": {
         "title": "Upload Your CV",
@@ -123,7 +121,7 @@
       "emptyDescription": "Add a short description or list of products to describe this company."
     },
     "form": {
-      "title": "Analyse Company",
+      "title": "Analyze Company",
       "companyName": "Company name",
       "companyNameHint": "Required",
       "companyNamePlaceholder": "e.g., Atlas Robotics",
@@ -659,7 +657,7 @@
       "empty": {
         "title": "No jobs yet",
         "description": "Upload a job to start matching and tailored materials.",
-        "cta": "Analyse Job"
+        "cta": "Analyze Job"
       }
     },
     "jobMatch": {
@@ -695,8 +693,8 @@
         },
         "job": {
           "title": "Upload a job",
-          "description": "Analyse a job description to personalize tailored materials.",
-          "cta": "Analyse Job"
+          "description": "Analyze a job description to personalize tailored materials.",
+          "cta": "Analyze Job"
         },
         "matchingSummary": {
           "title": "Generate a match summary",
@@ -736,8 +734,8 @@
       },
       "lockedJob": {
         "title": "Upload a job",
-        "description": "Analyse a job description to unlock tailored materials.",
-        "cta": "Analyse Job"
+        "description": "Analyze a job description to unlock tailored materials.",
+        "cta": "Analyze Job"
       },
       "lockedMatchingSummary": {
         "title": "Generate a match summary",
@@ -778,13 +776,6 @@
     "unsavedChangesDescription": "Are you sure you want to discard your changes?"
   },
   "common": {
-    "save": "Save",
-    "apply": "Apply",
-    "cancel": "Cancel",
-    "edit": "Edit",
-    "delete": "Delete",
-    "view": "View",
-    "close": "Close",
     "error": "Error",
     "backToProfile": "Back to Profile",
     "back": "Back",
@@ -794,7 +785,6 @@
     "notAvailable": "Not available",
     "lastUpdated": "Last updated {date}",
     "search": "Search...",
-    "loading": "Loading...",
     "actions": {
       "add": "Add",
       "create": "Create",
@@ -802,7 +792,12 @@
       "delete": "Delete",
       "print": "Print",
       "generate": "Generate",
-      "regenerate": "Regenerate"
+      "regenerate": "Regenerate",
+      "save": "Save",
+      "apply": "Apply",
+      "cancel": "Cancel",
+      "view": "View",
+      "close": "Close"
     },
     "states": {
       "loading": "Loading...",
@@ -810,8 +805,11 @@
       "generating": "Generating..."
     },
     "retry": "Retry",
-    "empty": "Start creating professional cover letters tailored to your profile.",
-    "untitled": "Untitled"
+    "untitled": "Untitled",
+    "labels": {
+      "cv": "CV",
+      "new": "New"
+    }
   },
   "canvas": {
     "needsUpdate": "Update recommended",
@@ -1106,7 +1104,7 @@
       "actions": {
         "view": "View job",
         "viewCompanies": "View companies",
-        "add": "Analyse Job",
+        "add": "Analyze Job",
         "match": "View match"
       },
       "search": {
@@ -1168,7 +1166,7 @@
       }
     },
     "form": {
-      "createTitle": "Analyse Job",
+      "createTitle": "Analyze Job",
       "createDescription": "Upload a job description for analysis",
       "errors": {
         "generic": "Something went wrong while saving this job."
@@ -1539,7 +1537,7 @@
         "empty": {
           "preview": "Generate your first speech to build your elevator pitch and career story."
         },
-        "title": "Speech"
+        "title": "Speeches"
       },
       "detail": {
         "description": "Build your elevator pitch, career story, and why-me narrative.",

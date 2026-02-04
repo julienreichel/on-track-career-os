@@ -299,7 +299,7 @@ function handleViewStories(id: string) {
         <UButton
           color="neutral"
           variant="ghost"
-          :label="t('common.cancel')"
+          :label="t('common.actions.cancel')"
           @click="cancelDelete"
         />
         <UButton color="error" :label="t('experiences.delete.confirm')" @click="confirmDelete" />

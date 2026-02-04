@@ -167,7 +167,7 @@ watch(
         <UButton
           color="neutral"
           variant="outline"
-          :label="t('common.cancel')"
+          :label="t('common.actions.cancel')"
           @click="handleClose"
         />
         <UButton

@@ -350,13 +350,13 @@ watch(item, (newValue) => {
                     <UButton
                       color="neutral"
                       variant="ghost"
-                      :label="t('common.cancel')"
+                      :label="t('common.actions.cancel')"
                       :disabled="loading || saving"
                       @click="handleCancel"
                     />
                     <UButton
                       color="primary"
-                      :label="t('common.save')"
+                      :label="t('common.actions.save')"
                       :disabled="!hasChanges || loading || saving"
                       :loading="saving"
                       data-testid="save-cover-letter-button"

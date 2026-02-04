@@ -97,7 +97,7 @@ const cancelDelete = () => {
     <!-- Custom Actions -->
     <template #actions>
       <UButton
-        :label="t('common.view')"
+        :label="t('common.actions.view')"
         icon="i-heroicons-eye"
         size="xs"
         color="primary"
@@ -106,7 +106,7 @@ const cancelDelete = () => {
         @click="handleView"
       />
       <UButton
-        :label="t('common.edit')"
+        :label="t('common.actions.edit')"
         icon="i-heroicons-pencil"
         size="xs"
         color="neutral"
@@ -126,13 +126,13 @@ const cancelDelete = () => {
   >
     <template #footer>
       <UButton
-        :label="t('common.cancel')"
+        :label="t('common.actions.cancel')"
         color="neutral"
         variant="ghost"
         class="cursor-pointer"
         @click="cancelDelete"
       />
-      <UButton :label="t('common.delete')" color="error" @click="confirmDelete" />
+      <UButton :label="t('common.actions.delete')" color="error" @click="confirmDelete" />
     </template>
   </UModal>
 </template>

@@ -78,7 +78,7 @@
             <!-- Custom Actions -->
             <template #actions>
               <UButton
-                :label="$t('common.view')"
+                :label="$t('common.actions.view')"
                 icon="i-heroicons-eye"
                 size="xs"
                 color="primary"
@@ -104,8 +104,8 @@
         v-model:open="deleteModalOpen"
         :title="t('applications.coverLetters.delete.title')"
         :description="t('applications.coverLetters.delete.message')"
-        :confirm-label="t('common.delete')"
-        :cancel-label="t('common.cancel')"
+        :confirm-label="t('common.actions.delete')"
+        :cancel-label="t('common.actions.cancel')"
         confirm-color="error"
         :loading="deleting"
         @confirm="handleDelete"
@@ -233,7 +233,7 @@ const resolveSubtitle = (letter: CoverLetter): string => {
 const resolvePreview = (letter: CoverLetter): string => {
   const content = letter.content || '';
   if (content.length === 0) {
-    return t('common.empty');
+    return t('applications.coverLetters.list.empty.content');
   }
 
   // Get first few lines as preview

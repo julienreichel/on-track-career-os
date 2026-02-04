@@ -65,7 +65,7 @@
             :loading="loading"
             :disabled="!form.fullName || loading || hasValidationErrors"
           >
-            {{ loading ? t('profile.actions.saving') : t('common.save') }}
+            {{ loading ? t('profile.actions.saving') : t('common.actions.save') }}
           </UButton>
         </div>
       </form>

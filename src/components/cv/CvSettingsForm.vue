@@ -75,7 +75,7 @@
       <UButton
         color="primary"
         type="button"
-        :label="t('common.save')"
+        :label="t('common.actions.save')"
         :loading="saving"
         @click="emit('save')"
       />

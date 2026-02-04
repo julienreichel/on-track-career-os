@@ -132,7 +132,7 @@ const getSegmentLabel = (segment: string): string => {
     'cover-letters': t('navigation.coverLetters'),
     speech: t('navigation.speeches'),
     interview: t('navigation.interview'),
-    cv: t('navigation.cv'),
+    cv: t('common.labels.cv'),
     stories: t('stories.list.title'),
   };
   return segmentMap[segment] || segment;

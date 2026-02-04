@@ -344,13 +344,13 @@ watch(item, (newValue) => {
                       <UButton
                         color="neutral"
                         variant="ghost"
-                        :label="t('common.cancel')"
+                        :label="t('common.actions.cancel')"
                         :disabled="loading || saving"
                         @click="handleCancel"
                       />
                       <UButton
                         color="primary"
-                        :label="t('common.save')"
+                        :label="t('common.actions.save')"
                         :disabled="loading || saving"
                         :loading="saving"
                         data-testid="save-speech-button"
@@ -415,7 +415,7 @@ watch(item, (newValue) => {
                       <UButton
                         color="primary"
                         variant="outline"
-                        :label="t('common.edit')"
+                        :label="t('common.actions.edit')"
                         icon="i-heroicons-pencil"
                         @click="handleEdit"
                       />

@@ -73,7 +73,7 @@ const handleGenerate = async () => {
 
           <div class="flex justify-end gap-3 pt-4 border-t">
             <UButton color="neutral" variant="outline" @click="handleCancel">
-              {{ t('common.cancel') }}
+              {{ t('common.actions.cancel') }}
             </UButton>
             <UButton color="primary" :disabled="!hasSelection" @click="handleGenerate">
               {{ t('stories.new.generate') }}

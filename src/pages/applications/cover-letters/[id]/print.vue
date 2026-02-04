@@ -26,7 +26,7 @@
           icon="i-heroicons-printer"
           @click="handlePrint"
         />
-        <UButton :label="$t('common.close')" variant="ghost" @click="handleClose" />
+        <UButton :label="$t('common.actions.close')" variant="ghost" @click="handleClose" />
       </div>
 
       <!-- Cover Letter Content -->

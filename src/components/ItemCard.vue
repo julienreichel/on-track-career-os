@@ -90,7 +90,7 @@ const handleDelete = (event: Event) => {
           <!-- Default Actions if no custom actions provided -->
           <div v-else class="flex gap-2">
             <UButton
-              :label="$t('common.edit')"
+              :label="$t('common.actions.edit')"
               icon="i-heroicons-pencil"
               size="xs"
               color="primary"
@@ -106,7 +106,7 @@ const handleDelete = (event: Event) => {
             size="xs"
             color="error"
             variant="ghost"
-            :aria-label="t('common.delete')"
+            :aria-label="t('common.actions.delete')"
             class="cursor-pointer"
             @click="handleDelete"
           />

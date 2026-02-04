@@ -96,7 +96,7 @@ describe('CvSettingsForm', () => {
 
     const saveButton = wrapper
       .findAll('button')
-      .find((button) => button.text() === i18n.global.t('common.save'));
+      .find((button) => button.text() === i18n.global.t('common.actions.save'));
     await saveButton?.trigger('click');
 
     expect(wrapper.emitted('save')).toBeTruthy();

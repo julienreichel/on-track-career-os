@@ -106,7 +106,7 @@ describe('CompanyCanvasEditor', () => {
       button.text().includes(i18n.global.t('companies.canvas.actions.generate'))
     );
     const editButton = buttons.find((button) =>
-      button.text().includes(i18n.global.t('common.edit'))
+      button.text().includes(i18n.global.t('common.actions.edit'))
     );
 
     expect(generateButton).toBeDefined();
@@ -119,7 +119,7 @@ describe('CompanyCanvasEditor', () => {
 
     const saveButton = wrapper
       .findAll('.u-button')
-      .find((button) => button.text() === i18n.global.t('common.save'));
+      .find((button) => button.text() === i18n.global.t('common.actions.save'));
     expect(saveButton).toBeDefined();
     await saveButton!.trigger('click');
     expect(wrapper.emitted('regenerate')).toBeTruthy();

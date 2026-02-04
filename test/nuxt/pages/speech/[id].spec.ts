@@ -213,7 +213,7 @@ describe('Speech detail page', () => {
 
     const editButton = wrapper
       .findAll('button')
-      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+      .find((button) => button.text().includes(i18n.global.t('common.actions.edit')));
     expect(editButton).toBeDefined();
 
     await editButton?.trigger('click');
@@ -255,7 +255,7 @@ describe('Speech detail page', () => {
 
     const editButton = wrapper
       .findAll('button')
-      .find((button) => button.text().includes(i18n.global.t('common.edit')));
+      .find((button) => button.text().includes(i18n.global.t('common.actions.edit')));
     expect(editButton).toBeDefined();
     await editButton?.trigger('click');
     await flushPromises();

@@ -323,7 +323,7 @@ onMounted(async () => {
             </UFormField>
 
             <div class="flex justify-end gap-3">
-              <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
+              <UButton :label="t('common.actions.cancel')" variant="ghost" @click="handleCancel" />
               <UButton
                 :label="t('stories.form.generateFromText')"
                 icon="i-heroicons-sparkles"
@@ -369,9 +369,9 @@ onMounted(async () => {
 
           <!-- Action Buttons -->
           <div class="flex justify-end gap-3">
-            <UButton :label="t('common.cancel')" variant="ghost" @click="handleCancel" />
+            <UButton :label="t('common.actions.cancel')" variant="ghost" @click="handleCancel" />
             <UButton
-              :label="t('common.save')"
+              :label="t('common.actions.save')"
               icon="i-heroicons-check"
               :disabled="!canSave || saving"
               :loading="saving"
