@@ -192,87 +192,85 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="t('stories.list.title')"
-        :description="companyName"
-        :links="[
-          {
-            label: t('experiences.list.title'),
-            to: '/profile/experiences',
-            icon: 'i-heroicons-arrow-left',
-          },
-          {
-            label: t('stories.list.addNew'),
-            icon: 'i-heroicons-plus',
-            onClick: handleNewStory,
-          },
-        ]"
+  <UPage>
+    <UPageHeader
+      :title="t('stories.list.title')"
+      :description="companyName"
+      :links="[
+        {
+          label: t('experiences.list.title'),
+          to: '/profile/experiences',
+          icon: 'i-heroicons-arrow-left',
+        },
+        {
+          label: t('stories.list.addNew'),
+          icon: 'i-heroicons-plus',
+          onClick: handleNewStory,
+        },
+      ]"
+    />
+
+    <UPageBody>
+      <!-- Error Alert -->
+      <UAlert
+        v-if="error"
+        color="error"
+        icon="i-heroicons-exclamation-triangle"
+        :title="t('common.error')"
+        :description="error"
+        class="mb-6"
       />
 
-      <UPageBody>
-        <!-- Error Alert -->
-        <UAlert
-          v-if="error"
-          color="error"
-          icon="i-heroicons-exclamation-triangle"
-          :title="t('common.error')"
-          :description="error"
-          class="mb-6"
-        />
+      <!-- Generation Error Alert -->
+      <UAlert
+        v-if="generationError"
+        color="error"
+        icon="i-heroicons-exclamation-triangle"
+        :title="t('common.error')"
+        :description="generationError"
+        class="mb-6"
+      />
 
-        <!-- Generation Error Alert -->
-        <UAlert
-          v-if="generationError"
-          color="error"
-          icon="i-heroicons-exclamation-triangle"
-          :title="t('common.error')"
-          :description="generationError"
-          class="mb-6"
-        />
+      <!-- Loading State -->
+      <div v-if="loading || isGenerating || !hasLoaded" class="space-y-4">
+        <ListSkeletonCards />
+        <p v-if="isGenerating" class="text-center text-sm text-gray-500">
+          {{ t('stories.list.generating') }}
+        </p>
+      </div>
 
-        <!-- Loading State -->
-        <div v-if="loading || isGenerating || !hasLoaded" class="space-y-4">
-          <ListSkeletonCards />
-          <p v-if="isGenerating" class="text-center text-sm text-gray-500">
-            {{ t('stories.list.generating') }}
-          </p>
-        </div>
+      <!-- Empty State -->
+      <UEmpty
+        v-else-if="stories.length === 0"
+        :title="t('stories.list.empty.experienceTitle')"
+        :description="t('stories.list.empty.experienceDescription')"
+        icon="i-heroicons-document-text"
+      >
+        <template #actions>
+          <UButton
+            :label="t('stories.list.autoGenerate')"
+            icon="i-heroicons-sparkles"
+            color="primary"
+            @click="handleAutoGenerate"
+          />
+          <UButton
+            :label="t('stories.list.addNew')"
+            icon="i-heroicons-plus"
+            variant="outline"
+            @click="handleNewStory"
+          />
+        </template>
+      </UEmpty>
 
-        <!-- Empty State -->
-        <UEmpty
-          v-else-if="stories.length === 0"
-          :title="t('stories.list.empty.experienceTitle')"
-          :description="t('stories.list.empty.experienceDescription')"
-          icon="i-heroicons-document-text"
-        >
-          <template #actions>
-            <UButton
-              :label="t('stories.list.autoGenerate')"
-              icon="i-heroicons-sparkles"
-              color="primary"
-              @click="handleAutoGenerate"
-            />
-            <UButton
-              :label="t('stories.list.addNew')"
-              icon="i-heroicons-plus"
-              variant="outline"
-              @click="handleNewStory"
-            />
-          </template>
-        </UEmpty>
-
-        <!-- Story List Component -->
-        <StoryList
-          v-else
-          :stories="stories"
-          :loading="loading || deleting"
-          :experience-id="experienceId"
-          @delete="handleDelete"
-          @refresh="handleRefresh"
-        />
-      </UPageBody>
-    </UPage>
-  </UContainer>
+      <!-- Story List Component -->
+      <StoryList
+        v-else
+        :stories="stories"
+        :loading="loading || deleting"
+        :experience-id="experienceId"
+        @delete="handleDelete"
+        @refresh="handleRefresh"
+      />
+    </UPageBody>
+  </UPage>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <UContainer>
+  <div>
     <UPage>
       <UPageHeader
         :title="document?.name || `${$t('common.untitled')} ${$t('common.labels.cv')}`"
@@ -109,9 +109,13 @@
                   />
                 </div>
                 <div class="mt-3 text-sm text-gray-500 dark:text-gray-400">
-                  <span v-if="profilePhotoLoading">{{ $t('applications.cvs.display.photoLoading') }}</span>
+                  <span v-if="profilePhotoLoading">{{
+                    $t('applications.cvs.display.photoLoading')
+                  }}</span>
                   <span v-else-if="profilePhotoError">{{ profilePhotoError }}</span>
-                  <span v-else-if="!profilePhotoUrl">{{ $t('applications.cvs.display.photoUnavailable') }}</span>
+                  <span v-else-if="!profilePhotoUrl">{{
+                    $t('applications.cvs.display.photoUnavailable')
+                  }}</span>
                 </div>
                 <div
                   v-if="profilePhotoUrl"
@@ -134,7 +138,11 @@
                   {{ $t('common.lastUpdated', { date: formattedUpdatedAt }) }}
                 </p>
                 <div class="flex justify-end gap-3">
-                  <UButton :label="$t('common.actions.cancel')" variant="ghost" @click="handleCancel" />
+                  <UButton
+                    :label="$t('common.actions.cancel')"
+                    variant="ghost"
+                    @click="handleCancel"
+                  />
                   <UButton
                     :label="$t('common.actions.save')"
                     icon="i-heroicons-check"
@@ -196,7 +204,7 @@
 
     <!-- Unsaved Changes Modal -->
     <UnsavedChangesModal v-model:open="showCancelConfirm" @discard="handleConfirmCancel" />
-  </UContainer>
+  </div>
 </template>
 
 <script setup lang="ts">

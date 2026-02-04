@@ -1,105 +1,107 @@
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="t('applications.speeches.page.title')"
-        :description="t('applications.speeches.page.description')"
-        :links="[
-          {
-            label: t('common.backToList'),
-            icon: 'i-heroicons-arrow-left',
-            to: { name: 'applications' },
-          },
-          {
-            label: t('applications.speeches.list.actions.create'),
-            icon: 'i-heroicons-plus',
-            to: { name: 'applications-speech-new' },
-          },
-        ]"
+  <UPage>
+    <UPageHeader
+      :title="t('applications.speeches.page.title')"
+      :description="t('applications.speeches.page.description')"
+      :links="[
+        {
+          label: t('common.backToList'),
+          icon: 'i-heroicons-arrow-left',
+          to: { name: 'applications' },
+        },
+        {
+          label: t('applications.speeches.list.actions.create'),
+          icon: 'i-heroicons-plus',
+          to: { name: 'applications-speech-new' },
+        },
+      ]"
+    />
+
+    <UPageBody>
+      <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
+
+      <LockedFeatureCard
+        v-for="feature in guidance.lockedFeatures"
+        :key="feature.id"
+        :feature="feature"
+        class="mb-6"
       />
 
-      <UPageBody>
-        <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
-
-        <LockedFeatureCard
-          v-for="feature in guidance.lockedFeatures"
-          :key="feature.id"
-          :feature="feature"
-          class="mb-6"
+      <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
+        <UInput
+          v-model="searchQuery"
+          icon="i-heroicons-magnifying-glass"
+          :placeholder="t('applications.speeches.list.search.placeholder')"
+          size="lg"
+          class="w-1/3"
         />
+      </div>
 
-        <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
-          <UInput
-            v-model="searchQuery"
-            icon="i-heroicons-magnifying-glass"
-            :placeholder="t('applications.speeches.list.search.placeholder')"
-            size="lg"
-            class="w-1/3"
-          />
-        </div>
-
-        <UAlert
-          v-if="error"
-          color="error"
-          icon="i-heroicons-exclamation-triangle"
-          :title="t('common.error')"
-          :description="error"
-          class="mb-6"
-        />
-
-        <ListSkeletonCards v-if="loading || !hasLoaded" />
-
-        <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
-
-        <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
-          <UEmpty :title="t('applications.speeches.list.search.noResults')" icon="i-heroicons-magnifying-glass">
-            <p class="text-sm text-gray-500">{{ t('applications.speeches.list.search.placeholder') }}</p>
-          </UEmpty>
-        </UCard>
-
-        <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <ItemCard
-            v-for="block in filteredItems"
-            :key="block.id"
-            :title="resolveTitle(block)"
-            :subtitle="formatUpdatedAt(block.updatedAt)"
-            @edit="navigateTo({ name: 'applications-speech-id', params: { id: block.id } })"
-            @delete="confirmDelete(block)"
-          >
-            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-              <p class="line-clamp-3">
-                {{ resolvePreview(block) }}
-              </p>
-            </div>
-
-            <template #actions>
-              <UButton
-                :label="t('common.actions.view')"
-                icon="i-heroicons-eye"
-                size="xs"
-                color="primary"
-                variant="outline"
-                @click="navigateTo({ name: 'applications-speech-id', params: { id: block.id } })"
-              />
-            </template>
-          </ItemCard>
-        </div>
-      </UPageBody>
-
-      <ConfirmModal
-        v-model:open="deleteModalOpen"
-        :title="t('applications.speeches.delete.title')"
-        :description="t('applications.speeches.delete.message')"
-        :confirm-label="t('common.actions.delete')"
-        :cancel-label="t('common.actions.cancel')"
-        confirm-color="error"
-        :loading="deleting"
-        @confirm="handleDelete"
+      <UAlert
+        v-if="error"
+        color="error"
+        icon="i-heroicons-exclamation-triangle"
+        :title="t('common.error')"
+        :description="error"
+        class="mb-6"
       />
-    </UPage>
-  </UContainer>
+
+      <ListSkeletonCards v-if="loading || !hasLoaded" />
+
+      <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
+
+      <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
+        <UEmpty
+          :title="t('applications.speeches.list.search.noResults')"
+          icon="i-heroicons-magnifying-glass"
+        >
+          <p class="text-sm text-gray-500">
+            {{ t('applications.speeches.list.search.placeholder') }}
+          </p>
+        </UEmpty>
+      </UCard>
+
+      <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ItemCard
+          v-for="block in filteredItems"
+          :key="block.id"
+          :title="resolveTitle(block)"
+          :subtitle="formatUpdatedAt(block.updatedAt)"
+          @edit="navigateTo({ name: 'applications-speech-id', params: { id: block.id } })"
+          @delete="confirmDelete(block)"
+        >
+          <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <p class="line-clamp-3">
+              {{ resolvePreview(block) }}
+            </p>
+          </div>
+
+          <template #actions>
+            <UButton
+              :label="t('common.actions.view')"
+              icon="i-heroicons-eye"
+              size="xs"
+              color="primary"
+              variant="outline"
+              @click="navigateTo({ name: 'applications-speech-id', params: { id: block.id } })"
+            />
+          </template>
+        </ItemCard>
+      </div>
+    </UPageBody>
+
+    <ConfirmModal
+      v-model:open="deleteModalOpen"
+      :title="t('applications.speeches.delete.title')"
+      :description="t('applications.speeches.delete.message')"
+      :confirm-label="t('common.actions.delete')"
+      :cancel-label="t('common.actions.cancel')"
+      confirm-color="error"
+      :loading="deleting"
+      @confirm="handleDelete"
+    />
+  </UPage>
 </template>
-
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';

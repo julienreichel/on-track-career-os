@@ -69,7 +69,6 @@ describe('Canvas Index Page', () => {
             useToast: () => mockToast,
           },
           stubs: {
-            UContainer: { template: '<div class="u-container"><slot /></div>' },
             UPage: { template: '<div class="u-page"><slot /></div>' },
             UPageHeader: { template: '<div class="u-page-header"><slot /></div>' },
             UPageBody: { template: '<div class="u-page-body"><slot /></div>' },
@@ -81,7 +80,6 @@ describe('Canvas Index Page', () => {
         },
       });
 
-      expect(wrapper.find('.u-container').exists()).toBe(true);
       expect(wrapper.find('.u-page').exists()).toBe(true);
       expect(wrapper.find('[data-testid="canvas-component"]').exists()).toBe(true);
     });
@@ -108,7 +106,6 @@ describe('Canvas Index Page', () => {
             useToast: () => mockToast,
           },
           stubs: {
-            UContainer: { template: '<div class="u-container"><slot /></div>' },
             UPage: { template: '<div class="u-page"><slot /></div>' },
             UPageHeader: { template: '<div class="u-page-header"><slot /></div>' },
             UPageBody: { template: '<div class="u-page-body"><slot /></div>' },
@@ -160,7 +157,6 @@ describe('Canvas Index Page', () => {
             useToast: () => mockToast,
           },
           stubs: {
-            UContainer: { template: '<div class="u-container"><slot /></div>' },
             UPage: { template: '<div class="u-page"><slot /></div>' },
             UPageHeader: { template: '<div class="u-page-header"><slot /></div>' },
             UPageBody: { template: '<div class="u-page-body"><slot /></div>' },

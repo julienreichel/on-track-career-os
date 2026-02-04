@@ -121,9 +121,6 @@ const stubs = {
 
 const pageComponentStubs = {
   ...stubs,
-  UContainer: {
-    template: '<div class="u-container"><slot /></div>',
-  },
   UPageGrid: {
     template: '<div class="u-page-grid"><slot /></div>',
   },

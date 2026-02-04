@@ -165,119 +165,117 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
 </script>
 
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="isNewExperience ? t('experiences.form.createTitle') : displayTitle"
-        :description="isNewExperience ? undefined : displayCompany"
-        :links="headerLinks"
+  <UPage>
+    <UPageHeader
+      :title="isNewExperience ? t('experiences.form.createTitle') : displayTitle"
+      :description="isNewExperience ? undefined : displayCompany"
+      :links="headerLinks"
+    />
+
+    <UPageBody>
+      <!-- Error Alert -->
+      <UAlert
+        v-if="errorMessage"
+        icon="i-heroicons-exclamation-triangle"
+        color="error"
+        variant="soft"
+        :title="t('ingestion.cv.upload.errors.unknown')"
+        :description="errorMessage"
+        :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+        @close="errorMessage = null"
       />
 
-      <UPageBody>
-        <!-- Error Alert -->
-        <UAlert
-          v-if="errorMessage"
-          icon="i-heroicons-exclamation-triangle"
-          color="error"
-          variant="soft"
-          :title="t('ingestion.cv.upload.errors.unknown')"
-          :description="errorMessage"
-          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-          @close="errorMessage = null"
-        />
+      <!-- Loading State -->
+      <div v-if="loading" class="flex justify-center py-12">
+        <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin text-primary" />
+      </div>
 
-        <!-- Loading State -->
-        <div v-if="loading" class="flex justify-center py-12">
-          <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin text-primary" />
-        </div>
+      <template v-else>
+        <div v-if="!isEditing" class="space-y-6">
+          <UCard class="relative">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              icon="i-heroicons-pencil"
+              :aria-label="t('common.actions.edit')"
+              class="absolute right-4 top-4 cursor-pointer"
+              @click="handleEdit"
+            />
+            <div class="space-y-6">
+              <div>
+                <p class="text-sm text-gray-500">{{ t('experiences.form.title') }}</p>
+                <p class="text-base text-gray-900 dark:text-gray-100">{{ displayTitle }}</p>
+              </div>
 
-        <template v-else>
-          <div v-if="!isEditing" class="space-y-6">
-            <UCard class="relative">
-              <UButton
-                color="neutral"
-                variant="ghost"
-                size="xs"
-                icon="i-heroicons-pencil"
-                :aria-label="t('common.actions.edit')"
-                class="absolute right-4 top-4 cursor-pointer"
-                @click="handleEdit"
-              />
-              <div class="space-y-6">
+              <div>
+                <p class="text-sm text-gray-500">{{ t('experiences.form.company') }}</p>
+                <p class="text-base text-gray-900 dark:text-gray-100">{{ displayCompany }}</p>
+              </div>
+
+              <div class="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p class="text-sm text-gray-500">{{ t('experiences.form.title') }}</p>
-                  <p class="text-base text-gray-900 dark:text-gray-100">{{ displayTitle }}</p>
+                  <p class="text-sm text-gray-500">{{ t('experiences.form.type') }}</p>
+                  <p class="text-base text-gray-900 dark:text-gray-100">{{ displayType }}</p>
                 </div>
-
                 <div>
-                  <p class="text-sm text-gray-500">{{ t('experiences.form.company') }}</p>
-                  <p class="text-base text-gray-900 dark:text-gray-100">{{ displayCompany }}</p>
-                </div>
-
-                <div class="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <p class="text-sm text-gray-500">{{ t('experiences.form.type') }}</p>
-                    <p class="text-base text-gray-900 dark:text-gray-100">{{ displayType }}</p>
-                  </div>
-                  <div>
-                    <p class="text-sm text-gray-500">{{ t('experiences.form.status') }}</p>
-                    <p class="text-base text-gray-900 dark:text-gray-100">{{ displayStatus }}</p>
-                  </div>
-                </div>
-
-                <div class="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <p class="text-sm text-gray-500">{{ t('experiences.form.startDate') }}</p>
-                    <p class="text-base text-gray-900 dark:text-gray-100">
-                      {{ displayStartDate }}
-                    </p>
-                  </div>
-                  <div>
-                    <p class="text-sm text-gray-500">{{ t('experiences.form.endDate') }}</p>
-                    <p class="text-base text-gray-900 dark:text-gray-100">{{ displayEndDate }}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <p class="text-sm text-gray-500">
-                    {{ t('experiences.form.responsibilities') }}
-                  </p>
-                  <ul
-                    v-if="responsibilitiesList.length"
-                    class="mt-2 list-disc space-y-1 pl-4 text-gray-900 dark:text-gray-100"
-                  >
-                    <li v-for="(item, idx) in responsibilitiesList" :key="idx">{{ item }}</li>
-                  </ul>
-                  <p v-else class="mt-2 text-sm text-gray-500">
-                    {{ t('experiences.card.noSummary') }}
-                  </p>
-                </div>
-
-                <div>
-                  <p class="text-sm text-gray-500">{{ t('experiences.form.tasks') }}</p>
-                  <ul
-                    v-if="tasksList.length"
-                    class="mt-2 list-disc space-y-1 pl-4 text-gray-900 dark:text-gray-100"
-                  >
-                    <li v-for="(item, idx) in tasksList" :key="idx">{{ item }}</li>
-                  </ul>
-                  <p v-else class="mt-2 text-sm text-gray-500">
-                    {{ t('experiences.card.noSummary') }}
-                  </p>
+                  <p class="text-sm text-gray-500">{{ t('experiences.form.status') }}</p>
+                  <p class="text-base text-gray-900 dark:text-gray-100">{{ displayStatus }}</p>
                 </div>
               </div>
-            </UCard>
-          </div>
 
-          <ExperienceForm
-            v-else
-            :experience="experience"
-            :loading="saving"
-            @save="handleSave"
-            @cancel="handleCancel"
-          />
-        </template>
-      </UPageBody>
-    </UPage>
-  </UContainer>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p class="text-sm text-gray-500">{{ t('experiences.form.startDate') }}</p>
+                  <p class="text-base text-gray-900 dark:text-gray-100">
+                    {{ displayStartDate }}
+                  </p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">{{ t('experiences.form.endDate') }}</p>
+                  <p class="text-base text-gray-900 dark:text-gray-100">{{ displayEndDate }}</p>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-sm text-gray-500">
+                  {{ t('experiences.form.responsibilities') }}
+                </p>
+                <ul
+                  v-if="responsibilitiesList.length"
+                  class="mt-2 list-disc space-y-1 pl-4 text-gray-900 dark:text-gray-100"
+                >
+                  <li v-for="(item, idx) in responsibilitiesList" :key="idx">{{ item }}</li>
+                </ul>
+                <p v-else class="mt-2 text-sm text-gray-500">
+                  {{ t('experiences.card.noSummary') }}
+                </p>
+              </div>
+
+              <div>
+                <p class="text-sm text-gray-500">{{ t('experiences.form.tasks') }}</p>
+                <ul
+                  v-if="tasksList.length"
+                  class="mt-2 list-disc space-y-1 pl-4 text-gray-900 dark:text-gray-100"
+                >
+                  <li v-for="(item, idx) in tasksList" :key="idx">{{ item }}</li>
+                </ul>
+                <p v-else class="mt-2 text-sm text-gray-500">
+                  {{ t('experiences.card.noSummary') }}
+                </p>
+              </div>
+            </div>
+          </UCard>
+        </div>
+
+        <ExperienceForm
+          v-else
+          :experience="experience"
+          :loading="saving"
+          @save="handleSave"
+          @cancel="handleCancel"
+        />
+      </template>
+    </UPageBody>
+  </UPage>
 </template>

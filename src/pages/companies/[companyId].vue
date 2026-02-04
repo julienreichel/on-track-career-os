@@ -245,205 +245,203 @@ function clearJobsError() {
 </script>
 
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="form.companyName || t('companies.detail.untitled')"
-        :description="t('companies.detail.description')"
-        :links="headerLinks"
+  <UPage>
+    <UPageHeader
+      :title="form.companyName || t('companies.detail.untitled')"
+      :description="t('companies.detail.description')"
+      :links="headerLinks"
+    />
+
+    <UPageBody>
+      <UAlert
+        v-if="errorMessage"
+        icon="i-heroicons-exclamation-triangle"
+        color="error"
+        variant="soft"
+        :title="t('companies.detail.errors.title')"
+        :description="errorMessage"
+        class="mb-6"
+        :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+        @close="errorMessage = null"
       />
 
-      <UPageBody>
-        <UAlert
-          v-if="errorMessage"
-          icon="i-heroicons-exclamation-triangle"
-          color="error"
-          variant="soft"
-          :title="t('companies.detail.errors.title')"
-          :description="errorMessage"
-          class="mb-6"
-          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-          @close="errorMessage = null"
-        />
+      <UCard v-if="loading">
+        <USkeleton class="h-8 w-full" />
+        <USkeleton class="mt-4 h-32 w-full" />
+      </UCard>
 
-        <UCard v-if="loading">
-          <USkeleton class="h-8 w-full" />
-          <USkeleton class="mt-4 h-32 w-full" />
+      <div v-else class="space-y-8">
+        <UCard>
+          <template v-if="isEditing">
+            <div class="space-y-6">
+              <CompanyForm v-model="form" :disabled="disableActions" />
+              <CompanyNotesInput v-model="rawNotes" :disabled="disableActions" />
+            </div>
+          </template>
+
+          <template v-else>
+            <div class="grid gap-4 md:grid-cols-2">
+              <UFormField :label="t('companies.form.companyName')">
+                <p>{{ form.companyName || t('common.notAvailable') }}</p>
+              </UFormField>
+              <UFormField :label="t('companies.form.industry')">
+                <p>{{ form.industry || t('common.notAvailable') }}</p>
+              </UFormField>
+              <UFormField :label="t('companies.form.sizeRange')">
+                <p>{{ form.sizeRange || t('common.notAvailable') }}</p>
+              </UFormField>
+              <UFormField :label="t('companies.form.website')">
+                <NuxtLink
+                  v-if="form.website"
+                  :to="form.website"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ form.website }}
+                </NuxtLink>
+                <p v-else>{{ t('common.notAvailable') }}</p>
+              </UFormField>
+            </div>
+
+            <UFormField :label="t('companies.form.description')" class="mt-4">
+              <p>{{ form.description || t('common.notAvailable') }}</p>
+            </UFormField>
+
+            <div class="mt-4 grid gap-4 md:grid-cols-3">
+              <UFormField :label="t('companies.form.productsServices')">
+                <ul v-if="form.productsServices.length" class="list-disc space-y-1 pl-4">
+                  <li v-for="item in form.productsServices" :key="item">
+                    {{ item }}
+                  </li>
+                </ul>
+                <p v-else>{{ t('common.notAvailable') }}</p>
+              </UFormField>
+              <UFormField :label="t('companies.form.targetMarkets')">
+                <ul v-if="form.targetMarkets.length" class="list-disc space-y-1 pl-4">
+                  <li v-for="item in form.targetMarkets" :key="item">
+                    {{ item }}
+                  </li>
+                </ul>
+                <p v-else>{{ t('common.notAvailable') }}</p>
+              </UFormField>
+              <UFormField :label="t('companies.form.customerSegments')">
+                <ul v-if="form.customerSegments.length" class="list-disc space-y-1 pl-4">
+                  <li v-for="item in form.customerSegments" :key="item">
+                    {{ item }}
+                  </li>
+                </ul>
+                <p v-else>{{ t('common.notAvailable') }}</p>
+              </UFormField>
+            </div>
+          </template>
+
+          <template #footer>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p v-if="formattedMeta" class="text-xs text-gray-400">
+                {{ t('common.lastUpdated', { date: formattedMeta }) }}
+              </p>
+              <div v-if="isEditing" class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  :label="t('common.actions.cancel')"
+                  :disabled="disableActions"
+                  data-testid="company-cancel-button"
+                  @click="handleCancel"
+                />
+                <UButton
+                  color="primary"
+                  icon="i-heroicons-check"
+                  :label="t('common.actions.save')"
+                  :loading="savingCompany"
+                  :disabled="!canSaveCompany"
+                  data-testid="company-save-button"
+                  @click="saveCompany"
+                />
+              </div>
+              <div v-else class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                <UButton
+                  color="primary"
+                  variant="outline"
+                  icon="i-heroicons-pencil"
+                  :label="t('common.actions.edit')"
+                  data-testid="company-edit-button"
+                  @click="handleEdit"
+                />
+              </div>
+            </div>
+          </template>
         </UCard>
 
-        <div v-else class="space-y-8">
-          <UCard>
-            <template v-if="isEditing">
-              <div class="space-y-6">
-                <CompanyForm v-model="form" :disabled="disableActions" />
-                <CompanyNotesInput v-model="rawNotes" :disabled="disableActions" />
-              </div>
-            </template>
+        <CompanyCanvasEditor
+          :blocks="canvasStore.draftBlocks.value"
+          :needs-update="canvasStore.canvas.value?.needsUpdate ?? true"
+          :last-generated-at="canvasStore.canvas.value?.lastGeneratedAt ?? null"
+          :saving="canvasSaving"
+          :regenerating="canvasRegenerating"
+          :disabled="canvasStore.loading.value"
+          @update:block="canvasStore.updateBlock"
+          @save="saveCanvas"
+          @regenerate="regenerateCanvas"
+        />
 
-            <template v-else>
-              <div class="grid gap-4 md:grid-cols-2">
-                <UFormField :label="t('companies.form.companyName')">
-                  <p>{{ form.companyName || t('common.notAvailable') }}</p>
-                </UFormField>
-                <UFormField :label="t('companies.form.industry')">
-                  <p>{{ form.industry || t('common.notAvailable') }}</p>
-                </UFormField>
-                <UFormField :label="t('companies.form.sizeRange')">
-                  <p>{{ form.sizeRange || t('common.notAvailable') }}</p>
-                </UFormField>
-                <UFormField :label="t('companies.form.website')">
-                  <NuxtLink
-                    v-if="form.website"
-                    :to="form.website"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {{ form.website }}
-                  </NuxtLink>
-                  <p v-else>{{ t('common.notAvailable') }}</p>
-                </UFormField>
-              </div>
+        <UCard>
+          <div class="mb-6">
+            <h2 class="text-xl font-semibold">
+              {{ t('companies.detail.sections.linkedJobs') }}
+            </h2>
+            <p class="text-sm text-gray-500">
+              {{ t('companies.detail.sections.linkedJobsDescription') }}
+            </p>
+          </div>
 
-              <UFormField :label="t('companies.form.description')" class="mt-4">
-                <p>{{ form.description || t('common.notAvailable') }}</p>
-              </UFormField>
-
-              <div class="mt-4 grid gap-4 md:grid-cols-3">
-                <UFormField :label="t('companies.form.productsServices')">
-                  <ul v-if="form.productsServices.length" class="list-disc space-y-1 pl-4">
-                    <li v-for="item in form.productsServices" :key="item">
-                      {{ item }}
-                    </li>
-                  </ul>
-                  <p v-else>{{ t('common.notAvailable') }}</p>
-                </UFormField>
-                <UFormField :label="t('companies.form.targetMarkets')">
-                  <ul v-if="form.targetMarkets.length" class="list-disc space-y-1 pl-4">
-                    <li v-for="item in form.targetMarkets" :key="item">
-                      {{ item }}
-                    </li>
-                  </ul>
-                  <p v-else>{{ t('common.notAvailable') }}</p>
-                </UFormField>
-                <UFormField :label="t('companies.form.customerSegments')">
-                  <ul v-if="form.customerSegments.length" class="list-disc space-y-1 pl-4">
-                    <li v-for="item in form.customerSegments" :key="item">
-                      {{ item }}
-                    </li>
-                  </ul>
-                  <p v-else>{{ t('common.notAvailable') }}</p>
-                </UFormField>
-              </div>
-            </template>
-
-            <template #footer>
-              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p v-if="formattedMeta" class="text-xs text-gray-400">
-                  {{ t('common.lastUpdated', { date: formattedMeta }) }}
-                </p>
-                <div v-if="isEditing" class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                  <UButton
-                    color="neutral"
-                    variant="ghost"
-                    :label="t('common.actions.cancel')"
-                    :disabled="disableActions"
-                    data-testid="company-cancel-button"
-                    @click="handleCancel"
-                  />
-                  <UButton
-                    color="primary"
-                    icon="i-heroicons-check"
-                    :label="t('common.actions.save')"
-                    :loading="savingCompany"
-                    :disabled="!canSaveCompany"
-                    data-testid="company-save-button"
-                    @click="saveCompany"
-                  />
-                </div>
-                <div v-else class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                  <UButton
-                    color="primary"
-                    variant="outline"
-                    icon="i-heroicons-pencil"
-                    :label="t('common.actions.edit')"
-                    data-testid="company-edit-button"
-                    @click="handleEdit"
-                  />
-                </div>
-              </div>
-            </template>
-          </UCard>
-
-          <CompanyCanvasEditor
-            :blocks="canvasStore.draftBlocks.value"
-            :needs-update="canvasStore.canvas.value?.needsUpdate ?? true"
-            :last-generated-at="canvasStore.canvas.value?.lastGeneratedAt ?? null"
-            :saving="canvasSaving"
-            :regenerating="canvasRegenerating"
-            :disabled="canvasStore.loading.value"
-            @update:block="canvasStore.updateBlock"
-            @save="saveCanvas"
-            @regenerate="regenerateCanvas"
+          <UAlert
+            v-if="jobsError"
+            icon="i-heroicons-exclamation-triangle"
+            color="error"
+            variant="soft"
+            :title="t('companies.detail.errors.title')"
+            :description="jobsError"
+            class="mb-4"
+            :close-button="{
+              icon: 'i-heroicons-x-mark-20-solid',
+              color: 'error',
+              variant: 'link',
+            }"
+            @close="clearJobsError"
           />
 
-          <UCard>
-            <div class="mb-6">
-              <h2 class="text-xl font-semibold">
-                {{ t('companies.detail.sections.linkedJobs') }}
-              </h2>
-              <p class="text-sm text-gray-500">
-                {{ t('companies.detail.sections.linkedJobsDescription') }}
-              </p>
-            </div>
-
-            <UAlert
-              v-if="jobsError"
-              icon="i-heroicons-exclamation-triangle"
-              color="error"
-              variant="soft"
-              :title="t('companies.detail.errors.title')"
-              :description="jobsError"
-              class="mb-4"
-              :close-button="{
-                icon: 'i-heroicons-x-mark-20-solid',
-                color: 'error',
-                variant: 'link',
-              }"
-              @close="clearJobsError"
+          <div v-if="jobsLoading" class="grid gap-4 md:grid-cols-2">
+            <USkeleton class="h-32 w-full" />
+            <USkeleton class="h-32 w-full" />
+          </div>
+          <div
+            v-else-if="relatedJobs.length === 0"
+            class="rounded-lg border border-dashed border-gray-200 p-6 text-center dark:border-gray-800"
+          >
+            <p class="text-sm text-gray-500">
+              {{ t('companies.detail.sections.linkedJobsEmpty') }}
+            </p>
+            <UButton
+              class="mt-4"
+              color="primary"
+              variant="outline"
+              :label="t('companies.list.actions.viewJobs')"
+              icon="i-heroicons-arrow-top-right-on-square"
+              to="/jobs"
             />
-
-            <div v-if="jobsLoading" class="grid gap-4 md:grid-cols-2">
-              <USkeleton class="h-32 w-full" />
-              <USkeleton class="h-32 w-full" />
-            </div>
-            <div
-              v-else-if="relatedJobs.length === 0"
-              class="rounded-lg border border-dashed border-gray-200 p-6 text-center dark:border-gray-800"
-            >
-              <p class="text-sm text-gray-500">
-                {{ t('companies.detail.sections.linkedJobsEmpty') }}
-              </p>
-              <UButton
-                class="mt-4"
-                color="primary"
-                variant="outline"
-                :label="t('companies.list.actions.viewJobs')"
-                icon="i-heroicons-arrow-top-right-on-square"
-                to="/jobs"
-              />
-            </div>
-            <div v-else class="grid gap-4 md:grid-cols-2">
-              <JobCard
-                v-for="job in relatedJobs"
-                :key="job.id"
-                :job="job"
-                :show-delete="false"
-                @open="openJob"
-              />
-            </div>
-          </UCard>
-        </div>
-      </UPageBody>
-    </UPage>
-  </UContainer>
+          </div>
+          <div v-else class="grid gap-4 md:grid-cols-2">
+            <JobCard
+              v-for="job in relatedJobs"
+              :key="job.id"
+              :job="job"
+              :show-delete="false"
+              @open="openJob"
+            />
+          </div>
+        </UCard>
+      </div>
+    </UPageBody>
+  </UPage>
 </template>

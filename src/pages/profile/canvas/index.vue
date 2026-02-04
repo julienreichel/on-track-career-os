@@ -1,43 +1,41 @@
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="t('canvas.page.title')"
-        :description="t('canvas.page.description')"
-        :links="headerLinks"
+  <UPage>
+    <UPageHeader
+      :title="t('canvas.page.title')"
+      :description="t('canvas.page.description')"
+      :links="headerLinks"
+    />
+
+    <UPageBody>
+      <!-- Error Alert -->
+      <UAlert
+        v-if="error"
+        icon="i-heroicons-exclamation-triangle"
+        color="error"
+        variant="soft"
+        :title="t('canvas.messages.error')"
+        :description="error"
+        :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+        @close="error = null"
       />
 
-      <UPageBody>
-        <!-- Error Alert -->
-        <UAlert
-          v-if="error"
-          icon="i-heroicons-exclamation-triangle"
-          color="error"
-          variant="soft"
-          :title="t('canvas.messages.error')"
-          :description="error"
-          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-          @close="error = null"
-        />
+      <LockedFeatureCard
+        v-for="feature in guidance.lockedFeatures"
+        :key="feature.id"
+        :feature="feature"
+        class="mb-6"
+      />
 
-        <LockedFeatureCard
-          v-for="feature in guidance.lockedFeatures"
-          :key="feature.id"
-          :feature="feature"
-          class="mb-6"
-        />
-
-        <PersonalCanvasComponent
-          v-if="!guidance.lockedFeatures?.length"
-          :canvas="canvas"
-          :loading="loading"
-          @generate="handleGenerate"
-          @regenerate="handleRegenerate"
-          @save="handleSave"
-        />
-      </UPageBody>
-    </UPage>
-  </UContainer>
+      <PersonalCanvasComponent
+        v-if="!guidance.lockedFeatures?.length"
+        :canvas="canvas"
+        :loading="loading"
+        @generate="handleGenerate"
+        @regenerate="handleRegenerate"
+        @save="handleSave"
+      />
+    </UPageBody>
+  </UPage>
 </template>
 
 <script setup lang="ts">

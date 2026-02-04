@@ -1,71 +1,69 @@
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="pageTitle"
-        :description="t('applications.cvs.templates.editor.subtitle')"
-        :links="[
-          {
-            label: t('applications.cvs.templates.editor.backToList'),
-            icon: 'i-heroicons-arrow-left',
-            to: { name: 'settings-cv' },
-          },
-        ]"
+  <UPage>
+    <UPageHeader
+      :title="pageTitle"
+      :description="t('applications.cvs.templates.editor.subtitle')"
+      :links="[
+        {
+          label: t('applications.cvs.templates.editor.backToList'),
+          icon: 'i-heroicons-arrow-left',
+          to: { name: 'settings-cv' },
+        },
+      ]"
+    />
+
+    <UPageBody>
+      <UAlert
+        v-if="error"
+        color="error"
+        icon="i-heroicons-exclamation-triangle"
+        :title="t('common.error')"
+        :description="error"
+        class="mb-6"
       />
 
-      <UPageBody>
-        <UAlert
-          v-if="error"
-          color="error"
-          icon="i-heroicons-exclamation-triangle"
-          :title="t('common.error')"
-          :description="error"
-          class="mb-6"
-        />
+      <div class="flex items-center gap-2 mb-6">
+        <UBadge v-if="isDefault" color="secondary" variant="outline" icon="i-heroicons-star">
+          {{ t('applications.cvs.templates.labels.default') }}
+        </UBadge>
+      </div>
 
-        <div class="flex items-center gap-2 mb-6">
-          <UBadge v-if="isDefault" color="secondary" variant="outline" icon="i-heroicons-star">
-            {{ t('applications.cvs.templates.labels.default') }}
-          </UBadge>
-        </div>
+      <CvTemplateEditor
+        v-if="template"
+        v-model:name="name"
+        v-model:content="content"
+        :loading="loading || saving"
+        :preview-content="previewContent ?? ''"
+        :preview-loading="previewLoading"
+        :preview-error="previewError"
+        @preview="handlePreview"
+      />
+      <UCard v-else-if="loading">
+        <USkeleton class="h-6 w-40 mb-4" />
+        <USkeleton class="h-10 w-full mb-4" />
+        <USkeleton class="h-64 w-full" />
+      </UCard>
 
-        <CvTemplateEditor
+      <div class="flex flex-wrap justify-end gap-2 pt-6">
+        <UButton
           v-if="template"
-          v-model:name="name"
-          v-model:content="content"
-          :loading="loading || saving"
-          :preview-content="previewContent ?? ''"
-          :preview-loading="previewLoading"
-          :preview-error="previewError"
-          @preview="handlePreview"
+          size="sm"
+          variant="ghost"
+          :label="t('applications.cvs.templates.editor.setDefault')"
+          :disabled="isDefault || saving"
+          @click="handleSetDefault"
         />
-        <UCard v-else-if="loading">
-          <USkeleton class="h-6 w-40 mb-4" />
-          <USkeleton class="h-10 w-full mb-4" />
-          <USkeleton class="h-64 w-full" />
-        </UCard>
-
-        <div class="flex flex-wrap justify-end gap-2 pt-6">
-          <UButton
-            v-if="template"
-            size="sm"
-            variant="ghost"
-            :label="t('applications.cvs.templates.editor.setDefault')"
-            :disabled="isDefault || saving"
-            @click="handleSetDefault"
-          />
-          <UButton
-            size="sm"
-            color="primary"
-            :label="t('common.actions.save')"
-            :loading="saving"
-            :disabled="saving || !template"
-            @click="handleSave"
-          />
-        </div>
-      </UPageBody>
-    </UPage>
-  </UContainer>
+        <UButton
+          size="sm"
+          color="primary"
+          :label="t('common.actions.save')"
+          :loading="saving"
+          :disabled="saving || !template"
+          @click="handleSave"
+        />
+      </div>
+    </UPageBody>
+  </UPage>
 </template>
 
 <script setup lang="ts">

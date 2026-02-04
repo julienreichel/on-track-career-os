@@ -490,266 +490,264 @@ function redirectToCompanyCreate() {
 </script>
 
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="displayTitle"
-        :description="t('jobs.detail.description')"
-        :links="headerLinks"
+  <UPage>
+    <UPageHeader
+      :title="displayTitle"
+      :description="t('jobs.detail.description')"
+      :links="headerLinks"
+    />
+
+    <UPageBody>
+      <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
+
+      <UAlert
+        v-if="errorMessage"
+        icon="i-heroicons-exclamation-triangle"
+        color="error"
+        variant="soft"
+        :title="t('jobs.detail.errors.title')"
+        :description="errorMessage"
+        :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+        class="mb-6"
+        @close="errorMessage = null"
       />
 
-      <UPageBody>
-        <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
+      <UCard v-if="loading">
+        <USkeleton class="h-6 w-1/3" />
+        <USkeleton class="mt-4 h-10 w-full" />
+        <USkeleton class="mt-4 h-24 w-full" />
+      </UCard>
 
-        <UAlert
-          v-if="errorMessage"
-          icon="i-heroicons-exclamation-triangle"
-          color="error"
-          variant="soft"
-          :title="t('jobs.detail.errors.title')"
-          :description="errorMessage"
-          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-          class="mb-6"
-          @close="errorMessage = null"
-        />
-
-        <UCard v-if="loading">
-          <USkeleton class="h-6 w-1/3" />
-          <USkeleton class="mt-4 h-10 w-full" />
-          <USkeleton class="mt-4 h-24 w-full" />
-        </UCard>
-
-        <template v-else-if="job">
-          <template v-if="isEditing">
-            <UCard class="mb-6">
-              <div class="flex flex-col gap-6">
-                <div class="grid gap-4 md:grid-cols-2">
-                  <UFormField :label="t('jobs.detail.fields.title')">
-                    <UInput
-                      v-model="form.title"
-                      :placeholder="t('jobs.detail.placeholders.title')"
-                      :disabled="disableActions"
-                      class="w-full"
-                      data-testid="job-title-input"
-                    />
-                  </UFormField>
-
-                  <UFormField :label="t('jobs.detail.fields.seniorityLevel')">
-                    <UInput
-                      v-model="form.seniorityLevel"
-                      :placeholder="t('jobs.detail.placeholders.seniorityLevel')"
-                      :disabled="disableActions"
-                      data-testid="job-seniority-input"
-                    />
-                  </UFormField>
-                </div>
-
-                <UFormField :label="t('jobs.detail.fields.roleSummary')">
-                  <UTextarea
-                    v-model="form.roleSummary"
-                    :placeholder="t('jobs.detail.placeholders.roleSummary')"
+      <template v-else-if="job">
+        <template v-if="isEditing">
+          <UCard class="mb-6">
+            <div class="flex flex-col gap-6">
+              <div class="grid gap-4 md:grid-cols-2">
+                <UFormField :label="t('jobs.detail.fields.title')">
+                  <UInput
+                    v-model="form.title"
+                    :placeholder="t('jobs.detail.placeholders.title')"
                     :disabled="disableActions"
-                    :rows="4"
                     class="w-full"
-                    data-testid="job-summary-input"
+                    data-testid="job-title-input"
                   />
                 </UFormField>
 
-                <div class="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <p class="text-sm text-gray-500">
-                      {{ t('jobs.detail.meta.status') }}
-                    </p>
-                    <UBadge color="neutral" variant="outline" class="mt-1">
-                      {{ statusLabel }}
-                    </UBadge>
-                  </div>
-                  <div>
-                    <p class="text-sm text-gray-500">
-                      {{ t('jobs.detail.meta.createdAt') }}
-                    </p>
-                    <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">
-                      {{ formattedCreatedAt || t('common.notAvailable') }}
-                    </p>
-                  </div>
-                  <div v-if="linkedCompany">
-                    <p class="text-sm text-gray-500">
-                      {{ t('jobs.detail.meta.companyId') }}
-                    </p>
-                    <div class="mt-1 flex items-center gap-2">
-                      <LinkedCompanyBadge :company="linkedCompany" />
-                      <UButton
-                        size="xs"
-                        variant="ghost"
-                        color="neutral"
-                        icon="i-heroicons-x-mark-20-solid"
-                        :aria-label="t('jobs.detail.companyLink.clear')"
-                        data-testid="job-company-clear"
-                        :disabled="linkingCompany"
-                        @click="handleCompanyLinkClear"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div v-if="!selectedCompanyId || !linkedCompany" class="mt-6">
-                  <div class="mt-3">
-                    <CompanySelector
-                      :model-value="selectedCompanyId"
-                      :companies="availableCompanies"
-                      :loading="companyStore.loading.value || linkingCompany"
-                      :disabled="companySelectorDisabled"
-                      @update:model-value="handleCompanyLinkChange"
-                      @clear="handleCompanyLinkClear"
-                      @create="redirectToCompanyCreate"
-                    />
-                  </div>
-                </div>
-              </div>
-            </UCard>
-
-            <UCard>
-              <template #header>
-                <div>
-                  <h3 class="text-lg font-semibold">{{ t('jobs.detail.sections.parsedData') }}</h3>
-                  <p class="text-sm text-gray-500">
-                    {{ t('jobs.detail.sections.description') }}
-                  </p>
-                </div>
-              </template>
-
-              <UTabs :items="tabItems" class="mt-4">
-                <template v-for="section in listSections" :key="section.key" #[section.key]>
-                  <TagInput
-                    :model-value="form[section.key] as string[]"
-                    :label="section.label"
-                    color="primary"
-                    :placeholder="section.placeholder"
-                    :hint="section.hint"
+                <UFormField :label="t('jobs.detail.fields.seniorityLevel')">
+                  <UInput
+                    v-model="form.seniorityLevel"
+                    :placeholder="t('jobs.detail.placeholders.seniorityLevel')"
                     :disabled="disableActions"
-                    :data-testid="`job-tag-${section.key}`"
-                    @update:model-value="updateListField(section.key as ListField, $event)"
+                    data-testid="job-seniority-input"
                   />
-                </template>
-              </UTabs>
-              <template #footer>
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
-                    {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                </UFormField>
+              </div>
+
+              <UFormField :label="t('jobs.detail.fields.roleSummary')">
+                <UTextarea
+                  v-model="form.roleSummary"
+                  :placeholder="t('jobs.detail.placeholders.roleSummary')"
+                  :disabled="disableActions"
+                  :rows="4"
+                  class="w-full"
+                  data-testid="job-summary-input"
+                />
+              </UFormField>
+
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p class="text-sm text-gray-500">
+                    {{ t('jobs.detail.meta.status') }}
                   </p>
-                  <div class="flex flex-wrap justify-end gap-3">
+                  <UBadge color="neutral" variant="outline" class="mt-1">
+                    {{ statusLabel }}
+                  </UBadge>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">
+                    {{ t('jobs.detail.meta.createdAt') }}
+                  </p>
+                  <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                    {{ formattedCreatedAt || t('common.notAvailable') }}
+                  </p>
+                </div>
+                <div v-if="linkedCompany">
+                  <p class="text-sm text-gray-500">
+                    {{ t('jobs.detail.meta.companyId') }}
+                  </p>
+                  <div class="mt-1 flex items-center gap-2">
+                    <LinkedCompanyBadge :company="linkedCompany" />
                     <UButton
-                      color="neutral"
+                      size="xs"
                       variant="ghost"
-                      :label="t('common.actions.cancel')"
-                      :disabled="disableActions"
-                      data-testid="job-cancel-button"
-                      @click="handleCancel"
-                    />
-                    <UButton
-                      color="primary"
-                      :label="t('common.actions.save')"
-                      icon="i-heroicons-check"
-                      :disabled="disableActions"
-                      :loading="saving"
-                      data-testid="job-save-button"
-                      @click="handleSave"
+                      color="neutral"
+                      icon="i-heroicons-x-mark-20-solid"
+                      :aria-label="t('jobs.detail.companyLink.clear')"
+                      data-testid="job-company-clear"
+                      :disabled="linkingCompany"
+                      @click="handleCompanyLinkClear"
                     />
                   </div>
-                </div>
-              </template>
-            </UCard>
-          </template>
-
-          <template v-else>
-            <TailoredMaterialsCard
-              :job="job"
-              :matching-summary="matchingSummary"
-              :existing-materials="existingMaterials"
-              :match-link="matchLink"
-              :summary-loading="loading"
-              :summary-error="null"
-              description-key="description"
-            />
-            <UCard class="mb-6">
-              <div class="flex flex-col gap-6">
-                <div class="grid gap-4 md:grid-cols-2">
-                  <UFormField :label="t('jobs.detail.fields.title')">
-                    <p>{{ form.title || t('common.notAvailable') }}</p>
-                  </UFormField>
-                  <UFormField :label="t('jobs.detail.fields.seniorityLevel')">
-                    <p>{{ form.seniorityLevel || t('common.notAvailable') }}</p>
-                  </UFormField>
-                </div>
-                <UFormField :label="t('jobs.detail.fields.roleSummary')">
-                  <p>{{ form.roleSummary || t('common.notAvailable') }}</p>
-                </UFormField>
-                <div class="grid gap-4 sm:grid-cols-2">
-                  <UFormField :label="t('jobs.detail.meta.status')">
-                    <UBadge color="neutral" variant="outline" icon="i-heroicons-briefcase">
-                      {{ statusLabel }}
-                    </UBadge>
-                  </UFormField>
-                  <UFormField :label="t('jobs.detail.meta.createdAt')">
-                    <p>{{ formattedCreatedAt || t('common.notAvailable') }}</p>
-                  </UFormField>
-                  <UFormField :label="t('jobs.detail.meta.companyId')">
-                    <LinkedCompanyBadge v-if="linkedCompany" :company="linkedCompany" />
-                    <p v-else>{{ t('common.notAvailable') }}</p>
-                  </UFormField>
                 </div>
               </div>
-            </UCard>
 
-            <UCard>
-              <template #header>
-                <div>
-                  <h3 class="text-lg font-semibold">{{ t('jobs.detail.sections.parsedData') }}</h3>
-                  <p class="text-sm text-gray-500">
-                    {{ t('jobs.detail.sections.description') }}
-                  </p>
+              <div v-if="!selectedCompanyId || !linkedCompany" class="mt-6">
+                <div class="mt-3">
+                  <CompanySelector
+                    :model-value="selectedCompanyId"
+                    :companies="availableCompanies"
+                    :loading="companyStore.loading.value || linkingCompany"
+                    :disabled="companySelectorDisabled"
+                    @update:model-value="handleCompanyLinkChange"
+                    @clear="handleCompanyLinkClear"
+                    @create="redirectToCompanyCreate"
+                  />
                 </div>
+              </div>
+            </div>
+          </UCard>
+
+          <UCard>
+            <template #header>
+              <div>
+                <h3 class="text-lg font-semibold">{{ t('jobs.detail.sections.parsedData') }}</h3>
+                <p class="text-sm text-gray-500">
+                  {{ t('jobs.detail.sections.description') }}
+                </p>
+              </div>
+            </template>
+
+            <UTabs :items="tabItems" class="mt-4">
+              <template v-for="section in listSections" :key="section.key" #[section.key]>
+                <TagInput
+                  :model-value="form[section.key] as string[]"
+                  :label="section.label"
+                  color="primary"
+                  :placeholder="section.placeholder"
+                  :hint="section.hint"
+                  :disabled="disableActions"
+                  :data-testid="`job-tag-${section.key}`"
+                  @update:model-value="updateListField(section.key as ListField, $event)"
+                />
               </template>
-
-              <UTabs :items="tabItems" class="mt-4">
-                <template v-for="section in viewListSections" :key="section.key" #[section.key]>
-                  <ul v-if="section.items.length" class="list-disc space-y-1 pl-4">
-                    <li v-for="item in section.items" :key="item">
-                      {{ item }}
-                    </li>
-                  </ul>
-                  <p v-else>{{ t('common.notAvailable') }}</p>
-                </template>
-              </UTabs>
-
-              <template #footer>
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
-                    {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
-                  </p>
-                  <div class="flex justify-end">
-                    <UButton
-                      color="primary"
-                      variant="outline"
-                      :label="t('common.actions.edit')"
-                      icon="i-heroicons-pencil"
-                      @click="handleEdit"
-                    />
-                  </div>
+            </UTabs>
+            <template #footer>
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                  {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                </p>
+                <div class="flex flex-wrap justify-end gap-3">
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    :label="t('common.actions.cancel')"
+                    :disabled="disableActions"
+                    data-testid="job-cancel-button"
+                    @click="handleCancel"
+                  />
+                  <UButton
+                    color="primary"
+                    :label="t('common.actions.save')"
+                    icon="i-heroicons-check"
+                    :disabled="disableActions"
+                    :loading="saving"
+                    data-testid="job-save-button"
+                    @click="handleSave"
+                  />
                 </div>
-              </template>
-            </UCard>
-          </template>
+              </div>
+            </template>
+          </UCard>
         </template>
 
-        <UCard v-else>
-          <UEmpty :title="t('jobs.detail.errors.notFound')" icon="i-heroicons-briefcase">
-            <template #actions>
-              <UButton :label="t('common.backToList')" @click="router.push('/jobs')" />
+        <template v-else>
+          <TailoredMaterialsCard
+            :job="job"
+            :matching-summary="matchingSummary"
+            :existing-materials="existingMaterials"
+            :match-link="matchLink"
+            :summary-loading="loading"
+            :summary-error="null"
+            description-key="description"
+          />
+          <UCard class="mb-6">
+            <div class="flex flex-col gap-6">
+              <div class="grid gap-4 md:grid-cols-2">
+                <UFormField :label="t('jobs.detail.fields.title')">
+                  <p>{{ form.title || t('common.notAvailable') }}</p>
+                </UFormField>
+                <UFormField :label="t('jobs.detail.fields.seniorityLevel')">
+                  <p>{{ form.seniorityLevel || t('common.notAvailable') }}</p>
+                </UFormField>
+              </div>
+              <UFormField :label="t('jobs.detail.fields.roleSummary')">
+                <p>{{ form.roleSummary || t('common.notAvailable') }}</p>
+              </UFormField>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <UFormField :label="t('jobs.detail.meta.status')">
+                  <UBadge color="neutral" variant="outline" icon="i-heroicons-briefcase">
+                    {{ statusLabel }}
+                  </UBadge>
+                </UFormField>
+                <UFormField :label="t('jobs.detail.meta.createdAt')">
+                  <p>{{ formattedCreatedAt || t('common.notAvailable') }}</p>
+                </UFormField>
+                <UFormField :label="t('jobs.detail.meta.companyId')">
+                  <LinkedCompanyBadge v-if="linkedCompany" :company="linkedCompany" />
+                  <p v-else>{{ t('common.notAvailable') }}</p>
+                </UFormField>
+              </div>
+            </div>
+          </UCard>
+
+          <UCard>
+            <template #header>
+              <div>
+                <h3 class="text-lg font-semibold">{{ t('jobs.detail.sections.parsedData') }}</h3>
+                <p class="text-sm text-gray-500">
+                  {{ t('jobs.detail.sections.description') }}
+                </p>
+              </div>
             </template>
-          </UEmpty>
-        </UCard>
-      </UPageBody>
-    </UPage>
-  </UContainer>
+
+            <UTabs :items="tabItems" class="mt-4">
+              <template v-for="section in viewListSections" :key="section.key" #[section.key]>
+                <ul v-if="section.items.length" class="list-disc space-y-1 pl-4">
+                  <li v-for="item in section.items" :key="item">
+                    {{ item }}
+                  </li>
+                </ul>
+                <p v-else>{{ t('common.notAvailable') }}</p>
+              </template>
+            </UTabs>
+
+            <template #footer>
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                  {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                </p>
+                <div class="flex justify-end">
+                  <UButton
+                    color="primary"
+                    variant="outline"
+                    :label="t('common.actions.edit')"
+                    icon="i-heroicons-pencil"
+                    @click="handleEdit"
+                  />
+                </div>
+              </div>
+            </template>
+          </UCard>
+        </template>
+      </template>
+
+      <UCard v-else>
+        <UEmpty :title="t('jobs.detail.errors.notFound')" icon="i-heroicons-briefcase">
+          <template #actions>
+            <UButton :label="t('common.backToList')" @click="router.push('/jobs')" />
+          </template>
+        </UEmpty>
+      </UCard>
+    </UPageBody>
+  </UPage>
 </template>

@@ -68,71 +68,69 @@ function viewExperiences() {
 </script>
 
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="t('ingestion.cv.upload.title')"
-        :description="t('ingestion.cv.upload.description')"
-      >
-        <template #actions>
-          <UButton
-            v-if="workflow.currentStep.value === 'upload'"
-            icon="i-heroicons-arrow-left"
-            variant="ghost"
-            :label="t('common.backToProfile')"
-            @click="router.push('/profile')"
-          />
-        </template>
-      </UPageHeader>
-
-      <UPageBody>
-        <!-- Error Alert -->
-        <UAlert
-          v-if="workflow.errorMessage.value"
-          icon="i-lucide-alert-triangle"
-          color="error"
-          :title="t('ingestion.cv.upload.errors.unknown')"
-          :description="workflow.errorMessage.value"
-          :close-button="{ icon: 'i-lucide-x', color: 'error', variant: 'link' }"
-          @close="workflow.clearError()"
-        />
-
-        <!-- Upload Step -->
-        <CvUploadStep
+  <UPage>
+    <UPageHeader
+      :title="t('ingestion.cv.upload.title')"
+      :description="t('ingestion.cv.upload.description')"
+    >
+      <template #actions>
+        <UButton
           v-if="workflow.currentStep.value === 'upload'"
-          @file-selected="handleFileSelected"
+          icon="i-heroicons-arrow-left"
+          variant="ghost"
+          :label="t('common.backToProfile')"
+          @click="router.push('/profile')"
+        />
+      </template>
+    </UPageHeader>
+
+    <UPageBody>
+      <!-- Error Alert -->
+      <UAlert
+        v-if="workflow.errorMessage.value"
+        icon="i-lucide-alert-triangle"
+        color="error"
+        :title="t('ingestion.cv.upload.errors.unknown')"
+        :description="workflow.errorMessage.value"
+        :close-button="{ icon: 'i-lucide-x', color: 'error', variant: 'link' }"
+        @close="workflow.clearError()"
+      />
+
+      <!-- Upload Step -->
+      <CvUploadStep
+        v-if="workflow.currentStep.value === 'upload'"
+        @file-selected="handleFileSelected"
+      />
+
+      <!-- Parsing Step -->
+      <CvParsingStep v-if="workflow.currentStep.value === 'parsing'" />
+
+      <!-- Preview Step -->
+      <div v-if="workflow.currentStep.value === 'preview'" class="space-y-6 pb-24">
+        <!-- Experiences Preview -->
+        <CvExperiencesPreview
+          :experiences="parsing.extractedExperiences.value"
+          @remove="parsing.removeExperience"
+          @update="parsing.updateExperience"
         />
 
-        <!-- Parsing Step -->
-        <CvParsingStep v-if="workflow.currentStep.value === 'parsing'" />
+        <!-- Actions -->
+        <StickyFooterCard>
+          <UButton :label="t('common.actions.cancel')" variant="ghost" @click="handleCancel" />
+          <UButton :label="t('ingestion.cv.upload.confirmImport')" @click="handleImport" />
+        </StickyFooterCard>
+      </div>
 
-        <!-- Preview Step -->
-        <div v-if="workflow.currentStep.value === 'preview'" class="space-y-6 pb-24">
-          <!-- Experiences Preview -->
-          <CvExperiencesPreview
-            :experiences="parsing.extractedExperiences.value"
-            @remove="parsing.removeExperience"
-            @update="parsing.updateExperience"
-          />
+      <!-- Importing Step -->
+      <CvParsingStep v-if="workflow.currentStep.value === 'importing'" />
 
-          <!-- Actions -->
-          <StickyFooterCard>
-            <UButton :label="t('common.actions.cancel')" variant="ghost" @click="handleCancel" />
-            <UButton :label="t('ingestion.cv.upload.confirmImport')" @click="handleImport" />
-          </StickyFooterCard>
-        </div>
-
-        <!-- Importing Step -->
-        <CvParsingStep v-if="workflow.currentStep.value === 'importing'" />
-
-        <!-- Complete Step -->
-        <CvImportSuccess
-          v-if="workflow.currentStep.value === 'complete'"
-          :created-count="workflow.importSummary.value.createdCount"
-          :updated-count="workflow.importSummary.value.updatedCount"
-          @view-experiences="viewExperiences"
-        />
-      </UPageBody>
-    </UPage>
-  </UContainer>
+      <!-- Complete Step -->
+      <CvImportSuccess
+        v-if="workflow.currentStep.value === 'complete'"
+        :created-count="workflow.importSummary.value.createdCount"
+        :updated-count="workflow.importSummary.value.updatedCount"
+        @view-experiences="viewExperiences"
+      />
+    </UPageBody>
+  </UPage>
 </template>

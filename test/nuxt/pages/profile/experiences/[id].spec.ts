@@ -36,9 +36,6 @@ const router = createRouter({
 });
 
 const stubs = {
-  UContainer: {
-    template: '<div class="u-container"><slot /></div>',
-  },
   UPage: {
     template: '<div class="u-page"><slot /></div>',
   },

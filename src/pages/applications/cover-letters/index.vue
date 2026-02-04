@@ -1,117 +1,117 @@
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="t('applications.coverLetters.page.title')"
-        :description="t('applications.coverLetters.page.description')"
-        :links="[
-          {
-            label: t('common.backToList'),
-            icon: 'i-heroicons-arrow-left',
-            to: { name: 'applications' },
-          },
-          {
-            label: t('applications.coverLetters.list.actions.create'),
-            icon: 'i-heroicons-plus',
-            to: { name: 'applications-cover-letters-new' },
-          },
-        ]"
+  <UPage>
+    <UPageHeader
+      :title="t('applications.coverLetters.page.title')"
+      :description="t('applications.coverLetters.page.description')"
+      :links="[
+        {
+          label: t('common.backToList'),
+          icon: 'i-heroicons-arrow-left',
+          to: { name: 'applications' },
+        },
+        {
+          label: t('applications.coverLetters.list.actions.create'),
+          icon: 'i-heroicons-plus',
+          to: { name: 'applications-cover-letters-new' },
+        },
+      ]"
+    />
+
+    <UPageBody>
+      <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
+
+      <LockedFeatureCard
+        v-for="feature in guidance.lockedFeatures"
+        :key="feature.id"
+        :feature="feature"
+        class="mb-6"
       />
 
-      <UPageBody>
-        <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
-
-        <LockedFeatureCard
-          v-for="feature in guidance.lockedFeatures"
-          :key="feature.id"
-          :feature="feature"
-          class="mb-6"
+      <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
+        <UInput
+          v-model="searchQuery"
+          icon="i-heroicons-magnifying-glass"
+          :placeholder="t('applications.coverLetters.list.search.placeholder')"
+          size="lg"
+          class="w-1/3"
         />
+      </div>
 
-        <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
-          <UInput
-            v-model="searchQuery"
-            icon="i-heroicons-magnifying-glass"
-            :placeholder="t('applications.coverLetters.list.search.placeholder')"
-            size="lg"
-            class="w-1/3"
-          />
-        </div>
-
-        <UAlert
-          v-if="error"
-          color="error"
-          icon="i-heroicons-exclamation-triangle"
-          :title="t('common.error')"
-          :description="error"
-          class="mb-6"
-        />
-
-        <ListSkeletonCards v-if="loading || !hasLoaded" />
-
-        <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
-
-        <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
-          <UEmpty
-            :title="t('applications.coverLetters.list.search.noResults')"
-            icon="i-heroicons-magnifying-glass"
-          >
-            <p class="text-sm text-gray-500">{{ t('applications.coverLetters.list.search.placeholder') }}</p>
-          </UEmpty>
-        </UCard>
-
-        <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <ItemCard
-            v-for="letter in filteredItems"
-            :key="letter.id"
-            :title="resolveTitle(letter)"
-            :subtitle="resolveSubtitle(letter)"
-            @edit="navigateTo({ name: 'applications-cover-letters-id', params: { id: letter.id } })"
-            @delete="confirmDelete(letter)"
-          >
-            <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-              <p class="line-clamp-3">
-                {{ resolvePreview(letter) }}
-              </p>
-            </div>
-
-            <!-- Custom Actions -->
-            <template #actions>
-              <UButton
-                :label="$t('common.actions.view')"
-                icon="i-heroicons-eye"
-                size="xs"
-                color="primary"
-                variant="outline"
-                @click="
-                  navigateTo({ name: 'applications-cover-letters-id', params: { id: letter.id } })
-                "
-              />
-              <UButton
-                :label="$t('common.actions.print')"
-                icon="i-heroicons-printer"
-                size="xs"
-                color="neutral"
-                variant="outline"
-                @click="handlePrint(letter)"
-              />
-            </template>
-          </ItemCard>
-        </div>
-      </UPageBody>
-
-      <ConfirmModal
-        v-model:open="deleteModalOpen"
-        :title="t('applications.coverLetters.delete.title')"
-        :description="t('applications.coverLetters.delete.message')"
-        :confirm-label="t('common.actions.delete')"
-        :cancel-label="t('common.actions.cancel')"
-        confirm-color="error"
-        :loading="deleting"
-        @confirm="handleDelete"
+      <UAlert
+        v-if="error"
+        color="error"
+        icon="i-heroicons-exclamation-triangle"
+        :title="t('common.error')"
+        :description="error"
+        class="mb-6"
       />
-    </UPage>
-  </UContainer>
+
+      <ListSkeletonCards v-if="loading || !hasLoaded" />
+
+      <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
+
+      <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
+        <UEmpty
+          :title="t('applications.coverLetters.list.search.noResults')"
+          icon="i-heroicons-magnifying-glass"
+        >
+          <p class="text-sm text-gray-500">
+            {{ t('applications.coverLetters.list.search.placeholder') }}
+          </p>
+        </UEmpty>
+      </UCard>
+
+      <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ItemCard
+          v-for="letter in filteredItems"
+          :key="letter.id"
+          :title="resolveTitle(letter)"
+          :subtitle="resolveSubtitle(letter)"
+          @edit="navigateTo({ name: 'applications-cover-letters-id', params: { id: letter.id } })"
+          @delete="confirmDelete(letter)"
+        >
+          <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <p class="line-clamp-3">
+              {{ resolvePreview(letter) }}
+            </p>
+          </div>
+
+          <!-- Custom Actions -->
+          <template #actions>
+            <UButton
+              :label="$t('common.actions.view')"
+              icon="i-heroicons-eye"
+              size="xs"
+              color="primary"
+              variant="outline"
+              @click="
+                navigateTo({ name: 'applications-cover-letters-id', params: { id: letter.id } })
+              "
+            />
+            <UButton
+              :label="$t('common.actions.print')"
+              icon="i-heroicons-printer"
+              size="xs"
+              color="neutral"
+              variant="outline"
+              @click="handlePrint(letter)"
+            />
+          </template>
+        </ItemCard>
+      </div>
+    </UPageBody>
+
+    <ConfirmModal
+      v-model:open="deleteModalOpen"
+      :title="t('applications.coverLetters.delete.title')"
+      :description="t('applications.coverLetters.delete.message')"
+      :confirm-label="t('common.actions.delete')"
+      :cancel-label="t('common.actions.cancel')"
+      confirm-color="error"
+      :loading="deleting"
+      @confirm="handleDelete"
+    />
+  </UPage>
 </template>
 
 <script setup lang="ts">

@@ -108,87 +108,85 @@ async function handleUploadSelected(file: File | null | undefined) {
 </script>
 
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="t('companies.form.title')"
-        :description="t('companies.form.description')"
-        :links="headerLinks"
-      />
+  <UPage>
+    <UPageHeader
+      :title="t('companies.form.title')"
+      :description="t('companies.form.description')"
+      :links="headerLinks"
+    />
 
-      <UPageBody>
-        <div class="space-y-6">
-          <div>
-            <p class="mb-4 text-sm text-gray-500">
-              {{ t('companies.upload.helper') }}
-            </p>
+    <UPageBody>
+      <div class="space-y-6">
+        <div>
+          <p class="mb-4 text-sm text-gray-500">
+            {{ t('companies.upload.helper') }}
+          </p>
 
-            <UAlert
-              v-if="uploadError"
-              icon="i-heroicons-exclamation-triangle"
-              color="error"
-              variant="soft"
-              :title="t('companies.upload.errors.title')"
-              :description="uploadError"
-              class="mb-4"
-              :close-button="{
-                icon: 'i-heroicons-x-mark-20-solid',
-                color: 'error',
-                variant: 'link',
-              }"
-              @close="uploadReset()"
-            />
+          <UAlert
+            v-if="uploadError"
+            icon="i-heroicons-exclamation-triangle"
+            color="error"
+            variant="soft"
+            :title="t('companies.upload.errors.title')"
+            :description="uploadError"
+            class="mb-4"
+            :close-button="{
+              icon: 'i-heroicons-x-mark-20-solid',
+              color: 'error',
+              variant: 'link',
+            }"
+            @close="uploadReset()"
+          />
 
-            <CompanyUploadStep
-              :selected-file="uploadSelectedFile"
-              :is-processing="uploadProcessing"
-              :status-message="uploadStatusMessage"
-              @file-selected="handleUploadSelected"
-            />
-          </div>
-
-          <USeparator :label="t('companies.upload.orManual')" />
-
-          <div>
-            <UAlert
-              v-if="formError"
-              icon="i-heroicons-exclamation-triangle"
-              color="error"
-              variant="soft"
-              :title="t('companies.form.errors.title')"
-              :description="formError"
-              class="mb-6"
-              :close-button="{
-                icon: 'i-heroicons-x-mark-20-solid',
-                color: 'error',
-                variant: 'link',
-              }"
-              @close="formError = null"
-            />
-
-            <UCard>
-              <CompanyForm
-                :model-value="form"
-                :disabled="disableActions"
-                @update:model-value="updateForm"
-              />
-
-              <template #footer>
-                <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                  <UButton
-                    color="primary"
-                    icon="i-heroicons-check"
-                    :label="t('companies.form.actions.save')"
-                    :loading="saving"
-                    :disabled="disableActions"
-                    @click="handleSave(false)"
-                  />
-                </div>
-              </template>
-            </UCard>
-          </div>
+          <CompanyUploadStep
+            :selected-file="uploadSelectedFile"
+            :is-processing="uploadProcessing"
+            :status-message="uploadStatusMessage"
+            @file-selected="handleUploadSelected"
+          />
         </div>
-      </UPageBody>
-    </UPage>
-  </UContainer>
+
+        <USeparator :label="t('companies.upload.orManual')" />
+
+        <div>
+          <UAlert
+            v-if="formError"
+            icon="i-heroicons-exclamation-triangle"
+            color="error"
+            variant="soft"
+            :title="t('companies.form.errors.title')"
+            :description="formError"
+            class="mb-6"
+            :close-button="{
+              icon: 'i-heroicons-x-mark-20-solid',
+              color: 'error',
+              variant: 'link',
+            }"
+            @close="formError = null"
+          />
+
+          <UCard>
+            <CompanyForm
+              :model-value="form"
+              :disabled="disableActions"
+              @update:model-value="updateForm"
+            />
+
+            <template #footer>
+              <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                <UButton
+                  color="primary"
+                  icon="i-heroicons-check"
+                  :label="t('companies.form.actions.save')"
+                  :loading="saving"
+                  :disabled="disableActions"
+                  @click="handleSave(false)"
+                />
+              </div>
+            </template>
+          </UCard>
+        </div>
+      </div>
+    </UPageBody>
+  </UPage>
 </template>

@@ -211,187 +211,182 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="isNew ? t('stories.form.createTitle') : t('stories.form.editTitle')"
-        :description="companyName"
-        :links="[
-          {
-            label: t('common.backToList'),
-            to: `/profile/stories`,
-            icon: 'i-heroicons-arrow-left',
-          },
-        ]"
+  <UPage>
+    <UPageHeader
+      :title="isNew ? t('stories.form.createTitle') : t('stories.form.editTitle')"
+      :description="companyName"
+      :links="[
+        {
+          label: t('common.backToList'),
+          to: `/profile/stories`,
+          icon: 'i-heroicons-arrow-left',
+        },
+      ]"
+    />
+
+    <UPageBody>
+      <!-- Error Alert -->
+      <UAlert
+        v-if="error"
+        color="error"
+        icon="i-heroicons-exclamation-triangle"
+        :title="t('common.error')"
+        :description="error"
+        class="mb-6"
       />
 
-      <UPageBody>
-        <!-- Error Alert -->
-        <UAlert
-          v-if="error"
-          color="error"
-          icon="i-heroicons-exclamation-triangle"
-          :title="t('common.error')"
-          :description="error"
-          class="mb-6"
-        />
+      <!-- Loading State -->
+      <div v-if="loading" class="flex items-center justify-center py-12">
+        <div class="text-center">
+          <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            {{ t('common.states.loading') }}
+          </p>
+        </div>
+      </div>
 
-        <!-- Loading State -->
-        <div v-if="loading" class="flex items-center justify-center py-12">
-          <div class="text-center">
-            <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
+      <!-- Saving State -->
+      <div v-else-if="saving" class="flex items-center justify-center py-12">
+        <div class="text-center">
+          <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            {{ t('common.states.saving') }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Mode Selection (only for new stories) -->
+      <UCard v-else-if="isNew && showModeSelection && !selectedMode" class="mb-6">
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-2">
+              {{ t('stories.form.mode.chooseTitle') }}
+            </h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ t('common.states.loading') }}
+              {{ t('stories.form.mode.chooseDescription') }}
             </p>
           </div>
-        </div>
 
-        <!-- Saving State -->
-        <div v-else-if="saving" class="flex items-center justify-center py-12">
-          <div class="text-center">
-            <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-primary mb-4" />
+          <div class="grid gap-4 md:grid-cols-2">
+            <!-- Interview Mode -->
+            <UCard
+              class="cursor-pointer hover:border-primary-500 transition-colors"
+              @click="handleStartInterview"
+            >
+              <div class="flex flex-col items-center text-center gap-3 p-4">
+                <UIcon name="i-heroicons-chat-bubble-left-right" class="w-8 h-8 text-primary" />
+                <h4 class="font-medium">{{ t('stories.form.mode.interview.title') }}</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ t('stories.form.mode.interview.description') }}
+                </p>
+              </div>
+            </UCard>
+
+            <!-- Manual Entry -->
+            <UCard
+              class="cursor-pointer hover:border-primary-500 transition-colors"
+              @click="handleSelectManual"
+            >
+              <div class="flex flex-col items-center text-center gap-3 p-4">
+                <UIcon name="i-heroicons-pencil" class="w-8 h-8 text-primary" />
+                <h4 class="font-medium">{{ t('stories.form.mode.manual.title') }}</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ t('stories.form.mode.manual.description') }}
+                </p>
+              </div>
+            </UCard>
+          </div>
+        </div>
+      </UCard>
+
+      <!-- Free Text Input -->
+      <UCard v-else-if="isNew && selectedMode === 'interview'" class="mb-6">
+        <div class="space-y-6">
+          <div>
+            <h3 class="text-lg font-semibold mb-2">
+              {{ t('stories.form.mode.freetext.title') }}
+            </h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              {{ t('common.states.saving') }}
+              {{ t('stories.form.mode.freetext.instructions') }}
             </p>
           </div>
-        </div>
 
-        <!-- Mode Selection (only for new stories) -->
-        <UCard v-else-if="isNew && showModeSelection && !selectedMode" class="mb-6">
-          <div class="space-y-6">
-            <div>
-              <h3 class="text-lg font-semibold mb-2">
-                {{ t('stories.form.mode.chooseTitle') }}
-              </h3>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ t('stories.form.mode.chooseDescription') }}
-              </p>
-            </div>
-
-            <div class="grid gap-4 md:grid-cols-2">
-              <!-- Interview Mode -->
-              <UCard
-                class="cursor-pointer hover:border-primary-500 transition-colors"
-                @click="handleStartInterview"
-              >
-                <div class="flex flex-col items-center text-center gap-3 p-4">
-                  <UIcon name="i-heroicons-chat-bubble-left-right" class="w-8 h-8 text-primary" />
-                  <h4 class="font-medium">{{ t('stories.form.mode.interview.title') }}</h4>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('stories.form.mode.interview.description') }}
-                  </p>
-                </div>
-              </UCard>
-
-              <!-- Manual Entry -->
-              <UCard
-                class="cursor-pointer hover:border-primary-500 transition-colors"
-                @click="handleSelectManual"
-              >
-                <div class="flex flex-col items-center text-center gap-3 p-4">
-                  <UIcon name="i-heroicons-pencil" class="w-8 h-8 text-primary" />
-                  <h4 class="font-medium">{{ t('stories.form.mode.manual.title') }}</h4>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('stories.form.mode.manual.description') }}
-                  </p>
-                </div>
-              </UCard>
-            </div>
-          </div>
-        </UCard>
-
-        <!-- Free Text Input -->
-        <UCard v-else-if="isNew && selectedMode === 'interview'" class="mb-6">
-          <div class="space-y-6">
-            <div>
-              <h3 class="text-lg font-semibold mb-2">
-                {{ t('stories.form.mode.freetext.title') }}
-              </h3>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ t('stories.form.mode.freetext.instructions') }}
-              </p>
-            </div>
-
-            <UFormField :label="t('stories.form.mode.freetext.label')" required>
-              <UTextarea
-                v-model="freeTextInput"
-                :placeholder="t('stories.form.mode.freetext.placeholder')"
-                :rows="10"
-                :disabled="interviewGenerating"
-                class="w-full"
-              />
-            </UFormField>
-
-            <div class="flex justify-end gap-3">
-              <UButton :label="t('common.actions.cancel')" variant="ghost" @click="handleCancel" />
-              <UButton
-                :label="t('stories.form.generateFromText')"
-                icon="i-heroicons-sparkles"
-                :disabled="!freeTextInput.trim() || interviewGenerating"
-                :loading="interviewGenerating"
-                @click="handleSubmitFreeText"
-              />
-            </div>
-          </div>
-        </UCard>
-
-        <!-- Story Form (for manual mode or editing or after interview) -->
-        <div v-else-if="(selectedMode === 'manual' || !isNew) && formState" class="space-y-6">
-          <UCard>
-            <StoryForm :model-value="formState" @update:model-value="handleStoryUpdate" />
-          </UCard>
-
-          <!-- Generate Achievements Button (manual mode only) -->
-          <div
-            v-if="selectedMode === 'manual' && !showAchievementsPanel"
-            class="flex justify-center"
-          >
-            <UButton
-              :label="t('stories.form.generateAchievements')"
-              icon="i-heroicons-sparkles"
-              :disabled="!canSave || enhancerGenerating"
-              :loading="enhancerGenerating"
-              @click="handleGenerateAchievements"
+          <UFormField :label="t('stories.form.mode.freetext.label')" required>
+            <UTextarea
+              v-model="freeTextInput"
+              :placeholder="t('stories.form.mode.freetext.placeholder')"
+              :rows="10"
+              :disabled="interviewGenerating"
+              class="w-full"
             />
-          </div>
+          </UFormField>
 
-          <!-- Achievements & KPIs Panel -->
-          <UCard v-if="showAchievementsPanel || !isNew">
-            <AchievementsKpisPanel
-              :achievements="achievements"
-              :kpis="kpiSuggestions"
-              :generating="enhancerGenerating"
-              @update:achievements="handleAchievementsUpdate"
-              @update:kpis="handleKpisUpdate"
-              @regenerate="handleGenerateAchievements"
-            />
-          </UCard>
-
-          <!-- Action Buttons -->
           <div class="flex justify-end gap-3">
             <UButton :label="t('common.actions.cancel')" variant="ghost" @click="handleCancel" />
             <UButton
-              :label="t('common.actions.save')"
-              icon="i-heroicons-check"
-              :disabled="!canSave || saving"
-              :loading="saving"
-              @click="handleSave"
+              :label="t('stories.form.generateFromText')"
+              icon="i-heroicons-sparkles"
+              :disabled="!freeTextInput.trim() || interviewGenerating"
+              :loading="interviewGenerating"
+              @click="handleSubmitFreeText"
             />
           </div>
         </div>
+      </UCard>
 
-        <!-- Not Found (editing non-existent story) -->
-        <UAlert
-          v-else-if="!isNew && !formState && !loading"
-          color="warning"
-          icon="i-heroicons-exclamation-triangle"
-          :title="t('stories.detail.notFound')"
-          :description="t('stories.detail.notFoundDescription')"
-        />
-      </UPageBody>
-    </UPage>
+      <!-- Story Form (for manual mode or editing or after interview) -->
+      <div v-else-if="(selectedMode === 'manual' || !isNew) && formState" class="space-y-6">
+        <UCard>
+          <StoryForm :model-value="formState" @update:model-value="handleStoryUpdate" />
+        </UCard>
 
-    <!-- Unsaved Changes Modal -->
-    <UnsavedChangesModal v-model:open="showCancelConfirm" @discard="handleConfirmCancel" />
-  </UContainer>
+        <!-- Generate Achievements Button (manual mode only) -->
+        <div v-if="selectedMode === 'manual' && !showAchievementsPanel" class="flex justify-center">
+          <UButton
+            :label="t('stories.form.generateAchievements')"
+            icon="i-heroicons-sparkles"
+            :disabled="!canSave || enhancerGenerating"
+            :loading="enhancerGenerating"
+            @click="handleGenerateAchievements"
+          />
+        </div>
+
+        <!-- Achievements & KPIs Panel -->
+        <UCard v-if="showAchievementsPanel || !isNew">
+          <AchievementsKpisPanel
+            :achievements="achievements"
+            :kpis="kpiSuggestions"
+            :generating="enhancerGenerating"
+            @update:achievements="handleAchievementsUpdate"
+            @update:kpis="handleKpisUpdate"
+            @regenerate="handleGenerateAchievements"
+          />
+        </UCard>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-3">
+          <UButton :label="t('common.actions.cancel')" variant="ghost" @click="handleCancel" />
+          <UButton
+            :label="t('common.actions.save')"
+            icon="i-heroicons-check"
+            :disabled="!canSave || saving"
+            :loading="saving"
+            @click="handleSave"
+          />
+        </div>
+      </div>
+
+      <!-- Not Found (editing non-existent story) -->
+      <UAlert
+        v-else-if="!isNew && !formState && !loading"
+        color="warning"
+        icon="i-heroicons-exclamation-triangle"
+        :title="t('stories.detail.notFound')"
+        :description="t('stories.detail.notFoundDescription')"
+      />
+    </UPageBody>
+  </UPage>
+
+  <!-- Unsaved Changes Modal -->
+  <UnsavedChangesModal v-model:open="showCancelConfirm" @discard="handleConfirmCancel" />
 </template>

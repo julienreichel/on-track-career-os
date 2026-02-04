@@ -144,123 +144,121 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="jobTitle"
-        :description="t('matching.page.description')"
-        :links="headerLinks"
+  <UPage>
+    <UPageHeader
+      :title="jobTitle"
+      :description="t('matching.page.description')"
+      :links="headerLinks"
+    />
+
+    <UPageBody>
+      <UAlert
+        v-if="errorMessage"
+        icon="i-heroicons-exclamation-triangle"
+        color="error"
+        variant="soft"
+        :title="t('matching.page.states.errorTitle')"
+        :description="errorMessage"
+        class="mb-6"
+        :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+        @close="errorMessage = null"
       />
 
-      <UPageBody>
-        <UAlert
-          v-if="errorMessage"
-          icon="i-heroicons-exclamation-triangle"
-          color="error"
-          variant="soft"
-          :title="t('matching.page.states.errorTitle')"
-          :description="errorMessage"
-          class="mb-6"
-          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-          @close="errorMessage = null"
-        />
+      <UCard v-if="isLoading">
+        <USkeleton class="h-6 w-1/3" />
+        <USkeleton class="mt-4 h-20 w-full" />
+        <USkeleton class="mt-4 h-32 w-full" />
+      </UCard>
 
-        <UCard v-if="isLoading">
-          <USkeleton class="h-6 w-1/3" />
-          <USkeleton class="mt-4 h-20 w-full" />
-          <USkeleton class="mt-4 h-32 w-full" />
+      <template v-else>
+        <UCard class="mb-6 space-y-4">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.status') }}</p>
+              <UBadge color="neutral" variant="outline" class="mt-1">
+                {{ jobStatus }}
+              </UBadge>
+            </div>
+            <div>
+              <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.updatedAt') }}</p>
+              <p class="mt-1 text-sm text-default">
+                {{ formattedUpdatedAt || t('common.notAvailable') }}
+              </p>
+            </div>
+            <div v-if="linkedCompany">
+              <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.companyId') }}</p>
+              <div class="mt-1">
+                <LinkedCompanyBadge :company="linkedCompany" />
+              </div>
+            </div>
+            <div v-else-if="companyLink">
+              <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.companyId') }}</p>
+              <UButton
+                class="mt-1"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                icon="i-heroicons-arrow-top-right-on-square"
+                :label="t('jobs.detail.companyLink.view')"
+                :to="companyLink"
+              />
+            </div>
+          </div>
+
+          <div v-if="job?.roleSummary" class="rounded-lg bg-muted/30 p-4">
+            <p class="text-sm font-medium text-highlighted">
+              {{ t('jobs.form.fields.roleSummary.label') }}
+            </p>
+            <p class="mt-2 text-sm text-default">
+              {{ job.roleSummary }}
+            </p>
+          </div>
+          <p v-else-if="!hasCompanySummary" class="text-sm text-dimmed">
+            {{ t('matching.page.description') }}
+          </p>
         </UCard>
 
-        <template v-else>
-          <UCard class="mb-6 space-y-4">
-            <div class="grid gap-4 sm:grid-cols-2">
-              <div>
-                <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.status') }}</p>
-                <UBadge color="neutral" variant="outline" class="mt-1">
-                  {{ jobStatus }}
-                </UBadge>
-              </div>
-              <div>
-                <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.updatedAt') }}</p>
-                <p class="mt-1 text-sm text-default">
-                  {{ formattedUpdatedAt || t('common.notAvailable') }}
-                </p>
-              </div>
-              <div v-if="linkedCompany">
-                <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.companyId') }}</p>
-                <div class="mt-1">
-                  <LinkedCompanyBadge :company="linkedCompany" />
-                </div>
-              </div>
-              <div v-else-if="companyLink">
-                <p class="text-sm text-dimmed">{{ t('jobs.detail.meta.companyId') }}</p>
-                <UButton
-                  class="mt-1"
-                  color="neutral"
-                  variant="ghost"
-                  size="xs"
-                  icon="i-heroicons-arrow-top-right-on-square"
-                  :label="t('jobs.detail.companyLink.view')"
-                  :to="companyLink"
-                />
-              </div>
-            </div>
-
-            <div v-if="job?.roleSummary" class="rounded-lg bg-muted/30 p-4">
-              <p class="text-sm font-medium text-highlighted">
-                {{ t('jobs.form.fields.roleSummary.label') }}
-              </p>
-              <p class="mt-2 text-sm text-default">
-                {{ job.roleSummary }}
-              </p>
-            </div>
-            <p v-else-if="!hasCompanySummary" class="text-sm text-dimmed">
-              {{ t('matching.page.description') }}
+        <UCard v-if="!hasSummary">
+          <UEmpty :title="t('matching.page.states.emptyTitle')" icon="i-heroicons-sparkles">
+            <p class="text-sm text-dimmed">
+              {{ t('matching.page.states.emptyDescription') }}
             </p>
-          </UCard>
+            <template #actions>
+              <UButton
+                color="primary"
+                icon="i-heroicons-sparkles"
+                :label="t('matching.page.actions.generate')"
+                :loading="isGenerating"
+                :disabled="isGenerating"
+                data-testid="matching-empty-generate"
+                @click="handleGenerate"
+              />
+            </template>
+          </UEmpty>
+        </UCard>
 
-          <UCard v-if="!hasSummary">
-            <UEmpty :title="t('matching.page.states.emptyTitle')" icon="i-heroicons-sparkles">
-              <p class="text-sm text-dimmed">
-                {{ t('matching.page.states.emptyDescription') }}
-              </p>
-              <template #actions>
-                <UButton
-                  color="primary"
-                  icon="i-heroicons-sparkles"
-                  :label="t('matching.page.actions.generate')"
-                  :loading="isGenerating"
-                  :disabled="isGenerating"
-                  data-testid="matching-empty-generate"
-                  @click="handleGenerate"
-                />
-              </template>
-            </UEmpty>
-          </UCard>
+        <TailoredMaterialsCard
+          :job="job"
+          :matching-summary="summary"
+          :existing-materials="engine.existingMaterials.value"
+          :summary-loading="isLoading"
+          :summary-error="errorMessage"
+        />
 
-          <TailoredMaterialsCard
-            :job="job"
-            :matching-summary="summary"
-            :existing-materials="engine.existingMaterials.value"
-            :summary-loading="isLoading"
-            :summary-error="errorMessage"
-          />
-
-          <MatchingSummaryCard
-            v-if="hasSummary"
-            class="mt-6"
-            :overall-score="summaryProps.overallScore"
-            :score-breakdown="summaryProps.scoreBreakdown"
-            :recommendation="summaryProps.recommendation"
-            :reasoning-highlights="summaryProps.reasoningHighlights"
-            :strengths-for-this-role="summaryProps.strengthsForThisRole"
-            :skill-match="summaryProps.skillMatch"
-            :risky-points="summaryProps.riskyPoints"
-            :impact-opportunities="summaryProps.impactOpportunities"
-            :tailoring-tips="summaryProps.tailoringTips"
-          />
-        </template>
-      </UPageBody>
-    </UPage>
-  </UContainer>
+        <MatchingSummaryCard
+          v-if="hasSummary"
+          class="mt-6"
+          :overall-score="summaryProps.overallScore"
+          :score-breakdown="summaryProps.scoreBreakdown"
+          :recommendation="summaryProps.recommendation"
+          :reasoning-highlights="summaryProps.reasoningHighlights"
+          :strengths-for-this-role="summaryProps.strengthsForThisRole"
+          :skill-match="summaryProps.skillMatch"
+          :risky-points="summaryProps.riskyPoints"
+          :impact-opportunities="summaryProps.impactOpportunities"
+          :tailoring-tips="summaryProps.tailoringTips"
+        />
+      </template>
+    </UPageBody>
+  </UPage>
 </template>

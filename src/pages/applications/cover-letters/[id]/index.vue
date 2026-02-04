@@ -261,159 +261,157 @@ watch(item, (newValue) => {
 
 <template>
   <div>
-    <UContainer>
-      <UPage>
-        <UPageHeader
-          :title="displayTitle"
-          :description="t('applications.coverLetters.display.description')"
-          :links="headerLinks"
+    <UPage>
+      <UPageHeader
+        :title="displayTitle"
+        :description="t('applications.coverLetters.display.description')"
+        :links="headerLinks"
+      />
+
+      <UPageBody>
+        <TailoredJobBanner
+          v-if="hasJobContext"
+          class="mb-6"
+          :job-title="targetJobTitle"
+          :target-job-label="t('tailoredMaterials.targetJobLabel')"
+          :view-job-label="t('tailoredMaterials.viewJob')"
+          :view-match-label="t('tailoredMaterials.viewMatch')"
+          :job-link="jobLink"
+          :match-link="matchLink"
+          :regenerate-label="t('tailoredMaterials.regenerateCoverLetter')"
+          :regenerate-loading="isRegenerating"
+          :regenerate-disabled="regenerateDisabled"
+          :context-error-title="t('tailoredMaterials.contextErrorTitle')"
+          :regenerate-error-title="t('tailoredMaterials.regenerateCoverLetterErrorTitle')"
+          :missing-summary-title="t('tailoredMaterials.missingSummaryTitle')"
+          :missing-summary-description="t('tailoredMaterials.missingSummaryCoverLetter')"
+          :context-error="contextErrorMessage"
+          :regenerate-error="regenerateError"
+          :missing-summary="missingSummary"
+          @regenerate="handleRegenerateTailored"
         />
 
-        <UPageBody>
-          <TailoredJobBanner
-            v-if="hasJobContext"
-            class="mb-6"
-            :job-title="targetJobTitle"
-            :target-job-label="t('tailoredMaterials.targetJobLabel')"
-            :view-job-label="t('tailoredMaterials.viewJob')"
-            :view-match-label="t('tailoredMaterials.viewMatch')"
-            :job-link="jobLink"
-            :match-link="matchLink"
-            :regenerate-label="t('tailoredMaterials.regenerateCoverLetter')"
-            :regenerate-loading="isRegenerating"
-            :regenerate-disabled="regenerateDisabled"
-            :context-error-title="t('tailoredMaterials.contextErrorTitle')"
-            :regenerate-error-title="t('tailoredMaterials.regenerateCoverLetterErrorTitle')"
-            :missing-summary-title="t('tailoredMaterials.missingSummaryTitle')"
-            :missing-summary-description="t('tailoredMaterials.missingSummaryCoverLetter')"
-            :context-error="contextErrorMessage"
-            :regenerate-error="regenerateError"
-            :missing-summary="missingSummary"
-            @regenerate="handleRegenerateTailored"
-          />
+        <UAlert
+          v-if="error && !isInitializing"
+          icon="i-heroicons-exclamation-triangle"
+          color="error"
+          variant="soft"
+          :title="t('applications.coverLetters.display.states.errorTitle')"
+          :description="error"
+          class="mb-6"
+          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+          @close="error = null"
+        />
 
-          <UAlert
-            v-if="error && !isInitializing"
-            icon="i-heroicons-exclamation-triangle"
-            color="error"
-            variant="soft"
-            :title="t('applications.coverLetters.display.states.errorTitle')"
-            :description="error"
-            class="mb-6"
-            :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-            @close="error = null"
-          />
+        <UCard v-if="loading || isInitializing">
+          <USkeleton class="h-6 w-1/3" />
+          <USkeleton class="mt-4 h-96 w-full" />
+        </UCard>
 
-          <UCard v-if="loading || isInitializing">
-            <USkeleton class="h-6 w-1/3" />
-            <USkeleton class="mt-4 h-96 w-full" />
-          </UCard>
-
-          <!-- Edit Mode -->
-          <template v-else-if="item && isEditing">
-            <UCard>
-              <div class="space-y-4">
-                <div>
-                  <h3 class="text-lg font-semibold mb-2">
-                    {{ t('applications.coverLetters.display.editMode') }}
-                  </h3>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ t('applications.coverLetters.display.editModeDescription') }}
-                  </p>
-                </div>
-
-                <UFormField :label="t('applications.coverLetters.display.titleLabel')">
-                  <UInput
-                    v-model="editTitle"
-                    :placeholder="t('applications.coverLetters.display.titlePlaceholder')"
-                    data-testid="cover-letter-title-input"
-                    class="w-full"
-                  />
-                </UFormField>
-
-                <UFormField :label="t('applications.coverLetters.display.contentLabel')" required>
-                  <UTextarea
-                    v-model="editContent"
-                    :rows="25"
-                    :placeholder="t('applications.coverLetters.display.contentPlaceholder')"
-                    class="w-full"
-                    data-testid="cover-letter-content-textarea"
-                  />
-                </UFormField>
-              </div>
-              <template #footer>
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
-                    {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
-                  </p>
-                  <div class="flex justify-end gap-3">
-                    <UButton
-                      color="neutral"
-                      variant="ghost"
-                      :label="t('common.actions.cancel')"
-                      :disabled="loading || saving"
-                      @click="handleCancel"
-                    />
-                    <UButton
-                      color="primary"
-                      :label="t('common.actions.save')"
-                      :disabled="!hasChanges || loading || saving"
-                      :loading="saving"
-                      data-testid="save-cover-letter-button"
-                      @click="handleSave"
-                    />
-                  </div>
-                </div>
-              </template>
-            </UCard>
-          </template>
-
-          <!-- View Mode -->
-          <template v-else-if="item">
-            <UCard>
+        <!-- Edit Mode -->
+        <template v-else-if="item && isEditing">
+          <UCard>
+            <div class="space-y-4">
               <div>
-                <MarkdownContent v-if="item.content" :content="item.content" class="doc-markdown" />
-                <div v-else class="text-gray-500 dark:text-gray-400 italic">
-                  {{ t('applications.coverLetters.display.emptyContent') }}
+                <h3 class="text-lg font-semibold mb-2">
+                  {{ t('applications.coverLetters.display.editMode') }}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ t('applications.coverLetters.display.editModeDescription') }}
+                </p>
+              </div>
+
+              <UFormField :label="t('applications.coverLetters.display.titleLabel')">
+                <UInput
+                  v-model="editTitle"
+                  :placeholder="t('applications.coverLetters.display.titlePlaceholder')"
+                  data-testid="cover-letter-title-input"
+                  class="w-full"
+                />
+              </UFormField>
+
+              <UFormField :label="t('applications.coverLetters.display.contentLabel')" required>
+                <UTextarea
+                  v-model="editContent"
+                  :rows="25"
+                  :placeholder="t('applications.coverLetters.display.contentPlaceholder')"
+                  class="w-full"
+                  data-testid="cover-letter-content-textarea"
+                />
+              </UFormField>
+            </div>
+            <template #footer>
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                  {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                </p>
+                <div class="flex justify-end gap-3">
+                  <UButton
+                    color="neutral"
+                    variant="ghost"
+                    :label="t('common.actions.cancel')"
+                    :disabled="loading || saving"
+                    @click="handleCancel"
+                  />
+                  <UButton
+                    color="primary"
+                    :label="t('common.actions.save')"
+                    :disabled="!hasChanges || loading || saving"
+                    :loading="saving"
+                    data-testid="save-cover-letter-button"
+                    @click="handleSave"
+                  />
                 </div>
               </div>
-              <template #footer>
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
-                    {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
-                  </p>
-                  <div class="flex justify-end gap-3">
-                    <UButton
-                      :label="t('applications.coverLetters.display.actions.print')"
-                      icon="i-heroicons-arrow-down-tray"
-                      variant="outline"
-                      @click="handlePrint"
-                    />
-                    <UButton
-                      :label="t('applications.coverLetters.display.actions.edit')"
-                      icon="i-heroicons-pencil"
-                      variant="outline"
-                      data-testid="edit-cover-letter-button"
-                      @click="toggleEdit"
-                    />
-                  </div>
-                </div>
-              </template>
-            </UCard>
-          </template>
-
-          <UCard v-else-if="!loading && !item">
-            <UAlert
-              icon="i-heroicons-exclamation-circle"
-              color="warning"
-              variant="soft"
-              :title="t('applications.coverLetters.display.states.notFound')"
-              :description="t('applications.coverLetters.display.states.notFoundDescription')"
-            />
+            </template>
           </UCard>
-        </UPageBody>
-      </UPage>
-    </UContainer>
+        </template>
+
+        <!-- View Mode -->
+        <template v-else-if="item">
+          <UCard>
+            <div>
+              <MarkdownContent v-if="item.content" :content="item.content" class="doc-markdown" />
+              <div v-else class="text-gray-500 dark:text-gray-400 italic">
+                {{ t('applications.coverLetters.display.emptyContent') }}
+              </div>
+            </div>
+            <template #footer>
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                  {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                </p>
+                <div class="flex justify-end gap-3">
+                  <UButton
+                    :label="t('applications.coverLetters.display.actions.print')"
+                    icon="i-heroicons-arrow-down-tray"
+                    variant="outline"
+                    @click="handlePrint"
+                  />
+                  <UButton
+                    :label="t('applications.coverLetters.display.actions.edit')"
+                    icon="i-heroicons-pencil"
+                    variant="outline"
+                    data-testid="edit-cover-letter-button"
+                    @click="toggleEdit"
+                  />
+                </div>
+              </div>
+            </template>
+          </UCard>
+        </template>
+
+        <UCard v-else-if="!loading && !item">
+          <UAlert
+            icon="i-heroicons-exclamation-circle"
+            color="warning"
+            variant="soft"
+            :title="t('applications.coverLetters.display.states.notFound')"
+            :description="t('applications.coverLetters.display.states.notFoundDescription')"
+          />
+        </UCard>
+      </UPageBody>
+    </UPage>
 
     <UnsavedChangesModal
       v-model:open="cancelModalOpen"

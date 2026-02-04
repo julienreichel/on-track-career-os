@@ -80,86 +80,84 @@ function cancelDelete() {
 </script>
 
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="t('companies.page.title')"
-        :description="t('companies.page.description')"
-        :links="headerLinks"
+  <UPage>
+    <UPageHeader
+      :title="t('companies.page.title')"
+      :description="t('companies.page.description')"
+      :links="headerLinks"
+    />
+
+    <UPageBody>
+      <div v-if="hasLoaded && !loading && rawCompanies.length > 0" class="mb-6">
+        <UInput
+          v-model="searchQuery"
+          icon="i-heroicons-magnifying-glass"
+          size="lg"
+          class="w-1/3"
+          :placeholder="t('companies.list.search.placeholder')"
+        />
+      </div>
+
+      <UAlert
+        v-if="errorMessage"
+        icon="i-heroicons-exclamation-triangle"
+        color="error"
+        variant="soft"
+        :title="t('companies.list.errors.title')"
+        :description="errorMessage"
+        :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+        class="mb-6"
+        @close="errorMessage = null"
       />
 
-      <UPageBody>
-        <div v-if="hasLoaded && !loading && rawCompanies.length > 0" class="mb-6">
-          <UInput
-            v-model="searchQuery"
-            icon="i-heroicons-magnifying-glass"
-            size="lg"
-            class="w-1/3"
-            :placeholder="t('companies.list.search.placeholder')"
-          />
-        </div>
+      <ListSkeletonCards v-if="loading || !hasLoaded" />
 
-        <UAlert
-          v-if="errorMessage"
-          icon="i-heroicons-exclamation-triangle"
-          color="error"
-          variant="soft"
-          :title="t('companies.list.errors.title')"
-          :description="errorMessage"
-          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-          class="mb-6"
-          @close="errorMessage = null"
+      <UCard v-else-if="rawCompanies.length === 0">
+        <UEmpty :title="t('companies.list.empty.title')" icon="i-heroicons-building-office-2">
+          <p class="text-sm text-gray-500">{{ t('companies.list.empty.description') }}</p>
+          <template #actions>
+            <UButton
+              :label="t('common.actions.add')"
+              icon="i-heroicons-plus"
+              @click="router.push('/companies/new')"
+            />
+          </template>
+        </UEmpty>
+      </UCard>
+
+      <UCard v-else-if="companies.length === 0">
+        <UEmpty :title="t('companies.list.search.noResults')" icon="i-heroicons-magnifying-glass">
+          <p class="text-sm text-gray-500">
+            {{ t('companies.list.search.placeholder') }}
+          </p>
+        </UEmpty>
+      </UCard>
+
+      <UPageGrid v-else>
+        <CompanyCard
+          v-for="company in companies"
+          :key="company.id"
+          :company="company"
+          @open="handleOpen"
+          @delete="requestDelete"
         />
+      </UPageGrid>
+    </UPageBody>
+  </UPage>
 
-        <ListSkeletonCards v-if="loading || !hasLoaded" />
-
-        <UCard v-else-if="rawCompanies.length === 0">
-          <UEmpty :title="t('companies.list.empty.title')" icon="i-heroicons-building-office-2">
-            <p class="text-sm text-gray-500">{{ t('companies.list.empty.description') }}</p>
-            <template #actions>
-              <UButton
-                :label="t('common.actions.add')"
-                icon="i-heroicons-plus"
-                @click="router.push('/companies/new')"
-              />
-            </template>
-          </UEmpty>
-        </UCard>
-
-        <UCard v-else-if="companies.length === 0">
-          <UEmpty :title="t('companies.list.search.noResults')" icon="i-heroicons-magnifying-glass">
-            <p class="text-sm text-gray-500">
-              {{ t('companies.list.search.placeholder') }}
-            </p>
-          </UEmpty>
-        </UCard>
-
-        <UPageGrid v-else>
-          <CompanyCard
-            v-for="company in companies"
-            :key="company.id"
-            :company="company"
-            @open="handleOpen"
-            @delete="requestDelete"
-          />
-        </UPageGrid>
-      </UPageBody>
-    </UPage>
-
-    <UModal
-      v-model:open="showDeleteModal"
-      :title="t('companies.delete.title')"
-      :description="t('companies.delete.message')"
-    >
-      <template #footer>
-        <UButton
-          color="neutral"
-          variant="ghost"
-          :label="t('common.actions.cancel')"
-          @click="cancelDelete"
-        />
-        <UButton color="error" :label="t('common.actions.delete')" @click="confirmDelete" />
-      </template>
-    </UModal>
-  </UContainer>
+  <UModal
+    v-model:open="showDeleteModal"
+    :title="t('companies.delete.title')"
+    :description="t('companies.delete.message')"
+  >
+    <template #footer>
+      <UButton
+        color="neutral"
+        variant="ghost"
+        :label="t('common.actions.cancel')"
+        @click="cancelDelete"
+      />
+      <UButton color="error" :label="t('common.actions.delete')" @click="confirmDelete" />
+    </template>
+  </UModal>
 </template>

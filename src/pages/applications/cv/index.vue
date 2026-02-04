@@ -1,131 +1,129 @@
 <template>
-  <UContainer>
-    <UPage>
-      <UPageHeader
-        :title="$t('applications.cvs.page.title')"
-        :description="$t('applications.cvs.page.description')"
-        :links="[
-          {
-            label: $t('common.backToList'),
-            icon: 'i-heroicons-arrow-left',
-            to: { name: 'applications' },
-          },
-          {
-            label: $t('applications.cvs.list.actions.settings'),
-            icon: 'i-heroicons-cog-6-tooth',
-            to: '/settings/cv',
-            color: 'neutral',
-            variant: 'outline',
-          },
-          {
-            label: $t('applications.cvs.list.actions.create'),
-            icon: 'i-heroicons-plus',
-            to: { name: 'applications-cv-new' },
-          },
-        ]"
+  <UPage>
+    <UPageHeader
+      :title="$t('applications.cvs.page.title')"
+      :description="$t('applications.cvs.page.description')"
+      :links="[
+        {
+          label: $t('common.backToList'),
+          icon: 'i-heroicons-arrow-left',
+          to: { name: 'applications' },
+        },
+        {
+          label: $t('applications.cvs.list.actions.settings'),
+          icon: 'i-heroicons-cog-6-tooth',
+          to: '/settings/cv',
+          color: 'neutral',
+          variant: 'outline',
+        },
+        {
+          label: $t('applications.cvs.list.actions.create'),
+          icon: 'i-heroicons-plus',
+          to: { name: 'applications-cv-new' },
+        },
+      ]"
+    />
+
+    <UPageBody>
+      <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
+
+      <LockedFeatureCard
+        v-for="feature in guidance.lockedFeatures"
+        :key="feature.id"
+        :feature="feature"
+        class="mb-6"
       />
 
-      <UPageBody>
-        <GuidanceBanner v-if="guidance.banner" :banner="guidance.banner" class="mb-6" />
-
-        <LockedFeatureCard
-          v-for="feature in guidance.lockedFeatures"
-          :key="feature.id"
-          :feature="feature"
-          class="mb-6"
+      <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
+        <UInput
+          v-model="searchQuery"
+          icon="i-heroicons-magnifying-glass"
+          :placeholder="t('applications.cvs.list.search.placeholder')"
+          size="lg"
+          class="w-1/3"
         />
+      </div>
 
-        <div v-if="hasLoaded && !loading && items.length > 0" class="mb-6">
-          <UInput
-            v-model="searchQuery"
-            icon="i-heroicons-magnifying-glass"
-            :placeholder="t('applications.cvs.list.search.placeholder')"
-            size="lg"
-            class="w-1/3"
-          />
-        </div>
+      <!-- Error Alert -->
+      <UAlert
+        v-if="error"
+        color="error"
+        icon="i-heroicons-exclamation-triangle"
+        :title="$t('common.error')"
+        :description="error"
+        class="mb-6"
+      />
 
-        <!-- Error Alert -->
-        <UAlert
-          v-if="error"
-          color="error"
-          icon="i-heroicons-exclamation-triangle"
-          :title="$t('common.error')"
-          :description="error"
-          class="mb-6"
-        />
+      <!-- Loading State -->
+      <ListSkeletonCards v-if="loading || !hasLoaded" />
 
-        <!-- Loading State -->
-        <ListSkeletonCards v-if="loading || !hasLoaded" />
+      <!-- Empty State -->
+      <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
 
-        <!-- Empty State -->
-        <EmptyStateActionCard v-else-if="guidance.emptyState" :empty-state="guidance.emptyState" />
+      <!-- CV List -->
+      <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
+        <UEmpty
+          :title="$t('applications.cvs.list.search.noResults')"
+          icon="i-heroicons-magnifying-glass"
+        >
+          <p class="text-sm text-gray-500">
+            {{ $t('applications.cvs.list.search.placeholder') }}
+          </p>
+        </UEmpty>
+      </UCard>
 
-        <!-- CV List -->
-        <UCard v-else-if="filteredItems.length === 0 && sortedItems.length !== 0">
-          <UEmpty
-            :title="$t('applications.cvs.list.search.noResults')"
-            icon="i-heroicons-magnifying-glass"
-          >
-            <p class="text-sm text-gray-500">
-              {{ $t('applications.cvs.list.search.placeholder') }}
-            </p>
-          </UEmpty>
-        </UCard>
-
-        <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <ItemCard
-            v-for="cv in filteredItems"
-            :key="cv.id"
-            :title="cv.name || `${$t('common.untitled')} ${$t('common.labels.cv')}`"
-            :subtitle="formatListDate(cv.updatedAt ?? cv.createdAt)"
-            @edit="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
-            @delete="confirmDelete(cv)"
-          >
-            <!-- CV Info Content -->
-            <div class="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-              <div v-if="cv.isTailored" class="flex items-center gap-1">
-                <UIcon name="i-heroicons-briefcase" class="flex-shrink-0" />
-                <span>{{ $t('applications.cvs.list.tailored') }}</span>
-              </div>
+      <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ItemCard
+          v-for="cv in filteredItems"
+          :key="cv.id"
+          :title="cv.name || `${$t('common.untitled')} ${$t('common.labels.cv')}`"
+          :subtitle="formatListDate(cv.updatedAt ?? cv.createdAt)"
+          @edit="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
+          @delete="confirmDelete(cv)"
+        >
+          <!-- CV Info Content -->
+          <div class="space-y-1 text-sm text-gray-600 dark:text-gray-400">
+            <div v-if="cv.isTailored" class="flex items-center gap-1">
+              <UIcon name="i-heroicons-briefcase" class="flex-shrink-0" />
+              <span>{{ $t('applications.cvs.list.tailored') }}</span>
             </div>
+          </div>
 
-            <!-- Custom Actions -->
-            <template #actions>
-              <UButton
-                :label="$t('common.actions.view')"
-                icon="i-heroicons-eye"
-                size="xs"
-                color="primary"
-                variant="outline"
-                @click="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
-              />
-              <UButton
-                :label="$t('common.actions.print')"
-                icon="i-heroicons-printer"
-                size="xs"
-                color="neutral"
-                variant="outline"
-                @click="handlePrint(cv)"
-              />
-            </template>
-          </ItemCard>
-        </div>
-      </UPageBody>
+          <!-- Custom Actions -->
+          <template #actions>
+            <UButton
+              :label="$t('common.actions.view')"
+              icon="i-heroicons-eye"
+              size="xs"
+              color="primary"
+              variant="outline"
+              @click="navigateTo({ name: 'applications-cv-id', params: { id: cv.id } })"
+            />
+            <UButton
+              :label="$t('common.actions.print')"
+              icon="i-heroicons-printer"
+              size="xs"
+              color="neutral"
+              variant="outline"
+              @click="handlePrint(cv)"
+            />
+          </template>
+        </ItemCard>
+      </div>
+    </UPageBody>
 
-      <!-- Delete Confirmation Modal -->
-      <ConfirmModal
-        v-model:open="deleteModalOpen"
-        :title="t('applications.cvs.delete.title')"
-        :description="t('applications.cvs.delete.message')"
-        :confirm-label="t('common.actions.delete')"
-        :cancel-label="t('common.actions.cancel')"
-        confirm-color="error"
-        :loading="deleting"
-        @confirm="handleDelete"
-      />
-    </UPage>
-  </UContainer>
+    <!-- Delete Confirmation Modal -->
+    <ConfirmModal
+      v-model:open="deleteModalOpen"
+      :title="t('applications.cvs.delete.title')"
+      :description="t('applications.cvs.delete.message')"
+      :confirm-label="t('common.actions.delete')"
+      :cancel-label="t('common.actions.cancel')"
+      confirm-color="error"
+      :loading="deleting"
+      @confirm="handleDelete"
+    />
+  </UPage>
 </template>
 
 <script setup lang="ts">

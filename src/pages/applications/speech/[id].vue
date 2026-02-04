@@ -40,7 +40,9 @@ const saving = ref(false);
 const cancelModalOpen = ref(false);
 const isGenerating = computed(() => engine.isGenerating.value);
 const hasJobContext = computed(() => Boolean(item.value?.jobId));
-const detailTitle = computed(() => item.value?.name?.trim() || t('applications.speeches.detail.untitled'));
+const detailTitle = computed(
+  () => item.value?.name?.trim() || t('applications.speeches.detail.untitled')
+);
 const formattedUpdatedAt = computed(() => formatDetailDate(item.value?.updatedAt));
 const targetJobTitle = computed(
   () => targetJob.value?.title?.trim() || t('tailoredMaterials.unknownJobTitle')
@@ -254,188 +256,186 @@ watch(item, (newValue) => {
 
 <template>
   <div>
-    <UContainer>
-      <UPage>
-        <UPageHeader
-          :title="detailTitle"
-          :description="t('applications.speeches.detail.description')"
-          :links="headerLinks"
+    <UPage>
+      <UPageHeader
+        :title="detailTitle"
+        :description="t('applications.speeches.detail.description')"
+        :links="headerLinks"
+      />
+
+      <UPageBody>
+        <TailoredJobBanner
+          v-if="hasJobContext"
+          class="mb-6"
+          :job-title="targetJobTitle"
+          :target-job-label="t('tailoredMaterials.targetJobLabel')"
+          :view-job-label="t('tailoredMaterials.viewJob')"
+          :view-match-label="t('tailoredMaterials.viewMatch')"
+          :job-link="jobLink"
+          :match-link="matchLink"
+          :regenerate-label="t('tailoredMaterials.regenerateSpeech')"
+          :regenerate-loading="isRegenerating"
+          :regenerate-disabled="regenerateDisabled"
+          :context-error-title="t('tailoredMaterials.contextErrorTitle')"
+          :regenerate-error-title="t('tailoredMaterials.regenerateSpeechErrorTitle')"
+          :missing-summary-title="t('tailoredMaterials.missingSummaryTitle')"
+          :missing-summary-description="t('tailoredMaterials.missingSummarySpeech')"
+          :context-error="contextErrorMessage"
+          :regenerate-error="regenerateError"
+          :missing-summary="missingSummary"
+          @regenerate="handleRegenerateTailored"
         />
 
-        <UPageBody>
-          <TailoredJobBanner
-            v-if="hasJobContext"
-            class="mb-6"
-            :job-title="targetJobTitle"
-            :target-job-label="t('tailoredMaterials.targetJobLabel')"
-            :view-job-label="t('tailoredMaterials.viewJob')"
-            :view-match-label="t('tailoredMaterials.viewMatch')"
-            :job-link="jobLink"
-            :match-link="matchLink"
-            :regenerate-label="t('tailoredMaterials.regenerateSpeech')"
-            :regenerate-loading="isRegenerating"
-            :regenerate-disabled="regenerateDisabled"
-            :context-error-title="t('tailoredMaterials.contextErrorTitle')"
-            :regenerate-error-title="t('tailoredMaterials.regenerateSpeechErrorTitle')"
-            :missing-summary-title="t('tailoredMaterials.missingSummaryTitle')"
-            :missing-summary-description="t('tailoredMaterials.missingSummarySpeech')"
-            :context-error="contextErrorMessage"
-            :regenerate-error="regenerateError"
-            :missing-summary="missingSummary"
-            @regenerate="handleRegenerateTailored"
-          />
+        <UAlert
+          v-if="error"
+          icon="i-heroicons-exclamation-triangle"
+          color="error"
+          variant="soft"
+          :title="t('applications.speeches.detail.states.errorTitle')"
+          :description="error"
+          class="mb-6"
+          :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+          @close="error = null"
+        />
 
-          <UAlert
-            v-if="error"
-            icon="i-heroicons-exclamation-triangle"
-            color="error"
-            variant="soft"
-            :title="t('applications.speeches.detail.states.errorTitle')"
-            :description="error"
-            class="mb-6"
-            :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-            @close="error = null"
-          />
+        <UAlert
+          v-if="engine.error.value"
+          icon="i-heroicons-exclamation-triangle"
+          color="warning"
+          variant="soft"
+          :title="t('applications.speeches.detail.states.generateErrorTitle')"
+          :description="engine.error.value"
+          class="mb-6"
+          :close-button="{
+            icon: 'i-heroicons-x-mark-20-solid',
+            color: 'warning',
+            variant: 'link',
+          }"
+          @close="engine.error.value = null"
+        />
 
-          <UAlert
-            v-if="engine.error.value"
-            icon="i-heroicons-exclamation-triangle"
-            color="warning"
-            variant="soft"
-            :title="t('applications.speeches.detail.states.generateErrorTitle')"
-            :description="engine.error.value"
-            class="mb-6"
-            :close-button="{
-              icon: 'i-heroicons-x-mark-20-solid',
-              color: 'warning',
-              variant: 'link',
-            }"
-            @close="engine.error.value = null"
-          />
+        <UCard v-if="loading">
+          <USkeleton class="h-6 w-1/3" />
+          <USkeleton class="mt-4 h-20 w-full" />
+          <USkeleton class="mt-4 h-32 w-full" />
+        </UCard>
 
-          <UCard v-if="loading">
-            <USkeleton class="h-6 w-1/3" />
-            <USkeleton class="mt-4 h-20 w-full" />
-            <USkeleton class="mt-4 h-32 w-full" />
-          </UCard>
+        <template v-else-if="item">
+          <template v-if="isEditing">
+            <UCard>
+              <div class="mb-6">
+                <UFormField :label="t('applications.speeches.form.fields.title.label')">
+                  <UInput
+                    v-model="formState.title"
+                    :placeholder="t('applications.speeches.form.fields.title.placeholder')"
+                    :disabled="loading || saving"
+                    data-testid="speech-title-input"
+                    class="w-full"
+                  />
+                </UFormField>
+              </div>
 
-          <template v-else-if="item">
-            <template v-if="isEditing">
-              <UCard>
-                <div class="mb-6">
-                  <UFormField :label="t('applications.speeches.form.fields.title.label')">
-                    <UInput
-                      v-model="formState.title"
-                      :placeholder="t('applications.speeches.form.fields.title.placeholder')"
+              <SpeechBlockEditorCard v-model="formState" :disabled="loading || saving" />
+              <template #footer>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                    {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                  </p>
+                  <div class="flex flex-wrap justify-end gap-3">
+                    <UButton
+                      color="neutral"
+                      variant="ghost"
+                      :label="t('common.actions.cancel')"
                       :disabled="loading || saving"
-                      data-testid="speech-title-input"
-                      class="w-full"
+                      @click="handleCancel"
                     />
-                  </UFormField>
-                </div>
-
-                <SpeechBlockEditorCard v-model="formState" :disabled="loading || saving" />
-                <template #footer>
-                  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
-                      {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
-                    </p>
-                    <div class="flex flex-wrap justify-end gap-3">
-                      <UButton
-                        color="neutral"
-                        variant="ghost"
-                        :label="t('common.actions.cancel')"
-                        :disabled="loading || saving"
-                        @click="handleCancel"
-                      />
-                      <UButton
-                        color="primary"
-                        :label="t('common.actions.save')"
-                        :disabled="loading || saving"
-                        :loading="saving"
-                        data-testid="save-speech-button"
-                        @click="handleSave"
-                      />
-                    </div>
-                  </div>
-                </template>
-              </UCard>
-            </template>
-
-            <template v-else>
-              <UCard>
-                <div class="space-y-2">
-                  <div>
-                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                      {{ t('applications.speeches.form.sections.elevatorPitch.label') }}
-                    </h3>
-                    <MarkdownContent
-                      v-if="hasElevatorPitch"
-                      :content="formState.elevatorPitch"
-                      class="doc-markdown"
+                    <UButton
+                      color="primary"
+                      :label="t('common.actions.save')"
+                      :disabled="loading || saving"
+                      :loading="saving"
+                      data-testid="save-speech-button"
+                      @click="handleSave"
                     />
                   </div>
                 </div>
-              </UCard>
-
-              <UCard class="mt-6">
-                <div class="space-y-2">
-                  <div>
-                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                      {{ t('applications.speeches.form.sections.careerStory.label') }}
-                    </h3>
-                    <MarkdownContent
-                      v-if="hasCareerStory"
-                      :content="formState.careerStory"
-                      class="doc-markdown"
-                    />
-                  </div>
-                </div>
-              </UCard>
-
-              <UCard class="mt-6">
-                <div class="space-y-2">
-                  <div>
-                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                      {{ t('applications.speeches.form.sections.whyMe.label') }}
-                    </h3>
-                    <MarkdownContent
-                      v-if="hasWhyMe"
-                      :content="formState.whyMe"
-                      class="doc-markdown"
-                    />
-                  </div>
-                </div>
-                <template #footer>
-                  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
-                      {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
-                    </p>
-                    <div class="flex justify-end">
-                      <UButton
-                        color="primary"
-                        variant="outline"
-                        :label="t('common.actions.edit')"
-                        icon="i-heroicons-pencil"
-                        @click="handleEdit"
-                      />
-                    </div>
-                  </div>
-                </template>
-              </UCard>
-            </template>
+              </template>
+            </UCard>
           </template>
 
-          <UAlert
-            v-else
-            color="warning"
-            icon="i-heroicons-exclamation-triangle"
-            :title="t('applications.speeches.detail.notFound')"
-            :description="t('applications.speeches.detail.notFoundDescription')"
-          />
-        </UPageBody>
-      </UPage>
-    </UContainer>
+          <template v-else>
+            <UCard>
+              <div class="space-y-2">
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                    {{ t('applications.speeches.form.sections.elevatorPitch.label') }}
+                  </h3>
+                  <MarkdownContent
+                    v-if="hasElevatorPitch"
+                    :content="formState.elevatorPitch"
+                    class="doc-markdown"
+                  />
+                </div>
+              </div>
+            </UCard>
+
+            <UCard class="mt-6">
+              <div class="space-y-2">
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                    {{ t('applications.speeches.form.sections.careerStory.label') }}
+                  </h3>
+                  <MarkdownContent
+                    v-if="hasCareerStory"
+                    :content="formState.careerStory"
+                    class="doc-markdown"
+                  />
+                </div>
+              </div>
+            </UCard>
+
+            <UCard class="mt-6">
+              <div class="space-y-2">
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                    {{ t('applications.speeches.form.sections.whyMe.label') }}
+                  </h3>
+                  <MarkdownContent
+                    v-if="hasWhyMe"
+                    :content="formState.whyMe"
+                    class="doc-markdown"
+                  />
+                </div>
+              </div>
+              <template #footer>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p v-if="formattedUpdatedAt" class="text-xs text-gray-400">
+                    {{ t('common.lastUpdated', { date: formattedUpdatedAt }) }}
+                  </p>
+                  <div class="flex justify-end">
+                    <UButton
+                      color="primary"
+                      variant="outline"
+                      :label="t('common.actions.edit')"
+                      icon="i-heroicons-pencil"
+                      @click="handleEdit"
+                    />
+                  </div>
+                </div>
+              </template>
+            </UCard>
+          </template>
+        </template>
+
+        <UAlert
+          v-else
+          color="warning"
+          icon="i-heroicons-exclamation-triangle"
+          :title="t('applications.speeches.detail.notFound')"
+          :description="t('applications.speeches.detail.notFoundDescription')"
+        />
+      </UPageBody>
+    </UPage>
 
     <UnsavedChangesModal v-model:open="cancelModalOpen" @discard="handleDiscard" />
   </div>

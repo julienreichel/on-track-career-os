@@ -37,7 +37,6 @@ const router = createRouter({
 const i18n = createTestI18n();
 
 const stubs = {
-  UContainer: { template: '<div class="u-container"><slot /></div>' },
   UPage: { template: '<div class="u-page"><slot /></div>' },
   UPageHeader: {
     props: ['title', 'description', 'links'],

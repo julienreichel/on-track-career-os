@@ -236,105 +236,106 @@ watch(
 
 <template>
   <div>
-    <UContainer>
-      <UPage>
-        <UPageHeader :title="t('applications.cvs.settings.title')" :description="t('applications.cvs.settings.subtitle')" />
+    <UPage>
+      <UPageHeader
+        :title="t('applications.cvs.settings.title')"
+        :description="t('applications.cvs.settings.subtitle')"
+      />
 
-        <UPageBody>
-          <UAlert
-            v-if="settingsError"
-            color="error"
-            icon="i-heroicons-exclamation-triangle"
-            :title="t('common.error')"
-            :description="settingsError"
-            class="mb-6"
-          />
-          <UAlert
-            v-else-if="templatesError"
-            color="error"
-            icon="i-heroicons-exclamation-triangle"
-            :title="t('common.error')"
-            :description="templatesError"
-            class="mb-6"
-          />
+      <UPageBody>
+        <UAlert
+          v-if="settingsError"
+          color="error"
+          icon="i-heroicons-exclamation-triangle"
+          :title="t('common.error')"
+          :description="settingsError"
+          class="mb-6"
+        />
+        <UAlert
+          v-else-if="templatesError"
+          color="error"
+          icon="i-heroicons-exclamation-triangle"
+          :title="t('common.error')"
+          :description="templatesError"
+          class="mb-6"
+        />
 
-          <ListSkeletonCards v-if="!isReady" />
+        <ListSkeletonCards v-if="!isReady" />
 
-          <div v-else class="space-y-10">
-            <section id="cv-templates">
-              <UCard>
-                <template #header>
-                  <div class="flex flex-wrap items-start justify-between gap-3">
-                    <div class="space-y-1">
-                      <h2 class="text-lg font-semibold text-default">
-                        {{ t('applications.cvs.templates.list.title') }}
-                      </h2>
-                      <p class="text-sm text-dimmed">
-                        {{ t('applications.cvs.templates.list.subtitle') }}
-                      </p>
-                    </div>
-                    <UButton
-                      color="primary"
-                      variant="outline"
-                      :label="t('applications.cvs.templates.list.actions.create')"
-                      icon="i-heroicons-plus"
-                      @click="createModalOpen = true"
-                    />
+        <div v-else class="space-y-10">
+          <section id="cv-templates">
+            <UCard>
+              <template #header>
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div class="space-y-1">
+                    <h2 class="text-lg font-semibold text-default">
+                      {{ t('applications.cvs.templates.list.title') }}
+                    </h2>
+                    <p class="text-sm text-dimmed">
+                      {{ t('applications.cvs.templates.list.subtitle') }}
+                    </p>
                   </div>
-                </template>
-
-                <UEmpty
-                  v-if="sortedTemplates.length === 0"
-                  :title="t('applications.cvs.templates.list.empty.title')"
-                  icon="i-heroicons-document-text"
-                >
-                  <p class="text-sm text-gray-500">
-                    {{ t('applications.cvs.templates.list.empty.description') }}
-                  </p>
-                  <template #actions>
-                    <UButton
-                      color="primary"
-                      :label="t('applications.cvs.templates.list.actions.create')"
-                      icon="i-heroicons-plus"
-                      @click="createModalOpen = true"
-                    />
-                  </template>
-                </UEmpty>
-
-                <UPageGrid v-else>
-                  <CvTemplateCard
-                    v-for="template in sortedTemplates"
-                    :key="template.id"
-                    :name="template.name"
-                    :is-default="template.id === defaultTemplateId"
-                    :updated-at="formatTemplateDate(template)"
-                    :primary-action-label="t('common.actions.edit')"
-                    primary-action-icon="i-heroicons-pencil"
-                    :secondary-action-label="t('applications.cvs.templates.list.actions.duplicate')"
-                    secondary-action-icon="i-heroicons-document-duplicate"
-                    :show-delete="true"
-                    :delete-label="t('common.actions.delete')"
-                    delete-icon="i-heroicons-trash"
-                    :data-testid="`cv-template-${template.id}`"
-                    @primary="handleEdit(template)"
-                    @secondary="handleDuplicate(template)"
-                    @delete="confirmDelete(template)"
+                  <UButton
+                    color="primary"
+                    variant="outline"
+                    :label="t('applications.cvs.templates.list.actions.create')"
+                    icon="i-heroicons-plus"
+                    @click="createModalOpen = true"
                   />
-                </UPageGrid>
-              </UCard>
-            </section>
+                </div>
+              </template>
 
-            <CvSettingsForm
-              v-model="formState!"
-              :experiences="experiences"
-              :loading-experiences="loadingExperiences"
-              :saving="saving"
-              @save="handleSave"
-            />
-          </div>
-        </UPageBody>
-      </UPage>
-    </UContainer>
+              <UEmpty
+                v-if="sortedTemplates.length === 0"
+                :title="t('applications.cvs.templates.list.empty.title')"
+                icon="i-heroicons-document-text"
+              >
+                <p class="text-sm text-gray-500">
+                  {{ t('applications.cvs.templates.list.empty.description') }}
+                </p>
+                <template #actions>
+                  <UButton
+                    color="primary"
+                    :label="t('applications.cvs.templates.list.actions.create')"
+                    icon="i-heroicons-plus"
+                    @click="createModalOpen = true"
+                  />
+                </template>
+              </UEmpty>
+
+              <UPageGrid v-else>
+                <CvTemplateCard
+                  v-for="template in sortedTemplates"
+                  :key="template.id"
+                  :name="template.name"
+                  :is-default="template.id === defaultTemplateId"
+                  :updated-at="formatTemplateDate(template)"
+                  :primary-action-label="t('common.actions.edit')"
+                  primary-action-icon="i-heroicons-pencil"
+                  :secondary-action-label="t('applications.cvs.templates.list.actions.duplicate')"
+                  secondary-action-icon="i-heroicons-document-duplicate"
+                  :show-delete="true"
+                  :delete-label="t('common.actions.delete')"
+                  delete-icon="i-heroicons-trash"
+                  :data-testid="`cv-template-${template.id}`"
+                  @primary="handleEdit(template)"
+                  @secondary="handleDuplicate(template)"
+                  @delete="confirmDelete(template)"
+                />
+              </UPageGrid>
+            </UCard>
+          </section>
+
+          <CvSettingsForm
+            v-model="formState!"
+            :experiences="experiences"
+            :loading-experiences="loadingExperiences"
+            :saving="saving"
+            @save="handleSave"
+          />
+        </div>
+      </UPageBody>
+    </UPage>
 
     <ConfirmModal
       v-model:open="deleteModalOpen"
