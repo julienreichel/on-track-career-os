@@ -445,10 +445,15 @@
     "list": {
       "title": "Stories",
       "addNew": "New Story",
-      "empty": "No stories yet for this experience.",
-      "emptyDescription": "Create your first STAR story to document your achievements.",
       "autoGenerate": "Auto-generate Stories",
-      "generating": "Generating stories from experience..."
+      "generating": "Generating stories from experience...",
+      "empty": {
+        "experienceTitle": "No stories yet for this experience.",
+        "experienceDescription": "Create your first STAR story to document your achievements.",
+        "title": "No Stories Yet",
+        "description": "Create your first STAR story to document your achievements",
+        "cta": "Create Your First Story"
+      }
     },
     "global": {
       "description": "Browse all your achievement stories across all experiences"
@@ -474,7 +479,11 @@
     },
     "detail": {
       "notFound": "Story not found",
-      "notFoundDescription": "The story you're looking for doesn't exist or has been deleted."
+      "notFoundDescription": "The story you're looking for doesn't exist or has been deleted.",
+      "title": "Story Details",
+      "description": "Review the STAR details for this story.",
+      "achievements": "Achievements",
+      "kpis": "Key Performance Indicators"
     },
     "form": {
       "createTitle": "Create New Story",
@@ -517,6 +526,18 @@
           "placeholder": "Tell us about your achievement, challenge, and the impact you made..."
         }
       }
+    },
+    "card": {
+      "noTitle": "Untitled Story",
+      "noContent": "No content",
+      "deleteConfirm": {
+        "title": "Delete Story",
+        "message": "Are you sure you want to delete this story? This action cannot be undone."
+      }
+    },
+    "editor": {
+      "unsavedChanges": "You have unsaved changes",
+      "unsavedChangesDescription": "Are you sure you want to discard your changes?"
     }
   },
   "star": {
@@ -553,19 +574,6 @@
   "enhancer": {
     "title": "Achievements & KPIs",
     "regenerate": "Regenerate"
-  },
-  "storyCard": {
-    "noTitle": "Untitled Story",
-    "noContent": "No content",
-    "deleteConfirm": {
-      "title": "Delete Story",
-      "message": "Are you sure you want to delete this story? This action cannot be undone."
-    }
-  },
-  "storyList": {
-    "emptyTitle": "No Stories Yet",
-    "emptyDescription": "Create your first STAR story to document your achievements",
-    "createFirst": "Create Your First Story"
   },
   "guidance": {
     "locked": {
@@ -764,16 +772,6 @@
         }
       }
     }
-  },
-  "storyView": {
-    "title": "Story Details",
-    "description": "Review the STAR details for this story.",
-    "achievements": "Achievements",
-    "kpis": "Key Performance Indicators"
-  },
-  "storyEditor": {
-    "unsavedChanges": "You have unsaved changes",
-    "unsavedChangesDescription": "Are you sure you want to discard your changes?"
   },
   "common": {
     "error": "Error",

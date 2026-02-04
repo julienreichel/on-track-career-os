@@ -26,8 +26,8 @@ const close = () => {
 <template>
   <UModal
     :open="open"
-    :title="story.title || t('storyView.title')"
-    :description="t('storyView.description')"
+    :title="story.title || t('stories.detail.title')"
+    :description="t('stories.detail.description')"
     @update:open="emit('update:open', $event)"
   >
     <template #body>
@@ -50,7 +50,7 @@ const close = () => {
         <div v-if="hasAchievements" class="border-t pt-4">
           <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center">
             <UIcon name="i-heroicons-trophy" class="w-4 h-4 mr-2" />
-            {{ t('storyView.achievements') }}
+            {{ t('stories.detail.achievements') }}
           </h4>
           <ul class="list-disc list-inside space-y-1">
             <li
@@ -67,7 +67,7 @@ const close = () => {
         <div v-if="hasKpis" class="border-t pt-4">
           <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center">
             <UIcon name="i-heroicons-chart-bar" class="w-4 h-4 mr-2" />
-            {{ t('storyView.kpis') }}
+            {{ t('stories.detail.kpis') }}
           </h4>
           <ul class="list-disc list-inside space-y-1">
             <li

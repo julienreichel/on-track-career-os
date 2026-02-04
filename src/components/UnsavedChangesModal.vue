@@ -30,8 +30,8 @@ const handleDiscard = () => {
 <template>
   <UModal
     v-model:open="isOpen"
-    :title="t('storyEditor.unsavedChanges')"
-    :description="t('storyEditor.unsavedChangesDescription')"
+    :title="t('stories.editor.unsavedChanges')"
+    :description="t('stories.editor.unsavedChangesDescription')"
   >
     <template #footer>
       <UButton :label="t('common.goBack')" variant="ghost" @click="handleGoBack" />

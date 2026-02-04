@@ -50,7 +50,7 @@ export function useStoryList(service = new STARStoryService()) {
       const userId = await resolveUserId(auth);
       stories.value = await service.getAllStories(userId);
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'storyList.errors.loadFailed';
+      error.value = err instanceof Error ? err.message : 'stories.list.errors.loadFailed';
       console.error('[useStoryList] Load error:', err);
     } finally {
       loading.value = false;
@@ -64,7 +64,7 @@ export function useStoryList(service = new STARStoryService()) {
    */
   const loadByExperienceId = async (experienceId: string) => {
     if (!experienceId) {
-      error.value = 'storyList.errors.missingExperienceId';
+      error.value = 'stories.list.errors.missingExperienceId';
       return;
     }
 
@@ -75,7 +75,7 @@ export function useStoryList(service = new STARStoryService()) {
       const loadedStories = await service.getStoriesByExperience(experienceId);
       stories.value = loadedStories;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'storyList.errors.loadFailed';
+      error.value = err instanceof Error ? err.message : 'stories.list.errors.loadFailed';
       console.error('[useStoryList] Load by experience ID error:', err);
     } finally {
       loading.value = false;
@@ -89,7 +89,7 @@ export function useStoryList(service = new STARStoryService()) {
    */
   const loadForExperience = async (experience: Experience) => {
     if (!experience) {
-      error.value = 'storyList.errors.missingExperience';
+      error.value = 'stories.list.errors.missingExperience';
       return;
     }
 
@@ -99,7 +99,7 @@ export function useStoryList(service = new STARStoryService()) {
     try {
       stories.value = await service.getStoriesByExperience(experience.id);
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'storyList.errors.loadFailed';
+      error.value = err instanceof Error ? err.message : 'stories.list.errors.loadFailed';
       console.error('[useStoryList] Load for experience error:', err);
     } finally {
       loading.value = false;
@@ -165,7 +165,7 @@ export function useStoryList(service = new STARStoryService()) {
       await service.deleteStory(storyId);
       stories.value = stories.value.filter((story) => story.id !== storyId);
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'storyList.errors.deleteFailed';
+      error.value = err instanceof Error ? err.message : 'stories.list.errors.deleteFailed';
       throw err;
     } finally {
       loading.value = false;
@@ -219,7 +219,7 @@ async function resolveUserId(auth: ReturnType<typeof useAuthUser>) {
 
   await auth.loadUserId();
   if (!auth.userId.value) {
-    throw new Error('storyList.errors.missingUserId');
+    throw new Error('stories.list.errors.missingUserId');
   }
 
   return auth.userId.value;

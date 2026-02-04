@@ -217,7 +217,7 @@ describe('useStoryEditor', () => {
       const result = await save('exp-1');
 
       expect(result).toBeNull();
-      expect(error.value).toBe('storyEditor.errors.invalidForm');
+      expect(error.value).toBe('stories.editor.errors.invalidForm');
       expect(mockService.createAndLinkStory).not.toHaveBeenCalled();
     });
 
@@ -233,7 +233,7 @@ describe('useStoryEditor', () => {
       const result = await save();
 
       expect(result).toBeNull();
-      expect(error.value).toBe('storyEditor.errors.missingExperienceId');
+      expect(error.value).toBe('stories.editor.errors.missingExperienceId');
     });
 
     it('should use provided experience ID over form state', async () => {
@@ -304,7 +304,7 @@ describe('useStoryEditor', () => {
       const result = await deleteStory();
 
       expect(result).toBe(false);
-      expect(error.value).toBe('storyEditor.errors.noStoryToDelete');
+      expect(error.value).toBe('stories.editor.errors.noStoryToDelete');
       expect(mockService.deleteStory).not.toHaveBeenCalled();
     });
 
@@ -351,7 +351,7 @@ describe('useStoryEditor', () => {
       const result = await linkToExperience('exp-1');
 
       expect(result).toBeNull();
-      expect(error.value).toBe('storyEditor.errors.noStoryToLink');
+      expect(error.value).toBe('stories.editor.errors.noStoryToLink');
       expect(mockService.linkStoryToExperience).not.toHaveBeenCalled();
     });
 

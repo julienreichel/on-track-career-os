@@ -243,8 +243,8 @@ onMounted(async () => {
         <!-- Empty State -->
         <UEmpty
           v-else-if="stories.length === 0"
-          :title="t('stories.list.empty')"
-          :description="t('stories.list.emptyDescription')"
+          :title="t('stories.list.empty.experienceTitle')"
+          :description="t('stories.list.empty.experienceDescription')"
           icon="i-heroicons-document-text"
         >
           <template #actions>

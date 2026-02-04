@@ -21,7 +21,7 @@ const showDeleteConfirm = ref(false);
 
 const headerTitle = computed(
   () =>
-    props.story.title?.trim() || props.experienceName || props.companyName || t('storyCard.noTitle')
+    props.story.title?.trim() || props.experienceName || props.companyName || t('stories.card.noTitle')
 );
 
 const subtitle = computed(() => {
@@ -33,7 +33,7 @@ const subtitle = computed(() => {
 
 const preview = computed(() => {
   const maxLength = 120;
-  const text = props.story.situation || props.story.task || t('storyCard.noContent');
+  const text = props.story.situation || props.story.task || t('stories.card.noContent');
   return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 });
 
@@ -120,8 +120,8 @@ const cancelDelete = () => {
   <!-- Delete Confirmation Modal -->
   <UModal
     v-model:open="showDeleteConfirm"
-    :title="t('storyCard.deleteConfirm.title')"
-    :description="t('storyCard.deleteConfirm.message')"
+    :title="t('stories.card.deleteConfirm.title')"
+    :description="t('stories.card.deleteConfirm.message')"
     :ui="{ footer: 'justify-end' }"
   >
     <template #footer>

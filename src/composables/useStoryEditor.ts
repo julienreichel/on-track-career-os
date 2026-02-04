@@ -137,7 +137,7 @@ export function useStoryEditor(storyId?: string) {
         isDirty.value = false;
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'storyEditor.errors.loadFailed';
+      error.value = err instanceof Error ? err.message : 'stories.editor.errors.loadFailed';
     } finally {
       loading.value = false;
     }
@@ -162,8 +162,8 @@ export function useStoryEditor(storyId?: string) {
     const targetExpId = experienceId || formState.value.experienceId;
     if (!canSave.value || !targetExpId) {
       error.value = !canSave.value
-        ? 'storyEditor.errors.invalidForm'
-        : 'storyEditor.errors.missingExperienceId';
+        ? 'stories.editor.errors.invalidForm'
+        : 'stories.editor.errors.missingExperienceId';
       return null;
     }
 
@@ -193,7 +193,7 @@ export function useStoryEditor(storyId?: string) {
       }
       return story.value;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'storyEditor.errors.saveFailed';
+      error.value = err instanceof Error ? err.message : 'stories.editor.errors.saveFailed';
       return null;
     } finally {
       saving.value = false;
@@ -202,7 +202,7 @@ export function useStoryEditor(storyId?: string) {
 
   const deleteStory = async () => {
     if (!story.value?.id) {
-      error.value = 'storyEditor.errors.noStoryToDelete';
+      error.value = 'stories.editor.errors.noStoryToDelete';
       return false;
     }
     deleting.value = true;
@@ -214,7 +214,7 @@ export function useStoryEditor(storyId?: string) {
       isDirty.value = false;
       return true;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'storyEditor.errors.deleteFailed';
+      error.value = err instanceof Error ? err.message : 'stories.editor.errors.deleteFailed';
       return false;
     } finally {
       deleting.value = false;
@@ -223,7 +223,7 @@ export function useStoryEditor(storyId?: string) {
 
   const linkToExperience = async (experienceId: string) => {
     if (!story.value?.id) {
-      error.value = 'storyEditor.errors.noStoryToLink';
+      error.value = 'stories.editor.errors.noStoryToLink';
       return null;
     }
     saving.value = true;
@@ -236,7 +236,7 @@ export function useStoryEditor(storyId?: string) {
       }
       return story.value;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'storyEditor.errors.linkFailed';
+      error.value = err instanceof Error ? err.message : 'stories.editor.errors.linkFailed';
       return null;
     } finally {
       saving.value = false;

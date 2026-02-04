@@ -61,13 +61,13 @@ const handleDelete = (story: STARStory) => {
     <!-- Empty State -->
     <UEmpty
       v-else-if="!hasStories"
-      :title="t('storyList.emptyTitle')"
-      :description="t('storyList.emptyDescription')"
+      :title="t('stories.list.empty.title')"
+      :description="t('stories.list.empty.description')"
       icon="i-heroicons-document-text"
     >
       <template #actions>
         <UButton
-          :label="t('storyList.createFirst')"
+          :label="t('stories.list.empty.cta')"
           icon="i-heroicons-plus"
           to="/profile/stories/new"
         />

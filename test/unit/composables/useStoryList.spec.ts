@@ -163,7 +163,7 @@ describe('useStoryList', () => {
 
       await loadByExperienceId('');
 
-      expect(error.value).toBe('storyList.errors.missingExperienceId');
+      expect(error.value).toBe('stories.list.errors.missingExperienceId');
       expect(mockService.getStoriesByExperience).not.toHaveBeenCalled();
     });
 
