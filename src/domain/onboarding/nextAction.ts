@@ -30,23 +30,6 @@ function phase1Primary(state: UserProgressState): NextActionItem {
 }
 
 function phase2Primary(state: UserProgressState): NextActionItem {
-  if (!state.phase3.isComplete) {
-    if (state.phase3.missing.includes('jobUploaded')) {
-      return action(
-        'upload-job',
-        'progress.actions.uploadJob',
-        'progress.rationale.jobUpload',
-        '/jobs/new'
-      );
-    }
-
-    return action(
-      'generate-match',
-      'progress.actions.generateMatch',
-      'progress.rationale.matchingSummary',
-      '/jobs'
-    );
-  }
   if (state.phase2.missing.includes('profileDepth')) {
     return action(
       'profile-depth',
@@ -68,6 +51,24 @@ function phase2Primary(state: UserProgressState): NextActionItem {
     'progress.actions.buildCanvas',
     'progress.rationale.personalCanvas',
     '/profile/canvas'
+  );
+}
+
+function phase3Primary(state: UserProgressState): NextActionItem {
+  if (state.phase3.missing.includes('jobUploaded')) {
+    return action(
+      'upload-job',
+      'progress.actions.uploadJob',
+      'progress.rationale.jobUpload',
+      '/jobs/new'
+    );
+  }
+
+  return action(
+    'generate-match',
+    'progress.actions.generateMatch',
+    'progress.rationale.matchingSummary',
+    '/jobs'
   );
 }
 
@@ -98,11 +99,19 @@ export function getNextAction(state: UserProgressState): NextAction {
     };
   }
 
-  if (!state.phase2.isComplete || !state.phase3.isComplete) {
+  if (!state.phase2.isComplete) {
     return {
       phase: 'phase2',
       primary: phase2Primary(state),
-      missingPrerequisites: [...state.phase2.missing, ...state.phase3.missing],
+      missingPrerequisites: state.phase2.missing,
+    };
+  }
+
+  if (!state.phase3.isComplete) {
+    return {
+      phase: 'phase3',
+      primary: phase3Primary(state),
+      missingPrerequisites: state.phase3.missing,
     };
   }
 

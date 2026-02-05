@@ -138,51 +138,17 @@ test.describe('Discovery flow', () => {
     await expect(page.getByText(/You're ready to move forward/i)).toBeVisible({
       timeout: 20000,
     });
-    await expect(page.getByRole('link', { name: /Analyze a job/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Strengthen my profile/i })).toBeVisible();
 
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    await expect(page.getByTestId('progress-primary-cta')).toHaveText(/Upload a job/i);
+    await expect(page.getByTestId('progress-primary-cta')).toHaveText(/Deepen your profile/i);
     await expectBadgeToast(page, 'Grounded');
     await expect(page.getByTestId('badge-pill-grounded')).toBeVisible({ timeout: 20000 });
   });
 
-  test('Phase 2A job upload + match + badge', async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    await expectProgressCta(page, /Upload a job/i, /\/jobs\/new$/);
-
-    await page.goto('/jobs');
-    await page.waitForLoadState('networkidle');
-
-    await expect(page.getByTestId('guidance-empty-state')).toBeVisible({ timeout: 10000 });
-    await page.getByRole('link', { name: /Analyze Job/i }).click();
-    await expect(page).toHaveURL(/\/jobs\/new/);
-
-    const jobInput = page.locator('input[type="file"]').first();
-    await jobInput.setInputFiles(JOB_FIXTURE);
-
-    await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 20000 });
-    const jobIdMatch = page.url().match(/\/jobs\/([0-9a-f-]+)$/i);
-    expect(jobIdMatch).toBeTruthy();
-    jobId = jobIdMatch ? jobIdMatch[1] : null;
-    if (!jobId) return;
-
-    await page.goto(`/jobs/${jobId}/match`);
-    await page.waitForLoadState('networkidle');
-    await expect(page.getByText(/Overall Match Score/i)).toBeVisible({ timeout: 30000 });
-    await expect(page.getByRole('button', { name: /Generate tailored CV/i })).toBeVisible({
-      timeout: 20000,
-    });
-
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-    await expectBadgeToast(page, 'Job Clarity');
-    await expect(page.getByTestId('badge-pill-jobClarity')).toBeVisible({ timeout: 20000 });
-  });
-
-  test('Phase 2B identity completion + badge', async ({ page }) => {
+  test('Phase 2 identity completion + badge', async ({ page }) => {
     test.setTimeout(60000); // Increase timeout for canvas generation in CI
 
     await page.goto('/');
@@ -233,7 +199,41 @@ test.describe('Discovery flow', () => {
     await expect(page.getByTestId('badge-pill-identityDefined')).toBeVisible({ timeout: 20000 });
   });
 
-  test('Phase 3 materials triad + Application Complete badge', async ({ page }) => {
+  test('Phase 3 job upload + match + badge', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expectProgressCta(page, /Upload a job/i, /\/jobs\/new$/);
+
+    await page.goto('/jobs');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByTestId('guidance-empty-state')).toBeVisible({ timeout: 10000 });
+    await page.getByRole('link', { name: /Analyze Job/i }).click();
+    await expect(page).toHaveURL(/\/jobs\/new/);
+
+    const jobInput = page.locator('input[type="file"]').first();
+    await jobInput.setInputFiles(JOB_FIXTURE);
+
+    await page.waitForURL(/\/jobs\/[0-9a-f-]+$/i, { timeout: 20000 });
+    const jobIdMatch = page.url().match(/\/jobs\/([0-9a-f-]+)$/i);
+    expect(jobIdMatch).toBeTruthy();
+    jobId = jobIdMatch ? jobIdMatch[1] : null;
+    if (!jobId) return;
+
+    await page.goto(`/jobs/${jobId}/match`);
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText(/Overall Match Score/i)).toBeVisible({ timeout: 30000 });
+    await expect(page.getByRole('button', { name: /Generate tailored CV/i })).toBeVisible({
+      timeout: 20000,
+    });
+
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expectBadgeToast(page, 'Job Clarity');
+    await expect(page.getByTestId('badge-pill-jobClarity')).toBeVisible({ timeout: 20000 });
+  });
+
+  test('Phase 4 materials triad + Application Complete badge', async ({ page }) => {
     test.setTimeout(60000); // Increase timeout for material generation + badge computation in CI
 
     expect(jobId).toBeTruthy();

@@ -78,20 +78,9 @@ const activePhaseTitle = computed(() => t(`progress.phaseChecklistTitles.${props
 
     <ProgressChecklistItems v-if="state.phase === 'phase1'" :items="phase1Items" />
 
-    <div v-else-if="state.phase === 'phase2'" class="space-y-4">
-      <div>
-        <p class="text-xs font-semibold uppercase text-dimmed">
-          {{ t('progress.phaseLabels.phase3') }}
-        </p>
-        <ProgressChecklistItems class="mt-2" :items="phase3Items" />
-      </div>
-      <div>
-        <p class="text-xs font-semibold uppercase text-dimmed">
-          {{ t('progress.phaseLabels.phase2') }}
-        </p>
-        <ProgressChecklistItems class="mt-2" :items="phase2Items" />
-      </div>
-    </div>
+    <ProgressChecklistItems v-else-if="state.phase === 'phase2'" :items="phase2Items" />
+
+    <ProgressChecklistItems v-else-if="state.phase === 'phase3'" :items="phase3Items" />
 
     <ProgressChecklistItems v-else-if="state.phase === 'phase4'" :items="phase4Items" />
 

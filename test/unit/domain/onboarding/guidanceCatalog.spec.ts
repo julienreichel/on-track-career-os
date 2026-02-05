@@ -153,13 +153,26 @@ describe('guidanceCatalog', () => {
   });
 
   it('returns empty jobs guidance when no jobs exist', () => {
-    const guidance = getGuidance('jobs', baseState(), { jobsCount: 0 });
+    const guidance = getGuidance('jobs', baseState({
+      phase1: { isComplete: true, missing: [] },
+      phase2: { isComplete: true, missing: [] },
+    }), { jobsCount: 0 });
+    expect(guidance.emptyState?.cta.to).toBe('/jobs/new');
+  });
+
+  it('returns jobs banner and empty state when phase 2 is incomplete', () => {
+    const guidance = getGuidance('jobs', baseState({
+      phase1: { isComplete: true, missing: [] },
+      phase2: { isComplete: false, missing: ['profileDepth'] },
+    }), { jobsCount: 0 });
+    expect(guidance.banner?.cta?.to).toBe('/profile/full?mode=edit');
     expect(guidance.emptyState?.cta.to).toBe('/jobs/new');
   });
 
   it('returns job detail banner when match is missing', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
+      phase2: { isComplete: true, missing: [] },
       phase3: { isComplete: false, missing: ['matchingSummary'] },
     });
     const guidance = getGuidance('job-detail', state, {

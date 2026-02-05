@@ -958,6 +958,7 @@
     "phaseChecklistTitles": {
       "phase1": "Checklist",
       "phase2": "Checklist",
+      "phase3": "Checklist",
       "phase4": "Checklist",
       "bonus": "Checklist"
     },

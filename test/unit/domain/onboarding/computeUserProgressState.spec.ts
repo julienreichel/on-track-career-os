@@ -66,9 +66,9 @@ describe('computeUserProgressState', () => {
     expect(state.phase3.isComplete).toBe(true);
   });
 
-  it('flags phase 2 when job path is incomplete', () => {
+  it('flags phase 3 when job path is incomplete', () => {
     const state = computeUserProgressState(baseInputs({ jobCount: 0, matchingSummaryCount: 0 }));
-    expect(state.phase).toBe('phase2');
+    expect(state.phase).toBe('phase3');
     expect(state.phase3.isComplete).toBe(false);
   });
 

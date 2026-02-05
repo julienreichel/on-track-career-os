@@ -58,6 +58,61 @@ export type GuidanceModel = {
 const isPhase4Unlocked = (state?: UserProgressState | null) =>
   Boolean(state?.phase3.isComplete && state?.phase2.isComplete);
 
+const getPhase2Banner = (state: UserProgressState): GuidanceBanner => {
+  if (state.phase2.missing.includes('profileDepth')) {
+    return {
+      titleKey: 'guidance.applications.banner.profileDepth.title',
+      descriptionKey: 'guidance.applications.banner.profileDepth.description',
+      cta: {
+        labelKey: 'guidance.applications.banner.profileDepth.cta',
+        to: '/profile/full?mode=edit',
+      },
+    };
+  }
+
+  if (state.phase2.missing.includes('stories')) {
+    return {
+      titleKey: 'guidance.applications.banner.stories.title',
+      descriptionKey: 'guidance.applications.banner.stories.description',
+      cta: {
+        labelKey: 'guidance.applications.banner.stories.cta',
+        to: '/profile/stories',
+      },
+    };
+  }
+
+  return {
+    titleKey: 'guidance.applications.banner.canvas.title',
+    descriptionKey: 'guidance.applications.banner.canvas.description',
+    cta: {
+      labelKey: 'guidance.applications.banner.canvas.cta',
+      to: '/profile/canvas',
+    },
+  };
+};
+
+const getPhase3Banner = (state: UserProgressState): GuidanceBanner => {
+  if (state.phase3.missing.includes('jobUploaded')) {
+    return {
+      titleKey: 'guidance.applications.banner.job.title',
+      descriptionKey: 'guidance.applications.banner.job.description',
+      cta: {
+        labelKey: 'guidance.applications.banner.job.cta',
+        to: '/jobs/new',
+      },
+    };
+  }
+
+  return {
+    titleKey: 'guidance.applications.banner.matchingSummary.title',
+    descriptionKey: 'guidance.applications.banner.matchingSummary.description',
+    cta: {
+      labelKey: 'guidance.applications.banner.matchingSummary.cta',
+      to: '/jobs',
+    },
+  };
+};
+
 const getCanvasUnlockCta = (
   state: UserProgressState
 ): { descriptionKey: string; cta: GuidanceCTA } => {
@@ -299,11 +354,32 @@ const getJobsGuidance = (
   state: UserProgressState | null,
   context: GuidanceContext
 ): GuidanceModel => {
+  const emptyState =
+    context.jobsCount === 0
+      ? {
+          titleKey: 'guidance.jobs.empty.title',
+          descriptionKey: 'guidance.jobs.empty.description',
+          icon: 'i-heroicons-briefcase',
+          cta: {
+            labelKey: 'guidance.jobs.empty.cta',
+            to: '/jobs/new',
+          },
+        }
+      : undefined;
+
+  if (state && !state.phase2.isComplete) {
+    return {
+      banner: getPhase2Banner(state),
+      emptyState,
+    };
+  }
+
   if (context.jobsCount !== 0) {
     if (
       context.jobId &&
       context.hasMatchingSummary === false &&
-      state?.phase3.missing.includes('matchingSummary')
+      state?.phase3.missing.includes('matchingSummary') &&
+      state.phase2.isComplete
     ) {
       return {
         banner: {
@@ -320,17 +396,7 @@ const getJobsGuidance = (
     return {};
   }
 
-  return {
-    emptyState: {
-      titleKey: 'guidance.jobs.empty.title',
-      descriptionKey: 'guidance.jobs.empty.description',
-      icon: 'i-heroicons-briefcase',
-      cta: {
-        labelKey: 'guidance.jobs.empty.cta',
-        to: '/jobs/new',
-      },
-    },
-  };
+  return { emptyState };
 };
 
 const getJobDetailGuidance = (
@@ -339,6 +405,12 @@ const getJobDetailGuidance = (
 ): GuidanceModel => {
   if (!context.jobId || context.hasMatchingSummary !== false) {
     return {};
+  }
+
+  if (state && !state.phase2.isComplete) {
+    return {
+      banner: getPhase2Banner(state),
+    };
   }
 
   if (!state?.phase3.missing.includes('matchingSummary')) {
@@ -382,59 +454,12 @@ const getApplicationsPhase2anner = (
     return undefined;
   }
 
-  if (state.phase2.missing.includes('profileDepth')) {
-    return {
-      titleKey: 'guidance.applications.banner.profileDepth.title',
-      descriptionKey: 'guidance.applications.banner.profileDepth.description',
-      cta: {
-        labelKey: 'guidance.applications.banner.profileDepth.cta',
-        to: '/profile/full?mode=edit',
-      },
-    };
+  if (!state.phase2.isComplete) {
+    return getPhase2Banner(state);
   }
 
-  if (state.phase2.missing.includes('stories')) {
-    return {
-      titleKey: 'guidance.applications.banner.stories.title',
-      descriptionKey: 'guidance.applications.banner.stories.description',
-      cta: {
-        labelKey: 'guidance.applications.banner.stories.cta',
-        to: '/profile/stories',
-      },
-    };
-  }
-
-  if (state.phase2.missing.includes('personalCanvas')) {
-    return {
-      titleKey: 'guidance.applications.banner.canvas.title',
-      descriptionKey: 'guidance.applications.banner.canvas.description',
-      cta: {
-        labelKey: 'guidance.applications.banner.canvas.cta',
-        to: '/profile/canvas',
-      },
-    };
-  }
-
-  if (state.phase3.missing.includes('jobUploaded')) {
-    return {
-      titleKey: 'guidance.applications.banner.job.title',
-      descriptionKey: 'guidance.applications.banner.job.description',
-      cta: {
-        labelKey: 'guidance.applications.banner.job.cta',
-        to: '/jobs/new',
-      },
-    };
-  }
-
-  if (state.phase3.missing.includes('matchingSummary')) {
-    return {
-      titleKey: 'guidance.applications.banner.matchingSummary.title',
-      descriptionKey: 'guidance.applications.banner.matchingSummary.description',
-      cta: {
-        labelKey: 'guidance.applications.banner.matchingSummary.cta',
-        to: '/jobs',
-      },
-    };
+  if (!state.phase3.isComplete) {
+    return getPhase3Banner(state);
   }
 
   return {

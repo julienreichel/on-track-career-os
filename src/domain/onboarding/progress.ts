@@ -110,8 +110,11 @@ function resolvePhase(
   if (!phase1.isComplete) {
     return 'phase1';
   }
-  if (!phase2.isComplete || !phase3.isComplete) {
+  if (!phase2.isComplete) {
     return 'phase2';
+  }
+  if (!phase3.isComplete) {
+    return 'phase3';
   }
   if (!phase4.isComplete) {
     return 'phase4';

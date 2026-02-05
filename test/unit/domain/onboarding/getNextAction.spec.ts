@@ -29,9 +29,9 @@ describe('getNextAction', () => {
     expect(action.primary.id).toBe('profile-depth');
   });
 
-  it('returns job upload when phase 2B is incomplete', () => {
+  it('returns job upload when phase 3 is incomplete', () => {
     const state = baseState({
-      phase: 'phase2',
+      phase: 'phase3',
       phase1: { isComplete: true, missing: [] },
       phase2: { isComplete: true, missing: [] },
       phase3: { isComplete: false, missing: ['jobUploaded'] },
@@ -60,7 +60,7 @@ describe('getNextAction', () => {
 
   it('returns generate match when job is uploaded but match is missing', () => {
     const state = baseState({
-      phase: 'phase2',
+      phase: 'phase3',
       phase1: { isComplete: true, missing: [] },
       phase2: { isComplete: true, missing: [] },
       phase3: { isComplete: false, missing: ['matchingSummary'] },

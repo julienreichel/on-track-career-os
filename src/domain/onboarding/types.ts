@@ -1,6 +1,6 @@
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 
-export type ProgressPhase = 'phase1' | 'phase2' | 'phase4' | 'bonus';
+export type ProgressPhase = 'phase1' | 'phase2' | 'phase3' | 'phase4' | 'bonus';
 
 export type ProgressGate =
   | 'cvUploaded'
