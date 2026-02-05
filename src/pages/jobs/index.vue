@@ -15,10 +15,12 @@ const jobAnalysis = useJobAnalysis();
 const jobs = jobAnalysis.jobs;
 const jobNeedingMatch = computed(() => jobs.value.find((job) => job.status !== 'analyzed'));
 const matchPromptJobId = computed(() => jobNeedingMatch.value?.id);
+const materialsJobId = computed(() => jobs.value[0]?.id);
+const guidanceJobId = computed(() => matchPromptJobId.value ?? materialsJobId.value);
 
 const { guidance } = useGuidance('jobs', () => ({
   jobsCount: jobs.value.length,
-  jobId: matchPromptJobId.value,
+  jobId: guidanceJobId.value,
   hasMatchingSummary: matchPromptJobId.value ? false : undefined,
 }));
 

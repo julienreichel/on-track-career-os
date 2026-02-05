@@ -181,4 +181,15 @@ describe('guidanceCatalog', () => {
     });
     expect(guidance.banner?.cta?.to).toBe('/jobs/job-1/match');
   });
+
+  it('returns materials banner on jobs when match exists and phase 4 is incomplete', () => {
+    const state = baseState({
+      phase1: { isComplete: true, missing: [] },
+      phase2: { isComplete: true, missing: [] },
+      phase3: { isComplete: true, missing: [] },
+      phase4: { isComplete: false, missing: ['tailoredCv'] },
+    });
+    const guidance = getGuidance('jobs', state, { jobsCount: 1, jobId: 'job-1' });
+    expect(guidance.banner?.cta?.to).toBe('/applications/cv/new?jobId=job-1');
+  });
 });

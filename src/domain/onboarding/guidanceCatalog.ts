@@ -375,12 +375,7 @@ const getJobsGuidance = (
   }
 
   if (context.jobsCount !== 0) {
-    if (
-      context.jobId &&
-      context.hasMatchingSummary === false &&
-      state?.phase3.missing.includes('matchingSummary') &&
-      state.phase2.isComplete
-    ) {
+    if (context.jobId && state?.phase3.missing.includes('matchingSummary')) {
       return {
         banner: {
           titleKey: 'guidance.jobs.banner.matchMissing.title',
@@ -393,6 +388,44 @@ const getJobsGuidance = (
       };
     }
 
+    if (context.jobId && state?.phase3.isComplete && !state.phase4.isComplete) {
+      const missing = state.phase4.missing;
+      const firstMissing = missing.includes('tailoredCv')
+        ? 'tailoredCv'
+        : missing.includes('tailoredCoverLetter')
+          ? 'tailoredCoverLetter'
+          : missing.includes('tailoredSpeech')
+            ? 'tailoredSpeech'
+            : null;
+
+      if (firstMissing) {
+        const target =
+          firstMissing === 'tailoredCv'
+            ? '/applications/cv/new'
+            : firstMissing === 'tailoredCoverLetter'
+              ? '/applications/cover-letters/new'
+              : '/applications/speech/new';
+
+        const labelKey =
+          firstMissing === 'tailoredCv'
+            ? 'tailoredMaterials.materials.generateCv'
+            : firstMissing === 'tailoredCoverLetter'
+              ? 'tailoredMaterials.materials.generateCoverLetter'
+              : 'tailoredMaterials.materials.generateSpeech';
+
+        return {
+          banner: {
+            titleKey: 'guidance.jobs.materials.title',
+            descriptionKey: 'guidance.jobs.materials.description',
+            cta: {
+              labelKey,
+              to: `${target}?jobId=${context.jobId}`,
+            },
+          },
+        };
+      }
+    }
+
     return {};
   }
 
@@ -403,30 +436,34 @@ const getJobDetailGuidance = (
   state: UserProgressState | null,
   context: GuidanceContext
 ): GuidanceModel => {
-  if (!context.jobId || context.hasMatchingSummary !== false) {
+  if (!context.jobId) {
     return {};
   }
 
-  if (state && !state.phase2.isComplete) {
+  if (context.hasMatchingSummary === false) {
+    if (state && !state.phase2.isComplete) {
+      return {
+        banner: getPhase2Banner(state),
+      };
+    }
+
+    if (!state?.phase3.missing.includes('matchingSummary')) {
+      return {};
+    }
+
     return {
-      banner: getPhase2Banner(state),
+      banner: {
+        titleKey: 'guidance.jobDetail.banner.title',
+        descriptionKey: 'guidance.jobDetail.banner.description',
+        cta: {
+          labelKey: 'guidance.jobDetail.banner.cta',
+          to: `/jobs/${context.jobId}/match`,
+        },
+      },
     };
   }
 
-  if (!state?.phase3.missing.includes('matchingSummary')) {
-    return {};
-  }
-
-  return {
-    banner: {
-      titleKey: 'guidance.jobDetail.banner.title',
-      descriptionKey: 'guidance.jobDetail.banner.description',
-      cta: {
-        labelKey: 'guidance.jobDetail.banner.cta',
-        to: `/jobs/${context.jobId}/match`,
-      },
-    },
-  };
+  return {};
 };
 
 const getApplicationsLocked = (state: UserProgressState | null, id: string): LockedFeature[] => {

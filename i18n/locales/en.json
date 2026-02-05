@@ -667,6 +667,10 @@
           "cta": "Generate match"
         }
       },
+      "materials": {
+        "title": "Generate tailored materials",
+        "description": "Create a tailored CV, cover letter, or speech from a job."
+      },
       "empty": {
         "title": "No jobs yet",
         "description": "Upload a job to start matching and tailored materials.",
