@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useJobUpload } from '@/composables/useJobUpload';
@@ -17,6 +17,7 @@ const {
   reset,
 } = useJobUpload();
 const textInput = ref('');
+const isTextProcessing = computed(() => isProcessing.value && !selectedFile.value);
 
 async function handleFileSelected(file: File | null | undefined) {
   const job = await processJobFile(file);
@@ -56,15 +57,24 @@ async function handleTextSubmitted(rawText: string) {
         />
 
         <JobUploadStep
+          v-if="!isTextProcessing"
           :selected-file="selectedFile"
           :is-processing="isProcessing"
           :status-message="statusMessage"
           @file-selected="handleFileSelected"
         />
 
-        <USeparator :label="t('ingestion.job.upload.orManual')" />
+        <UCard v-else>
+          <div class="space-y-3">
+            <USkeleton class="h-16 rounded-lg animate-pulse" />
+            <USkeleton class="h-10 rounded-lg animate-pulse" />
+            <p v-if="statusMessage" class="text-sm text-gray-500">{{ statusMessage }}</p>
+          </div>
+        </UCard>
 
-        <UCard>
+        <USeparator v-if="!isProcessing" :label="t('ingestion.job.upload.orManual')" />
+
+        <UCard v-if="!isProcessing">
           <UFormField
             :label="t('ingestion.job.upload.text.label')"
             :description="t('ingestion.job.upload.text.description')"
