@@ -662,9 +662,9 @@
     "jobs": {
       "banner": {
         "matchMissing": {
-          "title": "Your match is ready to review",
-          "description": "Open the match summary to see fit, gaps, and tailored recommendations.",
-          "cta": "View match"
+          "title": "Generate your job match",
+          "description": "The job has been processed. Generate your match to see fit, gaps, and recommendations.",
+          "cta": "Generate match"
         }
       },
       "empty": {
