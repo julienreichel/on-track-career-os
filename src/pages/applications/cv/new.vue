@@ -46,11 +46,10 @@ import { getDefaultCvSettings } from '@/domain/cvsettings/getDefaultCvSettings';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
 import { CV_SECTION_KEYS, type CvSectionKey } from '@/domain/cvsettings/CvSectionKey';
-import { resolveSystemCvTemplates } from '@/domain/cvtemplate/systemTemplates';
 import CvGenerateEntryCard from '@/components/cv/CvGenerateEntryCard.vue';
 import CvGenerationModal from '@/components/cv/CvGenerationModal.vue';
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
@@ -91,8 +90,7 @@ const defaults = computed(() =>
   })
 );
 
-const systemTemplates = computed(() => resolveSystemCvTemplates(locale.value, t));
-const fallbackTemplate = computed(() => systemTemplates.value[0] ?? null);
+const fallbackTemplate = computed(() => templates.value[0] ?? null);
 const templateLabel = computed(() => {
   const template = templates.value.find((item) => item.id === selectedTemplateId.value);
   if (template?.name) {

@@ -78,8 +78,9 @@ import { useAuthUser } from '@/composables/useAuthUser';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
 import { CV_SECTION_KEYS } from '@/domain/cvsettings/CvSectionKey';
+import { resolveSystemCvTemplates } from '@/domain/cvtemplate/systemTemplates';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const toast = useToast();
 const route = useRoute();
 const router = useRouter();
@@ -101,6 +102,8 @@ const error = ref<string | null>(null);
 const previewContent = ref<string | null>(null);
 const previewLoading = ref(false);
 const previewError = ref<string | null>(null);
+const isSystemTemplate = ref(false);
+const systemTemplateSource = ref<string | null>(null);
 
 const pageTitle = computed(() => name.value || t('applications.cvs.templates.editor.title'));
 const isDirty = computed(
@@ -120,21 +123,55 @@ const ensureSettings = async () => {
   return settings.value;
 };
 
+const ensureUserId = async () => {
+  if (!userId.value) {
+    await loadUserId();
+  }
+  if (!userId.value) {
+    throw new Error('Missing user id');
+  }
+  return userId.value;
+};
+
 const loadTemplate = async () => {
   loading.value = true;
   error.value = null;
   try {
     const id = route.params.id as string;
     const loaded = await service.get(id);
-    if (!loaded) {
+    if (loaded) {
+      template.value = loaded;
+      name.value = loaded.name;
+      content.value = loaded.content;
+      originalName.value = loaded.name;
+      originalContent.value = loaded.content;
+      isSystemTemplate.value = false;
+      systemTemplateSource.value = null;
+      return;
+    }
+
+    const systemTemplate = resolveSystemCvTemplates(locale.value, t).find(
+      (item) => item.id === id
+    );
+    if (!systemTemplate) {
       error.value = t('applications.cvs.templates.errors.notFound');
       return;
     }
-    template.value = loaded;
-    name.value = loaded.name;
-    content.value = loaded.content;
-    originalName.value = loaded.name;
-    originalContent.value = loaded.content;
+    template.value = {
+      id: systemTemplate.id,
+      name: systemTemplate.name,
+      content: systemTemplate.content,
+      source: systemTemplate.source,
+      userId: userId.value ?? 'system',
+      createdAt: '',
+      updatedAt: '',
+    } as CVTemplate;
+    name.value = systemTemplate.name;
+    content.value = systemTemplate.content;
+    originalName.value = systemTemplate.name;
+    originalContent.value = systemTemplate.content;
+    isSystemTemplate.value = true;
+    systemTemplateSource.value = systemTemplate.id;
   } catch {
     error.value = t('applications.cvs.templates.errors.loadFailed');
   } finally {
@@ -147,15 +184,25 @@ const handleSave = async () => {
   if (isDirty.value) {
     saving.value = true;
     try {
-      const updated = await service.update({
-        id: template.value.id,
-        name: name.value,
-        content: content.value,
-      });
+      const updated = isSystemTemplate.value
+        ? await service.create({
+            userId: await ensureUserId(),
+            name: name.value,
+            content: content.value,
+            source: systemTemplateSource.value ?? template.value.source ?? template.value.id,
+          })
+        : await service.update({
+            id: template.value.id,
+            name: name.value,
+            content: content.value,
+          });
       if (updated) {
         template.value = updated;
         originalName.value = updated.name;
         originalContent.value = updated.content;
+        await maybeUpdateDefaultAfterSystemEdit(updated);
+        isSystemTemplate.value = false;
+        systemTemplateSource.value = null;
         toast.add({
           title: t('applications.cvs.templates.toast.saved'),
           color: 'primary',
@@ -171,6 +218,27 @@ const handleSave = async () => {
     }
   }
   await router.push({ name: 'settings-cv' });
+};
+
+const maybeUpdateDefaultAfterSystemEdit = async (updated: CVTemplate) => {
+  if (!isSystemTemplate.value || !systemTemplateSource.value) {
+    return;
+  }
+  try {
+    const current = await ensureSettings();
+    if (current.defaultTemplateId !== systemTemplateSource.value) {
+      return;
+    }
+    await saveSettings({
+      id: current.id,
+      defaultTemplateId: updated.id,
+    });
+  } catch {
+    toast.add({
+      title: t('applications.cvs.templates.toast.defaultFailed'),
+      color: 'error',
+    });
+  }
 };
 
 const toTimestamp = (value?: string | null): number => {

@@ -10,6 +10,7 @@ const props = withDefaults(
     updatedAt?: string | null;
     source?: string | null;
     isDefault?: boolean;
+    isSystemTemplate?: boolean;
     primaryActionLabel?: string;
     primaryActionIcon?: string;
     secondaryActionLabel?: string;
@@ -25,6 +26,7 @@ const props = withDefaults(
     updatedAt: null,
     source: null,
     isDefault: false,
+    isSystemTemplate: false,
     primaryActionLabel: '',
     primaryActionIcon: '',
     secondaryActionLabel: '',
@@ -53,17 +55,22 @@ const resolvedDefaultLabel = computed(() => {
   return label || t('applications.cvs.templates.labels.default');
 });
 const updatedLabel = computed(() => t('applications.cvs.templates.labels.updated'));
+const resolvedSubtitle = computed(() => (props.isSystemTemplate ? '' : props.description));
+const bodyDescription = computed(() =>
+  props.isSystemTemplate ? props.description?.trim() ?? '' : ''
+);
 </script>
 
 <template>
   <div :data-testid="dataTestid">
     <ItemCard
       :title="name"
-      :subtitle="description"
+      :subtitle="resolvedSubtitle"
       :show-delete="showDelete"
       @delete="emit('delete')"
     >
-      <p v-if="updatedAt" class="text-xs text-dimmed">{{ updatedLabel }} {{ updatedAt }}</p>
+      <p v-if="bodyDescription" class="text-sm text-dimmed">{{ bodyDescription }}</p>
+      <p v-else-if="updatedAt" class="text-xs text-dimmed">{{ updatedLabel }} {{ updatedAt }}</p>
 
       <template #badges>
         <UBadge

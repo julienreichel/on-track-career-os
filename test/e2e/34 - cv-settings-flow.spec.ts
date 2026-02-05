@@ -41,14 +41,34 @@ test.describe('CV Settings & Templates (EPIC 3C)', () => {
     await page.goto('/settings/cv');
     await page.waitForLoadState('networkidle');
 
-    const createTemplateButton = page.getByRole('button', { name: /create template/i }).first();
-    await expect(createTemplateButton).toBeVisible();
-    await createTemplateButton.click();
+    const classicCard = page
+      .locator('[data-testid^="cv-template-"]')
+      .filter({ hasText: /classic/i })
+      .first();
+    await expect(classicCard).toBeVisible();
 
-    const systemTemplateButton = page.getByRole('button', { name: /classic/i });
-    await expect(systemTemplateButton).toBeVisible();
-    await systemTemplateButton.click();
+    const editButton = classicCard.getByRole('button', { name: /^edit$/i });
+    await editButton.click();
 
+    await expect(page).toHaveURL(/\/settings\/cv\/system:classic$/i);
+
+    const nameInput = page.getByLabel(/template name/i);
+    await expect(nameInput).toBeVisible();
+    const updatedName = `Classic Variant ${Date.now()}`;
+    await nameInput.fill(updatedName);
+
+    const saveButton = page.getByRole('button', { name: /^save$/i });
+    await expect(saveButton).toBeEnabled();
+    await saveButton.click();
+
+    await expect(page).toHaveURL(/\/settings\/cv$/i);
+    const newTemplateCard = page
+      .locator('[data-testid^="cv-template-"]')
+      .filter({ hasText: updatedName })
+      .first();
+    await expect(newTemplateCard).toBeVisible();
+
+    await newTemplateCard.getByRole('button', { name: /^edit$/i }).click();
     await expect(page).toHaveURL(/\/settings\/cv\/[0-9a-f-]+$/i);
     const templateIdMatch = page.url().match(/\/settings\/cv\/([0-9a-f-]+)$/i);
     expect(templateIdMatch).toBeTruthy();

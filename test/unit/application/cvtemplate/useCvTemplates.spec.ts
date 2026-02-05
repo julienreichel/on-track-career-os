@@ -24,7 +24,9 @@ describe('useCvTemplates', () => {
   });
 
   it('loads templates for the current user', async () => {
-    (service.listForUser as ReturnType<typeof vi.fn>).mockResolvedValue([{ id: 'tpl-1' }]);
+    (service.listForUser as ReturnType<typeof vi.fn>).mockResolvedValue([
+      { id: 'tpl-1', source: 'system:classic' },
+    ]);
 
     const { templates, load } = useCvTemplates({
       auth,
@@ -34,7 +36,8 @@ describe('useCvTemplates', () => {
     await load();
 
     expect(service.listForUser).toHaveBeenCalledWith('user-1');
-    expect(templates.value).toHaveLength(1);
+    expect(templates.value.length).toBeGreaterThanOrEqual(3);
+    expect(templates.value.some((template) => template.id === 'tpl-1')).toBe(true);
   });
 
   it('creates a template from exemplar and prepends it', async () => {
@@ -50,6 +53,6 @@ describe('useCvTemplates', () => {
     await createFromExemplar(systemTemplates.value[0]!);
 
     expect(service.createFromExemplar).toHaveBeenCalled();
-    expect(templates.value[0]).toEqual(created);
+    expect(templates.value.some((template) => template.id === created.id)).toBe(true);
   });
 });

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { CVTemplate } from '@/domain/cvtemplate/CVTemplate';
+import type { CvTemplateListItem } from '@/application/cvtemplate/useCvTemplates';
 import type { Experience } from '@/domain/experience/Experience';
 import type { CvSectionKey } from '@/domain/cvsettings/CvSectionKey';
 import { CV_SECTION_KEYS } from '@/domain/cvsettings/CvSectionKey';
@@ -10,7 +10,7 @@ import CvExperienceMultiSelect from '@/components/cv/CvExperienceMultiSelect.vue
 const props = withDefaults(
   defineProps<{
     open: boolean;
-    templates: CVTemplate[];
+    templates: CvTemplateListItem[];
     experiences: Experience[];
     loadingExperiences?: boolean;
     initialTemplateId: string | null;

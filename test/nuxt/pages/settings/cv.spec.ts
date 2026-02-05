@@ -35,28 +35,16 @@ const templatesRef = ref<CVTemplate[]>([
   } as CVTemplate,
 ]);
 const mockLoadTemplates = vi.fn();
-const mockCreateFromExemplar = vi.fn();
 const mockCreateTemplate = vi.fn();
 const mockUpdateTemplate = vi.fn();
 const mockDeleteTemplate = vi.fn();
-const systemTemplatesRef = ref([
-  {
-    id: 'system:classic',
-    name: 'Classic',
-    description: 'Classic template',
-    source: 'system:classic',
-    content: '# Classic',
-  },
-]);
 
 vi.mock('@/application/cvtemplate/useCvTemplates', () => ({
   useCvTemplates: () => ({
     templates: templatesRef,
-    systemTemplates: systemTemplatesRef,
     loading: ref(false),
     error: ref(null),
     load: mockLoadTemplates,
-    createFromExemplar: mockCreateFromExemplar,
     createTemplate: mockCreateTemplate,
     updateTemplate: mockUpdateTemplate,
     deleteTemplate: mockDeleteTemplate,
@@ -219,6 +207,9 @@ describe('CV Settings page', () => {
     expect(wrapper.text()).toContain(i18n.global.t('applications.cvs.templates.list.title'));
     expect(wrapper.text()).toContain('Classic');
     expect(wrapper.text()).toContain('Engineer');
+    expect(wrapper.text()).not.toContain(
+      i18n.global.t('applications.cvs.templates.list.actions.create')
+    );
   });
 
   it('saves settings and shows feedback', async () => {
@@ -245,43 +236,4 @@ describe('CV Settings page', () => {
     expect(mockSaveSettings).toHaveBeenCalled();
   });
 
-  it('creates a template from a system exemplar', async () => {
-    mockCreateFromExemplar.mockResolvedValue({
-      id: 'template-2',
-      name: 'Classic',
-      content: '# Classic',
-      source: 'system:classic',
-    });
-
-    const wrapper = mount(CvSettingsPage, {
-      global: {
-        plugins: [i18n, router],
-        stubs,
-      },
-    });
-
-    await flushPromises();
-
-    const createButton = wrapper
-      .findAll('button')
-      .find(
-        (button) =>
-          button.text() === i18n.global.t('applications.cvs.templates.list.actions.create')
-      );
-    expect(createButton).toBeTruthy();
-    await createButton?.trigger('click');
-    await flushPromises();
-
-    const systemButton = wrapper.findAll('button').find((button) => button.text() === 'Classic');
-    expect(systemButton).toBeTruthy();
-    await systemButton?.trigger('click');
-    await flushPromises();
-
-    expect(mockCreateFromExemplar).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: 'system:classic',
-        name: 'Classic',
-      })
-    );
-  });
 });

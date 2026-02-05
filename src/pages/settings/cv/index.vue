@@ -8,8 +8,7 @@ import type { Experience } from '@/domain/experience/Experience';
 import { useCvSettings } from '@/application/cvsettings/useCvSettings';
 import { useCvTemplates } from '@/application/cvtemplate/useCvTemplates';
 import { getDefaultCvSettings } from '@/domain/cvsettings/getDefaultCvSettings';
-import type { CVTemplate } from '@/domain/cvtemplate/CVTemplate';
-import type { SystemCvTemplate } from '@/domain/cvtemplate/systemTemplates';
+import type { CvTemplateListItem } from '@/application/cvtemplate/useCvTemplates';
 import CvSettingsForm, { type CvSettingsFormState } from '@/components/cv/CvSettingsForm.vue';
 import CvTemplateCard from '@/components/cv/CvTemplateCard.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
@@ -32,11 +31,9 @@ const {
 } = useCvSettings({ auth });
 const {
   templates,
-  systemTemplates,
   loading: templatesLoading,
   error: templatesError,
   load: loadTemplates,
-  createFromExemplar,
   createTemplate,
   deleteTemplate,
 } = useCvTemplates({ auth });
@@ -49,9 +46,7 @@ const hasLoaded = ref(false);
 const formState = ref<CvSettingsFormState | null>(null);
 const initialized = ref(false);
 const deleteModalOpen = ref(false);
-const templateToDelete = ref<CVTemplate | null>(null);
-const createModalOpen = ref(false);
-const creatingTemplate = ref(false);
+const templateToDelete = ref<CvTemplateListItem | null>(null);
 
 const isLoading = computed(
   () => settingsLoading.value || templatesLoading.value || loadingExperiences.value
@@ -97,7 +92,7 @@ const toTimestamp = (value?: string | null): number => {
   return Number.isNaN(timestamp) ? 0 : timestamp;
 };
 
-const sortedTemplates = computed(() =>
+const sortedTemplates = computed<CvTemplateListItem[]>(() =>
   [...templates.value].sort((a, b) => {
     const aTime = toTimestamp(a.updatedAt ?? a.createdAt);
     const bTime = toTimestamp(b.updatedAt ?? b.createdAt);
@@ -105,7 +100,7 @@ const sortedTemplates = computed(() =>
   })
 );
 
-const formatTemplateDate = (template: CVTemplate) =>
+const formatTemplateDate = (template: CvTemplateListItem) =>
   formatListDate(template.updatedAt ?? template.createdAt);
 
 const handleSave = async () => {
@@ -134,39 +129,16 @@ const handleSave = async () => {
   }
 };
 
-const handleCreateFromBase = async (template: SystemCvTemplate) => {
-  if (creatingTemplate.value) return;
-  creatingTemplate.value = true;
-  try {
-    const created = await createFromExemplar(template);
-    if (created) {
-      toast.add({
-        title: t('applications.cvs.templates.toast.created'),
-        color: 'primary',
-      });
-      createModalOpen.value = false;
-      await router.push({ name: 'settings-cv-id', params: { id: created.id } });
-    }
-  } catch {
-    toast.add({
-      title: t('applications.cvs.templates.toast.createFailed'),
-      color: 'error',
-    });
-  } finally {
-    creatingTemplate.value = false;
-  }
-};
-
-const handleEdit = (template: CVTemplate) => {
+const handleEdit = (template: CvTemplateListItem) => {
   void router.push({ name: 'settings-cv-id', params: { id: template.id } });
 };
 
-const handleDuplicate = async (template: CVTemplate) => {
+const handleDuplicate = async (template: CvTemplateListItem) => {
   try {
     const created = await createTemplate({
       name: t('applications.cvs.templates.list.duplicateName', { name: template.name }),
       content: template.content,
-      source: 'user',
+      source: template.source ?? undefined,
     });
     if (created) {
       toast.add({
@@ -183,7 +155,7 @@ const handleDuplicate = async (template: CVTemplate) => {
   }
 };
 
-const confirmDelete = (template: CVTemplate) => {
+const confirmDelete = (template: CvTemplateListItem) => {
   templateToDelete.value = template;
   deleteModalOpen.value = true;
 };
@@ -192,7 +164,32 @@ const handleDelete = async () => {
   if (!templateToDelete.value) return;
   deletingTemplate.value = true;
   try {
-    await deleteTemplate(templateToDelete.value.id);
+    const deletedId = templateToDelete.value.id;
+    await deleteTemplate(deletedId);
+    if (defaultTemplateId.value === deletedId && settings.value) {
+      const nextDefault =
+        sortedTemplates.value.find((template) => template.id !== deletedId)?.id ?? null;
+      try {
+        await saveSettings({
+          id: settings.value.id,
+          defaultTemplateId: nextDefault,
+          defaultDisabledSections: formState.value?.defaultDisabledSections ?? [],
+          defaultExcludedExperienceIds: formState.value?.defaultExcludedExperienceIds ?? [],
+          showProfilePhoto: formState.value?.showProfilePhoto ?? true,
+        });
+        if (formState.value) {
+          formState.value = {
+            ...formState.value,
+            defaultTemplateId: nextDefault,
+          };
+        }
+      } catch {
+        toast.add({
+          title: t('applications.cvs.settings.toast.saveFailed'),
+          color: 'error',
+        });
+      }
+    }
     toast.add({
       title: t('applications.cvs.templates.toast.deleted'),
       color: 'primary',
@@ -266,22 +263,13 @@ watch(
           <section id="cv-templates">
             <UCard>
               <template #header>
-                <div class="flex flex-wrap items-start justify-between gap-3">
-                  <div class="space-y-1">
-                    <h2 class="text-lg font-semibold text-default">
-                      {{ t('applications.cvs.templates.list.title') }}
-                    </h2>
-                    <p class="text-sm text-dimmed">
-                      {{ t('applications.cvs.templates.list.subtitle') }}
-                    </p>
-                  </div>
-                  <UButton
-                    color="primary"
-                    variant="outline"
-                    :label="t('applications.cvs.templates.list.actions.create')"
-                    icon="i-heroicons-plus"
-                    @click="createModalOpen = true"
-                  />
+                <div class="space-y-1">
+                  <h2 class="text-lg font-semibold text-default">
+                    {{ t('applications.cvs.templates.list.title') }}
+                  </h2>
+                  <p class="text-sm text-dimmed">
+                    {{ t('applications.cvs.templates.list.subtitle') }}
+                  </p>
                 </div>
               </template>
 
@@ -293,14 +281,6 @@ watch(
                 <p class="text-sm text-gray-500">
                   {{ t('applications.cvs.templates.list.empty.description') }}
                 </p>
-                <template #actions>
-                  <UButton
-                    color="primary"
-                    :label="t('applications.cvs.templates.list.actions.create')"
-                    icon="i-heroicons-plus"
-                    @click="createModalOpen = true"
-                  />
-                </template>
               </UEmpty>
 
               <UPageGrid v-else>
@@ -308,13 +288,15 @@ watch(
                   v-for="template in sortedTemplates"
                   :key="template.id"
                   :name="template.name"
+                  :description="template.description"
                   :is-default="template.id === defaultTemplateId"
+                  :is-system-template="template.isSystemTemplate"
                   :updated-at="formatTemplateDate(template)"
                   :primary-action-label="t('common.actions.edit')"
                   primary-action-icon="i-heroicons-pencil"
                   :secondary-action-label="t('applications.cvs.templates.list.actions.duplicate')"
                   secondary-action-icon="i-heroicons-document-duplicate"
-                  :show-delete="true"
+                  :show-delete="!template.isSystemTemplate"
                   :delete-label="t('common.actions.delete')"
                   delete-icon="i-heroicons-trash"
                   :data-testid="`cv-template-${template.id}`"
@@ -348,34 +330,5 @@ watch(
       @confirm="handleDelete"
     />
 
-    <UModal
-      v-model:open="createModalOpen"
-      :title="t('applications.cvs.templates.list.system.title')"
-      :description="t('applications.cvs.templates.list.system.description')"
-    >
-      <template #body>
-        <div class="flex flex-col gap-3">
-          <UButton
-            v-for="template in systemTemplates"
-            :key="template.id"
-            color="neutral"
-            variant="soft"
-            class="w-full justify-between"
-            :label="template.name"
-            :loading="creatingTemplate"
-            @click="handleCreateFromBase(template)"
-          />
-        </div>
-      </template>
-
-      <template #footer>
-        <UButton
-          color="neutral"
-          variant="ghost"
-          :label="t('common.actions.cancel')"
-          @click="createModalOpen = false"
-        />
-      </template>
-    </UModal>
   </div>
 </template>

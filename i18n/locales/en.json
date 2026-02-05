@@ -66,8 +66,8 @@
         },
         "fileUploaded": "Uploaded {fileName}",
         "status": {
-          "extracting": "Extracting job description from the uploaded file…",
-          "analyzing": "Analyzing job description with AI…"
+          "extracting": "Extracting job description from the uploaded file\u2026",
+          "analyzing": "Analyzing job description with AI\u2026"
         },
         "errors": {
           "tooShort": "The job description is too short. Please upload a complete document.",
@@ -236,14 +236,14 @@
       }
     },
     "upload": {
-      "helper": "Have a PDF or text file about the company? Drop it below and we’ll extract the details automatically.",
+      "helper": "Have a PDF or text file about the company? Drop it below and we\u2019ll extract the details automatically.",
       "dropzone": {
         "label": "Drop company brief or click to browse",
         "description": "Supports PDF and TXT files (max 5MB)"
       },
       "status": {
-        "extracting": "Extracting text from the document…",
-        "analyzing": "Analyzing company information…"
+        "extracting": "Extracting text from the document\u2026",
+        "analyzing": "Analyzing company information\u2026"
       },
       "errors": {
         "title": "Upload error",
@@ -1273,7 +1273,7 @@
       "generate": {
         "title": "Generate CV",
         "subtitle": "Generate a new CV using your saved defaults.",
-        "defaultName": "CV — {date}",
+        "defaultName": "CV \u2014 {date}",
         "entry": {
           "title": "CV generation",
           "description": "Review the defaults that will be applied before generating a CV.",
@@ -1645,5 +1645,21 @@
   },
   "errors": {
     "unknown": "An unknown error occurred. Please try again."
+  },
+  "cvTemplates": {
+    "system": {
+      "classic": {
+        "name": "Classic",
+        "description": "Traditional structure with summary, experience, education, skills, and interests."
+      },
+      "modern": {
+        "name": "Modern",
+        "description": "Highlight-driven layout with outcomes and a concise, modern header."
+      },
+      "competency": {
+        "name": "Competency",
+        "description": "Competency-based format with examples that demonstrate key behaviors."
+      }
+    }
   }
 }
