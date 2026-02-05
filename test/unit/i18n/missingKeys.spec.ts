@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import enLocale from '../../../i18n/locales/en.json';
 import { CV_SECTION_KEYS } from '@/domain/cvsettings/CvSectionKey';
+import { onboardingSteps } from '@/domain/onboarding/onboardingWizard';
 
 /**
  * Extracts actual i18n keys from source code by scanning for t('...')
@@ -125,6 +126,16 @@ describe('i18n - Missing Keys Detection', () => {
     const missingKeys = CV_SECTION_KEYS.filter(
       (key) => !definedKeys.has(`applications.cvs.settings.sectionLabels.${key}`)
     );
+
+    expect(missingKeys).toEqual([]);
+  });
+
+  it('should include onboarding wizard step labels and descriptions', () => {
+    const definedKeys = getAllDefinedKeys(enLocale);
+    const missingKeys = onboardingSteps.flatMap((step) => [
+      step.labelKey,
+      step.descriptionKey,
+    ]).filter((key) => !definedKeys.has(key));
 
     expect(missingKeys).toEqual([]);
   });

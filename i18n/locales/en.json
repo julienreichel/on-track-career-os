@@ -1072,17 +1072,24 @@
     "steps": {
       "cvUpload": {
         "title": "Upload your CV",
+        "description": "We use your CV to extract experiences and profile basics.",
         "hint": "We use your CV to extract experiences and profile basics."
       },
       "experienceReview": {
         "title": "Experiences",
+        "description": "Ensure at least three experiences for a strong foundation.",
         "hint": "Ensure at least three experiences for a strong foundation.",
         "count": "{count} experience(s) detected",
         "import": "Confirm & continue"
       },
       "profileBasics": {
         "title": "Confirm profile basics",
+        "description": "These basics unlock your personalized guidance.",
         "hint": "These basics unlock your personalized guidance."
+      },
+      "complete": {
+        "title": "You're ready to move forward",
+        "description": "Pick your next focus area to keep building momentum."
       }
     },
     "complete": {
