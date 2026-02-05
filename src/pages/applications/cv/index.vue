@@ -129,6 +129,7 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
 import { useCvDocuments } from '@/composables/useCvDocuments';
+import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { useGuidance } from '@/composables/useGuidance';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
@@ -141,8 +142,11 @@ const { t } = useI18n();
 const toast = useToast();
 
 const { items, loading, error, loadAll, deleteDocument } = useCvDocuments();
+const jobAnalysis = useJobAnalysis();
+const guidanceJobId = computed(() => jobAnalysis.jobs.value[0]?.id);
 const { guidance } = useGuidance('applications-cv', () => ({
   cvCount: items.value.length,
+  jobId: guidanceJobId.value,
 }));
 const searchQuery = ref('');
 const hasLoaded = ref(false);

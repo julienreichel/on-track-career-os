@@ -118,6 +118,7 @@
 import { onMounted, ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useGuidance } from '@/composables/useGuidance';
+import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import ItemCard from '@/components/ItemCard.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
@@ -131,8 +132,11 @@ import { formatListDate } from '@/utils/formatListDate';
 const { t } = useI18n();
 const toast = useToast();
 const { items, loading, error, loadAll, deleteCoverLetter } = useCoverLetters();
+const jobAnalysis = useJobAnalysis();
+const guidanceJobId = computed(() => jobAnalysis.jobs.value[0]?.id);
 const { guidance } = useGuidance('applications-cover-letters', () => ({
   coverLetterCount: items.value.length,
+  jobId: guidanceJobId.value,
 }));
 
 const deleteModalOpen = ref(false);

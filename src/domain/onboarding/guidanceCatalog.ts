@@ -55,9 +55,6 @@ export type GuidanceModel = {
   lockedFeatures?: LockedFeature[];
 };
 
-const isPhase4Unlocked = (state?: UserProgressState | null) =>
-  Boolean(state?.phase3.isComplete && state?.phase2.isComplete);
-
 const getPhase2Banner = (state: UserProgressState): GuidanceBanner => {
   if (state.phase2.missing.includes('profileDepth')) {
     return {
@@ -490,10 +487,40 @@ const getApplicationsLocked = (state: UserProgressState | null, id: string): Loc
   ];
 };
 
+type TailoredMaterialKey = 'tailoredCv' | 'tailoredCoverLetter' | 'tailoredSpeech';
+
+const buildTailoredMaterialBanner = (
+  material: TailoredMaterialKey,
+  jobId?: string
+): GuidanceBanner => {
+  const target =
+    material === 'tailoredCv'
+      ? '/applications/cv/new'
+      : material === 'tailoredCoverLetter'
+        ? '/applications/cover-letters/new'
+        : '/applications/speech/new';
+  const labelKey =
+    material === 'tailoredCv'
+      ? 'tailoredMaterials.materials.generateCv'
+      : material === 'tailoredCoverLetter'
+        ? 'tailoredMaterials.materials.generateCoverLetter'
+        : 'tailoredMaterials.materials.generateSpeech';
+  return {
+    titleKey: 'guidance.jobs.materials.title',
+    descriptionKey: 'guidance.jobs.materials.description',
+    cta: {
+      labelKey,
+      to: jobId ? `${target}?jobId=${jobId}` : '/jobs',
+    },
+  };
+};
+
 const getApplicationsPhase2anner = (
-  state: UserProgressState | null
+  state: UserProgressState | null,
+  context: GuidanceContext,
+  material: TailoredMaterialKey
 ): GuidanceBanner | undefined => {
-  if (!state || !state.phase1.isComplete || isPhase4Unlocked(state)) {
+  if (!state || !state.phase1.isComplete) {
     return undefined;
   }
 
@@ -505,14 +532,11 @@ const getApplicationsPhase2anner = (
     return getPhase3Banner(state);
   }
 
-  return {
-    titleKey: 'guidance.applications.banner.default.title',
-    descriptionKey: 'guidance.applications.banner.default.description',
-    cta: {
-      labelKey: 'guidance.applications.banner.default.cta',
-      to: '/jobs',
-    },
-  };
+  if (state.phase4.missing.includes(material)) {
+    return buildTailoredMaterialBanner(material, context.jobId);
+  }
+
+  return undefined;
 };
 
 const getApplicationsCvGuidance = (
@@ -520,7 +544,7 @@ const getApplicationsCvGuidance = (
   context: GuidanceContext
 ): GuidanceModel => {
   const lockedFeatures = getApplicationsLocked(state, 'cv-locked');
-  const banner = getApplicationsPhase2anner(state);
+  const banner = getApplicationsPhase2anner(state, context, 'tailoredCv');
   if (context.cvCount !== 0) {
     if (lockedFeatures.length) {
       return { lockedFeatures };
@@ -548,7 +572,7 @@ const getApplicationsCoverLettersGuidance = (
   context: GuidanceContext
 ): GuidanceModel => {
   const lockedFeatures = getApplicationsLocked(state, 'cover-letters-locked');
-  const banner = getApplicationsPhase2anner(state);
+  const banner = getApplicationsPhase2anner(state, context, 'tailoredCoverLetter');
   if (context.coverLetterCount !== 0) {
     if (lockedFeatures.length) {
       return { lockedFeatures };
@@ -577,7 +601,7 @@ const getApplicationsSpeechGuidance = (
   context: GuidanceContext
 ): GuidanceModel => {
   const lockedFeatures = getApplicationsLocked(state, 'speech-locked');
-  const banner = getApplicationsPhase2anner(state);
+  const banner = getApplicationsPhase2anner(state, context, 'tailoredSpeech');
   if (context.speechCount !== 0) {
     if (lockedFeatures.length) {
       return { lockedFeatures };
