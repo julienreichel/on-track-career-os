@@ -950,16 +950,15 @@
     "nextActionLabel": "Next action",
     "phaseLabels": {
       "phase1": "Ground me",
-      "phase2": "Growing up",
-      "phase2B": "Make sense of myself",
-      "phase2A": "Understand the job",
-      "phase3": "Position myself",
+      "phase2": "Make sense of myself",
+      "phase3": "Understand the job",
+      "phase4": "Position myself",
       "bonus": "Advanced"
     },
     "phaseChecklistTitles": {
       "phase1": "Checklist",
       "phase2": "Checklist",
-      "phase3": "Checklist",
+      "phase4": "Checklist",
       "bonus": "Checklist"
     },
     "checklistHint": "Complete the items below to unlock the next phase.",
@@ -1072,21 +1071,24 @@
     "steps": {
       "cvUpload": {
         "title": "Upload your CV",
-        "description": "Extract your experiences and key details."
+        "description": "Import your CV",
+        "hint": "Upload a PDF or Word document for best results."
       },
       "experienceReview": {
-        "title": "Review experiences",
-        "description": "Check, edit, and confirm your work history.",
+        "title": "Experiences",
+        "description": "Review and confirm your experiences",
+        "hint": "We recommend at least three experiences to build a strong profile.",
         "count": "{count} experience(s) detected",
         "import": "Confirm & continue"
       },
       "profileBasics": {
         "title": "Confirm profile basics",
-        "description": "Verify your core info to personalize your guidance."
+        "description": "Verify your details",
+        "hint": "Accurate details help us tailor your CV, stories, and job matches."
       },
       "complete": {
-        "title": "You're ready",
-        "description": "Choose next focus and keep building momentum."
+        "title": "You're ready to move forward",
+        "description": "Choose your next step"
       }
     },
     "complete": {
