@@ -1,6 +1,6 @@
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 
-export type ProgressPhase = 'phase1' | 'phase2' | 'phase3' | 'bonus';
+export type ProgressPhase = 'phase1' | 'phase2' | 'phase4' | 'bonus';
 
 export type ProgressGate =
   | 'cvUploaded'
@@ -23,9 +23,9 @@ export type ProgressCheckResult = {
 export type UserProgressState = {
   phase: ProgressPhase;
   phase1: ProgressCheckResult;
-  phase2B: ProgressCheckResult;
-  phase2A: ProgressCheckResult;
+  phase2: ProgressCheckResult;
   phase3: ProgressCheckResult;
+  phase4: ProgressCheckResult;
 };
 
 export type ProgressInputs = {
@@ -59,6 +59,6 @@ export type NextAction = {
 
 export type FeatureUnlocks = {
   phase2Enabled: boolean;
-  phase3Enabled: boolean;
+  phase4Enabled: boolean;
   bonusEnabled: boolean;
 };

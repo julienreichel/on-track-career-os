@@ -48,89 +48,89 @@ function computePhase1(input: ProgressInputs): ProgressCheckResult {
   return buildCheck(phase1Missing);
 }
 
-function computePhase2A(input: ProgressInputs): ProgressCheckResult {
+function computePhase3(input: ProgressInputs): ProgressCheckResult {
   const profileDepthComplete = hasProfileDepth(input.profile);
   const hasStories = input.storyCount > 0;
   const hasCanvas = input.personalCanvasCount > 0;
 
-  const phase2BMissing: ProgressGate[] = [];
+  const phase2Missing: ProgressGate[] = [];
   if (!profileDepthComplete) {
-    phase2BMissing.push('profileDepth');
+    phase2Missing.push('profileDepth');
   }
   if (!hasStories) {
-    phase2BMissing.push('stories');
+    phase2Missing.push('stories');
   }
   if (!hasCanvas) {
-    phase2BMissing.push('personalCanvas');
+    phase2Missing.push('personalCanvas');
   }
 
-  return buildCheck(phase2BMissing);
+  return buildCheck(phase2Missing);
 }
 
-function computePhase2B(input: ProgressInputs): ProgressCheckResult {
+function computePhase2(input: ProgressInputs): ProgressCheckResult {
   const hasJobs = input.jobCount > 0;
   const hasMatchingSummary = input.matchingSummaryCount > 0;
 
-  const phase2AMissing: ProgressGate[] = [];
+  const phase3Missing: ProgressGate[] = [];
   if (!hasJobs) {
-    phase2AMissing.push('jobUploaded');
+    phase3Missing.push('jobUploaded');
   }
   if (!hasMatchingSummary) {
-    phase2AMissing.push('matchingSummary');
-  }
-
-  return buildCheck(phase2AMissing);
-}
-
-function computePhase3(input: ProgressInputs): ProgressCheckResult {
-  const hasTailoredCv = input.tailoredCvCount > 0;
-  const hasTailoredCoverLetter = input.tailoredCoverLetterCount > 0;
-  const hasTailoredSpeech = input.tailoredSpeechCount > 0;
-
-  const phase3Missing: ProgressGate[] = [];
-  if (!hasTailoredCv) {
-    phase3Missing.push('tailoredCv');
-  }
-  if (!hasTailoredCoverLetter) {
-    phase3Missing.push('tailoredCoverLetter');
-  }
-  if (!hasTailoredSpeech) {
-    phase3Missing.push('tailoredSpeech');
+    phase3Missing.push('matchingSummary');
   }
 
   return buildCheck(phase3Missing);
 }
 
+function computePhase4(input: ProgressInputs): ProgressCheckResult {
+  const hasTailoredCv = input.tailoredCvCount > 0;
+  const hasTailoredCoverLetter = input.tailoredCoverLetterCount > 0;
+  const hasTailoredSpeech = input.tailoredSpeechCount > 0;
+
+  const phase4Missing: ProgressGate[] = [];
+  if (!hasTailoredCv) {
+    phase4Missing.push('tailoredCv');
+  }
+  if (!hasTailoredCoverLetter) {
+    phase4Missing.push('tailoredCoverLetter');
+  }
+  if (!hasTailoredSpeech) {
+    phase4Missing.push('tailoredSpeech');
+  }
+
+  return buildCheck(phase4Missing);
+}
+
 function resolvePhase(
   phase1: ProgressCheckResult,
-  phase2B: ProgressCheckResult,
-  phase2A: ProgressCheckResult,
-  phase3: ProgressCheckResult
+  phase2: ProgressCheckResult,
+  phase3: ProgressCheckResult,
+  phase4: ProgressCheckResult
 ): UserProgressState['phase'] {
   if (!phase1.isComplete) {
     return 'phase1';
   }
-  if (!phase2B.isComplete || !phase2A.isComplete) {
+  if (!phase2.isComplete || !phase3.isComplete) {
     return 'phase2';
   }
-  if (!phase3.isComplete) {
-    return 'phase3';
+  if (!phase4.isComplete) {
+    return 'phase4';
   }
   return 'bonus';
 }
 
 export function computeUserProgressState(input: ProgressInputs): UserProgressState {
   const phase1 = computePhase1(input);
-  const phase2B = computePhase2A(input);
-  const phase2A = computePhase2B(input);
-  const phase3 = computePhase3(input);
-  const phase = resolvePhase(phase1, phase2B, phase2A, phase3);
+  const phase2 = computePhase3(input);
+  const phase3 = computePhase2(input);
+  const phase4 = computePhase4(input);
+  const phase = resolvePhase(phase1, phase2, phase3, phase4);
 
   return {
     phase,
     phase1,
-    phase2B,
-    phase2A,
+    phase2,
     phase3,
+    phase4,
   };
 }

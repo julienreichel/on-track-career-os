@@ -31,7 +31,7 @@ export const badgeCatalog: BadgeDefinition[] = [
     titleKey: 'badges.applicationComplete.title',
     descriptionKey: 'badges.applicationComplete.description',
     icon: 'i-heroicons-clipboard-document-check',
-    phase: 'phase3',
+    phase: 'phase4',
   },
   // Bonus: Beyond the CV
   {

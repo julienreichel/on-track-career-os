@@ -64,9 +64,9 @@ const baseInputs: ProgressInputs = {
 const baseState: UserProgressState = {
   phase: 'phase1',
   phase1: { isComplete: true, missing: [] },
-  phase2A: { isComplete: false, missing: ['jobUploaded', 'matchingSummary'] },
-  phase2B: { isComplete: false, missing: ['profileDepth', 'personalCanvas'] },
-  phase3: { isComplete: false, missing: ['tailoredCv', 'tailoredCoverLetter'] },
+  phase3: { isComplete: false, missing: ['jobUploaded', 'matchingSummary'] },
+  phase2: { isComplete: false, missing: ['profileDepth', 'personalCanvas'] },
+  phase4: { isComplete: false, missing: ['tailoredCv', 'tailoredCoverLetter'] },
 };
 
 describe('useBadges', () => {

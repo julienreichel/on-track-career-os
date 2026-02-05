@@ -30,8 +30,8 @@ function phase1Primary(state: UserProgressState): NextActionItem {
 }
 
 function phase2Primary(state: UserProgressState): NextActionItem {
-  if (!state.phase2A.isComplete) {
-    if (state.phase2A.missing.includes('jobUploaded')) {
+  if (!state.phase3.isComplete) {
+    if (state.phase3.missing.includes('jobUploaded')) {
       return action(
         'upload-job',
         'progress.actions.uploadJob',
@@ -47,7 +47,7 @@ function phase2Primary(state: UserProgressState): NextActionItem {
       '/jobs'
     );
   }
-  if (state.phase2B.missing.includes('profileDepth')) {
+  if (state.phase2.missing.includes('profileDepth')) {
     return action(
       'profile-depth',
       'progress.actions.profileDepth',
@@ -55,7 +55,7 @@ function phase2Primary(state: UserProgressState): NextActionItem {
       '/profile/full?mode=edit'
     );
   }
-  if (state.phase2B.missing.includes('stories')) {
+  if (state.phase2.missing.includes('stories')) {
     return action(
       'add-stories',
       'progress.actions.addStories',
@@ -71,7 +71,7 @@ function phase2Primary(state: UserProgressState): NextActionItem {
   );
 }
 
-function phase3Primary(): NextActionItem {
+function phase4Primary(): NextActionItem {
   return action(
     'tailor-materials',
     'progress.actions.tailorMaterials',
@@ -98,19 +98,19 @@ export function getNextAction(state: UserProgressState): NextAction {
     };
   }
 
-  if (!state.phase2B.isComplete || !state.phase2A.isComplete) {
+  if (!state.phase2.isComplete || !state.phase3.isComplete) {
     return {
       phase: 'phase2',
       primary: phase2Primary(state),
-      missingPrerequisites: [...state.phase2B.missing, ...state.phase2A.missing],
+      missingPrerequisites: [...state.phase2.missing, ...state.phase3.missing],
     };
   }
 
-  if (!state.phase3.isComplete) {
+  if (!state.phase4.isComplete) {
     return {
-      phase: 'phase3',
-      primary: phase3Primary(),
-      missingPrerequisites: state.phase3.missing,
+      phase: 'phase4',
+      primary: phase4Primary(),
+      missingPrerequisites: state.phase4.missing,
     };
   }
 

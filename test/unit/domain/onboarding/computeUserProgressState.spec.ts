@@ -62,26 +62,26 @@ describe('computeUserProgressState', () => {
       })
     );
     expect(state.phase).toBe('phase2');
-    expect(state.phase2B.isComplete).toBe(false);
-    expect(state.phase2A.isComplete).toBe(true);
+    expect(state.phase2.isComplete).toBe(false);
+    expect(state.phase3.isComplete).toBe(true);
   });
 
   it('flags phase 2 when job path is incomplete', () => {
     const state = computeUserProgressState(baseInputs({ jobCount: 0, matchingSummaryCount: 0 }));
     expect(state.phase).toBe('phase2');
-    expect(state.phase2A.isComplete).toBe(false);
+    expect(state.phase3.isComplete).toBe(false);
   });
 
   it('flags phase 3 when tailored materials are missing', () => {
     const state = computeUserProgressState(baseInputs({ tailoredSpeechCount: 0 }));
-    expect(state.phase).toBe('phase3');
-    expect(state.phase3.isComplete).toBe(false);
-    expect(state.phase3.missing).toContain('tailoredSpeech');
+    expect(state.phase).toBe('phase4');
+    expect(state.phase4.isComplete).toBe(false);
+    expect(state.phase4.missing).toContain('tailoredSpeech');
   });
 
   it('returns bonus phase when all phases are complete', () => {
     const state = computeUserProgressState(baseInputs());
     expect(state.phase).toBe('bonus');
-    expect(state.phase3.isComplete).toBe(true);
+    expect(state.phase4.isComplete).toBe(true);
   });
 });

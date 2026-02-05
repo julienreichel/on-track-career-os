@@ -18,9 +18,9 @@ const baseInputs: ProgressInputs = {
 const baseState: UserProgressState = {
   phase: 'phase1',
   phase1: { isComplete: false, missing: ['cvUploaded', 'profileBasics', 'experienceCount'] },
-  phase2A: { isComplete: false, missing: ['jobUploaded', 'matchingSummary'] },
-  phase2B: { isComplete: false, missing: ['profileDepth', 'stories', 'personalCanvas'] },
-  phase3: { isComplete: false, missing: ['tailoredCv', 'tailoredCoverLetter', 'tailoredSpeech'] },
+  phase3: { isComplete: false, missing: ['jobUploaded', 'matchingSummary'] },
+  phase2: { isComplete: false, missing: ['profileDepth', 'stories', 'personalCanvas'] },
+  phase4: { isComplete: false, missing: ['tailoredCv', 'tailoredCoverLetter', 'tailoredSpeech'] },
 };
 
 describe('badge engine', () => {
@@ -35,11 +35,11 @@ describe('badge engine', () => {
     };
     const state: UserProgressState = {
       ...baseState,
-      phase: 'phase3',
+      phase: 'phase4',
       phase1: { isComplete: true, missing: [] },
-      phase2A: { isComplete: true, missing: [] },
-      phase2B: { isComplete: true, missing: [] },
       phase3: { isComplete: true, missing: [] },
+      phase2: { isComplete: true, missing: [] },
+      phase4: { isComplete: true, missing: [] },
     };
 
     const eligible = computeEligibleBadges(inputs, state);

@@ -55,8 +55,8 @@ export type GuidanceModel = {
   lockedFeatures?: LockedFeature[];
 };
 
-const isPhase3Unlocked = (state?: UserProgressState | null) =>
-  Boolean(state?.phase2A.isComplete && state?.phase2B.isComplete);
+const isPhase4Unlocked = (state?: UserProgressState | null) =>
+  Boolean(state?.phase3.isComplete && state?.phase2.isComplete);
 
 const getCanvasUnlockCta = (
   state: UserProgressState
@@ -79,7 +79,7 @@ const getCanvasUnlockCta = (
       },
     };
   }
-  if (state.phase2B.missing.includes('profileDepth')) {
+  if (state.phase2.missing.includes('profileDepth')) {
     return {
       descriptionKey: 'guidance.profileCanvas.locked.descriptionProfileDepth',
       cta: {
@@ -142,11 +142,11 @@ const getProfileGuidance = (state: UserProgressState | null): GuidanceModel => {
     };
   }
 
-  if (!state.phase1.isComplete || state.phase2B.isComplete) {
+  if (!state.phase1.isComplete || state.phase2.isComplete) {
     return {};
   }
 
-  if (state.phase2B.missing.includes('profileDepth')) {
+  if (state.phase2.missing.includes('profileDepth')) {
     return {
       banner: {
         titleKey: 'guidance.profile.banner.profileDepth.title',
@@ -159,7 +159,7 @@ const getProfileGuidance = (state: UserProgressState | null): GuidanceModel => {
     };
   }
 
-  if (state.phase2B.missing.includes('stories')) {
+  if (state.phase2.missing.includes('stories')) {
     return {
       banner: {
         titleKey: 'guidance.profile.banner.stories.title',
@@ -172,7 +172,7 @@ const getProfileGuidance = (state: UserProgressState | null): GuidanceModel => {
     };
   }
 
-  if (state.phase2B.missing.includes('personalCanvas')) {
+  if (state.phase2.missing.includes('personalCanvas')) {
     return {
       banner: {
         titleKey: 'guidance.profile.banner.personalCanvas.title',
@@ -278,10 +278,7 @@ const getProfileCanvasGuidance = (state: UserProgressState | null): GuidanceMode
     return {};
   }
 
-  if (
-    !state.phase2B.missing.includes('profileDepth') &&
-    !state.phase2B.missing.includes('stories')
-  ) {
+  if (!state.phase2.missing.includes('profileDepth') && !state.phase2.missing.includes('stories')) {
     return {};
   }
 
@@ -306,7 +303,7 @@ const getJobsGuidance = (
     if (
       context.jobId &&
       context.hasMatchingSummary === false &&
-      state?.phase2A.missing.includes('matchingSummary')
+      state?.phase3.missing.includes('matchingSummary')
     ) {
       return {
         banner: {
@@ -344,7 +341,7 @@ const getJobDetailGuidance = (
     return {};
   }
 
-  if (!state?.phase2A.missing.includes('matchingSummary')) {
+  if (!state?.phase3.missing.includes('matchingSummary')) {
     return {};
   }
 
@@ -378,14 +375,14 @@ const getApplicationsLocked = (state: UserProgressState | null, id: string): Loc
   ];
 };
 
-const getApplicationsPhase2Banner = (
+const getApplicationsPhase2anner = (
   state: UserProgressState | null
 ): GuidanceBanner | undefined => {
-  if (!state || !state.phase1.isComplete || isPhase3Unlocked(state)) {
+  if (!state || !state.phase1.isComplete || isPhase4Unlocked(state)) {
     return undefined;
   }
 
-  if (state.phase2B.missing.includes('profileDepth')) {
+  if (state.phase2.missing.includes('profileDepth')) {
     return {
       titleKey: 'guidance.applications.banner.profileDepth.title',
       descriptionKey: 'guidance.applications.banner.profileDepth.description',
@@ -396,7 +393,7 @@ const getApplicationsPhase2Banner = (
     };
   }
 
-  if (state.phase2B.missing.includes('stories')) {
+  if (state.phase2.missing.includes('stories')) {
     return {
       titleKey: 'guidance.applications.banner.stories.title',
       descriptionKey: 'guidance.applications.banner.stories.description',
@@ -407,7 +404,7 @@ const getApplicationsPhase2Banner = (
     };
   }
 
-  if (state.phase2B.missing.includes('personalCanvas')) {
+  if (state.phase2.missing.includes('personalCanvas')) {
     return {
       titleKey: 'guidance.applications.banner.canvas.title',
       descriptionKey: 'guidance.applications.banner.canvas.description',
@@ -418,7 +415,7 @@ const getApplicationsPhase2Banner = (
     };
   }
 
-  if (state.phase2A.missing.includes('jobUploaded')) {
+  if (state.phase3.missing.includes('jobUploaded')) {
     return {
       titleKey: 'guidance.applications.banner.job.title',
       descriptionKey: 'guidance.applications.banner.job.description',
@@ -429,7 +426,7 @@ const getApplicationsPhase2Banner = (
     };
   }
 
-  if (state.phase2A.missing.includes('matchingSummary')) {
+  if (state.phase3.missing.includes('matchingSummary')) {
     return {
       titleKey: 'guidance.applications.banner.matchingSummary.title',
       descriptionKey: 'guidance.applications.banner.matchingSummary.description',
@@ -455,7 +452,7 @@ const getApplicationsCvGuidance = (
   context: GuidanceContext
 ): GuidanceModel => {
   const lockedFeatures = getApplicationsLocked(state, 'cv-locked');
-  const banner = getApplicationsPhase2Banner(state);
+  const banner = getApplicationsPhase2anner(state);
   if (context.cvCount !== 0) {
     if (lockedFeatures.length) {
       return { lockedFeatures };
@@ -483,7 +480,7 @@ const getApplicationsCoverLettersGuidance = (
   context: GuidanceContext
 ): GuidanceModel => {
   const lockedFeatures = getApplicationsLocked(state, 'cover-letters-locked');
-  const banner = getApplicationsPhase2Banner(state);
+  const banner = getApplicationsPhase2anner(state);
   if (context.coverLetterCount !== 0) {
     if (lockedFeatures.length) {
       return { lockedFeatures };
@@ -512,7 +509,7 @@ const getApplicationsSpeechGuidance = (
   context: GuidanceContext
 ): GuidanceModel => {
   const lockedFeatures = getApplicationsLocked(state, 'speech-locked');
-  const banner = getApplicationsPhase2Banner(state);
+  const banner = getApplicationsPhase2anner(state);
   if (context.speechCount !== 0) {
     if (lockedFeatures.length) {
       return { lockedFeatures };

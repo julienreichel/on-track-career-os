@@ -68,9 +68,9 @@ const buildState = (missing: string[]): UserProgressState =>
   ({
     phase: 'phase1',
     phase1: { isComplete: false, missing },
-    phase2A: { isComplete: false, missing: ['jobUploaded', 'matchingSummary'] },
-    phase2B: { isComplete: false, missing: ['profileDepth', 'stories', 'personalCanvas'] },
-    phase3: { isComplete: false, missing: ['tailoredCv', 'tailoredCoverLetter', 'tailoredSpeech'] },
+    phase3: { isComplete: false, missing: ['jobUploaded', 'matchingSummary'] },
+    phase2: { isComplete: false, missing: ['profileDepth', 'stories', 'personalCanvas'] },
+    phase4: { isComplete: false, missing: ['tailoredCv', 'tailoredCoverLetter', 'tailoredSpeech'] },
   }) as UserProgressState;
 
 describe('useOnboardingWizard', () => {

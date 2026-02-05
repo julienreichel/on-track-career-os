@@ -11,17 +11,17 @@ export function computeEligibleBadges(inputs: ProgressInputs, state: UserProgres
   }
 
   // Phase 2A: Job Clarity (first job uploaded + matching summary viewed)
-  if (state.phase2A.isComplete) {
+  if (state.phase3.isComplete) {
     eligible.add('jobClarity');
   }
 
   // Phase 2B: Identity Defined (personal canvas created)
-  if (state.phase2B.isComplete) {
+  if (state.phase2.isComplete) {
     eligible.add('identityDefined');
   }
 
   // Phase 3: Application Complete (CV + letter + speech for same job)
-  if (state.phase3.isComplete) {
+  if (state.phase4.isComplete) {
     eligible.add('applicationComplete');
   }
 

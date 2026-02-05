@@ -5,9 +5,9 @@ import type { UserProgressState } from '@/domain/onboarding';
 const baseState = (overrides: Partial<UserProgressState> = {}): UserProgressState => ({
   phase: 'phase1',
   phase1: { isComplete: false, missing: ['profileBasics'] },
-  phase2B: { isComplete: false, missing: ['profileDepth'] },
-  phase2A: { isComplete: false, missing: ['jobUploaded'] },
-  phase3: { isComplete: false, missing: ['tailoredCv'] },
+  phase2: { isComplete: false, missing: ['profileDepth'] },
+  phase3: { isComplete: false, missing: ['jobUploaded'] },
+  phase4: { isComplete: false, missing: ['tailoredCv'] },
   ...overrides,
 });
 
@@ -15,7 +15,7 @@ describe('guidanceCatalog', () => {
   it('returns empty state for profile stories when none exist', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
-      phase2B: { isComplete: false, missing: ['stories'] },
+      phase2: { isComplete: false, missing: ['stories'] },
     });
     const guidance = getGuidance('profile-stories', state, { storiesCount: 0 });
     expect(guidance.emptyState?.cta.to).toBe('/profile/stories/new');
@@ -24,7 +24,7 @@ describe('guidanceCatalog', () => {
   it('returns locked guidance for profile stories when experiences are missing', () => {
     const state = baseState({
       phase1: { isComplete: false, missing: ['experienceCount'] },
-      phase2B: { isComplete: false, missing: ['stories'] },
+      phase2: { isComplete: false, missing: ['stories'] },
     });
     const guidance = getGuidance('profile-stories', state, { storiesCount: 0 });
     expect(guidance.lockedFeatures?.[0]?.id).toBe('stories-locked');
@@ -62,7 +62,7 @@ describe('guidanceCatalog', () => {
   it('returns profile depth banner when phase 2B is incomplete', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
-      phase2B: { isComplete: false, missing: ['profileDepth'] },
+      phase2: { isComplete: false, missing: ['profileDepth'] },
     });
     const guidance = getGuidance('profile', state);
     expect(guidance.banner?.cta?.to).toBe('/profile/full?mode=edit');
@@ -71,7 +71,7 @@ describe('guidanceCatalog', () => {
   it('returns personal canvas banner after profile depth and stories are complete', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
-      phase2B: { isComplete: false, missing: ['personalCanvas'] },
+      phase2: { isComplete: false, missing: ['personalCanvas'] },
     });
     const guidance = getGuidance('profile', state);
     expect(guidance.banner?.cta?.to).toBe('/profile/canvas');
@@ -80,8 +80,8 @@ describe('guidanceCatalog', () => {
   it('returns applications banner when phase 2 prerequisites are missing', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
-      phase2A: { isComplete: false, missing: ['jobUploaded'] },
-      phase2B: { isComplete: false, missing: ['profileDepth'] },
+      phase3: { isComplete: false, missing: ['jobUploaded'] },
+      phase2: { isComplete: false, missing: ['profileDepth'] },
     });
     const guidance = getGuidance('applications-cv', state, { cvCount: 0 });
     expect(guidance.banner?.cta?.to).toBe('/profile/full?mode=edit');
@@ -91,8 +91,8 @@ describe('guidanceCatalog', () => {
   it('returns matching summary banner when jobs exist but match is missing', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
-      phase2A: { isComplete: false, missing: ['matchingSummary'] },
-      phase2B: { isComplete: true, missing: [] },
+      phase3: { isComplete: false, missing: ['matchingSummary'] },
+      phase2: { isComplete: true, missing: [] },
     });
     const guidance = getGuidance('applications-cv', state, { cvCount: 0 });
     expect(guidance.banner?.cta?.to).toBe('/jobs');
@@ -102,8 +102,8 @@ describe('guidanceCatalog', () => {
   it('returns CV empty state when unlocked and no CVs exist', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
-      phase2A: { isComplete: true, missing: [] },
-      phase2B: { isComplete: true, missing: [] },
+      phase3: { isComplete: true, missing: [] },
+      phase2: { isComplete: true, missing: [] },
     });
     const guidance = getGuidance('applications-cv', state, { cvCount: 0 });
     expect(guidance.emptyState?.cta.to).toBe('/applications/cv/new');
@@ -113,8 +113,8 @@ describe('guidanceCatalog', () => {
   it('returns no empty state when CVs exist', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
-      phase2A: { isComplete: true, missing: [] },
-      phase2B: { isComplete: true, missing: [] },
+      phase3: { isComplete: true, missing: [] },
+      phase2: { isComplete: true, missing: [] },
     });
     const guidance = getGuidance('applications-cv', state, { cvCount: 1 });
     expect(guidance.emptyState).toBeUndefined();
@@ -123,8 +123,8 @@ describe('guidanceCatalog', () => {
   it('returns no empty state when cover letters exist', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
-      phase2A: { isComplete: true, missing: [] },
-      phase2B: { isComplete: true, missing: [] },
+      phase3: { isComplete: true, missing: [] },
+      phase2: { isComplete: true, missing: [] },
     });
     const guidance = getGuidance('applications-cover-letters', state, { coverLetterCount: 2 });
     expect(guidance.emptyState).toBeUndefined();
@@ -133,8 +133,8 @@ describe('guidanceCatalog', () => {
   it('returns empty guidance for speech when unlocked', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
-      phase2A: { isComplete: true, missing: [] },
-      phase2B: { isComplete: true, missing: [] },
+      phase3: { isComplete: true, missing: [] },
+      phase2: { isComplete: true, missing: [] },
     });
     const guidance = getGuidance('applications-speech', state, { speechCount: 1 });
     expect(guidance.lockedFeatures).toBeUndefined();
@@ -144,8 +144,8 @@ describe('guidanceCatalog', () => {
   it('prioritizes missing stories for applications banner', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
-      phase2A: { isComplete: false, missing: [] },
-      phase2B: { isComplete: false, missing: ['stories'] },
+      phase3: { isComplete: false, missing: [] },
+      phase2: { isComplete: false, missing: ['stories'] },
     });
     const guidance = getGuidance('applications-cover-letters', state, { coverLetterCount: 0 });
     expect(guidance.banner?.cta?.to).toBe('/profile/stories');
@@ -160,7 +160,7 @@ describe('guidanceCatalog', () => {
   it('returns job detail banner when match is missing', () => {
     const state = baseState({
       phase1: { isComplete: true, missing: [] },
-      phase2A: { isComplete: false, missing: ['matchingSummary'] },
+      phase3: { isComplete: false, missing: ['matchingSummary'] },
     });
     const guidance = getGuidance('job-detail', state, {
       jobId: 'job-1',

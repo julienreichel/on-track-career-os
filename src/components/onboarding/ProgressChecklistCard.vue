@@ -52,16 +52,16 @@ const phase1Items = computed(() =>
   buildItems(props.state.phase1, ['cvUploaded', 'experienceCount', 'profileBasics'])
 );
 
-const phase2BItems = computed(() =>
-  buildItems(props.state.phase2B, ['profileDepth', 'stories', 'personalCanvas'])
-);
-
-const phase2AItems = computed(() =>
-  buildItems(props.state.phase2A, ['jobUploaded', 'matchingSummary'])
+const phase2Items = computed(() =>
+  buildItems(props.state.phase2, ['profileDepth', 'stories', 'personalCanvas'])
 );
 
 const phase3Items = computed(() =>
-  buildItems(props.state.phase3, ['tailoredCv', 'tailoredCoverLetter', 'tailoredSpeech'])
+  buildItems(props.state.phase3, ['jobUploaded', 'matchingSummary'])
+);
+
+const phase4Items = computed(() =>
+  buildItems(props.state.phase4, ['tailoredCv', 'tailoredCoverLetter', 'tailoredSpeech'])
 );
 
 const activePhaseTitle = computed(() => t(`progress.phaseChecklistTitles.${props.state.phase}`));
@@ -81,19 +81,19 @@ const activePhaseTitle = computed(() => t(`progress.phaseChecklistTitles.${props
     <div v-else-if="state.phase === 'phase2'" class="space-y-4">
       <div>
         <p class="text-xs font-semibold uppercase text-dimmed">
-          {{ t('progress.phaseLabels.phase2A') }}
+          {{ t('progress.phaseLabels.phase3') }}
         </p>
-        <ProgressChecklistItems class="mt-2" :items="phase2AItems" />
+        <ProgressChecklistItems class="mt-2" :items="phase3Items" />
       </div>
       <div>
         <p class="text-xs font-semibold uppercase text-dimmed">
-          {{ t('progress.phaseLabels.phase2B') }}
+          {{ t('progress.phaseLabels.phase2') }}
         </p>
-        <ProgressChecklistItems class="mt-2" :items="phase2BItems" />
+        <ProgressChecklistItems class="mt-2" :items="phase2Items" />
       </div>
     </div>
 
-    <ProgressChecklistItems v-else-if="state.phase === 'phase3'" :items="phase3Items" />
+    <ProgressChecklistItems v-else-if="state.phase === 'phase4'" :items="phase4Items" />
 
     <p v-else class="text-sm text-muted-foreground">
       {{ t('progress.bonusHint') }}

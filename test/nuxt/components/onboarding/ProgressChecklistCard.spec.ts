@@ -21,9 +21,9 @@ describe('ProgressChecklistCard', () => {
         state: {
           phase: 'phase1',
           phase1: { isComplete: false, missing: ['cvUploaded'] },
-          phase2B: { isComplete: false, missing: ['profileDepth'] },
-          phase2A: { isComplete: false, missing: ['jobUploaded'] },
-          phase3: { isComplete: false, missing: ['tailoredCv'] },
+          phase2: { isComplete: false, missing: ['profileDepth'] },
+          phase3: { isComplete: false, missing: ['jobUploaded'] },
+          phase4: { isComplete: false, missing: ['tailoredCv'] },
         },
       },
       global: {

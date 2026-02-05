@@ -5,9 +5,9 @@ import type { UserProgressState } from '@/domain/onboarding';
 const baseState = (overrides: Partial<UserProgressState> = {}): UserProgressState => ({
   phase: 'phase1',
   phase1: { isComplete: false, missing: ['cvUploaded'] },
-  phase2B: { isComplete: false, missing: ['profileDepth'] },
-  phase2A: { isComplete: false, missing: ['jobUploaded'] },
-  phase3: { isComplete: false, missing: ['tailoredCv'] },
+  phase2: { isComplete: false, missing: ['profileDepth'] },
+  phase3: { isComplete: false, missing: ['jobUploaded'] },
+  phase4: { isComplete: false, missing: ['tailoredCv'] },
   ...overrides,
 });
 
@@ -22,8 +22,8 @@ describe('getNextAction', () => {
     const state = baseState({
       phase: 'phase2',
       phase1: { isComplete: true, missing: [] },
-      phase2B: { isComplete: false, missing: ['profileDepth'] },
-      phase2A: { isComplete: true, missing: [] },
+      phase2: { isComplete: false, missing: ['profileDepth'] },
+      phase3: { isComplete: true, missing: [] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('profile-depth');
@@ -33,8 +33,8 @@ describe('getNextAction', () => {
     const state = baseState({
       phase: 'phase2',
       phase1: { isComplete: true, missing: [] },
-      phase2B: { isComplete: true, missing: [] },
-      phase2A: { isComplete: false, missing: ['jobUploaded'] },
+      phase2: { isComplete: true, missing: [] },
+      phase3: { isComplete: false, missing: ['jobUploaded'] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('upload-job');
@@ -62,8 +62,8 @@ describe('getNextAction', () => {
     const state = baseState({
       phase: 'phase2',
       phase1: { isComplete: true, missing: [] },
-      phase2B: { isComplete: true, missing: [] },
-      phase2A: { isComplete: false, missing: ['matchingSummary'] },
+      phase2: { isComplete: true, missing: [] },
+      phase3: { isComplete: false, missing: ['matchingSummary'] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('generate-match');
@@ -73,8 +73,8 @@ describe('getNextAction', () => {
     const state = baseState({
       phase: 'phase2',
       phase1: { isComplete: true, missing: [] },
-      phase2B: { isComplete: false, missing: ['stories'] },
-      phase2A: { isComplete: true, missing: [] },
+      phase2: { isComplete: false, missing: ['stories'] },
+      phase3: { isComplete: true, missing: [] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('add-stories');
@@ -84,8 +84,8 @@ describe('getNextAction', () => {
     const state = baseState({
       phase: 'phase2',
       phase1: { isComplete: true, missing: [] },
-      phase2B: { isComplete: false, missing: ['personalCanvas'] },
-      phase2A: { isComplete: true, missing: [] },
+      phase2: { isComplete: false, missing: ['personalCanvas'] },
+      phase3: { isComplete: true, missing: [] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('build-canvas');
@@ -93,11 +93,11 @@ describe('getNextAction', () => {
 
   it('returns tailored materials CTA for phase 3', () => {
     const state = baseState({
-      phase: 'phase3',
+      phase: 'phase4',
       phase1: { isComplete: true, missing: [] },
-      phase2B: { isComplete: true, missing: [] },
-      phase2A: { isComplete: true, missing: [] },
-      phase3: { isComplete: false, missing: ['tailoredCv'] },
+      phase2: { isComplete: true, missing: [] },
+      phase3: { isComplete: true, missing: [] },
+      phase4: { isComplete: false, missing: ['tailoredCv'] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('tailor-materials');
@@ -107,9 +107,9 @@ describe('getNextAction', () => {
     const state = baseState({
       phase: 'bonus',
       phase1: { isComplete: true, missing: [] },
-      phase2B: { isComplete: true, missing: [] },
-      phase2A: { isComplete: true, missing: [] },
+      phase2: { isComplete: true, missing: [] },
       phase3: { isComplete: true, missing: [] },
+      phase4: { isComplete: true, missing: [] },
     });
     const action = getNextAction(state);
     expect(action.primary.id).toBe('optimize-materials');
