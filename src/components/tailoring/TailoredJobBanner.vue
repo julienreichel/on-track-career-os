@@ -31,14 +31,6 @@ const emit = defineEmits<{ (e: 'regenerate'): void }>();
       </div>
       <div class="flex flex-wrap items-center gap-3">
         <UButton
-          color="primary"
-          icon="i-heroicons-sparkles"
-          :label="props.regenerateLabel"
-          :loading="props.regenerateLoading"
-          :disabled="props.regenerateDisabled"
-          @click="emit('regenerate')"
-        />
-        <UButton
           v-if="props.jobLink"
           color="neutral"
           variant="outline"
@@ -53,6 +45,14 @@ const emit = defineEmits<{ (e: 'regenerate'): void }>();
           icon="i-heroicons-sparkles"
           :label="props.viewMatchLabel"
           :to="props.matchLink"
+        />
+        <UButton
+          color="primary"
+          icon="i-heroicons-sparkles"
+          :label="props.regenerateLabel"
+          :loading="props.regenerateLoading"
+          :disabled="props.regenerateDisabled"
+          @click="emit('regenerate')"
         />
       </div>
     </div>

@@ -31,9 +31,7 @@ const existingSpeech = ref<{ id: string } | null>(null);
 
 const hasSummary = computed(() => Boolean(props.matchingSummary));
 const hasMatchingSummary = computed(() => hasSummary.value);
-const hasExistingMaterials = computed(() =>
-  Boolean(existingCv.value || existingCoverLetter.value || existingSpeech.value)
-);
+
 const shouldLoadExistingMaterials = computed(() => props.existingMaterials === undefined);
 
 const materialsLoading = computed(() => tailoredMaterials.materialsLoading.value);
@@ -63,7 +61,11 @@ const speechLink = computed(() =>
   existingSpeech.value?.id ? `/applications/speech/${existingSpeech.value.id}` : null
 );
 
-const headerDescription = computed(() => t(`tailoredMaterials.materials.description`));
+const headerDescription = computed(() =>
+  hasMatchingSummary.value
+    ? t('tailoredMaterials.materials.description')
+    : t('tailoredMaterials.materials.missingSummaryHint')
+);
 
 watch(
   () => props.job?.id,
@@ -183,17 +185,10 @@ const handleGenerateSpeech = async () => {
         :description="materialsErrorMessage"
       />
 
-      <div
-        v-else-if="!hasMatchingSummary && !props.summaryLoading && !hasExistingMaterials"
-        class="space-y-3"
-      >
-        <p class="text-sm text-gray-600 dark:text-gray-400">
-          {{ t('tailoredMaterials.materials.missingSummaryHint') }}
-        </p>
+      <div v-else-if="!hasMatchingSummary && !props.summaryLoading" class="space-y-3">
         <UButton
           v-if="props.matchLink"
-          color="neutral"
-          variant="outline"
+          color="primary"
           icon="i-heroicons-sparkles"
           :label="t('tailoredMaterials.materials.generateMatch')"
           :to="props.matchLink"
@@ -215,7 +210,7 @@ const handleGenerateSpeech = async () => {
         <UButton
           v-else
           color="neutral"
-          variant="outline"
+          variant="subtle"
           icon="i-heroicons-document-text"
           :label="t('tailoredMaterials.materials.generateCv')"
           :loading="activeMaterial === 'cv'"
@@ -233,7 +228,7 @@ const handleGenerateSpeech = async () => {
         <UButton
           v-else
           color="neutral"
-          variant="outline"
+          variant="subtle"
           icon="i-heroicons-envelope"
           :label="t('tailoredMaterials.materials.generateCoverLetter')"
           :loading="activeMaterial === 'cover-letter'"
@@ -251,7 +246,7 @@ const handleGenerateSpeech = async () => {
         <UButton
           v-else
           color="neutral"
-          variant="outline"
+          variant="subtle"
           icon="i-heroicons-microphone"
           :label="t('tailoredMaterials.materials.generateSpeech')"
           :loading="activeMaterial === 'speech'"
