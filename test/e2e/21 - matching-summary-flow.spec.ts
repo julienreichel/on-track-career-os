@@ -86,7 +86,7 @@ test.describe('Matching summary workflow', () => {
     await page.goto(`/jobs/${jobId}`);
     await page.waitForLoadState('networkidle');
 
-    const matchLink = page.getByRole('link', { name: /view match/i }).first();
+    const matchLink = page.getByRole('link', { name: /generate match/i }).first();
     await expect(matchLink).toBeVisible();
     await matchLink.click();
 
