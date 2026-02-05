@@ -367,6 +367,57 @@ const getJobsGuidance = (
         }
       : undefined;
 
+  const buildMatchMissingBanner = (jobId: string): GuidanceModel => ({
+    banner: {
+      titleKey: 'guidance.jobs.banner.matchMissing.title',
+      descriptionKey: 'guidance.jobs.banner.matchMissing.description',
+      cta: {
+        labelKey: 'guidance.jobs.banner.matchMissing.cta',
+        to: `/jobs/${jobId}/match`,
+      },
+    },
+  });
+
+  const buildMaterialsBanner = (jobId: string): GuidanceModel => {
+    const missing = state?.phase4.missing ?? [];
+    const firstMissing = missing.includes('tailoredCv')
+      ? 'tailoredCv'
+      : missing.includes('tailoredCoverLetter')
+        ? 'tailoredCoverLetter'
+        : missing.includes('tailoredSpeech')
+          ? 'tailoredSpeech'
+          : null;
+
+    if (!firstMissing) {
+      return {};
+    }
+
+    const target =
+      firstMissing === 'tailoredCv'
+        ? '/applications/cv/new'
+        : firstMissing === 'tailoredCoverLetter'
+          ? '/applications/cover-letters/new'
+          : '/applications/speech/new';
+
+    const labelKey =
+      firstMissing === 'tailoredCv'
+        ? 'tailoredMaterials.materials.generateCv'
+        : firstMissing === 'tailoredCoverLetter'
+          ? 'tailoredMaterials.materials.generateCoverLetter'
+          : 'tailoredMaterials.materials.generateSpeech';
+
+    return {
+      banner: {
+        titleKey: 'guidance.jobs.materials.title',
+        descriptionKey: 'guidance.jobs.materials.description',
+        cta: {
+          labelKey,
+          to: `${target}?jobId=${jobId}`,
+        },
+      },
+    };
+  };
+
   if (state && !state.phase2.isComplete) {
     return {
       banner: getPhase2Banner(state),
@@ -374,62 +425,17 @@ const getJobsGuidance = (
     };
   }
 
-  if (context.jobsCount !== 0) {
-    if (context.jobId && state?.phase3.missing.includes('matchingSummary')) {
-      return {
-        banner: {
-          titleKey: 'guidance.jobs.banner.matchMissing.title',
-          descriptionKey: 'guidance.jobs.banner.matchMissing.description',
-          cta: {
-            labelKey: 'guidance.jobs.banner.matchMissing.cta',
-            to: `/jobs/${context.jobId}/match`,
-          },
-        },
-      };
+  if (context.jobsCount !== 0 && context.jobId) {
+    if (state?.phase3.missing.includes('matchingSummary')) {
+      return buildMatchMissingBanner(context.jobId);
     }
 
-    if (context.jobId && state?.phase3.isComplete && !state.phase4.isComplete) {
-      const missing = state.phase4.missing;
-      const firstMissing = missing.includes('tailoredCv')
-        ? 'tailoredCv'
-        : missing.includes('tailoredCoverLetter')
-          ? 'tailoredCoverLetter'
-          : missing.includes('tailoredSpeech')
-            ? 'tailoredSpeech'
-            : null;
-
-      if (firstMissing) {
-        const target =
-          firstMissing === 'tailoredCv'
-            ? '/applications/cv/new'
-            : firstMissing === 'tailoredCoverLetter'
-              ? '/applications/cover-letters/new'
-              : '/applications/speech/new';
-
-        const labelKey =
-          firstMissing === 'tailoredCv'
-            ? 'tailoredMaterials.materials.generateCv'
-            : firstMissing === 'tailoredCoverLetter'
-              ? 'tailoredMaterials.materials.generateCoverLetter'
-              : 'tailoredMaterials.materials.generateSpeech';
-
-        return {
-          banner: {
-            titleKey: 'guidance.jobs.materials.title',
-            descriptionKey: 'guidance.jobs.materials.description',
-            cta: {
-              labelKey,
-              to: `${target}?jobId=${context.jobId}`,
-            },
-          },
-        };
-      }
+    if (state?.phase3.isComplete && !state.phase4.isComplete) {
+      return buildMaterialsBanner(context.jobId);
     }
-
-    return {};
   }
 
-  return { emptyState };
+  return context.jobsCount !== 0 ? {} : { emptyState };
 };
 
 const getJobDetailGuidance = (
