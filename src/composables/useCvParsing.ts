@@ -18,6 +18,7 @@ PDFParse.setWorker(
 export function useCvParsing() {
   const { t, locale } = useI18n();
   const aiOps = useAiOperations();
+  const MAX_PDF_PAGES = 5;
 
   const extractedText = ref<string>('');
   const extractedExperiences = ref<ExtractedExperience[]>([]);
@@ -26,12 +27,21 @@ export function useCvParsing() {
   /**
    * Extract text from PDF file
    */
-  async function extractPdfText(file: File): Promise<string> {
+  async function extractPdfText(file: File): Promise<{ text: string; pageCount: number }> {
     const arrayBuffer = await file.arrayBuffer();
     const parser = new PDFParse({ data: arrayBuffer });
     const result = await parser.getText();
     await parser.destroy();
-    return result.text;
+    console.log(result);
+    return {
+      text: result.text,
+      pageCount:
+        typeof result.total === 'number'
+          ? result.total
+          : Array.isArray(result.pages)
+            ? result.pages.length
+            : 0,
+    };
   }
 
   /**
@@ -81,10 +91,16 @@ export function useCvParsing() {
 
   async function parseFile(file: File): Promise<void> {
     // Extract text based on file type
-    const text =
-      file.type === 'application/pdf'
-        ? await extractPdfText(file)
-        : await extractTextFileContent(file);
+    let text = '';
+    if (file.type === 'application/pdf') {
+      const parsed = await extractPdfText(file);
+      if (parsed.pageCount > MAX_PDF_PAGES) {
+        throw new Error(t('ingestion.cv.upload.errors.tooManyPagesDescription'));
+      }
+      text = parsed.text;
+    } else {
+      text = await extractTextFileContent(file);
+    }
 
     if (!text || text.trim().length === 0) {
       throw new Error(t('ingestion.cv.upload.errors.noTextExtracted'));

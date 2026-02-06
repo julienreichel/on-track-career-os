@@ -34,9 +34,12 @@ export function sanitizeJsonString(text: string): string {
   let result = '';
   let inString = false;
   let isEscaped = false;
+  const CONTROL_CHAR_LIMIT = 0x20;
+  const HEX_RADIX = 16;
+  const UNICODE_PAD = 4;
 
   for (let i = 0; i < text.length; i += 1) {
-    const char = text[i];
+    const char = text[i] ?? '';
     const code = char.charCodeAt(0);
 
     if (inString) {
@@ -58,7 +61,7 @@ export function sanitizeJsonString(text: string): string {
         continue;
       }
 
-      if (code < 0x20) {
+      if (code < CONTROL_CHAR_LIMIT) {
         switch (char) {
           case '\n':
             result += '\\n';
@@ -70,7 +73,7 @@ export function sanitizeJsonString(text: string): string {
             result += '\\t';
             break;
           default:
-            result += `\\u${code.toString(16).padStart(4, '0')}`;
+            result += `\\u${code.toString(HEX_RADIX).padStart(UNICODE_PAD, '0')}`;
             break;
         }
         continue;

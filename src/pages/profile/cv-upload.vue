@@ -32,6 +32,9 @@ const errorTitle = computed(() => {
   if (message === t('ingestion.cv.upload.errors.parsingFailed')) {
     return t('ingestion.cv.upload.errors.parsingFailedTitle');
   }
+  if (message === t('ingestion.cv.upload.errors.tooManyPagesDescription')) {
+    return t('ingestion.cv.upload.errors.tooManyPagesTitle');
+  }
   if (message === t('ingestion.cv.upload.errors.noTextExtracted')) {
     return t('ingestion.cv.upload.errors.noTextExtracted');
   }

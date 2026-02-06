@@ -195,6 +195,22 @@ describe('useCvParsing', () => {
         'ingestion.cv.upload.errors.noTextExtracted'
       );
     });
+
+    it('should reject PDFs longer than 5 pages', async () => {
+      const parsing = useCvParsing();
+      const pdfFile = new File(['pdf content'], 'test.pdf', { type: 'application/pdf' });
+
+      const mockParser = {
+        getText: vi.fn().mockResolvedValue({ text: 'Some text', total: 6 }),
+        destroy: vi.fn(),
+      };
+      vi.mocked(PDFParse).mockImplementation(() => mockParser as never);
+
+      await expect(parsing.parseFile(pdfFile)).rejects.toThrow(
+        'ingestion.cv.upload.errors.tooManyPagesDescription'
+      );
+      expect(mockAiOps.parseCv).not.toHaveBeenCalled();
+    });
   });
 
   describe('parseFile - TXT', () => {
