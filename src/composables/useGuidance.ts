@@ -1,16 +1,25 @@
 import { computed, getCurrentInstance, onMounted, unref } from 'vue';
 import { useUserProgress } from '@/composables/useUserProgress';
+import type { UseUserProgress } from '@/composables/useUserProgress';
 import { getGuidance } from '@/domain/onboarding';
 import type { GuidanceContext, GuidanceModel, GuidanceRouteKey } from '@/domain/onboarding';
 
 type GuidanceContextSource = GuidanceContext | (() => GuidanceContext);
 
+type UseGuidanceOptions = {
+  progress?: UseUserProgress;
+};
+
 const isTestEnvironment =
   (typeof process !== 'undefined' && process.env.VITEST === 'true') ||
   (typeof import.meta !== 'undefined' && (import.meta as { vitest?: boolean }).vitest === true);
 
-export function useGuidance(routeKey: GuidanceRouteKey, context: GuidanceContextSource = {}) {
-  const progress = useUserProgress();
+export function useGuidance(
+  routeKey: GuidanceRouteKey,
+  context: GuidanceContextSource = {},
+  options: UseGuidanceOptions = {}
+) {
+  const progress = options.progress ?? useUserProgress();
 
   if (getCurrentInstance()) {
     onMounted(() => {

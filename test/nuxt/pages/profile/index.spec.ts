@@ -6,34 +6,20 @@ import { createTestI18n } from '../../../utils/createTestI18n';
 import ProfileIndexPage from '@/pages/profile/index.vue';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 
-const mockUserId = ref<string | null>('user-1');
 const mockProfileItem = ref<UserProfile | null>({
   id: 'profile-1',
   fullName: 'Ava Test',
   profilePhotoKey: null,
 } as UserProfile);
-const mockProfileLoading = ref(false);
-const mockProfileError = ref<string | null>(null);
-const mockProfileLoad = vi.fn();
-const mockExperienceList = vi.fn();
+const mockProgress = {
+  profile: mockProfileItem,
+  error: ref<string | null>(null),
+  loading: ref(false),
+  load: vi.fn(),
+};
 const mockGuidance = ref<{ banner?: { title: string; description?: string } } | null>({
   banner: { title: 'Next step' },
 });
-
-vi.mock('@/composables/useAuthUser', () => ({
-  useAuthUser: () => ({
-    userId: mockUserId,
-  }),
-}));
-
-vi.mock('@/application/user-profile/useUserProfile', () => ({
-  useUserProfile: () => ({
-    item: mockProfileItem,
-    loading: mockProfileLoading,
-    error: mockProfileError,
-    load: mockProfileLoad,
-  }),
-}));
 
 vi.mock('@/composables/useGuidance', () => ({
   useGuidance: () => ({
@@ -41,10 +27,8 @@ vi.mock('@/composables/useGuidance', () => ({
   }),
 }));
 
-vi.mock('@/domain/experience/ExperienceRepository', () => ({
-  ExperienceRepository: vi.fn(() => ({
-    list: mockExperienceList,
-  })),
+vi.mock('@/composables/useUserProgress', () => ({
+  useUserProgress: () => mockProgress,
 }));
 
 const mockProfilePhotoService = {
@@ -121,16 +105,14 @@ async function mountPage() {
 
 describe('Profile Index Page', () => {
   beforeEach(() => {
-    mockUserId.value = 'user-1';
     mockProfileItem.value = {
       id: 'profile-1',
       fullName: 'Ava Test',
       profilePhotoKey: null,
     } as UserProfile;
-    mockProfileLoading.value = false;
-    mockProfileError.value = null;
-    mockProfileLoad.mockResolvedValue(undefined);
-    mockExperienceList.mockResolvedValue([]);
+    mockProgress.error.value = null;
+    mockProgress.loading.value = false;
+    mockProgress.load.mockResolvedValue(undefined);
     mockGuidance.value = { banner: { title: 'Next step' } };
     mockProfilePhotoService.getSignedUrl.mockReset();
   });

@@ -62,25 +62,21 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useAuthUser } from '@/composables/useAuthUser';
-import { useUserProfile } from '@/application/user-profile/useUserProfile';
 import { useGuidance } from '@/composables/useGuidance';
-import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
+import { useUserProgress } from '@/composables/useUserProgress';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import type { UserProfile } from '@/domain/user-profile/UserProfile';
 import type { PageHeaderLink } from '@/types/ui';
 import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
 
 const { t } = useI18n();
-const { userId } = useAuthUser();
-
 const profile = ref<UserProfile | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const photoPreviewUrl = ref<string | null>(null);
 const profilePhotoService = new ProfilePhotoService();
-const experienceRepo = new ExperienceRepository();
-const { guidance } = useGuidance('profile');
+const progress = useUserProgress();
+const { guidance } = useGuidance('profile', {}, { progress });
 
 const headerLinks = computed<PageHeaderLink[]>(() => [
   {
@@ -104,15 +100,11 @@ const loadPhotoPreview = async (key: string | null | undefined) => {
 };
 
 watch(
-  userId,
-  async (newUserId) => {
-    if (!newUserId) return;
+  () => progress.profile.value,
+  async (newProfile) => {
+    if (!newProfile) return;
     try {
-      const profileComposable = useUserProfile(newUserId);
-      loading.value = profileComposable.loading.value;
-      error.value = profileComposable.error.value;
-      await profileComposable.load();
-      profile.value = profileComposable.item.value;
+      profile.value = newProfile;
       loading.value = false;
       await loadPhotoPreview(profile.value?.profilePhotoKey);
     } catch (err) {
@@ -120,9 +112,21 @@ watch(
       error.value = t('profile.messages.loadError');
       loading.value = false;
     }
-
-    await experienceRepo.list(newUserId);
   },
   { immediate: true }
 );
+
+watch(
+  () => progress.error.value,
+  (progressError) => {
+    if (!progressError) {
+      return;
+    }
+    error.value = progressError;
+    loading.value = false;
+  },
+  { immediate: true }
+);
+
+void progress.load();
 </script>
