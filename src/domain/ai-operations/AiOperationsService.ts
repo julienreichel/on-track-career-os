@@ -105,7 +105,6 @@ export class AiOperationsService {
       throw new Error('Language cannot be empty');
     }
 
-    let result: ParsedCV;
     try {
       const parsed = await this.repo.parseCvText(cvText, language);
 
@@ -114,19 +113,13 @@ export class AiOperationsService {
         throw new Error('Invalid CV parsing result structure');
       }
 
-      result = parsed;
+      return parsed;
     } catch (error) {
       // Re-throw with more context
       throw new Error(
         `Failed to parse CV text: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
-
-    if (!result.isCv) {
-      throw new Error(result.errorMessage || 'Document does not appear to be a CV');
-    }
-
-    return result;
   }
 
   /**

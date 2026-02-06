@@ -19,6 +19,7 @@ export function useCvParsing() {
   const { t, locale } = useI18n();
   const aiOps = useAiOperations();
   const MAX_PDF_PAGES = 5;
+  const NON_CV_ERROR_CODE = 'ERR_NON_CV_DOCUMENT';
 
   const extractedText = ref<string>('');
   const extractedExperiences = ref<ExtractedExperience[]>([]);
@@ -112,7 +113,11 @@ export function useCvParsing() {
     await aiOps.parseCv(text, language);
 
     if (aiOps.error.value) {
-      throw new Error(aiOps.error.value);
+      const message = aiOps.error.value;
+      if (message.includes(NON_CV_ERROR_CODE)) {
+        throw new Error(t('ingestion.cv.upload.errors.notCvDescription'));
+      }
+      throw new Error(message);
     }
 
     if (

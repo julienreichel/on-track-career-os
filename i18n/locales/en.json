@@ -44,6 +44,7 @@
           "genericTitle": "An error occurred",
           "noTextExtracted": "No text could be extracted from the file.",
           "unknown": "An unknown error occurred",
+          "notCvDescription": "This document doesn't look like a CV. Please upload a CV or resume.",
           "tooManyPagesDescription": "Documents longer than 5 pages are not supported for CV parsing.",
           "parsingFailed": "Failed to parse CV. Please try again or enter experiences manually.",
           "extractionFailed": "Failed to extract experiences. Please try again.",

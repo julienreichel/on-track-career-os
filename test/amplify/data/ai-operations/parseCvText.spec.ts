@@ -155,8 +155,6 @@ English (Native), Spanish (Fluent)
       ],
       rawBlocks: [],
       confidence: 0.78,
-      isCv: true,
-      errorMessage: '',
     };
   };
 
@@ -202,8 +200,6 @@ English (Native), Spanish (Fluent)
         experienceItems: { experienceType: string; rawBlock: string }[];
         rawBlocks: string[];
         confidence: number;
-        isCv: boolean;
-        errorMessage: string;
       };
       expect(parsed.experienceItems).toHaveLength(2);
       expect(parsed.experienceItems[0]?.rawBlock).toContain('TechCorp');
@@ -221,34 +217,11 @@ English (Native), Spanish (Fluent)
       expect(parsed.profile.seniorityLevel).toBe('Senior');
       expect(parsed.profile.languages).toContain('English');
       expect(parsed.profile.languages).toContain('Spanish');
-      expect(parsed.isCv).toBe(true);
-      expect(parsed.errorMessage).toBe('');
     });
 
-    it('should flag non-CV content with error message', async () => {
+    it('should throw when content is not a CV', async () => {
       const nonCvResponse = {
-        profile: {
-          fullName: '',
-          headline: '',
-          location: '',
-          seniorityLevel: '',
-          primaryEmail: '',
-          primaryPhone: '',
-          workPermitInfo: '',
-          socialLinks: [],
-          aspirations: [],
-          personalValues: [],
-          strengths: [],
-          interests: [],
-          skills: [],
-          certifications: [],
-          languages: [],
-        },
-        experienceItems: [],
-        rawBlocks: [],
-        confidence: 0.05,
-        isCv: false,
-        errorMessage: 'This document does not appear to be a CV.',
+        error: 'Not a CV.',
       };
 
       mockSend.mockResolvedValueOnce({
@@ -263,22 +236,14 @@ English (Native), Spanish (Fluent)
         ),
       });
 
-      const result = (await handler({
-        arguments: { cvText: 'Invoice #1234', language: 'en' },
-      })) as {
-        isCv: boolean;
-        errorMessage: string;
-        confidence: number;
-      };
-
-      expect(result.isCv).toBe(false);
-      expect(result.errorMessage).toBe(
-        'Unable to parse this document as a CV. Please upload a CV or resume.'
-      );
-      expect(result.confidence).toBeLessThanOrEqual(0.3);
+      await expect(
+        handler({
+          arguments: { cvText: 'Invoice #1234', language: 'en' },
+        })
+      ).rejects.toThrow('Not a CV.');
     });
 
-    it('should return fallback output when model response is invalid JSON', async () => {
+    it('should throw when model response is invalid JSON', async () => {
       const invalidResponse = {
         output: {
           message: {
@@ -295,17 +260,11 @@ English (Native), Spanish (Fluent)
           body: Buffer.from(JSON.stringify(invalidResponse)),
         });
 
-      const result = (await handler({
-        arguments: { cvText: 'Broken response', language: 'en' },
-      })) as {
-        isCv: boolean;
-        errorMessage: string;
-        experienceItems: unknown[];
-      };
-
-      expect(result.isCv).toBe(false);
-      expect(result.errorMessage.length).toBeGreaterThan(0);
-      expect(result.experienceItems).toEqual([]);
+      await expect(
+        handler({
+          arguments: { cvText: 'Broken response', language: 'en' },
+        })
+      ).rejects.toThrow('AI cannot produce a stable answer');
     });
     it('should validate output structure and apply operation-specific fallbacks', async () => {
       const mockBedrockResponse = {
@@ -367,7 +326,7 @@ English (Native), Spanish (Fluent)
       expect(parsed.profile.languages).toEqual([]);
     });
 
-    it('should apply fallback when profile and experience items are missing', async () => {
+    it('should throw when profile and experience items are missing', async () => {
       mockSend.mockResolvedValueOnce({
         body: Buffer.from(
           JSON.stringify({
@@ -386,37 +345,11 @@ English (Native), Spanish (Fluent)
         ),
       });
 
-      const resultString = await handler({
-        arguments: { cvText: mockCvText, language: 'en' },
-      });
-      const result = resultString as {
-        profile: {
-          fullName: string;
-          aspirations: string[];
-          personalValues: string[];
-          strengths: string[];
-          interests: string[];
-          languages: string[];
-          skills: string[];
-          certifications: string[];
-        };
-        experienceItems: { experienceType: string; rawBlock: string }[];
-        rawBlocks: string[];
-        confidence: number;
-      };
-
-      // Should apply fallback structure for missing fields
-      expect(result.experienceItems).toEqual([]);
-      expect(result.rawBlocks).toEqual([]);
-
-      // Should apply fallback for missing profile
-      expect(result.profile).toBeDefined();
-      expect(result.profile.fullName).toBe('');
-      expect(result.profile.aspirations).toEqual([]);
-      expect(result.profile.personalValues).toEqual([]);
-      expect(result.profile.strengths).toEqual([]);
-      expect(result.profile.interests).toEqual([]);
-      expect(result.profile.languages).toEqual([]);
+      await expect(
+        handler({
+          arguments: { cvText: mockCvText, language: 'en' },
+        })
+      ).rejects.toThrow('ERR_NON_CV_DOCUMENT');
     });
 
     it('should repair string arrays and invalid experience items', async () => {

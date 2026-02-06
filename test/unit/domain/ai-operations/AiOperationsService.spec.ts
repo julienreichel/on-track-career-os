@@ -83,8 +83,6 @@ describe('AiOperationsService', () => {
         ],
         rawBlocks: ['Experience section...'],
         confidence: 0.7,
-        isCv: true,
-        errorMessage: '',
       };
 
       mockRepo.parseCvText.mockResolvedValue(mockParsedCv);
@@ -129,36 +127,11 @@ describe('AiOperationsService', () => {
       );
     });
 
-    it('should surface non-CV error message to caller', async () => {
-      const mockParsedCv: ParsedCV = {
-        profile: {
-          fullName: '',
-          headline: '',
-          location: '',
-          seniorityLevel: '',
-          primaryEmail: '',
-          primaryPhone: '',
-          workPermitInfo: '',
-          socialLinks: [],
-          aspirations: [],
-          personalValues: [],
-          strengths: [],
-          interests: [],
-          skills: [],
-          certifications: [],
-          languages: [],
-        },
-        experienceItems: [],
-        rawBlocks: [],
-        confidence: 0.1,
-        isCv: false,
-        errorMessage: 'This document does not appear to be a CV.',
-      };
-
-      mockRepo.parseCvText.mockResolvedValue(mockParsedCv);
+    it('should surface non-CV errors from repository', async () => {
+      mockRepo.parseCvText.mockRejectedValue(new Error('ERR_NON_CV_DOCUMENT'));
 
       await expect(service.parseCvText('Random text', 'en')).rejects.toThrow(
-        'This document does not appear to be a CV.'
+        'Failed to parse CV text: ERR_NON_CV_DOCUMENT'
       );
     });
   });

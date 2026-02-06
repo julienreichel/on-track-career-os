@@ -271,6 +271,17 @@ describe('useCvParsing', () => {
       await expect(parsing.parseFile(textFile)).rejects.toThrow('AI parsing error');
     });
 
+    it('should map non-CV error code to i18n message', async () => {
+      const parsing = useCvParsing();
+      const textFile = new File(['CV text'], 'test.txt', { type: 'text/plain' });
+
+      mockAiOps.error.value = 'ERR_NON_CV_DOCUMENT';
+
+      await expect(parsing.parseFile(textFile)).rejects.toThrow(
+        'ingestion.cv.upload.errors.notCvDescription'
+      );
+    });
+
     it('should throw error when no experiences extracted', async () => {
       const parsing = useCvParsing();
       const textFile = new File(['CV text'], 'test.txt', { type: 'text/plain' });

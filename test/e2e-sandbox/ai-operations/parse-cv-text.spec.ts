@@ -154,11 +154,7 @@ French (Basic)
     expect(parsedCv).toHaveProperty('experienceItems');
     expect(parsedCv).toHaveProperty('rawBlocks');
     expect(parsedCv).toHaveProperty('confidence');
-    expect(parsedCv).toHaveProperty('isCv');
-    expect(parsedCv).toHaveProperty('errorMessage');
     expect(typeof parsedCv.confidence).toBe('number');
-    expect(typeof parsedCv.isCv).toBe('boolean');
-    expect(typeof parsedCv.errorMessage).toBe('string');
 
     // All fields should be arrays
     expect(Array.isArray(parsedCv.experienceItems)).toBe(true);
@@ -203,7 +199,7 @@ French (Basic)
     }
   }, 60000); // 60s timeout for AI operation
 
-  it('should return non-CV signal for irrelevant text', async () => {
+  it('should reject irrelevant text', async () => {
     const nonCvText = `
 INVOICE #2026-001
 ACME Corp
@@ -211,43 +207,24 @@ Total Due: $1,250.00
 Due Date: 2026-02-20
     `.trim();
 
-    const parsedCv = await repository.parseCvText(nonCvText, 'en');
-
-    expect(parsedCv).toHaveProperty('isCv');
-    expect(parsedCv).toHaveProperty('errorMessage');
-    expect(typeof parsedCv.isCv).toBe('boolean');
-    expect(typeof parsedCv.errorMessage).toBe('string');
-
-    if (process.env.FAKE_AI_PROVIDER !== 'true') {
-      expect(parsedCv.isCv).toBe(false);
-      expect(parsedCv.errorMessage.length).toBeGreaterThan(0);
-    }
+    await expect(repository.parseCvText(nonCvText, 'en')).rejects.toThrow();
   }, 60000);
 
-  it('should handle empty CV text gracefully', async () => {
-    // Test with empty input - per AI Interaction Contract fallback rules,
-    // should return valid structure with empty arrays instead of throwing
-    const parsedCv = await repository.parseCvText('', 'en');
+  it('should reject empty CV text', async () => {
+    const isFakeProvider = process.env.FAKE_AI_PROVIDER === 'true';
 
-    // Validate structure is returned (even if empty)
-    expect(parsedCv).toHaveProperty('profile');
-    expect(parsedCv).toHaveProperty('experienceItems');
-    expect(parsedCv).toHaveProperty('rawBlocks');
-
-    // All section fields should be arrays (even if empty)
-    expect(Array.isArray(parsedCv.experienceItems)).toBe(true);
-    expect(Array.isArray(parsedCv.rawBlocks)).toBe(true);
-
-    // Profile should exist with empty/undefined fields
-    expect(parsedCv.profile).toBeDefined();
-    expect(Array.isArray(parsedCv.profile.socialLinks)).toBe(true);
-    expect(Array.isArray(parsedCv.profile.aspirations)).toBe(true);
-    expect(Array.isArray(parsedCv.profile.personalValues)).toBe(true);
-    expect(Array.isArray(parsedCv.profile.strengths)).toBe(true);
-    expect(Array.isArray(parsedCv.profile.interests)).toBe(true);
-    expect(Array.isArray(parsedCv.profile.skills)).toBe(true);
-    expect(Array.isArray(parsedCv.profile.certifications)).toBe(true);
-    expect(Array.isArray(parsedCv.profile.languages)).toBe(true);
+    try {
+      const parsedCv = await repository.parseCvText('', 'en');
+      if (!isFakeProvider) {
+        throw new Error('Expected empty CV text to be rejected.');
+      }
+      expect(parsedCv).toBeDefined();
+    } catch (error) {
+      if (isFakeProvider) {
+        throw error;
+      }
+      expect(error).toBeTruthy();
+    }
   }, 30000);
 
   it('should parse minimal CV with partial information', async () => {

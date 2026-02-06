@@ -143,8 +143,6 @@ describe('AiOperationsRepository', () => {
         ],
         rawBlocks: [],
         confidence: 0.5,
-        isCv: true,
-        errorMessage: '',
       };
 
       mockClient.parseCvText.mockResolvedValue({
@@ -169,7 +167,7 @@ describe('AiOperationsRepository', () => {
       });
 
       await expect(repository.parseCvText('invalid text', 'en')).rejects.toThrow(
-        'AI operation failed'
+        'AI processing failed'
       );
     });
 
