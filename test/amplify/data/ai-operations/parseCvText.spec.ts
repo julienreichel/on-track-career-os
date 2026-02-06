@@ -272,7 +272,9 @@ English (Native), Spanish (Fluent)
       };
 
       expect(result.isCv).toBe(false);
-      expect(result.errorMessage).toBe('This document does not appear to be a CV.');
+      expect(result.errorMessage).toBe(
+        'Unable to parse this document as a CV. Please upload a CV or resume.'
+      );
       expect(result.confidence).toBeLessThanOrEqual(0.3);
     });
 

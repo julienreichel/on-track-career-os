@@ -41,12 +41,9 @@
         "successSummary": "Imported {created} experience(s), updated {updated} experience(s)",
         "viewExperiences": "View Experiences",
         "errors": {
+          "genericTitle": "An error occurred",
           "noTextExtracted": "No text could be extracted from the file.",
           "unknown": "An unknown error occurred",
-          "notCvTitle": "This document isn't a CV",
-          "notCvDescription": "This document doesn't look like a CV. Please upload a CV or resume.",
-          "parsingFailedTitle": "We couldn't parse your CV",
-          "tooManyPagesTitle": "This document is too long",
           "tooManyPagesDescription": "Documents longer than 5 pages are not supported for CV parsing.",
           "parsingFailed": "Failed to parse CV. Please try again or enter experiences manually.",
           "extractionFailed": "Failed to extract experiences. Please try again.",

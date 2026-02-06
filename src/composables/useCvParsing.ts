@@ -32,7 +32,6 @@ export function useCvParsing() {
     const parser = new PDFParse({ data: arrayBuffer });
     const result = await parser.getText();
     await parser.destroy();
-    console.log(result);
     return {
       text: result.text,
       pageCount:
