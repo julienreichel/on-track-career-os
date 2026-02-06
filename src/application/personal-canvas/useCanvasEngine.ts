@@ -18,32 +18,77 @@ import type { Experience } from '@/domain/experience/Experience';
  * Build PersonalCanvasInput from profile, experiences, and stories
  */
 function buildCanvasInput(
-  profile: { fullName?: string | null; headline?: string | null; summary?: string | null } | null,
+  profile: {
+    fullName?: string | null;
+    headline?: string | null;
+    location?: string | null;
+    seniorityLevel?: string | null;
+    primaryEmail?: string | null;
+    primaryPhone?: string | null;
+    workPermitInfo?: string | null;
+    socialLinks?: (string | null)[] | null;
+    aspirations?: (string | null)[] | null;
+    personalValues?: (string | null)[] | null;
+    strengths?: (string | null)[] | null;
+    interests?: (string | null)[] | null;
+    skills?: (string | null)[] | null;
+    certifications?: (string | null)[] | null;
+    languages?: (string | null)[] | null;
+  } | null,
   experiences: Experience[],
   stories: STARStory[]
 ): PersonalCanvasInput {
+  const filterStrings = (values?: (string | null)[] | null) =>
+    values?.filter((value): value is string => Boolean(value && value.trim().length > 0)) || [];
+
+  const requiredString = (value?: string | null) => value?.trim() || '';
+  const optionalString = (value?: string | null) => (value?.trim() ? value.trim() : undefined);
+
+  const buildProfile = () => ({
+    fullName: requiredString(profile?.fullName),
+    headline: optionalString(profile?.headline),
+    location: optionalString(profile?.location),
+    seniorityLevel: optionalString(profile?.seniorityLevel),
+    primaryEmail: optionalString(profile?.primaryEmail),
+    primaryPhone: optionalString(profile?.primaryPhone),
+    workPermitInfo: optionalString(profile?.workPermitInfo),
+    socialLinks: filterStrings(profile?.socialLinks),
+    aspirations: filterStrings(profile?.aspirations),
+    personalValues: filterStrings(profile?.personalValues),
+    strengths: filterStrings(profile?.strengths),
+    interests: filterStrings(profile?.interests),
+    skills: filterStrings(profile?.skills),
+    certifications: filterStrings(profile?.certifications),
+    languages: filterStrings(profile?.languages),
+  });
+
+  const buildExperience = (exp: Experience) => ({
+    id: exp.id,
+    title: exp.title || '',
+    companyName: exp.companyName || '',
+    startDate: exp.startDate || undefined,
+    endDate: exp.endDate || undefined,
+    experienceType: exp.experienceType || 'work',
+    responsibilities: filterStrings(exp.responsibilities),
+    tasks: filterStrings(exp.tasks),
+    status: exp.status || undefined,
+    rawText: exp.rawText || undefined,
+  });
+
+  const buildStory = (story: STARStory) => ({
+    experienceId: story.experienceId || undefined,
+    title: story.title || undefined,
+    situation: story.situation || undefined,
+    task: story.task || undefined,
+    action: story.action || undefined,
+    result: story.result || undefined,
+    achievements: filterStrings(story.achievements),
+  });
+
   return {
-    profile: {
-      fullName: profile?.fullName || undefined,
-      headline: profile?.headline || undefined,
-      summary: profile?.summary || undefined,
-    },
-    experiences: experiences.map((exp) => ({
-      title: exp.title || undefined,
-      company: exp.companyName || undefined,
-      startDate: exp.startDate || undefined,
-      endDate: exp.endDate || undefined,
-      responsibilities: exp.responsibilities?.filter((r): r is string => r !== null) || undefined,
-      tasks: exp.tasks?.filter((t): t is string => t !== null) || undefined,
-    })),
-    stories: stories.map((story) => ({
-      situation: story.situation || undefined,
-      task: story.task || undefined,
-      action: story.action || undefined,
-      result: story.result || undefined,
-      achievements: story.achievements?.filter((a): a is string => a !== null) || undefined,
-      kpiSuggestions: story.kpiSuggestions?.filter((k): k is string => k !== null) || undefined,
-    })),
+    profile: buildProfile(),
+    experiences: experiences.map(buildExperience),
+    stories: stories.map(buildStory),
   };
 }
 
@@ -67,7 +112,19 @@ export function useCanvasEngine() {
     id: string;
     fullName?: string | null;
     headline?: string | null;
-    summary?: string | null;
+    location?: string | null;
+    seniorityLevel?: string | null;
+    primaryEmail?: string | null;
+    primaryPhone?: string | null;
+    workPermitInfo?: string | null;
+    socialLinks?: (string | null)[] | null;
+    aspirations?: (string | null)[] | null;
+    personalValues?: (string | null)[] | null;
+    strengths?: (string | null)[] | null;
+    interests?: (string | null)[] | null;
+    skills?: (string | null)[] | null;
+    certifications?: (string | null)[] | null;
+    languages?: (string | null)[] | null;
   } | null>(null);
 
   const service = new PersonalCanvasService();

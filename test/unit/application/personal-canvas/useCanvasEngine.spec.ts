@@ -55,7 +55,8 @@ describe('useCanvasEngine', () => {
     id: 'user-123',
     fullName: 'John Doe',
     headline: 'Senior Engineer',
-    summary: 'Experienced developer',
+    location: 'Paris, France',
+    skills: ['TypeScript', 'Leadership'],
   };
 
   const mockExperience = {
@@ -64,6 +65,7 @@ describe('useCanvasEngine', () => {
     companyName: 'Tech Corp',
     startDate: '2020-01',
     endDate: '2024-01',
+    experienceType: 'work',
     responsibilities: ['Lead development', 'Mentor team'],
     tasks: ['Build features', 'Code reviews'],
   };
@@ -338,13 +340,15 @@ describe('useCanvasEngine', () => {
         profile: {
           fullName: 'John Doe',
           headline: 'Senior Engineer',
-          summary: '8 years of experience',
+          location: 'Paris, France',
         },
         experiences: [
           {
             title: 'Senior Engineer',
-            company: 'Tech Corp',
+            companyName: 'Tech Corp',
+            experienceType: 'work',
             responsibilities: ['Led development team'],
+            tasks: [],
           },
         ],
         stories: [
@@ -393,7 +397,7 @@ describe('useCanvasEngine', () => {
       'should handle regeneration errors',
       withMockedConsoleError(async () => {
         const mockInput: PersonalCanvasInput = {
-          profile: { fullName: 'John Doe', headline: 'Engineer', summary: '5 years' },
+          profile: { fullName: 'John Doe', headline: 'Engineer' },
           experiences: [],
           stories: [],
         };
@@ -412,7 +416,7 @@ describe('useCanvasEngine', () => {
 
     it('should not manage loading state during regeneration (caller manages it)', async () => {
       const input: PersonalCanvasInput = {
-        profile: { fullName: 'John', headline: 'Dev', summary: '3 years' },
+        profile: { fullName: 'John', headline: 'Dev' },
         experiences: [],
         stories: [],
       };
@@ -432,7 +436,7 @@ describe('useCanvasEngine', () => {
 
     it('should return canvas on successful regeneration', async () => {
       const input: PersonalCanvasInput = {
-        profile: { fullName: 'Jane Smith', headline: 'Staff Engineer', summary: '10 years' },
+        profile: { fullName: 'Jane Smith', headline: 'Staff Engineer' },
         experiences: [],
         stories: [],
       };

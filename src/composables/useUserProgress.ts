@@ -12,9 +12,7 @@ import {
 
 export type UseUserProgress = ReturnType<typeof useUserProgress>;
 
-type ProgressSnapshot = NonNullable<
-  Awaited<ReturnType<UserProfileService['getProgressSnapshot']>>
->;
+type ProgressSnapshot = NonNullable<Awaited<ReturnType<UserProfileService['getProgressSnapshot']>>>;
 
 export function useUserProgress() {
   const auth = useAuthUser();

@@ -1,5 +1,7 @@
 import { invokeAiWithRetry, type InvokeAiOptions } from './utils/bedrock';
 import { truncateForLog, withAiOperationHandlerObject } from './utils/common';
+import { formatAiInputContext } from './utils/promptFormat';
+import type { Experience, Profile, SpeechStory } from './types/schema-types';
 
 /**
  * AWS Lambda handler for ai.generatePersonalCanvas
@@ -95,27 +97,9 @@ const OUTPUT_SCHEMA = `{
 
 // Type definitions matching AI Interaction Contract
 export interface PersonalCanvasInput {
-  profile: {
-    fullName?: string;
-    headline?: string;
-    summary?: string;
-  };
-  experiences: Array<{
-    title?: string;
-    company?: string;
-    startDate?: string;
-    endDate?: string;
-    responsibilities?: string[];
-    tasks?: string[];
-  }>;
-  stories: Array<{
-    situation?: string;
-    task?: string;
-    action?: string;
-    result?: string;
-    achievements?: string[];
-    kpiSuggestions?: string[];
-  }>;
+  profile: Profile;
+  experiences: Experience[];
+  stories: SpeechStory[];
 }
 
 export interface PersonalCanvasOutput {
@@ -286,50 +270,16 @@ function validatePersonalCanvas(parsed: Partial<PersonalCanvasOutput>): Personal
 async function generatePersonalCanvasCore(
   input: PersonalCanvasInput
 ): Promise<PersonalCanvasOutput> {
-  // Generate user prompt with injected data
-  const profileSummary = `
-Name: ${input.profile.fullName || 'N/A'}
-Headline: ${input.profile.headline || 'N/A'}
-Summary: ${input.profile.summary || 'N/A'}
-  `.trim();
-
-  const experiencesSummary = input.experiences
-    .map((exp, idx) =>
-      `
-Experience ${idx + 1}:
-- Title: ${exp.title || 'N/A'}
-- Company: ${exp.company || 'N/A'}
-- Duration: ${exp.startDate || 'N/A'} to ${exp.endDate || 'Present'}
-- Responsibilities: ${exp.responsibilities?.join(', ') || 'N/A'}
-- Tasks: ${exp.tasks?.join(', ') || 'N/A'}
-    `.trim()
-    )
-    .join('\n\n');
-
-  const storiesSummary = input.stories
-    .map((story, idx) =>
-      `
-Story ${idx + 1}:
-- Situation: ${story.situation || 'N/A'}
-- Task: ${story.task || 'N/A'}
-- Action: ${story.action || 'N/A'}
-- Result: ${story.result || 'N/A'}
-- Achievements: ${story.achievements?.join('; ') || 'N/A'}
-- KPIs: ${story.kpiSuggestions?.join('; ') || 'N/A'}
-    `.trim()
-    )
-    .join('\n\n');
+  const context = formatAiInputContext({
+    language: 'en',
+    profile: input.profile,
+    experiences: input.experiences,
+    stories: input.stories,
+  });
 
   const userPrompt = `Generate the Personal Business Model Canvas from the following user data:
 
-PROFILE:
-${profileSummary}
-
-EXPERIENCES:
-${experiencesSummary || 'No experiences provided'}
-
-STORIES:
-${storiesSummary || 'No stories provided'}
+${context}
 
 Analyze this data and generate all 9 sections of the Personal Business Model Canvas.
 Return ONLY valid JSON matching this schema:

@@ -188,13 +188,16 @@ describe('PersonalCanvasService', () => {
         profile: {
           fullName: 'John Doe',
           headline: 'Senior Engineer with 8 years experience',
-          summary: 'Aspiring Tech Lead',
+          location: 'Paris, France',
+          skills: ['System Design', 'Leadership'],
         },
         experiences: [
           {
             title: 'Senior Software Engineer',
-            company: 'Tech Corp',
+            companyName: 'Tech Corp',
+            experienceType: 'work',
             responsibilities: ['Led team of 5 engineers'],
+            tasks: [],
           },
         ],
         stories: [
@@ -229,7 +232,7 @@ describe('PersonalCanvasService', () => {
 
     it('should handle AI operation errors', async () => {
       const mockInput: PersonalCanvasInput = {
-        profile: { fullName: 'John Doe', headline: 'Engineer', summary: '5 years experience' },
+        profile: { fullName: 'John Doe', headline: 'Engineer' },
         experiences: [],
         stories: [],
       };
@@ -247,13 +250,13 @@ describe('PersonalCanvasService', () => {
         profile: {
           fullName: 'Jane Smith',
           headline: 'Staff Engineer with 12 years experience',
-          summary:
-            'Aspiring Principal Engineer with skills in TypeScript, System Design, and Leadership',
+          skills: ['TypeScript', 'System Design', 'Leadership'],
         },
         experiences: [
           {
             title: 'Staff Engineer',
-            company: 'Big Tech',
+            companyName: 'Big Tech',
+            experienceType: 'work',
             responsibilities: [
               'Led multiple cross-functional initiatives',
               'Reduced latency by 60%',
@@ -262,8 +265,10 @@ describe('PersonalCanvasService', () => {
           },
           {
             title: 'Senior Engineer',
-            company: 'Startup',
+            companyName: 'Startup',
+            experienceType: 'work',
             responsibilities: ['Built core platform from scratch'],
+            tasks: [],
           },
         ],
         stories: [

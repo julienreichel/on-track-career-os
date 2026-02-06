@@ -41,7 +41,7 @@ describe('ai.generatePersonalCanvas', () => {
 
     // Extract customer segments from experiences
     const customerSegs =
-      input.experiences.map((exp) => exp.company || 'Target companies').slice(0, 3) || [];
+      input.experiences.map((exp) => exp.companyName || 'Target companies').slice(0, 3) || [];
 
     return {
       customerSegments: customerSegs.length > 0 ? customerSegs : ['Tech companies', 'Startups'],
@@ -62,12 +62,12 @@ describe('ai.generatePersonalCanvas', () => {
         profile: {
           fullName: 'John Doe',
           headline: 'Senior Software Engineer',
-          summary: 'Experienced engineer specializing in cloud architecture',
         },
         experiences: [
           {
             title: 'Senior Software Engineer',
-            company: 'TechCorp',
+            companyName: 'TechCorp',
+            experienceType: 'work',
             startDate: '2020-01-01',
             endDate: '2023-12-31',
             responsibilities: ['Architected microservices', 'Led team of 5 engineers'],
@@ -75,7 +75,8 @@ describe('ai.generatePersonalCanvas', () => {
           },
           {
             title: 'Software Engineer',
-            company: 'StartupInc',
+            companyName: 'StartupInc',
+            experienceType: 'work',
             startDate: '2018-06-01',
             endDate: '2019-12-31',
             responsibilities: ['Built web application'],
@@ -89,7 +90,6 @@ describe('ai.generatePersonalCanvas', () => {
             action: 'Implemented monitoring and auto-scaling',
             result: 'Achieved 99.9% uptime',
             achievements: ['Improved system reliability'],
-            kpiSuggestions: ['Uptime: 99.9%'],
           },
           {
             situation: 'Slow deployment process',
@@ -97,7 +97,6 @@ describe('ai.generatePersonalCanvas', () => {
             action: 'Built CI/CD pipeline',
             result: 'Reduced deployment time by 70%',
             achievements: ['Automated deployments'],
-            kpiSuggestions: ['Deployment time: -70%'],
           },
         ],
       };
@@ -209,7 +208,15 @@ describe('ai.generatePersonalCanvas', () => {
     it('should support snake_case field names from AI response', async () => {
       const input = {
         profile: { fullName: 'Test User' },
-        experiences: [{ title: 'Engineer', company: 'TestCo' }],
+        experiences: [
+          {
+            title: 'Engineer',
+            companyName: 'TestCo',
+            experienceType: 'work',
+            responsibilities: [],
+            tasks: [],
+          },
+        ],
         stories: [],
       };
 
@@ -290,15 +297,21 @@ describe('ai.generatePersonalCanvas', () => {
 
     it('should handle experiences with missing optional fields', async () => {
       const input = {
-        profile: {},
+        profile: { fullName: 'Test User' },
         experiences: [
           {
             title: 'Engineer',
-            // Missing company, dates, responsibilities, tasks
+            companyName: '',
+            experienceType: 'work',
+            responsibilities: [],
+            tasks: [],
           },
           {
-            company: 'TechCorp',
-            // Missing title
+            title: '',
+            companyName: 'TechCorp',
+            experienceType: 'work',
+            responsibilities: [],
+            tasks: [],
           },
         ],
         stories: [],
@@ -336,7 +349,7 @@ describe('ai.generatePersonalCanvas', () => {
           {
             situation: 'Test situation',
             task: 'Test task',
-            // Missing action, result, achievements, kpiSuggestions
+            // Missing action, result, achievements
           },
         ],
       };
@@ -373,12 +386,18 @@ describe('ai.generatePersonalCanvas', () => {
         experiences: [
           {
             title: 'Role 1',
-            company: 'Company 1',
+            companyName: 'Company 1',
+            experienceType: 'work',
             responsibilities: ['Task 1'],
+            tasks: [],
           },
           {
             // Minimal experience
             title: 'Role 2',
+            companyName: '',
+            experienceType: 'work',
+            responsibilities: [],
+            tasks: [],
           },
         ],
         stories: [
@@ -388,7 +407,6 @@ describe('ai.generatePersonalCanvas', () => {
             action: 'Action',
             result: 'Result',
             achievements: ['Achievement'],
-            kpiSuggestions: ['KPI'],
           },
           {
             // Partial story

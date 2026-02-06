@@ -235,5 +235,4 @@ describe('CV Settings page', () => {
 
     expect(mockSaveSettings).toHaveBeenCalled();
   });
-
 });

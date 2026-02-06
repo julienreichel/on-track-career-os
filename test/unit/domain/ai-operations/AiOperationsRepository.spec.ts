@@ -316,12 +316,14 @@ describe('AiOperationsRepository', () => {
         profile: {
           fullName: 'John Doe',
           headline: 'Senior Software Engineer',
-          summary: 'Experienced engineer',
         },
         experiences: [
           {
             title: 'Senior Software Engineer',
-            company: 'Tech Corp',
+            companyName: 'Tech Corp',
+            experienceType: 'work',
+            responsibilities: [],
+            tasks: [],
           },
         ],
         stories: [
