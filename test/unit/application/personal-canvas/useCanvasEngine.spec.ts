@@ -3,8 +3,6 @@ import { useCanvasEngine } from '@/application/personal-canvas/useCanvasEngine';
 import { PersonalCanvasService } from '@/domain/personal-canvas/PersonalCanvasService';
 import { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
 import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
-import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { PersonalCanvas } from '@/domain/personal-canvas/PersonalCanvas';
 import type { PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas';
 import { withMockedConsoleError } from '../../../utils/withMockedConsole';
@@ -13,8 +11,6 @@ import { withMockedConsoleError } from '../../../utils/withMockedConsole';
 vi.mock('@/domain/personal-canvas/PersonalCanvasService');
 vi.mock('@/domain/personal-canvas/PersonalCanvasRepository');
 vi.mock('@/domain/user-profile/UserProfileRepository');
-vi.mock('@/domain/experience/ExperienceRepository');
-vi.mock('@/domain/starstory/STARStoryService');
 
 vi.mock('@/composables/useAnalytics', () => ({
   useAnalytics: () => ({
@@ -26,8 +22,6 @@ describe('useCanvasEngine', () => {
   let mockService: ReturnType<typeof vi.mocked<PersonalCanvasService>>;
   let mockRepository: ReturnType<typeof vi.mocked<PersonalCanvasRepository>>;
   let mockUserProfileRepo: ReturnType<typeof vi.mocked<UserProfileRepository>>;
-  let mockExperienceRepo: ReturnType<typeof vi.mocked<ExperienceRepository>>;
-  let mockStoryService: ReturnType<typeof vi.mocked<STARStoryService>>;
 
   const mockPersonalCanvas = {
     id: 'canvas-123',
@@ -79,6 +73,10 @@ describe('useCanvasEngine', () => {
     achievements: ['Reduced latency', 'Improved UX'],
     kpiSuggestions: ['Response time: 200ms -> 100ms'],
   };
+  const mockProfileWithExperiences = {
+    ...mockUserProfile,
+    experiences: [{ ...mockExperience, stories: [mockStory] }],
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -98,22 +96,13 @@ describe('useCanvasEngine', () => {
     mockUserProfileRepo = {
       get: vi.fn(),
       getCanvasSnapshot: vi.fn(),
+      getForTailoring: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<UserProfileRepository>>;
-
-    mockExperienceRepo = {
-      list: vi.fn(),
-    } as unknown as ReturnType<typeof vi.mocked<ExperienceRepository>>;
-
-    mockStoryService = {
-      getStoriesByExperience: vi.fn(),
-    } as unknown as ReturnType<typeof vi.mocked<STARStoryService>>;
 
     // Mock constructor returns
     vi.mocked(PersonalCanvasService).mockImplementation(() => mockService);
     vi.mocked(PersonalCanvasRepository).mockImplementation(() => mockRepository);
     vi.mocked(UserProfileRepository).mockImplementation(() => mockUserProfileRepo);
-    vi.mocked(ExperienceRepository).mockImplementation(() => mockExperienceRepo);
-    vi.mocked(STARStoryService).mockImplementation(() => mockStoryService);
   });
 
   describe('loadCanvas', () => {
@@ -522,8 +511,7 @@ describe('useCanvasEngine', () => {
 
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
       mockUserProfileRepo.getCanvasSnapshot.mockResolvedValue(null); // No existing canvas
-      mockExperienceRepo.list.mockResolvedValue([mockExperience]);
-      mockStoryService.getStoriesByExperience.mockResolvedValue([mockStory]);
+      mockUserProfileRepo.getForTailoring.mockResolvedValue(mockProfileWithExperiences);
       mockService.regenerateCanvas.mockResolvedValue(newCanvas as PersonalCanvas);
       mockRepository.create.mockResolvedValue(mockPersonalCanvas);
 
@@ -544,8 +532,7 @@ describe('useCanvasEngine', () => {
       const existingCanvas = { ...mockPersonalCanvas, id: 'existing-id' };
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
       mockUserProfileRepo.getCanvasSnapshot.mockResolvedValue(existingCanvas);
-      mockExperienceRepo.list.mockResolvedValue([mockExperience]);
-      mockStoryService.getStoriesByExperience.mockResolvedValue([mockStory]);
+      mockUserProfileRepo.getForTailoring.mockResolvedValue(mockProfileWithExperiences);
       mockService.regenerateCanvas.mockResolvedValue(mockPersonalCanvas);
       mockRepository.update.mockResolvedValue(mockPersonalCanvas);
 
@@ -572,8 +559,10 @@ describe('useCanvasEngine', () => {
       withMockedConsoleError(async () => {
         mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
         mockUserProfileRepo.getCanvasSnapshot.mockResolvedValue(null);
-        mockExperienceRepo.list.mockResolvedValue([]);
-        mockStoryService.getStoriesByExperience.mockResolvedValue([]);
+        mockUserProfileRepo.getForTailoring.mockResolvedValue({
+          ...mockUserProfile,
+          experiences: [],
+        });
         mockService.regenerateCanvas.mockRejectedValue(new Error('AI service error'));
 
         const { error, generateAndSave, initializeForUser } = useCanvasEngine();
@@ -591,8 +580,7 @@ describe('useCanvasEngine', () => {
     it('should regenerate and save canvas successfully', async () => {
       mockUserProfileRepo.get.mockResolvedValue(mockUserProfile);
       mockUserProfileRepo.getCanvasSnapshot.mockResolvedValue(null);
-      mockExperienceRepo.list.mockResolvedValue([mockExperience]);
-      mockStoryService.getStoriesByExperience.mockResolvedValue([mockStory]);
+      mockUserProfileRepo.getForTailoring.mockResolvedValue(mockProfileWithExperiences);
       mockService.regenerateCanvas.mockResolvedValue(mockPersonalCanvas);
       mockRepository.create.mockResolvedValue(mockPersonalCanvas);
 

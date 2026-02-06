@@ -2,8 +2,6 @@ import { ref } from 'vue';
 import { PersonalCanvasService } from '@/domain/personal-canvas/PersonalCanvasService';
 import { PersonalCanvasRepository } from '@/domain/personal-canvas/PersonalCanvasRepository';
 import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
-import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import { useAnalytics } from '@/composables/useAnalytics';
 import type {
   PersonalCanvas,
@@ -130,8 +128,6 @@ export function useCanvasEngine() {
   const service = new PersonalCanvasService();
   const repository = new PersonalCanvasRepository();
   const userProfileRepo = new UserProfileRepository();
-  const experienceRepo = new ExperienceRepository();
-  const storyService = new STARStoryService();
 
   /**
    * Load PersonalCanvas by ID
@@ -232,22 +228,29 @@ export function useCanvasEngine() {
       return { experiences: [], stories: [] };
     }
 
-    const experiences = await experienceRepo.list(profile.value.id);
+    const profileSnapshot = await userProfileRepo.getForTailoring(profile.value.id);
+    if (!profileSnapshot) {
+      return { experiences: [], stories: [] };
+    }
 
-    const storyResponses = await Promise.all(
-      experiences.map(async (exp) => {
-        try {
-          return await storyService.getStoriesByExperience(exp.id);
-        } catch (err) {
-          console.error('[useCanvasEngine] Error loading stories for experience:', exp.id, err);
-          return [];
-        }
-      })
-    );
+    const rawExperiences = (profileSnapshot as unknown as { experiences?: unknown }).experiences;
+    const experiences = Array.isArray(rawExperiences)
+      ? (rawExperiences.filter(Boolean) as Experience[])
+      : [];
 
-    const allStories = storyResponses.flat();
+    const stories = Array.isArray(rawExperiences)
+      ? rawExperiences
+          .flatMap((exp) => {
+            if (!exp || typeof exp !== 'object') {
+              return [];
+            }
+            const storiesValue = (exp as { stories?: unknown }).stories;
+            return Array.isArray(storiesValue) ? (storiesValue as STARStory[]) : [];
+          })
+          .filter(Boolean)
+      : [];
 
-    return { experiences, stories: allStories };
+    return { experiences, stories };
   };
 
   /**
