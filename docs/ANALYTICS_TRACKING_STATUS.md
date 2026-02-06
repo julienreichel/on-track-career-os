@@ -30,7 +30,7 @@
 
 ## 🎉 All Events Tracked!
 
-All 11 analytics events have been successfully implemented following the established pattern:
+All 14 analytics events have been successfully implemented following the established pattern:
 
 1. Import `useAnalytics` from `@/composables/useAnalytics`
 2. Call `const { captureEvent } = useAnalytics();` where needed

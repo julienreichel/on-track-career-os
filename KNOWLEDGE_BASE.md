@@ -8,7 +8,7 @@
 
 **On Track Career** is a Nuxt 4 TypeScript application helping job seekers create targeted application materials through AI-powered analysis and generation. The system combines personal discovery (identity, skills, stories) with job analysis (company research, description parsing, matching) to generate customized CVs, cover letters, and speeches.
 
-**Stack:** Nuxt 4 (TypeScript strict) + AWS Amplify Gen2 (GraphQL API, Lambda functions, Cognito auth) + Nuxt UI component library + Vitest/Playwright testing.
+**Stack:** Nuxt 4 (TypeScript strict) + AWS Amplify Gen2 (GraphQL API, Lambda functions, Cognito auth) + Nuxt UI component library + PostHog analytics + Vitest/Playwright testing.
 
 **Architecture:** Clean architecture with clear domain separation. All business logic in domain/application layers, UI components consume typed composables, GraphQL repositories handle data access, AI operations via Lambda functions with strict JSON contracts.
 
@@ -120,8 +120,11 @@ User-scoped data access enforced at GraphQL layer
 ### System
 
 `useAuthUser()` — Authentication, user session  
-`useOnboardingProgress()` — 5-phase progress tracking, guidance  
-`useBreadcrumbMapping()` — Dynamic breadcrumbs
+`useUserProgress()` — 5-phase progress tracking, guidance inputs, unlocks  
+`useBadges()` — Badge eligibility + toast notifications  
+`useActiveJobsDashboard()` — Active job states for dashboard  
+`useBreadcrumbMapping()` — Dynamic breadcrumbs  
+`useAnalytics()` — PostHog event capture + page naming
 
 ---
 
@@ -135,10 +138,13 @@ User-scoped data access enforced at GraphQL layer
 
 ### Profile Zone
 
-`/profile` — User profile editing  
+`/profile` — User profile summary  
+`/profile/full` — Full profile editor  
 `/profile/canvas` — Personal BMC generation and editing  
 `/profile/experiences` — Experience list with timeline  
 `/profile/experiences/:id/stories` — STAR stories for experience  
+`/profile/stories` — All stories list  
+`/profile/stories/new` — New story creation  
 `/cv-upload` — Initial CV upload and parsing
 
 ### Jobs & Companies
@@ -152,10 +158,13 @@ User-scoped data access enforced at GraphQL layer
 ### Applications
 
 `/applications/cv` — CV library  
+`/applications/cv/new` — CV generation  
 `/applications/cv/:id` — CV editor (markdown + preview)  
 `/applications/cv/:id/print` — Print-optimized view  
 `/applications/cover-letters` — Letter library  
-`/applications/speech` — Speech library
+`/applications/cover-letters/new` — Cover letter generation  
+`/applications/speech` — Speech library  
+`/applications/speech/new` — Speech generation
 
 ### Settings
 

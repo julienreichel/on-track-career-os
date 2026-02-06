@@ -1,7 +1,7 @@
 # HIGH-LEVEL NAVIGATION STRUCTURE
 
-**Status:** 85% Implemented (EPICs 1A, 1B, 2, 3, 3B, 3C, F2, 5A, 5B, 5C complete)  
-**Last Updated:** 2025-01-23
+**Status:** 98% Implemented (EPICs 1A–6, F2 complete)  
+**Last Updated:** 2026-02-06
 
 _(MVP → V1)_
 
@@ -58,17 +58,18 @@ This structure forms the **backbone of the product** and ensures users always ha
 - Uses Amplify UI Authenticator
 - Automatic redirect to `/` after login
 
-## 0.2 First-Time Onboarding Wizard ❌ NOT IMPLEMENTED
+## 0.2 First-Time Onboarding Wizard ✅ IMPLEMENTED
 
-**Status:** Not implemented - users start directly at dashboard
+**Status:** Implemented — 4-step wizard
 
-**Planned Features:**
+**Features:**
 
 - Upload CV or start manually
 - Enter values & goals
-- Quick tour of features
+- Capture experiences + stories
+- Set job search focus
 
-**Planned UI:** `<USteps>` and `<UCard>`
+**UI:** `<USteps>` and `<UCard>`
 
 ---
 

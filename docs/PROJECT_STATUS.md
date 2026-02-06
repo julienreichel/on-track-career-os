@@ -1,7 +1,7 @@
 # Project Status — On Track Career
 
-**Last Updated:** 2026-01-23  
-**Version:** v0.11.0 — 98% MVP Complete
+**Last Updated:** 2026-02-06  
+**Version:** v0.12.0 (post-0.11.0) — 98% MVP Complete
 
 ---
 
@@ -14,17 +14,21 @@
 - ✅ **12/12 AI operations** implemented
 - ✅ **18 GraphQL models** (13 MVP + 5 V1)
 - ✅ **11 domain modules** with full layers
-- ✅ **1500+ tests** across 55+ suites
-- ✅ **35 pages** with full functionality
+- ✅ **1526+ tests** across 190+ suites
+- ✅ **40+ pages** with full functionality
 - ✅ **98% MVP complete**
 
-### Recent Additions (v0.11.0 - EPIC 3C)
+### Recent Additions (post v0.11.0)
 
-- CV template library (3 system templates: Classic, Modern, Competency)
-- CV settings page (defaults: template, sections, experiences)
-- Template markdown editor with preview
-- "Ask each time" modal for generation customization
-- Settings navigation zone
+- PostHog analytics integration with onboarding funnel + key event tracking
+- Breadcrumb-driven page titles + dynamic navigation structure
+- Job description paste flow in addition to file upload
+- CV parsing contract v2 (merged social/contact fields + language input)
+- CV settings defaults + UX grouping improvements
+- Onboarding guidance refinements (phase flow, badges, recommendations)
+- Reduced redundant GraphQL calls (progress/badges/loading optimizations)
+- i18n consolidation and coverage tests for missing keys
+- Layout normalization (UPage as root, consistent margins)
 
 ---
 
@@ -155,10 +159,10 @@
 **Features:** Contact info rendering, social links, formatting  
 **Integration:** Embedded in generateCv AI operation
 
-### ✅ EPIC 3C: CV Customization (100%) — v0.11.0
+### ✅ EPIC 3C: CV Customization (100%) — v0.12.0
 
 **Core:** CVTemplate & CVSettings models with full CRUD  
-**Features:** 3 system templates (Classic, Modern, Competency), template library, markdown editor, "ask each time" modal, experience/section selection  
+**Features:** 3 system templates (Classic, Modern, Competency), template library, markdown editor, "ask each time" modal, experience/section selection, default settings workflow refinements  
 **Pages:** `/settings/cv`, `/settings/cv/:id`  
 **Impact:** Repeatable CV generation with consistent structure
 
