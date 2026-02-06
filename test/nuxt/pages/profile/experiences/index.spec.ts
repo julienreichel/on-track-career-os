@@ -43,19 +43,12 @@ const router = createRouter({
 
 const mockExperienceList = vi.fn<[], Promise<Experience[]>>(() => Promise.resolve([]));
 const mockDeleteExperience = vi.fn();
-const mockStoryCount = vi.fn(() => Promise.resolve([]));
 const guidanceRef = ref<GuidanceModel>({});
 
 vi.mock('@/domain/experience/ExperienceRepository', () => ({
   ExperienceRepository: vi.fn(() => ({
-    list: mockExperienceList,
+    listWithStories: mockExperienceList,
     delete: mockDeleteExperience,
-  })),
-}));
-
-vi.mock('@/domain/starstory/STARStoryService', () => ({
-  STARStoryService: vi.fn(() => ({
-    getStoriesByExperience: mockStoryCount,
   })),
 }));
 
@@ -378,7 +371,6 @@ describe('Experiences Page Component', () => {
 describe('Experiences Page Integration', () => {
   beforeEach(() => {
     mockExperienceList.mockReset();
-    mockStoryCount.mockReset();
     guidanceRef.value = {
       emptyState: {
         titleKey: 'guidance.profileExperiences.empty.title',
@@ -405,7 +397,6 @@ describe('Experiences Page Integration', () => {
 
   it('renders empty state when repository returns no experiences', async () => {
     mockExperienceList.mockResolvedValueOnce([]);
-    mockStoryCount.mockResolvedValue([]);
 
     const wrapper = await mountExperiencesPage();
     expect(wrapper.find('.guidance-empty-state-stub').exists()).toBe(true);
@@ -417,7 +408,6 @@ describe('Experiences Page Integration', () => {
       resolveList = resolve;
     });
     mockExperienceList.mockReturnValueOnce(listPromise);
-    mockStoryCount.mockResolvedValue([]);
 
     const wrapper = mount(ExperiencesPage, {
       global: {
@@ -455,7 +445,6 @@ describe('Experiences Page Integration', () => {
         rawText: '',
       } as Experience,
     ]);
-    mockStoryCount.mockResolvedValue([]);
     guidanceRef.value = {};
 
     const wrapper = await mountExperiencesPage();
@@ -482,7 +471,6 @@ describe('Experiences Page Integration', () => {
         rawText: '',
       } as Experience,
     ]);
-    mockStoryCount.mockResolvedValue([]);
     guidanceRef.value = {};
 
     const wrapper = await mountExperiencesPage();
@@ -508,7 +496,6 @@ describe('Experiences Page Integration', () => {
         rawText: '',
       } as Experience,
     ]);
-    mockStoryCount.mockResolvedValue([]);
     guidanceRef.value = {};
 
     const wrapper = await mountExperiencesPage();
@@ -551,7 +538,6 @@ describe('Experiences Page Integration', () => {
         rawText: '',
       } as Experience,
     ]);
-    mockStoryCount.mockResolvedValue([]);
     guidanceRef.value = {};
 
     const wrapper = await mountExperiencesPage();
@@ -595,7 +581,6 @@ describe('Experiences Page Integration', () => {
         rawText: '',
       } as Experience,
     ]);
-    mockStoryCount.mockResolvedValue([]);
     guidanceRef.value = {};
 
     const wrapper = await mountExperiencesPage();

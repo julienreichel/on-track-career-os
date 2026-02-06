@@ -3,7 +3,6 @@ import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { Experience } from '@/domain/experience/Experience';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useGuidance } from '@/composables/useGuidance';
@@ -16,7 +15,6 @@ const { t } = useI18n();
 const router = useRouter();
 const { userId } = useAuthUser();
 const experienceRepo = new ExperienceRepository();
-const storyService = new STARStoryService();
 
 function toTimestamp(dateString: string | null | undefined): number {
   if (!dateString) {
@@ -110,9 +108,10 @@ async function loadExperiences() {
   errorMessage.value = null;
 
   try {
-    const result = await experienceRepo.list(userId.value);
-    experiences.value = result || [];
-    await loadStoryCounts();
+    const result = await experienceRepo.listWithStories(userId.value);
+    const safeResult = result ?? [];
+    experiences.value = safeResult.map((item) => item as Experience);
+    rebuildStoryCounts(safeResult);
   } catch (error) {
     errorMessage.value =
       error instanceof Error ? error.message : t('experiences.errors.loadFailed');
@@ -123,21 +122,10 @@ async function loadExperiences() {
   }
 }
 
-async function loadStoryCounts() {
-  const counts = await Promise.all(
-    experiences.value.map(async (experience) => {
-      try {
-        const stories = await storyService.getStoriesByExperience(experience.id);
-        return { id: experience.id, count: stories.length };
-      } catch (error) {
-        console.error(`[experiences] Error loading stories for ${experience.id}:`, error);
-        return { id: experience.id, count: 0 };
-      }
-    })
-  );
-
-  storyCounts.value = counts.reduce<Record<string, number>>((acc, { id, count }) => {
-    acc[id] = count;
+function rebuildStoryCounts(withStories: { id: string; stories?: unknown }[]) {
+  storyCounts.value = withStories.reduce<Record<string, number>>((acc, experience) => {
+    const stories = (experience as { stories?: unknown }).stories;
+    acc[experience.id] = Array.isArray(stories) ? stories.length : 0;
     return acc;
   }, {});
 }
@@ -161,7 +149,9 @@ async function confirmDelete() {
   try {
     await experienceRepo.delete(experienceToDelete.value);
     experiences.value = experiences.value.filter((exp) => exp.id !== experienceToDelete.value);
-    await loadStoryCounts();
+    storyCounts.value = Object.fromEntries(
+      Object.entries(storyCounts.value).filter(([key]) => key !== experienceToDelete.value)
+    );
     showDeleteModal.value = false;
     experienceToDelete.value = null;
   } catch (error) {

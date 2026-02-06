@@ -1,4 +1,5 @@
 import { computed, ref, unref } from 'vue';
+import type { MaybeRef } from 'vue';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { useCvDocuments } from '@/composables/useCvDocuments';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
@@ -116,7 +117,7 @@ const resolveCta = (job: JobDescription, missing: JobMaterialKey[]) => {
   };
 };
 
-type MaterialSource<T> = T[] | null | undefined | { value: T[] | null };
+type MaterialSource<T> = MaybeRef<T[] | null | undefined>;
 
 type ActiveJobsDashboardOptions = {
   materials?: {
@@ -130,7 +131,7 @@ const resolveMaterialItems = <T>(source: MaterialSource<T>, fallback: T[]): T[] 
   if (!source) {
     return fallback;
   }
-  const value = unref(source as { value?: T[] | null } | T[] | null | undefined);
+  const value = unref(source);
   return Array.isArray(value) ? value : fallback;
 };
 

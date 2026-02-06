@@ -29,7 +29,7 @@ type UserProfileWithExperiences = UserProfile & {
   experiences?: (Experience | null)[] | null;
 };
 
-type ExperienceWithStories = Experience & {
+export type ExperienceWithStories = Experience & {
   stories?: (STARStory | null)[] | null;
 };
 
@@ -86,6 +86,20 @@ export class ExperienceRepository {
     const profile = data as UserProfileWithExperiences | null;
     const items = (profile?.experiences ?? []) as Experience[];
     return items.filter((item): item is Experience => Boolean(item));
+  }
+
+  async listWithStories(userId: string): Promise<ExperienceWithStories[]> {
+    if (!userId) {
+      return [];
+    }
+
+    const selectionSet = ['id', 'experiences.*', 'experiences.stories.*'];
+
+    const { data } = await this._userProfileModel.get({ id: userId }, gqlOptions({ selectionSet }));
+
+    const profile = data as UserProfileExperienceContext | null;
+    const items = (profile?.experiences ?? []) as ExperienceWithStories[];
+    return items.filter((item): item is ExperienceWithStories => Boolean(item));
   }
 
   async getExperienceContext(userId: string): Promise<{
