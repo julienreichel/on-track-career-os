@@ -27,6 +27,7 @@ export function useUserProgress() {
   const inputs = ref<ProgressInputs | null>(null);
   const snapshot = ref<ProgressSnapshot | null>(null);
   const hasLoaded = ref(false);
+  let loadPromise: Promise<void> | null = null;
 
   const nextAction = computed(() => (state.value ? getNextAction(state.value) : null));
   const unlockableFeatures = computed(() =>
@@ -34,72 +35,81 @@ export function useUserProgress() {
   );
 
   const load = async () => {
-    if (loading.value || hasLoaded.value) {
-      return;
+    if (hasLoaded.value) {
+      return loadPromise ?? Promise.resolve();
+    }
+
+    if (loading.value) {
+      return loadPromise ?? Promise.resolve();
     }
 
     loading.value = true;
     error.value = null;
 
-    try {
-      if (!auth.userId.value) {
-        await auth.loadUserId();
+    loadPromise = (async () => {
+      try {
+        if (!auth.userId.value) {
+          await auth.loadUserId();
+        }
+
+        const userId = auth.userId.value;
+        if (!userId) {
+          throw new Error('Missing user information');
+        }
+
+        if (jobAnalysis.jobs.value.length === 0) {
+          await jobAnalysis.listJobs();
+        }
+
+        const loadedSnapshot = await profileService.getProgressSnapshot(userId);
+        if (!loadedSnapshot) {
+          throw new Error('User profile not found');
+        }
+
+        const jobs = jobAnalysis.jobs.value;
+        const tailoredCvs = loadedSnapshot.cvs.filter((doc) => Boolean(doc.jobId));
+        const tailoredCoverLetters = loadedSnapshot.coverLetters.filter((doc) =>
+          Boolean(doc.jobId)
+        );
+        const tailoredSpeechBlocks = loadedSnapshot.speechBlocks.filter((doc) =>
+          Boolean(doc.jobId)
+        );
+
+        const progressInputs: ProgressInputs = {
+          profile: loadedSnapshot.profile,
+          cvCount: loadedSnapshot.cvs.length,
+          experienceCount: loadedSnapshot.experiences.length,
+          storyCount: loadedSnapshot.stories.length,
+          personalCanvasCount: loadedSnapshot.personalCanvas ? 1 : 0,
+          jobCount: jobs.length,
+          matchingSummaryCount: loadedSnapshot.matchingSummaries.length,
+          tailoredCvCount: tailoredCvs.length,
+          tailoredCoverLetterCount: tailoredCoverLetters.length,
+          tailoredSpeechCount: tailoredSpeechBlocks.length,
+          companyCanvasCount: 0, // TODO: Add company canvases to progress snapshot
+          hasCustomTemplate: false, // TODO: Implement custom template tracking
+        };
+
+        snapshot.value = loadedSnapshot;
+        profile.value = loadedSnapshot.profile;
+        inputs.value = progressInputs;
+        state.value = computeUserProgressState(progressInputs);
+        hasLoaded.value = true;
+      } catch (err) {
+        error.value = err instanceof Error ? err.message : 'progress.errors.loadFailed';
+        state.value = null;
+        profile.value = null;
+        inputs.value = null;
+        snapshot.value = null;
+        hasLoaded.value = false;
+        console.error('[useUserProgress] Failed to load progress', err);
+      } finally {
+        loading.value = false;
+        loadPromise = null;
       }
+    })();
 
-      const userId = auth.userId.value;
-      if (!userId) {
-        throw new Error('Missing user information');
-      }
-
-      if (jobAnalysis.jobs.value.length === 0) {
-        await jobAnalysis.listJobs();
-      }
-
-      const loadedSnapshot = await profileService.getProgressSnapshot(userId);
-      if (!loadedSnapshot) {
-        throw new Error('User profile not found');
-      }
-
-      const jobs = jobAnalysis.jobs.value;
-      const tailoredCvs = loadedSnapshot.cvs.filter((doc) => Boolean(doc.jobId));
-      const tailoredCoverLetters = loadedSnapshot.coverLetters.filter((doc) =>
-        Boolean(doc.jobId)
-      );
-      const tailoredSpeechBlocks = loadedSnapshot.speechBlocks.filter((doc) =>
-        Boolean(doc.jobId)
-      );
-
-      const progressInputs: ProgressInputs = {
-        profile: loadedSnapshot.profile,
-        cvCount: loadedSnapshot.cvs.length,
-        experienceCount: loadedSnapshot.experiences.length,
-        storyCount: loadedSnapshot.stories.length,
-        personalCanvasCount: loadedSnapshot.personalCanvas ? 1 : 0,
-        jobCount: jobs.length,
-        matchingSummaryCount: loadedSnapshot.matchingSummaries.length,
-        tailoredCvCount: tailoredCvs.length,
-        tailoredCoverLetterCount: tailoredCoverLetters.length,
-        tailoredSpeechCount: tailoredSpeechBlocks.length,
-        companyCanvasCount: 0, // TODO: Add company canvases to progress snapshot
-        hasCustomTemplate: false, // TODO: Implement custom template tracking
-      };
-
-      snapshot.value = loadedSnapshot;
-      profile.value = loadedSnapshot.profile;
-      inputs.value = progressInputs;
-      state.value = computeUserProgressState(progressInputs);
-      hasLoaded.value = true;
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'progress.errors.loadFailed';
-      state.value = null;
-      profile.value = null;
-      inputs.value = null;
-      snapshot.value = null;
-      hasLoaded.value = false;
-      console.error('[useUserProgress] Failed to load progress', err);
-    } finally {
-      loading.value = false;
-    }
+    return loadPromise;
   };
 
   const refresh = async () => {
