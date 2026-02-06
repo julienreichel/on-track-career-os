@@ -57,8 +57,7 @@ export function useJobUpload() {
 
     status.value = 'analyzing';
     try {
-      const draft = await jobAnalysis.createJobFromRawText(sanitized);
-      const analyzed = await jobAnalysis.reanalyseJob(draft.id);
+      const analyzed = await jobAnalysis.createAnalyzedJobFromRawText(sanitized);
       const { captureEvent } = useAnalytics();
       captureEvent('job_uploaded');
       return analyzed;

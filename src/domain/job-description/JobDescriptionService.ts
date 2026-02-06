@@ -63,28 +63,43 @@ export class JobDescriptionService {
     return this.companyRepo.getJobsByCompany(companyId);
   }
 
-  async createJobFromRawText(rawText: string): Promise<JobDescription> {
+  async createAnalyzedJobFromRawText(
+    rawText: string,
+    ownerId?: string
+  ): Promise<JobDescription> {
     const sanitized = rawText?.trim();
     if (!sanitized) {
       throw new Error('Job description text cannot be empty');
     }
 
+    const parsed = await this.aiService.parseJobDescription(sanitized);
+    const parsedPayload = this.buildParsedUpdatePayload(parsed);
+
     const input: JobDescriptionCreateInput = {
       rawText: sanitized,
-      title: DEFAULT_JOB_TITLE,
-      status: 'draft',
-      responsibilities: [],
-      requiredSkills: [],
-      behaviours: [],
-      successCriteria: [],
-      explicitPains: [],
+      title: parsedPayload.title || DEFAULT_JOB_TITLE,
+      seniorityLevel: parsedPayload.seniorityLevel || '',
+      roleSummary: parsedPayload.roleSummary || '',
+      responsibilities: parsedPayload.responsibilities || [],
+      requiredSkills: parsedPayload.requiredSkills || [],
+      behaviours: parsedPayload.behaviours || [],
+      successCriteria: parsedPayload.successCriteria || [],
+      explicitPains: parsedPayload.explicitPains || [],
+      atsKeywords: parsedPayload.atsKeywords || [],
+      status: parsedPayload.status || 'complete',
     };
 
     const created = await this.repo.create(input);
     if (!created) {
       throw new Error('Failed to create job description');
     }
-    return created;
+
+    const enrichedJob = { ...created, rawText: sanitized };
+    if (ownerId) {
+      return this.autoLinkCompany(enrichedJob, ownerId);
+    }
+
+    return enrichedJob;
   }
 
   async updateJob(
@@ -112,29 +127,6 @@ export class JobDescriptionService {
     parsed: ParsedJobDescription
   ): Promise<JobDescription> {
     return this.updateJob(jobId, this.buildParsedUpdatePayload(parsed));
-  }
-
-  async reanalyseJob(jobId: string, ownerId?: string): Promise<JobDescription> {
-    const job = await this.repo.get(jobId);
-    if (!job) {
-      throw new Error('Job description not found');
-    }
-
-    const jobText = job.rawText?.trim();
-    if (!jobText) {
-      throw new Error('Job description has no raw text to analyse');
-    }
-
-    const parsed = await this.aiService.parseJobDescription(jobText);
-    const updated = await this.attachParsedJobDescription(jobId, parsed);
-    const enrichedJob = { ...updated, rawText: job.rawText };
-
-    // Only auto-link company if ownerId is provided
-    if (ownerId) {
-      return this.autoLinkCompany(enrichedJob, ownerId);
-    }
-
-    return enrichedJob;
   }
 
   async deleteJob(jobId: string): Promise<void> {

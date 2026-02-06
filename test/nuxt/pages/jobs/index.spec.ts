@@ -21,9 +21,8 @@ vi.mock('@/composables/useJobAnalysis', () => ({
     listJobs: mockListJobs,
     deleteJob: mockDeleteJob,
     loadJob: vi.fn(),
-    createJobFromRawText: vi.fn(),
+    createAnalyzedJobFromRawText: vi.fn(),
     updateJob: vi.fn(),
-    reanalyseJob: vi.fn(),
     resetState: vi.fn(),
   }),
 }));

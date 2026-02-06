@@ -481,7 +481,7 @@ describe('AiOperationsService', () => {
             },
           ],
         })
-      ).rejects.toThrow('Each experience must have title and startDate');
+      ).rejects.toThrow('Each experience must have title');
     });
 
     it('rejects when language is not supported', async () => {

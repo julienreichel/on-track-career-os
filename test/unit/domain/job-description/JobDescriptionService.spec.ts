@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
-import { allowConsoleOutput } from '../../../setup/console-guard';
 import type { JobDescriptionRepository } from '@/domain/job-description/JobDescriptionRepository';
 import type {
   JobDescription,
@@ -10,7 +9,6 @@ import type { AiOperationsService } from '@/domain/ai-operations/AiOperationsSer
 import type { ParsedJobDescription } from '@/domain/ai-operations/ParsedJobDescription';
 import type { CompanyRepository } from '@/domain/company/CompanyRepository';
 import type { CompanyCanvasRepository } from '@/domain/company-canvas/CompanyCanvasRepository';
-import type { Company } from '@/domain/company/Company';
 import type { MatchingSummaryService } from '@/domain/matching-summary/MatchingSummaryService';
 
 // Mock the repository
@@ -148,37 +146,62 @@ describe('JobDescriptionService', () => {
     });
   });
 
-  describe('createJobFromRawText', () => {
-    it('should create a draft job from raw text', async () => {
-      const mockCreated = {
-        id: 'job-1',
-        title: 'Job description pending analysis',
-        status: 'draft',
-      } as JobDescription;
-      mockRepository.create.mockResolvedValue(mockCreated);
+  describe('createAnalyzedJobFromRawText', () => {
+    it('creates a completed job from parsed AI output', async () => {
+      const parsed = {
+        title: 'Senior Engineer',
+        seniorityLevel: 'Senior',
+        roleSummary: 'Summary',
+        responsibilities: ['Build systems'],
+        requiredSkills: ['TypeScript'],
+        behaviours: ['Ownership'],
+        successCriteria: ['Deliver'],
+        explicitPains: ['Legacy debt'],
+        atsKeywords: ['Engineer'],
+      } as ParsedJobDescription;
 
-      const result = await service.createJobFromRawText('   Job text  ');
+      mockAiService.parseJobDescription.mockResolvedValue(parsed);
+      mockRepository.create.mockResolvedValue({
+        id: 'job-2',
+        title: parsed.title,
+        status: 'complete',
+      } as JobDescription);
 
+      const result = await service.createAnalyzedJobFromRawText('Job text');
+
+      expect(mockAiService.parseJobDescription).toHaveBeenCalledWith('Job text');
       expect(mockRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           rawText: 'Job text',
-          status: 'draft',
+          title: parsed.title,
+          status: 'complete',
         })
       );
-      expect(result).toEqual(mockCreated);
+      expect(result?.title).toBe(parsed.title);
     });
 
-    it('should throw when raw text empty', async () => {
-      await expect(service.createJobFromRawText('  ')).rejects.toThrow(
+    it('throws when raw text empty', async () => {
+      await expect(service.createAnalyzedJobFromRawText('  ')).rejects.toThrow(
         'Job description text cannot be empty'
       );
       expect(mockRepository.create).not.toHaveBeenCalled();
     });
 
-    it('should throw when repository fails to create', async () => {
+    it('throws when repository fails to create', async () => {
+      mockAiService.parseJobDescription.mockResolvedValue({
+        title: 'Role',
+        seniorityLevel: '',
+        roleSummary: '',
+        responsibilities: [],
+        requiredSkills: [],
+        behaviours: [],
+        successCriteria: [],
+        explicitPains: [],
+        atsKeywords: [],
+      } as ParsedJobDescription);
       mockRepository.create.mockResolvedValue(null);
 
-      await expect(service.createJobFromRawText('Job text')).rejects.toThrow(
+      await expect(service.createAnalyzedJobFromRawText('Job text')).rejects.toThrow(
         'Failed to create job description'
       );
     });
@@ -234,200 +257,6 @@ describe('JobDescriptionService', () => {
         })
       );
       expect(result).toEqual(mockUpdated);
-    });
-  });
-
-  describe('reanalyseJob', () => {
-    it('should throw when job not found', async () => {
-      mockRepository.get.mockResolvedValue(null);
-
-      await expect(service.reanalyseJob('missing')).rejects.toThrow('Job description not found');
-      expect(mockAiService.parseJobDescription).not.toHaveBeenCalled();
-    });
-
-    it('should throw when rawText missing', async () => {
-      mockRepository.get.mockResolvedValue({ id: 'job-1', rawText: '' } as JobDescription);
-
-      await expect(service.reanalyseJob('job-1')).rejects.toThrow(
-        'Job description has no raw text to analyse'
-      );
-    });
-
-    it('should parse job and update', async () => {
-      const job = { id: 'job-1', rawText: 'Job text' } as JobDescription;
-      const parsed = {
-        title: 'Parsed',
-        seniorityLevel: '',
-        roleSummary: '',
-        responsibilities: [],
-        requiredSkills: [],
-        behaviours: [],
-        successCriteria: [],
-        explicitPains: [],
-        atsKeywords: [],
-      } as ParsedJobDescription;
-      const updatedJob = { ...job, title: 'Parsed' } as JobDescription;
-
-      mockRepository.get.mockResolvedValue(job);
-      mockAiService.parseJobDescription.mockResolvedValue(parsed);
-      mockRepository.update.mockResolvedValue(updatedJob);
-
-      await allowConsoleOutput(async () => {
-        const result = await service.reanalyseJob('job-1');
-        expect(result).toEqual(updatedJob);
-      });
-
-      expect(mockAiService.parseJobDescription).toHaveBeenCalledWith('Job text');
-      expect(mockRepository.update).toHaveBeenCalledTimes(1);
-    });
-
-    it('links to existing company when analysis succeeds', async () => {
-      const job = {
-        id: 'job-1',
-        rawText: 'Job text',
-        title: 'Engineer',
-        owner: 'user-1::user-1',
-      } as JobDescription;
-      const parsed = {
-        title: 'Parsed',
-        seniorityLevel: '',
-        roleSummary: '',
-        responsibilities: [],
-        requiredSkills: [],
-        behaviours: [],
-        successCriteria: [],
-        explicitPains: [],
-        atsKeywords: [],
-      } as ParsedJobDescription;
-      const updatedJob = { ...job, title: 'Parsed' } as JobDescription;
-      const jobWithCompany = { ...updatedJob, companyId: 'company-123' } as JobDescription;
-
-      mockRepository.get.mockResolvedValue(job);
-      mockAiService.parseJobDescription.mockResolvedValue(parsed);
-      mockRepository.update.mockResolvedValueOnce(updatedJob).mockResolvedValueOnce(jobWithCompany);
-      mockAiService.analyzeCompanyInfo.mockResolvedValue({
-        companyProfile: {
-          companyName: 'Acme Inc.',
-          industry: 'Software',
-          sizeRange: '',
-          website: '',
-          productsServices: ['Automation'],
-          targetMarkets: [],
-          customerSegments: [],
-          description: '',
-          rawNotes: 'Job text',
-        },
-      });
-      mockCompanyRepo.findByNormalizedName.mockResolvedValue({
-        id: 'company-123',
-        companyName: 'Acme Inc.',
-        productsServices: [],
-        targetMarkets: [],
-        customerSegments: [],
-      } as Company);
-      mockCompanyRepo.update.mockResolvedValue({
-        id: 'company-123',
-        companyName: 'Acme Inc.',
-      } as Company);
-
-      let result: JobDescription;
-      await allowConsoleOutput(async () => {
-        result = await service.reanalyseJob('job-1', 'user-1::user-1');
-      });
-
-      expect(mockRepository.update).toHaveBeenCalledTimes(2);
-      expect(mockCompanyRepo.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          id: 'company-123',
-        })
-      );
-      expect(result.companyId).toBe('company-123');
-      expect(result.companyId).toBe('company-123');
-    });
-
-    it('creates company and canvas when none exists', async () => {
-      const job = {
-        id: 'job-1',
-        rawText: 'Job text',
-        title: 'Engineer',
-        owner: 'user-1::user-1',
-      } as JobDescription;
-      const parsed = {
-        title: 'Parsed',
-        seniorityLevel: '',
-        roleSummary: '',
-        responsibilities: [],
-        requiredSkills: [],
-        behaviours: [],
-        successCriteria: [],
-        explicitPains: [],
-        atsKeywords: [],
-      } as ParsedJobDescription;
-      const updatedJob = { ...job, title: 'Parsed' } as JobDescription;
-      const jobWithCompany = { ...updatedJob, companyId: 'company-999' } as JobDescription;
-
-      mockRepository.get.mockResolvedValue(job);
-      mockAiService.parseJobDescription.mockResolvedValue(parsed);
-      mockRepository.update.mockResolvedValueOnce(updatedJob).mockResolvedValueOnce(jobWithCompany);
-      mockAiService.analyzeCompanyInfo.mockResolvedValue({
-        companyProfile: {
-          companyName: 'NewCo',
-          industry: '',
-          sizeRange: '',
-          website: '',
-          productsServices: [],
-          targetMarkets: [],
-          customerSegments: [],
-          description: '',
-          rawNotes: 'Job text',
-        },
-      });
-      mockCompanyRepo.findByNormalizedName.mockResolvedValue(null);
-      mockCompanyRepo.create.mockResolvedValue({
-        id: 'company-999',
-        companyName: 'NewCo',
-      } as Company);
-
-      let result: JobDescription;
-      await allowConsoleOutput(async () => {
-        result = await service.reanalyseJob('job-1', 'user-1::user-1');
-      });
-
-      expect(mockCompanyRepo.create).toHaveBeenCalled();
-      expect(mockCanvasRepo.create).toHaveBeenCalledWith(
-        expect.objectContaining({
-          companyId: 'company-999',
-          needsUpdate: true,
-        })
-      );
-      expect(result.companyId).toBe('company-999');
-      expect(result.companyId).toBe('company-999');
-    });
-
-    it('continues when company analysis fails', async () => {
-      const job = { id: 'job-1', rawText: 'Job text' } as JobDescription;
-      const parsed = {
-        title: 'Parsed',
-        seniorityLevel: '',
-        roleSummary: '',
-        responsibilities: [],
-        requiredSkills: [],
-        behaviours: [],
-        successCriteria: [],
-        explicitPains: [],
-        atsKeywords: [],
-      } as ParsedJobDescription;
-      const updatedJob = { ...job, title: 'Parsed' } as JobDescription;
-
-      mockRepository.get.mockResolvedValue(job);
-      mockAiService.parseJobDescription.mockResolvedValue(parsed);
-      mockRepository.update.mockResolvedValue(updatedJob);
-      mockAiService.analyzeCompanyInfo.mockRejectedValue(new Error('AI failed'));
-
-      await allowConsoleOutput(async () => {
-        const result = await service.reanalyseJob('job-1');
-        expect(result.companyId).toBeUndefined();
-      });
     });
   });
 

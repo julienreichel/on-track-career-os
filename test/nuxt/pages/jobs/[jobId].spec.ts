@@ -7,7 +7,6 @@ import { createTestI18n } from '../../../utils/createTestI18n';
 
 const mockLoadJobWithRelations = vi.fn();
 const mockUpdateJob = vi.fn();
-const mockReanalyseJob = vi.fn();
 
 const baseCompany = {
   id: 'company-1',
@@ -40,12 +39,11 @@ const jobAnalysisMock = {
   jobs: ref([]),
   selectedJob,
   listJobs: vi.fn(),
-  createJobFromRawText: vi.fn(),
+  createAnalyzedJobFromRawText: vi.fn(),
   deleteJob: vi.fn(),
   loadJob: vi.fn(),
   loadJobWithRelations: mockLoadJobWithRelations,
   updateJob: mockUpdateJob,
-  reanalyseJob: mockReanalyseJob,
   loading: ref(false),
   error: ref(null),
 };

@@ -54,8 +54,9 @@ export function useJobAnalysis() {
     return result;
   };
 
-  const createJobFromRawText = async (rawText: string) => {
-    const created = await handle(() => service.createJobFromRawText(rawText));
+  const createAnalyzedJobFromRawText = async (rawText: string) => {
+    const ownerId = await auth.getOwnerIdOrThrow();
+    const created = await handle(() => service.createAnalyzedJobFromRawText(rawText, ownerId));
     selectedJob.value = created;
     jobs.value = [created, ...jobs.value];
     return created;
@@ -63,14 +64,6 @@ export function useJobAnalysis() {
 
   const updateJob = async (jobId: string, patch: Partial<JobDescriptionUpdateInput>) => {
     const updated = await handle(() => service.updateJob(jobId, patch));
-    selectedJob.value = updated;
-    jobs.value = jobs.value.map((job) => (job.id === updated.id ? updated : job));
-    return updated;
-  };
-
-  const reanalyseJob = async (jobId: string) => {
-    const ownerId = await auth.getOwnerIdOrThrow();
-    const updated = await handle(() => service.reanalyseJob(jobId, ownerId));
     selectedJob.value = updated;
     jobs.value = jobs.value.map((job) => (job.id === updated.id ? updated : job));
     return updated;
@@ -99,9 +92,8 @@ export function useJobAnalysis() {
     listJobs,
     loadJob,
     loadJobWithRelations,
-    createJobFromRawText,
+    createAnalyzedJobFromRawText,
     updateJob,
-    reanalyseJob,
     deleteJob,
     resetState,
   };

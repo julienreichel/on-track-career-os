@@ -21,9 +21,8 @@ describe('useJobAnalysis', () => {
     listJobs: ReturnType<typeof vi.fn>;
     getFullJobDescription: ReturnType<typeof vi.fn>;
     getJobWithRelations: ReturnType<typeof vi.fn>;
-    createJobFromRawText: ReturnType<typeof vi.fn>;
+    createAnalyzedJobFromRawText: ReturnType<typeof vi.fn>;
     updateJob: ReturnType<typeof vi.fn>;
-    reanalyseJob: ReturnType<typeof vi.fn>;
     deleteJob: ReturnType<typeof vi.fn>;
   };
 
@@ -32,9 +31,8 @@ describe('useJobAnalysis', () => {
       listJobs: vi.fn(),
       getFullJobDescription: vi.fn(),
       getJobWithRelations: vi.fn(),
-      createJobFromRawText: vi.fn(),
+      createAnalyzedJobFromRawText: vi.fn(),
       updateJob: vi.fn(),
-      reanalyseJob: vi.fn(),
       deleteJob: vi.fn(),
     };
 
@@ -56,12 +54,12 @@ describe('useJobAnalysis', () => {
     expect(jobs.value).toEqual(mockJobs);
   });
 
-  it('should create job from raw text', async () => {
-    const created = { id: 'job-1', title: 'Draft', status: 'draft' } as JobDescription;
-    mockService.createJobFromRawText.mockResolvedValue(created);
+  it('should create analyzed job from raw text', async () => {
+    const created = { id: 'job-2', title: 'Analyst', status: 'complete' } as JobDescription;
+    mockService.createAnalyzedJobFromRawText.mockResolvedValue(created);
 
-    const { selectedJob, jobs, createJobFromRawText } = useJobAnalysis();
-    await createJobFromRawText('New job');
+    const { selectedJob, jobs, createAnalyzedJobFromRawText } = useJobAnalysis();
+    await createAnalyzedJobFromRawText('Parsed job text');
 
     expect(selectedJob.value).toEqual(created);
     expect(jobs.value[0]).toEqual(created);
@@ -99,20 +97,6 @@ describe('useJobAnalysis', () => {
     await updateJob('job-1', { title: 'Updated' } as Partial<JobDescriptionUpdateInput>);
 
     expect(mockService.updateJob).toHaveBeenCalledWith('job-1', { title: 'Updated' });
-    expect(selectedJob.value).toEqual(updated);
-    expect(jobs.value[0]).toEqual(updated);
-  });
-
-  it('should reanalyse job and update lists', async () => {
-    const updated = { id: 'job-1', title: 'Analyzed', status: 'analyzed' } as JobDescription;
-    mockService.reanalyseJob.mockResolvedValue(updated);
-
-    const { jobs, selectedJob, reanalyseJob } = useJobAnalysis();
-    jobs.value = [{ id: 'job-1', title: 'Draft' } as JobDescription];
-
-    await reanalyseJob('job-1');
-
-    expect(mockService.reanalyseJob).toHaveBeenCalledWith('job-1', 'user-1::user-1');
     expect(selectedJob.value).toEqual(updated);
     expect(jobs.value[0]).toEqual(updated);
   });

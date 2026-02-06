@@ -3,7 +3,6 @@ import { useJobUpload } from '@/composables/useJobUpload';
 
 const mocks = vi.hoisted(() => {
   const mockCreateJob = vi.fn();
-  const mockReanalyseJob = vi.fn();
   const mockGetText = vi.fn();
   const mockDestroy = vi.fn();
 
@@ -15,14 +14,13 @@ const mocks = vi.hoisted(() => {
 
   return {
     mockCreateJob,
-    mockReanalyseJob,
     mockGetText,
     mockDestroy,
     PDFParseMock,
   };
 });
 
-const { mockCreateJob, mockReanalyseJob, mockGetText, mockDestroy } = mocks;
+const { mockCreateJob, mockGetText, mockDestroy } = mocks;
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -32,8 +30,7 @@ vi.mock('vue-i18n', () => ({
 
 vi.mock('@/composables/useJobAnalysis', () => ({
   useJobAnalysis: () => ({
-    createJobFromRawText: mockCreateJob,
-    reanalyseJob: mockReanalyseJob,
+    createAnalyzedJobFromRawText: mockCreateJob,
   }),
 }));
 
@@ -62,22 +59,19 @@ describe('useJobUpload', () => {
   it('processes a PDF file and returns analyzed job', async () => {
     mockGetText.mockResolvedValueOnce({ text: 'A'.repeat(500) });
     const analyzedJob = { id: 'job-123', title: 'Role' };
-    mockCreateJob.mockResolvedValueOnce({ id: 'draft-1' });
-    mockReanalyseJob.mockResolvedValueOnce(analyzedJob);
+    mockCreateJob.mockResolvedValueOnce(analyzedJob);
 
     const jobUpload = useJobUpload();
     const job = await jobUpload.handleFileSelected(createPdfFile());
 
     expect(job).toEqual(analyzedJob);
     expect(mockCreateJob).toHaveBeenCalled();
-    expect(mockReanalyseJob).toHaveBeenCalled();
     expect(jobUpload.errorMessage.value).toBeNull();
   });
 
   it('processes text file using File.text()', async () => {
     const analyzedJob = { id: 'job-999', title: 'Role' };
-    mockCreateJob.mockResolvedValueOnce({ id: 'draft-2' });
-    mockReanalyseJob.mockResolvedValueOnce(analyzedJob);
+    mockCreateJob.mockResolvedValueOnce(analyzedJob);
 
     const jobUpload = useJobUpload();
     const job = await jobUpload.handleFileSelected(createTextFile('B'.repeat(500)));
@@ -99,8 +93,7 @@ describe('useJobUpload', () => {
 
   it('captures errors from analysis', async () => {
     mockGetText.mockResolvedValueOnce({ text: 'A'.repeat(500) });
-    mockCreateJob.mockResolvedValueOnce({ id: 'draft-3' });
-    mockReanalyseJob.mockRejectedValueOnce(new Error('analysis failed'));
+    mockCreateJob.mockRejectedValueOnce(new Error('analysis failed'));
 
     const jobUpload = useJobUpload();
     const job = await jobUpload.handleFileSelected(createPdfFile());
@@ -111,8 +104,7 @@ describe('useJobUpload', () => {
 
   it('maps non-job error code to i18n message', async () => {
     mockGetText.mockResolvedValueOnce({ text: 'A'.repeat(500) });
-    mockCreateJob.mockResolvedValueOnce({ id: 'draft-5' });
-    mockReanalyseJob.mockRejectedValueOnce(new Error('Not a job description'));
+    mockCreateJob.mockRejectedValueOnce(new Error('Not a job description'));
 
     const jobUpload = useJobUpload();
     const job = await jobUpload.handleFileSelected(createPdfFile());
@@ -123,15 +115,13 @@ describe('useJobUpload', () => {
 
   it('processes pasted text and returns analyzed job', async () => {
     const analyzedJob = { id: 'job-555', title: 'Role' };
-    mockCreateJob.mockResolvedValueOnce({ id: 'draft-4' });
-    mockReanalyseJob.mockResolvedValueOnce(analyzedJob);
+    mockCreateJob.mockResolvedValueOnce(analyzedJob);
 
     const jobUpload = useJobUpload();
     const job = await jobUpload.handleTextSubmitted('C'.repeat(500));
 
     expect(job).toEqual(analyzedJob);
     expect(mockCreateJob).toHaveBeenCalled();
-    expect(mockReanalyseJob).toHaveBeenCalled();
     expect(jobUpload.errorMessage.value).toBeNull();
   });
 });
