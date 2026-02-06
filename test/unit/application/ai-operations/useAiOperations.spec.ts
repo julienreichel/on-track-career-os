@@ -105,6 +105,7 @@ describe('useAiOperations', () => {
       behaviours: ['Bias for action'],
       successCriteria: ['Increased adoption'],
       explicitPains: ['Fragmented data'],
+      atsKeywords: [],
     };
 
     mockService.parseJobDescription.mockResolvedValue(mockParsedJob);
@@ -282,6 +283,7 @@ describe('useAiOperations', () => {
       behaviours: [],
       successCriteria: [],
       explicitPains: [],
+      atsKeywords: [],
     };
     experiences.value = [];
     starStories.value = [

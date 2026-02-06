@@ -87,8 +87,6 @@ The team currently struggles with fragmented messaging and lack of unified posit
 
     const parsed = await repository.parseJobDescription(jobText);
 
-    console.log(parsed);
-
     expect(typeof parsed.title).toBe('string');
     expect(typeof parsed.roleSummary).toBe('string');
     expect(Array.isArray(parsed.responsibilities)).toBe(true);

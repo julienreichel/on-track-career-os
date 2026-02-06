@@ -197,9 +197,7 @@ describe('AiOperationsService', () => {
     it('should throw when repository fails', async () => {
       mockRepo.parseJobDescription.mockRejectedValue(new Error('AI failure'));
 
-      await expect(service.parseJobDescription('Valid text')).rejects.toThrow(
-        'Failed to parse job description: AI failure'
-      );
+      await expect(service.parseJobDescription('Valid text')).rejects.toThrow('AI failure');
     });
 
     it('should throw when structure invalid', async () => {
@@ -208,6 +206,22 @@ describe('AiOperationsService', () => {
       await expect(service.parseJobDescription('Valid text')).rejects.toThrow(
         'Invalid job description parsing result structure'
       );
+    });
+
+    it('should surface non-job errors from repository', async () => {
+      mockRepo.parseJobDescription.mockRejectedValue(
+        new Error('ERR_NON_JOB_DESCRIPTION')
+      );
+
+      await expect(service.parseJobDescription('Random text')).rejects.toThrow(
+        'ERR_NON_JOB_DESCRIPTION'
+      );
+    });
+
+    it('should surface NonJobSchema errors from repository', async () => {
+      mockRepo.parseJobDescription.mockRejectedValue(new Error('NonJobSchema'));
+
+      await expect(service.parseJobDescription('Random text')).rejects.toThrow('NonJobSchema');
     });
   });
 

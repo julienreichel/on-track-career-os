@@ -63,8 +63,8 @@ export function useJobUpload() {
       captureEvent('job_uploaded');
       return analyzed;
     } catch (error) {
-      errorMessage.value =
-        error instanceof Error ? error.message : t('ingestion.job.upload.errors.generic');
+      const message = error instanceof Error ? error.message : '';
+      errorMessage.value = message || t('ingestion.job.upload.errors.generic');
       selectedFile.value = null;
       throw error;
     } finally {
@@ -94,8 +94,8 @@ export function useJobUpload() {
       const job = await processFile(file);
       return job;
     } catch (error) {
-      errorMessage.value =
-        error instanceof Error ? error.message : t('ingestion.job.upload.errors.generic');
+      const message = error instanceof Error ? error.message : '';
+      errorMessage.value = message || t('ingestion.job.upload.errors.generic');
       return null;
     }
   }

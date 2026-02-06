@@ -285,7 +285,17 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     const { data, errors } = await this.client.parseJobDescription({ jobText }, gqlOptions());
 
     if (errors && errors.length > 0) {
-      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+      const message =
+        errors
+          .map((error) => {
+            if (!error || typeof error !== 'object') return '';
+            if ('message' in error) {
+              return String((error as Record<string, unknown>).message ?? '');
+            }
+            return '';
+          })
+          .filter((value) => value.length > 0)[0] || 'AI operation failed';
+      throw new Error(message);
     }
 
     if (!data) {

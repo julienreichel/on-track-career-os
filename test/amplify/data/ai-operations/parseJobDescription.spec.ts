@@ -99,7 +99,7 @@ describe('ai.parseJobDescription', () => {
     expect(response.atsKeywords).toEqual([]);
   });
 
-  it('should sanitize poorly structured outputs', async () => {
+  it('should throw when output lacks job fields', async () => {
     const malformedOutput = {
       title: 123,
       seniorityLevel: null,
@@ -114,18 +114,26 @@ describe('ai.parseJobDescription', () => {
 
     mockSend.mockResolvedValue(buildBedrockResponse(malformedOutput));
 
-    const response = await handler({
-      arguments: { jobText: 'Badly formatted JD' },
-    });
+    await expect(
+      handler({
+        arguments: { jobText: 'Badly formatted JD' },
+      })
+    ).rejects.toThrow(
+      'ERR_NON_JOB_DESCRIPTION'
+    );
+  });
 
-    expect(response.title).toBe('');
-    expect(response.seniorityLevel).toBe('');
-    expect(response.roleSummary).toBe('');
-    expect(response.responsibilities).toEqual([]);
-    expect(response.requiredSkills).toEqual([]);
-    expect(response.behaviours).toEqual([]);
-    expect(response.successCriteria).toEqual([]);
-    expect(response.explicitPains).toEqual([]);
-    expect(response.atsKeywords).toEqual([]);
+  it('should throw when input is not a job description', async () => {
+    const nonJobOutput = {
+      error: 'NonJobSchema',
+    };
+
+    mockSend.mockResolvedValue(buildBedrockResponse(nonJobOutput));
+
+    await expect(
+      handler({
+        arguments: { jobText: 'Random content' },
+      })
+    ).rejects.toThrow('ERR_NON_JOB_DESCRIPTION');
   });
 });

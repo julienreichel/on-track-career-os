@@ -43,9 +43,13 @@ RULES:
 - atsKeywords = important keywords and phrases that ATS (Applicant Tracking Systems) would look for (skills, tools, technologies, certifications, industry terms).
 - You MAY infer keywords that a reasonable ATS/resume screener would expect based on the job text.
 - Inference must be conservative: infer only when strongly supported by the text.   
+- If the input is NOT a job description, return ONLY the NonJobSchema.
+- If the input IS a job description, return ONLY the JobSchema.
+- In NonJobSchema, "error" must be a short human-readable reason. Never return schema names.
 - No markdown, explanations, or additional commentary.`;
 
-const OUTPUT_SCHEMA = `{
+const OUTPUT_SCHEMA = `JobSchema:
+{
   "title": "string",
   "seniorityLevel": "string",
   "roleSummary": "string",
@@ -55,6 +59,11 @@ const OUTPUT_SCHEMA = `{
   "successCriteria": ["string"],
   "explicitPains": ["string"],
   "atsKeywords": ["string"]
+}
+
+NonJobSchema:
+{
+  "error": "string"
 }`;
 
 export interface ParseJobDescriptionInput {
@@ -73,6 +82,10 @@ export interface ParseJobDescriptionOutput {
   atsKeywords: string[];
 }
 
+const NON_JOB_ERROR_CODE = 'ERR_NON_JOB_DESCRIPTION';
+const NON_JOB_SCHEMA_SENTINEL = 'nonjobschema';
+const JOB_SCHEMA_SENTINEL = 'jobschema';
+
 function sanitizeString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
@@ -87,7 +100,7 @@ function sanitizeStringArray(value: unknown): string[] {
     .filter((item) => item.length > 0);
 }
 
-function validateOutput(parsed: Partial<ParseJobDescriptionOutput>): ParseJobDescriptionOutput {
+function coerceJobOutput(parsed: Partial<ParseJobDescriptionOutput>): ParseJobDescriptionOutput {
   const title = sanitizeString(parsed.title);
   const seniorityLevel = sanitizeString(parsed.seniorityLevel);
   const roleSummary = sanitizeString(parsed.roleSummary);
@@ -111,16 +124,44 @@ function validateOutput(parsed: Partial<ParseJobDescriptionOutput>): ParseJobDes
   };
 }
 
+function validateOutput(parsed: Partial<ParseJobDescriptionOutput> | { error?: unknown })
+  : ParseJobDescriptionOutput {
+  const errorValue = (parsed as { error?: unknown }).error;
+  if (typeof errorValue === 'string' && errorValue.trim().length > 0) {
+    const normalized = errorValue.trim();
+    const normalizedKey = normalized.toLowerCase();
+    if (normalizedKey === NON_JOB_SCHEMA_SENTINEL || normalizedKey === JOB_SCHEMA_SENTINEL) {
+      throw new Error(NON_JOB_ERROR_CODE);
+    }
+    throw new Error(normalized);
+  }
+
+  const job = coerceJobOutput(parsed as Partial<ParseJobDescriptionOutput>);
+  const hasCoreFields =
+    job.title.length > 0 ||
+    job.roleSummary.length > 0 ||
+    job.responsibilities.length > 0 ||
+    job.requiredSkills.length > 0 ||
+    job.atsKeywords.length > 0;
+
+  if (!hasCoreFields) {
+    throw new Error(NON_JOB_ERROR_CODE);
+  }
+
+  return job;
+}
+
 function buildUserPrompt(jobText: string): string {
   return `Extract a structured JobDescription object from the following job post.
 
 Job Description:
 ${jobText}
 
-Return ONLY JSON with this exact schema:
+Return ONLY JSON with one of these schemas:
 ${OUTPUT_SCHEMA}
 
-Remember: do not invent data and leave strings empty or arrays empty if not mentioned.`;
+Remember: do not invent data and leave strings empty or arrays empty if not mentioned.
+If returning NonJobSchema, "error" must be a short human-readable reason (not a schema name).`;
 }
 
 export const handler = async (event: {

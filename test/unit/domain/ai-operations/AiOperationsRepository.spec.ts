@@ -66,6 +66,7 @@ describe('AiOperationsRepository', () => {
         behaviours: ['Ownership'],
         successCriteria: ['Adoption'],
         explicitPains: ['Fragmentation'],
+        atsKeywords: ['Product Manager'],
       };
 
       mockClient.parseJobDescription.mockResolvedValue({
@@ -88,7 +89,18 @@ describe('AiOperationsRepository', () => {
         errors: [{ message: 'AI failure' }],
       });
 
-      await expect(repository.parseJobDescription('Broken')).rejects.toThrow('AI operation failed');
+      await expect(repository.parseJobDescription('Broken')).rejects.toThrow('AI failure');
+    });
+
+    it('should map non-job errors to error code', async () => {
+      mockClient.parseJobDescription.mockResolvedValue({
+        data: null,
+        errors: [{ message: 'Not a job description' }],
+      });
+
+      await expect(repository.parseJobDescription('Not a job')).rejects.toThrow(
+        'Not a job description'
+      );
     });
 
     it('should throw when no data returned', async () => {

@@ -1184,7 +1184,7 @@
       "createTitle": "Analyze Job",
       "createDescription": "Upload a job description for analysis",
       "errors": {
-        "generic": "Something went wrong while saving this job."
+        "generic": "Something went wrong while analyzing this job."
       },
       "fields": {
         "roleSummary": {

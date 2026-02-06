@@ -218,6 +218,7 @@ describe('JobDescriptionService', () => {
         behaviours: ['Ownership'],
         successCriteria: ['Goal'],
         explicitPains: ['Pain'],
+        atsKeywords: ['Keyword'],
       } as ParsedJobDescription;
 
       const mockUpdated = { id: 'job-1', ...parsed, status: 'complete' } as JobDescription;

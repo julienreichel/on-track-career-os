@@ -140,19 +140,13 @@ export class AiOperationsService {
       throw new Error('Job description text cannot be empty');
     }
 
-    try {
-      const result = await this.repo.parseJobDescription(jobText);
+    const result = await this.repo.parseJobDescription(jobText);
 
-      if (!isParsedJobDescription(result)) {
-        throw new Error('Invalid job description parsing result structure');
-      }
-
-      return result;
-    } catch (error) {
-      throw new Error(
-        `Failed to parse job description: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+    if (!isParsedJobDescription(result)) {
+      throw new Error('Invalid job description parsing result structure');
     }
+
+    return result;
   }
 
   /**

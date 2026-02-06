@@ -109,6 +109,18 @@ describe('useJobUpload', () => {
     expect(jobUpload.errorMessage.value).toBe('analysis failed');
   });
 
+  it('maps non-job error code to i18n message', async () => {
+    mockGetText.mockResolvedValueOnce({ text: 'A'.repeat(500) });
+    mockCreateJob.mockResolvedValueOnce({ id: 'draft-5' });
+    mockReanalyseJob.mockRejectedValueOnce(new Error('Not a job description'));
+
+    const jobUpload = useJobUpload();
+    const job = await jobUpload.handleFileSelected(createPdfFile());
+
+    expect(job).toBeNull();
+    expect(jobUpload.errorMessage.value).toBe('Not a job description');
+  });
+
   it('processes pasted text and returns analyzed job', async () => {
     const analyzedJob = { id: 'job-555', title: 'Role' };
     mockCreateJob.mockResolvedValueOnce({ id: 'draft-4' });
