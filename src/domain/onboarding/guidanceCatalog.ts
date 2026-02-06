@@ -520,7 +520,7 @@ const getApplicationsPhase2anner = (
   context: GuidanceContext,
   material: TailoredMaterialKey
 ): GuidanceBanner | undefined => {
-  if (!state || !state.phase1.isComplete) {
+  if (!state?.phase1.isComplete) {
     return undefined;
   }
 

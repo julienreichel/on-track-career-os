@@ -2,14 +2,19 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useToast } from '#imports';
 import { useUserProgress } from '@/composables/useUserProgress';
+import type { UseUserProgress } from '@/composables/useUserProgress';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import { badgeCatalogById, computeEligibleBadges, diffBadges } from '@/domain/badges';
 import type { BadgeDefinition, BadgeId } from '@/domain/badges';
 
-export function useBadges() {
+type UseBadgesOptions = {
+  progress?: UseUserProgress;
+};
+
+export function useBadges(options: UseBadgesOptions = {}) {
   const { t } = useI18n();
   const toast = useToast();
-  const progress = useUserProgress();
+  const progress = options.progress ?? useUserProgress();
   const profileService = new UserProfileService();
 
   const earnedBadges = ref<BadgeId[]>([]);

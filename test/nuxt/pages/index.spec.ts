@@ -5,8 +5,6 @@ import { createRouter, createMemoryHistory } from 'vue-router';
 import { ref } from 'vue';
 import IndexPage from '@/pages/index.vue';
 
-const mockUserId = ref<string | null>(null);
-const mockExperienceList = vi.fn();
 const mockBadges = {
   earnedBadgeDefinitions: ref([]),
   load: vi.fn(),
@@ -19,20 +17,10 @@ const mockActiveJobs = {
 const mockProgress = {
   state: ref<{ phase?: string } | null>({ phase: 'bonus' }),
   profile: ref<{ fullName?: string | null } | null>({ fullName: 'Ava Test' }),
+  inputs: ref<{ experienceCount: number } | null>(null),
+  snapshot: ref(null),
   load: vi.fn(),
 };
-
-vi.mock('@/composables/useAuthUser', () => ({
-  useAuthUser: () => ({
-    userId: mockUserId,
-  }),
-}));
-
-vi.mock('@/domain/experience/ExperienceRepository', () => ({
-  ExperienceRepository: vi.fn(() => ({
-    list: mockExperienceList,
-  })),
-}));
 
 vi.mock('@/composables/useBadges', () => ({
   useBadges: () => mockBadges,
@@ -108,21 +96,17 @@ async function mountPage() {
 
 describe('Index Page Component', () => {
   beforeEach(() => {
-    mockUserId.value = null;
-    mockExperienceList.mockReset();
     mockBadges.earnedBadgeDefinitions.value = [];
     mockActiveJobs.loading.value = false;
     mockActiveJobs.states.value = [];
     mockProgress.state.value = { phase: 'bonus' };
     mockProgress.profile.value = { fullName: 'Ava Test' };
+    mockProgress.inputs.value = null;
   });
 
   it('renders header and feature cards without CV upload card', async () => {
-    mockExperienceList.mockResolvedValue([]);
+    mockProgress.inputs.value = { experienceCount: 0 };
     const wrapper = await mountPage();
-
-    mockUserId.value = 'user-1';
-    await flushPromises();
 
     expect(wrapper.find('.u-page-header').text()).toContain(
       i18n.global.t('home.title', { name: 'Ava Test' })
@@ -135,12 +119,9 @@ describe('Index Page Component', () => {
   });
 
   it('shows progress guidance and active jobs when onboarding is complete', async () => {
-    mockExperienceList.mockResolvedValue([{ id: 'exp-1' }]);
+    mockProgress.inputs.value = { experienceCount: 1 };
     mockActiveJobs.states.value = [{ jobId: 'job-1' }];
     const wrapper = await mountPage();
-
-    mockUserId.value = 'user-1';
-    await flushPromises();
 
     expect(wrapper.find('.progress-guidance-section').exists()).toBe(true);
     expect(wrapper.find('.active-jobs-card').exists()).toBe(true);
@@ -148,12 +129,9 @@ describe('Index Page Component', () => {
   });
 
   it('renders badge grid when badges are earned', async () => {
-    mockExperienceList.mockResolvedValue([{ id: 'exp-1' }]);
+    mockProgress.inputs.value = { experienceCount: 1 };
     mockBadges.earnedBadgeDefinitions.value = [{ id: 'badge-1' }];
     const wrapper = await mountPage();
-
-    mockUserId.value = 'user-1';
-    await flushPromises();
 
     expect(wrapper.find('.badge-grid-card').exists()).toBe(true);
   });

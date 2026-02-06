@@ -68,8 +68,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
-import { useAuthUser } from '@/composables/useAuthUser';
 import ProgressGuidanceSection from '@/components/onboarding/ProgressGuidanceSection.vue';
 import ActiveJobsCard from '@/components/dashboard/ActiveJobsCard.vue';
 import { useBadges } from '@/composables/useBadges';
@@ -79,13 +77,16 @@ import { useUserProgress } from '@/composables/useUserProgress';
 
 // Home page - requires authentication
 const { t } = useI18n();
-const { userId } = useAuthUser();
-
 const showOnboarding = ref(false);
-const experienceRepo = new ExperienceRepository();
-const badges = useBadges();
-const activeJobs = useActiveJobsDashboard();
 const progress = useUserProgress();
+const badges = useBadges({ progress });
+const activeJobs = useActiveJobsDashboard({
+  materials: {
+    cvs: computed(() => progress.snapshot?.value?.cvs ?? []),
+    coverLetters: computed(() => progress.snapshot?.value?.coverLetters ?? []),
+    speechBlocks: computed(() => progress.snapshot?.value?.speechBlocks ?? []),
+  },
+});
 const welcomeName = computed(
   () => progress.profile.value?.fullName?.trim() || t('home.fallbackName')
 );
@@ -103,16 +104,15 @@ onMounted(() => {
   void progress.load();
 });
 
-// Check if user has any experiences when userId is available
-watch(userId, async (newUserId) => {
-  if (!newUserId) return;
-
-  try {
-    const experiences = await experienceRepo.list(newUserId);
-    showOnboarding.value = !experiences || experiences.length === 0;
-  } catch (error) {
-    console.error('Error checking experiences:', error);
-    showOnboarding.value = true;
-  }
-});
+// Check if user has any experiences when progress inputs are available
+watch(
+  () => progress.inputs?.value ?? null,
+  (inputs) => {
+    if (!inputs) {
+      return;
+    }
+    showOnboarding.value = inputs.experienceCount === 0;
+  },
+  { immediate: true }
+);
 </script>

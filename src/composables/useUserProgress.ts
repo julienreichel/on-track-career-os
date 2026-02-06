@@ -12,6 +12,10 @@ import {
 
 export type UseUserProgress = ReturnType<typeof useUserProgress>;
 
+type ProgressSnapshot = NonNullable<
+  Awaited<ReturnType<UserProfileService['getProgressSnapshot']>>
+>;
+
 export function useUserProgress() {
   const auth = useAuthUser();
   const jobAnalysis = useJobAnalysis();
@@ -21,6 +25,7 @@ export function useUserProgress() {
   const state = ref<UserProgressState | null>(null);
   const profile = ref<UserProfile | null>(null);
   const inputs = ref<ProgressInputs | null>(null);
+  const snapshot = ref<ProgressSnapshot | null>(null);
   const hasLoaded = ref(false);
 
   const nextAction = computed(() => (state.value ? getNextAction(state.value) : null));
@@ -50,24 +55,28 @@ export function useUserProgress() {
         await jobAnalysis.listJobs();
       }
 
-      const snapshot = await profileService.getProgressSnapshot(userId);
-      if (!snapshot) {
+      const loadedSnapshot = await profileService.getProgressSnapshot(userId);
+      if (!loadedSnapshot) {
         throw new Error('User profile not found');
       }
 
       const jobs = jobAnalysis.jobs.value;
-      const tailoredCvs = snapshot.cvs.filter((doc) => Boolean(doc.jobId));
-      const tailoredCoverLetters = snapshot.coverLetters.filter((doc) => Boolean(doc.jobId));
-      const tailoredSpeechBlocks = snapshot.speechBlocks.filter((doc) => Boolean(doc.jobId));
+      const tailoredCvs = loadedSnapshot.cvs.filter((doc) => Boolean(doc.jobId));
+      const tailoredCoverLetters = loadedSnapshot.coverLetters.filter((doc) =>
+        Boolean(doc.jobId)
+      );
+      const tailoredSpeechBlocks = loadedSnapshot.speechBlocks.filter((doc) =>
+        Boolean(doc.jobId)
+      );
 
       const progressInputs: ProgressInputs = {
-        profile: snapshot.profile,
-        cvCount: snapshot.cvs.length,
-        experienceCount: snapshot.experiences.length,
-        storyCount: snapshot.stories.length,
-        personalCanvasCount: snapshot.personalCanvas ? 1 : 0,
+        profile: loadedSnapshot.profile,
+        cvCount: loadedSnapshot.cvs.length,
+        experienceCount: loadedSnapshot.experiences.length,
+        storyCount: loadedSnapshot.stories.length,
+        personalCanvasCount: loadedSnapshot.personalCanvas ? 1 : 0,
         jobCount: jobs.length,
-        matchingSummaryCount: snapshot.matchingSummaries.length,
+        matchingSummaryCount: loadedSnapshot.matchingSummaries.length,
         tailoredCvCount: tailoredCvs.length,
         tailoredCoverLetterCount: tailoredCoverLetters.length,
         tailoredSpeechCount: tailoredSpeechBlocks.length,
@@ -75,7 +84,8 @@ export function useUserProgress() {
         hasCustomTemplate: false, // TODO: Implement custom template tracking
       };
 
-      profile.value = snapshot.profile;
+      snapshot.value = loadedSnapshot;
+      profile.value = loadedSnapshot.profile;
       inputs.value = progressInputs;
       state.value = computeUserProgressState(progressInputs);
       hasLoaded.value = true;
@@ -84,6 +94,7 @@ export function useUserProgress() {
       state.value = null;
       profile.value = null;
       inputs.value = null;
+      snapshot.value = null;
       hasLoaded.value = false;
       console.error('[useUserProgress] Failed to load progress', err);
     } finally {
@@ -100,6 +111,7 @@ export function useUserProgress() {
     state,
     profile,
     inputs,
+    snapshot,
     nextAction,
     unlockableFeatures,
     loading,

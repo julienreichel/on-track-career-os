@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue';
+import { computed, ref, unref } from 'vue';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { useCvDocuments } from '@/composables/useCvDocuments';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
@@ -116,7 +116,25 @@ const resolveCta = (job: JobDescription, missing: JobMaterialKey[]) => {
   };
 };
 
-export function useActiveJobsDashboard() {
+type MaterialSource<T> = T[] | null | undefined | { value: T[] | null };
+
+type ActiveJobsDashboardOptions = {
+  materials?: {
+    cvs?: MaterialSource<CVDocument>;
+    coverLetters?: MaterialSource<CoverLetter>;
+    speechBlocks?: MaterialSource<SpeechBlock>;
+  };
+};
+
+const resolveMaterialItems = <T>(source: MaterialSource<T>, fallback: T[]): T[] => {
+  if (!source) {
+    return fallback;
+  }
+  const value = unref(source as { value?: T[] | null } | T[] | null | undefined);
+  return Array.isArray(value) ? value : fallback;
+};
+
+export function useActiveJobsDashboard(options: ActiveJobsDashboardOptions = {}) {
   const jobAnalysis = useJobAnalysis();
   const cvDocuments = useCvDocuments();
   const coverLetters = useCoverLetters();
@@ -134,12 +152,15 @@ export function useActiveJobsDashboard() {
     error.value = null;
 
     try {
-      await Promise.all([
-        jobAnalysis.listJobs(),
-        cvDocuments.loadAll(),
-        coverLetters.loadAll(),
-        speechBlocks.loadAll(),
-      ]);
+      const loadCvs = options.materials?.cvs ? Promise.resolve() : cvDocuments.loadAll();
+      const loadCoverLetters = options.materials?.coverLetters
+        ? Promise.resolve()
+        : coverLetters.loadAll();
+      const loadSpeechBlocks = options.materials?.speechBlocks
+        ? Promise.resolve()
+        : speechBlocks.loadAll();
+
+      await Promise.all([jobAnalysis.listJobs(), loadCvs, loadCoverLetters, loadSpeechBlocks]);
       loaded.value = true;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -151,9 +172,18 @@ export function useActiveJobsDashboard() {
   const jobs = computed(() => jobAnalysis.jobs.value ?? []);
 
   const states = computed<JobApplicationState[]>(() => {
-    const cvItems = (cvDocuments.items.value ?? []) as CVDocument[];
-    const coverItems = (coverLetters.items.value ?? []) as CoverLetter[];
-    const speechItems = (speechBlocks.items.value ?? []) as SpeechBlock[];
+    const cvItems = resolveMaterialItems(
+      options.materials?.cvs,
+      (cvDocuments.items.value ?? []) as CVDocument[]
+    );
+    const coverItems = resolveMaterialItems(
+      options.materials?.coverLetters,
+      (coverLetters.items.value ?? []) as CoverLetter[]
+    );
+    const speechItems = resolveMaterialItems(
+      options.materials?.speechBlocks,
+      (speechBlocks.items.value ?? []) as SpeechBlock[]
+    );
 
     const mapped = jobs.value.map((job) => {
       const jobId = job.id;
