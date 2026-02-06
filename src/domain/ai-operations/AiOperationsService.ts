@@ -105,21 +105,28 @@ export class AiOperationsService {
       throw new Error('Language cannot be empty');
     }
 
+    let result: ParsedCV;
     try {
-      const result = await this.repo.parseCvText(cvText, language);
+      const parsed = await this.repo.parseCvText(cvText, language);
 
       // Validate output structure
-      if (!isParsedCV(result)) {
+      if (!isParsedCV(parsed)) {
         throw new Error('Invalid CV parsing result structure');
       }
 
-      return result;
+      result = parsed;
     } catch (error) {
       // Re-throw with more context
       throw new Error(
         `Failed to parse CV text: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
+
+    if (!result.isCv) {
+      throw new Error(result.errorMessage || 'Document does not appear to be a CV');
+    }
+
+    return result;
   }
 
   /**

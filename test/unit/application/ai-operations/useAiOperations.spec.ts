@@ -80,6 +80,8 @@ describe('useAiOperations', () => {
       experienceItems: [],
       rawBlocks: [],
       confidence: 0.5,
+      isCv: true,
+      errorMessage: '',
     } as ParsedCV;
     mockService.parseCvText.mockResolvedValue(mockParsedCv);
 
@@ -268,6 +270,8 @@ describe('useAiOperations', () => {
       experienceItems: [],
       rawBlocks: [],
       confidence: 0.5,
+      isCv: true,
+      errorMessage: '',
     } as ParsedCV;
     parsedJobDescription.value = {
       title: 'Example',

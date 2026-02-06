@@ -43,6 +43,9 @@
         "errors": {
           "noTextExtracted": "No text could be extracted from the file.",
           "unknown": "An unknown error occurred",
+          "notCvTitle": "This document isn't a CV",
+          "notCvDescription": "This document doesn't look like a CV. Please upload a CV or resume.",
+          "parsingFailedTitle": "We couldn't parse your CV",
           "parsingFailed": "Failed to parse CV. Please try again or enter experiences manually.",
           "extractionFailed": "Failed to extract experiences. Please try again.",
           "importFailed": "Failed to import experiences. Please try again."

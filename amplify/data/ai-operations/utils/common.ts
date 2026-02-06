@@ -28,6 +28,71 @@ export function extractJson(text: string): string {
 }
 
 /**
+ * Sanitize JSON string by escaping control characters inside string literals.
+ */
+export function sanitizeJsonString(text: string): string {
+  let result = '';
+  let inString = false;
+  let isEscaped = false;
+
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+    const code = char.charCodeAt(0);
+
+    if (inString) {
+      if (isEscaped) {
+        result += char;
+        isEscaped = false;
+        continue;
+      }
+
+      if (char === '\\') {
+        result += char;
+        isEscaped = true;
+        continue;
+      }
+
+      if (char === '"') {
+        inString = false;
+        result += char;
+        continue;
+      }
+
+      if (code < 0x20) {
+        switch (char) {
+          case '\n':
+            result += '\\n';
+            break;
+          case '\r':
+            result += '\\r';
+            break;
+          case '\t':
+            result += '\\t';
+            break;
+          default:
+            result += `\\u${code.toString(16).padStart(4, '0')}`;
+            break;
+        }
+        continue;
+      }
+
+      result += char;
+      continue;
+    }
+
+    if (char === '"') {
+      inString = true;
+      result += char;
+      continue;
+    }
+
+    result += char;
+  }
+
+  return result;
+}
+
+/**
  * Truncate text for logging
  */
 export function truncateForLog(text: string, maxLength: number = MAX_LOG_LENGTH): string {

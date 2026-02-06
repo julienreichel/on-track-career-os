@@ -8,6 +8,7 @@ import {
   INITIAL_TEMPERATURE,
   RETRY_TEMPERATURE,
   extractJson,
+  sanitizeJsonString,
   truncateForLog,
   createLogEntry,
   createErrorLogEntry,
@@ -82,6 +83,19 @@ describe('common utilities', () => {
       const input = '```\n{"data": [{"id": 1}, {"id": 2}]}\n```';
       const result = extractJson(input);
       expect(result).toBe('{"data": [{"id": 1}, {"id": 2}]}');
+    });
+  });
+
+  describe('sanitizeJsonString', () => {
+    it('should escape control characters inside string literals', () => {
+      const input = '{"text":"Line1\nLine2\tTabbed"}';
+      const sanitized = sanitizeJsonString(input);
+      expect(JSON.parse(sanitized)).toEqual({ text: 'Line1\nLine2\tTabbed' });
+    });
+
+    it('should leave valid JSON unchanged', () => {
+      const input = '{"a":1,"b":"ok"}';
+      expect(sanitizeJsonString(input)).toBe(input);
     });
   });
 

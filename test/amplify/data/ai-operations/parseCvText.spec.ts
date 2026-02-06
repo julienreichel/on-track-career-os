@@ -155,6 +155,8 @@ English (Native), Spanish (Fluent)
       ],
       rawBlocks: [],
       confidence: 0.78,
+      isCv: true,
+      errorMessage: '',
     };
   };
 
@@ -200,6 +202,8 @@ English (Native), Spanish (Fluent)
         experienceItems: { experienceType: string; rawBlock: string }[];
         rawBlocks: string[];
         confidence: number;
+        isCv: boolean;
+        errorMessage: string;
       };
       expect(parsed.experienceItems).toHaveLength(2);
       expect(parsed.experienceItems[0]?.rawBlock).toContain('TechCorp');
@@ -217,6 +221,89 @@ English (Native), Spanish (Fluent)
       expect(parsed.profile.seniorityLevel).toBe('Senior');
       expect(parsed.profile.languages).toContain('English');
       expect(parsed.profile.languages).toContain('Spanish');
+      expect(parsed.isCv).toBe(true);
+      expect(parsed.errorMessage).toBe('');
+    });
+
+    it('should flag non-CV content with error message', async () => {
+      const nonCvResponse = {
+        profile: {
+          fullName: '',
+          headline: '',
+          location: '',
+          seniorityLevel: '',
+          primaryEmail: '',
+          primaryPhone: '',
+          workPermitInfo: '',
+          socialLinks: [],
+          aspirations: [],
+          personalValues: [],
+          strengths: [],
+          interests: [],
+          skills: [],
+          certifications: [],
+          languages: [],
+        },
+        experienceItems: [],
+        rawBlocks: [],
+        confidence: 0.05,
+        isCv: false,
+        errorMessage: 'This document does not appear to be a CV.',
+      };
+
+      mockSend.mockResolvedValueOnce({
+        body: Buffer.from(
+          JSON.stringify({
+            output: {
+              message: {
+                content: [{ text: JSON.stringify(nonCvResponse) }],
+              },
+            },
+          })
+        ),
+      });
+
+      const result = (await handler({
+        arguments: { cvText: 'Invoice #1234', language: 'en' },
+      })) as {
+        isCv: boolean;
+        errorMessage: string;
+        confidence: number;
+      };
+
+      expect(result.isCv).toBe(false);
+      expect(result.errorMessage).toBe('This document does not appear to be a CV.');
+      expect(result.confidence).toBeLessThanOrEqual(0.3);
+    });
+
+    it('should return fallback output when model response is invalid JSON', async () => {
+      const invalidResponse = {
+        output: {
+          message: {
+            content: [{ text: 'not json' }],
+          },
+        },
+      };
+
+      mockSend
+        .mockResolvedValueOnce({
+          body: Buffer.from(JSON.stringify(invalidResponse)),
+        })
+        .mockResolvedValueOnce({
+          body: Buffer.from(JSON.stringify(invalidResponse)),
+        });
+
+      const result = (await handler({
+        arguments: { cvText: 'Broken response', language: 'en' },
+      })) as {
+        isCv: boolean;
+        errorMessage: string;
+        experienceItems: unknown[];
+      };
+
+      expect(result.isCv).toBe(false);
+      expect(result.errorMessage.length).toBeGreaterThan(0);
+      expect(result.experienceItems).toEqual([]);
     });
     it('should validate output structure and apply operation-specific fallbacks', async () => {
       const mockBedrockResponse = {

@@ -27,6 +27,8 @@ HARD RULES:
 - Strings must be "" when unknown (never undefined, never null, never "null").
 - Arrays must be [] when empty (never a string).
 - Each experience item must be a single, non-merged item (one role / one education entry / one volunteer entry / one project).
+- If the input is NOT a CV/resume, set "isCv" to false and explain briefly in "errorMessage" (in the target language).
+- If the input IS a CV/resume, set "isCv" to true and set "errorMessage" to "".
 
 EXTRACTION RULES:
 - Extract profile fields if explicitly present: full name, headline, location, seniority level, email, phone, work permit info, social links.
@@ -76,7 +78,9 @@ const OUTPUT_SCHEMA = `{
     }
   ],
   "rawBlocks": ["string"],
-  "confidence": 0.95
+  "confidence": 0.95,
+  "isCv": true,
+  "errorMessage": "string"
 }`;
 
 // Type definitions matching AI Interaction Contract
@@ -104,6 +108,8 @@ export interface ParseCvTextOutput {
   }[];
   rawBlocks: string[];
   confidence: number;
+  isCv: boolean;
+  errorMessage: string;
 }
 
 export interface ParseCvTextInput {
@@ -112,6 +118,25 @@ export interface ParseCvTextInput {
 }
 
 const EXPERIENCE_TYPES = ['work', 'education', 'volunteer', 'project'] as const;
+const DEFAULT_NON_CV_ERROR =
+  'Unable to parse this document as a CV. Please upload a CV or resume.';
+const EMPTY_PROFILE: ParseCvTextOutput['profile'] = {
+  fullName: '',
+  headline: '',
+  location: '',
+  seniorityLevel: '',
+  primaryEmail: '',
+  primaryPhone: '',
+  workPermitInfo: '',
+  socialLinks: [],
+  aspirations: [],
+  personalValues: [],
+  strengths: [],
+  interests: [],
+  skills: [],
+  certifications: [],
+  languages: [],
+};
 
 function sanitizeString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
@@ -170,6 +195,16 @@ function sanitizeExperienceItems(
   });
 
   return items;
+}
+
+function sanitizeBoolean(value: unknown, fallback = false): boolean {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true') return true;
+    if (normalized === 'false') return false;
+  }
+  return fallback;
 }
 
 /**
@@ -238,11 +273,48 @@ function validateOutput(parsedOutput: Partial<ParseCvTextOutput>): ParseCvTextOu
       ? Math.min(boundedConfidence, LOW_CONFIDENCE_CAP)
       : boundedConfidence;
 
+  let isCv = sanitizeBoolean(
+    parsedOutput.isCv ?? (parsedOutput as Record<string, unknown>).is_cv,
+    true
+  );
+  let errorMessage = sanitizeString(
+    parsedOutput.errorMessage ?? (parsedOutput as Record<string, unknown>).error_message
+  );
+
+  const hasProfileData =
+    [
+      profile.fullName,
+      profile.headline,
+      profile.location,
+      profile.seniorityLevel,
+      profile.primaryEmail,
+      profile.primaryPhone,
+      profile.workPermitInfo,
+    ].some((value) => value.length > 0) ||
+    [
+      profile.socialLinks,
+      profile.aspirations,
+      profile.personalValues,
+      profile.strengths,
+      profile.interests,
+      profile.skills,
+      profile.certifications,
+      profile.languages,
+    ].some((items) => items.length > 0);
+  const hasExperienceItems = experienceItems.length > 0;
+
+  if (!hasProfileData && !hasExperienceItems) {
+    isCv = false;
+    errorMessage = DEFAULT_NON_CV_ERROR;
+  }
+
   return {
     profile,
     experienceItems,
     rawBlocks,
     confidence,
+    isCv,
+    errorMessage: isCv ? '' : errorMessage || DEFAULT_NON_CV_ERROR,
   };
 }
 
@@ -265,7 +337,8 @@ Important:
 - rawBlock must preserve the original language (no translation).
 - If a profile field is not found: use "" for strings and [] for arrays.
 - Never output null (not as JSON null and not as the string "null").
-- confidence is a number between 0 and 1.`;
+- confidence is a number between 0 and 1.
+- If the input is not a CV/resume, set isCv=false and provide a short errorMessage in the target language.`;
 }
 
 /**
@@ -279,13 +352,27 @@ export const handler = async (event: {
     event,
     async (args) => {
       const userPrompt = buildUserPrompt(args.cvText, args.language);
-      return invokeAiWithRetry<ParseCvTextOutput>({
-        systemPrompt: SYSTEM_PROMPT,
-        userPrompt,
-        outputSchema: OUTPUT_SCHEMA,
-        validate: validateOutput,
-        operationName: 'parseCvText',
-      });
+      try {
+        return await invokeAiWithRetry<ParseCvTextOutput>({
+          systemPrompt: SYSTEM_PROMPT,
+          userPrompt,
+          outputSchema: OUTPUT_SCHEMA,
+          validate: validateOutput,
+          operationName: 'parseCvText',
+        });
+      } catch (error) {
+        console.error('[parseCvText] Fallback to non-CV output', {
+          message: (error as Error).message,
+        });
+        return validateOutput({
+          profile: EMPTY_PROFILE,
+          experienceItems: [],
+          rawBlocks: [],
+          confidence: 0,
+          isCv: false,
+          errorMessage: DEFAULT_NON_CV_ERROR,
+        });
+      }
     },
     (args) => ({
       cvText: truncateForLog(args.cvText),

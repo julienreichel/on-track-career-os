@@ -82,6 +82,8 @@ describe('useProfileMerge', () => {
     experienceItems: [],
     rawBlocks: [],
     confidence: 0.6,
+    isCv: true,
+    errorMessage: '',
   };
 
   it('should skip update if profile does not exist', async () => {

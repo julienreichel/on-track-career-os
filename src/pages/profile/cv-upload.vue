@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useCvUploadWorkflow } from '@/composables/useCvUploadWorkflow';
@@ -13,6 +14,29 @@ const router = useRouter();
 const workflow = useCvUploadWorkflow();
 const parsing = useCvParsing();
 const importing = useExperienceImport();
+const NON_CV_BACKEND_MESSAGE =
+  'Unable to parse this document as a CV. Please upload a CV or resume.';
+
+const errorTitle = computed(() => {
+  const message = workflow.errorMessage.value;
+  if (!message) return '';
+  if (message === t('ingestion.cv.upload.errors.notCvDescription')) {
+    return t('ingestion.cv.upload.errors.notCvTitle');
+  }
+  if (message === t('ingestion.cv.upload.errors.importFailed')) {
+    return t('ingestion.cv.upload.errors.importFailed');
+  }
+  if (message === t('ingestion.cv.upload.errors.extractionFailed')) {
+    return t('ingestion.cv.upload.errors.extractionFailed');
+  }
+  if (message === t('ingestion.cv.upload.errors.parsingFailed')) {
+    return t('ingestion.cv.upload.errors.parsingFailedTitle');
+  }
+  if (message === t('ingestion.cv.upload.errors.noTextExtracted')) {
+    return t('ingestion.cv.upload.errors.noTextExtracted');
+  }
+  return t('ingestion.cv.upload.errors.unknown');
+});
 
 // Handle file selection and parsing
 async function handleFileSelected(file: File) {
@@ -23,10 +47,13 @@ async function handleFileSelected(file: File) {
     await parsing.parseFile(file);
     workflow.setStep('preview');
   } catch (error) {
-    workflow.setError(
-      error instanceof Error ? error.message : t('ingestion.cv.upload.errors.unknown')
-    );
     workflow.reset();
+    const fallbackMessage = t('ingestion.cv.upload.errors.unknown');
+    let message = error instanceof Error ? error.message : fallbackMessage;
+    if (message === NON_CV_BACKEND_MESSAGE) {
+      message = t('ingestion.cv.upload.errors.notCvDescription');
+    }
+    workflow.setError(message);
   }
 }
 
@@ -86,15 +113,15 @@ function viewExperiences() {
 
     <UPageBody>
       <!-- Error Alert -->
-      <UAlert
-        v-if="workflow.errorMessage.value"
-        icon="i-lucide-alert-triangle"
-        color="error"
-        :title="t('ingestion.cv.upload.errors.unknown')"
-        :description="workflow.errorMessage.value"
-        :close-button="{ icon: 'i-lucide-x', color: 'error', variant: 'link' }"
-        @close="workflow.clearError()"
-      />
+    <UAlert
+      v-if="workflow.errorMessage.value"
+      icon="i-lucide-alert-triangle"
+      color="error"
+      :title="errorTitle"
+      :description="workflow.errorMessage.value"
+      :close-button="{ icon: 'i-lucide-x', color: 'error', variant: 'link' }"
+      @close="workflow.clearError()"
+    />
 
       <!-- Upload Step -->
       <CvUploadStep

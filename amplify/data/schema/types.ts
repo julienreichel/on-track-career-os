@@ -38,6 +38,8 @@ export const schemaTypes = {
     experienceItems: a.ref('ParseCvTextExperienceItemType').array().required(),
     rawBlocks: a.string().array().required(),
     confidence: a.float().required(),
+    isCv: a.boolean().required(),
+    errorMessage: a.string().required(),
   }),
 
   StarStoryType: a.customType({

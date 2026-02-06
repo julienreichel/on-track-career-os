@@ -11,6 +11,7 @@ import {
   INITIAL_TEMPERATURE,
   RETRY_TEMPERATURE,
   extractJson,
+  sanitizeJsonString,
 } from './common';
 
 const MS_TO_SECONDS = 1000;
@@ -285,8 +286,10 @@ No explanations. No markdown. Just pure JSON.`;
     operationName: operationName ? `${operationName}_retry` : undefined,
   });
 
+  const extracted = extractJson(responseText);
+  const sanitized = sanitizeJsonString(extracted);
   try {
-    return JSON.parse(responseText);
+    return JSON.parse(sanitized);
   } catch (error) {
     throw new Error(`AI cannot produce a stable answer. Last error: ${(error as Error).message}`);
   }
@@ -320,7 +323,7 @@ export async function invokeAiWithRetry<T>(options: InvokeAiOptions<T>): Promise
   });
 
   // Extract JSON from potential markdown wrappers
-  responseText = extractJson(responseText);
+  responseText = sanitizeJsonString(extractJson(responseText));
 
   // Try to parse
   let parsedOutput: T;

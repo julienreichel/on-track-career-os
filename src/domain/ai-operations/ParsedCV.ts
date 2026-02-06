@@ -23,6 +23,8 @@ export function isParsedCV(data: unknown): data is ParsedCV {
   if (!Array.isArray(cv.experienceItems)) return false;
   if (!Array.isArray(cv.rawBlocks)) return false;
   if (typeof cv.confidence !== 'number') return false;
+  if (typeof cv.isCv !== 'boolean') return false;
+  if (typeof cv.errorMessage !== 'string') return false;
 
   const profile = cv.profile as Record<string, unknown>;
   const stringFields = [

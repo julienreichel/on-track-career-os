@@ -131,6 +131,8 @@ describe('AiOperationsRepository', () => {
         ],
         rawBlocks: [],
         confidence: 0.5,
+        isCv: true,
+        errorMessage: '',
       };
 
       mockClient.parseCvText.mockResolvedValue({

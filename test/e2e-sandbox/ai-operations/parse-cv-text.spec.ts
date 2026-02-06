@@ -154,7 +154,11 @@ French (Basic)
     expect(parsedCv).toHaveProperty('experienceItems');
     expect(parsedCv).toHaveProperty('rawBlocks');
     expect(parsedCv).toHaveProperty('confidence');
+    expect(parsedCv).toHaveProperty('isCv');
+    expect(parsedCv).toHaveProperty('errorMessage');
     expect(typeof parsedCv.confidence).toBe('number');
+    expect(typeof parsedCv.isCv).toBe('boolean');
+    expect(typeof parsedCv.errorMessage).toBe('string');
 
     // All fields should be arrays
     expect(Array.isArray(parsedCv.experienceItems)).toBe(true);
@@ -198,6 +202,27 @@ French (Basic)
       expect(hasProfileData).toBe(true);
     }
   }, 60000); // 60s timeout for AI operation
+
+  it('should return non-CV signal for irrelevant text', async () => {
+    const nonCvText = `
+INVOICE #2026-001
+ACME Corp
+Total Due: $1,250.00
+Due Date: 2026-02-20
+    `.trim();
+
+    const parsedCv = await repository.parseCvText(nonCvText, 'en');
+
+    expect(parsedCv).toHaveProperty('isCv');
+    expect(parsedCv).toHaveProperty('errorMessage');
+    expect(typeof parsedCv.isCv).toBe('boolean');
+    expect(typeof parsedCv.errorMessage).toBe('string');
+
+    if (process.env.FAKE_AI_PROVIDER !== 'true') {
+      expect(parsedCv.isCv).toBe(false);
+      expect(parsedCv.errorMessage.length).toBeGreaterThan(0);
+    }
+  }, 60000);
 
   it('should handle empty CV text gracefully', async () => {
     // Test with empty input - per AI Interaction Contract fallback rules,

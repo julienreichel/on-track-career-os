@@ -83,6 +83,8 @@ describe('AiOperationsService', () => {
         ],
         rawBlocks: ['Experience section...'],
         confidence: 0.7,
+        isCv: true,
+        errorMessage: '',
       };
 
       mockRepo.parseCvText.mockResolvedValue(mockParsedCv);
@@ -124,6 +126,39 @@ describe('AiOperationsService', () => {
       // Act & Assert
       await expect(service.parseCvText('Sample CV text', 'en')).rejects.toThrow(
         'Invalid CV parsing result structure'
+      );
+    });
+
+    it('should surface non-CV error message to caller', async () => {
+      const mockParsedCv: ParsedCV = {
+        profile: {
+          fullName: '',
+          headline: '',
+          location: '',
+          seniorityLevel: '',
+          primaryEmail: '',
+          primaryPhone: '',
+          workPermitInfo: '',
+          socialLinks: [],
+          aspirations: [],
+          personalValues: [],
+          strengths: [],
+          interests: [],
+          skills: [],
+          certifications: [],
+          languages: [],
+        },
+        experienceItems: [],
+        rawBlocks: [],
+        confidence: 0.1,
+        isCv: false,
+        errorMessage: 'This document does not appear to be a CV.',
+      };
+
+      mockRepo.parseCvText.mockResolvedValue(mockParsedCv);
+
+      await expect(service.parseCvText('Random text', 'en')).rejects.toThrow(
+        'This document does not appear to be a CV.'
       );
     });
   });
