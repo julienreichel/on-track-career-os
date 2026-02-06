@@ -330,8 +330,8 @@ export class AiOperationsService {
 
     // Validate each experience has required fields
     for (const exp of input.experiences) {
-      if (!exp.title || !exp.startDate) {
-        throw new Error('Each experience must have title and startDate');
+      if (!exp.title) {
+        throw new Error('Each experience must have title');
       }
     }
   }

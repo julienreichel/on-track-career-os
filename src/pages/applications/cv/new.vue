@@ -55,7 +55,7 @@ const router = useRouter();
 const toast = useToast();
 
 const { userId, loadUserId } = useAuthUser();
-const { createDocument } = useCvDocuments();
+const { createDocument, error: createError } = useCvDocuments();
 const { generateCv, generating, error: generationError } = useCvGenerator();
 const tailoredMaterials = useTailoredMaterials();
 const { settings, load: loadSettings } = useCvSettings();
@@ -174,6 +174,7 @@ const generateGenericCv = async (context: ReturnType<typeof resolveGenerationCon
   if (!cvDocument) {
     toast.add({
       title: t('applications.cvs.generate.toast.createFailed'),
+      description: createError.value || undefined,
       color: 'error',
     });
     return;
