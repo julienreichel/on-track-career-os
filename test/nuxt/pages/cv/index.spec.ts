@@ -42,6 +42,12 @@ vi.mock('@/composables/useGuidance', () => ({
   }),
 }));
 
+vi.mock('@/composables/useJobAnalysis', () => ({
+  useJobAnalysis: () => ({
+    jobs: ref([]),
+  }),
+}));
+
 // Create i18n instance for tests
 const i18n = createTestI18n();
 

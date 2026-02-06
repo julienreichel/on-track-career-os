@@ -48,6 +48,12 @@ vi.mock('@/composables/useGuidance', () => ({
   }),
 }));
 
+vi.mock('@/composables/useJobAnalysis', () => ({
+  useJobAnalysis: () => ({
+    jobs: ref([]),
+  }),
+}));
+
 const mockToast = {
   add: vi.fn(),
 };

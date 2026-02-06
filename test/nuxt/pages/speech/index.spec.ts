@@ -56,6 +56,12 @@ vi.mock('@/composables/useGuidance', () => ({
   }),
 }));
 
+vi.mock('@/composables/useJobAnalysis', () => ({
+  useJobAnalysis: () => ({
+    jobs: ref([]),
+  }),
+}));
+
 const generateMock = vi.fn();
 const engineMock = {
   isGenerating: ref(false),

@@ -34,6 +34,12 @@ vi.mock('@/composables/useGuidance', () => ({
   }),
 }));
 
+vi.mock('@/composables/useJobAnalysis', () => ({
+  useJobAnalysis: () => ({
+    jobs: ref([]),
+  }),
+}));
+
 const router = createRouter({
   history: createMemoryHistory(),
   routes: [
