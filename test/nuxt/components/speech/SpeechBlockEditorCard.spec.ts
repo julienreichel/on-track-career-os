@@ -15,6 +15,13 @@ const SpeechSectionStub = {
   `,
 };
 
+const requireItem = <T>(item: T | undefined, label: string): T => {
+  if (!item) {
+    throw new Error(`Expected ${label} to be present`);
+  }
+  return item;
+};
+
 describe('SpeechBlockEditorCard', () => {
   it('renders three section editors', () => {
     const wrapper = mount(SpeechBlockEditorCard, {
@@ -55,7 +62,7 @@ describe('SpeechBlockEditorCard', () => {
     });
 
     const sections = wrapper.findAll('.speech-section');
-    await sections[0].trigger('click');
+    await requireItem(sections[0], 'speech section').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
     const payload = wrapper.emitted('update:modelValue')?.[0]?.[0];

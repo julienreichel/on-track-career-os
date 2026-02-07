@@ -25,6 +25,13 @@ const stubs = {
   },
 };
 
+const requireItem = <T>(item: T | undefined, label: string): T => {
+  if (!item) {
+    throw new Error(`Expected ${label} to be present`);
+  }
+  return item;
+};
+
 describe('BadgeList', () => {
   const createWrapper = (props = {}) => {
     return mount(BadgeList, {
@@ -68,7 +75,7 @@ describe('BadgeList', () => {
     const wrapper = createWrapper();
     const removeButtons = wrapper.findAll('.u-button');
 
-    await removeButtons[1].trigger('click');
+    await requireItem(removeButtons[1], 'remove button').trigger('click');
 
     expect(wrapper.emitted('remove')).toBeTruthy();
     expect(wrapper.emitted('remove')?.[0]).toEqual([1]);
@@ -91,7 +98,7 @@ describe('BadgeList', () => {
     const wrapper = createWrapper();
     const removeButtons = wrapper.findAll('.u-button');
 
-    await removeButtons[0].trigger('click');
+    await requireItem(removeButtons[0], 'remove button').trigger('click');
 
     expect(wrapper.emitted('remove')?.[0]).toEqual([0]);
   });
@@ -100,7 +107,7 @@ describe('BadgeList', () => {
     const wrapper = createWrapper();
     const removeButtons = wrapper.findAll('.u-button');
 
-    await removeButtons[2].trigger('click');
+    await requireItem(removeButtons[2], 'remove button').trigger('click');
 
     expect(wrapper.emitted('remove')?.[0]).toEqual([2]);
   });

@@ -63,6 +63,13 @@ const mockExperience: Experience = {
 } as Experience;
 
 describe('ExperienceForm', () => {
+  const requireItem = <T>(item: T | undefined, label: string): T => {
+    if (!item) {
+      throw new Error(`Expected ${label} to be present`);
+    }
+    return item;
+  };
+
   const createWrapper = (props = {}) => {
     return mount(ExperienceForm, {
       props,
@@ -123,15 +130,21 @@ describe('ExperienceForm', () => {
 
     // Fill out the form
     const inputs = wrapper.findAll('.u-input');
-    await inputs[0].setValue('Software Engineer');
-    await inputs[1].setValue('Test Company');
-    await inputs[2].setValue('2024-01-01');
+    const titleInput = requireItem(inputs[0], 'title input');
+    const companyInput = requireItem(inputs[1], 'company input');
+    const startDateInput = requireItem(inputs[2], 'start date input');
+
+    await titleInput.setValue('Software Engineer');
+    await companyInput.setValue('Test Company');
+    await startDateInput.setValue('2024-01-01');
 
     const form = wrapper.find('form');
     await form.trigger('submit.prevent');
 
     expect(wrapper.emitted('save')).toBeTruthy();
-    expect(wrapper.emitted('save')?.[0][0]).toMatchObject({
+    const emittedSave = wrapper.emitted('save');
+    const emittedPayload = requireItem(emittedSave?.[0], 'save emission')[0];
+    expect(emittedPayload).toMatchObject({
       title: 'Software Engineer',
       companyName: 'Test Company',
       startDate: '2024-01-01',
@@ -143,7 +156,7 @@ describe('ExperienceForm', () => {
     const buttons = wrapper.findAll('.u-button');
     const cancelButton = buttons.find((btn) => btn.text() === 'Cancel');
 
-    await cancelButton?.trigger('click');
+    await requireItem(cancelButton, 'cancel button').trigger('click');
     expect(wrapper.emitted('cancel')).toBeTruthy();
   });
 
@@ -152,7 +165,7 @@ describe('ExperienceForm', () => {
     const buttons = wrapper.findAll('.u-button');
     const submitButton = buttons.find((btn) => btn.attributes('type') === 'submit');
 
-    expect(submitButton?.attributes('disabled')).toBeDefined();
+    expect(requireItem(submitButton, 'submit button').attributes('disabled')).toBeDefined();
   });
 
   it('shows loading state on submit button', () => {
@@ -160,23 +173,27 @@ describe('ExperienceForm', () => {
     const buttons = wrapper.findAll('.u-button');
     const submitButton = buttons.find((btn) => btn.attributes('type') === 'submit');
 
-    expect(submitButton?.attributes('disabled')).toBeDefined();
+    expect(requireItem(submitButton, 'submit button').attributes('disabled')).toBeDefined();
   });
 
   it('converts responsibilities textarea to array', async () => {
     const wrapper = createWrapper();
     const textareas = wrapper.findAll('.u-textarea');
 
-    await textareas[0].setValue('Responsibility 1\nResponsibility 2\nResponsibility 3');
+    await requireItem(textareas[0], 'responsibilities textarea').setValue(
+      'Responsibility 1\nResponsibility 2\nResponsibility 3'
+    );
 
     const inputs = wrapper.findAll('.u-input');
-    await inputs[0].setValue('Test Title');
-    await inputs[2].setValue('2024-01-01');
+    const titleInput = requireItem(inputs[0], 'title input');
+    const startDateInput = requireItem(inputs[2], 'start date input');
+    await titleInput.setValue('Test Title');
+    await startDateInput.setValue('2024-01-01');
 
     const form = wrapper.find('form');
     await form.trigger('submit.prevent');
 
-    const emittedData = wrapper.emitted('save')?.[0][0] as any;
+    const emittedData = requireItem(wrapper.emitted('save')?.[0], 'save emission')[0] as any;
     expect(emittedData.responsibilities).toEqual([
       'Responsibility 1',
       'Responsibility 2',
@@ -188,16 +205,18 @@ describe('ExperienceForm', () => {
     const wrapper = createWrapper();
     const textareas = wrapper.findAll('.u-textarea');
 
-    await textareas[1].setValue('Task 1\nTask 2');
+    await requireItem(textareas[1], 'tasks textarea').setValue('Task 1\nTask 2');
 
     const inputs = wrapper.findAll('.u-input');
-    await inputs[0].setValue('Test Title');
-    await inputs[2].setValue('2024-01-01');
+    const titleInput = requireItem(inputs[0], 'title input');
+    const startDateInput = requireItem(inputs[2], 'start date input');
+    await titleInput.setValue('Test Title');
+    await startDateInput.setValue('2024-01-01');
 
     const form = wrapper.find('form');
     await form.trigger('submit.prevent');
 
-    const emittedData = wrapper.emitted('save')?.[0][0] as any;
+    const emittedData = requireItem(wrapper.emitted('save')?.[0], 'save emission')[0] as any;
     expect(emittedData.tasks).toEqual(['Task 1', 'Task 2']);
   });
 });

@@ -29,6 +29,13 @@ const stubs = {
   },
 };
 
+const requireItem = <T>(item: T | undefined, label: string): T => {
+  if (!item) {
+    throw new Error(`Expected ${label} to be present`);
+  }
+  return item;
+};
+
 describe('ImportSuccess', () => {
   const createWrapper = (props = {}) => {
     return mount(ImportSuccess, {
@@ -67,14 +74,16 @@ describe('ImportSuccess', () => {
   it('renders view experiences button', () => {
     const wrapper = createWrapper();
     const buttons = wrapper.findAll('.u-button');
-    expect(buttons[0].text()).toContain('View Experiences');
+    expect(requireItem(buttons[0], 'view experiences button').text()).toContain(
+      'View Experiences'
+    );
   });
 
   it('emits viewExperiences event when button is clicked', async () => {
     const wrapper = createWrapper();
     const buttons = wrapper.findAll('.u-button');
 
-    await buttons[0].trigger('click');
+    await requireItem(buttons[0], 'view experiences button').trigger('click');
 
     expect(wrapper.emitted('viewExperiences')).toBeTruthy();
     expect(wrapper.emitted('viewExperiences')?.[0]).toEqual([]);

@@ -258,7 +258,8 @@ describe('CanvasSectionCard', () => {
       // Check that update:items was emitted with the new tag
       const updateEvents = wrapper.emitted('update:items');
       expect(updateEvents).toBeTruthy();
-      expect(updateEvents?.[0][0]).toContain('New Tag');
+      expect(updateEvents?.length).toBeGreaterThan(0);
+      expect(updateEvents?.[0]?.[0]).toContain('New Tag');
     });
 
     it('does not add empty tags', async () => {
@@ -298,7 +299,8 @@ describe('CanvasSectionCard', () => {
       // Check that update:items was emitted (tag was added)
       const updateEvents = wrapper.emitted('update:items');
       expect(updateEvents).toBeTruthy();
-      expect(updateEvents?.[0][0]).toContain('New Tag');
+      expect(updateEvents?.length).toBeGreaterThan(0);
+      expect(updateEvents?.[0]?.[0]).toContain('New Tag');
     });
 
     it('removes tag when delete button clicked', async () => {
@@ -314,7 +316,8 @@ describe('CanvasSectionCard', () => {
       expect(badges.length).toBeGreaterThan(0);
 
       const firstBadge = badges[0];
-      const deleteButtons = firstBadge.findAllComponents({ name: 'UButton' });
+      expect(firstBadge).toBeTruthy();
+      const deleteButtons = firstBadge?.findAllComponents({ name: 'UButton' }) ?? [];
       const deleteButton = deleteButtons.find(
         (btn) => btn.props('icon') === 'i-heroicons-x-mark-20-solid'
       );
@@ -326,8 +329,11 @@ describe('CanvasSectionCard', () => {
       // Check that update:items was emitted with item removed
       const updateEvents = wrapper.emitted('update:items');
       expect(updateEvents).toBeTruthy();
+      expect(updateEvents?.length).toBeGreaterThan(0);
       // The emitted array should have one less item
-      const lastEmit = updateEvents?.[updateEvents.length - 1][0] as string[];
+      const lastEmit = updateEvents?.[updateEvents.length - 1]?.[0] as string[] | undefined;
+      expect(lastEmit).toBeTruthy();
+      if (!lastEmit) return;
       expect(lastEmit.length).toBe(2);
     });
 
@@ -354,10 +360,13 @@ describe('CanvasSectionCard', () => {
       await inputElement.trigger('keydown.enter');
       await flushPromises();
 
-      const updateEvents = wrapper.emitted('update:items') as string[][];
-      expect(updateEvents.length).toBeGreaterThanOrEqual(3);
+      const updateEvents = wrapper.emitted('update:items') as string[][] | undefined;
+      expect(updateEvents).toBeTruthy();
+      expect(updateEvents?.length).toBeGreaterThanOrEqual(3);
       // Each event emission contains the full array of tags accumulated so far
-      const lastEmit = updateEvents[updateEvents.length - 1][0];
+      const lastEmit = updateEvents?.[updateEvents.length - 1]?.[0];
+      expect(lastEmit).toBeTruthy();
+      if (!lastEmit) return;
       expect(lastEmit).toContain('Tag 1');
       expect(lastEmit).toContain('Tag 2');
       expect(lastEmit).toContain('Tag 3');

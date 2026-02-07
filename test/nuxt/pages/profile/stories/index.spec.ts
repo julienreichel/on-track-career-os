@@ -63,6 +63,13 @@ type StoriesPageExposed = {
   error: Ref<string | null>;
 };
 
+const requireItem = <T>(item: T | undefined, label: string): T => {
+  if (!item) {
+    throw new Error(`Expected ${label} to be present`);
+  }
+  return item;
+};
+
 describe('Profile Stories Page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -229,7 +236,7 @@ describe('Profile Stories Page', () => {
 
     // Test that component received the stories (they're refs)
     expect(wrapper.vm.stories.value).toHaveLength(1);
-    expect(wrapper.vm.stories.value[0].id).toBe('story-1');
+    expect(requireItem(wrapper.vm.stories.value[0], 'story').id).toBe('story-1');
   });
 
   it('should pass stories to StoryList component', async () => {
@@ -259,7 +266,7 @@ describe('Profile Stories Page', () => {
 
     // Check that stories are available in the component
     expect(wrapper.vm.stories.value).toHaveLength(1);
-    expect(wrapper.vm.stories.value[0].achievements).toHaveLength(2);
+    expect(requireItem(wrapper.vm.stories.value[0], 'story').achievements).toHaveLength(2);
   });
 
   it('should pass KPI suggestions to StoryList component', async () => {
@@ -287,7 +294,7 @@ describe('Profile Stories Page', () => {
 
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.stories.value[0].kpiSuggestions).toHaveLength(2);
+    expect(requireItem(wrapper.vm.stories.value[0], 'story').kpiSuggestions).toHaveLength(2);
   });
 
   it('should handle stories with no achievements or KPIs', async () => {
@@ -315,8 +322,9 @@ describe('Profile Stories Page', () => {
 
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.stories.value[0].achievements).toHaveLength(0);
-    expect(wrapper.vm.stories.value[0].kpiSuggestions).toHaveLength(0);
+    const story = requireItem(wrapper.vm.stories.value[0], 'story');
+    expect(story.achievements).toHaveLength(0);
+    expect(story.kpiSuggestions).toHaveLength(0);
   });
 
   it('should pass showCompanyNames prop to StoryList', async () => {

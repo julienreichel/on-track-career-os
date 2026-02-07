@@ -36,6 +36,13 @@ const defaultFormState: StoryFormState = {
   kpiSuggestions: [],
 };
 
+const requireItem = <T>(item: T | undefined, label: string): T => {
+  if (!item) {
+    throw new Error(`Expected ${label} to be present`);
+  }
+  return item;
+};
+
 describe('StoryForm', () => {
   it('renders all four STAR fields', () => {
     const wrapper = mount(StoryForm, {
@@ -95,11 +102,21 @@ describe('StoryForm', () => {
 
     const inputs = wrapper.findAll('input');
     const textareas = wrapper.findAll('textarea');
-    expect((inputs[0].element as HTMLInputElement).value).toBe('Cloud migration leader');
-    expect((textareas[0].element as HTMLTextAreaElement).value).toBe('Test situation');
-    expect((textareas[1].element as HTMLTextAreaElement).value).toBe('Test task');
-    expect((textareas[2].element as HTMLTextAreaElement).value).toBe('Test action');
-    expect((textareas[3].element as HTMLTextAreaElement).value).toBe('Test result');
+    expect(
+      (requireItem(inputs[0], 'title input').element as HTMLInputElement).value
+    ).toBe('Cloud migration leader');
+    expect(
+      (requireItem(textareas[0], 'situation textarea').element as HTMLTextAreaElement).value
+    ).toBe('Test situation');
+    expect(
+      (requireItem(textareas[1], 'task textarea').element as HTMLTextAreaElement).value
+    ).toBe('Test task');
+    expect(
+      (requireItem(textareas[2], 'action textarea').element as HTMLTextAreaElement).value
+    ).toBe('Test action');
+    expect(
+      (requireItem(textareas[3], 'result textarea').element as HTMLTextAreaElement).value
+    ).toBe('Test result');
   });
 
   it('emits update:modelValue when situation changes', async () => {
@@ -114,7 +131,7 @@ describe('StoryForm', () => {
     });
 
     const textareas = wrapper.findAll('textarea');
-    await textareas[0].setValue('New situation');
+    await requireItem(textareas[0], 'situation textarea').setValue('New situation');
 
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
     const emittedValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as StoryFormState;
@@ -133,7 +150,7 @@ describe('StoryForm', () => {
     });
 
     const textareas = wrapper.findAll('textarea');
-    await textareas[1].setValue('New task');
+    await requireItem(textareas[1], 'task textarea').setValue('New task');
 
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
     const emittedValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as StoryFormState;
@@ -152,7 +169,7 @@ describe('StoryForm', () => {
     });
 
     const textareas = wrapper.findAll('textarea');
-    await textareas[2].setValue('New action');
+    await requireItem(textareas[2], 'action textarea').setValue('New action');
 
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
     const emittedValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as StoryFormState;
@@ -171,7 +188,7 @@ describe('StoryForm', () => {
     });
 
     const textareas = wrapper.findAll('textarea');
-    await textareas[3].setValue('New result');
+    await requireItem(textareas[3], 'result textarea').setValue('New result');
 
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
     const emittedValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as StoryFormState;
@@ -200,7 +217,7 @@ describe('StoryForm', () => {
     });
 
     const textareas = wrapper.findAll('textarea');
-    await textareas[0].setValue('Updated situation');
+    await requireItem(textareas[0], 'situation textarea').setValue('Updated situation');
 
     const emittedValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as StoryFormState;
     expect(emittedValue.title).toBe('Original title');
@@ -308,8 +325,8 @@ describe('StoryForm', () => {
 
     const inputs = wrapper.findAll('input');
     const textareas = wrapper.findAll('textarea');
-    await inputs[0].setValue('');
-    await textareas[0].setValue('');
+    await requireItem(inputs[0], 'title input').setValue('');
+    await requireItem(textareas[0], 'situation textarea').setValue('');
 
     const emittedValue = wrapper.emitted('update:modelValue')?.[0]?.[0] as StoryFormState;
     expect(emittedValue.situation).toBe('');

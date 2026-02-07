@@ -131,7 +131,7 @@ const stubs = {
           return;
         }
         if (link.to) {
-          this.$router.push(link.to);
+          router.push(link.to);
         }
       },
     },

@@ -43,6 +43,13 @@ const stubs = {
   },
 };
 
+const requireItem = <T>(item: T | undefined, label: string): T => {
+  if (!item) {
+    throw new Error(`Expected ${label} to be present`);
+  }
+  return item;
+};
+
 describe('TagInput', () => {
   it('renders with label and placeholder', () => {
     const wrapper = mount(TagInput, {
@@ -313,7 +320,7 @@ describe('TagInput', () => {
     });
 
     const removeButtons = wrapper.findAll('button');
-    await removeButtons[1].trigger('click');
+    await requireItem(removeButtons[1], 'remove button').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([['Tag 1', 'Tag 3']]);
@@ -336,7 +343,7 @@ describe('TagInput', () => {
     // Check that badge is rendered with content
     const badges = wrapper.findAll('.badge');
     expect(badges.length).toBe(1);
-    expect(badges[0].text()).toContain('Tag 1');
+    expect(requireItem(badges[0], 'badge').text()).toContain('Tag 1');
   });
 
   it('shows hint text when provided', () => {

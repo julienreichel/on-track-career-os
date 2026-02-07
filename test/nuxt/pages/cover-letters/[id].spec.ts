@@ -224,7 +224,7 @@ describe('Cover letter detail page', () => {
     expect(proseContent.text()).toContain('Dear Hiring Manager');
     expect(proseContent.text()).toContain('I am writing to apply');
 
-    const setupState = wrapper.vm.$.setupState as {
+    const setupState = (wrapper.vm.$ as any).setupState as {
       isEditing: boolean;
       editTitle: string;
       editContent: string;
@@ -264,7 +264,7 @@ describe('Cover letter detail page', () => {
     const wrapper = await mountPage();
     await flushPromises();
 
-    const setupState = wrapper.vm.$.setupState as {
+    const setupState = (wrapper.vm.$ as any).setupState as {
       isEditing: boolean;
       editTitle: string;
       editContent: string;

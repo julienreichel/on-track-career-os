@@ -223,7 +223,7 @@ describe('Speech detail page', () => {
   it('invokes generate when action is triggered', async () => {
     const wrapper = await mountPage();
     await flushPromises();
-    const setupState = wrapper.vm.$.setupState as { handleGenerate: () => Promise<void> };
+    const setupState = (wrapper.vm.$ as any).setupState as { handleGenerate: () => Promise<void> };
     await setupState.handleGenerate();
     expect(generateMock).toHaveBeenCalled();
   });

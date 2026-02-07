@@ -47,6 +47,13 @@ const stubs = {
   },
 };
 
+const requireItem = <T>(item: T | undefined, label: string): T => {
+  if (!item) {
+    throw new Error(`Expected ${label} to be present`);
+  }
+  return item;
+};
+
 describe('CompanySelector', () => {
   it('filters and emits selection', async () => {
     const wrapper = mount(CompanySelector, {
@@ -66,7 +73,7 @@ describe('CompanySelector', () => {
     const options = wrapper.findAll('[data-testid="company-selector-option"]');
     expect(options).toHaveLength(1);
 
-    await options[0].trigger('click');
+    await requireItem(options[0], 'company option').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['company-2']);
   });

@@ -40,6 +40,13 @@ const stubs = {
   },
 };
 
+const requireItem = <T>(item: T | undefined, label: string): T => {
+  if (!item) {
+    throw new Error(`Expected ${label} to be present`);
+  }
+  return item;
+};
+
 describe('CvExperienceMultiSelect', () => {
   it('renders empty state when no experiences', () => {
     const wrapper = mount(CvExperienceMultiSelect, {
@@ -65,7 +72,7 @@ describe('CvExperienceMultiSelect', () => {
     });
 
     const cards = wrapper.findAll('.card');
-    await cards[0].trigger('click');
+    await requireItem(cards[0], 'experience card').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
     expect(wrapper.emitted('update:modelValue')![0]).toEqual([['exp-1']]);
@@ -83,7 +90,7 @@ describe('CvExperienceMultiSelect', () => {
     });
 
     const button = wrapper.findAll('button').find((btn) => btn.text() === 'Select all');
-    await button?.trigger('click');
+    await requireItem(button, 'select all button').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')![0]).toEqual([['exp-1', 'exp-2']]);
   });

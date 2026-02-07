@@ -109,6 +109,13 @@ async function mountPage() {
 }
 
 describe('New Company Page', () => {
+  const requireItem = <T>(item: T | undefined, label: string): T => {
+    if (!item) {
+      throw new Error(`Expected ${label} to be present`);
+    }
+    return item;
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -128,7 +135,7 @@ describe('New Company Page', () => {
     const saveButton =
       wrapper.findAll('.u-button').find((button) => button.text().includes('Save')) ??
       wrapper.findAll('.u-button')[1];
-    await saveButton.trigger('click');
+    await requireItem(saveButton, 'save button').trigger('click');
     expect(mockCreateCompany).toHaveBeenCalled();
   });
 });

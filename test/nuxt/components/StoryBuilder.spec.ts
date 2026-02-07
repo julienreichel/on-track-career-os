@@ -20,7 +20,7 @@ const stubs = {
       '<textarea v-model="internalValue" :placeholder="placeholder" @input="handleInput" />',
     props: ['modelValue', 'placeholder', 'rows'],
     emits: ['update:modelValue'],
-    setup(props, { emit }) {
+    setup(props: any, { emit }: { emit: (event: string, ...args: any[]) => void }) {
       const internalValue = props.modelValue;
       const handleInput = (event: Event) => {
         emit('update:modelValue', (event.target as HTMLTextAreaElement).value);
@@ -32,7 +32,7 @@ const stubs = {
     template: '<input :value="modelValue" :placeholder="placeholder" @input="handleInput" />',
     props: ['modelValue', 'placeholder', 'disabled', 'readonly'],
     emits: ['update:modelValue'],
-    setup(props, { emit }) {
+    setup(props: any, { emit }: { emit: (event: string, ...args: any[]) => void }) {
       const internalValue = props.modelValue;
       const handleInput = (event: Event) => {
         emit('update:modelValue', (event.target as HTMLInputElement).value);

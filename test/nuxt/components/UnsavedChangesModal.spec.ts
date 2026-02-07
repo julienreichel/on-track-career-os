@@ -30,6 +30,13 @@ const stubs = {
   },
 };
 
+const requireItem = <T>(item: T | undefined, label: string): T => {
+  if (!item) {
+    throw new Error(`Expected ${label} to be present`);
+  }
+  return item;
+};
+
 describe('UnsavedChangesModal', () => {
   it('renders when open is true', () => {
     const wrapper = mount(UnsavedChangesModal, {
@@ -104,7 +111,7 @@ describe('UnsavedChangesModal', () => {
 
     const buttons = wrapper.findAll('button');
     expect(buttons).toHaveLength(2);
-    expect(buttons[0].text()).toContain('Go back');
+    expect(requireItem(buttons[0], 'go back button').text()).toContain('Go back');
   });
 
   it('renders Go back button with ghost variant', () => {
@@ -120,8 +127,9 @@ describe('UnsavedChangesModal', () => {
 
     const buttons = wrapper.findAll('button');
     expect(buttons).toHaveLength(2);
-    expect(buttons[0].text()).toContain('Go back');
-    expect(buttons[0].classes()).toContain('ghost');
+    const goBackButton = requireItem(buttons[0], 'go back button');
+    expect(goBackButton.text()).toContain('Go back');
+    expect(goBackButton.classes()).toContain('ghost');
   });
 
   it('emits update:open with false when Go back is clicked', async () => {
@@ -136,7 +144,7 @@ describe('UnsavedChangesModal', () => {
     });
 
     const buttons = wrapper.findAll('button');
-    await buttons[0].trigger('click');
+    await requireItem(buttons[0], 'go back button').trigger('click');
 
     expect(wrapper.emitted('update:open')).toBeTruthy();
     expect(wrapper.emitted('update:open')?.[0]).toEqual([false]);
@@ -154,7 +162,7 @@ describe('UnsavedChangesModal', () => {
     });
 
     const buttons = wrapper.findAll('button');
-    await buttons[1].trigger('click');
+    await requireItem(buttons[1], 'discard button').trigger('click');
 
     expect(wrapper.emitted('discard')).toBeTruthy();
   });
@@ -207,7 +215,7 @@ describe('UnsavedChangesModal', () => {
     });
 
     const buttons = wrapper.findAll('button');
-    await buttons[0].trigger('click');
+    await requireItem(buttons[0], 'go back button').trigger('click');
 
     expect(wrapper.emitted('discard')).toBeFalsy();
   });
@@ -223,7 +231,7 @@ describe('UnsavedChangesModal', () => {
       },
     });
 
-    const discardButton = wrapper.findAll('button')[1];
+    const discardButton = requireItem(wrapper.findAll('button')[1], 'discard button');
     await discardButton.trigger('click');
     await discardButton.trigger('click');
     await discardButton.trigger('click');

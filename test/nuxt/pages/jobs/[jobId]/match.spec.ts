@@ -32,9 +32,11 @@ const baseSummary = {
   tailoringTips: ['Highlight metrics', 'Show learning agility'],
 };
 
+type MatchingSummary = typeof baseSummary;
+
 const engineMock = {
   job: ref({ ...baseJob }),
-  matchingSummary: ref({ ...baseSummary }),
+  matchingSummary: ref<MatchingSummary | null>({ ...baseSummary }),
   isLoading: ref(false),
   isGenerating: ref(false),
   error: ref<string | null>(null),

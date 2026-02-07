@@ -13,7 +13,7 @@ const baseCompany = {
   companyName: 'Acme Corp',
 };
 
-const baseJob = {
+const baseJobInit = {
   id: 'job-1',
   title: 'Lead Engineer',
   seniorityLevel: 'Senior',
@@ -33,7 +33,17 @@ const baseJob = {
   updatedAt: '2024-01-02T00:00:00.000Z',
 };
 
-const selectedJob = ref({ ...baseJob });
+type JobWithCompany = Omit<
+  typeof baseJobInit,
+  'companyId' | 'company'
+> & {
+  companyId: string | null;
+  company: { id: string; companyName: string } | null;
+};
+
+const baseJob: JobWithCompany = { ...baseJobInit, companyId: 'company-1', company: baseCompany };
+
+const selectedJob = ref<JobWithCompany>({ ...baseJob });
 
 const jobAnalysisMock = {
   jobs: ref([]),

@@ -51,6 +51,13 @@ const stubs = {
   },
 };
 
+const requireItem = <T>(item: T | undefined, label: string): T => {
+  if (!item) {
+    throw new Error(`Expected ${label} to be present`);
+  }
+  return item;
+};
+
 describe('CvExperiencePicker', () => {
   let mockExperienceRepo: { list: ReturnType<typeof vi.fn> };
   let mockExperiences: Experience[];
@@ -207,7 +214,7 @@ describe('CvExperiencePicker', () => {
     await flushPromises();
 
     const cards = wrapper.findAll('.card');
-    await cards[0].trigger('click');
+    await requireItem(cards[0], 'experience card').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
     expect(wrapper.emitted('update:modelValue')![0]).toEqual([['exp-1']]);
@@ -229,7 +236,7 @@ describe('CvExperiencePicker', () => {
 
     const buttons = wrapper.findAll('button');
     const selectAllButton = buttons.find((b) => b.text() === 'Select All');
-    await selectAllButton!.trigger('click');
+    await requireItem(selectAllButton, 'select all button').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')![0]).toEqual([['exp-1', 'exp-2']]);
   });
@@ -252,7 +259,7 @@ describe('CvExperiencePicker', () => {
     const deselectButton = buttons.find((b) => b.text() === 'Deselect All');
     expect(deselectButton).toBeDefined();
 
-    await deselectButton!.trigger('click');
+    await requireItem(deselectButton, 'deselect all button').trigger('click');
 
     expect(wrapper.emitted('update:modelValue')![0]).toEqual([[]]);
   });
@@ -289,8 +296,8 @@ describe('CvExperiencePicker', () => {
     await flushPromises();
 
     const cards = wrapper.findAll('.card');
-    expect(cards[0].classes()).toContain('subtle');
-    expect(cards[1].classes()).toContain('outline');
+    expect(requireItem(cards[0], 'experience card').classes()).toContain('subtle');
+    expect(requireItem(cards[1], 'experience card').classes()).toContain('outline');
   });
 
   it('should display date ranges', async () => {
@@ -345,8 +352,8 @@ describe('CvExperiencePicker', () => {
 
     const cards = wrapper.findAll('.card');
     // First card should be the most recent (exp-1 from 2020)
-    expect(cards[0].text()).toContain('Senior Engineer');
-    expect(cards[1].text()).toContain('Junior Developer');
+    expect(requireItem(cards[0], 'experience card').text()).toContain('Senior Engineer');
+    expect(requireItem(cards[1], 'experience card').text()).toContain('Junior Developer');
   });
 
   it('should not load experiences if userId is null', async () => {
@@ -424,7 +431,7 @@ describe('CvExperiencePicker', () => {
     await flushPromises();
 
     const checkbox = wrapper.find('input[type="checkbox"]');
-    expect(checkbox.element.checked).toBe(false);
+    expect((checkbox.element as HTMLInputElement).checked).toBe(false);
 
     const card = wrapper.find('.card');
     await card.trigger('click');
