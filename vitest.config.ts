@@ -19,17 +19,6 @@ export default defineConfig({
           include: ['test/unit/**/*.spec.ts'],
           environment: 'node',
           setupFiles: [resolve(__dirname, './test/setup/console-guard.ts')],
-          coverage: {
-            provider: 'v8',
-            include: ['src/**/*.{ts,vue}'],
-            exclude: [
-              'src/**/*.spec.ts',
-              'src/**/*.test.ts',
-              'src/tests/**',
-              'test/**',
-              'amplify/**',
-            ],
-          },
         },
         // Configure path aliases for unit tests
         resolve: {
@@ -45,16 +34,6 @@ export default defineConfig({
           name: 'amplify',
           include: ['test/amplify/**/*.spec.ts'],
           environment: 'node',
-          coverage: {
-            provider: 'v8',
-            include: ['amplify/**/*.ts'],
-            exclude: [
-              'amplify/**/*.spec.ts',
-              'amplify/**/*.test.ts',
-              'amplify/backend.ts',
-              'amplify/**/resource.ts',
-            ],
-          },
         },
         // Configure path aliases for amplify tests
         resolve: {
@@ -89,7 +68,6 @@ export default defineConfig({
           name: 'e2e-sandbox',
           // E2E tests allow console output for debugging
           setupFiles: [],
-          onConsoleLog: undefined,
           include: ['test/e2e-sandbox/**/*.spec.ts'],
           environment: 'node',
           testTimeout: 60000, // 60s for AWS operations

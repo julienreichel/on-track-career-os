@@ -42,4 +42,15 @@ export default defineNuxtConfig({
   alias: {
     '@amplify': resolve(__dirname, './amplify'),
   },
+
+  typescript: {
+    tsConfig: {
+      exclude: [
+        '../test/**',
+        '../test-results/**',
+        '../playwright-report/**',
+        '../coverage/**',
+      ],
+    },
+  },
 });
