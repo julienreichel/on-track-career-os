@@ -209,23 +209,17 @@ risk: low
 
 ## Top 10 Refactor Backlog (P0 → P2)
 
-1. Sanitize markdown rendering (`v-html` + `marked`) in `MarkdownContent`.
-2. Add pagination to list queries (`fetchAllListItems` in list pages).
-3. Reduce heavy GraphQL selection sets in profile/job/experience queries.
-4. Centralize client error logging with redaction.
-5. Replace “fetch all then filter” in company matching with indexed query.
-6. Establish a consistent error UX standard (toast vs inline).
-7. Split the largest pages/services into smaller composables and UI components.
-8. Remove `src/coverage` artifacts from `src/` tree.
-9. Remove test-utils from runtime Nuxt modules.
-10. Move hard-coded error strings to i18n keys.
+1. Add pagination to list queries (`fetchAllListItems` in list pages).
+2. Reduce heavy GraphQL selection sets in profile/job/experience queries.
+3. Centralize client error logging with redaction.
+4. Replace “fetch all then filter” in company matching with indexed query.
+5. Establish a consistent error UX standard (toast vs inline).
+6. Split the largest pages/services into smaller composables and UI components.
+7. Remove test-utils from runtime Nuxt modules.
 
 ## Quick Wins (≤ 1h each)
 
-1. Sanitize markdown output with `dompurify` in `MarkdownContent`.
-2. Remove or relocate `src/coverage/*` from the source tree.
-3. Replace hard-coded error strings with i18n keys in `useCvDocuments` and `useActiveJobsDashboard`.
-4. Remove `@nuxt/test-utils` modules from runtime `nuxt.config.ts`.
+1. Remove `@nuxt/test-utils` modules from runtime `nuxt.config.ts`.
 
 ## Big Rocks (multi-day)
 

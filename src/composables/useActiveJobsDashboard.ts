@@ -1,5 +1,6 @@
 import { computed, ref, unref } from 'vue';
 import type { MaybeRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { useCvDocuments } from '@/composables/useCvDocuments';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
@@ -136,6 +137,7 @@ const resolveMaterialItems = <T>(source: MaterialSource<T>, fallback: T[]): T[] 
 };
 
 export function useActiveJobsDashboard(options: ActiveJobsDashboardOptions = {}) {
+  const { t } = useI18n();
   const jobAnalysis = useJobAnalysis();
   const cvDocuments = useCvDocuments();
   const coverLetters = useCoverLetters();
@@ -164,7 +166,7 @@ export function useActiveJobsDashboard(options: ActiveJobsDashboardOptions = {})
       await Promise.all([jobAnalysis.listJobs(), loadCvs, loadCoverLetters, loadSpeechBlocks]);
       loaded.value = true;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred';
+      error.value = err instanceof Error ? err.message : t('common.errors.unknown');
     } finally {
       loading.value = false;
     }

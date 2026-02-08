@@ -776,6 +776,9 @@
   },
   "common": {
     "error": "Error",
+    "errors": {
+      "unknown": "Unknown error occurred"
+    },
     "backToProfile": "Back to Profile",
     "back": "Back",
     "discard": "Discard",
@@ -1312,6 +1315,12 @@
           "createFailed": "Failed to create CV",
           "generationFailed": "Failed to generate CV content",
           "error": "An error occurred"
+        },
+        "errors": {
+          "missingUserInfo": "Missing user information",
+          "cvDocumentCreateFailed": "Failed to create CV document",
+          "cvDocumentUpdateFailed": "Failed to update CV document",
+          "cvDocumentDeleteFailed": "Failed to delete CV document"
         }
       },
       "settings": {

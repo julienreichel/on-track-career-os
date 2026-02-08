@@ -1,4 +1,5 @@
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
 import { useAuthUser } from '@/composables/useAuthUser';
 import type {
@@ -23,6 +24,7 @@ function updateItemInArray(items: CVDocument[], updated: CVDocument | null | und
  */
 
 export function useCvDocuments() {
+  const { t } = useI18n();
   const items = ref<CVDocument[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
@@ -41,11 +43,11 @@ export function useCvDocuments() {
         await auth.loadUserId();
       }
       if (!auth.userId.value) {
-        throw new Error('Missing user information');
+        throw new Error(t('applications.cvs.generate.errors.missingUserInfo'));
       }
       items.value = await repository.listByUser(auth.userId.value);
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error occurred';
+      error.value = err instanceof Error ? err.message : t('common.errors.unknown');
       console.error('[useCvDocuments] Error loading CV documents:', err);
     } finally {
       loading.value = false;
@@ -69,7 +71,9 @@ export function useCvDocuments() {
       }
       return created;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to create CV document';
+      error.value = err instanceof Error
+        ? err.message
+        : t('applications.cvs.generate.errors.cvDocumentCreateFailed');
       console.error('[useCvDocuments] Error creating CV document:', err);
       return null;
     } finally {
@@ -92,7 +96,9 @@ export function useCvDocuments() {
       updateItemInArray(items.value, updated);
       return updated;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to update CV document';
+      error.value = err instanceof Error
+        ? err.message
+        : t('applications.cvs.generate.errors.cvDocumentUpdateFailed');
       console.error('[useCvDocuments] Error updating CV document:', err);
       return null;
     } finally {
@@ -112,7 +118,9 @@ export function useCvDocuments() {
       items.value = items.value.filter((item) => item.id !== id);
       return true;
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to delete CV document';
+      error.value = err instanceof Error
+        ? err.message
+        : t('applications.cvs.generate.errors.cvDocumentDeleteFailed');
       console.error('[useCvDocuments] Error deleting CV document:', err);
       return false;
     } finally {
