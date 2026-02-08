@@ -152,14 +152,17 @@ describe('useTailoredMaterials', () => {
     cvRepository: {
       create: vi.fn().mockResolvedValue(cvDocument),
       update: vi.fn().mockResolvedValue(cvDocument),
+      listByUser: vi.fn().mockResolvedValue([]),
     } as unknown as CVDocumentRepository,
     coverLetterService: {
       createCoverLetter: vi.fn().mockResolvedValue(coverLetter),
       updateCoverLetter: vi.fn().mockResolvedValue(coverLetter),
+      listCoverLettersByUser: vi.fn().mockResolvedValue([]),
     } as unknown as CoverLetterService,
     speechBlockService: {
       createSpeechBlock: vi.fn().mockResolvedValue(speechBlock),
       updateSpeechBlock: vi.fn().mockResolvedValue(speechBlock),
+      listSpeechBlocksByUser: vi.fn().mockResolvedValue([]),
     } as unknown as SpeechBlockService,
     jobService: {
       getFullJobDescription: vi.fn().mockResolvedValue(job),
@@ -349,5 +352,232 @@ describe('useTailoredMaterials', () => {
         name: 'Updated Speech',
       })
     );
+  });
+
+  it('loads tailoring context with matching summary fallback (companyId -> null)', async () => {
+    const deps = createDependencies();
+    deps.matchingSummaryService.getByContext = vi
+      .fn()
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(matchingSummary);
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    const result = await engine.loadTailoringContext(job.id);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.job).toEqual(job);
+      expect(result.matchingSummary).toEqual(matchingSummary);
+    }
+    expect(deps.matchingSummaryService.getByContext).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ jobId: job.id, companyId: job.companyId })
+    );
+    expect(deps.matchingSummaryService.getByContext).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ jobId: job.id, companyId: null })
+    );
+  });
+
+  it('returns unauthenticated error when loading context without user', async () => {
+    const deps = createDependencies();
+    const auth = {
+      userId: ref<string | null>(null),
+      loadUserId: vi.fn().mockResolvedValue(undefined),
+    };
+    const engine = useTailoredMaterials({ auth, dependencies: deps });
+
+    const result = await engine.loadTailoringContext(job.id);
+
+    expect(result).toEqual({ ok: false, error: 'unauthenticated' });
+    expect(engine.contextError.value).toBe('unauthenticated');
+  });
+
+  it('returns jobNotFound when job is missing', async () => {
+    const deps = createDependencies();
+    deps.jobService.getFullJobDescription = vi.fn().mockResolvedValue(null);
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    const result = await engine.loadTailoringContext(job.id);
+
+    expect(result).toEqual({ ok: false, error: 'jobNotFound' });
+    expect(engine.contextError.value).toBe('jobNotFound');
+  });
+
+  it('handles loadTailoringContext failures', async () => {
+    const deps = createDependencies();
+    deps.jobService.getFullJobDescription = vi.fn().mockRejectedValue(new Error('boom'));
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    await allowConsoleOutput(async () => {
+      const result = await engine.loadTailoringContext(job.id);
+      expect(result).toEqual({ ok: false, error: 'loadContextFailed' });
+    });
+
+    expect(engine.contextError.value).toBe('loadContextFailed');
+  });
+
+  it('returns empty result when loading context without job id', async () => {
+    const deps = createDependencies();
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    const result = await engine.loadTailoringContext(null);
+
+    expect(result).toEqual({ ok: false, error: null });
+    expect(engine.contextError.value).toBe(null);
+  });
+
+  it('loads existing materials and picks latest per type', async () => {
+    const deps = createDependencies();
+    deps.cvRepository.listByUser = vi.fn().mockResolvedValue([
+      { id: 'cv-old', jobId: job.id, createdAt: '2023-01-01' },
+      { id: 'cv-new', jobId: job.id, updatedAt: '2024-02-01' },
+      { id: 'cv-other', jobId: 'job-2', updatedAt: '2025-01-01' },
+    ]);
+    deps.coverLetterService.listCoverLettersByUser = vi.fn().mockResolvedValue([
+      { id: 'cl-1', jobId: job.id, updatedAt: 'invalid-date' },
+      { id: 'cl-2', jobId: job.id, createdAt: '2022-01-01' },
+    ]);
+    deps.speechBlockService.listSpeechBlocksByUser = vi.fn().mockResolvedValue([
+      { id: 'sb-1', jobId: job.id, createdAt: '2021-01-01' },
+      { id: 'sb-2', jobId: job.id, updatedAt: '2023-05-01' },
+    ]);
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    const result = await engine.loadExistingMaterialsForJob(job.id);
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.cv?.id).toBe('cv-new');
+      expect(result.data.coverLetter?.id).toBe('cl-2');
+      expect(result.data.speechBlock?.id).toBe('sb-2');
+    }
+  });
+
+  it('returns unauthenticated when loading materials without user', async () => {
+    const deps = createDependencies();
+    const auth = {
+      userId: ref<string | null>(null),
+      loadUserId: vi.fn().mockResolvedValue(undefined),
+    };
+    const engine = useTailoredMaterials({ auth, dependencies: deps });
+
+    await allowConsoleOutput(async () => {
+      const result = await engine.loadExistingMaterialsForJob(job.id);
+      expect(result).toEqual({ ok: false, error: 'unauthenticated' });
+    });
+
+    expect(engine.materialsError.value).toBe('unauthenticated');
+  });
+
+  it('returns empty result when loading materials without job id', async () => {
+    const deps = createDependencies();
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    const result = await engine.loadExistingMaterialsForJob(undefined);
+
+    expect(result).toEqual({ ok: false, error: null });
+    expect(engine.materialsError.value).toBe(null);
+  });
+
+  it('filters experiences and sections for tailored CV', async () => {
+    const deps = createDependencies();
+    deps.userProfileService.getProfileForTailoring = vi.fn().mockResolvedValue({
+      ...profile,
+      socialLinks: ['https://example.com', ''],
+      skills: ['TypeScript', ''],
+      experiences: [
+        {
+          id: 'exp-work',
+          userId,
+          experienceType: 'work',
+          title: 'Engineer',
+          companyName: 'Atlas',
+          startDate: '2020-01-01',
+        },
+        {
+          id: 'exp-edu',
+          userId,
+          experienceType: 'education',
+          title: 'BSc',
+          companyName: 'Uni',
+          startDate: '2018-01-01',
+        },
+        {
+          id: 'exp-project',
+          userId,
+          experienceType: 'project',
+          title: 'Side project',
+          companyName: 'Self',
+          startDate: '2019-01-01',
+        },
+      ],
+    });
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    await engine.generateTailoredCvForJob({
+      job,
+      matchingSummary,
+      options: {
+        enabledSections: ['experience', 'projects', 'skills', 'links'],
+        selectedExperienceIds: ['exp-work', 'exp-project'],
+      },
+    });
+
+    const call = vi.mocked(deps.aiService.generateCv).mock.calls[0]?.[0];
+    expect(call).toEqual(
+      expect.objectContaining({
+        profile: expect.objectContaining({
+          skills: ['TypeScript'],
+          socialLinks: ['https://example.com'],
+        }),
+        experiences: expect.arrayContaining([expect.objectContaining({ id: 'exp-work' })]),
+      })
+    );
+    expect(call?.experiences).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: 'exp-project' })])
+    );
+    expect(call?.experiences).toEqual(
+      expect.not.arrayContaining([expect.objectContaining({ id: 'exp-edu' })])
+    );
+  });
+
+  it('omits templateMarkdown when blank and trims when provided', async () => {
+    const deps = createDependencies();
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    await engine.generateTailoredCvForJob({
+      job,
+      matchingSummary,
+      options: { templateMarkdown: '   ' },
+    });
+
+    expect(deps.aiService.generateCv).toHaveBeenCalledWith(
+      expect.not.objectContaining({ templateMarkdown: expect.any(String) })
+    );
+
+    await engine.generateTailoredCvForJob({
+      job,
+      matchingSummary,
+      options: { templateMarkdown: '  # Template  ' },
+    });
+
+    expect(deps.aiService.generateCv).toHaveBeenLastCalledWith(
+      expect.objectContaining({ templateMarkdown: '# Template' })
+    );
+  });
+
+  it('stores error message when generator fails', async () => {
+    const deps = createDependencies();
+    deps.aiService.generateCv = vi.fn().mockRejectedValue(new Error('AI down'));
+    const engine = useTailoredMaterials({ auth: buildAuthStub(), dependencies: deps });
+
+    await allowConsoleOutput(async () => {
+      const result = await engine.generateTailoredCvForJob({ job, matchingSummary });
+      expect(result).toBeNull();
+    });
+
+    expect(engine.error.value).toBe('AI down');
+    expect(engine.isGenerating.value).toBe(false);
   });
 });

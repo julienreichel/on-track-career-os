@@ -214,11 +214,11 @@ describe('StoryList', () => {
       const storyNoExp = { ...mockStory1, experienceId: undefined };
       const wrapper = mountList();
       mockRouter.push.mockClear();
-      
+
       await allowConsoleOutput(async () => {
         wrapper.vm.handleEdit(storyNoExp);
       });
-      
+
       expect(mockRouter.push).not.toHaveBeenCalled();
     });
 
@@ -306,10 +306,12 @@ describe('StoryList', () => {
     });
 
     it('handles many stories', () => {
-      const manyStories = Array(10).fill(null).map((_, i) => ({
-        ...mockStory1,
-        id: `story-${i}`,
-      }));
+      const manyStories = Array(10)
+        .fill(null)
+        .map((_, i) => ({
+          ...mockStory1,
+          id: `story-${i}`,
+        }));
       const wrapper = mountList({ stories: manyStories });
       expect(wrapper.props('stories')).toHaveLength(10);
     });
