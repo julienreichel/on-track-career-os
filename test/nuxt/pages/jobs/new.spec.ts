@@ -12,6 +12,7 @@ const statusMessage = ref<string | null>(null);
 const mockHandleFileSelected = vi.fn();
 const mockHandleTextSubmitted = vi.fn();
 const mockReset = vi.fn();
+const toastAdd = vi.fn();
 
 vi.mock('@/composables/useJobUpload', () => ({
   useJobUpload: () => ({
@@ -22,6 +23,18 @@ vi.mock('@/composables/useJobUpload', () => ({
     handleFileSelected: mockHandleFileSelected,
     handleTextSubmitted: mockHandleTextSubmitted,
     reset: mockReset,
+  }),
+}));
+
+vi.mock('#app', () => ({
+  useToast: () => ({
+    add: toastAdd,
+  }),
+}));
+
+vi.mock('#imports', () => ({
+  useToast: () => ({
+    add: toastAdd,
   }),
 }));
 
@@ -109,6 +122,7 @@ describe('Job Upload Page', () => {
     errorMessage.value = null;
     isProcessing.value = false;
     statusMessage.value = null;
+    toastAdd.mockClear();
   });
 
   it('renders header and upload component', async () => {
@@ -118,10 +132,18 @@ describe('Job Upload Page', () => {
     expect(wrapper.findComponent(JobUploadStepStub).exists()).toBe(true);
   });
 
-  it('displays error alert when errorMessage is set', async () => {
+  it('notifies via toast when errorMessage is set', async () => {
     errorMessage.value = 'Upload failed';
     const wrapper = await mountPage();
-    expect(wrapper.find('.u-alert').text()).toContain('Upload failed');
+    expect(wrapper.find('.u-alert').exists()).toBe(false);
+    expect(toastAdd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: i18n.global.t('jobs.form.errors.generic'),
+        description: 'Upload failed',
+        color: 'error',
+      })
+    );
+    expect(mockReset).toHaveBeenCalled();
   });
 
   it('forwards file selection events to the composable handler', async () => {
