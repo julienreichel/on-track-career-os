@@ -6,6 +6,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 const props = withDefaults(
   defineProps<{
@@ -16,5 +17,10 @@ const props = withDefaults(
   }
 );
 
-const renderedHtml = computed(() => (props.content ? marked(props.content) : ''));
+const renderedHtml = computed(() => {
+  if (!props.content) return '';
+  const rawHtml = marked.parse(props.content, { async: false });
+  if (typeof rawHtml !== 'string') return '';
+  return DOMPurify.sanitize(rawHtml, { USE_PROFILES: { html: true } });
+});
 </script>
