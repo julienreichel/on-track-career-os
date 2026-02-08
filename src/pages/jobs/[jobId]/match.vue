@@ -11,6 +11,7 @@ import { useMatchingEngine } from '@/composables/useMatchingEngine';
 import { useCompanies } from '@/composables/useCompanies';
 import type { PageHeaderLink } from '@/types/ui';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 
 definePageMeta({
   breadcrumbLabel: 'Match',
@@ -19,6 +20,7 @@ definePageMeta({
 const route = useRoute();
 const { t } = useI18n();
 const companyStore = useCompanies();
+const { pageError, setPageError, clearPageError, notifyActionError } = useErrorDisplay();
 
 const jobId = computed(() => route.params.jobId as string | undefined);
 
@@ -119,9 +121,25 @@ watch(
         hasLoadedCompanies.value = true;
       } catch (error) {
         logError('[matching] Failed to load companies', error);
+        notifyActionError({
+          title: t('matching.page.states.errorTitle'),
+          description: error instanceof Error ? error.message : undefined,
+        });
       }
     }
   }
+);
+
+watch(
+  () => errorMessage.value,
+  (message) => {
+    if (message) {
+      setPageError(message);
+      return;
+    }
+    clearPageError();
+  },
+  { immediate: true }
 );
 
 const handleGenerate = async () => {
@@ -129,7 +147,16 @@ const handleGenerate = async () => {
     await engine.regenerate();
   } catch (error) {
     logError('[matching] Failed to regenerate match', error);
+    notifyActionError({
+      title: t('matching.page.states.errorTitle'),
+      description: error instanceof Error ? error.message : undefined,
+    });
   }
+};
+
+const handleClearError = () => {
+  clearPageError();
+  errorMessage.value = null;
 };
 
 onMounted(async () => {
@@ -140,6 +167,10 @@ onMounted(async () => {
     }
   } catch (error) {
     logError('[matching] Failed to load matching data', error);
+    notifyActionError({
+      title: t('matching.page.states.errorTitle'),
+      description: error instanceof Error ? error.message : undefined,
+    });
   }
 });
 </script>
@@ -154,15 +185,15 @@ onMounted(async () => {
 
     <UPageBody>
       <UAlert
-        v-if="errorMessage"
+        v-if="pageError"
         icon="i-heroicons-exclamation-triangle"
         color="error"
         variant="soft"
         :title="t('matching.page.states.errorTitle')"
-        :description="errorMessage"
+        :description="pageError"
         class="mb-6"
         :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-        @close="errorMessage = null"
+        @close="handleClearError"
       />
 
       <UCard v-if="isLoading">

@@ -3,6 +3,7 @@ import { onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 import JobCard from '@/components/job/JobCard.vue';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 import { useGuidance } from '@/composables/useGuidance';
@@ -23,10 +24,10 @@ const { guidance } = useGuidance('jobs', () => ({
   jobId: guidanceJobId.value,
   hasMatchingSummary: matchPromptJobId.value ? false : undefined,
 }));
+const { pageError, setPageError, clearPageError, notifyActionError } = useErrorDisplay();
 
 const loading = ref(true);
 const hasLoaded = ref(false);
-const errorMessage = ref<string | null>(null);
 const showDeleteModal = ref(false);
 const jobToDelete = ref<string | null>(null);
 const searchQuery = ref('');
@@ -71,12 +72,13 @@ const filteredJobs = computed(() => {
 async function loadJobs() {
   loading.value = true;
   hasLoaded.value = false;
-  errorMessage.value = null;
+  clearPageError();
   try {
     await jobAnalysis.listJobs();
   } catch (error) {
-    errorMessage.value =
+    const message =
       error instanceof Error ? error.message : t('ingestion.job.upload.errors.generic');
+    setPageError(message);
   } finally {
     loading.value = false;
     hasLoaded.value = true;
@@ -101,8 +103,10 @@ async function confirmDelete() {
     showDeleteModal.value = false;
     jobToDelete.value = null;
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('ingestion.job.upload.errors.generic');
+    notifyActionError({
+      title: t('jobs.list.errors.generic'),
+      description: error instanceof Error ? error.message : undefined,
+    });
   }
 }
 
@@ -134,15 +138,15 @@ function cancelDelete() {
       </div>
 
       <UAlert
-        v-if="errorMessage"
+        v-if="pageError"
         icon="i-heroicons-exclamation-triangle"
         color="error"
         variant="soft"
         :title="t('jobs.list.errors.generic')"
-        :description="errorMessage"
+        :description="pageError"
         :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
         class="mb-6"
-        @close="errorMessage = null"
+        @close="clearPageError"
       />
 
       <ListSkeletonCards v-if="loading || !hasLoaded" />

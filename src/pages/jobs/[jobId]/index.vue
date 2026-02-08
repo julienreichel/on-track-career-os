@@ -9,6 +9,7 @@ import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { useCompanies } from '@/composables/useCompanies';
 import TailoredMaterialsCard from '@/components/tailoring/TailoredMaterialsCard.vue';
 import { formatDetailDate } from '@/utils/formatDetailDate';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 import type {
   JobDescription,
   JobDescriptionUpdateInput,
@@ -50,6 +51,7 @@ const router = useRouter();
 const { t } = useI18n();
 const jobAnalysis = useJobAnalysis();
 const companyStore = useCompanies();
+const { pageError, setPageError, clearPageError, notifyActionError } = useErrorDisplay();
 
 const jobId = computed(() => route.params.jobId as string | undefined);
 const job = jobAnalysis.selectedJob;
@@ -65,7 +67,6 @@ type JobWithRelations = JobDescription & {
 const jobWithRelations = computed(() => job.value as JobWithRelations | null);
 
 const loading = ref(false);
-const errorMessage = ref<string | null>(null);
 const saving = ref(false);
 const isEditing = ref(false);
 const selectedCompanyId = ref<string | null>(null);
@@ -294,7 +295,7 @@ async function loadJob() {
   }
 
   loading.value = true;
-  errorMessage.value = null;
+  clearPageError();
 
   try {
     const result = await jobAnalysis.loadJobWithRelations(id);
@@ -303,7 +304,8 @@ async function loadJob() {
     }
     hydrateForm(result);
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : t('jobs.detail.errors.generic');
+    const message = error instanceof Error ? error.message : t('jobs.detail.errors.generic');
+    setPageError(message);
   } finally {
     loading.value = false;
   }
@@ -314,10 +316,10 @@ async function loadCompanies() {
     await companyStore.listCompanies();
   } catch (error) {
     logError('[jobDetail] Failed to load companies', error);
-    if (!errorMessage.value) {
-      errorMessage.value =
-        error instanceof Error ? error.message : t('companies.list.errors.generic');
-    }
+    notifyActionError({
+      title: t('companies.list.errors.title'),
+      description: error instanceof Error ? error.message : t('companies.list.errors.generic'),
+    });
   }
 }
 
@@ -419,7 +421,6 @@ async function handleSave() {
   }
 
   saving.value = true;
-  errorMessage.value = null;
 
   try {
     const payload = buildUpdatePayload();
@@ -427,7 +428,10 @@ async function handleSave() {
     hydrateForm(updated);
     isEditing.value = false;
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : t('jobs.detail.errors.generic');
+    notifyActionError({
+      title: t('jobs.detail.errors.title'),
+      description: error instanceof Error ? error.message : t('jobs.detail.errors.generic'),
+    });
   } finally {
     saving.value = false;
   }
@@ -466,14 +470,16 @@ async function handleCompanyLinkChange(nextCompanyId: string | null) {
 
   selectedCompanyId.value = nextCompanyId;
   linkingCompany.value = true;
-  errorMessage.value = null;
 
   try {
     const updated = await jobAnalysis.updateJob(job.value.id, { companyId: nextCompanyId });
     hydrateForm(updated);
   } catch (error) {
     selectedCompanyId.value = previousCompanyId;
-    errorMessage.value = error instanceof Error ? error.message : t('jobs.detail.errors.generic');
+    notifyActionError({
+      title: t('jobs.detail.errors.title'),
+      description: error instanceof Error ? error.message : t('jobs.detail.errors.generic'),
+    });
   } finally {
     linkingCompany.value = false;
   }
@@ -501,15 +507,15 @@ function redirectToCompanyCreate() {
 
     <UPageBody>
       <UAlert
-        v-if="errorMessage"
+        v-if="pageError"
         icon="i-heroicons-exclamation-triangle"
         color="error"
         variant="soft"
         :title="t('jobs.detail.errors.title')"
-        :description="errorMessage"
+        :description="pageError"
         :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
         class="mb-6"
-        @close="errorMessage = null"
+        @close="clearPageError"
       />
 
       <UCard v-if="loading">

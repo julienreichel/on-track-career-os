@@ -6,6 +6,18 @@
     />
 
     <UPageBody>
+      <UAlert
+        v-if="pageError"
+        icon="i-heroicons-exclamation-triangle"
+        color="error"
+        variant="soft"
+        :title="t('applications.cvs.generate.toast.error')"
+        :description="pageError"
+        :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
+        class="mb-6"
+        @close="clearPageError"
+      />
+
       <CvGenerateEntryCard
         :template-name="templateLabel"
         :section-count="selectedSections.length"
@@ -42,6 +54,7 @@ import { useTailoredMaterials } from '@/application/tailoring/useTailoredMateria
 import { useCvSettings } from '@/application/cvsettings/useCvSettings';
 import { useCvTemplates } from '@/application/cvtemplate/useCvTemplates';
 import { useAnalytics } from '@/composables/useAnalytics';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 import { getDefaultCvSettings } from '@/domain/cvsettings/getDefaultCvSettings';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
@@ -53,6 +66,7 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
+const { pageError, setPageError, clearPageError, notifyActionError } = useErrorDisplay();
 
 const { userId, loadUserId } = useAuthUser();
 const { createDocument, error: createError } = useCvDocuments();
@@ -150,10 +164,9 @@ const generateGenericCv = async (context: ReturnType<typeof resolveGenerationCon
   });
 
   if (!cvMarkdown) {
-    toast.add({
+    notifyActionError({
       title: t('applications.cvs.generate.toast.generationFailed'),
       description: generationError.value || undefined,
-      color: 'error',
     });
     return;
   }
@@ -172,10 +185,9 @@ const generateGenericCv = async (context: ReturnType<typeof resolveGenerationCon
   });
 
   if (!cvDocument) {
-    toast.add({
+    notifyActionError({
       title: t('applications.cvs.generate.toast.createFailed'),
       description: createError.value || undefined,
-      color: 'error',
     });
     return;
   }
@@ -200,18 +212,16 @@ const generateTailoredCv = async (
 ) => {
   const tailoringContext = await tailoredMaterials.loadTailoringContext(targetJobId);
   if (!tailoringContext.ok) {
-    toast.add({
+    notifyActionError({
       title: t('applications.cvs.generate.toast.error'),
-      color: 'error',
     });
     await router.push('/jobs');
     return;
   }
 
   if (!tailoringContext.matchingSummary) {
-    toast.add({
+    notifyActionError({
       title: t('applications.cvs.generate.toast.generationFailed'),
-      color: 'error',
     });
     await router.push(`/jobs/${targetJobId}/match`);
     return;
@@ -231,9 +241,8 @@ const generateTailoredCv = async (
   });
 
   if (!created?.id) {
-    toast.add({
+    notifyActionError({
       title: t('applications.cvs.generate.toast.createFailed'),
-      color: 'error',
     });
     return;
   }
@@ -265,7 +274,7 @@ const startGeneration = async (override?: {
 const handleGenerateClick = async () => {
   await prepareDefaults();
   if (!userId.value) {
-    toast.add({ title: t('applications.cvs.generate.toast.error'), color: 'error' });
+    notifyActionError({ title: t('applications.cvs.generate.toast.error') });
     return;
   }
   void startGeneration();
@@ -289,6 +298,10 @@ const loadExperiences = async () => {
   loadingExperiences.value = true;
   try {
     experiences.value = await experienceRepo.list(userId.value);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : t('applications.cvs.generate.toast.error');
+    setPageError(message);
   } finally {
     loadingExperiences.value = false;
   }
@@ -302,8 +315,15 @@ const ensureLoaded = async () => {
     return;
   }
 
-  await Promise.all([loadSettings(), loadTemplates(), loadExperiences()]);
-  initialized.value = true;
+  try {
+    clearPageError();
+    await Promise.all([loadSettings(), loadTemplates(), loadExperiences()]);
+    initialized.value = true;
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : t('applications.cvs.generate.toast.error');
+    setPageError(message);
+  }
 };
 
 const prepareDefaults = async () => {

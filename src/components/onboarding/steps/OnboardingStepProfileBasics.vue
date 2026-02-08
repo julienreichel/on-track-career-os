@@ -7,6 +7,7 @@ import { useUserProfile } from '@/application/user-profile/useUserProfile';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
 import { isValidEmail, isValidPhone } from '@/domain/user-profile/contactValidation';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 import type { ProfileForm } from '@/components/profile/types';
 import type { UserProfileUpdateInput } from '@/domain/user-profile/UserProfile';
 import { profileFormContextKey } from '@/components/profile/profileFormContext';
@@ -24,6 +25,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const { userId, loadUserId } = useAuthUser();
+const { notifyActionError } = useErrorDisplay();
 
 const form = ref<ProfileForm>({
   fullName: '',
@@ -47,7 +49,6 @@ const form = ref<ProfileForm>({
 const isEditing = ref(true);
 const loading = ref(false);
 const profileLoading = ref(true);
-const error = ref<string | null>(null);
 const photoPreviewUrl = ref<string | null>(null);
 const uploadingPhoto = ref(false);
 const photoError = ref<string | null>(null);
@@ -239,20 +240,28 @@ const handleSave = async () => {
     return;
   }
   if (!form.value.fullName?.trim()) {
-    error.value = t('onboarding.errors.fullNameRequired');
+    notifyActionError({
+      title: t('onboarding.errors.title'),
+      description: t('onboarding.errors.fullNameRequired'),
+    });
     return;
   }
   if (hasValidationErrors.value) {
-    error.value = t('onboarding.errors.validationFailed');
+    notifyActionError({
+      title: t('onboarding.errors.title'),
+      description: t('onboarding.errors.validationFailed'),
+    });
     return;
   }
   if (!userId.value || !saveProfile) {
-    error.value = t('onboarding.errors.missingUser');
+    notifyActionError({
+      title: t('onboarding.errors.title'),
+      description: t('onboarding.errors.missingUser'),
+    });
     return;
   }
 
   loading.value = true;
-  error.value = null;
 
   try {
     const payload: UserProfileUpdateInput = {
@@ -278,10 +287,16 @@ const handleSave = async () => {
     if (saved) {
       emit('complete');
     } else {
-      error.value = t('onboarding.errors.saveFailed');
+      notifyActionError({
+        title: t('onboarding.errors.title'),
+        description: t('onboarding.errors.saveFailed'),
+      });
     }
   } catch {
-    error.value = t('onboarding.errors.saveFailed');
+    notifyActionError({
+      title: t('onboarding.errors.title'),
+      description: t('onboarding.errors.saveFailed'),
+    });
   } finally {
     loading.value = false;
   }
@@ -325,15 +340,6 @@ provide(profileFormContextKey, {
       </template>
       <p class="text-sm text-dimmed">{{ t('onboarding.steps.profileBasics.hint') }}</p>
     </UCard>
-
-    <UAlert
-      v-if="error"
-      icon="i-heroicons-exclamation-triangle"
-      color="error"
-      variant="soft"
-      :title="t('onboarding.errors.title')"
-      :description="error"
-    />
 
     <template v-if="profileLoading">
       <UCard class="space-y-3">

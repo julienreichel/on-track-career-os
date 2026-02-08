@@ -7,6 +7,7 @@ import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useGuidance } from '@/composables/useGuidance';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 import type { PageHeaderLink } from '@/types/ui';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
@@ -16,6 +17,7 @@ const { t } = useI18n();
 const router = useRouter();
 const { userId } = useAuthUser();
 const experienceRepo = new ExperienceRepository();
+const { pageError, setPageError, clearPageError, notifyActionError } = useErrorDisplay();
 
 function toTimestamp(dateString: string | null | undefined): number {
   if (!dateString) {
@@ -29,7 +31,6 @@ const experiences = ref<Experience[]>([]);
 const storyCounts = ref<Record<string, number>>({});
 const loading = ref(false);
 const hasLoaded = ref(false);
-const errorMessage = ref<string | null>(null);
 const showDeleteModal = ref(false);
 const experienceToDelete = ref<string | null>(null);
 const searchQuery = ref('');
@@ -106,7 +107,7 @@ async function loadExperiences() {
 
   loading.value = true;
   hasLoaded.value = false;
-  errorMessage.value = null;
+  clearPageError();
 
   try {
     const result = await experienceRepo.listWithStories(userId.value);
@@ -114,8 +115,9 @@ async function loadExperiences() {
     experiences.value = safeResult.map((item) => item as Experience);
     rebuildStoryCounts(safeResult);
   } catch (error) {
-    errorMessage.value =
+    const message =
       error instanceof Error ? error.message : t('experiences.errors.loadFailed');
+    setPageError(message);
     logError('[experiences] Error loading experiences:', error);
   } finally {
     loading.value = false;
@@ -156,8 +158,10 @@ async function confirmDelete() {
     showDeleteModal.value = false;
     experienceToDelete.value = null;
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('experiences.errors.deleteFailed');
+    notifyActionError({
+      title: t('experiences.errors.deleteFailed'),
+      description: error instanceof Error ? error.message : undefined,
+    });
     logError('[experiences] Error deleting experience:', error);
   }
 }
@@ -236,14 +240,14 @@ function handleViewStories(id: string) {
 
       <!-- Error Alert -->
       <UAlert
-        v-if="errorMessage"
+        v-if="pageError"
         icon="i-heroicons-exclamation-triangle"
         color="error"
         variant="soft"
-        :title="t('ingestion.cv.upload.errors.unknown')"
-        :description="errorMessage"
+        :title="t('experiences.errors.loadFailed')"
+        :description="pageError"
         :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-        @close="errorMessage = null"
+        @close="clearPageError"
       />
 
       <!-- Loading State -->

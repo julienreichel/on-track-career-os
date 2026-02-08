@@ -1,23 +1,21 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useCvUploadWorkflow } from '@/composables/useCvUploadWorkflow';
 import { useCvParsing } from '@/composables/useCvParsing';
 import { useExperienceImport } from '@/composables/useExperienceImport';
 import StickyFooterCard from '@/components/common/StickyFooterCard.vue';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 
 const { t } = useI18n();
 const router = useRouter();
+const { notifyActionError } = useErrorDisplay();
 
 // Composables
 const workflow = useCvUploadWorkflow();
 const parsing = useCvParsing();
 const importing = useExperienceImport();
-
-const errorTitle = computed(() =>
-  workflow.errorMessage.value ? t('ingestion.cv.upload.errors.genericTitle') : ''
-);
 
 // Handle file selection and parsing
 async function handleFileSelected(file: File) {
@@ -70,6 +68,18 @@ function handleCancel() {
 function viewExperiences() {
   void router.push('/profile/experiences');
 }
+
+watch(
+  () => workflow.errorMessage.value,
+  (message) => {
+    if (!message) return;
+    notifyActionError({
+      title: t('ingestion.cv.upload.errors.genericTitle'),
+      description: message,
+    });
+    workflow.clearError();
+  }
+);
 </script>
 
 <template>
@@ -90,17 +100,6 @@ function viewExperiences() {
     </UPageHeader>
 
     <UPageBody>
-      <!-- Error Alert -->
-    <UAlert
-      v-if="workflow.errorMessage.value"
-      icon="i-lucide-alert-triangle"
-      color="error"
-      :title="errorTitle"
-      :description="workflow.errorMessage.value"
-      :close-button="{ icon: 'i-lucide-x', color: 'error', variant: 'link' }"
-      @close="workflow.clearError()"
-    />
-
       <!-- Upload Step -->
       <CvUploadStep
         v-if="workflow.currentStep.value === 'upload'"

@@ -3,6 +3,7 @@ import { onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useCompanies } from '@/composables/useCompanies';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 import CompanyCard from '@/components/company/CompanyCard.vue';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 import type { PageHeaderLink } from '@/types/ui';
@@ -10,10 +11,10 @@ import type { PageHeaderLink } from '@/types/ui';
 const router = useRouter();
 const { t } = useI18n();
 const companyStore = useCompanies();
+const { pageError, setPageError, clearPageError, notifyActionError } = useErrorDisplay();
 
 const loading = ref(false);
 const hasLoaded = ref(false);
-const errorMessage = ref<string | null>(null);
 const showDeleteModal = ref(false);
 const companyToDelete = ref<string | null>(null);
 
@@ -38,12 +39,13 @@ const searchQuery = companyStore.searchQuery;
 async function loadCompanies() {
   loading.value = true;
   hasLoaded.value = false;
-  errorMessage.value = null;
+  clearPageError();
   try {
     await companyStore.listCompanies();
   } catch (error) {
-    errorMessage.value =
+    const message =
       error instanceof Error ? error.message : t('companies.list.errors.generic');
+    setPageError(message);
   } finally {
     loading.value = false;
     hasLoaded.value = true;
@@ -68,8 +70,10 @@ async function confirmDelete() {
     showDeleteModal.value = false;
     companyToDelete.value = null;
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('companies.list.errors.generic');
+    notifyActionError({
+      title: t('companies.list.errors.title'),
+      description: error instanceof Error ? error.message : t('companies.list.errors.generic'),
+    });
   }
 }
 
@@ -99,15 +103,15 @@ function cancelDelete() {
       </div>
 
       <UAlert
-        v-if="errorMessage"
+        v-if="pageError"
         icon="i-heroicons-exclamation-triangle"
         color="error"
         variant="soft"
         :title="t('companies.list.errors.title')"
-        :description="errorMessage"
+        :description="pageError"
         :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
         class="mb-6"
-        @close="errorMessage = null"
+        @close="clearPageError"
       />
 
       <ListSkeletonCards v-if="loading || !hasLoaded" />

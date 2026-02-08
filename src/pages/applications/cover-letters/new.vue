@@ -39,16 +39,6 @@
             />
           </UFormField>
 
-          <!-- Error Display -->
-          <UAlert
-            v-if="generationError"
-            color="error"
-            icon="i-heroicons-exclamation-triangle"
-            :title="$t('applications.coverLetters.form.errors.generation')"
-            :description="generationError"
-            class="mb-4"
-          />
-
           <div class="flex justify-end gap-3">
             <UButton :label="$t('common.actions.cancel')" variant="ghost" @click="cancel" />
             <UButton
@@ -90,6 +80,7 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthUser } from '@/composables/useAuthUser';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 import { useCoverLetters } from '@/application/cover-letter/useCoverLetters';
 import { useCoverLetterEngine } from '@/composables/useCoverLetterEngine';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
@@ -100,6 +91,7 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
+const { notifyActionError } = useErrorDisplay();
 
 // Get current user ID from auth
 const { userId, loadUserId } = useAuthUser();
@@ -128,7 +120,6 @@ const jobDescriptionObj = computed<SpeechInput['jobDescription'] | undefined>(()
 
 // Generation state
 const generating = ref(false);
-const generationError = ref<string | null>(null);
 const autoTriggered = ref(false);
 const autoJobId = computed(() => {
   const value = route.query.jobId;
@@ -152,16 +143,14 @@ const generateCoverLetter = async () => {
   }
 
   generating.value = true;
-  generationError.value = null;
 
   try {
     if (!userId.value) {
       await loadUserId();
     }
     if (!userId.value) {
-      toast.add({
+      notifyActionError({
         title: t('applications.coverLetters.toast.createFailed'),
-        color: 'error',
       });
       return;
     }
@@ -173,10 +162,9 @@ const generateCoverLetter = async () => {
     const content = await engine.generate(jobDescriptionObj.value);
 
     if (!content) {
-      toast.add({
+      notifyActionError({
         title: t('applications.coverLetters.toast.generationFailed'),
         description: engine.error.value || undefined,
-        color: 'error',
       });
       return;
     }
@@ -207,17 +195,15 @@ const generateCoverLetter = async () => {
       logError(
         '[coverLetterNew] Failed to create cover letter - createCoverLetter returned null'
       );
-      toast.add({
+      notifyActionError({
         title: t('applications.coverLetters.toast.createFailed'),
-        color: 'error',
       });
     }
   } catch (err) {
     logError('[coverLetterNew] Error generating cover letter:', err);
-    generationError.value = err instanceof Error ? err.message : 'Unknown error';
-    toast.add({
+    notifyActionError({
       title: t('applications.coverLetters.toast.error'),
-      color: 'error',
+      description: err instanceof Error ? err.message : undefined,
     });
   } finally {
     generating.value = false;
@@ -230,22 +216,19 @@ const generateTailoredCoverLetter = async (jobId: string) => {
   }
   autoTriggered.value = true;
   generating.value = true;
-  generationError.value = null;
 
   try {
     const context = await tailoredMaterials.loadTailoringContext(jobId);
     if (!context.ok) {
-      toast.add({
+      notifyActionError({
         title: t('applications.coverLetters.toast.error'),
-        color: 'error',
       });
       await router.push('/jobs');
       return;
     }
     if (!context.matchingSummary) {
-      toast.add({
+      notifyActionError({
         title: t('applications.coverLetters.toast.generationFailed'),
-        color: 'error',
       });
       await router.push(`/jobs/${jobId}/match`);
       return;
@@ -263,16 +246,14 @@ const generateTailoredCoverLetter = async (jobId: string) => {
       return;
     }
 
-    toast.add({
+    notifyActionError({
       title: t('applications.coverLetters.toast.createFailed'),
-      color: 'error',
     });
   } catch (err) {
     logError('[coverLetterNew] Error generating tailored cover letter:', err);
-    generationError.value = err instanceof Error ? err.message : 'Unknown error';
-    toast.add({
+    notifyActionError({
       title: t('applications.coverLetters.toast.error'),
-      color: 'error',
+      description: err instanceof Error ? err.message : undefined,
     });
   } finally {
     generating.value = false;

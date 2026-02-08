@@ -7,16 +7,17 @@ import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience, ExperienceCreateInput } from '@/domain/experience/Experience';
 import ExperienceForm from '@/components/ExperienceForm.vue';
 import type { PageHeaderLink } from '@/types/ui';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 
 const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
 const experienceRepo = new ExperienceRepository();
+const { pageError, setPageError, clearPageError, notifyActionError } = useErrorDisplay();
 
 const experience = ref<Experience | null>(null);
 const loading = ref(false);
 const saving = ref(false);
-const errorMessage = ref<string | null>(null);
 const isEditing = ref(false);
 
 const experienceId = computed(() => {
@@ -53,7 +54,7 @@ onMounted(async () => {
 
 async function loadExperience(id: string) {
   loading.value = true;
-  errorMessage.value = null;
+  clearPageError();
 
   try {
     const result = await experienceRepo.get(id);
@@ -62,8 +63,8 @@ async function loadExperience(id: string) {
     }
     experience.value = result;
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('experiences.errors.loadFailed');
+    const message = error instanceof Error ? error.message : t('experiences.errors.loadFailed');
+    setPageError(message);
     logError('[experience] Error loading experience:', error);
   } finally {
     loading.value = false;
@@ -72,7 +73,6 @@ async function loadExperience(id: string) {
 
 async function handleSave(data: ExperienceCreateInput) {
   saving.value = true;
-  errorMessage.value = null;
 
   try {
     // Get current user ID
@@ -102,8 +102,10 @@ async function handleSave(data: ExperienceCreateInput) {
       isEditing.value = false;
     }
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('experiences.errors.saveFailed');
+    notifyActionError({
+      title: t('experiences.errors.saveFailed'),
+      description: error instanceof Error ? error.message : undefined,
+    });
     logError('[experience] Error saving experience:', error);
   } finally {
     saving.value = false;
@@ -176,14 +178,14 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
     <UPageBody>
       <!-- Error Alert -->
       <UAlert
-        v-if="errorMessage"
+        v-if="pageError"
         icon="i-heroicons-exclamation-triangle"
         color="error"
         variant="soft"
-        :title="t('ingestion.cv.upload.errors.unknown')"
-        :description="errorMessage"
+        :title="t('experiences.errors.loadFailed')"
+        :description="pageError"
         :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-        @close="errorMessage = null"
+        @close="clearPageError"
       />
 
       <!-- Loading State -->

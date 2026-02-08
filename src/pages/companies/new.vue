@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useCompanies } from '@/composables/useCompanies';
@@ -7,9 +7,11 @@ import { useCompanyUpload } from '@/composables/useCompanyUpload';
 import CompanyForm, { type CompanyFormState } from '@/components/company/CompanyForm.vue';
 import CompanyUploadStep from '@/components/company/CompanyUploadStep.vue';
 import { CompanyService } from '@/domain/company/CompanyService';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 
 const router = useRouter();
 const { t } = useI18n();
+const { notifyActionError } = useErrorDisplay();
 
 const companies = useCompanies();
 const companyService = new CompanyService();
@@ -35,7 +37,6 @@ const form = reactive<CompanyFormState>({
 const rawNotes = ref('');
 const saving = ref(false);
 const analyzing = ref(false);
-const formError = ref<string | null>(null);
 
 const disableActions = computed(() => saving.value || analyzing.value);
 
@@ -65,15 +66,20 @@ function updateForm(value: CompanyFormState) {
 
 async function handleSave(analyze = false) {
   if (!form.companyName.trim()) {
-    formError.value = t('companies.form.errors.missingName');
+    notifyActionError({
+      title: t('companies.form.errors.title'),
+      description: t('companies.form.errors.missingName'),
+    });
     return;
   }
   if (analyze && !rawNotes.value.trim()) {
-    formError.value = t('companies.form.errors.missingNotes');
+    notifyActionError({
+      title: t('companies.form.errors.title'),
+      description: t('companies.form.errors.missingNotes'),
+    });
     return;
   }
 
-  formError.value = null;
   saving.value = !analyze;
   analyzing.value = analyze;
 
@@ -92,7 +98,10 @@ async function handleSave(analyze = false) {
 
     await router.push(`/companies/${result.id}`);
   } catch (error) {
-    formError.value = error instanceof Error ? error.message : t('companies.form.errors.generic');
+    notifyActionError({
+      title: t('companies.form.errors.title'),
+      description: error instanceof Error ? error.message : t('companies.form.errors.generic'),
+    });
   } finally {
     saving.value = false;
     analyzing.value = false;
@@ -105,6 +114,18 @@ async function handleUploadSelected(file: File | null | undefined) {
     await router.push(`/companies/${created.id}`);
   }
 }
+
+watch(
+  () => uploadError.value,
+  (message) => {
+    if (!message) return;
+    notifyActionError({
+      title: t('companies.upload.errors.title'),
+      description: message,
+    });
+    uploadReset();
+  }
+);
 </script>
 
 <template>
@@ -122,22 +143,6 @@ async function handleUploadSelected(file: File | null | undefined) {
             {{ t('companies.upload.helper') }}
           </p>
 
-          <UAlert
-            v-if="uploadError"
-            icon="i-heroicons-exclamation-triangle"
-            color="error"
-            variant="soft"
-            :title="t('companies.upload.errors.title')"
-            :description="uploadError"
-            class="mb-4"
-            :close-button="{
-              icon: 'i-heroicons-x-mark-20-solid',
-              color: 'error',
-              variant: 'link',
-            }"
-            @close="uploadReset()"
-          />
-
           <CompanyUploadStep
             :selected-file="uploadSelectedFile"
             :is-processing="uploadProcessing"
@@ -149,22 +154,6 @@ async function handleUploadSelected(file: File | null | undefined) {
         <USeparator :label="t('companies.upload.orManual')" />
 
         <div>
-          <UAlert
-            v-if="formError"
-            icon="i-heroicons-exclamation-triangle"
-            color="error"
-            variant="soft"
-            :title="t('companies.form.errors.title')"
-            :description="formError"
-            class="mb-6"
-            :close-button="{
-              icon: 'i-heroicons-x-mark-20-solid',
-              color: 'error',
-              variant: 'link',
-            }"
-            @close="formError = null"
-          />
-
           <UCard>
             <CompanyForm
               :model-value="form"

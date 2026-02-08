@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useJobUpload } from '@/composables/useJobUpload';
 import JobUploadStep from '@/components/job/JobUploadStep.vue';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -16,8 +17,21 @@ const {
   handleTextSubmitted: processJobText,
   reset,
 } = useJobUpload();
+const { notifyActionError } = useErrorDisplay();
 const textInput = ref('');
 const isTextProcessing = computed(() => isProcessing.value && !selectedFile.value);
+
+watch(
+  () => errorMessage.value,
+  (message) => {
+    if (!message) return;
+    notifyActionError({
+      title: t('jobs.form.errors.generic'),
+      description: message,
+    });
+    reset();
+  }
+);
 
 async function handleFileSelected(file: File | null | undefined) {
   const job = await processJobFile(file);
@@ -45,17 +59,6 @@ async function handleTextSubmitted(rawText: string) {
 
     <UPageBody>
       <div class="space-y-6">
-        <UAlert
-          v-if="errorMessage"
-          color="error"
-          icon="i-lucide-alert-triangle"
-          :title="t('jobs.form.errors.generic')"
-          :description="errorMessage"
-          :close-button="{ icon: 'i-lucide-x', color: 'error', variant: 'link' }"
-          class="mb-6"
-          @close="reset()"
-        />
-
         <JobUploadStep
           v-if="!isTextProcessing"
           :selected-file="selectedFile"

@@ -43,15 +43,7 @@ Note: No server-only secrets were observed in `runtimeConfig.public` in nuxt.con
 
 ## 3) P0 Reliability & Error Handling
 
-1. Finding: Inconsistent error UX patterns across pages
-   severity: P1
-   category: 3.2 Inconsistent error UX
-   location: src/pages/applications/cv/new.vue; src/pages/applications/cover-letters/new.vue; src/pages/jobs/index.vue; src/pages/profile/experiences/index.vue
-   symptom: Some flows use toasts, others inline `UAlert`, and some only set error refs.
-   whyItMatters: Users get inconsistent feedback, and some errors are easy to miss.
-   suggestedFix: Define a single error display standard (e.g., inline `UAlert` for page-scoped errors + toast for actions). Encapsulate in a shared composable.
-   estimatedEffort: S
-   risk: low
+No open findings in this section.
 
 ## 4) P0 Architecture & Boundaries
 

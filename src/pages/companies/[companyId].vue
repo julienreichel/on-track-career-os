@@ -9,6 +9,7 @@ import JobCard from '@/components/job/JobCard.vue';
 import { useCompany } from '@/application/company/useCompany';
 import { useCompanyCanvas } from '@/application/company/useCompanyCanvas';
 import { useCompanyJobs } from '@/application/company/useCompanyJobs';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 import type { Company } from '@/domain/company/Company';
 import type { CompanyCanvas } from '@/domain/company-canvas/CompanyCanvas';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
@@ -16,6 +17,7 @@ import type { JobDescription } from '@/domain/job-description/JobDescription';
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const { pageError, setPageError, clearPageError, notifyActionError } = useErrorDisplay();
 
 const companyId = computed(() => route.params.companyId as string);
 const companyStore = useCompany(companyId.value);
@@ -23,7 +25,6 @@ const canvasStore = useCompanyCanvas(companyId.value);
 const jobsStore = useCompanyJobs(companyId.value);
 
 const loading = ref(true);
-const errorMessage = ref<string | null>(null);
 const savingCompany = ref(false);
 const analyzingCompany = ref(false);
 const isEditing = ref(false);
@@ -132,7 +133,7 @@ watch(
 
 async function loadCompany() {
   loading.value = true;
-  errorMessage.value = null;
+  clearPageError();
   try {
     const result = await companyStore.loadWithRelations();
     if (!result) {
@@ -143,8 +144,9 @@ async function loadCompany() {
     jobsStore.hydrate(hydrated.jobs ?? []);
     isEditing.value = false;
   } catch (error) {
-    errorMessage.value =
+    const message =
       error instanceof Error ? error.message : t('companies.detail.errors.generic');
+    setPageError(message);
   } finally {
     loading.value = false;
   }
@@ -170,7 +172,6 @@ function arraysEqual(a: string[], b: string[]) {
 async function saveCompany() {
   if (!company.value) return;
   savingCompany.value = true;
-  errorMessage.value = null;
   try {
     const payload = {
       companyName: form.companyName,
@@ -189,8 +190,10 @@ async function saveCompany() {
       isEditing.value = false;
     }
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('companies.detail.errors.generic');
+    notifyActionError({
+      title: t('companies.detail.errors.title'),
+      description: error instanceof Error ? error.message : t('companies.detail.errors.generic'),
+    });
   } finally {
     savingCompany.value = false;
   }
@@ -211,11 +214,13 @@ function handleCancel() {
 
 async function saveCanvas() {
   canvasSaving.value = true;
-  errorMessage.value = null;
   try {
     await canvasStore.save();
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : t('companies.canvas.errors.save');
+    notifyActionError({
+      title: t('companies.canvas.errors.save'),
+      description: error instanceof Error ? error.message : undefined,
+    });
   } finally {
     canvasSaving.value = false;
   }
@@ -223,13 +228,14 @@ async function saveCanvas() {
 
 async function regenerateCanvas() {
   canvasRegenerating.value = true;
-  errorMessage.value = null;
   try {
     const notes = rawNotes.value ? [rawNotes.value] : [];
     await canvasStore.regenerate(notes);
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : t('companies.canvas.errors.generate');
+    notifyActionError({
+      title: t('companies.canvas.errors.generate'),
+      description: error instanceof Error ? error.message : undefined,
+    });
   } finally {
     canvasRegenerating.value = false;
   }
@@ -254,15 +260,15 @@ function clearJobsError() {
 
     <UPageBody>
       <UAlert
-        v-if="errorMessage"
+        v-if="pageError"
         icon="i-heroicons-exclamation-triangle"
         color="error"
         variant="soft"
         :title="t('companies.detail.errors.title')"
-        :description="errorMessage"
+        :description="pageError"
         class="mb-6"
         :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-        @close="errorMessage = null"
+        @close="clearPageError"
       />
 
       <UCard v-if="loading">

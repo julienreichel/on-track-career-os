@@ -8,18 +8,13 @@
 
     <UPageBody>
       <UAlert
-        v-if="error || loadError"
+        v-if="pageError"
         icon="i-heroicons-exclamation-triangle"
         color="error"
         variant="soft"
-        :title="error || loadError || ''"
+        :title="pageError"
         :close-button="{ icon: 'i-heroicons-x-mark-20-solid', color: 'error', variant: 'link' }"
-        @close="
-          () => {
-            error = null;
-            loadError = null;
-          }
-        "
+        @close="clearPageError"
       />
 
       <UAlert
@@ -79,6 +74,7 @@ import { computed, nextTick, onMounted, provide, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthUser } from '@/composables/useAuthUser';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
 import { useUserProfile } from '@/application/user-profile/useUserProfile';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
@@ -95,6 +91,7 @@ const route = useRoute();
 const router = useRouter();
 const { userId } = useAuthUser();
 const progress = useUserProgress();
+const { pageError, setPageError, clearPageError, notifyActionError } = useErrorDisplay();
 
 const profile = ref<UserProfile | null>(null);
 const loading = ref(false);
@@ -245,6 +242,18 @@ const initProfile = (id: string) => {
     }
   });
 };
+
+watch(
+  loadError,
+  (message) => {
+    if (message) {
+      setPageError(message);
+      return;
+    }
+    clearPageError();
+  },
+  { immediate: true }
+);
 
 watch(
   userId,
@@ -451,6 +460,7 @@ const saveProfileUpdates = async () => {
     const success = await saveProfile(payload);
     if (!success) {
       error.value = t('profile.messages.saveError');
+      notifyActionError({ title: t('profile.messages.saveError') });
       return;
     }
     saveSuccess.value = true;
@@ -462,6 +472,7 @@ const saveProfileUpdates = async () => {
   } catch (err) {
     logError('[profile] Save failed:', err);
     error.value = t('profile.messages.saveError');
+    notifyActionError({ title: t('profile.messages.saveError') });
   } finally {
     loading.value = false;
   }
