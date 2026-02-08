@@ -1026,7 +1026,8 @@
         "viewJob": "View job",
         "generateCv": "Generate CV",
         "generateCoverLetter": "Generate cover letter",
-        "generateSpeech": "Generate speech"
+        "generateSpeech": "Generate speech",
+        "generateMatch": "Generate match"
       }
     }
   },
