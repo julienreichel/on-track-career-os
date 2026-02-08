@@ -22,93 +22,119 @@ let cvTemplateService: CVTemplateService | null = null;
 let companyService: CompanyService | null = null;
 let jobService: JobDescriptionService | null = null;
 
-export function useBreadcrumbMapping() {
-  /**
-   * Get display name for an experience ID
-   */
-  const getExperienceName = async (experienceId: string): Promise<string> => {
-    // Lazy initialize service to avoid issues in test environment
-    if (!experienceService) {
-      experienceService = new ExperienceService();
-    }
-
-    // Check cache first
-    if (mappingCache.value[experienceId]) {
-      return mappingCache.value[experienceId];
-    }
-
-    // Fetch from API
-    try {
-      const experience = await experienceService.getFullExperience(experienceId);
-      const name = experience?.companyName || experience?.title;
-      if (name) {
-        mappingCache.value[experienceId] = name;
-        return name;
-      }
-    } catch (err) {
-      logError('[useBreadcrumbMapping] Error fetching experience:', err);
-    }
-
-    // Return ID as fallback
-    return experienceId;
+type UseBreadcrumbMappingOptions = {
+  toast?: {
+    add: (options: Record<string, unknown>) => void;
   };
+  fallbackLabel?: string;
+  errorTitle?: string;
+  errorDescription?: string;
+};
 
-  /**
-   * Get display name for a CV document ID
-   */
-  const getCVDocumentName = async (cvId: string): Promise<string> => {
-    // Lazy initialize service to avoid issues in test environment
-    if (!cvDocumentService) {
-      cvDocumentService = new CVDocumentService();
+const resolveErrorMessage = (value: string | undefined, fallback: string) =>
+  value && value.trim().length > 0 ? value : fallback;
+
+const getExperienceName = async (
+  experienceId: string,
+  fallbackLabel: string,
+  notifyFailure: () => void
+): Promise<string> => {
+  if (!experienceService) {
+    experienceService = new ExperienceService();
+  }
+
+  if (mappingCache.value[experienceId]) {
+    return mappingCache.value[experienceId];
+  }
+
+  try {
+    const experience = await experienceService.getFullExperience(experienceId);
+    const name = experience?.companyName || experience?.title;
+    if (name) {
+      mappingCache.value[experienceId] = name;
+      return name;
     }
+  } catch (err) {
+    logError('[useBreadcrumbMapping] Error fetching experience', err, { experienceId });
+    notifyFailure();
+  }
 
-    // Check cache first
-    if (mappingCache.value[cvId]) {
-      return mappingCache.value[cvId];
+  return fallbackLabel;
+};
+
+const getCVDocumentName = async (
+  cvId: string,
+  fallbackLabel: string,
+  notifyFailure: () => void
+): Promise<string> => {
+  if (!cvDocumentService) {
+    cvDocumentService = new CVDocumentService();
+  }
+
+  if (mappingCache.value[cvId]) {
+    return mappingCache.value[cvId];
+  }
+
+  try {
+    const cvDocument = await cvDocumentService.getFullCVDocument(cvId);
+    const name = cvDocument?.name;
+    if (name) {
+      mappingCache.value[cvId] = name;
+      return name;
     }
+  } catch (err) {
+    logError('[useBreadcrumbMapping] Error fetching CV document', err, { cvId });
+    notifyFailure();
+  }
 
-    // Fetch from API
-    try {
-      const cvDocument = await cvDocumentService.getFullCVDocument(cvId);
-      const name = cvDocument?.name;
-      if (name) {
-        mappingCache.value[cvId] = name;
-        return name;
-      }
-    } catch (err) {
-      logError('[useBreadcrumbMapping] Error fetching CV document:', err);
+  return fallbackLabel;
+};
+
+const getCVTemplateName = async (
+  templateId: string,
+  fallbackLabel: string,
+  notifyFailure: () => void
+): Promise<string> => {
+  if (!cvTemplateService) {
+    cvTemplateService = new CVTemplateService();
+  }
+
+  if (mappingCache.value[templateId]) {
+    return mappingCache.value[templateId];
+  }
+
+  try {
+    const template = await cvTemplateService.get(templateId);
+    const name = template?.name;
+    if (name) {
+      mappingCache.value[templateId] = name;
+      return name;
     }
+  } catch (err) {
+    logError('[useBreadcrumbMapping] Error fetching CV template', err, { templateId });
+    notifyFailure();
+  }
 
-    // Return ID as fallback
-    return cvId;
+  return fallbackLabel;
+};
+
+export function useBreadcrumbMapping(options: UseBreadcrumbMappingOptions) {
+  const toast = options.toast ?? null;
+  const fallbackLabel = resolveErrorMessage(options.fallbackLabel, 'Unknown');
+  const errorTitle = resolveErrorMessage(options.errorTitle, 'Error');
+  const errorDescription = resolveErrorMessage(
+    options.errorDescription,
+    'Unable to resolve breadcrumb name.'
+  );
+
+  const notifyFailure = () => {
+    toast?.add({
+      title: errorTitle,
+      description: errorDescription,
+      color: 'error',
+      icon: 'i-heroicons-exclamation-triangle',
+    });
   };
-
-  /**
-   * Get display name for a CV template ID
-   */
-  const getCVTemplateName = async (templateId: string): Promise<string> => {
-    if (!cvTemplateService) {
-      cvTemplateService = new CVTemplateService();
-    }
-
-    if (mappingCache.value[templateId]) {
-      return mappingCache.value[templateId];
-    }
-
-    try {
-      const template = await cvTemplateService.get(templateId);
-      const name = template?.name;
-      if (name) {
-        mappingCache.value[templateId] = name;
-        return name;
-      }
-    } catch (err) {
-      logError('[useBreadcrumbMapping] Error fetching CV template:', err);
-    }
-
-    return templateId;
-  };
-
   /**
    * Check if a string looks like a UUID
    */
@@ -133,22 +159,22 @@ export function useBreadcrumbMapping() {
 
     // Determine what type of ID this is based on the previous segment
     if (previousSegment === 'experiences') {
-      return await getExperienceName(segment);
+      return await getExperienceName(segment, fallbackLabel, notifyFailure);
     }
 
     if (previousSegment === 'cv') {
       if (previousParentSegment === 'settings') {
-        return await getCVTemplateName(segment);
+        return await getCVTemplateName(segment, fallbackLabel, notifyFailure);
       }
-      return await getCVDocumentName(segment);
+      return await getCVDocumentName(segment, fallbackLabel, notifyFailure);
     }
 
     if (previousSegment === 'companies') {
-      return await getCompanyName(segment);
+      return await getCompanyName(segment, fallbackLabel, notifyFailure);
     }
 
     if (previousSegment === 'jobs') {
-      return await getJobName(segment);
+      return await getJobName(segment, fallbackLabel, notifyFailure);
     }
 
     // Add more mappings here as needed for other entity types
@@ -162,6 +188,11 @@ export function useBreadcrumbMapping() {
    */
   const clearCache = () => {
     mappingCache.value = {};
+    experienceService = null;
+    cvDocumentService = null;
+    cvTemplateService = null;
+    companyService = null;
+    jobService = null;
   };
 
   return {
@@ -174,7 +205,11 @@ export function useBreadcrumbMapping() {
 /**
  * Get display name for a company ID
  */
-const getCompanyName = async (companyId: string): Promise<string> => {
+const getCompanyName = async (
+  companyId: string,
+  fallbackLabel: string,
+  notifyFailure: () => void
+): Promise<string> => {
   if (!companyService) {
     companyService = new CompanyService();
   }
@@ -191,13 +226,18 @@ const getCompanyName = async (companyId: string): Promise<string> => {
       return name;
     }
   } catch (err) {
-    logError('[useBreadcrumbMapping] Error fetching company:', err);
+    logError('[useBreadcrumbMapping] Error fetching company', err, { companyId });
+    notifyFailure();
   }
 
-  return companyId;
+  return fallbackLabel;
 };
 
-const getJobName = async (jobId: string): Promise<string> => {
+const getJobName = async (
+  jobId: string,
+  fallbackLabel: string,
+  notifyFailure: () => void
+): Promise<string> => {
   if (!jobService) {
     jobService = new JobDescriptionService();
   }
@@ -214,8 +254,9 @@ const getJobName = async (jobId: string): Promise<string> => {
       return title;
     }
   } catch (err) {
-    logError('[useBreadcrumbMapping] Error fetching job:', err);
+    logError('[useBreadcrumbMapping] Error fetching job', err, { jobId });
+    notifyFailure();
   }
 
-  return jobId;
+  return fallbackLabel;
 };

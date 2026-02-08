@@ -777,7 +777,8 @@
   "common": {
     "error": "Error",
     "errors": {
-      "unknown": "Unknown error occurred"
+      "unknown": "Unknown error occurred",
+      "breadcrumbResolveFailed": "Unable to resolve breadcrumb name."
     },
     "backToProfile": "Back to Profile",
     "back": "Back",
@@ -810,7 +811,8 @@
     "untitled": "Untitled",
     "labels": {
       "cv": "CV",
-      "new": "New"
+      "new": "New",
+      "unknown": "Unknown"
     },
     "editor": {
       "unsavedChanges": "You have unsaved changes",

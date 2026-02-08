@@ -44,8 +44,14 @@ import { useBreadcrumbMapping } from '@/composables/useBreadcrumbMapping';
 import type { NavigationMenuItem } from '@nuxt/ui';
 
 const { t } = useI18n();
+const toast = useToast();
 const route = useRoute();
-const { resolveSegment, isUUID } = useBreadcrumbMapping();
+const { resolveSegment, isUUID } = useBreadcrumbMapping({
+  toast,
+  fallbackLabel: t('common.labels.unknown'),
+  errorTitle: t('common.error'),
+  errorDescription: t('common.errors.breadcrumbResolveFailed'),
+});
 
 // Navigation items for UNavigationMenu
 const navigationItems = computed<NavigationMenuItem[]>(() => [

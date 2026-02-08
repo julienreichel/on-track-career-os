@@ -43,17 +43,7 @@ Note: No server-only secrets were observed in `runtimeConfig.public` in nuxt.con
 
 ## 3) P0 Reliability & Error Handling
 
-1. Finding: Errors are swallowed in breadcrumb resolution
-   severity: P1
-   category: 3.1 Missing states (loading / empty / error)
-   location: src/composables/useBreadcrumbMapping.ts
-   symptom: Errors are logged and the UI silently falls back to IDs with no user-facing indicator.
-   whyItMatters: Users see confusing breadcrumb IDs; failures remain hidden and harder to diagnose.
-   suggestedFix: Provide a lightweight error indicator or fallback label ("Unknown") and surface a toast or banner when mapping fails.
-   estimatedEffort: S
-   risk: medium
-
-2. Finding: Inconsistent error UX patterns across pages
+1. Finding: Inconsistent error UX patterns across pages
    severity: P1
    category: 3.2 Inconsistent error UX
    location: src/pages/applications/cv/new.vue; src/pages/applications/cover-letters/new.vue; src/pages/jobs/index.vue; src/pages/profile/experiences/index.vue

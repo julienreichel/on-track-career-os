@@ -17,7 +17,7 @@ export default defineNuxtPlugin((_nuxtApp) => {
   });
 
   const router = useRouter();
-  const { resolveSegment, isUUID } = useBreadcrumbMapping();
+  const { resolveSegment, isUUID } = useBreadcrumbMapping({});
 
   // Map route segments to their translated labels (using static mapping to avoid i18n composable issues)
   const getSegmentLabel = (segment: string): string => {
