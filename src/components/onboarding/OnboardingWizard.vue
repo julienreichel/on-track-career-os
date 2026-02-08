@@ -52,6 +52,7 @@ const stepItems = computed(() =>
         :is-processing="wizard.isProcessing.value"
         @import-experiences="wizard.importExperiences"
         @back="wizard.back"
+        @remove-experience="wizard.parsing.removeExperience"
         @update-experience="wizard.parsing.updateExperience"
       />
 

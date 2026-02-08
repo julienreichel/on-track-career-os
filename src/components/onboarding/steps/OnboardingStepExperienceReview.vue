@@ -11,11 +11,13 @@ type Props = {
 };
 
 const props = defineProps<Props>();
-const emit = defineEmits<{
-  importExperiences: [];
-  back: [];
-  updateExperience: [index: number, value: ExtractedExperience];
-}>();
+const emit = defineEmits({
+  importExperiences: () => true,
+  back: () => true,
+  removeExperience: (index: number) => typeof index === 'number',
+  updateExperience: (index: number, value: ExtractedExperience) =>
+    typeof index === 'number' && Boolean(value),
+});
 
 const { t } = useI18n();
 
@@ -36,6 +38,7 @@ const experienceCount = computed(() => props.experiences.length);
 
     <CvExperiencesPreview
       :experiences="experiences"
+      @remove="(index) => emit('removeExperience', index)"
       @update="(index, value) => emit('updateExperience', index, value)"
     />
 
