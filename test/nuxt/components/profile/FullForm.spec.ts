@@ -402,7 +402,7 @@ describe('FullForm', () => {
   });
 
   it('handles photo selection with validation errors', async () => {
-    const wrapper = mount(FullForm, {
+    mount(FullForm, {
       global: {
         plugins: [i18n, router],
         stubs: {
@@ -471,7 +471,7 @@ describe('FullForm', () => {
         }) as any
     );
 
-    const wrapper = mount(FullForm, {
+    mount(FullForm, {
       global: {
         plugins: [i18n, router],
         stubs: {
@@ -525,7 +525,7 @@ describe('FullForm', () => {
         }) as any
     );
 
-    const wrapper = mount(FullForm, {
+    mount(FullForm, {
       global: {
         plugins: [i18n, router],
         stubs: {
