@@ -1,14 +1,97 @@
 # 🧭 EPIC ROADMAP — AI CAREER COACH EDITION
 
-_(MVP Complete → Coaching Layers Expansion)_
+Perfect — beta feedback is gold for shaping the landing. I went through it and several comments directly justify a **strong pre-login explanation layer**. Here’s how it informs the landing EPIC.
 
-Your MVP already covers:
-✔ Identity extraction
-✔ Stories & achievements
-✔ Company/job analysis
-✔ Tailored CV, letters, speeches
+---
 
-Now we shift from **generation → coaching & decision support**.
+## 🧱 Landing EPIC Scope (Beta-Informed)
+
+### 🔹 Hero Section
+
+**Headline:**
+
+> _Your AI Career Coach — from self-discovery to job offers._
+
+**Subtext:**
+
+> Stop guessing what employers want. Understand your value and present it with impact.
+
+CTA:
+**Start my career journey**
+
+---
+
+### 🔹 “How It Works” — Guided Journey (CRITICAL)
+
+This directly addresses beta confusion.
+
+**Section Title:**
+**A step-by-step journey, not just a CV tool**
+
+Visual flow:
+
+1. **Discover your strengths & direction**
+2. **Turn your experience into impact stories**
+3. **Understand what employers really need**
+4. **Create targeted CVs and letters with feedback**
+5. **Prepare confidently for interviews**
+
+This mirrors your actual system flow
+
+---
+
+### 🔹 “Built for Real Job Search, Not Just Documents”
+
+Comparison block:
+
+| Typical Tools       | Your On Track Career                             |
+| ------------------- | ------------------------------------------------ |
+| Write CVs           | Understand your value first                      |
+| Generic templates   | Stories & achievements from your real experience |
+| One-shot generation | Continuous feedback & improvement                |
+| Focus on documents  | Focus on strategy, positioning & confidence      |
+
+This reflects your strategic positioning section
+
+---
+
+### 🔹 “You Stay in Control”
+
+Addresses AI trust concerns from beta feedback about validation.
+
+Bullets:
+
+- AI suggestions are always editable
+- Nothing is saved without your validation
+- You see _why_ suggestions are made
+
+Matches your observability philosophy
+
+---
+
+### 🔹 Preview Section (Screenshots)
+
+Show:
+
+- Personal Canvas
+- Story Builder
+- Job Match view
+- CV editor
+
+Caption example:
+
+> “See how your experience connects to what employers actually need.”
+
+---
+
+### 🔹 Final CTA
+
+> _Ready to stop guessing and start positioning yourself strategically?_
+
+Buttons:
+
+- Create my account
+- I already have an account
 
 ---
 
