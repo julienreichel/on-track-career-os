@@ -15,16 +15,6 @@ suggestedFix: Centralize client logging with a redaction step. Log only a short 
 estimatedEffort: M
 risk: medium
 
-2. Finding: No explicit restriction on raw HTML in markdown pipeline
-severity: P1
-category: 1.2 Rendering untrusted content (XSS risks)
-location: src/components/MarkdownContent.vue
-symptom: `marked()` is used with default options, which allow inline HTML in markdown.
-whyItMatters: Even with sanitization, allowing raw HTML increases attack surface and maintenance burden.
-suggestedFix: Configure `marked` to disallow raw HTML or use a markdown-it pipeline with explicit allowlist settings.
-estimatedEffort: S
-risk: medium
-
 Note: No server-only secrets were observed in `runtimeConfig.public` in nuxt.config.ts during this audit.
 
 ## 2) P0 Data & GraphQL Performance
