@@ -17,7 +17,7 @@ test.describe('Job analysis workflow', () => {
     // Ensure jobs list header and breadcrumb link exist
     await expect(page.getByRole('link', { name: 'Jobs' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Jobs', level: 1 })).toBeVisible();
-    const addJobLink = page.getByRole('link', { name: /add/i }).first();
+    const addJobLink = page.getByRole('link', { name: /Analyze Job/i }).first();
     await expect(addJobLink).toBeVisible();
     await addJobLink.click();
 

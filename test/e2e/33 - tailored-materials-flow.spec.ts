@@ -17,7 +17,7 @@ test.describe('Tailored materials workflow', () => {
     await page.goto('/jobs');
     await page.waitForLoadState('networkidle');
 
-    const addJobLink = page.getByRole('link', { name: /^add$/i }).first();
+    const addJobLink = page.getByRole('link', { name: /^Analyze Job$/i }).first();
     await expect(addJobLink).toBeVisible();
     await addJobLink.click();
 

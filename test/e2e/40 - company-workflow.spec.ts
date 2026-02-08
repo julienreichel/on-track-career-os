@@ -111,7 +111,10 @@ test.describe('Company workflow', () => {
 
     await page.goto('/jobs');
     await page.waitForLoadState('networkidle');
-    await page.getByRole('link', { name: /^add$/i }).click();
+    await page
+      .getByRole('link', { name: /^Analyze Job$/i })
+      .first()
+      .click();
     await expect(page).toHaveURL('/jobs/new');
     await page.waitForLoadState('networkidle');
 
