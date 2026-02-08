@@ -39,8 +39,8 @@ const headerLinks = computed(() => [
     variant: 'ghost' as const,
   },
   {
-    label: t('common.actions.add'),
-    icon: 'i-heroicons-plus',
+    label: t('jobs.list.actions.add'),
+    icon: 'i-heroicons-sparkles',
     to: '/jobs/new',
   },
 ]);

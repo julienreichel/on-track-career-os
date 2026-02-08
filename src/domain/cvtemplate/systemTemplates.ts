@@ -22,8 +22,8 @@ export const SYSTEM_CV_TEMPLATE_DEFS: SystemCvTemplateDefinition[] = [
   {
     id: 'system:classic',
     source: 'system:classic',
-    nameKey: 'cvTemplates.system.classic.name',
-    descriptionKey: 'cvTemplates.system.classic.description',
+    nameKey: 'applications.cvs.templates.system.classic.name',
+    descriptionKey: 'applications.cvs.templates.system.classic.description',
     contentByLocale: {
       en: classicEn,
     },
@@ -31,8 +31,8 @@ export const SYSTEM_CV_TEMPLATE_DEFS: SystemCvTemplateDefinition[] = [
   {
     id: 'system:modern',
     source: 'system:modern',
-    nameKey: 'cvTemplates.system.modern.name',
-    descriptionKey: 'cvTemplates.system.modern.description',
+    nameKey: 'applications.cvs.templates.system.modern.name',
+    descriptionKey: 'applications.cvs.templates.system.modern.description',
     contentByLocale: {
       en: modernEn,
     },
@@ -40,8 +40,8 @@ export const SYSTEM_CV_TEMPLATE_DEFS: SystemCvTemplateDefinition[] = [
   {
     id: 'system:competency',
     source: 'system:competency',
-    nameKey: 'cvTemplates.system.competency.name',
-    descriptionKey: 'cvTemplates.system.competency.description',
+    nameKey: 'applications.cvs.templates.system.competency.name',
+    descriptionKey: 'applications.cvs.templates.system.competency.description',
     contentByLocale: {
       en: competencyEn,
     },

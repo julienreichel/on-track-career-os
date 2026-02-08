@@ -22,9 +22,6 @@
   },
   "ingestion": {
     "cv": {
-      "errors": {
-        "parsingFailed": "Failed to parse CV"
-      },
       "upload": {
         "title": "Upload Your CV",
         "description": "Upload your CV to extract your professional experience automatically.",
@@ -67,10 +64,9 @@
           "placeholder": "Paste the description here...",
           "submit": "Analyze job"
         },
-        "fileUploaded": "Uploaded {fileName}",
         "status": {
-          "extracting": "Extracting job description from the uploaded file\u2026",
-          "analyzing": "Analyzing job description with AI\u2026"
+          "extracting": "Extracting job description from the uploaded file…",
+          "analyzing": "Analyzing job description with AI…"
         },
         "errors": {
           "tooShort": "The job description is too short. Please upload a complete document.",
@@ -239,14 +235,14 @@
       }
     },
     "upload": {
-      "helper": "Have a PDF or text file about the company? Drop it below and we\u2019ll extract the details automatically.",
+      "helper": "Have a PDF or text file about the company? Drop it below and we'll extract the details automatically.",
       "dropzone": {
         "label": "Drop company brief or click to browse",
         "description": "Supports PDF and TXT files (max 5MB)"
       },
       "status": {
-        "extracting": "Extracting text from the document\u2026",
-        "analyzing": "Analyzing company information\u2026"
+        "extracting": "Extracting text from the document…",
+        "analyzing": "Analyzing company information…"
       },
       "errors": {
         "title": "Upload error",
@@ -342,9 +338,6 @@
       "title": "Delete Experience",
       "message": "Are you sure you want to delete this experience? This action cannot be undone.",
       "confirm": "Delete"
-    },
-    "page": {
-      "title": "Experiences"
     }
   },
   "profile": {
@@ -542,10 +535,6 @@
         "title": "Delete Story",
         "message": "Are you sure you want to delete this story? This action cannot be undone."
       }
-    },
-    "editor": {
-      "unsavedChanges": "You have unsaved changes",
-      "unsavedChangesDescription": "Are you sure you want to discard your changes?"
     }
   },
   "star": {
@@ -819,6 +808,10 @@
     "labels": {
       "cv": "CV",
       "new": "New"
+    },
+    "editor": {
+      "unsavedChanges": "You have unsaved changes",
+      "unsavedChangesDescription": "Are you sure you want to discard your changes?"
     }
   },
   "canvas": {
@@ -954,7 +947,6 @@
   },
   "progress": {
     "phaseLabel": "Current phase",
-    "nextActionLabel": "Next action",
     "phaseLabels": {
       "phase1": "Ground me",
       "phase2": "Make sense of myself",
@@ -1019,7 +1011,8 @@
       "description": "Track match readiness and materials for your most recent roles.",
       "empty": "No active jobs yet.",
       "match": {
-        "value": "Match {score}%"
+        "value": "Match {score}%",
+        "naValue": "No match"
       },
       "materials": {
         "cv": "CV",
@@ -1243,8 +1236,7 @@
         "search": {
           "placeholder": "Search CVs...",
           "noResults": "No CVs match your search."
-        },
-        "title": "My CVs"
+        }
       },
       "delete": {
         "title": "Delete CV",
@@ -1255,7 +1247,6 @@
         "deleteFailed": "Failed to delete CV"
       },
       "display": {
-        "untitled": "Untitled",
         "description": "Review and refine your CV details.",
         "loading": "Loading CV...",
         "saving": "Saving changes...",
@@ -1287,7 +1278,7 @@
       "generate": {
         "title": "Generate CV",
         "subtitle": "Generate a new CV using your saved defaults.",
-        "defaultName": "CV \u2014 {date}",
+        "defaultName": "CV — {date}",
         "entry": {
           "title": "CV generation",
           "description": "Review the defaults that will be applied before generating a CV.",
@@ -1480,8 +1471,7 @@
         },
         "empty": {
           "content": "Start creating professional cover letters tailored to your profile."
-        },
-        "title": "Cover Letters"
+        }
       },
       "detail": {
         "untitled": "Untitled"
@@ -1565,8 +1555,7 @@
         },
         "empty": {
           "preview": "Generate your first speech to build your elevator pitch and career story."
-        },
-        "title": "Speeches"
+        }
       },
       "detail": {
         "description": "Build your elevator pitch, career story, and why-me narrative.",
@@ -1659,21 +1648,5 @@
   },
   "errors": {
     "unknown": "An unknown error occurred. Please try again."
-  },
-  "cvTemplates": {
-    "system": {
-      "classic": {
-        "name": "Classic",
-        "description": "Traditional structure with summary, experience, education, skills, and interests."
-      },
-      "modern": {
-        "name": "Modern",
-        "description": "Highlight-driven layout with outcomes and a concise, modern header."
-      },
-      "competency": {
-        "name": "Competency",
-        "description": "Competency-based format with examples that demonstrate key behaviors."
-      }
-    }
   }
 }
