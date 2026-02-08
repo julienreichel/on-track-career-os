@@ -1,5 +1,12 @@
 import { config } from '@vue/test-utils';
 
+if (typeof globalThis.$fetch === 'undefined') {
+  const baseFetch = (async () => ({})) as unknown as typeof $fetch;
+  baseFetch.raw = (async () => ({ _data: {} })) as unknown as typeof $fetch.raw;
+  baseFetch.create = (() => baseFetch) as unknown as typeof $fetch.create;
+  globalThis.$fetch = baseFetch;
+}
+
 const routerLinkStub = {
   name: 'RouterLinkStub',
   props: ['to'],
