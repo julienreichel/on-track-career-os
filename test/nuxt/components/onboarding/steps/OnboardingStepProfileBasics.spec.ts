@@ -47,6 +47,20 @@ vi.mock('@/composables/useErrorDisplay', () => ({
   })),
 }));
 
+vi.mock('@/domain/user-profile/UserProfileService', () => ({
+  UserProfileService: vi.fn(() => ({
+    updateUserProfile: vi.fn().mockResolvedValue({ profilePhotoKey: null }),
+  })),
+}));
+
+vi.mock('@/domain/user-profile/ProfilePhotoService', () => ({
+  ProfilePhotoService: vi.fn(() => ({
+    upload: vi.fn(),
+    delete: vi.fn(),
+    getSignedUrl: vi.fn(),
+  })),
+}));
+
 const stubs = {
   UCard: {
     name: 'UCard',
