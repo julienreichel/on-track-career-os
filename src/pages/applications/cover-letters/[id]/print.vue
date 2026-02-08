@@ -36,6 +36,7 @@
 </template>
 
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { computed, onMounted, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { useCoverLetter } from '@/application/cover-letter/useCoverLetter';
@@ -69,7 +70,7 @@ const loadPrint = async () => {
     }, PRINT_DELAY_MS);
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load cover letter';
-    console.error('[coverLetterPrint] Error loading cover letter:', err);
+    logError('[coverLetterPrint] Error loading cover letter:', err);
   } finally {
     loading.value = false;
   }

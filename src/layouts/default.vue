@@ -38,6 +38,7 @@
 
 <script setup lang="ts">
 // Default layout with header and sign out
+import { logError } from '@/utils/logError';
 import { computed, ref, watch } from 'vue';
 import { useBreadcrumbMapping } from '@/composables/useBreadcrumbMapping';
 import type { NavigationMenuItem } from '@nuxt/ui';
@@ -142,13 +143,13 @@ const handleSignOut = async () => {
   try {
     const { $Amplify } = useNuxtApp();
     if (!$Amplify?.Auth?.signOut) {
-      console.error('Amplify Auth is not initialized');
+      logError('Amplify Auth is not initialized');
       return;
     }
     await $Amplify.Auth.signOut();
     await navigateTo('/login');
   } catch (error) {
-    console.error(t('auth.errorSigningOut'), error);
+    logError(t('auth.errorSigningOut'), error);
   }
 };
 

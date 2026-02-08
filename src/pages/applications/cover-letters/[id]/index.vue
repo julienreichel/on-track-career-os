@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -155,7 +156,7 @@ const handleDelete = async () => {
       });
     }
   } catch (err) {
-    console.error('[coverLetterDisplay] Delete failed', err);
+    logError('[coverLetterDisplay] Delete failed', err);
     toast.add({ title: t('applications.coverLetters.display.toast.deleteFailed'), color: 'error' });
   } finally {
     deleting.value = false;
@@ -177,7 +178,7 @@ const loadJobSummary = async (jobId?: string | null) => {
     const job = await jobService.getJobSummary(jobId);
     targetJob.value = job;
   } catch (err) {
-    console.error('[coverLetterDisplay] Failed to load job summary', err);
+    logError('[coverLetterDisplay] Failed to load job summary', err);
   }
 };
 
@@ -230,7 +231,7 @@ const handleRegenerateTailored = async () => {
       toast.add({ title: t('tailoredMaterials.toast.coverLetterRegenerated'), color: 'primary' });
     }
   } catch (err) {
-    console.error('[coverLetterDisplay] Failed to regenerate tailored cover letter', err);
+    logError('[coverLetterDisplay] Failed to regenerate tailored cover letter', err);
     toast.add({ title: t('tailoredMaterials.toast.coverLetterRegenerateFailed'), color: 'error' });
   }
 };

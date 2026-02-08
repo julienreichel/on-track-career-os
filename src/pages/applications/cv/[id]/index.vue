@@ -208,6 +208,7 @@
 </template>
 
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import MarkdownContent from '@/components/MarkdownContent.vue';
@@ -307,7 +308,7 @@ const loadProfilePhoto = async (userId: string) => {
   } catch (err) {
     profilePhotoUrl.value = null;
     profilePhotoError.value = err instanceof Error ? err.message : 'Failed to load profile photo';
-    console.error('[cvDisplay] Error loading profile photo:', err);
+    logError('[cvDisplay] Error loading profile photo:', err);
   } finally {
     profilePhotoLoading.value = false;
   }
@@ -330,7 +331,7 @@ const load = async () => {
     }
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load CV';
-    console.error('[cvDisplay] Error loading CV:', err);
+    logError('[cvDisplay] Error loading CV:', err);
   } finally {
     loading.value = false;
   }
@@ -384,7 +385,7 @@ const saveEdit = async () => {
       });
     }
   } catch (err) {
-    console.error('[cvDisplay] Error saving CV:', err);
+    logError('[cvDisplay] Error saving CV:', err);
     toast.add({
       title: t('applications.cvs.display.toast.saveFailed'),
       color: 'error',
@@ -443,7 +444,7 @@ const handleRegenerateTailored = async () => {
       }
     }
   } catch (err) {
-    console.error('[cvDisplay] Failed to regenerate tailored CV', err);
+    logError('[cvDisplay] Failed to regenerate tailored CV', err);
     toast.add({ title: t('tailoredMaterials.toast.cvRegenerateFailed'), color: 'error' });
   }
 };

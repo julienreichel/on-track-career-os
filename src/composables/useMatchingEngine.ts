@@ -1,3 +1,4 @@
+import { logWarn } from '@/utils/logError';
 import { computed, ref, type Ref } from 'vue';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useAnalytics } from '@/composables/useAnalytics';
@@ -336,7 +337,7 @@ async function loadCompanyPayload(companyId: string, companyService: CompanyServ
     // Return flat structure matching GraphQL schema CompanyType
     return mapCompanyProfile(company);
   } catch (err) {
-    console.warn('[useMatchingEngine] Unable to load company context', err);
+    logWarn('[useMatchingEngine] Unable to load company context', err);
     return undefined;
   }
 }

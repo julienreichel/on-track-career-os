@@ -1,3 +1,4 @@
+import { logError } from '@/utils/logError';
 import { computed, ref, type Ref } from 'vue';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
@@ -154,7 +155,7 @@ function createStateRunner(errorRef: Ref<string | null>) {
       return await operation();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
-      console.error('[CoverLetterEngine]', message, err);
+      logError('[CoverLetterEngine]', message, err);
       errorRef.value = message;
       return undefined;
     } finally {

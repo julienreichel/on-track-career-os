@@ -1,3 +1,4 @@
+import { logError } from '@/utils/logError';
 import { ref } from 'vue';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
@@ -70,7 +71,7 @@ const generateAchievements = async (
       kpiSuggestions: achievementsData.kpiSuggestions || [],
     };
   } catch (err) {
-    console.error('[Stories] Failed to generate achievements for story:', err);
+    logError('[Stories] Failed to generate achievements for story:', err);
     return { achievements: [], kpiSuggestions: [] };
   }
 };
@@ -117,7 +118,7 @@ export function useStoryAutoGenerate() {
         await generateStoriesForExperience(experienceService, storyService, experienceId);
       }
     } catch (err) {
-      console.error('[Stories] Auto-generation error:', err);
+      logError('[Stories] Auto-generation error:', err);
       error.value = err instanceof Error ? err.message : ERROR_FALLBACK_KEY;
     } finally {
       isGenerating.value = false;

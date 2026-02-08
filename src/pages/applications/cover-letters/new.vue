@@ -85,6 +85,7 @@
 </template>
 
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -203,7 +204,7 @@ const generateCoverLetter = async () => {
         params: { id: coverLetter.id },
       });
     } else {
-      console.error(
+      logError(
         '[coverLetterNew] Failed to create cover letter - createCoverLetter returned null'
       );
       toast.add({
@@ -212,7 +213,7 @@ const generateCoverLetter = async () => {
       });
     }
   } catch (err) {
-    console.error('[coverLetterNew] Error generating cover letter:', err);
+    logError('[coverLetterNew] Error generating cover letter:', err);
     generationError.value = err instanceof Error ? err.message : 'Unknown error';
     toast.add({
       title: t('applications.coverLetters.toast.error'),
@@ -267,7 +268,7 @@ const generateTailoredCoverLetter = async (jobId: string) => {
       color: 'error',
     });
   } catch (err) {
-    console.error('[coverLetterNew] Error generating tailored cover letter:', err);
+    logError('[coverLetterNew] Error generating tailored cover letter:', err);
     generationError.value = err instanceof Error ? err.message : 'Unknown error';
     toast.add({
       title: t('applications.coverLetters.toast.error'),

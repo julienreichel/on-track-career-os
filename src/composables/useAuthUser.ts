@@ -1,3 +1,4 @@
+import { logError } from '@/utils/logError';
 import { ref, onMounted, computed } from 'vue';
 import { fetchUserAttributes } from 'aws-amplify/auth';
 
@@ -18,7 +19,7 @@ export const useAuthUser = () => {
       const userAttributes = await fetchUserAttributes();
       userId.value = userAttributes.sub || null;
     } catch (err) {
-      console.error('Failed to fetch user attributes:', err);
+      logError('Failed to fetch user attributes:', err);
       error.value = 'Failed to load user information';
       userId.value = null;
     } finally {

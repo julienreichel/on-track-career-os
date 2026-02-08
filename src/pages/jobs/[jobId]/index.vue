@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { computed, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -312,7 +313,7 @@ async function loadCompanies() {
   try {
     await companyStore.listCompanies();
   } catch (error) {
-    console.error('[jobDetail] Failed to load companies', error);
+    logError('[jobDetail] Failed to load companies', error);
     if (!errorMessage.value) {
       errorMessage.value =
         error instanceof Error ? error.message : t('companies.list.errors.generic');

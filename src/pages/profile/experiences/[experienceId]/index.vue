@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { ref, onMounted, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
@@ -63,7 +64,7 @@ async function loadExperience(id: string) {
   } catch (error) {
     errorMessage.value =
       error instanceof Error ? error.message : t('experiences.errors.loadFailed');
-    console.error('[experience] Error loading experience:', error);
+    logError('[experience] Error loading experience:', error);
   } finally {
     loading.value = false;
   }
@@ -103,7 +104,7 @@ async function handleSave(data: ExperienceCreateInput) {
   } catch (error) {
     errorMessage.value =
       error instanceof Error ? error.message : t('experiences.errors.saveFailed');
-    console.error('[experience] Error saving experience:', error);
+    logError('[experience] Error saving experience:', error);
   } finally {
     saving.value = false;
   }

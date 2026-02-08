@@ -1,3 +1,4 @@
+import { logError } from '@/utils/logError';
 import { ref, computed } from 'vue';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { STARStory as AiSTARStory } from '@/domain/ai-operations/STARStory';
@@ -47,7 +48,7 @@ export function useStoryEnhancer() {
       return result;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'enhancer.errors.generationFailed';
-      console.error('[useStoryEnhancer] Generation error:', err);
+      logError('[useStoryEnhancer] Generation error:', err);
       return null;
     } finally {
       generating.value = false;

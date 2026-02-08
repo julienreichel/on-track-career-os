@@ -1,3 +1,4 @@
+import { logError } from '@/utils/logError';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
@@ -49,7 +50,7 @@ export function useCvDocuments(options: { i18n?: { t: (key: string) => string } 
       items.value = await repository.listByUser(auth.userId.value);
     } catch (err) {
       error.value = err instanceof Error ? err.message : t('common.errors.unknown');
-      console.error('[useCvDocuments] Error loading CV documents:', err);
+      logError('[useCvDocuments] Error loading CV documents:', err);
     } finally {
       loading.value = false;
     }
@@ -75,7 +76,7 @@ export function useCvDocuments(options: { i18n?: { t: (key: string) => string } 
       error.value = err instanceof Error
         ? err.message
         : t('applications.cvs.generate.errors.cvDocumentCreateFailed');
-      console.error('[useCvDocuments] Error creating CV document:', err);
+      logError('[useCvDocuments] Error creating CV document:', err);
       return null;
     } finally {
       loading.value = false;
@@ -100,7 +101,7 @@ export function useCvDocuments(options: { i18n?: { t: (key: string) => string } 
       error.value = err instanceof Error
         ? err.message
         : t('applications.cvs.generate.errors.cvDocumentUpdateFailed');
-      console.error('[useCvDocuments] Error updating CV document:', err);
+      logError('[useCvDocuments] Error updating CV document:', err);
       return null;
     } finally {
       loading.value = false;
@@ -122,7 +123,7 @@ export function useCvDocuments(options: { i18n?: { t: (key: string) => string } 
       error.value = err instanceof Error
         ? err.message
         : t('applications.cvs.generate.errors.cvDocumentDeleteFailed');
-      console.error('[useCvDocuments] Error deleting CV document:', err);
+      logError('[useCvDocuments] Error deleting CV document:', err);
       return false;
     } finally {
       loading.value = false;

@@ -1,3 +1,4 @@
+import { logWarn } from '@/utils/logError';
 import { UserProfileRepository } from '@/domain/user-profile/UserProfileRepository';
 import type { ParseCvTextOutput } from '@amplify/data/ai-operations/parseCvText';
 import type { ParsedCV } from '@/domain/ai-operations/ParsedCV';
@@ -36,7 +37,7 @@ export function useProfileMerge() {
     const existingProfile = await userProfileRepo.get(userId);
 
     if (!existingProfile) {
-      console.warn('User profile not found, skipping profile update');
+      logWarn('User profile not found, skipping profile update');
       return;
     }
 

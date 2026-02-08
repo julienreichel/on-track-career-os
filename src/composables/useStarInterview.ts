@@ -1,3 +1,4 @@
+import { logError } from '@/utils/logError';
 import { ref, computed } from 'vue';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import type { STARStory as AiSTARStory } from '@/domain/ai-operations/STARStory';
@@ -248,7 +249,7 @@ export function useStarInterview(sourceText?: string) {
       return generatedStory.value;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'interview.errors.generationFailed';
-      console.error('[useStarInterview] Generation error:', err);
+      logError('[useStarInterview] Generation error:', err);
       return null;
     } finally {
       generating.value = false;

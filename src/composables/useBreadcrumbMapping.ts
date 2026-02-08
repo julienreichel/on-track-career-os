@@ -1,3 +1,4 @@
+import { logError } from '@/utils/logError';
 import { ref } from 'vue';
 import { ExperienceService } from '@/domain/experience/ExperienceService';
 import { CVTemplateService } from '@/domain/cvtemplate/CVTemplateService';
@@ -45,7 +46,7 @@ export function useBreadcrumbMapping() {
         return name;
       }
     } catch (err) {
-      console.error('[useBreadcrumbMapping] Error fetching experience:', err);
+      logError('[useBreadcrumbMapping] Error fetching experience:', err);
     }
 
     // Return ID as fallback
@@ -75,7 +76,7 @@ export function useBreadcrumbMapping() {
         return name;
       }
     } catch (err) {
-      console.error('[useBreadcrumbMapping] Error fetching CV document:', err);
+      logError('[useBreadcrumbMapping] Error fetching CV document:', err);
     }
 
     // Return ID as fallback
@@ -102,7 +103,7 @@ export function useBreadcrumbMapping() {
         return name;
       }
     } catch (err) {
-      console.error('[useBreadcrumbMapping] Error fetching CV template:', err);
+      logError('[useBreadcrumbMapping] Error fetching CV template:', err);
     }
 
     return templateId;
@@ -190,7 +191,7 @@ const getCompanyName = async (companyId: string): Promise<string> => {
       return name;
     }
   } catch (err) {
-    console.error('[useBreadcrumbMapping] Error fetching company:', err);
+    logError('[useBreadcrumbMapping] Error fetching company:', err);
   }
 
   return companyId;
@@ -213,7 +214,7 @@ const getJobName = async (jobId: string): Promise<string> => {
       return title;
     }
   } catch (err) {
-    console.error('[useBreadcrumbMapping] Error fetching job:', err);
+    logError('[useBreadcrumbMapping] Error fetching job:', err);
   }
 
   return jobId;

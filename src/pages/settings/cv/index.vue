@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { computed, ref, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -63,7 +64,7 @@ const loadExperiences = async (ownerId: string) => {
   try {
     experiences.value = await experienceRepo.list(ownerId);
   } catch (error) {
-    console.error('[cvSettings] Failed to load experiences:', error);
+    logError('[cvSettings] Failed to load experiences:', error);
   } finally {
     loadingExperiences.value = false;
   }

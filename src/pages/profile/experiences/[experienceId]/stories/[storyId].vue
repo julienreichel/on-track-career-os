@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -106,7 +107,7 @@ const handleSubmitFreeText = async () => {
       await handleGenerateAchievements();
     }
   } catch (err) {
-    console.error('[StoryForm] Free text generation error:', err);
+    logError('[StoryForm] Free text generation error:', err);
   }
 };
 
@@ -162,7 +163,7 @@ const handleSave = async () => {
       void router.push(`/profile/experiences/${experienceId.value}/stories`);
     }
   } catch (err) {
-    console.error('[StoryForm] Save error:', err);
+    logError('[StoryForm] Save error:', err);
   }
 };
 
@@ -190,7 +191,7 @@ onMounted(async () => {
       companyName.value = experience.companyName || experience.title;
     }
   } catch (err) {
-    console.error('[StoryForm] Error loading experience:', err);
+    logError('[StoryForm] Error loading experience:', err);
   }
 
   // If editing, load the story

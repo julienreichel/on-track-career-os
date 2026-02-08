@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -172,7 +173,7 @@ const handleGenerate = async () => {
     applySpeechResult(result);
     toast.add({ title: t('applications.speeches.toast.generated'), color: 'primary' });
   } catch (err) {
-    console.error('[speechDetail] Failed to generate speech', err);
+    logError('[speechDetail] Failed to generate speech', err);
   }
 };
 
@@ -229,7 +230,7 @@ const handleRegenerateTailored = async () => {
       toast.add({ title: t('tailoredMaterials.toast.speechRegenerated'), color: 'primary' });
     }
   } catch (err) {
-    console.error('[speechDetail] Failed to regenerate tailored speech', err);
+    logError('[speechDetail] Failed to regenerate tailored speech', err);
     toast.add({ title: t('tailoredMaterials.toast.speechRegenerateFailed'), color: 'error' });
   }
 };

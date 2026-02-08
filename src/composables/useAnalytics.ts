@@ -1,3 +1,4 @@
+import { logWarn } from '@/utils/logError';
 /**
  * Analytics composable for tracking user events
  * Provides a type-safe wrapper around PostHog (or any analytics provider)
@@ -39,7 +40,7 @@ export function useAnalytics() {
       }
     } catch (error) {
       // Silently fail - analytics should never break the app
-      console.warn('Analytics capture failed:', error);
+      logWarn('Analytics capture failed:', error);
     }
   };
 

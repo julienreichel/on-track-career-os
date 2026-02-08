@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { ref, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStoryList } from '@/composables/useStoryList';
@@ -40,7 +41,7 @@ const handleDelete = async (story: STARStory) => {
       filteredStories.value = search(searchQuery.value);
     }
   } catch (err) {
-    console.error('[Stories] Delete error:', err);
+    logError('[Stories] Delete error:', err);
   } finally {
     deleting.value = false;
   }

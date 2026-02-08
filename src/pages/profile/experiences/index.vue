@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { ref, watch, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -115,7 +116,7 @@ async function loadExperiences() {
   } catch (error) {
     errorMessage.value =
       error instanceof Error ? error.message : t('experiences.errors.loadFailed');
-    console.error('[experiences] Error loading experiences:', error);
+    logError('[experiences] Error loading experiences:', error);
   } finally {
     loading.value = false;
     hasLoaded.value = true;
@@ -157,7 +158,7 @@ async function confirmDelete() {
   } catch (error) {
     errorMessage.value =
       error instanceof Error ? error.message : t('experiences.errors.deleteFailed');
-    console.error('[experiences] Error deleting experience:', error);
+    logError('[experiences] Error deleting experience:', error);
   }
 }
 

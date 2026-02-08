@@ -74,6 +74,7 @@
 </template>
 
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { computed, nextTick, onMounted, provide, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -294,7 +295,7 @@ const loadPhotoPreview = async (key: string | null) => {
     const url = await profilePhotoService.getSignedUrl(key);
     photoPreviewUrl.value = url || null;
   } catch (err) {
-    console.error('[profile] Failed to load photo preview:', err);
+    logError('[profile] Failed to load photo preview:', err);
     photoPreviewUrl.value = null;
   }
 };
@@ -317,7 +318,7 @@ const persistProfilePhotoKey = async (key: string | null) => {
       }
     }
   } catch (err) {
-    console.error('[profile] Failed to persist photo key:', err);
+    logError('[profile] Failed to persist photo key:', err);
     photoError.value = t('profile.validation.photoPersistFailed');
   }
 };
@@ -358,7 +359,7 @@ const handlePhotoSelected = async (event: Event) => {
       await profilePhotoService.delete(previousKey);
     }
   } catch (err) {
-    console.error('[profile] Photo upload failed:', err);
+    logError('[profile] Photo upload failed:', err);
     photoError.value = t('profile.validation.photoUploadFailed');
   } finally {
     uploadingPhoto.value = false;
@@ -374,7 +375,7 @@ const handleRemovePhoto = async () => {
     await persistProfilePhotoKey(null);
     await loadPhotoPreview(null);
   } catch (err) {
-    console.error('[profile] Photo removal failed:', err);
+    logError('[profile] Photo removal failed:', err);
     photoError.value = t('profile.validation.photoRemoveFailed');
   } finally {
     uploadingPhoto.value = false;
@@ -459,7 +460,7 @@ const saveProfileUpdates = async () => {
     const { captureEvent } = useAnalytics();
     captureEvent('profile_updated');
   } catch (err) {
-    console.error('[profile] Save failed:', err);
+    logError('[profile] Save failed:', err);
     error.value = t('profile.messages.saveError');
   } finally {
     loading.value = false;

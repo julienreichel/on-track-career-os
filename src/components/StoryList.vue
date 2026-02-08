@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
@@ -42,7 +43,7 @@ const handleView = (story: STARStory) => {
 
 const handleEdit = (story: STARStory) => {
   if (!story.experienceId) {
-    console.error('[StoryList] Cannot edit story without experienceId');
+    logError('[StoryList] Cannot edit story without experienceId');
     return;
   }
   void router.push(`/profile/experiences/${story.experienceId}/stories/${story.id}`);

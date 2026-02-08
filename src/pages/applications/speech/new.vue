@@ -84,6 +84,7 @@
 </template>
 
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -200,7 +201,7 @@ const generateSpeech = async () => {
       toast.add({ title: t('applications.speeches.toast.createFailed'), color: 'error' });
     }
   } catch (err) {
-    console.error('[speechNew] Error generating speech:', err);
+    logError('[speechNew] Error generating speech:', err);
     generationError.value = err instanceof Error ? err.message : 'Unknown error';
     toast.add({
       title: t('applications.speeches.toast.error'),
@@ -255,7 +256,7 @@ const generateTailoredSpeech = async (jobId: string) => {
       color: 'error',
     });
   } catch (err) {
-    console.error('[speechNew] Error generating tailored speech:', err);
+    logError('[speechNew] Error generating tailored speech:', err);
     generationError.value = err instanceof Error ? err.message : 'Unknown error';
     toast.add({
       title: t('applications.speeches.toast.error'),

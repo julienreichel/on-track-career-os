@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -117,7 +118,7 @@ watch(
         await companyStore.listCompanies();
         hasLoadedCompanies.value = true;
       } catch (error) {
-        console.error('[matching] Failed to load companies', error);
+        logError('[matching] Failed to load companies', error);
       }
     }
   }
@@ -127,7 +128,7 @@ const handleGenerate = async () => {
   try {
     await engine.regenerate();
   } catch (error) {
-    console.error('[matching] Failed to regenerate match', error);
+    logError('[matching] Failed to regenerate match', error);
   }
 };
 
@@ -138,7 +139,7 @@ onMounted(async () => {
       await handleGenerate();
     }
   } catch (error) {
-    console.error('[matching] Failed to load matching data', error);
+    logError('[matching] Failed to load matching data', error);
   }
 });
 </script>

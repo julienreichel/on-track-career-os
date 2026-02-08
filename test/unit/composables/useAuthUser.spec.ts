@@ -69,7 +69,10 @@ describe('useAuthUser', () => {
     expect(userId.value).toBeNull();
     expect(error.value).toBe('Failed to load user information');
     expect(loading.value).toBe(false);
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to fetch user attributes:', mockError);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'Failed to fetch user attributes:',
+      expect.objectContaining({ message: 'Auth error', name: 'Error' })
+    );
 
     consoleErrorSpy.mockRestore();
   });

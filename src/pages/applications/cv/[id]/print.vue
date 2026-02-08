@@ -43,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { ref, computed, onMounted, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import MarkdownContent from '@/components/MarkdownContent.vue';
@@ -94,7 +95,7 @@ const loadProfilePhoto = async (userId: string) => {
   } catch (err) {
     profilePhotoUrl.value = null;
     profilePhotoError.value = err instanceof Error ? err.message : 'Failed to load profile photo';
-    console.error('[cvPrint] Error loading profile photo:', err);
+    logError('[cvPrint] Error loading profile photo:', err);
   } finally {
     profilePhotoLoading.value = false;
   }
@@ -117,7 +118,7 @@ const load = async () => {
     }, PRINT_DELAY_MS);
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load CV';
-    console.error('[cvPrint] Error loading CV:', err);
+    logError('[cvPrint] Error loading CV:', err);
   } finally {
     loading.value = false;
   }

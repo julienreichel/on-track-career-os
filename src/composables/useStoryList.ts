@@ -1,3 +1,4 @@
+import { logError } from '@/utils/logError';
 import { ref, computed } from 'vue';
 import { STARStoryService } from '@/domain/starstory/STARStoryService';
 import { useAuthUser } from '@/composables/useAuthUser';
@@ -51,7 +52,7 @@ export function useStoryList(service = new STARStoryService()) {
       stories.value = await service.getAllStories(userId);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'stories.list.errors.loadFailed';
-      console.error('[useStoryList] Load error:', err);
+      logError('[useStoryList] Load error:', err);
     } finally {
       loading.value = false;
     }
@@ -76,7 +77,7 @@ export function useStoryList(service = new STARStoryService()) {
       stories.value = loadedStories;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'stories.list.errors.loadFailed';
-      console.error('[useStoryList] Load by experience ID error:', err);
+      logError('[useStoryList] Load by experience ID error:', err);
     } finally {
       loading.value = false;
     }
@@ -100,7 +101,7 @@ export function useStoryList(service = new STARStoryService()) {
       stories.value = await service.getStoriesByExperience(experience.id);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'stories.list.errors.loadFailed';
-      console.error('[useStoryList] Load for experience error:', err);
+      logError('[useStoryList] Load for experience error:', err);
     } finally {
       loading.value = false;
     }

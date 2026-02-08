@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { computed, provide, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAuthUser } from '@/composables/useAuthUser';
@@ -108,7 +109,7 @@ const loadPhotoPreview = async (key: string | null) => {
     const url = await profilePhotoService.getSignedUrl(key);
     photoPreviewUrl.value = url || null;
   } catch (err) {
-    console.error('[onboarding] Failed to load photo preview:', err);
+    logError('[onboarding] Failed to load photo preview:', err);
     photoPreviewUrl.value = null;
   }
 };
@@ -124,7 +125,7 @@ const persistProfilePhotoKey = async (key: string | null) => {
       form.value.profilePhotoKey = updated.profilePhotoKey || null;
     }
   } catch (err) {
-    console.error('[onboarding] Failed to persist photo key:', err);
+    logError('[onboarding] Failed to persist photo key:', err);
     photoError.value = t('profile.validation.photoPersistFailed');
   }
 };
@@ -210,7 +211,7 @@ const handlePhotoSelected = async (event: Event) => {
       await profilePhotoService.delete(previousKey);
     }
   } catch (err) {
-    console.error('[onboarding] Photo upload failed:', err);
+    logError('[onboarding] Photo upload failed:', err);
     photoError.value = t('profile.validation.photoUploadFailed');
   } finally {
     uploadingPhoto.value = false;
@@ -226,7 +227,7 @@ const handleRemovePhoto = async () => {
     await persistProfilePhotoKey(null);
     await loadPhotoPreview(null);
   } catch (err) {
-    console.error('[onboarding] Photo removal failed:', err);
+    logError('[onboarding] Photo removal failed:', err);
     photoError.value = t('profile.validation.photoRemoveFailed');
   } finally {
     uploadingPhoto.value = false;

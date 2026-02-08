@@ -1,3 +1,4 @@
+import { logError } from '@/utils/logError';
 import { computed, ref } from 'vue';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
@@ -100,7 +101,7 @@ export function useUserProgress() {
         inputs.value = null;
         snapshot.value = null;
         hasLoaded.value = false;
-        console.error('[useUserProgress] Failed to load progress', err);
+        logError('[useUserProgress] Failed to load progress', err);
       } finally {
         loading.value = false;
         loadPromise = null;

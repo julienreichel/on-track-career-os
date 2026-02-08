@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -44,7 +45,7 @@ const handleDelete = async (story: STARStory) => {
   try {
     await deleteStory(story.id);
   } catch (err) {
-    console.error('[Stories] Delete error:', err);
+    logError('[Stories] Delete error:', err);
   } finally {
     deleting.value = false;
   }
@@ -139,7 +140,7 @@ const handleAutoGenerate = async () => {
         achievements = achievementsData.achievements || [];
         kpiSuggestions = achievementsData.kpiSuggestions || [];
       } catch (achievementsErr) {
-        console.error('[Stories] Failed to generate achievements for story:', achievementsErr);
+        logError('[Stories] Failed to generate achievements for story:', achievementsErr);
         // Continue without achievements - story can still be saved
       }
 
@@ -160,7 +161,7 @@ const handleAutoGenerate = async () => {
     // 5. Reload stories list using cached experience
     await loadForExperience(experience);
   } catch (err) {
-    console.error('[Stories] Auto-generation error:', err);
+    logError('[Stories] Auto-generation error:', err);
     generationError.value = err instanceof Error ? err.message : 'Unknown error occurred';
   } finally {
     isGenerating.value = false;
@@ -182,7 +183,7 @@ onMounted(async () => {
         await loadForExperience(experience);
       }
     } catch (err) {
-      console.error('[Stories] Error loading experience:', err);
+      logError('[Stories] Error loading experience:', err);
       // Fallback: try loading stories by ID
       await loadByExperienceId(experienceId.value);
     }

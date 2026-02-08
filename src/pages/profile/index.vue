@@ -60,6 +60,7 @@
 </template>
 
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useGuidance } from '@/composables/useGuidance';
@@ -94,7 +95,7 @@ const loadPhotoPreview = async (key: string | null | undefined) => {
   try {
     photoPreviewUrl.value = await profilePhotoService.getSignedUrl(key);
   } catch (err) {
-    console.error('[profile-summary] Failed to load photo preview:', err);
+    logError('[profile-summary] Failed to load photo preview:', err);
     photoPreviewUrl.value = null;
   }
 };
@@ -108,7 +109,7 @@ watch(
       loading.value = false;
       await loadPhotoPreview(profile.value?.profilePhotoKey);
     } catch (err) {
-      console.error('[profile-summary] Failed to load profile:', err);
+      logError('[profile-summary] Failed to load profile:', err);
       error.value = t('profile.messages.loadError');
       loading.value = false;
     }

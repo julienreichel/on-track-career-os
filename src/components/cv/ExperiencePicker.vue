@@ -76,6 +76,7 @@
 </template>
 
 <script setup lang="ts">
+import { logError } from '@/utils/logError';
 import { ref, computed, watch, onMounted } from 'vue';
 import { ExperienceRepository } from '@/domain/experience/ExperienceRepository';
 import type { Experience } from '@/domain/experience/Experience';
@@ -155,7 +156,7 @@ const loadExperiences = async () => {
       return dateB.localeCompare(dateA);
     });
   } catch (error) {
-    console.error('[CvExperiencePicker] Error loading experiences:', error);
+    logError('[CvExperiencePicker] Error loading experiences:', error);
   } finally {
     loading.value = false;
   }

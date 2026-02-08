@@ -1,3 +1,4 @@
+import { logError } from '@/utils/logError';
 import { ref } from 'vue';
 import { AiOperationsService } from '@/domain/ai-operations/AiOperationsService';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
@@ -49,7 +50,7 @@ export function useCvGenerator() {
         return null;
       }
       error.value = err instanceof Error ? err.message : 'cvGenerator.errors.buildInputFailed';
-      console.error('[useCvGenerator] Error building input:', err);
+      logError('[useCvGenerator] Error building input:', err);
       return null;
     }
   };
@@ -78,7 +79,7 @@ export function useCvGenerator() {
       return result;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'cvGenerator.errors.generationFailed';
-      console.error('[useCvGenerator] Error generating CV:', err);
+      logError('[useCvGenerator] Error generating CV:', err);
       return null;
     } finally {
       generating.value = false;
