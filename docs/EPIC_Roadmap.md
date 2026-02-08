@@ -1,195 +1,225 @@
-# EPIC ROADMAP (MVP → V1 → V2 → V3)
+# 🧭 EPIC ROADMAP — AI CAREER COACH EDITION
 
-### EPIC F1 — Product Observability & Feedback Loops
+_(MVP Complete → Coaching Layers Expansion)_
 
-**Goal:**
-Understand how users actually use the product and where they struggle.
+Your MVP already covers:
+✔ Identity extraction
+✔ Stories & achievements
+✔ Company/job analysis
+✔ Tailored CV, letters, speeches
 
-**Includes:**
-
-- Usage tracking at feature / page level (privacy-first)
-- Drop-off and friction detection
-- AI output feedback (👍 / 👎 / optional comment)
-- Confidence & usefulness signals on AI-generated data
-- Error & anomaly detection
-
-**Success Criteria:**
-
-- Clear visibility on user paths
-- Ability to identify unused or confusing features
-- Actionable feedback on AI usefulness
+Now we shift from **generation → coaching & decision support**.
 
 ---
 
-### EPIC F2 — Onboarding, Guidance & User Flow Clarity
+# 🚀 V1 — Coaching on Top of Existing Features (High Impact, Low Cost)
 
-**Goal:**
-Ensure users always know **what to do next** and **why it matters**.
-
-**Includes:**
-
-- First-time user guidance
-- Contextual hints and explanations
-- Empty-state guidance
-- Progressive disclosure (reduce cognitive load)
-- Clear “next action” suggestions
-
-**Success Criteria:**
-
-- Users complete core flows without external explanation
-- Reduced abandonment during early usage
-- Increased completion of profile, canvas, and first CV
+These features **reuse your existing data and AI flows**, adding **feedback and guidance** rather than brand-new complex systems.
 
 ---
 
-### EPIC F3 — UI Simplification & UX Consistency
+## 🧠 EPIC C1 — Positioning & Career Target Coaching
 
-**Goal:**
-Make the interface minimal, predictable, and calm.
-
-**Includes:**
-
-- Remove visual noise and redundant UI
-- Enforce Nuxt UI usage everywhere
-- Eliminate custom CSS
-- Consistent layouts, spacing, and interaction patterns
-- Review navigation to remove dead or secondary paths
-
-**Success Criteria:**
-
-- Fewer UI components with clearer roles
-- Consistent look & feel across all pages
-- Faster user comprehension
-
----
-
-### EPIC F4 — Code Quality, Performance & Security Hardening
-
-**Goal:**
-Ensure the codebase is efficient, secure, and easy to evolve.
-
-**Includes:**
-
-- Enforce GraphQL best practices
-  - ❌ No `list()` in production paths
-  - ✅ Use relationships & filtered queries
-
-- Remove dead code (components, composables, models)
-- Ensure correct foldering & composable structure
-- Review data access for performance
-- Strengthen security & authorization patterns
-
-**Success Criteria:**
-
-- Leaner codebase
-- Predictable data access costs
-- Clear architectural rules respected everywhere
-
----
-
-# V1 — Enhance Quality & Personalization
-
----
-
-## EPIC 3C — CV Customization (Sections/Experience Selection + Templates)
-
-**Goal:**
-Let users control **what goes into a CV** and **how it looks**, so every new CV generation can reliably match a chosen layout and content scope—without relying on the current “new CV” wizard UI.
-
----
+**Goal:** Help users move from reflection to **clear professional direction**
 
 ### Includes
 
-#### 1) CV Generation Settings (content scope)
+- Career Target Definition (1–3 roles, industries, company types)
+- “Non-negotiables vs nice-to-have”
+- Positioning Clarity Feedback
+  → AI evaluates if user identity is clear and consistent
 
-- **Per-user settings** to decide:
-  - Which **experiences** are eligible/included by default
-  - Which **sections** are included (e.g., Summary, Skills, Experience, Education, Projects, Certifications, Languages, Interests, etc.)
+### Why V1
 
-- A setting: **“Ask me each time before generating a CV”**
-  - If enabled: generation flow shows a lightweight prompt/modal to confirm selection at generation time
-  - If disabled: generation uses saved defaults silently
-
-- This **replaces the current UI** on `/applications/cv/new` (the page becomes a thin “Generate” entry point using saved settings, optionally prompting when “ask each time” is enabled).
-
-#### 2) CV Template Library (Markdown-based)
-
-- Users can **select a template** used as the “style/layout target” for generation.
-- Templates are stored as **Markdown** (with conventions/placeholders you already use for print/export parity).
-- The user can:
-  - Start from predefined templates
-  - **Edit** an existing template
-  - **Create** a new template
-
-- Selected template is passed into `generateCv` and the AI is instructed to **match the provided example** as closely as possible (structure + headings + ordering + formatting conventions).
-
-#### 3) System Templates (seeded)
-
-Generate and ship **3 templates** in the system:
-
-- **Template A:** Conventional CV (classic, 2-page friendly)
-- **Template B:** Conventional CV (modern, slightly different hierarchy/visual rhythm but still ATS-safe)
-- **Template C:** **Competency-based CV** (skills/competencies first; experience mapped as evidence)
+Uses existing Personal Canvas + Profile data
+Adds a coaching layer, not heavy infra
 
 ---
 
-### User Value
+## 🧩 EPIC C2 — Competency Evidence Map
 
-- Users can produce multiple CV variants quickly (short/long, targeted vs generic) **without redoing the selection work** each time.
-- CV output becomes more predictable because generation is “anchored” to a concrete template example.
-- Supports different strategies (standard chronological vs competency-driven) depending on the job.
+**Goal:** Show users whether they have **enough proof** for key competencies
 
----
+### Includes
 
-### Reason in V1
+- Map stories & achievements to competency categories (leadership, teamwork, problem solving…)
+- Highlight weakly supported competencies
+- Suggest which type of example to add
 
-EPIC 3 is already functional end-to-end (generate → edit → print). This EPIC upgrades it from “works” to “repeatable and customizable,” which aligns with the project’s post-MVP hardening/personalization direction and the planned need for a Settings area.
+### Why V1
 
----
-
-### Success Criteria
-
-- Users can create a new CV in **≤ 30 seconds** using saved settings (no wizard friction).
-- Regenerations **preserve structure** consistently according to the selected template.
-- Users can maintain **multiple templates** and switch between them without breaking print/export.
-- “Ask each time” flow is fast and unobtrusive, and becomes the only time users see selection UI.
-- Test coverage added for:
-  - Template CRUD
-  - Settings CRUD + effective generation inputs
-  - `/applications/cv/new` (now thin) happy path
-  - At least one E2E flow for “ask each time” selection → generate → edit → print.
+Reuses stories, KPIs, strengths — just adds analysis
 
 ---
 
-## EPIC 7 — Expanded Personal Profile (Communication & Psychological)
+## 📄 EPIC C3 — AI Feedback on Materials
 
-**Goal:** Add deeper behavioral insights.
+**Goal:** Turn CV & letter generation into **interactive improvement**
+
+### Includes
+
+- AI Feedback Panel (“more formal”, “stronger impact”, etc.)
+- CV / Cover Letter Strength Analyzer
+  → Clarity, impact, alignment with role
+
+### Why V1
+
+No new data models required — just post-generation evaluation
+
+---
+
+## 🎯 EPIC C4 — Opportunity Strategy Coach
+
+**Goal:** Help users decide **where to invest effort**
+
+### Includes
+
+- “Should I apply / network first / skip?”
+- Fit vs growth opportunity explanation
+- Skill gap summary per job
+
+### Why V1
+
+Builds on MatchingSummary already implemented
+
+---
+
+## ⚙️ EPIC C5 — Momentum & Activity Coaching
+
+**Goal:** Keep users moving
+
+### Includes
+
+- Simple job search activity tracker (applications, networking, interviews)
+- “Next best action” nudges
+- Inactivity reminders
+
+### Why V1
+
+Simple CRUD + logic = high behavioral impact
+
+---
+
+# 🧠 V2 — Performance Coaching & Interview Readiness
+
+Now we help users **perform**, not just prepare.
+
+---
+
+## 🎤 EPIC C6 — Interview Intelligence
+
+**Goal:** Help users answer better, not just prepare questions
+
+### Includes
+
+- Story Recommender per job
+- AI Answer Feedback Coach (user writes answer → AI evaluates structure, impact)
+- Suggested improvement tips
+
+---
+
+## 🤝 EPIC C7 — Networking Preparation Assistant
+
+**Goal:** Support strategic networking
+
+### Includes
+
+- Intro message generator
+- Conversation starters based on target role/company
+- Follow-up message suggestions
+
+---
+
+## 🌍 EPIC C8 — Skill Gap → Growth Guidance
+
+**Goal:** Turn job gaps into development paths
+
+### Includes
+
+- Detect repeated skill gaps across jobs
+- Suggest reframing existing experience
+- Suggest learning or exposure paths
+
+---
+
+# 🧩 V3 — Deeper Personalization & Behavioral Coaching
+
+---
+
+## 🧠 EPIC C9 — Work Style & Behavioral Insights
+
+Extension of profile psychology.
 
 ### Includes
 
 - Communication style
-- Work style
-- Strengths & blind spots
-- Integration into tailoring
-
-### User Value
-
-More authentic and personalized applications.
+- Work style preferences
+- Strengths vs blind spots
+- Integrated into materials & interview advice
 
 ---
 
-# V2 — Intelligence, Automation & Growth
+## 📊 EPIC C10 — Progress Intelligence Dashboard
 
-## EPIC 8 — Multi-Version Tracking & Revision History
-
-**Goal:** Support professional iterative workflows.
+**Goal:** Visual coaching
 
 ### Includes
 
-- Version snapshots
-- Compare versions
-- Restore versions
+- Positioning strength score
+- Competency coverage score
+- Activity consistency score
+- Application vs interview conversion view
 
-### User Value
+---
 
-Power-user functionality for serious job hunters.
+# 🚀 V4 — Advanced Strategy & Ecosystem
+
+---
+
+## 🧑‍🏫 EPIC C11 — Coach / Mentor Mode
+
+### Includes
+
+- Shared profile access for coaches
+- Feedback from human mentors
+- Collaborative review on stories and materials
+
+---
+
+## 🔁 EPIC C12 — Career Evolution Tracking
+
+### Includes
+
+- Multi-version career positioning over time
+- Track growth of strengths, competencies, and direction
+
+---
+
+# 🧭 PRIORITY LOGIC
+
+| Version | Focus                                     | Why                                         |
+| ------- | ----------------------------------------- | ------------------------------------------- |
+| **V1**  | Positioning + feedback + decision support | Biggest coaching impact, low technical cost |
+| **V2**  | Interview & networking performance        | Converts opportunities into success         |
+| **V3**  | Personalization & progress analytics      | Deepens long-term engagement                |
+| **V4**  | Ecosystem & long-term career tracking     | Strategic expansion                         |
+
+---
+
+# 🧠 BIG PICTURE SHIFT
+
+**MVP = Output Generator**
+**V1–V4 = Coaching Intelligence Layers**
+
+You’re layering:
+
+1. **Clarity coaching**
+2. **Proof coaching**
+3. **Decision coaching**
+4. **Performance coaching**
+5. **Behavior coaching**
+
+This is how the product evolves from:
+
+📄 “Write better CVs”
+→ 🧠 “Become better at managing your career”
