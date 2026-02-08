@@ -63,10 +63,7 @@ export class JobDescriptionService {
     return this.companyRepo.getJobsByCompany(companyId);
   }
 
-  async createAnalyzedJobFromRawText(
-    rawText: string,
-    ownerId?: string
-  ): Promise<JobDescription> {
+  async createAnalyzedJobFromRawText(rawText: string, ownerId?: string): Promise<JobDescription> {
     const sanitized = rawText?.trim();
     if (!sanitized) {
       throw new Error('Job description text cannot be empty');

@@ -41,7 +41,11 @@ describe('CvUploadPage', () => {
     router = createRouter({
       history: createMemoryHistory(),
       routes: [
-        { path: '/profile/cv-upload', name: 'profile-cv-upload', component: { template: '<div>CV Upload</div>' } },
+        {
+          path: '/profile/cv-upload',
+          name: 'profile-cv-upload',
+          component: { template: '<div>CV Upload</div>' },
+        },
       ],
     });
 

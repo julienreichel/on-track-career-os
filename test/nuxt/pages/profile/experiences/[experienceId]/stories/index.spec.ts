@@ -451,9 +451,7 @@ describe('Stories Index Page', () => {
         ];
 
         mockStoryService.generateStar.mockResolvedValue(generatedStories);
-        mockStoryService.generateAchievements.mockRejectedValue(
-          new Error('Achievements failed')
-        );
+        mockStoryService.generateAchievements.mockRejectedValue(new Error('Achievements failed'));
 
         const wrapper = await mountPage();
         await flushPromises();

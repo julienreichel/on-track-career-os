@@ -184,8 +184,9 @@ function sanitizeExperienceItems(
 /**
  * Validate and apply fallback rules from AIC
  */
-function validateOutput(parsedOutput: Partial<ParseCvTextOutput> | { error?: unknown })
-  : ParseCvTextOutput {
+function validateOutput(
+  parsedOutput: Partial<ParseCvTextOutput> | { error?: unknown }
+): ParseCvTextOutput {
   const errorValue = (parsedOutput as { error?: unknown }).error;
   if (typeof errorValue === 'string' && errorValue.trim().length > 0) {
     throw new Error(errorValue.trim() === 'NonCvSchema' ? NON_CV_ERROR_CODE : errorValue.trim());

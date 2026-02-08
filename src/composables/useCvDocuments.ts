@@ -73,9 +73,10 @@ export function useCvDocuments(options: { i18n?: { t: (key: string) => string } 
       }
       return created;
     } catch (err) {
-      error.value = err instanceof Error
-        ? err.message
-        : t('applications.cvs.generate.errors.cvDocumentCreateFailed');
+      error.value =
+        err instanceof Error
+          ? err.message
+          : t('applications.cvs.generate.errors.cvDocumentCreateFailed');
       logError('[useCvDocuments] Error creating CV document:', err);
       return null;
     } finally {
@@ -98,9 +99,10 @@ export function useCvDocuments(options: { i18n?: { t: (key: string) => string } 
       updateItemInArray(items.value, updated);
       return updated;
     } catch (err) {
-      error.value = err instanceof Error
-        ? err.message
-        : t('applications.cvs.generate.errors.cvDocumentUpdateFailed');
+      error.value =
+        err instanceof Error
+          ? err.message
+          : t('applications.cvs.generate.errors.cvDocumentUpdateFailed');
       logError('[useCvDocuments] Error updating CV document:', err);
       return null;
     } finally {
@@ -120,9 +122,10 @@ export function useCvDocuments(options: { i18n?: { t: (key: string) => string } 
       items.value = items.value.filter((item) => item.id !== id);
       return true;
     } catch (err) {
-      error.value = err instanceof Error
-        ? err.message
-        : t('applications.cvs.generate.errors.cvDocumentDeleteFailed');
+      error.value =
+        err instanceof Error
+          ? err.message
+          : t('applications.cvs.generate.errors.cvDocumentDeleteFailed');
       logError('[useCvDocuments] Error deleting CV document:', err);
       return false;
     } finally {

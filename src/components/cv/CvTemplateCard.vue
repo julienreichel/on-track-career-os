@@ -57,7 +57,7 @@ const resolvedDefaultLabel = computed(() => {
 const updatedLabel = computed(() => t('applications.cvs.templates.labels.updated'));
 const resolvedSubtitle = computed(() => (props.isSystemTemplate ? '' : props.description));
 const bodyDescription = computed(() =>
-  props.isSystemTemplate ? props.description?.trim() ?? '' : ''
+  props.isSystemTemplate ? (props.description?.trim() ?? '') : ''
 );
 </script>
 

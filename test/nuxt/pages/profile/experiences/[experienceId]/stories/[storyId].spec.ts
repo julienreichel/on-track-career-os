@@ -444,7 +444,7 @@ describe('Story Form Page', () => {
     it('handleGenerateAchievements does nothing when formState is null', async () => {
       const wrapper = await mountPage();
       await flushPromises();
-      
+
       // Manually set formState to null after mount
       formStateRef.value = null;
       mockGenerate.mockClear();
@@ -457,7 +457,7 @@ describe('Story Form Page', () => {
     it('handleGenerateAchievements generates and updates achievements', async () => {
       const wrapper = await mountPage();
       await flushPromises();
-      
+
       // Set formState after mount
       formStateRef.value = { ...mockFormState };
       achievementsRef.value = ['New achievement'];

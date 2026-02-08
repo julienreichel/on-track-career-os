@@ -43,8 +43,7 @@ async function loadCompanies() {
   try {
     await companyStore.listCompanies();
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : t('companies.list.errors.generic');
+    const message = error instanceof Error ? error.message : t('companies.list.errors.generic');
     setPageError(message);
   } finally {
     loading.value = false;

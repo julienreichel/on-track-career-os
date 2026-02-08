@@ -124,8 +124,9 @@ function coerceJobOutput(parsed: Partial<ParseJobDescriptionOutput>): ParseJobDe
   };
 }
 
-function validateOutput(parsed: Partial<ParseJobDescriptionOutput> | { error?: unknown })
-  : ParseJobDescriptionOutput {
+function validateOutput(
+  parsed: Partial<ParseJobDescriptionOutput> | { error?: unknown }
+): ParseJobDescriptionOutput {
   const errorValue = (parsed as { error?: unknown }).error;
   if (typeof errorValue === 'string' && errorValue.trim().length > 0) {
     const normalized = errorValue.trim();

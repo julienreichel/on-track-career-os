@@ -33,10 +33,7 @@ const baseJobInit = {
   updatedAt: '2024-01-02T00:00:00.000Z',
 };
 
-type JobWithCompany = Omit<
-  typeof baseJobInit,
-  'companyId' | 'company'
-> & {
+type JobWithCompany = Omit<typeof baseJobInit, 'companyId' | 'company'> & {
   companyId: string | null;
   company: { id: string; companyName: string } | null;
 };

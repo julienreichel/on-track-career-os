@@ -68,9 +68,7 @@ const mockMatchingSummary: MatchingSummary = {
 
 const mockRouter = createRouter({
   history: createMemoryHistory(),
-  routes: [
-    { path: '/applications/cv/:id', component: { template: '<div>CV Detail</div>' } },
-  ],
+  routes: [{ path: '/applications/cv/:id', component: { template: '<div>CV Detail</div>' } }],
 });
 
 const mockCVDocumentService = {
@@ -97,7 +95,7 @@ const mockTailoredMaterials = {
 
 const mountPage = async (props = {}, routeParams = { id: 'cv-123' }) => {
   await mockRouter.push(`/applications/cv/${routeParams.id}`);
-  
+
   const wrapper = mount(CvDetailPage, {
     props,
     global: {
@@ -136,19 +134,19 @@ describe('CV Detail Page (index.vue)', () => {
       job: mockJob,
       matchingSummary: mockMatchingSummary,
     });
-    
+
     const { CVDocumentService } = await import('@/domain/cvdocument/CVDocumentService');
     vi.mocked(CVDocumentService).mockImplementation(() => mockCVDocumentService as any);
-    
+
     const { UserProfileService } = await import('@/domain/user-profile/UserProfileService');
     vi.mocked(UserProfileService).mockImplementation(() => mockUserProfileService as any);
-    
+
     const { ProfilePhotoService } = await import('@/domain/user-profile/ProfilePhotoService');
     vi.mocked(ProfilePhotoService).mockImplementation(() => mockProfilePhotoService as any);
-    
+
     const { useAuthUser } = await import('@/composables/useAuthUser');
     vi.mocked(useAuthUser).mockReturnValue({ userId: { value: 'user-123' } } as any);
-    
+
     const { useTailoredMaterials } = await import('@/application/tailoring/useTailoredMaterials');
     vi.mocked(useTailoredMaterials).mockReturnValue(mockTailoredMaterials as any);
   });
@@ -296,7 +294,7 @@ describe('CV Detail Page (index.vue)', () => {
       mockCVDocumentService.getFullCVDocument.mockImplementation(
         () => new Promise((resolve) => setTimeout(() => resolve(mockCvDocument), 100))
       );
-      
+
       const wrapper = await mountPage();
       expect(wrapper.vm.loading).toBe(true);
       await flushPromises();
@@ -312,7 +310,7 @@ describe('CV Detail Page (index.vue)', () => {
 
     it('load handles error gracefully', async () => {
       mockCVDocumentService.getFullCVDocument.mockRejectedValue(new Error('Network error'));
-      
+
       await allowConsoleOutput(async () => {
         const wrapper = await mountPage();
         await flushPromises();
@@ -330,7 +328,7 @@ describe('CV Detail Page (index.vue)', () => {
 
     it('loadProfilePhoto handles missing photo key', async () => {
       mockUserProfileService.getFullUserProfile.mockResolvedValue({ profilePhotoKey: null });
-      
+
       const wrapper = await mountPage();
       await wrapper.vm.loadProfilePhoto('user-123');
       await flushPromises();
@@ -339,7 +337,7 @@ describe('CV Detail Page (index.vue)', () => {
 
     it('loadProfilePhoto handles errors', async () => {
       mockUserProfileService.getFullUserProfile.mockRejectedValue(new Error('Photo error'));
-      
+
       await allowConsoleOutput(async () => {
         const wrapper = await mountPage();
         await wrapper.vm.loadProfilePhoto('user-123');
@@ -370,7 +368,7 @@ describe('CV Detail Page (index.vue)', () => {
       const wrapper = await mountPage();
       await flushPromises();
       wrapper.vm.document = mockCvDocument;
-      
+
       expect(wrapper.vm.isEditing).toBe(false);
       wrapper.vm.toggleEdit();
       expect(wrapper.vm.isEditing).toBe(true);
@@ -383,7 +381,7 @@ describe('CV Detail Page (index.vue)', () => {
       wrapper.vm.isEditing = true;
       wrapper.vm.editContent = 'Original';
       wrapper.vm.originalContent = 'Original';
-      
+
       wrapper.vm.handleCancel();
       expect(wrapper.vm.isEditing).toBe(false);
     });
@@ -394,7 +392,7 @@ describe('CV Detail Page (index.vue)', () => {
       wrapper.vm.isEditing = true;
       wrapper.vm.editContent = 'Modified';
       wrapper.vm.originalContent = 'Original';
-      
+
       wrapper.vm.handleCancel();
       expect(wrapper.vm.showCancelConfirm).toBe(true);
       expect(wrapper.vm.isEditing).toBe(true);
@@ -407,7 +405,7 @@ describe('CV Detail Page (index.vue)', () => {
       wrapper.vm.editContent = 'Modified';
       wrapper.vm.originalContent = 'Original';
       wrapper.vm.showCancelConfirm = true;
-      
+
       wrapper.vm.handleConfirmCancel();
       expect(wrapper.vm.showCancelConfirm).toBe(false);
       expect(wrapper.vm.isEditing).toBe(false);
@@ -419,16 +417,16 @@ describe('CV Detail Page (index.vue)', () => {
     it('saveEdit updates document', async () => {
       const updatedDoc = { ...mockCvDocument, content: 'Updated content' };
       mockCVDocumentService.updateCVDocument.mockResolvedValue(updatedDoc);
-      
+
       const wrapper = await mountPage();
       await flushPromises();
       wrapper.vm.document = mockCvDocument;
       wrapper.vm.editContent = 'Updated content';
       wrapper.vm.isEditing = true;
-      
+
       await wrapper.vm.saveEdit();
       await flushPromises();
-      
+
       expect(mockCVDocumentService.updateCVDocument).toHaveBeenCalledWith({
         id: 'cv-123',
         content: 'Updated content',
@@ -441,15 +439,15 @@ describe('CV Detail Page (index.vue)', () => {
     it('saveEdit handles error', async () => {
       await allowConsoleOutput(async () => {
         mockCVDocumentService.updateCVDocument.mockRejectedValue(new Error('Save failed'));
-        
+
         const wrapper = await mountPage();
         await flushPromises();
         wrapper.vm.document = mockCvDocument;
         wrapper.vm.editContent = 'Updated content';
-        
+
         await wrapper.vm.saveEdit();
         await flushPromises();
-        
+
         expect(wrapper.vm.saving).toBe(false);
       });
     });
@@ -457,7 +455,7 @@ describe('CV Detail Page (index.vue)', () => {
     it('saveEdit does nothing when document is null', async () => {
       const wrapper = await mountPage();
       wrapper.vm.document = null;
-      
+
       await wrapper.vm.saveEdit();
       expect(mockCVDocumentService.updateCVDocument).not.toHaveBeenCalled();
     });
@@ -466,10 +464,10 @@ describe('CV Detail Page (index.vue)', () => {
   describe('Print Functionality', () => {
     it('handlePrint opens print window', async () => {
       const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
-      
+
       const wrapper = await mountPage();
       wrapper.vm.handlePrint();
-      
+
       expect(openSpy).toHaveBeenCalledWith('/applications/cv/cv-123/print', '_blank');
       openSpy.mockRestore();
     });
@@ -480,16 +478,16 @@ describe('CV Detail Page (index.vue)', () => {
       const regeneratedDoc = { ...mockCvDocument, content: 'Regenerated content' };
       mockTailoredMaterials.regenerateTailoredCvForJob.mockResolvedValue(regeneratedDoc);
       mockCVDocumentService.getFullCVDocument.mockResolvedValue(regeneratedDoc);
-      
+
       const wrapper = await mountPage();
       await flushPromises();
       wrapper.vm.document = mockCvDocument;
       wrapper.vm.targetJob = mockJob;
       wrapper.vm.matchingSummary = mockMatchingSummary;
-      
+
       await wrapper.vm.handleRegenerateTailored();
       await flushPromises();
-      
+
       expect(mockTailoredMaterials.regenerateTailoredCvForJob).toHaveBeenCalledWith({
         id: 'cv-123',
         job: mockJob,
@@ -509,21 +507,23 @@ describe('CV Detail Page (index.vue)', () => {
       wrapper.vm.document = mockCvDocument;
       wrapper.vm.targetJob = null;
       wrapper.vm.matchingSummary = null;
-      
+
       await wrapper.vm.handleRegenerateTailored();
       expect(mockTailoredMaterials.regenerateTailoredCvForJob).not.toHaveBeenCalled();
     });
 
     it('handleRegenerateTailored handles error', async () => {
       await allowConsoleOutput(async () => {
-        mockTailoredMaterials.regenerateTailoredCvForJob.mockRejectedValue(new Error('Regeneration failed'));
-        
+        mockTailoredMaterials.regenerateTailoredCvForJob.mockRejectedValue(
+          new Error('Regeneration failed')
+        );
+
         const wrapper = await mountPage();
         await flushPromises();
         wrapper.vm.document = mockCvDocument;
         wrapper.vm.targetJob = mockJob;
         wrapper.vm.matchingSummary = mockMatchingSummary;
-        
+
         await wrapper.vm.handleRegenerateTailored();
         await flushPromises();
       });

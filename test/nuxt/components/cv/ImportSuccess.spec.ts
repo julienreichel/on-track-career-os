@@ -74,9 +74,7 @@ describe('ImportSuccess', () => {
   it('renders view experiences button', () => {
     const wrapper = createWrapper();
     const buttons = wrapper.findAll('.u-button');
-    expect(requireItem(buttons[0], 'view experiences button').text()).toContain(
-      'View Experiences'
-    );
+    expect(requireItem(buttons[0], 'view experiences button').text()).toContain('View Experiences');
   });
 
   it('emits viewExperiences event when button is clicked', async () => {

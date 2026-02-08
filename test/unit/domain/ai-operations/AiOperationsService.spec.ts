@@ -182,9 +182,7 @@ describe('AiOperationsService', () => {
     });
 
     it('should surface non-job errors from repository', async () => {
-      mockRepo.parseJobDescription.mockRejectedValue(
-        new Error('ERR_NON_JOB_DESCRIPTION')
-      );
+      mockRepo.parseJobDescription.mockRejectedValue(new Error('ERR_NON_JOB_DESCRIPTION'));
 
       await expect(service.parseJobDescription('Random text')).rejects.toThrow(
         'ERR_NON_JOB_DESCRIPTION'

@@ -28,7 +28,11 @@ describe('StoryNewPage', () => {
     router = createRouter({
       history: createMemoryHistory(),
       routes: [
-        { path: '/profile/stories/new', name: 'profile-stories-new', component: { template: '<div>New</div>' } },
+        {
+          path: '/profile/stories/new',
+          name: 'profile-stories-new',
+          component: { template: '<div>New</div>' },
+        },
       ],
     });
 

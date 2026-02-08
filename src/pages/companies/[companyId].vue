@@ -144,8 +144,7 @@ async function loadCompany() {
     jobsStore.hydrate(hydrated.jobs ?? []);
     isEditing.value = false;
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : t('companies.detail.errors.generic');
+    const message = error instanceof Error ? error.message : t('companies.detail.errors.generic');
     setPageError(message);
   } finally {
     loading.value = false;

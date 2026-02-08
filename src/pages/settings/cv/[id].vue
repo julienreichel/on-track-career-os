@@ -150,9 +150,7 @@ const loadTemplate = async () => {
       return;
     }
 
-    const systemTemplate = resolveSystemCvTemplates(locale.value, t).find(
-      (item) => item.id === id
-    );
+    const systemTemplate = resolveSystemCvTemplates(locale.value, t).find((item) => item.id === id);
     if (!systemTemplate) {
       error.value = t('applications.cvs.templates.errors.notFound');
       return;

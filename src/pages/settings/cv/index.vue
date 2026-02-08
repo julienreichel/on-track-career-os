@@ -330,6 +330,5 @@ watch(
       :loading="deletingTemplate"
       @confirm="handleDelete"
     />
-
   </div>
 </template>

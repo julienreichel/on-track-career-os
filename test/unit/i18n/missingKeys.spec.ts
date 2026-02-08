@@ -132,10 +132,9 @@ describe('i18n - Missing Keys Detection', () => {
 
   it('should include onboarding wizard step labels and descriptions', () => {
     const definedKeys = getAllDefinedKeys(enLocale);
-    const missingKeys = onboardingSteps.flatMap((step) => [
-      step.labelKey,
-      step.descriptionKey,
-    ]).filter((key) => !definedKeys.has(key));
+    const missingKeys = onboardingSteps
+      .flatMap((step) => [step.labelKey, step.descriptionKey])
+      .filter((key) => !definedKeys.has(key));
 
     expect(missingKeys).toEqual([]);
   });

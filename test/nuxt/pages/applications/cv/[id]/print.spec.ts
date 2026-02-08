@@ -24,9 +24,7 @@ const mockCvDocument: CVDocument = {
 
 const mockRouter = createRouter({
   history: createMemoryHistory(),
-  routes: [
-    { path: '/applications/cv/:id/print', component: { template: '<div>CV Print</div>' } },
-  ],
+  routes: [{ path: '/applications/cv/:id/print', component: { template: '<div>CV Print</div>' } }],
 });
 
 const mockCVDocumentService = {
@@ -43,7 +41,7 @@ const mockProfilePhotoService = {
 
 const mountPage = async (props = {}, routeParams = { id: 'cv-123' }) => {
   await mockRouter.push(`/applications/cv/${routeParams.id}/print`);
-  
+
   const wrapper = mount(CvPrintPage, {
     props,
     global: {
@@ -66,16 +64,16 @@ describe('CV Print Page (print.vue)', () => {
     mockCVDocumentService.getFullCVDocument.mockResolvedValue(mockCvDocument);
     mockUserProfileService.getFullUserProfile.mockResolvedValue({ profilePhotoKey: 'photo-key' });
     mockProfilePhotoService.getSignedUrl.mockResolvedValue('https://example.com/photo.jpg');
-    
+
     const { CVDocumentService } = await import('@/domain/cvdocument/CVDocumentService');
     vi.mocked(CVDocumentService).mockImplementation(() => mockCVDocumentService as any);
-    
+
     const { UserProfileService } = await import('@/domain/user-profile/UserProfileService');
     vi.mocked(UserProfileService).mockImplementation(() => mockUserProfileService as any);
-    
+
     const { ProfilePhotoService } = await import('@/domain/user-profile/ProfilePhotoService');
     vi.mocked(ProfilePhotoService).mockImplementation(() => mockProfilePhotoService as any);
-    
+
     // Mock window.print and window.close
     vi.spyOn(window, 'print').mockImplementation(() => {});
     vi.spyOn(window, 'close').mockImplementation(() => {});
@@ -110,7 +108,7 @@ describe('CV Print Page (print.vue)', () => {
       vi.useFakeTimers();
       await mountPage();
       await flushPromises();
-      
+
       vi.advanceTimersByTime(500);
       expect(window.print).toHaveBeenCalled();
       vi.useRealTimers();
@@ -161,7 +159,7 @@ describe('CV Print Page (print.vue)', () => {
       mockCVDocumentService.getFullCVDocument.mockImplementation(
         () => new Promise((resolve) => setTimeout(() => resolve(mockCvDocument), 100))
       );
-      
+
       const wrapper = await mountPage();
       expect(wrapper.vm.loading).toBe(true);
       await flushPromises();
@@ -176,7 +174,7 @@ describe('CV Print Page (print.vue)', () => {
     it('load handles error gracefully', async () => {
       await allowConsoleOutput(async () => {
         mockCVDocumentService.getFullCVDocument.mockRejectedValue(new Error('Network error'));
-        
+
         const wrapper = await mountPage();
         await flushPromises();
         expect(wrapper.vm.error).toBe('Network error');
@@ -187,7 +185,7 @@ describe('CV Print Page (print.vue)', () => {
     it('load clears previous error', async () => {
       const wrapper = await mountPage();
       wrapper.vm.error = 'Previous error';
-      
+
       await wrapper.vm.load();
       await flushPromises();
       expect(wrapper.vm.error).toBeNull();
@@ -203,7 +201,7 @@ describe('CV Print Page (print.vue)', () => {
 
     it('loadProfilePhoto handles missing photo key', async () => {
       mockUserProfileService.getFullUserProfile.mockResolvedValue({ profilePhotoKey: null });
-      
+
       const wrapper = await mountPage();
       await wrapper.vm.loadProfilePhoto('user-123');
       await flushPromises();
@@ -212,7 +210,7 @@ describe('CV Print Page (print.vue)', () => {
 
     it('loadProfilePhoto handles missing profile', async () => {
       mockUserProfileService.getFullUserProfile.mockResolvedValue(null);
-      
+
       const wrapper = await mountPage();
       await wrapper.vm.loadProfilePhoto('user-123');
       await flushPromises();
@@ -221,7 +219,7 @@ describe('CV Print Page (print.vue)', () => {
 
     it('loadProfilePhoto handles errors', async () => {
       mockUserProfileService.getFullUserProfile.mockRejectedValue(new Error('Photo error'));
-      
+
       await allowConsoleOutput(async () => {
         const wrapper = await mountPage();
         await wrapper.vm.loadProfilePhoto('user-123');
@@ -235,10 +233,10 @@ describe('CV Print Page (print.vue)', () => {
     it('loadProfilePhoto sets loading state', async () => {
       const wrapper = await mountPage();
       expect(wrapper.vm.profilePhotoLoading).toBe(false);
-      
+
       const loadPromise = wrapper.vm.loadProfilePhoto('user-123');
       expect(wrapper.vm.profilePhotoLoading).toBe(true);
-      
+
       await loadPromise;
       expect(wrapper.vm.profilePhotoLoading).toBe(false);
     });
@@ -304,7 +302,7 @@ describe('CV Print Page (print.vue)', () => {
   describe('Error Handling', () => {
     it('displays error when document load fails', async () => {
       mockCVDocumentService.getFullCVDocument.mockRejectedValue(new Error('Document not found'));
-      
+
       await allowConsoleOutput(async () => {
         const wrapper = await mountPage();
         await flushPromises();
@@ -316,12 +314,12 @@ describe('CV Print Page (print.vue)', () => {
     it('can retry after error', async () => {
       mockCVDocumentService.getFullCVDocument.mockRejectedValueOnce(new Error('Network error'));
       mockCVDocumentService.getFullCVDocument.mockResolvedValueOnce(mockCvDocument);
-      
+
       await allowConsoleOutput(async () => {
         const wrapper = await mountPage();
         await flushPromises();
         expect(wrapper.vm.error).toBe('Network error');
-        
+
         mockCVDocumentService.getFullCVDocument.mockClear();
         await wrapper.vm.load();
         await flushPromises();
@@ -332,7 +330,7 @@ describe('CV Print Page (print.vue)', () => {
 
     it('handles non-Error exceptions', async () => {
       mockCVDocumentService.getFullCVDocument.mockRejectedValue('String error');
-      
+
       await allowConsoleOutput(async () => {
         const wrapper = await mountPage();
         await flushPromises();
@@ -342,7 +340,7 @@ describe('CV Print Page (print.vue)', () => {
 
     it('handles photo load errors gracefully', async () => {
       mockProfilePhotoService.getSignedUrl.mockRejectedValue(new Error('S3 error'));
-      
+
       await allowConsoleOutput(async () => {
         const wrapper = await mountPage();
         await flushPromises();
@@ -357,7 +355,7 @@ describe('CV Print Page (print.vue)', () => {
       vi.useFakeTimers();
       await mountPage();
       await flushPromises();
-      
+
       expect(window.print).not.toHaveBeenCalled();
       vi.advanceTimersByTime(499);
       expect(window.print).not.toHaveBeenCalled();
@@ -369,15 +367,15 @@ describe('CV Print Page (print.vue)', () => {
     it('does not auto-print when error occurs', async () => {
       mockCVDocumentService.getFullCVDocument.mockRejectedValue(new Error('Load failed'));
       vi.useFakeTimers();
-      
+
       await allowConsoleOutput(async () => {
         await mountPage();
         await flushPromises();
         vi.advanceTimersByTime(500);
-        
+
         expect(window.print).not.toHaveBeenCalled();
       });
-      
+
       vi.useRealTimers();
     });
   });
@@ -391,7 +389,7 @@ describe('CV Print Page (print.vue)', () => {
     it('handles different user IDs', async () => {
       const differentUserDoc = { ...mockCvDocument, userId: 'user-456' };
       mockCVDocumentService.getFullCVDocument.mockResolvedValue(differentUserDoc);
-      
+
       await mountPage();
       await flushPromises();
       expect(mockUserProfileService.getFullUserProfile).toHaveBeenCalledWith('user-456');

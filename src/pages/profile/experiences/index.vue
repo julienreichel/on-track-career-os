@@ -115,8 +115,7 @@ async function loadExperiences() {
     experiences.value = safeResult.map((item) => item as Experience);
     rebuildStoryCounts(safeResult);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : t('experiences.errors.loadFailed');
+    const message = error instanceof Error ? error.message : t('experiences.errors.loadFailed');
     setPageError(message);
     logError('[experiences] Error loading experiences:', error);
   } finally {

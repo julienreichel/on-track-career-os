@@ -8,11 +8,7 @@ export default defineNuxtConfig({
   // Use src/ as the source directory for Nuxt
   srcDir: 'src/',
 
-  modules: [
-    '@nuxt/eslint',
-    '@nuxt/ui',
-    '@nuxtjs/i18n',
-  ],
+  modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxtjs/i18n'],
   ssr: false, // Disable server-side rendering
   css: ['~/assets/css/main.css'],
 
@@ -43,12 +39,7 @@ export default defineNuxtConfig({
 
   typescript: {
     tsConfig: {
-      exclude: [
-        '../test/**',
-        '../test-results/**',
-        '../playwright-report/**',
-        '../coverage/**',
-      ],
+      exclude: ['../test/**', '../test-results/**', '../playwright-report/**', '../coverage/**'],
     },
   },
 });

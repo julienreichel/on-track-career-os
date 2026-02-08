@@ -192,9 +192,7 @@ const generateCoverLetter = async () => {
         params: { id: coverLetter.id },
       });
     } else {
-      logError(
-        '[coverLetterNew] Failed to create cover letter - createCoverLetter returned null'
-      );
+      logError('[coverLetterNew] Failed to create cover letter - createCoverLetter returned null');
       notifyActionError({
         title: t('applications.coverLetters.toast.createFailed'),
       });

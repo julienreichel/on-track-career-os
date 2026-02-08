@@ -102,15 +102,15 @@ describe('StoryForm', () => {
 
     const inputs = wrapper.findAll('input');
     const textareas = wrapper.findAll('textarea');
-    expect(
-      (requireItem(inputs[0], 'title input').element as HTMLInputElement).value
-    ).toBe('Cloud migration leader');
+    expect((requireItem(inputs[0], 'title input').element as HTMLInputElement).value).toBe(
+      'Cloud migration leader'
+    );
     expect(
       (requireItem(textareas[0], 'situation textarea').element as HTMLTextAreaElement).value
     ).toBe('Test situation');
-    expect(
-      (requireItem(textareas[1], 'task textarea').element as HTMLTextAreaElement).value
-    ).toBe('Test task');
+    expect((requireItem(textareas[1], 'task textarea').element as HTMLTextAreaElement).value).toBe(
+      'Test task'
+    );
     expect(
       (requireItem(textareas[2], 'action textarea').element as HTMLTextAreaElement).value
     ).toBe('Test action');

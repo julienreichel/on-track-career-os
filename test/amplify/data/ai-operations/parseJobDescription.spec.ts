@@ -118,9 +118,7 @@ describe('ai.parseJobDescription', () => {
       handler({
         arguments: { jobText: 'Badly formatted JD' },
       })
-    ).rejects.toThrow(
-      'ERR_NON_JOB_DESCRIPTION'
-    );
+    ).rejects.toThrow('ERR_NON_JOB_DESCRIPTION');
   });
 
   it('should throw when input is not a job description', async () => {

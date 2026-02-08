@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mount, VueWrapper } from '@vue/test-utils';
-import { createRouter, createMemoryHistory, Router } from 'vue-router';
+import type { VueWrapper } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
+import type { Router } from 'vue-router';
+import { createRouter, createMemoryHistory } from 'vue-router';
 import { createTestI18n } from '../../../utils/createTestI18n';
 import ProfileFullPage from '@/pages/profile/full.vue';
 
