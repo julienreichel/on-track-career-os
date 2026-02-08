@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount, VueWrapper } from '@vue/test-utils';
-import { createRouter, createMemoryHistory, Router } from 'vue-router';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import { createRouter, createMemoryHistory, type Router } from 'vue-router';
 import { createTestI18n } from '../../../../utils/createTestI18n';
 import StoryNewPage from '@/pages/profile/stories/new.vue';
 
