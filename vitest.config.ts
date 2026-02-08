@@ -83,7 +83,7 @@ export default defineConfig({
     ],
     // Global coverage settings
     coverage: {
-      provider: 'v8',
+      provider: 'istanbul', // istanbul handles Vue SFCs better than v8
       reportsDirectory: './coverage',
       reporter: ['text', 'json', 'json-summary', 'html'],
       all: true,
