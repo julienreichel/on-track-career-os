@@ -126,6 +126,9 @@ type ActiveJobsDashboardOptions = {
     coverLetters?: MaterialSource<CoverLetter>;
     speechBlocks?: MaterialSource<SpeechBlock>;
   };
+  i18n?: {
+    t: (key: string) => string;
+  };
 };
 
 const resolveMaterialItems = <T>(source: MaterialSource<T>, fallback: T[]): T[] => {
@@ -137,7 +140,8 @@ const resolveMaterialItems = <T>(source: MaterialSource<T>, fallback: T[]): T[] 
 };
 
 export function useActiveJobsDashboard(options: ActiveJobsDashboardOptions = {}) {
-  const { t } = useI18n();
+  const i18n = options.i18n ?? useI18n();
+  const t = i18n.t;
   const jobAnalysis = useJobAnalysis();
   const cvDocuments = useCvDocuments();
   const coverLetters = useCoverLetters();

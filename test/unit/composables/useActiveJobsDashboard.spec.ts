@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { useActiveJobsDashboard } from '@/composables/useActiveJobsDashboard';
+import { createTestI18n } from '../../utils/createTestI18n';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
@@ -57,6 +58,8 @@ const buildJob = (overrides: Partial<JobDescription>): JobDescription =>
   }) as JobDescription;
 
 describe('useActiveJobsDashboard', () => {
+  const i18n = createTestI18n();
+
   beforeEach(() => {
     jobsRef.value = [];
     cvItems.value = [];
@@ -69,7 +72,7 @@ describe('useActiveJobsDashboard', () => {
   });
 
   it('loads jobs and materials once', async () => {
-    const dashboard = useActiveJobsDashboard();
+    const dashboard = useActiveJobsDashboard({ i18n: { t: i18n.global.t } });
     await dashboard.load();
 
     expect(mockListJobs).toHaveBeenCalled();
@@ -81,7 +84,7 @@ describe('useActiveJobsDashboard', () => {
   it('prefers match generation when job is not analyzed', () => {
     jobsRef.value = [buildJob({ status: 'complete' })];
 
-    const dashboard = useActiveJobsDashboard();
+    const dashboard = useActiveJobsDashboard({ i18n: { t: i18n.global.t } });
     const [state] = dashboard.states.value;
 
     expect(state.matchStatus).toBe('pending');
@@ -97,7 +100,7 @@ describe('useActiveJobsDashboard', () => {
       }),
     ];
 
-    const dashboard = useActiveJobsDashboard();
+    const dashboard = useActiveJobsDashboard({ i18n: { t: i18n.global.t } });
     const [state] = dashboard.states.value;
 
     expect(state.matchStatus).toBe('ready');
@@ -115,7 +118,7 @@ describe('useActiveJobsDashboard', () => {
       buildJob({ id: 'job-4', status: 'complete', updatedAt: '2024-01-13T00:00:00.000Z' }),
     ];
 
-    const dashboard = useActiveJobsDashboard();
+    const dashboard = useActiveJobsDashboard({ i18n: { t: i18n.global.t } });
     const states = dashboard.states.value;
 
     expect(states).toHaveLength(3);

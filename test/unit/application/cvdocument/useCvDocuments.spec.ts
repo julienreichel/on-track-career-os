@@ -3,6 +3,7 @@ import { useCvDocuments } from '@/composables/useCvDocuments';
 import { CVDocumentRepository } from '@/domain/cvdocument/CVDocumentRepository';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 import { withMockedConsoleError } from '../../../utils/withMockedConsole';
+import { createTestI18n } from '../../../utils/createTestI18n';
 
 // Mock dependencies
 vi.mock('@/domain/cvdocument/CVDocumentRepository');
@@ -14,6 +15,8 @@ vi.mock('@/composables/useAuthUser', () => ({
 }));
 
 describe('useCvDocuments', () => {
+  const i18n = createTestI18n();
+
   let mockRepository: {
     listByUser: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
@@ -45,7 +48,7 @@ describe('useCvDocuments', () => {
 
       mockRepository.listByUser.mockResolvedValue(mockCVs);
 
-      const { items, loading, error, loadAll } = useCvDocuments();
+      const { items, loading, error, loadAll } = useCvDocuments({ i18n: { t: i18n.global.t } });
 
       expect(loading.value).toBe(false);
 
@@ -62,7 +65,7 @@ describe('useCvDocuments', () => {
       withMockedConsoleError(async () => {
         mockRepository.listByUser.mockRejectedValue(new Error('Load failed'));
 
-        const { items, error, loadAll } = useCvDocuments();
+        const { items, error, loadAll } = useCvDocuments({ i18n: { t: i18n.global.t } });
 
         await loadAll();
 
@@ -76,7 +79,7 @@ describe('useCvDocuments', () => {
         () => new Promise((resolve) => setTimeout(() => resolve([]), 10))
       );
 
-      const { loading, loadAll } = useCvDocuments();
+      const { loading, loadAll } = useCvDocuments({ i18n: { t: i18n.global.t } });
 
       const loadPromise = loadAll();
       expect(loading.value).toBe(true);
@@ -103,7 +106,7 @@ describe('useCvDocuments', () => {
 
       mockRepository.create.mockResolvedValue(mockCreated);
 
-      const { items, createDocument } = useCvDocuments();
+      const { items, createDocument } = useCvDocuments({ i18n: { t: i18n.global.t } });
 
       const result = await createDocument(input as never);
 
@@ -133,7 +136,7 @@ describe('useCvDocuments', () => {
 
       mockRepository.create.mockResolvedValue(mockCreated);
 
-      const { items, createDocument } = useCvDocuments();
+      const { items, createDocument } = useCvDocuments({ i18n: { t: i18n.global.t } });
 
       const result = await createDocument(input as never);
 
@@ -147,7 +150,7 @@ describe('useCvDocuments', () => {
       withMockedConsoleError(async () => {
         mockRepository.create.mockRejectedValue(new Error('Creation failed'));
 
-        const { error, createDocument } = useCvDocuments();
+        const { error, createDocument } = useCvDocuments({ i18n: { t: i18n.global.t } });
 
         const result = await createDocument({ name: 'CV', userId: 'user-1' } as never);
 
@@ -159,7 +162,7 @@ describe('useCvDocuments', () => {
     it('should not add to items if creation returns null', async () => {
       mockRepository.create.mockResolvedValue(null);
 
-      const { items, createDocument } = useCvDocuments();
+      const { items, createDocument } = useCvDocuments({ i18n: { t: i18n.global.t } });
 
       await createDocument({ name: 'CV', userId: 'user-1' } as never);
 
@@ -175,7 +178,7 @@ describe('useCvDocuments', () => {
       mockRepository.listByUser.mockResolvedValue([mockCV]);
       mockRepository.update.mockResolvedValue(mockUpdated);
 
-      const { items, loadAll, updateDocument } = useCvDocuments();
+      const { items, loadAll, updateDocument } = useCvDocuments({ i18n: { t: i18n.global.t } });
 
       await loadAll();
       const result = await updateDocument({
@@ -201,7 +204,7 @@ describe('useCvDocuments', () => {
       mockRepository.listByUser.mockResolvedValue([mockCV]);
       mockRepository.update.mockResolvedValue(mockUpdated);
 
-      const { items, loadAll, updateDocument } = useCvDocuments();
+      const { items, loadAll, updateDocument } = useCvDocuments({ i18n: { t: i18n.global.t } });
 
       await loadAll();
       const result = await updateDocument({
@@ -224,7 +227,7 @@ describe('useCvDocuments', () => {
       withMockedConsoleError(async () => {
         mockRepository.update.mockRejectedValue(new Error('Update failed'));
 
-        const { error, updateDocument } = useCvDocuments();
+        const { error, updateDocument } = useCvDocuments({ i18n: { t: i18n.global.t } });
 
         const result = await updateDocument({ id: 'cv-1', name: 'New' } as never);
 
@@ -244,7 +247,7 @@ describe('useCvDocuments', () => {
       mockRepository.listByUser.mockResolvedValue(mockCVs);
       mockRepository.delete.mockResolvedValue(undefined);
 
-      const { items, loadAll, deleteDocument } = useCvDocuments();
+      const { items, loadAll, deleteDocument } = useCvDocuments({ i18n: { t: i18n.global.t } });
 
       await loadAll();
       const result = await deleteDocument('cv-1');
@@ -259,7 +262,7 @@ describe('useCvDocuments', () => {
       withMockedConsoleError(async () => {
         mockRepository.delete.mockRejectedValue(new Error('Deletion failed'));
 
-        const { error, deleteDocument } = useCvDocuments();
+        const { error, deleteDocument } = useCvDocuments({ i18n: { t: i18n.global.t } });
 
         const result = await deleteDocument('cv-1');
 

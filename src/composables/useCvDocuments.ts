@@ -23,8 +23,9 @@ function updateItemInArray(items: CVDocument[], updated: CVDocument | null | und
  * Composable for managing CV documents list and block operations
  */
 
-export function useCvDocuments() {
-  const { t } = useI18n();
+export function useCvDocuments(options: { i18n?: { t: (key: string) => string } } = {}) {
+  const i18n = options.i18n ?? useI18n();
+  const t = i18n.t;
   const items = ref<CVDocument[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
