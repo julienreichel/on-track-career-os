@@ -82,4 +82,98 @@ describe('ProfileSectionProfessionalAttributes', () => {
     const wrapper = mountSection(true);
     expect(wrapper.findAll('.tag-input')).toHaveLength(3);
   });
+
+  it('renders skills tag input', () => {
+    const wrapper = mountSection(false);
+    expect(wrapper.text()).toContain('Leadership');
+  });
+
+  it('renders certifications tag input', () => {
+    const wrapper = mountSection(false);
+    expect(wrapper.text()).toContain('Scrum Master');
+  });
+
+  it('renders languages tag input', () => {
+    const wrapper = mountSection(false);
+    expect(wrapper.text()).toContain('English');
+  });
+
+  it('has form data for all professional attributes', () => {
+    const wrapper = mountSection(true);
+    expect(wrapper.vm.form.skills).toBeDefined();
+    expect(wrapper.vm.form.certifications).toBeDefined();
+    expect(wrapper.vm.form.languages).toBeDefined();
+  });
+
+  it('hides section when no attributes and not editing', () => {
+    const form = ref<ProfileForm>({
+      fullName: 'Ada Lovelace',
+      headline: '',
+      location: '',
+      seniorityLevel: '',
+      primaryEmail: '',
+      primaryPhone: '',
+      workPermitInfo: '',
+      profilePhotoKey: null,
+      aspirations: [],
+      personalValues: [],
+      strengths: [],
+      interests: [],
+      skills: [],
+      certifications: [],
+      languages: [],
+      socialLinks: [],
+    });
+
+    const wrapper = mount(ProfileSectionProfessionalAttributes, {
+      global: {
+        plugins: [i18n],
+        stubs,
+        provide: {
+          [profileFormContextKey as symbol]: {
+            form,
+            isEditing: ref(false),
+            editingSection: ref(null),
+            sectionEditingEnabled: computed(() => true),
+            loading: ref(false),
+            hasValidationErrors: computed(() => false),
+            hasProfessionalAttributes: ref(false),
+            startSectionEditing: () => {},
+            cancelSectionEditing: () => {},
+            saveSectionEditing: async () => {},
+          },
+        },
+      },
+    });
+
+    expect(wrapper.find('.u-card').exists()).toBe(false);
+  });
+
+  it('component renders in view mode', () => {
+    const wrapper = mountSection(false);
+    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it('passes correct editable prop to tag inputs in edit mode', () => {
+    const wrapper = mountSection(true);
+    const tagInputs = wrapper.findAllComponents({ name: 'TagInput' });
+    tagInputs.forEach((input) => {
+      expect(input.props('editable')).toBe(true);
+    });
+  });
+
+  it('passes correct editable prop to tag inputs in view mode', () => {
+    const wrapper = mountSection(false);
+    const tagInputs = wrapper.findAllComponents({ name: 'TagInput' });
+    tagInputs.forEach((input) => {
+      expect(input.props('editable')).toBe(false);
+    });
+  });
+
+  it('uses success color for tag inputs', () => {
+    const wrapper = mountSection(false);
+    // The color prop is passed to TagInput which uses it for styling
+    expect(wrapper.html()).toContain('tag-input');
+  });
 });

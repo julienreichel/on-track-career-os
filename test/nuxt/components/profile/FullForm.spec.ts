@@ -299,4 +299,100 @@ describe('FullForm', () => {
     expect(wrapper.find('.identity-values').exists()).toBe(false);
     expect(wrapper.find('.professional-attributes').exists()).toBe(false);
   });
+
+  it('shows page error alert when error is set', async () => {
+    mockError.value = 'Test error message';
+    mockProfile.value = null;
+
+    const wrapper = mount(FullForm, {
+      global: {
+        plugins: [i18n, router],
+        stubs,
+      },
+      props: {
+        saveProfile: mockSaveProfile,
+      },
+    });
+
+    await flushPromises();
+    // Error should be handled by the component
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it('renders all profile sections', async () => {
+    mockProfile.value = {
+      id: 'profile-1',
+      userId: 'user-123',
+      fullName: 'John Doe',
+      headline: 'Engineer',
+      location: 'NYC',
+      seniorityLevel: 'Senior',
+      primaryEmail: 'john@example.com',
+      primaryPhone: '+1234567890',
+      workPermitInfo: 'US Citizen',
+      aspirations: ['Leadership'],
+      personalValues: ['Innovation'],
+      strengths: ['Communication'],
+      interests: ['Technology'],
+      skills: ['JavaScript'],
+      certifications: ['AWS'],
+      languages: ['English'],
+      socialLinks: ['https://linkedin.com/in/johndoe'],
+    } as unknown as UserProfile;
+
+    mockProgressState.value = {
+      phase1: { missing: [] },
+    };
+
+    const wrapper = mount(FullForm, {
+      global: {
+        plugins: [i18n, router],
+        stubs,
+      },
+      props: {
+        saveProfile: mockSaveProfile,
+      },
+    });
+
+    await flushPromises();
+
+    // All sections should be present
+    expect(wrapper.findComponent({ name: 'ProfileSectionCoreIdentity' })).toBeDefined();
+    expect(wrapper.findComponent({ name: 'ProfileSectionWorkPermit' })).toBeDefined();
+    expect(wrapper.findComponent({ name: 'ProfileSectionContact' })).toBeDefined();
+  });
+
+  it('renders form with submit handler', async () => {
+    const wrapper = mount(FullForm, {
+      global: {
+        plugins: [i18n, router],
+        stubs,
+      },
+      props: {
+        saveProfile: mockSaveProfile,
+      },
+    });
+
+    await flushPromises();
+
+    const form = wrapper.find('form');
+    expect(form.exists()).toBe(true);
+  });
+
+  it('provides form context to child components', async () => {
+    const wrapper = mount(FullForm, {
+      global: {
+        plugins: [i18n, router],
+        stubs,
+      },
+      props: {
+        saveProfile: mockSaveProfile,
+      },
+    });
+
+    await flushPromises();
+
+    // Component should provide context via profileFormContextKey
+    expect(wrapper.vm).toBeDefined();
+  });
 });

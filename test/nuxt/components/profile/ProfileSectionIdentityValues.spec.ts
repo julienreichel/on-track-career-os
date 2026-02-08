@@ -82,4 +82,92 @@ describe('ProfileSectionIdentityValues', () => {
     const wrapper = mountSection(true);
     expect(wrapper.findAll('.tag-input')).toHaveLength(3);
   });
+
+  it('renders personal values tag input', () => {
+    const wrapper = mountSection(false);
+    expect(wrapper.text()).toContain('Curiosity');
+  });
+
+  it('renders strengths tag input', () => {
+    const wrapper = mountSection(false);
+    expect(wrapper.text()).toContain('Leadership');
+  });
+
+  it('renders interests tag input', () => {
+    const wrapper = mountSection(false);
+    expect(wrapper.text()).toContain('Mathematics');
+  });
+
+  it('has form data for all identity values', () => {
+    const wrapper = mountSection(true);
+    expect(wrapper.vm.form.personalValues).toBeDefined();
+    expect(wrapper.vm.form.strengths).toBeDefined();
+    expect(wrapper.vm.form.interests).toBeDefined();
+  });
+
+  it('hides section when no values and not editing', () => {
+    const form = ref<ProfileForm>({
+      fullName: 'Ada Lovelace',
+      headline: '',
+      location: '',
+      seniorityLevel: '',
+      primaryEmail: '',
+      primaryPhone: '',
+      workPermitInfo: '',
+      profilePhotoKey: null,
+      aspirations: [],
+      personalValues: [],
+      strengths: [],
+      interests: [],
+      skills: [],
+      certifications: [],
+      languages: [],
+      socialLinks: [],
+    });
+
+    const wrapper = mount(ProfileSectionIdentityValues, {
+      global: {
+        plugins: [i18n],
+        stubs,
+        provide: {
+          [profileFormContextKey as symbol]: {
+            form,
+            isEditing: ref(false),
+            editingSection: ref(null),
+            sectionEditingEnabled: computed(() => true),
+            loading: ref(false),
+            hasValidationErrors: computed(() => false),
+            hasIdentityValues: ref(false),
+            startSectionEditing: () => {},
+            cancelSectionEditing: () => {},
+            saveSectionEditing: async () => {},
+          },
+        },
+      },
+    });
+
+    expect(wrapper.find('.u-card').exists()).toBe(false);
+  });
+
+  it('component renders in view mode', () => {
+    const wrapper = mountSection(false);
+    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it('passes correct editable prop to tag inputs in edit mode', () => {
+    const wrapper = mountSection(true);
+    const tagInputs = wrapper.findAllComponents({ name: 'TagInput' });
+    tagInputs.forEach((input) => {
+      expect(input.props('editable')).toBe(true);
+    });
+  });
+
+  it('passes correct editable prop to tag inputs in view mode', () => {
+    const wrapper = mountSection(false);
+    const tagInputs = wrapper.findAllComponents({ name: 'TagInput' });
+    tagInputs.forEach((input) => {
+      expect(input.props('editable')).toBe(false);
+    });
+  });
 });

@@ -116,4 +116,106 @@ describe('ProfileCoreIdentitySection', () => {
       .some((button) => button.text().includes(uploadLabel));
     expect(hasUploadAction).toBe(true);
   });
+
+  it('component handles photo preview URL in state', () => {
+    const wrapper = createWrapper({
+      isEditing: false,
+      photoPreviewUrl: 'https://example.com/photo.jpg',
+    });
+    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it('component has fullName prop for alt text', () => {
+    const wrapper = createWrapper();
+    expect(wrapper.vm.form.fullName).toContain('Ada Lovelace');
+  });
+
+  it('component supports edit mode state', () => {
+    const wrapper = createWrapper({ isEditing: true });
+    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.vm).toBeDefined();
+  });
+
+  it('component handles photo URL and edit mode together', () => {
+    const wrapper = createWrapper({
+      isEditing: true,
+      photoPreviewUrl: 'https://example.com/photo.jpg',
+    });
+    expect(wrapper.exists()).toBe(true);
+    expect(wrapper.vm.form).toBeDefined();
+  });
+
+  it('has form data for core identity fields', () => {
+    const wrapper = createWrapper({ isEditing: true });
+    expect(wrapper.vm.form.fullName).toBeDefined();
+    expect(wrapper.vm.form.headline).toBeDefined();
+    expect(wrapper.vm.form.location).toBeDefined();
+    expect(wrapper.vm.form.seniorityLevel).toBeDefined();
+  });
+
+  it('displays required indicator for fullName', () => {
+    const wrapper = createWrapper();
+    expect(wrapper.html()).toContain('*');
+  });
+
+  it('renders seniority level field', () => {
+    const wrapper = createWrapper();
+    expect(wrapper.text()).toContain('Principal');
+  });
+
+  it('hides fields with no value in view mode', () => {
+    const form = ref<ProfileForm>({
+      fullName: 'Test User',
+      headline: '',
+      location: '',
+      seniorityLevel: '',
+      primaryEmail: '',
+      primaryPhone: '',
+      workPermitInfo: '',
+      profilePhotoKey: null,
+      aspirations: [],
+      personalValues: [],
+      strengths: [],
+      interests: [],
+      skills: [],
+      certifications: [],
+      languages: [],
+      socialLinks: [],
+    });
+
+    const wrapper = mount(ProfileSectionCoreIdentity, {
+      global: {
+        plugins: [i18n],
+        stubs,
+        provide: {
+          [profileFormContextKey as symbol]: {
+            form,
+            isEditing: ref(false),
+            editingSection: ref(null),
+            sectionEditingEnabled: computed(() => true),
+            loading: ref(false),
+            hasValidationErrors: computed(() => false),
+            hasCoreIdentity: ref(true),
+            photoPreviewUrl: ref(null),
+            uploadingPhoto: ref(false),
+            photoError: ref<string | null>(null),
+            photoInputRef: ref<HTMLInputElement | null>(null),
+            emailError: ref<string | undefined>(undefined),
+            phoneError: ref<string | undefined>(undefined),
+            startSectionEditing: () => {},
+            cancelSectionEditing: () => {},
+            saveSectionEditing: async () => {},
+            triggerPhotoPicker: () => {},
+            handlePhotoSelected: () => {},
+            handleRemovePhoto: () => {},
+            formatSocialLink: (link: string) => link,
+          },
+        },
+      },
+    });
+
+    expect(wrapper.text()).toContain('Test User');
+    expect(wrapper.text()).not.toContain('Mathematician');
+  });
 });
