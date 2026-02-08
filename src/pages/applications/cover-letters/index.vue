@@ -11,7 +11,7 @@
         },
         {
           label: t('applications.coverLetters.list.actions.create'),
-          icon: 'i-heroicons-plus',
+          icon: 'i-heroicons-sparkles',
           to: { name: 'applications-cover-letters-new' },
         },
       ]"

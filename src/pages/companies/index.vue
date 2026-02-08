@@ -26,7 +26,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
   },
   {
     label: t('common.actions.add'),
-    icon: 'i-heroicons-plus',
+    icon: 'i-heroicons-sparkles',
     to: '/companies/new',
   },
 ]);

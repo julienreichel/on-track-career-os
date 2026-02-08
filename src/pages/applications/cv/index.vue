@@ -18,7 +18,7 @@
         },
         {
           label: $t('applications.cvs.list.actions.create'),
-          icon: 'i-heroicons-plus',
+          icon: 'i-heroicons-sparkles',
           to: { name: 'applications-cv-new' },
         },
       ]"
