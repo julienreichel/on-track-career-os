@@ -10,10 +10,8 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxt/eslint',
-    '@nuxt/test-utils',
     '@nuxt/ui',
     '@nuxtjs/i18n',
-    '@nuxt/test-utils/module',
   ],
   ssr: false, // Disable server-side rendering
   css: ['~/assets/css/main.css'],

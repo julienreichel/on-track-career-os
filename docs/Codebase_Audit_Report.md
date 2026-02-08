@@ -5,17 +5,7 @@ Scope: Repository audit following docs/Codebase_Audit.md
 
 ## 1) P0 Security & Privacy
 
-1. Finding: Markdown rendering uses `v-html` without sanitization
-severity: P0
-category: 1.2 Rendering untrusted content (XSS risks)
-location: src/components/MarkdownContent.vue
-symptom: `marked()` output is injected via `v-html` without sanitization.
-whyItMatters: User-generated markdown can contain HTML/JS payloads, enabling XSS in CV/cover letter views.
-suggestedFix: Sanitize `marked()` output using `dompurify` (already in dependencies). Consider a strict allowlist, strip dangerous attributes, and disable raw HTML in marked if possible.
-estimatedEffort: S
-risk: high
-
-2. Finding: Error logging may expose PII in client logs
+1. Finding: Error logging may expose PII in client logs
 severity: P0
 category: 1.1 Sensitive data exposure
 location: src/components/profile/FullForm.vue; src/components/onboarding/steps/OnboardingStepProfileBasics.vue; src/composables/useCvDocuments.ts; src/pages/applications/cover-letters/new.vue; src/pages/applications/cv/[id]/index.vue
@@ -25,7 +15,7 @@ suggestedFix: Centralize client logging with a redaction step. Log only a short 
 estimatedEffort: M
 risk: medium
 
-3. Finding: No explicit restriction on raw HTML in markdown pipeline
+2. Finding: No explicit restriction on raw HTML in markdown pipeline
 severity: P1
 category: 1.2 Rendering untrusted content (XSS risks)
 location: src/components/MarkdownContent.vue
@@ -115,17 +105,7 @@ risk: low
 
 ## 5) P1 Dead Code & Duplication
 
-1. Finding: Coverage artifacts checked into `src/coverage`
-severity: P1
-category: 5.1 Dead code
-location: src/coverage/*
-symptom: HTML/JS coverage output lives inside the production `src/` tree.
-whyItMatters: Adds noise to the repo, risks accidental bundling, and complicates search results.
-suggestedFix: Move coverage artifacts to `coverage/` only and add ignore rules for build tooling.
-estimatedEffort: S
-risk: low
-
-2. Finding: Duplicate upload workflows
+1. Finding: Duplicate upload workflows
 severity: P2
 category: 5.2 Duplicated code (logic + UI)
 location: src/composables/useJobUpload.ts; src/composables/useCompanyUpload.ts; src/composables/useCvUploadWorkflow.ts
@@ -161,15 +141,7 @@ risk: medium
 
 ## 8) P1 i18n Readiness
 
-1. Finding: Hard-coded error strings in composables
-severity: P1
-category: 8.1 Hard-coded strings
-location: src/composables/useCvDocuments.ts; src/composables/useActiveJobsDashboard.ts
-symptom: Error strings like "Missing user information" and "Unknown error occurred" are hard-coded in code.
-whyItMatters: Blocks localization and creates inconsistent wording across the app.
-suggestedFix: Move these strings into i18n keys and reference via `t()`.
-estimatedEffort: S
-risk: low
+No open findings in this section.
 
 ## 9) P2 Testing Health
 
@@ -185,17 +157,7 @@ risk: low
 
 ## 10) P2 Dependency & Build Hygiene
 
-1. Finding: Test utilities included in runtime Nuxt modules
-severity: P2
-category: 10.1 Dependency bloat
-location: nuxt.config.ts
-symptom: `@nuxt/test-utils` and `@nuxt/test-utils/module` are included in `modules`, which affects runtime builds.
-whyItMatters: Increases bundle size and may introduce unintended behavior in production.
-suggestedFix: Remove test-utils from runtime modules and keep them only for test configuration.
-estimatedEffort: S
-risk: low
-
-2. Finding: Coverage artifacts live under `src/` and are excluded via tsconfig only
+No open findings in this section.
 severity: P2
 category: 10.2 Build & runtime anti-patterns
 location: src/coverage/*; nuxt.config.ts (tsConfig exclude)
@@ -215,11 +177,10 @@ risk: low
 4. Replace “fetch all then filter” in company matching with indexed query.
 5. Establish a consistent error UX standard (toast vs inline).
 6. Split the largest pages/services into smaller composables and UI components.
-7. Remove test-utils from runtime Nuxt modules.
 
 ## Quick Wins (≤ 1h each)
 
-1. Remove `@nuxt/test-utils` modules from runtime `nuxt.config.ts`.
+No remaining quick wins in this list.
 
 ## Big Rocks (multi-day)
 
