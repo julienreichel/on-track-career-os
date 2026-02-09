@@ -24,8 +24,8 @@ function generateTestUser() {
 setup('authenticate', async ({ page }) => {
   const testUser = generateTestUser();
 
-  // Navigate to the app (will redirect to login if not authenticated)
-  await page.goto('/');
+  // Navigate to the login screen directly in signup mode
+  await page.goto('/login?mode=signup');
 
   // Wait for Amplify UI authenticator to load
   await page.waitForLoadState('networkidle');
@@ -68,25 +68,14 @@ setup('authenticate', async ({ page }) => {
   await page.waitForTimeout(500);
 
   // Click and wait for account creation + auto-login
-  await Promise.all([
-    page.waitForNavigation({ timeout: 15000 }).catch(() => {}),
-    createAccountButton.click(),
-  ]);
+  await createAccountButton.click();
+
+  // Wait for authenticated route instead of generic navigation.
+  await page.waitForURL('**/home', { timeout: 30000 });
 
   // Verify authentication by navigating to a protected route
   await page.goto('/profile');
-  await page.waitForLoadState('networkidle');
-
-  // Ensure we're not redirected back to login
-  const currentUrl = page.url();
-
-  if (currentUrl.includes('/login') || currentUrl.includes('sign')) {
-    // Check for any error messages on the page
-    const errorText = await page.locator('[class*="error"], [role="alert"]').allTextContents();
-    throw new Error(
-      `Account creation/authentication failed. User: ${testUser.email}. Errors: ${errorText.join(', ')}`
-    );
-  }
+  await page.waitForURL('**/profile', { timeout: 15000 });
 
   // Log successful user creation for debugging
   console.log(`✓ Created and authenticated test user: ${testUser.email}`);

@@ -23,7 +23,7 @@ function generateTestUser() {
 }
 
 async function signUp(page: Page, user: { email: string; password: string; name: string }) {
-  await page.goto('/');
+  await page.goto('/home');
   await page.waitForLoadState('networkidle');
 
   const createAccountTab = page
@@ -85,7 +85,7 @@ test.describe('Discovery flow', () => {
   };
 
   test('Phase 1 onboarding + Grounded badge', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/home');
     await page.waitForLoadState('networkidle');
 
     await expect(page.getByRole('link', { name: /Start onboarding/i })).toBeVisible({
@@ -140,7 +140,7 @@ test.describe('Discovery flow', () => {
     });
     await expect(page.getByRole('link', { name: /Strengthen my profile/i })).toBeVisible();
 
-    await page.goto('/');
+    await page.goto('/home');
     await page.waitForLoadState('networkidle');
 
     await expect(page.getByTestId('progress-primary-cta')).toHaveText(/Deepen your profile/i);
@@ -151,7 +151,7 @@ test.describe('Discovery flow', () => {
   test('Phase 2 identity completion + badge', async ({ page }) => {
     test.setTimeout(60000); // Increase timeout for canvas generation in CI
 
-    await page.goto('/');
+    await page.goto('/home');
     await page.waitForLoadState('networkidle');
     await expectProgressCta(page, /Deepen your profile/i, /\/profile\/full\?mode=edit$/);
 
@@ -193,14 +193,14 @@ test.describe('Discovery flow', () => {
       timeout: 20000,
     });
 
-    await page.goto('/');
+    await page.goto('/home');
     await page.waitForLoadState('networkidle', { timeout: 60000 });
     await expectBadgeToast(page, 'Identity Defined');
     await expect(page.getByTestId('badge-pill-identityDefined')).toBeVisible({ timeout: 20000 });
   });
 
   test('Phase 3 job upload + match + badge', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/home');
     await page.waitForLoadState('networkidle');
     await expectProgressCta(page, /Upload a job/i, /\/jobs\/new$/);
 
@@ -230,7 +230,7 @@ test.describe('Discovery flow', () => {
       timeout: 20000,
     });
 
-    await page.goto('/');
+    await page.goto('/home');
     await page.waitForLoadState('networkidle');
     await expectBadgeToast(page, 'Job Clarity');
     await expect(page.getByTestId('badge-pill-jobClarity')).toBeVisible({ timeout: 20000 });
@@ -242,7 +242,7 @@ test.describe('Discovery flow', () => {
     expect(jobId).toBeTruthy();
     if (!jobId) return;
 
-    await page.goto('/');
+    await page.goto('/home');
     await page.waitForLoadState('networkidle');
     await expectProgressCta(page, /Create tailored materials/i, /\/jobs$/);
 
@@ -283,7 +283,7 @@ test.describe('Discovery flow', () => {
 
     await page.waitForURL(/\/applications\/speech\/[0-9a-f-]+$/i, { timeout: 30000 });
 
-    await page.goto('/');
+    await page.goto('/home');
     await page.waitForLoadState('networkidle', { timeout: 60000 });
     await expectBadgeToast(page, 'Application Complete');
     await expect(page.getByTestId('badge-pill-applicationComplete')).toBeVisible({

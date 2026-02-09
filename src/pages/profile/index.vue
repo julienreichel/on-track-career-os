@@ -83,7 +83,7 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
   {
     label: t('common.back'),
     icon: 'i-heroicons-arrow-left',
-    to: '/',
+    to: '/home',
   },
 ]);
 

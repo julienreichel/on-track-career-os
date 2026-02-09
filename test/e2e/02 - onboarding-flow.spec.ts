@@ -21,7 +21,7 @@ test.describe('Onboarding wizard', () => {
   test('routes new users to onboarding and completes phase 1', async ({ page }) => {
     const testUser = generateTestUser();
 
-    await page.goto('/');
+    await page.goto('/login?mode=signup');
     await page.waitForLoadState('networkidle');
 
     const createAccountTab = page

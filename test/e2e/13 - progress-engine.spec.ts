@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Progress Engine', () => {
   test('shows a next action on the dashboard', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/home');
     await page.waitForLoadState('networkidle');
 
     const banner = page.getByTestId('progress-banner');

@@ -20,8 +20,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Home Page - Authenticated User', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/home');
+    await page.waitForURL('**/home');
   });
   // Retry tests due to occasional auth state timing issues
   test.describe.configure({ retries: 2 });
@@ -50,18 +50,18 @@ test.describe('Home Page - Authenticated User', () => {
 test.describe('Home Page - Unauthenticated User', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test('should redirect to login or show login page', async ({ page }) => {
+  test('should show landing page and route to signup', async ({ page }) => {
     await page.goto('/');
-
-    // Wait for navigation to settle
     await page.waitForLoadState('networkidle');
 
-    // Check if redirected to login or if login form is shown
-    const url = page.url();
-    const hasLoginForm =
-      (await page.locator('input[type="email"], input[name="username"]').count()) > 0;
+    await expect(page.getByTestId('landing-hero')).toBeVisible();
 
-    // Either URL contains login/sign-in OR login form is visible
-    expect(url.includes('login') || url.includes('sign-in') || hasLoginForm).toBeTruthy();
+    await page.getByTestId('landing-cta-signup').click();
+    await page.waitForURL(/\/login/);
+
+    const url = page.url();
+    expect(url.includes('mode=signup')).toBeTruthy();
+
+    await expect(page.locator('input[name="confirm_password"]')).toBeVisible();
   });
 });

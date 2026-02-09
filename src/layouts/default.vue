@@ -2,7 +2,7 @@
   <UContainer>
     <UHeader toggle-side="left">
       <template #title>
-        <NuxtLink to="/" class="font-semibold">
+        <NuxtLink to="/home" class="font-semibold">
           {{ t('app.title') }}
         </NuxtLink>
       </template>
@@ -167,7 +167,7 @@ const generateBreadcrumbs = async () => {
   // Always add home
   items.push({
     label: t('navigation.home'),
-    to: '/',
+    to: '/home',
     icon: 'i-heroicons-home',
   });
 
@@ -222,7 +222,7 @@ watch(
 );
 
 // Only show breadcrumb on non-home pages
-const showBreadcrumb = computed(() => route.path !== '/');
+const showBreadcrumb = computed(() => route.path !== '/home');
 
 // Generate page title from breadcrumb items (excluding Home icon)
 const pageTitle = computed(() => {

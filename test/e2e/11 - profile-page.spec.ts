@@ -85,7 +85,7 @@ test.describe('Profile Page - Navigation', () => {
 
     // Should be back at home
     const url = page.url();
-    expect(url).toMatch(/\/$|\/index/);
+    expect(url).toMatch(/\/home$/);
   });
 
   test('should navigate to experiences page from profile', async ({ page }) => {
