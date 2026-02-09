@@ -27,6 +27,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
+      siteUrl: process.env.PUBLIC_SITE_URL || 'http://localhost:3000',
       posthogPublicKey: process.env.PUBLIC_POSTHOG_KEY || '',
       posthogHost: process.env.PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com',
       posthogDefaults: process.env.PUBLIC_POSTHOG_DEFAULTS || '2025-11-30',

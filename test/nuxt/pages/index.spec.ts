@@ -5,6 +5,11 @@ import LandingPage from '@/pages/index.vue';
 import landingRedirect from '@/middleware/landing-redirect.client';
 import { AUTHENTICATED_HOME } from '@/utils/authRouting';
 
+const { useSeoMeta, useHead } = vi.hoisted(() => ({
+  useSeoMeta: vi.fn(),
+  useHead: vi.fn(),
+}));
+
 const stubs = {
   UPage: {
     template: '<main class="u-page"><slot /></main>',
@@ -29,6 +34,11 @@ vi.mock('#app', () => ({
   navigateTo: (...args: unknown[]) => navigateTo(...args),
 }));
 
+vi.mock('#app/composables/head', () => ({
+  useSeoMeta,
+  useHead,
+}));
+
 vi.mock('@/composables/useAuthState', () => ({
   useAuthState: () => ({
     refresh: vi.fn().mockResolvedValue(undefined),
@@ -39,6 +49,8 @@ vi.mock('@/composables/useAuthState', () => ({
 beforeEach(() => {
   navigateTo.mockReset();
   isAuthenticated.value = false;
+  useSeoMeta.mockReset();
+  useHead.mockReset();
 });
 
 describe('Landing Page', () => {
@@ -50,6 +62,10 @@ describe('Landing Page', () => {
     });
 
     expect(wrapper.find('[data-testid="landing-hero"]').exists()).toBe(true);
+    const seoCall = useSeoMeta.mock.calls[0]?.[0];
+    expect(seoCall?.title).toBeTruthy();
+    expect(seoCall?.description).toBeTruthy();
+    expect(seoCall?.ogTitle).toBeTruthy();
   });
 
   it('redirects authenticated users to the app home', async () => {

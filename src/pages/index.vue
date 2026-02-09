@@ -64,8 +64,39 @@
 </template>
 
 <script setup lang="ts">
+import { useSeoMetaDefaults } from '@/composables/useSeoMetaDefaults';
+import { buildAbsoluteUrl } from '@/utils/url';
+
 definePageMeta({
   layout: 'public',
   middleware: ['landing-redirect-client'],
+});
+
+const route = useRoute();
+const { siteName, baseUrl, ogImage, titleTemplate } = useSeoMetaDefaults();
+
+const title = 'AI Career Coach for Focused Job Search';
+const description =
+  'Clarify your career direction, target the right roles, and generate tailored materials with guided AI support.';
+const canonicalUrl = buildAbsoluteUrl(baseUrl, route.path);
+const ogImageUrl = buildAbsoluteUrl(baseUrl, ogImage);
+
+useHead({
+  titleTemplate,
+  link: [{ rel: 'canonical', href: canonicalUrl }],
+});
+
+useSeoMeta({
+  title,
+  description,
+  ogTitle: `${title} | ${siteName}`,
+  ogDescription: description,
+  ogType: 'website',
+  ogImage: ogImageUrl,
+  ogUrl: canonicalUrl,
+  twitterCard: 'summary_large_image',
+  twitterTitle: `${title} | ${siteName}`,
+  twitterDescription: description,
+  twitterImage: ogImageUrl,
 });
 </script>
