@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, flushPromises } from '@vue/test-utils';
 import { createTestI18n } from '../../utils/createTestI18n';
 import DefaultLayout from '@/layouts/default.vue';
 
 // Create i18n instance for tests
 const i18n = createTestI18n();
 
-const navigateTo = vi.fn().mockResolvedValue(undefined);
+const { navigateTo } = vi.hoisted(() => ({
+  navigateTo: vi.fn().mockResolvedValue(undefined),
+}));
 
 // Mock Nuxt composables
 vi.mock('#app', () => ({
@@ -19,6 +21,16 @@ vi.mock('#app', () => ({
   }),
   navigateTo,
 }));
+
+vi.mock('#app/composables/router', async () => {
+  const actual = await vi.importActual<typeof import('#app/composables/router')>(
+    '#app/composables/router'
+  );
+  return {
+    ...actual,
+    navigateTo,
+  };
+});
 
 // Stub Nuxt UI components
 const stubs = {
@@ -138,6 +150,7 @@ describe('default.vue layout', () => {
 
     // Button should be clickable
     await signOutButton?.trigger('click');
+    await flushPromises();
     expect(navigateTo).toHaveBeenCalledWith('/');
     // Note: Full sign out flow requires e2e testing with Amplify Auth
   });
