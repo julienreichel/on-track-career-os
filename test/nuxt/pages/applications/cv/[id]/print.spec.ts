@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
 import { createTestI18n } from '../../../../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
@@ -61,6 +61,7 @@ const mountPage = async (props = {}, routeParams = { id: 'cv-123' }) => {
 describe('CV Print Page (print.vue)', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
     mockCVDocumentService.getFullCVDocument.mockResolvedValue(mockCvDocument);
     mockUserProfileService.getFullUserProfile.mockResolvedValue({ profilePhotoKey: 'photo-key' });
     mockProfilePhotoService.getSignedUrl.mockResolvedValue('https://example.com/photo.jpg');
@@ -77,6 +78,11 @@ describe('CV Print Page (print.vue)', () => {
     // Mock window.print and window.close
     vi.spyOn(window, 'print').mockImplementation(() => {});
     vi.spyOn(window, 'close').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.clearAllTimers();
+    vi.useRealTimers();
   });
 
   describe('Component Lifecycle', () => {
@@ -105,13 +111,11 @@ describe('CV Print Page (print.vue)', () => {
     });
 
     it('triggers auto-print after loading', async () => {
-      vi.useFakeTimers();
       await mountPage();
       await flushPromises();
 
       vi.advanceTimersByTime(500);
       expect(window.print).toHaveBeenCalled();
-      vi.useRealTimers();
     });
   });
 
@@ -352,7 +356,6 @@ describe('CV Print Page (print.vue)', () => {
 
   describe('Auto-Print Behavior', () => {
     it('delays print by 500ms after load', async () => {
-      vi.useFakeTimers();
       await mountPage();
       await flushPromises();
 
@@ -361,12 +364,10 @@ describe('CV Print Page (print.vue)', () => {
       expect(window.print).not.toHaveBeenCalled();
       vi.advanceTimersByTime(1);
       expect(window.print).toHaveBeenCalled();
-      vi.useRealTimers();
     });
 
     it('does not auto-print when error occurs', async () => {
       mockCVDocumentService.getFullCVDocument.mockRejectedValue(new Error('Load failed'));
-      vi.useFakeTimers();
 
       await allowConsoleOutput(async () => {
         await mountPage();
@@ -375,8 +376,6 @@ describe('CV Print Page (print.vue)', () => {
 
         expect(window.print).not.toHaveBeenCalled();
       });
-
-      vi.useRealTimers();
     });
   });
 
