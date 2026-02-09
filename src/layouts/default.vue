@@ -153,7 +153,7 @@ const handleSignOut = async () => {
       return;
     }
     await $Amplify.Auth.signOut();
-    await navigateTo('/login');
+    await navigateTo('/');
   } catch (error) {
     logError(t('auth.errorSigningOut'), error);
   }

@@ -6,6 +6,8 @@ import DefaultLayout from '@/layouts/default.vue';
 // Create i18n instance for tests
 const i18n = createTestI18n();
 
+const navigateTo = vi.fn().mockResolvedValue(undefined);
+
 // Mock Nuxt composables
 vi.mock('#app', () => ({
   useNuxtApp: () => ({
@@ -15,7 +17,7 @@ vi.mock('#app', () => ({
       },
     },
   }),
-  navigateTo: vi.fn().mockResolvedValue(undefined),
+  navigateTo,
 }));
 
 // Stub Nuxt UI components
@@ -136,6 +138,7 @@ describe('default.vue layout', () => {
 
     // Button should be clickable
     await signOutButton?.trigger('click');
+    expect(navigateTo).toHaveBeenCalledWith('/');
     // Note: Full sign out flow requires e2e testing with Amplify Auth
   });
 });

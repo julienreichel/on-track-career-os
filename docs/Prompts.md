@@ -128,7 +128,7 @@ Today, anonymous users hitting the site are redirected to `/login`, which create
 
 ### 2) Intro
 
-Now that `/` is public, we need a landing page that explains the product in <30 seconds: what it is, who it’s for, what outcomes it provides, how it works, and why it’s different. This prompt exists to implement the landing UI **cleanly** with Nuxt UI and existing page scaffolds (UContainer → UPage → UPageHeader/UPageBody) with reusable card patterns.
+Now that `/` is public, we need a landing page that explains the product in <30 seconds: what it is, who it’s for, what outcomes it provides, how it works, and why it’s different. This prompt exists to implement the landing UI **cleanly** with Nuxt UI and existing page scaffolds (UPage → UPageHeader/UPageBody) with reusable card patterns.
 
 ### 3) Feature scope
 
