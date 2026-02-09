@@ -9,7 +9,7 @@ export default defineNuxtConfig({
   srcDir: 'src/',
 
   modules: ['@nuxt/eslint', '@nuxt/ui', '@nuxtjs/i18n'],
-  ssr: false, // Disable server-side rendering
+  ssr: true,
   css: ['~/assets/css/main.css'],
 
   i18n: {
@@ -36,6 +36,20 @@ export default defineNuxtConfig({
 
   alias: {
     '@amplify': resolve(__dirname, './amplify'),
+    '@vueuse/core': resolve(__dirname, './node_modules/@nuxt/ui/node_modules/@vueuse/core'),
+  },
+
+  nitro: {
+    prerender: {
+      routes: ['/', '/login'],
+      crawlLinks: false,
+    },
+  },
+
+  routeRules: {
+    '/': { prerender: true, ssr: true },
+    '/login': { prerender: true, ssr: true },
+    '/**': { ssr: false },
   },
 
   typescript: {
