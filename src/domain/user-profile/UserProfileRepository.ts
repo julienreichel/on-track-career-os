@@ -25,7 +25,10 @@ export type AmplifyUserProfileModel = {
 };
 
 export type AmplifyMutations = {
-  deleteUserProfileWithAuth: (input: { userId: string }) => Promise<{ data: boolean | null }>;
+  deleteUserProfileWithAuth: (
+    input: { userId: string },
+    options?: Record<string, unknown>
+  ) => Promise<{ data: boolean | null }>;
 };
 
 export class UserProfileRepository {
@@ -233,7 +236,10 @@ export class UserProfileRepository {
    * Uses Lambda mutation to delete both DynamoDB record and Cognito user in one call
    */
   async delete(id: string) {
-    const { data } = await this.mutations.deleteUserProfileWithAuth({ userId: id });
+    const { data } = await this.mutations.deleteUserProfileWithAuth(
+      { userId: id },
+      gqlOptions()
+    );
     return data;
   }
 }

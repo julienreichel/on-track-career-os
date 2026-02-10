@@ -30,4 +30,11 @@ export class UserProfileService {
   async updateUserProfile(input: UserProfileUpdateInput): Promise<UserProfile | null> {
     return await this.repo.update(input);
   }
+
+  async deleteUserProfile(id: string): Promise<boolean> {
+    if (!id) {
+      return false;
+    }
+    return Boolean(await this.repo.delete(id));
+  }
 }

@@ -902,6 +902,15 @@
       "title": "CV settings",
       "description": "Set your default template, sections, and experiences.",
       "action": "Open CV settings"
+    },
+    "accountDeletion": {
+      "title": "Delete account",
+      "description": "Permanently delete your account and all associated data.",
+      "action": "Delete my account",
+      "confirmTitle": "Delete your account?",
+      "confirmDescription": "This action is permanent. All your profile data, documents, and progress will be removed.",
+      "confirmAction": "Yes, delete everything",
+      "deleteFailed": "Account deletion failed. Please try again."
     }
   },
   "tailoredMaterials": {

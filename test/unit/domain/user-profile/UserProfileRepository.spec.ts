@@ -285,6 +285,8 @@ describe('UserProfileRepository', () => {
 
       expect(mockMutations.deleteUserProfileWithAuth).toHaveBeenCalledWith({
         userId: 'user-123',
+      }, {
+        authMode: 'userPool',
       });
       expect(result).toBe(true);
     });
