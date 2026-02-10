@@ -46,6 +46,12 @@ vi.mock('@/composables/useAuthState', () => ({
   }),
 }));
 
+vi.mock('vue-i18n', () => ({
+  useI18n: () => ({
+    t: (key: string) => key,
+  }),
+}));
+
 beforeEach(() => {
   navigateTo.mockReset();
   isAuthenticated.value = false;

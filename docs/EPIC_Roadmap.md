@@ -4,7 +4,7 @@ Perfect — beta feedback is gold for shaping the landing. I went through it and
 
 ---
 
-## 🧱 Landing EPIC Scope (Beta-Informed)
+## 🧱 Landing EPIC Scope
 
 ### 🔹 Hero Section
 
@@ -21,83 +21,156 @@ CTA:
 
 ---
 
-### 🔹 “How It Works” — Guided Journey (CRITICAL)
+# 🌅 EPIC L1 — Public Landing & Pre-Auth Experience
 
-This directly addresses beta confusion.
+**Goal:**
+Give first-time visitors a clear, motivating understanding of the product _before_ asking them to sign in.
 
-**Section Title:**
-**A step-by-step journey, not just a CV tool**
-
-Visual flow:
-
-1. **Discover your strengths & direction**
-2. **Turn your experience into impact stories**
-3. **Understand what employers really need**
-4. **Create targeted CVs and letters with feedback**
-5. **Prepare confidently for interviews**
-
-This mirrors your actual system flow
+This EPIC transforms the app from a “tool behind a login” into a **coaching platform people feel invited into**.
 
 ---
 
-### 🔹 “Built for Real Job Search, Not Just Documents”
+## 🎯 User Problem
 
-Comparison block:
+When redirected directly to login:
 
-| Typical Tools       | Your On Track Career                             |
-| ------------------- | ------------------------------------------------ |
-| Write CVs           | Understand your value first                      |
-| Generic templates   | Stories & achievements from your real experience |
-| One-shot generation | Continuous feedback & improvement                |
-| Focus on documents  | Focus on strategy, positioning & confidence      |
+- ❓ “What is this app?”
+- ❓ “Is this just another CV builder?”
+- ❓ “Why should I trust it with my data?”
+- ❓ “What will I gain if I create an account?”
 
-This reflects your strategic positioning section
+We need to answer those in **30 seconds or less**.
 
 ---
 
-### 🔹 “You Stay in Control”
+## 🧱 Scope
 
-Addresses AI trust concerns from beta feedback about validation.
+### 1️⃣ Public Landing Page (`/` before login)
 
-Bullets:
+A clean, modern, **coach-oriented** landing page.
 
-- AI suggestions are always editable
-- Nothing is saved without your validation
-- You see _why_ suggestions are made
+#### Hero Section
 
-Matches your observability philosophy
+**Headline (example):**
+
+> _Your AI Career Coach — from self-discovery to job offers._
+
+**Subtext:**
+
+> Understand your value. Position yourself strategically. Communicate with impact.
+
+CTA:
+
+- **Start my career journey**
+- Secondary: “See how it works”
 
 ---
 
-### 🔹 Preview Section (Screenshots)
+### 2️⃣ “How It Works” Section (3–5 steps)
 
-Show:
+Visual journey:
+
+1. **Understand Yourself**
+   Extract strengths, achievements, and career direction
+2. **Understand Employers**
+   Decode job offers and company needs
+3. **Align & Position**
+   See where you bring the most value
+4. **Communicate Clearly**
+   Build CVs, letters, and pitches with feedback
+5. **Progress with Confidence**
+   Track actions and improve over time
+
+This reflects your core flow from the product description
+
+---
+
+### 3️⃣ “What Makes This Different”
+
+Not a CV builder. A **Career Coach**.
+
+| Others              | You                                 |
+| ------------------- | ----------------------------------- |
+| Help write CV       | Help understand your value          |
+| One-shot generation | Continuous feedback & improvement   |
+| Focus on documents  | Focus on positioning & strategy     |
+| Generic templates   | Personalized stories & achievements |
+
+---
+
+### 4️⃣ Trust & Safety Section
+
+Because this is career + personal data:
+
+- Your data belongs to you
+- Fully editable AI suggestions
+- Nothing sent without your validation
+- Secure authentication
+
+This aligns with your Observability Philosophy
+
+---
+
+### 5️⃣ Soft Feature Preview (No Demo Account Yet)
+
+Show **screenshots / mock blocks** of:
 
 - Personal Canvas
 - Story Builder
-- Job Match view
-- CV editor
+- Job Matching
+- CV Builder
 
-Caption example:
+With captions like:
 
-> “See how your experience connects to what employers actually need.”
+> “See how your experience connects to employer needs.”
 
 ---
 
-### 🔹 Final CTA
+### 6️⃣ CTA Section
 
-> _Ready to stop guessing and start positioning yourself strategically?_
+Strong emotional call:
+
+> _Stop guessing what employers want. Start understanding your value._
 
 Buttons:
 
-- Create my account
-- I already have an account
+- **Create my account**
+- Already have account → Sign in
 
 ---
 
-# 🚀 V1 — Coaching on Top of Existing Features (High Impact, Low Cost)
+## 🧩 Optional (If Time Allows in Same EPIC)
 
-These features **reuse your existing data and AI flows**, adding **feedback and guidance** rather than brand-new complex systems.
+### 🔹 Welcome Screen After Signup (First Login)
+
+Instead of dropping users into dashboard:
+
+“Welcome to your Career Coach. Here’s what we’ll do together.”
+
+With 3 steps:
+
+- Upload your CV
+- Build your stories
+- Analyze a job you want
+
+---
+
+## 🛠 Technical Scope
+
+- Public route not requiring auth
+- Responsive layout
+- Reuse design system (Nuxt UI)
+- Lightweight images / illustrations
+- SEO-friendly structure (later bonus)
+
+---
+
+## ✅ Success Criteria
+
+- User can explain the product after 20 seconds
+- Reduced bounce on login page
+- Increased account creation rate
+- New users reach onboarding with **clear expectations**
 
 ---
 
