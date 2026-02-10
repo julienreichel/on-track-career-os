@@ -75,6 +75,33 @@
       }
     }
   },
+  "landing": {
+    "hero": {
+      "eyebrow": "Career clarity, faster",
+      "title": "Turn your experience into a focused job search in days, not months.",
+      "description": "On Track Career helps you map your strengths, target roles, and build the materials you need to apply with confidence.",
+      "ctaPrimary": "Create account",
+      "ctaSecondary": "Sign in"
+    },
+    "features": {
+      "clarity": {
+        "title": "Clarify your direction",
+        "description": "Define the roles you want and the narrative that makes your experience stand out."
+      },
+      "materials": {
+        "title": "Generate ready-to-send materials",
+        "description": "Produce tailored resumes, cover letters, and stories that match each opportunity."
+      },
+      "momentum": {
+        "title": "Stay momentum-focused",
+        "description": "Track progress, unlock next steps, and keep the job search moving forward."
+      }
+    },
+    "seo": {
+      "title": "AI Career Coach for Focused Job Search",
+      "description": "Clarify your career direction, target the right roles, and generate tailored materials with guided AI support."
+    }
+  },
   "home": {
     "title": "Welcome {name}",
     "description": "What do you want to do today?",

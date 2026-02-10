@@ -4,14 +4,13 @@
       <section class="py-12 md:py-16">
         <div class="max-w-2xl space-y-6">
           <p class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-            Career clarity, faster
+            {{ t('landing.hero.eyebrow') }}
           </p>
           <h1 data-testid="landing-hero" class="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Turn your experience into a focused job search in days, not months.
+            {{ t('landing.hero.title') }}
           </h1>
           <p class="text-base text-dimmed">
-            On Track Career helps you map your strengths, target roles, and build the materials you need
-            to apply with confidence.
+            {{ t('landing.hero.description') }}
           </p>
           <div class="flex flex-wrap items-center gap-3">
             <UButton
@@ -19,7 +18,7 @@
               color="primary"
               size="lg"
               :to="{ path: '/login', query: { mode: 'signup' } }"
-              label="Create account"
+              :label="t('landing.hero.ctaPrimary')"
             />
             <UButton
               data-testid="landing-cta-signin"
@@ -27,7 +26,7 @@
               variant="outline"
               size="lg"
               :to="{ path: '/login', query: { mode: 'signin' } }"
-              label="Sign in"
+              :label="t('landing.hero.ctaSecondary')"
             />
           </div>
         </div>
@@ -36,25 +35,25 @@
       <section class="grid gap-6 md:grid-cols-3">
         <UCard>
           <div class="space-y-2">
-            <h2 class="text-lg font-semibold">Clarify your direction</h2>
+            <h2 class="text-lg font-semibold">{{ t('landing.features.clarity.title') }}</h2>
             <p class="text-sm text-dimmed">
-              Define the roles you want and the narrative that makes your experience stand out.
+              {{ t('landing.features.clarity.description') }}
             </p>
           </div>
         </UCard>
         <UCard>
           <div class="space-y-2">
-            <h2 class="text-lg font-semibold">Generate ready-to-send materials</h2>
+            <h2 class="text-lg font-semibold">{{ t('landing.features.materials.title') }}</h2>
             <p class="text-sm text-dimmed">
-              Produce tailored resumes, cover letters, and stories that match each opportunity.
+              {{ t('landing.features.materials.description') }}
             </p>
           </div>
         </UCard>
         <UCard>
           <div class="space-y-2">
-            <h2 class="text-lg font-semibold">Stay momentum-focused</h2>
+            <h2 class="text-lg font-semibold">{{ t('landing.features.momentum.title') }}</h2>
             <p class="text-sm text-dimmed">
-              Track progress, unlock next steps, and keep the job search moving forward.
+              {{ t('landing.features.momentum.description') }}
             </p>
           </div>
         </UCard>
@@ -66,6 +65,7 @@
 <script setup lang="ts">
 import { useSeoMetaDefaults } from '@/composables/useSeoMetaDefaults';
 import { buildAbsoluteUrl } from '@/utils/url';
+import { useI18n } from 'vue-i18n';
 
 definePageMeta({
   layout: 'public',
@@ -73,11 +73,11 @@ definePageMeta({
 });
 
 const route = useRoute();
+const { t } = useI18n();
 const { siteName, baseUrl, ogImage, titleTemplate } = useSeoMetaDefaults();
 
-const title = 'AI Career Coach for Focused Job Search';
-const description =
-  'Clarify your career direction, target the right roles, and generate tailored materials with guided AI support.';
+const title = t('landing.seo.title');
+const description = t('landing.seo.description');
 const canonicalUrl = buildAbsoluteUrl(baseUrl, route.path);
 const ogImageUrl = buildAbsoluteUrl(baseUrl, ogImage);
 
