@@ -27,6 +27,7 @@ export default withNuxt(
             'match',
             'login',
             'eula',
+            'privacy',
             'new',
             'print',
             '[id]',

@@ -26,6 +26,10 @@ defineOptions({ name: 'PublicLayout' });
 const currentYear = new Date().getFullYear();
 const footerItems: NavigationMenuItem[] = [
   {
+    label: 'Privacy Policy',
+    to: '/privacy',
+  },
+  {
     label: 'End User License Agreement',
     to: '/eula',
   },

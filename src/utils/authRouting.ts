@@ -1,4 +1,4 @@
-export const PUBLIC_ROUTES = ['/', '/login', '/eula'];
+export const PUBLIC_ROUTES = ['/', '/login', '/eula', '/privacy'];
 export const AUTHENTICATED_HOME = '/home';
 
 const PUBLIC_ROUTE_PREFIXES = [
