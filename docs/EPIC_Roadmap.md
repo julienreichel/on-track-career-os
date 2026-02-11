@@ -1,176 +1,290 @@
 # 🧭 EPIC ROADMAP — AI CAREER COACH EDITION
 
-Perfect — beta feedback is gold for shaping the landing. I went through it and several comments directly justify a **strong pre-login explanation layer**. Here’s how it informs the landing EPIC.
+# 🚀 EPIC 1 — Clear Transformation & Outcome Framing
+
+### **Problem**
+
+Users go through many reflective steps but don’t clearly see the **before → after transformation**. It feels like filling in tools, not progressing toward interviews.
+
+### **Goal**
+
+Make the product visibly move users from:
+
+> _“Unclear and generic” → “Positioned and interview-ready.”_
+
+### **Key Features**
+
+- New **“Career Readiness” header** on dashboard
+- Readiness stages:
+  - Profile Clarity
+  - Positioning Strength
+  - Job Alignment
+  - Interview Readiness
+
+- Short transformation summary:
+
+  > “You now have a quantified, job-aligned profile ready for applications.”
+
+### **Integration with Existing App**
+
+Builds on your current milestone system (Grounded, Identity Defined, etc.) but reframes them as **progress toward employability**, not just completion.
+
+### **Acceptance Criteria**
+
+- Users can see a single “Career Readiness” status at all times
+- Each existing milestone maps to a readiness dimension
+- At least one screen summarizes “Here’s how far you’ve come”
 
 ---
 
-## 🧱 Landing EPIC Scope
+# 🎯 EPIC 2 — Job Fit & Application Strength Analyzer
 
-### 🔹 Hero Section
+### **Problem**
 
-**Headline:**
+Users generate CVs and letters but don’t know:
 
-> _Your AI Career Coach — from self-discovery to job offers._
+> “How strong is this application for THIS job?”
 
-**Subtext:**
+### **Goal**
 
-> Stop guessing what employers want. Understand your value and present it with impact.
+Turn the system into a **strategic evaluator**, not just a generator.
 
-CTA:
-**Start my career journey**
+### **Key Features**
 
----
+- “Application Strength” score per job
+- Breakdown:
+  - Skill Match
+  - Experience Relevance
+  - Impact Evidence
+  - Story Coverage
 
-# 🌅 EPIC L1 — Public Landing & Pre-Auth Experience
+- “Top 3 improvements before applying”
+- Highlight missing signals (e.g., leadership, ownership, metrics)
 
-**Goal:**
-Give first-time visitors a clear, motivating understanding of the product _before_ asking them to sign in.
+### **Integration with Existing App**
 
-This EPIC transforms the app from a “tool behind a login” into a **coaching platform people feel invited into**.
+Extends your current job match scoring by connecting it directly to:
 
----
+- CV content
+- Story database
+- Achievements
 
-## 🎯 User Problem
+### **Acceptance Criteria**
 
-When redirected directly to login:
-
-- ❓ “What is this app?”
-- ❓ “Is this just another CV builder?”
-- ❓ “Why should I trust it with my data?”
-- ❓ “What will I gain if I create an account?”
-
-We need to answer those in **30 seconds or less**.
-
----
-
-## 🧱 Scope
-
-### 1️⃣ Public Landing Page (`/` before login)
-
-A clean, modern, **coach-oriented** landing page.
-
-#### Hero Section
-
-**Headline (example):**
-
-> _Your AI Career Coach — from self-discovery to job offers._
-
-**Subtext:**
-
-> Understand your value. Position yourself strategically. Communicate with impact.
-
-CTA:
-
-- **Start my career journey**
-- Secondary: “See how it works”
+- After CV generation, users see a job-specific strength score
+- System suggests at least 2 concrete improvements
+- Users can click suggestions and jump directly to edit relevant content
 
 ---
 
-### 2️⃣ “How It Works” Section (3–5 steps)
+# 🧠 EPIC 3 — Interview Preparation Engine
 
-Visual journey:
+### **Problem**
 
-1. **Understand Yourself**
-   Extract strengths, achievements, and career direction
-2. **Understand Employers**
-   Decode job offers and company needs
-3. **Align & Position**
-   See where you bring the most value
-4. **Communicate Clearly**
-   Build CVs, letters, and pitches with feedback
-5. **Progress with Confidence**
-   Track actions and improve over time
+You stop at application. The user’s biggest anxiety is the **interview**.
 
-This reflects your core flow from the product description
+### **Goal**
 
----
+Make the platform useful _after_ they get invited.
 
-### 3️⃣ “What Makes This Different”
+### **Key Features**
 
-Not a CV builder. A **Career Coach**.
+- AI-generated likely interview questions based on:
+  - Job description
+  - Company canvas
+  - User experience
 
-| Others              | You                                 |
-| ------------------- | ----------------------------------- |
-| Help write CV       | Help understand your value          |
-| One-shot generation | Continuous feedback & improvement   |
-| Focus on documents  | Focus on positioning & strategy     |
-| Generic templates   | Personalized stories & achievements |
+- Suggested stories to answer each question
+- “Coverage indicator”:
 
----
+  > “You have strong examples for teamwork, weaker for conflict.”
 
-### 4️⃣ Trust & Safety Section
+- Interview story bank view
 
-Because this is career + personal data:
+### **Integration with Existing App**
 
-- Your data belongs to you
-- Fully editable AI suggestions
-- Nothing sent without your validation
-- Secure authentication
+Directly uses:
 
-This aligns with your Observability Philosophy
+- Story Builder outputs
+- Experience Builder achievements
+- Company & Job model
+
+### **Acceptance Criteria**
+
+- For any job, system generates at least 8 likely questions
+- Each question links to at least one suggested user story (or flags a gap)
+- Users can mark questions as “Prepared”
 
 ---
 
-### 5️⃣ Soft Feature Preview (No Demo Account Yet)
+# 📈 EPIC 4 — Achievement & CV Strength Feedback
 
-Show **screenshots / mock blocks** of:
+### **Problem**
 
-- Personal Canvas
-- Story Builder
-- Job Matching
+Users often describe responsibilities, not impact.
+
+### **Goal**
+
+Continuously upgrade user content quality.
+
+### **Key Features**
+
+- Achievement strength indicator (Weak / Solid / Strong)
+- Prompts:
+  - “What changed because of your work?”
+  - “Can you quantify this?”
+
+- CV bullet quality feedback
+
+### **Integration with Existing App**
+
+Enhances:
+
+- Experience Builder
 - CV Builder
 
-With captions like:
+Uses existing structured achievement data.
 
-> “See how your experience connects to employer needs.”
+### **Acceptance Criteria**
 
----
-
-### 6️⃣ CTA Section
-
-Strong emotional call:
-
-> _Stop guessing what employers want. Start understanding your value._
-
-Buttons:
-
-- **Create my account**
-- Already have account → Sign in
+- Each achievement receives a quality rating
+- Users get at least one improvement suggestion per weak item
+- CV preview visually distinguishes strong vs weak bullets
 
 ---
 
-## 🧩 Optional (If Time Allows in Same EPIC)
+# 🧩 EPIC 5 — Progress, Confidence & Readiness Signals
 
-### 🔹 Welcome Screen After Signup (First Login)
+### **Problem**
 
-Instead of dropping users into dashboard:
+Users don’t _feel_ progress, only activity.
 
-“Welcome to your Career Coach. Here’s what we’ll do together.”
+### **Goal**
 
-With 3 steps:
+Turn effort into visible confidence.
 
-- Upload your CV
-- Build your stories
-- Analyze a job you want
+### **Key Features**
+
+- “You are ready for…” indicators:
+  - “Ready to apply to Product roles”
+  - “Interview-ready for leadership discussions”
+
+- Profile strength stats:
+  - # quantified achievements
+  - # stories covering key competencies
+
+- Growth notifications:
+
+  > “Your leadership signal increased”
+
+### **Integration with Existing App**
+
+Pulls data from:
+
+- Stories
+- Achievements
+- Job matches
+- Milestones
+
+Sits above current milestone system as a **confidence layer**.
+
+### **Acceptance Criteria**
+
+- Users see at least 3 dynamic readiness indicators
+- Changes in profile data update indicators
+- At least one “confidence message” appears after major actions
 
 ---
 
-## 🛠 Technical Scope
+# ⏳ EPIC 6 — Urgency & Job Search Mode
 
-- Public route not requiring auth
-- Responsive layout
-- Reuse design system (Nuxt UI)
-- Lightweight images / illustrations
-- SEO-friendly structure (later bonus)
+### **Problem**
+
+The product feels reflective, not time-sensitive.
+
+### **Goal**
+
+Make it feel like a **co-pilot during an active job search**.
+
+### **Key Features**
+
+- “Current Focus” selector:
+  - Exploring
+  - Applying
+  - Interviewing soon
+
+- Contextual priorities:
+  - “You have an interview soon → prepare stories”
+
+- Optional deadlines per job
+
+### **Integration with Existing App**
+
+Adds a behavioral layer that reorders existing tools:
+
+- Interview prep surfaces earlier when relevant
+- CV tuning prioritized when applying
+
+### **Acceptance Criteria**
+
+- Users can set a job search mode
+- Dashboard adapts recommended next steps
+- At least one feature changes behavior based on mode
 
 ---
 
-## ✅ Success Criteria
+# 🧭 EPIC 7 — Application Strategy Guidance
 
-- User can explain the product after 20 seconds
-- Reduced bounce on login page
-- Increased account creation rate
-- New users reach onboarding with **clear expectations**
+### **Problem**
+
+Users don’t know which jobs are worth pursuing.
+
+### **Goal**
+
+Support **decision-making**, not just content creation.
+
+### **Key Features**
+
+- “Should I apply?” analysis
+  - Fit vs stretch
+  - Growth potential
+
+- Job comparison view
+- Flag over- or under-qualified roles
+
+### **Integration with Existing App**
+
+Builds on existing job fit scoring but reframes it as **strategy**, not just compatibility.
+
+### **Acceptance Criteria**
+
+- Users see a recommendation (Strong Fit / Stretch / Risky)
+- Explanation provided in plain language
+- Users can compare at least two jobs side-by-side
+
+---
+
+## 🤖 EPIC C0 — In-App AI Career Companion
+
+**Problem**
+Users struggle to know what to write, how to reflect, and how to use structured tools like strengths, stories, and the Personal Canvas.
+
+**Goal**
+Provide a **context-aware AI coach inside the product** that guides reflection and helps users complete each section with clarity.
+
+**Key Features**
+
+- Contextual guidance per screen (Profile, Strengths, Stories, Canvas, Jobs)
+- Guided reflection questions
+- Field-level assistance (strengths, achievements, value proposition, direction)
+- Canvas translator (explains each block in practical career terms)
+- Action mode: AI proposes structured updates → user confirms → data saved
+
+**Success Criteria**
+
+- Users engage with the companion in ≥40% of profile-building sessions
+- Increase completion rate of Strengths, Stories, and Canvas sections
+- Users report reduced confusion in usability feedback
 
 ---
 
@@ -342,40 +456,102 @@ Extension of profile psychology.
 
 ---
 
-## 🔁 EPIC C12 — Career Evolution Tracking
+## 🤖 EPIC C13 — In-App AI Career Companion
+
+**Goal:** Provide users with a **context-aware AI coach inside the product** that helps them think, reflect, and complete each step of their career positioning journey.
+
+---
 
 ### Includes
 
-- Multi-version career positioning over time
-- Track growth of strengths, competencies, and direction
+#### 🧭 Contextual Guidance
+
+- Companion is aware of the current section (Profile, Strengths, Stories, Personal Canvas, Job Analysis, etc.)
+- Explains _what this section is for_ in plain language
+- Provides examples when users feel stuck (“What counts as a strength?”, “What should go in this canvas box?”)
+
+#### 🧠 Reflection & Clarity Coaching
+
+- Helps users reflect through guided questions
+  → “Tell me about a time you solved a difficult problem”
+- Extracts potential strengths, achievements, and themes from user answers
+- Suggests wording that fits structured fields
+
+#### ✍️ Field-Level Assistance
+
+- Users can ask for help filling specific parts:
+  - Strengths
+  - Achievements
+  - Value proposition
+  - Career direction
+
+- Companion proposes structured drafts aligned with the system’s models
+- User can accept, edit, or reject suggestions
+
+#### 🧩 Canvas & Framework Translator
+
+- Makes abstract tools (like the Personal Business Model Canvas) easier to understand
+- Explains each block in practical career terms
+- Suggests initial content based on existing profile and stories
+
+#### 🔄 Action Mode (AI → Data Integration)
+
+- Companion can propose direct updates to structured data
+- With user confirmation, it can:
+  - Add/edit strengths
+  - Draft achievements
+  - Update canvas sections
+  - Refine positioning statements
 
 ---
 
-# 🧭 PRIORITY LOGIC
+### Why V1–V2 Priority
 
-| Version | Focus                                     | Why                                         |
-| ------- | ----------------------------------------- | ------------------------------------------- |
-| **V1**  | Positioning + feedback + decision support | Biggest coaching impact, low technical cost |
-| **V2**  | Interview & networking performance        | Converts opportunities into success         |
-| **V3**  | Personalization & progress analytics      | Deepens long-term engagement                |
-| **V4**  | Ecosystem & long-term career tracking     | Strategic expansion                         |
+- Reduces cognitive load and blank-page anxiety
+- Increases completion rates for reflective sections
+- Makes advanced tools usable for non-expert users
+- Multiplies the value of existing EPICs (C1–C6) without requiring major new data models
+
+This turns the product from a **set of intelligent tools** into a **guided coaching experience**.
 
 ---
 
-# 🧠 BIG PICTURE SHIFT
+### How It Integrates With Existing EPICs
 
-**MVP = Output Generator**
-**V1–V4 = Coaching Intelligence Layers**
+| EPIC                                        | Companion Contribution                                            |
+| ------------------------------------------- | ----------------------------------------------------------------- |
+| **C1 Positioning & Career Target Coaching** | Helps articulate goals and positioning statements                 |
+| **C2 Competency Evidence Map**              | Suggests missing examples and prompts users for stronger evidence |
+| **C3 AI Feedback on Materials**             | Explains feedback and helps rewrite weak parts                    |
+| **C5 Momentum & Activity Coaching**         | Suggests next steps conversationally                              |
+| **C6 Interview Intelligence**               | Enables conversational interview rehearsal                        |
+| **Personal Canvas**                         | Translates abstract blocks into concrete career language          |
 
-You’re layering:
+The companion acts as a **coaching interface layer** across the entire platform.
 
-1. **Clarity coaching**
-2. **Proof coaching**
-3. **Decision coaching**
-4. **Performance coaching**
-5. **Behavior coaching**
+---
 
-This is how the product evolves from:
+### Acceptance Criteria
 
-📄 “Write better CVs”
-→ 🧠 “Become better at managing your career”
+- Companion is accessible from all major profile-building and job-preparation sections
+- It adapts its guidance based on the current context (which screen + what data is missing or weak)
+- It can suggest structured content, not just free-form text
+- Users can insert suggestions directly into fields with one action
+- It can guide users step-by-step through complex sections like the Personal Canvas
+
+---
+
+### Strategic Impact
+
+Without this EPIC, the product is:
+🛠 A powerful but demanding career toolkit
+
+With this EPIC, the product becomes:
+🧭 **An AI career coach that guides users through every step**
+
+This significantly increases:
+
+- User confidence
+- Depth of reflection
+- Feature adoption
+- Perceived personal support
