@@ -1065,7 +1065,8 @@
         "generateCv": "Generate CV",
         "generateCoverLetter": "Generate cover letter",
         "generateSpeech": "Generate speech",
-        "generateMatch": "Generate match"
+        "generateMatch": "Generate match",
+        "reviewMatch": "View match"
       }
     }
   },
