@@ -134,7 +134,7 @@ const autoJobId = computed(() => {
 const isAutoFlow = computed(() => Boolean(autoJobId.value));
 
 const cancel = () => {
-  void router.push({ name: 'cover-letters' });
+  void router.push({ name: 'applications-cover-letters' });
 };
 
 const generateCoverLetter = async () => {
