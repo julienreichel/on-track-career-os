@@ -1,5 +1,5 @@
 <template>
-  <UContainer>
+  <div>
     <UHeader toggle-side="left">
       <template #title>
         <NuxtLink to="/home" class="font-semibold">
@@ -28,12 +28,22 @@
     </UHeader>
 
     <UMain>
-      <div v-if="showBreadcrumb" class="mb-6">
-        <UBreadcrumb :items="breadcrumbItems" />
-      </div>
-      <slot />
+      <UContainer>
+        <div v-if="showBreadcrumb" class="mb-3 mt-3">
+          <UBreadcrumb :items="breadcrumbItems" />
+        </div>
+        <slot />
+      </UContainer>
     </UMain>
-  </UContainer>
+    <USeparator />
+    <UFooter>
+      <template #left>
+        <p class="text-sm text-muted">© {{ currentYear }} On Track Career</p>
+      </template>
+
+      <UNavigationMenu :items="footerItems" variant="link" />
+    </UFooter>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -52,6 +62,18 @@ const { resolveSegment, isUUID } = useBreadcrumbMapping({
   errorTitle: t('common.error'),
   errorDescription: t('common.errors.breadcrumbResolveFailed'),
 });
+
+const currentYear = new Date().getFullYear();
+const footerItems: NavigationMenuItem[] = [
+  {
+    label: 'Privacy Policy',
+    to: '/privacy',
+  },
+  {
+    label: 'End User License Agreement',
+    to: '/eula',
+  },
+];
 
 // Navigation items for UNavigationMenu
 const navigationItems = computed<NavigationMenuItem[]>(() => [
