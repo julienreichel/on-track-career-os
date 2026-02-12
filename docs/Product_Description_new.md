@@ -1,252 +1,276 @@
-# **Your On Track Career — Your AI Career Coach**
+# **Your On Track Career — From Experience to Interview**
 
-**Discover Yourself. Understand the Market. Communicate Your Value. Move Forward.**
+**Your AI Career Positioning & Application Coach**
 
----
-
-# 1. Overview
-
-**Your On Track Career** is an **AI-powered career coaching platform** that helps professionals understand their value, position themselves strategically, and convert opportunities into meaningful interviews and offers.
-
-It combines:
-
-- **Self-discovery**
-- **Career positioning**
-- **Market and opportunity analysis**
-- **Communication tools (CV, letter, speech)**
-- **Guided feedback and progress coaching**
-
-into a single coherent system — a **Personal AI Career Coach** whose mission is to help users:
-
-1. Understand who they are professionally
-2. Define where they want to go
-3. Communicate their value clearly
-4. Make strategic decisions in their job search
-5. Progress with confidence and structure
-
-This is not just a content generator — it is a **guided system that teaches users how to manage their career**.
+Turn your messy career history into a clear, targeted story that gets you interviews.
 
 ---
 
-# 2. Core Philosophy
+# 1. The Core Problem We Solve
 
-### ✔ AI should coach, not replace
+Most professionals don’t struggle because they lack experience.
 
-The system guides users who don’t know how to express themselves — while keeping them in control. AI provides structure, suggestions, and feedback, but users validate and refine everything.
+They struggle because they don’t know how to:
 
-### ✔ Career growth requires clarity before action
-
-Users first clarify identity, strengths, and direction before producing application materials.
-
-### ✔ Job search is a strategic process
-
-Success comes from alignment between:
-
-- Personal strengths
-- Career direction
-- Company needs
-- Market realities
-
-### ✔ Feedback creates progress
-
-The system doesn’t just generate outputs — it evaluates clarity, alignment, and impact, and guides users on how to improve.
-
-### ✔ Everything connects
-
-Identity → Career Targets → Experience Proof → Market Needs → Communication → Feedback → Iteration.
-
----
-
-# 3. Primary User Outcomes
-
-Users can:
-
-- Understand their **professional identity and value**
-- Define **clear career targets**
-- Turn past experience into **proof of impact**
-- Understand **company and job needs**
-- Create **strategic, targeted application materials**
-- Prepare effectively for **interviews and networking**
-- Make informed decisions about **where to apply**
-- Maintain **momentum and structure** during their job search
-
----
-
-# 4. Product Capabilities
-
----
-
-## 4.1 Self-Knowledge & Career Direction
-
-The platform helps users clarify **who they are** and **where they are going**.
-
-### Includes:
-
-- Strengths, motivations, and values discovery
-- Personal Business Model Canvas
-- Career vision and direction
-- **Career Targeting Module (NEW)**
-  - Define 1–3 target roles
-  - Define industries and company types
-  - Identify non-negotiables and preferences
-
-### Coaching Layer
-
-- **Positioning Clarity Feedback (NEW)**
-  AI evaluates how clearly the user can articulate their professional identity and value.
-
----
-
-## 4.2 Experience & Proof of Value
-
-Users transform experience into **evidence of competence**.
-
-### Includes:
-
-- Experience Builder (achievements, KPIs, impact)
-- Story Builder (STAR/SOAR stories)
-- Skill and strength extraction
-
-### Coaching Layer
-
-- **Competency Evidence Map (NEW)**
-  Visualizes which key competencies are well supported by examples and which need strengthening.
-
----
-
-## 4.3 Personal Marketing Materials
-
-The system helps users communicate their value clearly and strategically.
-
-### Includes:
-
-- CV Builder (generic and job-tailored)
-- Cover Letter Generator
-- Speech & Elevator Pitch Builder
-- LinkedIn positioning guidance
-
-### Coaching Layer
-
-- **AI Feedback Panel (NEW)**
-  Users can refine outputs with instructions like “more formal”, “more impact”, “shorter”, etc.
-- **Material Strength Analyzer (NEW)**
-  AI evaluates clarity, impact, and alignment with the target role.
-
----
-
-## 4.4 Market & Opportunity Strategy
-
-The platform helps users understand not only a job, but **how to position themselves in the market**.
-
-### Includes:
-
-- Job description analysis
-- Company analysis and company canvas
-- User–Job–Company matching
-
-### Coaching Layer
-
-- **Opportunity Strategy Coach (NEW)**
-  Helps decide:
-  - Should I apply?
-  - Should I network first?
-  - Is this role aligned with my direction?
-
-- **Skill Gap → Learning Guidance (NEW)**
-  Suggests how to close important gaps through reframing, learning, or new experiences.
-
----
-
-## 4.5 Networking & Visibility
-
-Users learn to move from anonymous candidate to visible professional.
-
-### Includes:
-
-- Positioning-based introductions
-- Story and value articulation for conversations
-
-### Coaching Layer
-
-- **Networking Prep Assistant (NEW)**
-  Generates conversation starters, outreach messages, and positioning for informational interviews.
-
----
-
-## 4.6 Interview Preparation
-
-The platform supports users in converting opportunities into offers.
-
-### Includes:
-
-- Interview question generation
-- Role-specific preparation
-
-### Coaching Layer
-
-- **Story Recommender (NEW)**
-  Suggests which stories best match the target role.
-- **Answer Feedback Coach (NEW)**
-  Evaluates user answers for clarity, structure, and impact.
-
----
-
-## 4.7 Execution & Momentum
-
-The platform supports users in maintaining progress and discipline.
-
-### Includes:
-
-- Onboarding and progress guidance
-
-### Coaching Layer
-
-- **Job Search Activity Tracker (NEW)**
-  Tracks applications, networking, and interviews.
-- **Momentum Nudges (NEW)**
-  Encourages consistent progress and suggests next best actions.
-
----
-
-# 5. System Role
-
-Your On Track Career acts as:
-
-- A **mirror** — helping users understand themselves
-- A **translator** — turning experience into value language
-- A **strategist** — connecting personal value to market needs
-- A **coach** — giving feedback and guidance
-- A **companion** — supporting progress over time
-
----
-
-# 6. Strategic Positioning
-
-This product goes beyond CV builders and generic AI writing tools.
-
-Its unique value lies in a **Personal Understanding System** that connects:
-
-- Identity
-- Stories
-- Achievements
-- Strengths
-- Company needs
-- Market positioning
-
-into a dynamic coaching loop that helps users grow, not just generate text.
-
----
-
-# 7. Why This Product Wins
-
-Because career transitions are not writing problems — they are **clarity, positioning, and confidence problems**.
-
-This platform helps users:
-
-- Understand their own story
+- Clearly explain their value
+- Adapt their story to a specific role
+- Prove impact convincingly
 - Position themselves strategically
-- Communicate with impact
-- Learn from feedback
-- Progress with structure
+- Prepare confidently for interviews
 
-With AI-powered guidance, structured reflection, and continuous coaching, users are not just producing documents — they are **becoming more effective professionals in how they present and manage their careers**.
+They think they need:
+
+- A better CV
+- A better cover letter
+- Better interview answers
+
+What they actually need is:
+
+> **Clarity, translation, and strategic alignment.**
+
+They need help turning:
+
+> “Here’s what I did”
+> into
+> “Here’s why you should hire me.”
+
+That’s the real problem.
+
+---
+
+# 2. What This Product Is
+
+**Your On Track Career** is an AI-powered career positioning and application coaching platform designed to help professionals:
+
+- Clarify their professional identity
+- Define a clear direction
+- Translate experience into proof of impact
+- Align with specific job opportunities
+- Generate convincing application materials
+- Prepare strategically for interviews
+- Track progress toward readiness
+
+It is not just a content generator.
+
+It is a:
+
+> **Career Translation Engine + Strategic Application Coach**
+
+From confusion → to clarity
+From generic applications → to targeted positioning
+From doubt → to interview readiness
+
+---
+
+# 3. When People Create an Account (Trigger Moments)
+
+Users don’t join because they want reflection.
+
+They join because something hurts:
+
+- “I’ve sent 15 applications and got nothing.”
+- “This job is perfect but I don’t know how to tailor my CV.”
+- “I want to change direction but my experience doesn’t fit.”
+- “I have an interview next week and I’m not ready.”
+- “I feel invisible in the job market.”
+
+This platform exists for those moments.
+
+---
+
+# 4. The Transformation (From → To)
+
+### Before
+
+- Unclear strengths
+- Generic CV
+- Weak achievements
+- Random job applications
+- Interview anxiety
+- No feedback loop
+
+### After
+
+- Clear positioning statement
+- Quantified, impact-driven achievements
+- Job-specific tailored applications
+- Strategic job selection
+- Interview-ready stories
+- Visible progress and readiness indicators
+
+The system makes the transformation visible.
+
+---
+
+# 5. How It Works
+
+The platform guides users through a structured journey:
+
+---
+
+## 5.1 Clarify Identity & Direction
+
+Users define:
+
+- Strengths
+- Motivations
+- Values
+- Career targets
+- Non-negotiables
+
+The system evaluates positioning clarity and highlights inconsistencies.
+
+Result:
+
+> A clear professional identity, not just a list of jobs.
+
+---
+
+## 5.2 Turn Experience into Proof
+
+Users transform past roles into:
+
+- Quantified achievements
+- Competency-backed stories
+- Impact-driven narratives
+
+The system shows:
+
+- Which competencies are well supported
+- Which areas lack evidence
+- How to strengthen weak achievements
+
+Result:
+
+> Experience becomes proof of value.
+
+---
+
+## 5.3 Analyze Jobs & Companies Strategically
+
+Users upload job descriptions.
+
+The system:
+
+- Identifies explicit and hidden pains
+- Maps user strengths to company needs
+- Evaluates role alignment
+- Highlights risks and mitigation angles
+
+Result:
+
+> Job search becomes strategic, not random.
+
+---
+
+## 5.4 Evaluate Application Strength
+
+After generating materials, the system answers:
+
+- How strong is this application for THIS job?
+- Where is the proof weak?
+- What signals are missing?
+- What should be improved before applying?
+
+Users receive:
+
+- Application Strength Score
+- Top improvement actions
+- Direct edit shortcuts
+
+Result:
+
+> Users apply with confidence, not guesswork.
+
+---
+
+## 5.5 Prepare for Interviews
+
+The system predicts:
+
+- Likely interview questions
+- Behavioral themes
+- Objections recruiters may raise
+
+It suggests:
+
+- Which stories to use
+- Where coverage is weak
+- How to improve answers
+
+Result:
+
+> Users walk into interviews prepared and structured.
+
+---
+
+## 5.6 Track Progress & Readiness
+
+The platform makes growth visible:
+
+- Career Readiness Score
+- Positioning strength indicators
+- Competency coverage map
+- “You are ready for…” signals
+- Job search activity tracking
+
+Users don’t just write — they progress.
+
+---
+
+# 6. The AI Career Companion
+
+Throughout the journey, users are supported by a context-aware AI companion that:
+
+- Explains what each section means
+- Helps users reflect when they’re stuck
+- Suggests structured content
+- Translates abstract tools into practical language
+- Proposes updates that users can approve
+
+The system feels less like software and more like a coach.
+
+---
+
+# 7. Why Users Pay
+
+People don’t pay for introspection.
+
+They pay for outcomes.
+
+They pay because:
+
+- It increases their chances of interviews
+- It helps them stand out
+- It reduces rejection
+- It saves time
+- It gives confidence
+- It prepares them for high-stakes moments
+
+The value proposition in their mind:
+
+> “If this helps me land one better job, it’s worth far more than the subscription.”
+
+Career transitions are high-stakes, high-emotion moments.
+
+This product exists for those moments.
+
+---
+
+# 8. Strategic Positioning
+
+This is not:
+
+- A CV template library
+- A generic AI writing tool
+- A passive reflection platform
+
+It is:
+
+> **An AI Career Positioning & Application Coach**
+
+Helping professionals move from:
+
+**Experience → Positioning → Application → Interview → Offer**
+
+With structure, feedback, and confidence at every step.
