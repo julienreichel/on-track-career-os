@@ -41,12 +41,9 @@ export default defineNuxtConfig({
 
   nitro: {
     prerender: {
-      routes: ['/', '/login'],
+      routes: ['/', '/login', '/200.html', '/404.html'],
       crawlLinks: false,
       autoSubfolderIndex: false,
-    },
-    output: {
-      publicDir: resolve(__dirname, '.output/public'),
     },
   },
 
