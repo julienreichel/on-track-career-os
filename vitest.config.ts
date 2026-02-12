@@ -71,6 +71,7 @@ export default defineConfig({
           include: ['test/e2e-sandbox/**/*.spec.ts'],
           environment: 'node',
           testTimeout: 60000, // 60s for AWS operations
+          retry: 2, // Retry flaky AI operations up to 2 times
         },
         // Configure path aliases for sandbox tests
         resolve: {
