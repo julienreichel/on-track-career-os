@@ -43,6 +43,10 @@ export default defineNuxtConfig({
     prerender: {
       routes: ['/', '/login'],
       crawlLinks: false,
+      autoSubfolderIndex: false,
+    },
+    output: {
+      publicDir: resolve(__dirname, '.output/public'),
     },
   },
 
