@@ -4,7 +4,7 @@ import { AUTHENTICATED_HOME } from '@/utils/authRouting';
 
 export default defineNuxtRouteMiddleware(async (to) => {
   // Only redirect if we're actually on the landing page
-  if (to.path !== '/') {
+  if (to?.path && to.path !== '/') {
     return;
   }
 
