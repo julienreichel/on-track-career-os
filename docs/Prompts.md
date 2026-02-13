@@ -441,7 +441,7 @@ A2 is a “decision gate” feature. It must be reliable, debuggable, and testab
   - pdf text extraction failure
 
 - Deterministic UX messaging (i18n keys if applicable).
-- Add minimal PostHog events if you already track key events (optional, consistent with existing usage).
+- Add minimal PostHog events, consistent with existing usage.
 
 **Out of scope**
 
