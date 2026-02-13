@@ -139,6 +139,9 @@ const tabItems = computed(() =>
 );
 
 const matchLink = computed(() => (jobId.value ? `/jobs/${jobId.value}/match` : undefined));
+const applicationStrengthLink = computed(() =>
+  jobId.value ? `/jobs/${jobId.value}/application-strength` : undefined
+);
 
 const headerLinks = computed<PageHeaderLink[]>(() => {
   const links: PageHeaderLink[] = [
@@ -154,6 +157,14 @@ const headerLinks = computed<PageHeaderLink[]>(() => {
       label: t('jobs.detail.actions.viewMatch'),
       icon: 'i-heroicons-sparkles',
       to: matchLink.value,
+    });
+  }
+
+  if (applicationStrengthLink.value) {
+    links.push({
+      label: 'Application strength',
+      icon: 'i-heroicons-chart-bar',
+      to: applicationStrengthLink.value,
     });
   }
 
