@@ -129,6 +129,16 @@ export const generateCoverLetterFunction = defineFunction({
   timeoutSeconds: 60,
 });
 
+export const evaluateApplicationStrengthFunction = defineFunction({
+  entry: '../ai-operations/evaluateApplicationStrength.ts',
+  environment: {
+    MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
+  },
+  timeoutSeconds: 60,
+});
+
 export const schemaLambdas = {
   // =====================================================
   // AI OPERATIONS (Custom Queries)
@@ -298,6 +308,18 @@ export const schemaLambdas = {
     .returns(a.string())
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(generateCoverLetterFunction)),
+
+  evaluateApplicationStrength: a
+    .query()
+    .arguments({
+      job: a.ref('JobType').required(),
+      cvText: a.string().required(),
+      coverLetterText: a.string().required(),
+      language: a.string().required(),
+    })
+    .returns(a.ref('EvaluateApplicationStrengthOutputType'))
+    .authorization((allow) => [allow.authenticated()])
+    .handler(a.handler.function(evaluateApplicationStrengthFunction)),
 
   // =====================================================
   // UTILITY FUNCTIONS (Custom Queries)

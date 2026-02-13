@@ -8,6 +8,7 @@ import type { PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas'
 import type { GenerateCvInput } from '@/domain/ai-operations/types/generateCv';
 import type { CompanyAnalysisResult } from '@/domain/ai-operations/CompanyAnalysis';
 import type { GeneratedCompanyCanvas } from '@/domain/ai-operations/CompanyCanvasResult';
+import type { EvaluateApplicationStrengthInput } from '@/domain/ai-operations/ApplicationStrengthResult';
 
 // Mock gqlOptions
 vi.mock('@/data/graphql/options', () => ({
@@ -32,6 +33,8 @@ describe('AiOperationsRepository', () => {
     generateCompanyCanvas: ReturnType<typeof vi.fn>;
     generateMatchingSummary: ReturnType<typeof vi.fn>;
     generateSpeech: ReturnType<typeof vi.fn>;
+    generateCoverLetter: ReturnType<typeof vi.fn>;
+    evaluateApplicationStrength: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -48,6 +51,8 @@ describe('AiOperationsRepository', () => {
       generateCompanyCanvas: vi.fn(),
       generateMatchingSummary: vi.fn(),
       generateSpeech: vi.fn(),
+      generateCoverLetter: vi.fn(),
+      evaluateApplicationStrength: vi.fn(),
     };
 
     // Inject the mocks via constructor (dependency injection)
@@ -698,6 +703,98 @@ describe('AiOperationsRepository', () => {
       await expect(repository.generateSpeech(speechInput as never)).rejects.toThrow(
         'AI operation returned no data'
       );
+    });
+  });
+
+  describe('evaluateApplicationStrength', () => {
+    const applicationStrengthInput: EvaluateApplicationStrengthInput = {
+      job: {
+        title: 'Senior Product Manager',
+        seniorityLevel: 'Senior',
+        roleSummary: 'Lead product roadmap and execution.',
+        responsibilities: ['Drive roadmap'],
+        requiredSkills: ['Stakeholder management'],
+        behaviours: ['Ownership'],
+        successCriteria: ['Improve adoption'],
+        explicitPains: ['Fragmented roadmap'],
+        atsKeywords: ['Product strategy', 'Roadmap'],
+      },
+      cvText: 'Product leader with 8 years experience.',
+      coverLetterText: '',
+      language: 'en',
+    };
+
+    const applicationStrengthResponse = {
+      overallScore: 72,
+      dimensionScores: {
+        atsReadiness: 74,
+        keywordCoverage: 69,
+        clarityFocus: 70,
+        targetedFitSignals: 71,
+        evidenceStrength: 75,
+      },
+      decision: {
+        label: 'borderline',
+        readyToApply: false,
+        rationaleBullets: ['Good fit signals', 'Needs stronger quantified impact'],
+      },
+      missingSignals: ['Explicit ownership metrics'],
+      topImprovements: [
+        {
+          title: 'Add measurable impact',
+          action: 'Include metrics in recent experience bullets.',
+          impact: 'high',
+          target: { document: 'cv', anchor: 'experience' },
+        },
+        {
+          title: 'Refine summary',
+          action: 'Align summary to role priorities.',
+          impact: 'medium',
+          target: { document: 'cv', anchor: 'summary' },
+        },
+      ],
+      notes: {
+        atsNotes: ['Good keyword presence.'],
+        humanReaderNotes: ['Tighten targeting language.'],
+      },
+    };
+
+    it('routes evaluateApplicationStrength with full payload including language', async () => {
+      mockClient.evaluateApplicationStrength.mockResolvedValue({
+        data: applicationStrengthResponse,
+        errors: undefined,
+      });
+
+      const result = await repository.evaluateApplicationStrength(applicationStrengthInput);
+
+      expect(result).toEqual(applicationStrengthResponse);
+      expect(mockClient.evaluateApplicationStrength).toHaveBeenCalledWith(
+        applicationStrengthInput,
+        expect.objectContaining({ authMode: 'userPool' })
+      );
+      expect(mockClient.evaluateApplicationStrength.mock.calls[0][0].language).toBe('en');
+    });
+
+    it('throws when AI returns errors', async () => {
+      mockClient.evaluateApplicationStrength.mockResolvedValue({
+        data: null,
+        errors: [{ message: 'bad' }],
+      });
+
+      await expect(
+        repository.evaluateApplicationStrength(applicationStrengthInput)
+      ).rejects.toThrow('AI operation failed');
+    });
+
+    it('throws when no data returned', async () => {
+      mockClient.evaluateApplicationStrength.mockResolvedValue({
+        data: null,
+        errors: undefined,
+      });
+
+      await expect(
+        repository.evaluateApplicationStrength(applicationStrengthInput)
+      ).rejects.toThrow('AI operation returned no data');
     });
   });
 });

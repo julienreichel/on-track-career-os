@@ -20,6 +20,11 @@ import type { MatchingSummaryInput, MatchingSummaryResult } from './MatchingSumm
 import { isMatchingSummaryResult } from './MatchingSummaryResult';
 import type { SpeechInput, SpeechResult } from './SpeechResult';
 import { isSpeechResult } from './SpeechResult';
+import type {
+  ApplicationStrengthResult,
+  EvaluateApplicationStrengthInput,
+} from './ApplicationStrengthResult';
+import { isApplicationStrengthResult } from './ApplicationStrengthResult';
 
 type AnalyzeCompanyMock =
   | CompanyAnalysisResult
@@ -454,6 +459,26 @@ export class AiOperationsService {
     const result = await this.repo.generateCoverLetter(input);
     if (typeof result !== 'string') {
       throw new Error('Invalid cover letter generation result');
+    }
+    return result;
+  }
+
+  async evaluateApplicationStrength(
+    input: EvaluateApplicationStrengthInput
+  ): Promise<ApplicationStrengthResult> {
+    if (!input?.job?.title?.trim()) {
+      throw new Error('Job title is required');
+    }
+    if (!input?.cvText?.trim()) {
+      throw new Error('CV text cannot be empty');
+    }
+    if (!input?.language?.trim()) {
+      throw new Error('Language cannot be empty');
+    }
+
+    const result = await this.repo.evaluateApplicationStrength(input);
+    if (!isApplicationStrengthResult(result)) {
+      throw new Error('Invalid application strength result');
     }
     return result;
   }

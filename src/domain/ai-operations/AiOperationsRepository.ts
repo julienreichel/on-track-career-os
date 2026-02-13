@@ -10,6 +10,10 @@ import type { AnalyzeCompanyInfoInput, CompanyAnalysisResult } from './CompanyAn
 import type { GeneratedCompanyCanvas, GeneratedCompanyCanvasInput } from './CompanyCanvasResult';
 import type { MatchingSummaryInput, MatchingSummaryResult } from './MatchingSummaryResult';
 import type { SpeechInput, SpeechResult } from './SpeechResult';
+import type {
+  ApplicationStrengthResult,
+  EvaluateApplicationStrengthInput,
+} from './ApplicationStrengthResult';
 
 /**
  * Repository interface for AI operations
@@ -91,6 +95,9 @@ export interface IAiOperationsRepository {
    */
   generateSpeech(input: SpeechInput): Promise<SpeechResult>;
   generateCoverLetter(input: SpeechInput): Promise<string>;
+  evaluateApplicationStrength(
+    input: EvaluateApplicationStrengthInput
+  ): Promise<ApplicationStrengthResult>;
 }
 
 /**
@@ -150,6 +157,11 @@ export type AmplifyAiOperations = {
 
   generateCoverLetter: (
     input: SpeechInput,
+    options?: Record<string, unknown>
+  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
+
+  evaluateApplicationStrength: (
+    input: EvaluateApplicationStrengthInput,
     options?: Record<string, unknown>
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 
@@ -384,5 +396,21 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     }
 
     return data as string;
+  }
+
+  async evaluateApplicationStrength(
+    input: EvaluateApplicationStrengthInput
+  ): Promise<ApplicationStrengthResult> {
+    const { data, errors } = await this.client.evaluateApplicationStrength(input, gqlOptions());
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    return data as ApplicationStrengthResult;
   }
 }

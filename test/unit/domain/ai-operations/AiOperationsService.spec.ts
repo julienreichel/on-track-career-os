@@ -12,6 +12,7 @@ import type { CompanyAnalysisResult } from '@/domain/ai-operations/CompanyAnalys
 import type { GeneratedCompanyCanvas } from '@/domain/ai-operations/CompanyCanvasResult';
 import type { MatchingSummaryResult } from '@/domain/ai-operations/MatchingSummaryResult';
 import type { SpeechResult } from '@/domain/ai-operations/SpeechResult';
+import type { ApplicationStrengthResult } from '@/domain/ai-operations/ApplicationStrengthResult';
 
 // Mock the repository
 vi.mock('@/domain/ai-operations/AiOperationsRepository');
@@ -29,6 +30,8 @@ describe('AiOperationsService', () => {
     generateCompanyCanvas: ReturnType<typeof vi.fn>;
     generateMatchingSummary: ReturnType<typeof vi.fn>;
     generateSpeech: ReturnType<typeof vi.fn>;
+    generateCoverLetter: ReturnType<typeof vi.fn>;
+    evaluateApplicationStrength: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -44,6 +47,8 @@ describe('AiOperationsService', () => {
       generateCompanyCanvas: vi.fn(),
       generateMatchingSummary: vi.fn(),
       generateSpeech: vi.fn(),
+      generateCoverLetter: vi.fn(),
+      evaluateApplicationStrength: vi.fn(),
     };
 
     // Create service with mocked repo
@@ -925,6 +930,101 @@ describe('AiOperationsService', () => {
 
       await expect(service.generateCoverLetter(validInput as never)).rejects.toThrow(
         'Invalid cover letter generation result'
+      );
+    });
+  });
+
+  describe('evaluateApplicationStrength', () => {
+    const validInput = {
+      job: {
+        title: 'Senior Product Manager',
+        seniorityLevel: 'Senior',
+        roleSummary: 'Lead roadmap strategy.',
+        responsibilities: ['Drive strategy'],
+        requiredSkills: ['Stakeholder management'],
+        behaviours: ['Ownership'],
+        successCriteria: ['Increased adoption'],
+        explicitPains: ['Roadmap fragmentation'],
+        atsKeywords: ['Product strategy', 'Roadmap'],
+      },
+      cvText: 'Product manager with measurable outcomes.',
+      coverLetterText: '',
+      language: 'en',
+    };
+
+    const validResult: ApplicationStrengthResult = {
+      overallScore: 70,
+      dimensionScores: {
+        atsReadiness: 72,
+        keywordCoverage: 68,
+        clarityFocus: 69,
+        targetedFitSignals: 70,
+        evidenceStrength: 71,
+      },
+      decision: {
+        label: 'borderline',
+        readyToApply: false,
+        rationaleBullets: ['Strong base', 'Needs better metrics'],
+      },
+      missingSignals: ['Specific ownership examples'],
+      topImprovements: [
+        {
+          title: 'Add quantified impact',
+          action: 'Include concrete metrics in achievements.',
+          impact: 'high',
+          target: { document: 'cv', anchor: 'experience' },
+        },
+        {
+          title: 'Improve summary targeting',
+          action: 'Align summary wording with role scope.',
+          impact: 'medium',
+          target: { document: 'cv', anchor: 'summary' },
+        },
+      ],
+      notes: {
+        atsNotes: ['Keywords partially covered'],
+        humanReaderNotes: ['Needs stronger evidence'],
+      },
+    };
+
+    it('returns validated application strength output', async () => {
+      mockRepo.evaluateApplicationStrength.mockResolvedValue(validResult);
+
+      const result = await service.evaluateApplicationStrength(validInput as never);
+
+      expect(result).toEqual(validResult);
+      expect(mockRepo.evaluateApplicationStrength).toHaveBeenCalledWith(validInput);
+    });
+
+    it('throws when job title is missing', async () => {
+      await expect(
+        service.evaluateApplicationStrength({
+          ...validInput,
+          job: { ...validInput.job, title: '' },
+        } as never)
+      ).rejects.toThrow('Job title is required');
+      expect(mockRepo.evaluateApplicationStrength).not.toHaveBeenCalled();
+    });
+
+    it('throws when cvText is empty', async () => {
+      await expect(
+        service.evaluateApplicationStrength({ ...validInput, cvText: '' } as never)
+      ).rejects.toThrow('CV text cannot be empty');
+      expect(mockRepo.evaluateApplicationStrength).not.toHaveBeenCalled();
+    });
+
+    it('throws when language is missing', async () => {
+      await expect(
+        service.evaluateApplicationStrength({ ...validInput, language: '' } as never)
+      ).rejects.toThrow('Language cannot be empty');
+      expect(mockRepo.evaluateApplicationStrength).not.toHaveBeenCalled();
+    });
+
+    it('throws when repo returns invalid structure', async () => {
+      mockRepo.evaluateApplicationStrength.mockResolvedValue({ invalid: true });
+
+      await expect(service.evaluateApplicationStrength(validInput as never)).rejects.toThrow(
+        'Invalid application strength result'
       );
     });
   });

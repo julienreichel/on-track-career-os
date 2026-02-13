@@ -7,6 +7,10 @@ import type { STARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 import type { PersonalCanvas, PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas';
 import type { ParsedJobDescription } from '@/domain/ai-operations/ParsedJobDescription';
+import type {
+  ApplicationStrengthResult,
+  EvaluateApplicationStrengthInput,
+} from '@/domain/ai-operations/ApplicationStrengthResult';
 
 /**
  * Helper function to handle async operations with loading and error states
@@ -48,6 +52,7 @@ export function useAiOperations() {
   const starStories = ref<STARStory[] | null>(null); // Changed to array
   const achievementsAndKpis = ref<AchievementsAndKpis | null>(null);
   const personalCanvas = ref<PersonalCanvas | null>(null);
+  const applicationStrength = ref<ApplicationStrengthResult | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
   const service = new AiOperationsService();
@@ -93,6 +98,14 @@ export function useAiOperations() {
       personalCanvas
     );
 
+  const evaluateApplicationStrength = (input: EvaluateApplicationStrengthInput) =>
+    handleAsyncOperation(
+      () => service.evaluateApplicationStrength(input),
+      loading,
+      error,
+      applicationStrength
+    );
+
   const reset = () => {
     parsedCv.value = null;
     parsedJobDescription.value = null;
@@ -100,6 +113,7 @@ export function useAiOperations() {
     starStories.value = null;
     achievementsAndKpis.value = null;
     personalCanvas.value = null;
+    applicationStrength.value = null;
     error.value = null;
     loading.value = false;
   };
@@ -111,6 +125,7 @@ export function useAiOperations() {
     starStories,
     achievementsAndKpis,
     personalCanvas,
+    applicationStrength,
     loading,
     error,
     parseCv,
@@ -119,6 +134,7 @@ export function useAiOperations() {
     generateStarStory,
     generateAchievementsAndKpis,
     generatePersonalCanvas,
+    evaluateApplicationStrength,
     reset,
   };
 }

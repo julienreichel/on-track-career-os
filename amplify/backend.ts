@@ -15,6 +15,7 @@ import {
   generateMatchingSummaryFunction,
   generateSpeechFunction,
   generateCoverLetterFunction,
+  evaluateApplicationStrengthFunction,
 } from './data/resource';
 import { deleteUserProfile } from './data/delete-user-profile/resource';
 import { storage } from './storage/resource';
@@ -38,6 +39,7 @@ const backend = defineBackend({
   generateMatchingSummaryFunction,
   generateSpeechFunction,
   generateCoverLetterFunction,
+  evaluateApplicationStrengthFunction,
   deleteUserProfile,
 });
 
@@ -132,6 +134,14 @@ backend.generateSpeechFunction.resources.lambda.addToRolePolicy(
 );
 
 backend.generateCoverLetterFunction.resources.lambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['bedrock:InvokeModel'],
+    resources: ['arn:aws:bedrock:*::foundation-model/*', 'arn:aws:bedrock:*:*:inference-profile/*'],
+  })
+);
+
+backend.evaluateApplicationStrengthFunction.resources.lambda.addToRolePolicy(
   new PolicyStatement({
     effect: Effect.ALLOW,
     actions: ['bedrock:InvokeModel'],

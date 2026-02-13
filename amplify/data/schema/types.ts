@@ -187,4 +187,42 @@ export const schemaTypes = {
     keyPartners: a.string().array().required(),
     costStructure: a.string().array().required(),
   }),
+
+  EvaluateApplicationStrengthImprovementTargetType: a.customType({
+    document: a.string().required(),
+    anchor: a.string().required(),
+  }),
+
+  EvaluateApplicationStrengthImprovementType: a.customType({
+    title: a.string().required(),
+    action: a.string().required(),
+    impact: a.string().required(),
+    target: a.ref('EvaluateApplicationStrengthImprovementTargetType').required(),
+  }),
+
+  EvaluateApplicationStrengthDecisionType: a.customType({
+    label: a.string().required(),
+    readyToApply: a.boolean().required(),
+    rationaleBullets: a.string().array().required(),
+  }),
+
+  EvaluateApplicationStrengthNotesType: a.customType({
+    atsNotes: a.string().array().required(),
+    humanReaderNotes: a.string().array().required(),
+  }),
+
+  EvaluateApplicationStrengthOutputType: a.customType({
+    overallScore: a.integer().required(),
+    dimensionScores: a.customType({
+      atsReadiness: a.integer().required(),
+      keywordCoverage: a.integer().required(),
+      clarityFocus: a.integer().required(),
+      targetedFitSignals: a.integer().required(),
+      evidenceStrength: a.integer().required(),
+    }),
+    decision: a.ref('EvaluateApplicationStrengthDecisionType').required(),
+    missingSignals: a.string().array().required(),
+    topImprovements: a.ref('EvaluateApplicationStrengthImprovementType').array().required(),
+    notes: a.ref('EvaluateApplicationStrengthNotesType').required(),
+  }),
 };
