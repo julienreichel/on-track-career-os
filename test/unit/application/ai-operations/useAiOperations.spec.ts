@@ -6,9 +6,11 @@ import type { ExperiencesResult } from '@/domain/ai-operations/Experience';
 import type { STARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 import type { ParsedJobDescription } from '@/domain/ai-operations/ParsedJobDescription';
+import { ApplicationStrengthService } from '@/domain/application-strength/ApplicationStrengthService';
 
 // Mock the service
 vi.mock('@/domain/ai-operations/AiOperationsService');
+vi.mock('@/domain/application-strength/ApplicationStrengthService');
 
 describe('useAiOperations', () => {
   let mockService: {
@@ -17,6 +19,9 @@ describe('useAiOperations', () => {
     extractExperienceBlocks: ReturnType<typeof vi.fn>;
     generateStarStory: ReturnType<typeof vi.fn>;
     generateAchievementsAndKpis: ReturnType<typeof vi.fn>;
+  };
+  let mockApplicationStrengthService: {
+    evaluate: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -28,10 +33,16 @@ describe('useAiOperations', () => {
       generateStarStory: vi.fn(),
       generateAchievementsAndKpis: vi.fn(),
     };
+    mockApplicationStrengthService = {
+      evaluate: vi.fn(),
+    };
 
     // Mock the service constructor
     vi.mocked(AiOperationsService).mockImplementation(
       () => mockService as unknown as AiOperationsService
+    );
+    vi.mocked(ApplicationStrengthService).mockImplementation(
+      () => mockApplicationStrengthService as unknown as ApplicationStrengthService
     );
   });
 
@@ -236,6 +247,53 @@ describe('useAiOperations', () => {
     expect(achievementsAndKpis.value).toBeNull();
   });
 
+  it('should evaluate application strength via domain service', async () => {
+    const mockEvaluation = {
+      overallScore: 70,
+      dimensionScores: {
+        atsReadiness: 72,
+        keywordCoverage: 68,
+        clarityFocus: 69,
+        targetedFitSignals: 70,
+        evidenceStrength: 71,
+      },
+      decision: {
+        label: 'borderline',
+        readyToApply: false,
+        rationaleBullets: ['Good base', 'Needs stronger metrics'],
+      },
+      missingSignals: [],
+      topImprovements: [],
+      notes: {
+        atsNotes: [],
+        humanReaderNotes: [],
+      },
+    };
+    mockApplicationStrengthService.evaluate.mockResolvedValue(mockEvaluation);
+
+    const { applicationStrength, loading, error, evaluateApplicationStrength } = useAiOperations();
+    await evaluateApplicationStrength({
+      job: {
+        title: 'Senior Product Manager',
+        seniorityLevel: 'Senior',
+        roleSummary: 'Lead roadmap',
+        responsibilities: ['Drive strategy'],
+        requiredSkills: ['Stakeholder management'],
+        behaviours: ['Ownership'],
+        successCriteria: ['Improve adoption'],
+        explicitPains: ['Fragmented roadmap'],
+        atsKeywords: ['Product strategy'],
+      },
+      cvText: 'CV content',
+      coverLetterText: '',
+      language: 'en',
+    });
+
+    expect(loading.value).toBe(false);
+    expect(error.value).toBeNull();
+    expect(applicationStrength.value).toEqual(mockEvaluation);
+  });
+
   it('should reset state', () => {
     // Arrange
     const {
@@ -244,6 +302,7 @@ describe('useAiOperations', () => {
       experiences,
       starStories,
       achievementsAndKpis,
+      applicationStrength,
       loading,
       error,
       reset,
@@ -295,6 +354,27 @@ describe('useAiOperations', () => {
       achievements: ['Test'],
       kpiSuggestions: ['Test KPI'],
     };
+    applicationStrength.value = {
+      overallScore: 0,
+      dimensionScores: {
+        atsReadiness: 0,
+        keywordCoverage: 0,
+        clarityFocus: 0,
+        targetedFitSignals: 0,
+        evidenceStrength: 0,
+      },
+      decision: {
+        label: 'risky',
+        readyToApply: false,
+        rationaleBullets: [],
+      },
+      missingSignals: [],
+      topImprovements: [],
+      notes: {
+        atsNotes: [],
+        humanReaderNotes: [],
+      },
+    };
     loading.value = true;
     error.value = 'Some error';
 
@@ -307,6 +387,7 @@ describe('useAiOperations', () => {
     expect(experiences.value).toBeNull();
     expect(starStories.value).toBeNull();
     expect(achievementsAndKpis.value).toBeNull();
+    expect(applicationStrength.value).toBeNull();
     expect(loading.value).toBe(false);
     expect(error.value).toBeNull();
   });

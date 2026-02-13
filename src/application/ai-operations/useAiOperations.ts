@@ -7,10 +7,11 @@ import type { STARStory } from '@/domain/ai-operations/STARStory';
 import type { AchievementsAndKpis } from '@/domain/ai-operations/AchievementsAndKpis';
 import type { PersonalCanvas, PersonalCanvasInput } from '@/domain/ai-operations/PersonalCanvas';
 import type { ParsedJobDescription } from '@/domain/ai-operations/ParsedJobDescription';
+import { ApplicationStrengthService } from '@/domain/application-strength/ApplicationStrengthService';
 import type {
-  ApplicationStrengthResult,
-  EvaluateApplicationStrengthInput,
-} from '@/domain/ai-operations/ApplicationStrengthResult';
+  ApplicationStrengthEvaluation,
+  ApplicationStrengthEvaluationInput,
+} from '@/domain/application-strength/ApplicationStrengthEvaluation';
 
 /**
  * Helper function to handle async operations with loading and error states
@@ -52,10 +53,11 @@ export function useAiOperations() {
   const starStories = ref<STARStory[] | null>(null); // Changed to array
   const achievementsAndKpis = ref<AchievementsAndKpis | null>(null);
   const personalCanvas = ref<PersonalCanvas | null>(null);
-  const applicationStrength = ref<ApplicationStrengthResult | null>(null);
+  const applicationStrength = ref<ApplicationStrengthEvaluation | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
   const service = new AiOperationsService();
+  const applicationStrengthService = new ApplicationStrengthService();
 
   const parseCv = (cvText: string, language: string) =>
     handleAsyncOperation(() => service.parseCvText(cvText, language), loading, error, parsedCv);
@@ -98,9 +100,9 @@ export function useAiOperations() {
       personalCanvas
     );
 
-  const evaluateApplicationStrength = (input: EvaluateApplicationStrengthInput) =>
+  const evaluateApplicationStrength = (input: ApplicationStrengthEvaluationInput) =>
     handleAsyncOperation(
-      () => service.evaluateApplicationStrength(input),
+      () => applicationStrengthService.evaluate(input),
       loading,
       error,
       applicationStrength
