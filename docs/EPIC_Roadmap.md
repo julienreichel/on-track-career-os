@@ -1,6 +1,6 @@
 # 🧭 EPIC ROADMAP — AI CAREER COACH EDITION
 
-# 🚀 EPIC 1 — Clear Transformation & Outcome Framing
+# 🚀 EPIC A1 — Clear Transformation & Outcome Framing
 
 ### **Problem**
 
@@ -37,7 +37,7 @@ Builds on your current milestone system (Grounded, Identity Defined, etc.) but r
 
 ---
 
-# 🎯 EPIC 2 — Job Fit & Application Strength Analyzer
+# 🎯 EPIC A2 — Job Fit & Application Strength Analyzer
 
 ### **Problem**
 
@@ -77,7 +77,7 @@ Extends your current job match scoring by connecting it directly to:
 
 ---
 
-# 🧠 EPIC 3 — Interview Preparation Engine
+# 🧠 EPIC A3 — Interview Preparation Engine
 
 ### **Problem**
 
@@ -117,7 +117,7 @@ Directly uses:
 
 ---
 
-# 📈 EPIC 4 — Achievement & CV Strength Feedback
+# 📈 EPIC A4 — Achievement & CV Strength Feedback
 
 ### **Problem**
 
@@ -153,7 +153,7 @@ Uses existing structured achievement data.
 
 ---
 
-# 🧩 EPIC 5 — Progress, Confidence & Readiness Signals
+# 🧩 EPIC A5 — Progress, Confidence & Readiness Signals
 
 ### **Problem**
 
@@ -196,7 +196,7 @@ Sits above current milestone system as a **confidence layer**.
 
 ---
 
-# ⏳ EPIC 6 — Urgency & Job Search Mode
+# ⏳ EPIC A6 — Urgency & Job Search Mode
 
 ### **Problem**
 
@@ -233,7 +233,7 @@ Adds a behavioral layer that reorders existing tools:
 
 ---
 
-# 🧭 EPIC 7 — Application Strategy Guidance
+# 🧭 EPIC A7 — Application Strategy Guidance
 
 ### **Problem**
 
@@ -261,6 +261,39 @@ Builds on existing job fit scoring but reframes it as **strategy**, not just com
 - Users see a recommendation (Strong Fit / Stretch / Risky)
 - Explanation provided in plain language
 - Users can compare at least two jobs side-by-side
+
+---
+
+# 📋 EPIC B0 — Application Pipeline & Job Tracker
+
+### Problem
+
+Users prepare strategically but manage applications in spreadsheets or Notion.
+
+### Goal
+
+Make On Track the central command center for job search execution.
+
+### Core Features
+
+- Kanban board per user
+- Customizable states (Applied, HR Screen, Interview 1, etc.)
+- Per-stage action checklist
+- Interview notes per stage
+- Deadlines & reminders
+- Conversion analytics
+- Strength score vs outcome comparison
+
+### Strategic Role
+
+This connects:
+
+- Application Strength (EPIC 2)
+- Interview Prep (EPIC 3)
+- Momentum Coaching (C5)
+- Progress Dashboard (C10)
+
+It becomes the behavioral backbone.
 
 ---
 
@@ -555,3 +588,31 @@ This significantly increases:
 - Depth of reflection
 - Feature adoption
 - Perceived personal support
+
+---
+
+## 🎯 Clean Execution Sequence
+
+### Phase 1 — Intelligence Deepening
+
+A2 → C3 → C2
+
+### Phase 2 — Strategic Decision Layer
+
+C1 → A7 → C4
+
+### Phase 3 — Interview Performance
+
+A3 → C6
+
+### Phase 4 — UX Amplification
+
+C0 (merge with C13) → A1
+
+### Phase 5 — Execution Backbone
+
+B0 → C5
+
+### Phase 6 — Advanced Expansion
+
+C8 → C7 → C9 → C10 → C11

@@ -49,7 +49,6 @@
 | **5C** | User-Job-Company Matching | ✅ 100% | 1/1    | Fit score, recommendations, tailoring |
 | **6**  | Tailored Materials        | ✅ 100% | 3/3    | Job-specific CV/letter/speech         |
 | **F2** | Onboarding & Guidance     | ✅ 100% | -      | 5-phase progress, badges, guidance    |
-| **F1** | Interview Prep            | ❌ 0%   | 0/3    | Question sets, sessions (V1)          |
 
 **Overall Progress:** 98% MVP | 12 of 13 EPICs complete
 
@@ -214,20 +213,6 @@
 **Features:** Phase detection (Complete profile → Create canvas → Document stories → Find opportunities → Apply), 7 badges, contextual guidance, dashboard cockpit  
 **Pages:** `/`, `/onboarding` (4-step wizard)  
 **Impact:** User flow clarity, reduced abandonment
-
----
-
-## 📋 Remaining Work (2%)
-
-### EPIC F1: Interview Prep (V1)
-
-**Models:** InterviewQuestionSet, InterviewSession  
-**AI Ops (3):** generateInterviewQuestions, evaluateAnswer, suggestFollowUp  
-**Pages:** /interview/questions, /interview/sessions, /interview/sessions/:id
-
-### Enhancements
-
-Advanced search/filtering, bulk operations, analytics dashboard, application tracking, export formats (Word, LaTeX)
 
 ---
 

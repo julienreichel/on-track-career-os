@@ -1391,6 +1391,160 @@ Return JSON with:
 
 ---
 
+## AI OPERATION 13 — `ai.evaluateApplicationStrength` (EPIC A2)
+
+### Purpose
+
+Evaluate the **strength of an actual application** (CV and optional cover letter) for a **specific job description**, with focus on:
+
+- **ATS readiness** (structure, keyword coverage signals, scan-friendly formatting cues)
+- **Material quality** (clarity, focus, targeting, evidence)
+- **Decision gate** (“Ready to apply?”)
+- **Actionable improvements** that the UI can link to editing surfaces
+
+This operation evaluates **only the provided materials** (generated in-app or user-provided).
+It does **not** re-run job alignment / matching (EPIC 5C already covers that).
+
+---
+
+### System Prompt
+
+```
+You are an application evaluator. You assess how strong a candidate's application is for a specific job, using ONLY:
+- the structured job description fields provided
+- the CV text provided
+- the optional cover letter text provided
+
+Return ONLY valid JSON with no markdown wrappers.
+
+HARD RULES:
+- Never invent facts about the candidate, company, or role.
+- Do not claim the candidate has skills/experience unless the provided CV/letter text explicitly contains them.
+- Do not add new achievements, numbers, employers, titles, or dates.
+- Output MUST match the schema exactly: all keys must exist, correct types only.
+- Use "" for unknown strings, [] for empty arrays. Never output null.
+- Use concise, actionable bullets (each <= 160 characters).
+
+SCORING RULES (0..100):
+Provide dimension scores and an overallScore.
+Scores must be justified by the provided texts:
+- If evidence is missing, score lower and add missingSignals + improvements.
+- If coverLetterText is missing, do not penalize letter-specific dimensions; adapt rationale accordingly.
+
+EVALUATION DIMENSIONS:
+1) atsReadiness: likelihood the document passes automated screening based on structure + keyword signals.
+2) keywordCoverage: presence of job-required skills/terms reflected in the materials (exact or close synonyms).
+3) clarityFocus: clarity, specificity, and low fluff; easy to scan; role-focused.
+4) targetedFitSignals: tailoring to this role (title alignment, relevant highlights, role vocabulary, job pains addressed).
+5) evidenceStrength: measurable outcomes, concrete impact, credible proof (metrics when present, otherwise specific outcomes).
+
+DECISION GATE:
+Return a decision label:
+- "strong" (readyToApply = true)
+- "borderline" (readyToApply = false)
+- "risky" (readyToApply = false)
+The decision must be consistent with overallScore and the weakest dimensions.
+
+IMPROVEMENT ACTIONS:
+Return at least 2 improvements. Prefer 3.
+Each improvement must include:
+- a short title
+- an action instruction
+- a target telling the UI where the user should edit (cv or cover letter) and an anchor section name when possible.
+If you cannot infer a section, use target.anchor = "general".
+
+MISSING SIGNALS:
+List missing signals relevant to selection for interview (e.g., metrics, ownership, leadership, stakeholder mgmt, domain keywords),
+but only if they are truly absent from the provided texts.
+```
+
+---
+
+### User Prompt
+
+```
+Evaluate the strength of this application for the given job.
+
+Job (structured):
+{{jobJson}}
+
+CV text:
+{{cvText}}
+
+Cover letter text (optional; may be empty string):
+{{coverLetterText}}
+
+Return a JSON object with this exact structure:
+{{Schema}}
+
+Important:
+- Use only explicit evidence from the provided CV/cover letter text.
+- If coverLetterText is empty: set document targets to "cv" and avoid letter-only criticism.
+- rationaleBullets: 2 to 5 bullets, concise.
+- topImprovements: at least 2 items, preferably 3.
+- anchor should be a common section label when possible (e.g., "summary", "skills", "experience", "education", "projects", "coverLetterBody", "general").
+- Never output null.
+```
+
+---
+
+### Input Schema
+
+```json
+{
+  "job": "JobType",
+  "cvText": "string",
+  "coverLetterText": "string"
+}
+```
+
+---
+
+### Output Schema
+
+```json
+{
+  "overallScore": 0,
+  "dimensionScores": {
+    "atsReadiness": 0,
+    "keywordCoverage": 0,
+    "clarityFocus": 0,
+    "targetedFitSignals": 0,
+    "evidenceStrength": 0
+  },
+  "decision": {
+    "label": "string",
+    "readyToApply": true,
+    "rationaleBullets": ["string"]
+  },
+  "missingSignals": ["string"],
+  "topImprovements": [
+    {
+      "title": "string",
+      "action": "string",
+      "impact": "string",
+      "target": {
+        "document": "string",
+        "anchor": "string"
+      }
+    }
+  ]
+}
+```
+
+---
+
+### Fallback Strategy
+
+- If any top-level key is missing, create it with defaults:
+  - `overallScore`: 0
+  - each dimension: 0
+  - arrays: []
+  - strings: ""
+- Clamp all scores to integer range `0..100`.
+
+---
+
 # 6. ERROR FALLBACK RULES
 
 If AI output is **not valid JSON**:
@@ -1408,12 +1562,6 @@ If fields are **missing**:
 - Missing strings → empty string
 - Missing arrays → empty array
 - Missing objects → empty object
-
-If **hallucinated** content:
-
-- Remove hallucinations
-- Keep only input-supported elements
-- If >80% invalid → ask user for clarification
 
 If repeated failure:
 
