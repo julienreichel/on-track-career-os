@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { ApplicationStrengthEvaluation } from '@/domain/application-strength/ApplicationStrengthEvaluation';
+import ScoreSummaryCard from '@/components/common/ScoreSummaryCard.vue';
 
 const props = defineProps<{
   evaluation: ApplicationStrengthEvaluation;
@@ -17,43 +18,56 @@ const decisionColor = computed(() => {
 });
 
 const dimensions = computed(() => [
-  { key: 'atsReadiness', label: 'ATS readiness', value: props.evaluation.dimensionScores.atsReadiness },
-  { key: 'keywordCoverage', label: 'Keyword coverage', value: props.evaluation.dimensionScores.keywordCoverage },
-  { key: 'clarityFocus', label: 'Clarity and focus', value: props.evaluation.dimensionScores.clarityFocus },
-  { key: 'targetedFitSignals', label: 'Targeted fit signals', value: props.evaluation.dimensionScores.targetedFitSignals },
-  { key: 'evidenceStrength', label: 'Evidence strength', value: props.evaluation.dimensionScores.evidenceStrength },
+  {
+    key: 'atsReadiness',
+    label: 'ATS readiness',
+    value: props.evaluation.dimensionScores.atsReadiness,
+    max: 100,
+    testId: 'application-strength-dimension-atsReadiness',
+  },
+  {
+    key: 'keywordCoverage',
+    label: 'Keyword coverage',
+    value: props.evaluation.dimensionScores.keywordCoverage,
+    max: 100,
+    testId: 'application-strength-dimension-keywordCoverage',
+  },
+  {
+    key: 'clarityFocus',
+    label: 'Clarity and focus',
+    value: props.evaluation.dimensionScores.clarityFocus,
+    max: 100,
+    testId: 'application-strength-dimension-clarityFocus',
+  },
+  {
+    key: 'targetedFitSignals',
+    label: 'Targeted fit signals',
+    value: props.evaluation.dimensionScores.targetedFitSignals,
+    max: 100,
+    testId: 'application-strength-dimension-targetedFitSignals',
+  },
+  {
+    key: 'evidenceStrength',
+    label: 'Evidence strength',
+    value: props.evaluation.dimensionScores.evidenceStrength,
+    max: 100,
+    testId: 'application-strength-dimension-evidenceStrength',
+  },
 ]);
 </script>
 
 <template>
   <div class="space-y-6">
-    <UCard data-testid="application-strength-results-overview">
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div class="flex-1">
-          <p class="text-sm text-dimmed uppercase tracking-wide">Overall score</p>
-          <div class="mt-2 flex items-baseline gap-3">
-            <p class="text-4xl font-bold text-highlighted">{{ props.evaluation.overallScore }}</p>
-            <p class="text-sm text-dimmed">/100</p>
-          </div>
-          <UBadge :color="decisionColor" variant="outline" size="lg" class="mt-2">
-            {{ props.evaluation.decision.label }} ·
-            {{ props.evaluation.decision.readyToApply ? 'ready to apply' : 'not ready' }}
-          </UBadge>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 md:grid-cols-5">
-          <div
-            v-for="dimension in dimensions"
-            :key="dimension.key"
-            :data-testid="`application-strength-dimension-${dimension.key}`"
-            class="flex flex-col gap-1 rounded-lg border border-border/50 p-3"
-          >
-            <p class="text-xs text-dimmed uppercase tracking-wide">{{ dimension.label }}</p>
-            <p class="text-xl font-semibold text-highlighted">{{ dimension.value }}/100</p>
-          </div>
-        </div>
-      </div>
-    </UCard>
+    <ScoreSummaryCard
+      title="Overall score"
+      :overall-score="props.evaluation.overallScore"
+      :overall-max="100"
+      :badge-color="decisionColor"
+      :badge-label="`${props.evaluation.decision.label} · ${props.evaluation.decision.readyToApply ? 'ready to apply' : 'not ready'}`"
+      :metrics="dimensions"
+      metrics-grid-class="md:grid-cols-5"
+      test-id="application-strength-results-overview"
+    />
 
     <UCard>
       <template #header>

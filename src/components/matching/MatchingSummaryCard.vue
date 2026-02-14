@@ -1,35 +1,15 @@
 <template>
   <div class="space-y-6">
     <!-- Score Card -->
-    <UCard>
-      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div class="flex-1">
-          <p class="text-sm text-dimmed uppercase tracking-wide">
-            {{ t('matching.summaryCard.overallScore') }}
-          </p>
-          <div class="mt-2 flex items-baseline gap-3">
-            <p class="text-4xl font-bold text-highlighted">{{ overallScore }}</p>
-            <p class="text-sm text-dimmed">/100</p>
-          </div>
-          <UBadge :color="recommendationColor" variant="outline" class="mt-2" size="lg">
-            {{ recommendationLabel }}
-          </UBadge>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <div
-            v-for="item in scoreBreakdownItems"
-            :key="item.key"
-            class="flex flex-col gap-1 rounded-lg border border-border/50 p-3"
-          >
-            <p class="text-xs text-dimmed uppercase tracking-wide">{{ item.label }}</p>
-            <p class="text-xl font-semibold text-highlighted">
-              {{ item.value }}<span class="text-sm text-dimmed">/{{ item.max }}</span>
-            </p>
-          </div>
-        </div>
-      </div>
-    </UCard>
+    <ScoreSummaryCard
+      :title="t('matching.summaryCard.overallScore')"
+      :overall-score="overallScore"
+      :overall-max="100"
+      :badge-label="recommendationLabel"
+      :badge-color="recommendationColor"
+      :metrics="scoreBreakdownItems"
+      metrics-grid-class="md:grid-cols-4"
+    />
 
     <!-- Reasoning Highlights -->
     <UCard>
@@ -166,6 +146,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import ScoreSummaryCard from '@/components/common/ScoreSummaryCard.vue';
 
 const props = withDefaults(
   defineProps<{
