@@ -34,11 +34,27 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
 ]);
 
 const hasEvaluation = computed(() => Boolean(page.evaluator.evaluation.value));
-const pageBusy = computed(
-  () => page.loading.value || page.inputs.isExtractingCv.value || page.inputs.isExtractingCoverLetter.value
-);
+const pageBusy = computed(() => page.loading.value || page.inputs.isExtracting.value);
 
 const errorMessage = computed(() => page.pageError.value || page.evaluator.error.value);
+
+function isPdfFile(file: File | null | undefined): boolean {
+  if (!file) {
+    return false;
+  }
+  return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+}
+
+async function handleUploadFile(file: File | null | undefined) {
+  await page.inputs.handleFileUpload(file);
+  if (!isPdfFile(file)) {
+    return;
+  }
+  if (!page.canEvaluate.value) {
+    return;
+  }
+  await page.evaluate();
+}
 
 onMounted(async () => {
   await page.load();
@@ -71,29 +87,19 @@ onMounted(async () => {
 
       <ApplicationStrengthInputCard
         v-if="page.showInput.value"
-        :cv-source-mode="page.inputs.cvSourceMode.value"
-        :cover-letter-source-mode="page.inputs.coverLetterSourceMode.value"
-        :has-tailored-cv="page.inputs.hasTailoredCv.value"
-        :has-tailored-cover-letter="page.inputs.hasTailoredCoverLetter.value"
-        :tailored-cv-text="page.inputs.tailoredCvText.value"
-        :tailored-cover-letter-text="page.inputs.tailoredCoverLetterText.value"
-        :pasted-cv-text="page.inputs.pastedCvText.value"
-        :pasted-cover-letter-text="page.inputs.pastedCoverLetterText.value"
-        :extracted-cv-text="page.inputs.extractedCvText.value"
-        :extracted-cover-letter-text="page.inputs.extractedCoverLetterText.value"
+        :selected-file="page.inputs.selectedFile.value"
+        :pasted-text="page.inputs.pastedText.value"
+        :extracted-text="page.inputs.extractedText.value"
+        :extracted-type="page.inputs.extractedType.value"
+        :pasted-type="page.inputs.pastedType.value"
         :can-evaluate="page.canEvaluate.value"
         :loading="page.evaluator.loading.value"
-        :is-extracting-cv="page.inputs.isExtractingCv.value"
-        :is-extracting-cover-letter="page.inputs.isExtractingCoverLetter.value"
+        :is-extracting="page.inputs.isExtracting.value"
         :validation-errors="page.inputs.validationErrors.value"
         :extraction-error="page.inputs.extractionError.value"
         class="mb-6"
-        @update:cv-source-mode="page.inputs.cvSourceMode.value = $event"
-        @update:cover-letter-source-mode="page.inputs.coverLetterSourceMode.value = $event"
-        @update:pasted-cv-text="page.inputs.pastedCvText.value = $event"
-        @update:pasted-cover-letter-text="page.inputs.pastedCoverLetterText.value = $event"
-        @upload-cv-file="page.inputs.handleFileUpload('cv', $event)"
-        @upload-cover-letter-file="page.inputs.handleFileUpload('coverLetter', $event)"
+        @update:pasted-text="page.inputs.pastedText.value = $event"
+        @upload-file="handleUploadFile($event)"
         @evaluate="page.evaluate()"
       />
 

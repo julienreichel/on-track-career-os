@@ -16,46 +16,51 @@ vi.mock('pdf-parse', () => ({
 }));
 
 describe('useApplicationStrengthInputs', () => {
-  const tailoredCvText = ref('');
-  const tailoredCoverLetterText = ref('');
+  const candidateFullName = ref('');
 
   beforeEach(() => {
     vi.clearAllMocks();
-    tailoredCvText.value = '';
-    tailoredCoverLetterText.value = '';
+    candidateFullName.value = '';
   });
 
-  it('populates text from uploaded PDF', async () => {
-    const state = useApplicationStrengthInputs({ tailoredCvText, tailoredCoverLetterText });
+  it('populates extracted text from uploaded PDF', async () => {
+    const state = useApplicationStrengthInputs({ candidateFullName });
     const file = new File(['pdf bytes'], 'cv.pdf', { type: 'application/pdf' });
 
-    await state.handleFileUpload('cv', file);
+    await state.handleFileUpload(file);
 
     expect(PDFParse).toHaveBeenCalled();
-    expect(state.extractedCvText.value).toBe('Extracted PDF text');
+    expect(state.extractedText.value).toBe('Extracted PDF text');
   });
 
-  it('enforces canEvaluate rules for missing and provided CV text', () => {
-    const state = useApplicationStrengthInputs({ tailoredCvText, tailoredCoverLetterText });
+  it('detects cv when name appears near beginning', () => {
+    candidateFullName.value = 'Jane Doe';
+    const state = useApplicationStrengthInputs({ candidateFullName });
 
-    expect(state.canEvaluate.value).toBe(false);
-    expect(state.validationErrors.value).toHaveLength(1);
+    state.pastedText.value = 'Jane Doe\nProduct Manager\nExperience...';
 
-    state.pastedCvText.value = 'Senior software engineer with 8 years of experience.';
-    expect(state.canEvaluate.value).toBe(true);
-    expect(state.validationErrors.value).toHaveLength(0);
+    expect(state.pastedType.value).toBe('cv');
+    expect(state.cvText.value.length).toBeGreaterThan(0);
+    expect(state.coverLetterText.value).toBe('');
   });
 
-  it('enables tailored tabs when content exists', () => {
-    tailoredCvText.value = 'Tailored CV body';
-    tailoredCoverLetterText.value = 'Tailored cover letter';
+  it('detects cover letter when name appears near end', () => {
+    candidateFullName.value = 'Jane Doe';
+    const state = useApplicationStrengthInputs({ candidateFullName });
 
-    const state = useApplicationStrengthInputs({ tailoredCvText, tailoredCoverLetterText });
-    state.reset();
+    state.pastedText.value = 'Dear Hiring Team,\nI am applying for the role.\nBest regards,\nJane Doe';
 
-    expect(state.hasTailoredCv.value).toBe(true);
-    expect(state.hasTailoredCoverLetter.value).toBe(true);
-    expect(state.cvSourceMode.value).toBe('tailoredCv');
-    expect(state.coverLetterSourceMode.value).toBe('tailoredCoverLetter');
+    expect(state.pastedType.value).toBe('coverLetter');
+    expect(state.coverLetterText.value.length).toBeGreaterThan(0);
+    expect(state.cvText.value).toBe('');
+  });
+
+  it('falls back to cv when contact info exists and name not found', () => {
+    const state = useApplicationStrengthInputs({ candidateFullName });
+
+    state.pastedText.value =
+      'Profile\nExperienced engineer\nEmail: test@example.com\nPhone: +33 6 12 34 56 78';
+
+    expect(state.pastedType.value).toBe('cv');
   });
 });

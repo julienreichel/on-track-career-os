@@ -29,11 +29,13 @@ test.describe('Application strength workflow', () => {
 
     await expect(page).toHaveURL(/\/jobs\/[0-9a-f-]+\/application-strength$/i);
 
-    const cvText = page.locator('[data-testid="application-strength-cv-text"]');
+    const cvText = page.locator('[data-testid="application-strength-paste-text"]');
     await expect(cvText).toBeVisible({ timeout: 10000 });
-    await cvText.fill(
-      'Senior product manager with 9 years of experience leading cross-functional launches, defining roadmaps, and improving conversion by 18 percent.'
-    );
+    await cvText.fill(`John Doe
+john.doe@example.com | +1 415 555 0132
+Senior product manager with 9 years of experience leading cross-functional launches, defining roadmaps, and improving conversion by 18 percent.`);
+
+    await expect(page.getByText(/Detected pasted text as CV\./i)).toBeVisible();
 
     const evaluateButton = page.locator('[data-testid="application-strength-evaluate"]');
     await expect(evaluateButton).toBeEnabled();

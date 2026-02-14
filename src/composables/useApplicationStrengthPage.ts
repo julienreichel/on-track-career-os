@@ -1,26 +1,14 @@
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
+import { useAuthUser } from '@/composables/useAuthUser';
 import { useApplicationStrengthInputs } from '@/composables/useApplicationStrengthInputs';
 import { useApplicationStrengthEvaluator } from '@/composables/useApplicationStrengthEvaluator';
+import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
-import type { CVDocument } from '@/domain/cvdocument/CVDocument';
-import type { CoverLetter } from '@/domain/cover-letter/CoverLetter';
 import type { EvaluateApplicationStrengthInput } from '@/domain/ai-operations/ApplicationStrengthResult';
 
 type JobOperationInput = EvaluateApplicationStrengthInput['job'];
-
-type JobWithRelations = JobDescription & {
-  cvs?: Array<CVDocument | null> | null;
-  coverLetters?: Array<CoverLetter | null> | null;
-};
-
-type DatedItem = {
-  content?: string | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-  generatedAt?: string | null;
-};
 
 function toStringList(values: unknown): string[] {
   if (!Array.isArray(values)) {
@@ -43,60 +31,43 @@ function mapJobToOperationInput(job: JobDescription): JobOperationInput {
   };
 }
 
-function pickMostRecentContent<T extends DatedItem>(items: Array<T | null> | null | undefined): string {
-  if (!Array.isArray(items) || items.length === 0) {
-    return '';
-  }
-
-  const validItems = items.filter((item): item is T => Boolean(item));
-  if (!validItems.length) {
-    return '';
-  }
-
-  const mostRecent =
-    [...validItems].sort((a, b) => {
-      const dateA = new Date(a.updatedAt ?? a.generatedAt ?? a.createdAt ?? 0).getTime();
-      const dateB = new Date(b.updatedAt ?? b.generatedAt ?? b.createdAt ?? 0).getTime();
-      return dateB - dateA;
-    })[0] ?? null;
-
-  return mostRecent?.content?.trim() ?? '';
-}
-
 export function useApplicationStrengthPage(jobId: string) {
   const { locale } = useI18n();
   const jobAnalysis = useJobAnalysis();
+  const auth = useAuthUser();
+  const profileService = new UserProfileService();
   const evaluator = useApplicationStrengthEvaluator();
 
   const loading = ref(false);
   const pageError = ref<string | null>(null);
   const forceHideInput = ref(false);
+  const candidateFullName = ref('');
 
-  const job = computed(() => jobAnalysis.selectedJob.value as JobWithRelations | null);
+  const job = computed(() => jobAnalysis.selectedJob.value);
   const hasJob = computed(() => Boolean(job.value));
-
-  const tailoredCvText = computed(() => pickMostRecentContent(job.value?.cvs));
-  const tailoredCoverLetterText = computed(() => pickMostRecentContent(job.value?.coverLetters));
-
-  const inputs = useApplicationStrengthInputs({
-    tailoredCvText,
-    tailoredCoverLetterText,
-  });
-
   const hasEvaluation = computed(() => Boolean(evaluator.evaluation.value));
   const showInput = computed(() => !hasEvaluation.value && !forceHideInput.value);
 
-  watch(
-    [tailoredCvText, tailoredCoverLetterText],
-    () => {
-      inputs.ensureSupportedModes();
-    },
-    { immediate: true }
-  );
+  const inputs = useApplicationStrengthInputs({ candidateFullName });
 
   const canEvaluate = computed(
     () => hasJob.value && inputs.canEvaluate.value && !evaluator.loading.value
   );
+
+  async function resolveCandidateName() {
+    try {
+      if (!auth.userId.value) {
+        await auth.loadUserId();
+      }
+      if (!auth.userId.value) {
+        return;
+      }
+      const profile = await profileService.getFullUserProfile(auth.userId.value);
+      candidateFullName.value = profile?.fullName?.trim() ?? '';
+    } catch {
+      candidateFullName.value = '';
+    }
+  }
 
   const evaluate = async () => {
     pageError.value = null;
@@ -135,8 +106,7 @@ export function useApplicationStrengthPage(jobId: string) {
     pageError.value = null;
 
     try {
-      await jobAnalysis.loadJobWithRelations(jobId);
-      inputs.ensureSupportedModes();
+      await Promise.all([jobAnalysis.loadJobWithRelations(jobId), resolveCandidateName()]);
     } catch (error) {
       pageError.value = error instanceof Error ? error.message : 'Failed to load page.';
     } finally {

@@ -6,14 +6,16 @@ PDFParse.setWorker(
   'https://cdn.jsdelivr.net/npm/pdf-parse@latest/dist/pdf-parse/web/pdf.worker.mjs'
 );
 
-export type CvSourceMode = 'tailoredCv' | 'pastedText' | 'pdfUpload';
-export type CoverLetterSourceMode = 'tailoredCoverLetter' | 'pastedText' | 'pdfUpload';
-export type MaterialKind = 'cv' | 'coverLetter';
-
 type UseApplicationStrengthInputsOptions = {
-  tailoredCvText: Ref<string>;
-  tailoredCoverLetterText: Ref<string>;
+  candidateFullName: Ref<string>;
 };
+
+type DetectedType = 'cv' | 'coverLetter';
+
+const BEGIN_LINE_LIMIT = 2;
+const END_LINE_LIMIT = 2;
+const EMAIL_REGEX = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
+const PHONE_REGEX = /(?:\+?\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?)?\d{3,4}[\s.-]?\d{3,4}/;
 
 async function extractPdfText(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
@@ -30,145 +32,151 @@ async function extractTextFromFile(file: File): Promise<string> {
   return file.text();
 }
 
-// eslint-disable-next-line max-lines-per-function
+function getNameLineIndexes(text: string, fullName: string): { first: number; last: number; total: number } {
+  if (!fullName) {
+    return { first: -1, last: -1, total: 0 };
+  }
+
+  const lines = text
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const loweredName = fullName.toLowerCase();
+  const indexes = lines
+    .map((line, index) => (line.toLowerCase().includes(loweredName) ? index : -1))
+    .filter((index) => index >= 0);
+
+  if (!indexes.length) {
+    return { first: -1, last: -1, total: lines.length };
+  }
+
+  return {
+    first: indexes[0] ?? -1,
+    last: indexes[indexes.length - 1] ?? -1,
+    total: lines.length,
+  };
+}
+
+function looksLikeCvByContactInfo(text: string): boolean {
+  return EMAIL_REGEX.test(text) || PHONE_REGEX.test(text);
+}
+
+function detectMaterialType(text: string, fullName: string): DetectedType {
+  const normalized = text.trim();
+  if (!normalized) {
+    return 'coverLetter';
+  }
+
+  const namePosition = getNameLineIndexes(normalized, fullName);
+  if (namePosition.last >= 0 && namePosition.last >= Math.max(0, namePosition.total - END_LINE_LIMIT)) {
+    return 'coverLetter';
+  }
+  if (namePosition.first >= 0 && namePosition.first < BEGIN_LINE_LIMIT) {
+    return 'cv';
+  }
+  if (looksLikeCvByContactInfo(normalized)) {
+    return 'cv';
+  }
+
+  return 'coverLetter';
+}
+
 export function useApplicationStrengthInputs(options: UseApplicationStrengthInputsOptions) {
-  const cvSourceMode = ref<CvSourceMode>('pastedText');
-  const coverLetterSourceMode = ref<CoverLetterSourceMode>('pastedText');
-
-  const pastedCvText = ref('');
-  const pastedCoverLetterText = ref('');
-  const extractedCvText = ref('');
-  const extractedCoverLetterText = ref('');
-
-  const isExtractingCv = ref(false);
-  const isExtractingCoverLetter = ref(false);
+  const pastedText = ref('');
+  const extractedText = ref('');
+  const selectedFile = ref<File | null>(null);
+  const isExtracting = ref(false);
   const extractionError = ref<string | null>(null);
 
-  const hasTailoredCv = computed(() => Boolean(options.tailoredCvText.value.trim()));
-  const hasTailoredCoverLetter = computed(() => Boolean(options.tailoredCoverLetterText.value.trim()));
+  const uploadedType = computed<DetectedType | null>(() => {
+    if (!extractedText.value.trim()) {
+      return null;
+    }
+    return detectMaterialType(extractedText.value, options.candidateFullName.value);
+  });
+
+  const pastedType = computed<DetectedType | null>(() => {
+    if (!pastedText.value.trim()) {
+      return null;
+    }
+    return detectMaterialType(pastedText.value, options.candidateFullName.value);
+  });
 
   const cvText = computed(() => {
-    if (cvSourceMode.value === 'tailoredCv') {
-      return options.tailoredCvText.value.trim();
+    const blocks: string[] = [];
+    if (uploadedType.value === 'cv') {
+      blocks.push(extractedText.value.trim());
     }
-    if (cvSourceMode.value === 'pdfUpload') {
-      return extractedCvText.value.trim();
+    if (pastedType.value === 'cv') {
+      blocks.push(pastedText.value.trim());
     }
-    return pastedCvText.value.trim();
+    return blocks.filter(Boolean).join('\n\n');
   });
 
   const coverLetterText = computed(() => {
-    if (coverLetterSourceMode.value === 'tailoredCoverLetter') {
-      return options.tailoredCoverLetterText.value.trim();
+    const blocks: string[] = [];
+    if (uploadedType.value === 'coverLetter') {
+      blocks.push(extractedText.value.trim());
     }
-    if (coverLetterSourceMode.value === 'pdfUpload') {
-      return extractedCoverLetterText.value.trim();
+    if (pastedType.value === 'coverLetter') {
+      blocks.push(pastedText.value.trim());
     }
-    return pastedCoverLetterText.value.trim();
+    return blocks.filter(Boolean).join('\n\n');
   });
 
-  const canEvaluate = computed(
-    () => Boolean(cvText.value.trim()) && !isExtractingCv.value && !isExtractingCoverLetter.value
+  const hasAnyMaterial = computed(
+    () => Boolean(cvText.value.trim()) || Boolean(coverLetterText.value.trim())
   );
 
+  const canEvaluate = computed(() => hasAnyMaterial.value && !isExtracting.value);
+
   const validationErrors = computed(() => {
-    const errors: string[] = [];
-    if (!cvText.value.trim()) {
-      errors.push('CV text is required. Paste text, upload a file, or use the tailored CV.');
+    if (hasAnyMaterial.value) {
+      return [];
     }
-    return errors;
+    return ['Upload or paste at least one document (CV or cover letter).'];
   });
 
-  async function handleFileUpload(kind: MaterialKind, file: File | null | undefined) {
+  async function handleFileUpload(file: File | null | undefined) {
     if (!file) {
       return;
     }
 
+    selectedFile.value = file;
     extractionError.value = null;
-    if (kind === 'cv') {
-      isExtractingCv.value = true;
-    } else {
-      isExtractingCoverLetter.value = true;
-    }
+    isExtracting.value = true;
 
     try {
-      const extracted = (await extractTextFromFile(file)).trim();
-      if (kind === 'cv') {
-        extractedCvText.value = extracted;
-      } else {
-        extractedCoverLetterText.value = extracted;
-      }
+      extractedText.value = (await extractTextFromFile(file)).trim();
     } catch (error) {
       extractionError.value = error instanceof Error ? error.message : 'Unable to extract file text.';
+      selectedFile.value = null;
     } finally {
-      if (kind === 'cv') {
-        isExtractingCv.value = false;
-      } else {
-        isExtractingCoverLetter.value = false;
-      }
-    }
-  }
-
-  function ensureSupportedModes() {
-    if (
-      hasTailoredCv.value &&
-      cvSourceMode.value === 'pastedText' &&
-      !pastedCvText.value.trim() &&
-      !extractedCvText.value.trim()
-    ) {
-      cvSourceMode.value = 'tailoredCv';
-    }
-    if (
-      hasTailoredCoverLetter.value &&
-      coverLetterSourceMode.value === 'pastedText' &&
-      !pastedCoverLetterText.value.trim() &&
-      !extractedCoverLetterText.value.trim()
-    ) {
-      coverLetterSourceMode.value = 'tailoredCoverLetter';
-    }
-
-    if (cvSourceMode.value === 'tailoredCv' && !hasTailoredCv.value) {
-      cvSourceMode.value = 'pastedText';
-    }
-    if (coverLetterSourceMode.value === 'tailoredCoverLetter' && !hasTailoredCoverLetter.value) {
-      coverLetterSourceMode.value = 'pastedText';
+      isExtracting.value = false;
     }
   }
 
   function reset() {
-    cvSourceMode.value = hasTailoredCv.value ? 'tailoredCv' : 'pastedText';
-    coverLetterSourceMode.value = hasTailoredCoverLetter.value ? 'tailoredCoverLetter' : 'pastedText';
-    pastedCvText.value = '';
-    pastedCoverLetterText.value = '';
-    extractedCvText.value = '';
-    extractedCoverLetterText.value = '';
-    isExtractingCv.value = false;
-    isExtractingCoverLetter.value = false;
+    pastedText.value = '';
+    extractedText.value = '';
+    selectedFile.value = null;
     extractionError.value = null;
+    isExtracting.value = false;
   }
 
-  reset();
-
   return {
-    cvSourceMode,
-    coverLetterSourceMode,
-    tailoredCvText: options.tailoredCvText,
-    tailoredCoverLetterText: options.tailoredCoverLetterText,
-    pastedCvText,
-    pastedCoverLetterText,
-    extractedCvText,
-    extractedCoverLetterText,
-    hasTailoredCv,
-    hasTailoredCoverLetter,
+    pastedText,
+    extractedText,
+    selectedFile,
+    extractedType: uploadedType,
+    pastedType,
     cvText,
     coverLetterText,
     canEvaluate,
     validationErrors,
-    isExtractingCv,
-    isExtractingCoverLetter,
+    isExtracting,
     extractionError,
     handleFileUpload,
-    ensureSupportedModes,
     reset,
   };
 }
