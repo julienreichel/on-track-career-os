@@ -1545,6 +1545,336 @@ Important:
 
 ---
 
+## AI OPERATION — `ai.evaluateCompetencyCoverage`
+
+### Purpose
+
+Given a list of **competencies** (skills/strengths/job-competencies) and the user’s **STAR stories + experiences**, return a **coverage signal** per competency:
+
+- **high** = at least one story directly evidences it
+- **medium** = at least one story indirectly relates to it
+- **low** = no story evidence found
+
+Also return **recommended next actions** and **suggested experience candidates** to create a new story from (when coverage is low/medium).
+
+This operation is used in:
+
+- Profile “Check skills” / “Check strengths”
+- Job match evidence section on `/jobs/[jobId]/match` (job competencies = requiredSkills + behaviours + responsibilities, already normalized/deduped by the caller)
+
+---
+
+### System Prompt
+
+```txt
+You evaluate whether a user's stories provide evidence for a list of competencies (skills/strengths/job competencies).
+
+Return ONLY valid JSON with no markdown wrappers.
+
+HARD RULES:
+- Never invent evidence. Only cite storyIds or experienceIds that are present in the input.
+- Never invent competencies not present in the input list.
+- Do not rewrite or paraphrase the user's story content; only reference IDs and provide short suggestion prompts.
+- Output MUST match the schema exactly: all keys must exist, correct types only.
+- Strings must be "" when unknown (never undefined, never null).
+- Arrays must be [] when empty.
+- Never output null (not as JSON null and not as the string "null").
+
+COVERAGE RULES:
+- "high" coverage: at least one story is a direct match (the competency is explicitly evidenced by the story's content or story tags).
+- "medium" coverage: no direct match, but at least one story is an indirect match (related theme, adjacent capability).
+- "low" coverage: no matching story.
+- Direct vs indirect should be decided conservatively. Prefer "medium" over "high" if uncertain.
+
+EVIDENCE RULES:
+- Use story.tags when available:
+  - If competencyType is "skill", storySkills[] is a strong signal.
+  - If competencyType is "strength", storyStrengths[] is a strong signal.
+- If story tags are absent or empty, infer cautiously from story text (situation/task/action/result).
+- When providing evidence IDs, only reference IDs that exist in the input.
+
+EXPERIENCE CANDIDATE RULES:
+- If coverage is low or medium, try to propose experienceIds that could likely support a story for this competency.
+- Only propose experienceIds that exist in the input experiences list.
+- If no suitable experience can be identified confidently, set requiresUserExperiencePick=true and suggestedExperienceIds=[].
+
+SUGGESTION PROMPTS:
+- Provide 1–3 short actionable prompts for what to demonstrate in a story (<= 90 chars each).
+- Prompts must be generic and not invent company/project specifics.
+
+NORMALIZATION:
+- Assume competencies have already been normalized/deduplicated by the caller, but be tolerant of casing and minor punctuation differences when matching.
+```
+
+---
+
+### User Prompt Template
+
+```txt
+Evaluate competency evidence coverage for the user.
+
+Competency type:
+{{competencyType}}  // "skill" | "strength" | "jobCompetency"
+
+Competencies to evaluate (already normalized + deduplicated by the app):
+{{competenciesJson}}
+
+User experiences:
+{{experiencesJson}}
+
+User stories:
+{{storiesJson}}
+
+Return JSON with the exact schema.
+```
+
+---
+
+### Input Schema
+
+```json
+{
+  "competencyType": "skill|strength|jobCompetency",
+  "competencies": ["string"],
+  "experiences": [
+    {
+      "id": "string",
+      "title": "string",
+      "companyName": "string",
+      "startDate": "string",
+      "endDate": "string",
+      "experienceType": "work|education|volunteer|project",
+      "responsibilities": ["string"],
+      "tasks": ["string"]
+    }
+  ],
+  "stories": [
+    {
+      "id": "string",
+      "experienceId": "string",
+      "title": "string",
+      "situation": "string",
+      "task": "string",
+      "action": "string",
+      "result": "string",
+      "skills": ["string"],
+      "strengths": ["string"]
+    }
+  ]
+}
+```
+
+> Notes:
+>
+> - `experiences[].id` and `stories[].id` / `experienceId` must be included by the caller.
+> - `stories[].skills` and `stories[].strengths` are required arrays (empty allowed).
+
+---
+
+### Output Schema
+
+```json
+{
+  "results": [
+    {
+      "competency": "string",
+      "coverage": "low|medium|high",
+      "directStoryIds": ["string"],
+      "indirectStoryIds": ["string"],
+      "suggestedExperienceIds": ["string"],
+      "requiresUserExperiencePick": true,
+      "suggestedPrompts": ["string"],
+      "recommendedActions": [
+        "none|createStoryFromExperience|improveExistingStory|askUserPickExperience"
+      ]
+    }
+  ],
+  "summary": {
+    "highCount": 0,
+    "mediumCount": 0,
+    "lowCount": 0
+  }
+}
+```
+
+---
+
+### Fallback Strategy
+
+- If output JSON is malformed: return:
+  - `results` = one entry per input competency with:
+    - `coverage: "low"`
+    - empty arrays
+    - `requiresUserExperiencePick: true`
+    - `recommendedActions: ["askUserPickExperience"]`
+    - `suggestedPrompts: []`
+
+  - `summary` counts computed accordingly.
+
+- If any `results[]` item is missing a required key: fill with safe defaults:
+  - strings: `""`
+  - arrays: `[]`
+  - `coverage: "low"`
+  - `requiresUserExperiencePick: true`
+  - `recommendedActions: ["askUserPickExperience"]`
+
+- Clamp prompt lengths to <= 90 characters; truncate if necessary.
+- Deduplicate storyIds and experienceIds within each result.
+
+---
+
+## AI OPERATION — `ai.extractSkillsAndStrengthsFromEvidence`
+
+### Purpose
+
+Propose **skills and strengths** that can be extracted from the user’s existing **stories and experiences**, so the user can add them to `UserProfile.skills[]` and `UserProfile.strengths[]` with one click.
+
+Must be grounded in provided content. No invented abilities.
+
+---
+
+### System Prompt
+
+```txt
+You extract proposed skills and strengths from a user's existing evidence (stories and experiences).
+
+Return ONLY valid JSON with no markdown wrappers.
+
+HARD RULES:
+- Never invent skills/strengths that are not supported by the input.
+- Propose only items that are reasonably evidenced by story content (preferred) or experience responsibilities/tasks (secondary).
+- Output MUST match the schema exactly: all keys must exist, correct types only.
+- Strings must be "" when unknown (never undefined, never null).
+- Arrays must be [] when empty.
+- Never output null (not as JSON null and not as the string "null").
+
+QUALITY RULES:
+- Prefer concise skill/strength labels (1–4 words).
+- Avoid duplicates and near-duplicates (case/punctuation variants).
+- Avoid overly generic items (e.g., "work", "job", "experience").
+- Do not add seniority adjectives unless explicitly supported (avoid "expert", "world-class", etc.).
+
+EVIDENCE RULES:
+- For each proposed item, provide evidence IDs:
+  - storyIds when derived from stories
+  - experienceIds when derived from experiences
+- Only reference IDs present in the input.
+
+DEDUP RULES:
+- Compare case-insensitively and ignore minor punctuation.
+- Also deduplicate against existingSkills and existingStrengths provided by the caller.
+```
+
+---
+
+## User Prompt Template
+
+```txt
+Extract proposed skills and strengths from the user's evidence.
+
+Existing profile skills:
+{{existingSkillsJson}}
+
+Existing profile strengths:
+{{existingStrengthsJson}}
+
+User experiences:
+{{experiencesJson}}
+
+User stories:
+{{storiesJson}}
+
+Return JSON with the exact schema.
+```
+
+---
+
+### Input Schema
+
+```json
+{
+  "existingSkills": ["string"],
+  "existingStrengths": ["string"],
+  "experiences": [
+    {
+      "id": "string",
+      "title": "string",
+      "companyName": "string",
+      "experienceType": "work|education|volunteer|project",
+      "responsibilities": ["string"],
+      "tasks": ["string"]
+    }
+  ],
+  "stories": [
+    {
+      "id": "string",
+      "experienceId": "string",
+      "title": "string",
+      "situation": "string",
+      "task": "string",
+      "action": "string",
+      "result": "string",
+      "skills": ["string"],
+      "strengths": ["string"]
+    }
+  ]
+}
+```
+
+---
+
+### Output Schema
+
+```json
+{
+  "proposedSkills": [
+    {
+      "label": "string",
+      "confidence": 0.75,
+      "storyIds": ["string"],
+      "experienceIds": ["string"],
+      "alreadyInProfile": false
+    }
+  ],
+  "proposedStrengths": [
+    {
+      "label": "string",
+      "confidence": 0.75,
+      "storyIds": ["string"],
+      "experienceIds": ["string"],
+      "alreadyInProfile": false
+    }
+  ],
+  "dedupeNotes": {
+    "skillsDroppedAsDuplicate": ["string"],
+    "strengthsDroppedAsDuplicate": ["string"]
+  }
+}
+```
+
+> Confidence is 0..1 and should be conservative:
+>
+> - Story-based evidence → higher
+> - Experience-only evidence → lower
+
+---
+
+### Fallback Strategy
+
+- If output JSON is malformed: return:
+  - `proposedSkills: []`
+  - `proposedStrengths: []`
+  - `dedupeNotes` with empty arrays
+
+- If any proposed item is missing keys: drop it.
+- Clamp `confidence` to [0, 1].
+- Remove any item that matches (case-insensitive) an entry in:
+  - existingSkills / existingStrengths
+
+- Deduplicate labels within the proposed lists.
+
+---
+
 # 6. ERROR FALLBACK RULES
 
 If AI output is **not valid JSON**:
