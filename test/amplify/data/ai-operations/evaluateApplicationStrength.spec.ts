@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
+import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 
 vi.mock('@aws-sdk/client-bedrock-runtime', () => {
   const mockSend = vi.fn();
@@ -73,6 +73,17 @@ describe('ai.evaluateApplicationStrength', () => {
       })
     ),
   });
+
+  const extractUserPromptFromFirstCall = (): string => {
+    const input = vi.mocked(InvokeModelCommand).mock.calls[0]?.[0] as { body?: string } | undefined;
+    if (!input?.body) {
+      return '';
+    }
+    const body = JSON.parse(input.body) as {
+      messages?: Array<{ content?: Array<{ text?: string }> }>;
+    };
+    return body.messages?.[0]?.content?.[0]?.text ?? '';
+  };
 
   const validArguments = {
     job: {
@@ -263,5 +274,74 @@ describe('ai.evaluateApplicationStrength', () => {
 
     expect(response.topImprovements.length).toBeGreaterThanOrEqual(2);
     expect(response.topImprovements.every((item) => item.target.document === 'cv')).toBe(true);
+  });
+
+  it('cv empty path supports cover-letter-only evaluations', async () => {
+    mockSend.mockResolvedValue(
+      buildBedrockResponse({
+        overallScore: 63,
+        dimensionScores: {
+          atsReadiness: 63,
+          keywordCoverage: 63,
+          clarityFocus: 63,
+          targetedFitSignals: 63,
+          evidenceStrength: 63,
+        },
+        decision: { label: 'borderline', readyToApply: false, rationaleBullets: ['A', 'B'] },
+        missingSignals: [],
+        topImprovements: [
+          {
+            title: 'Strengthen opening',
+            action: 'Make opening more role-specific.',
+            impact: 'high',
+            target: { document: 'cv', anchor: 'summary' },
+          },
+        ],
+        notes: { atsNotes: [], humanReaderNotes: [] },
+      })
+    );
+
+    const response = await handler({
+      arguments: {
+        ...validArguments,
+        cvText: '',
+        coverLetterText: 'I am a strong fit for this role.',
+      },
+    });
+
+    expect(response.topImprovements.length).toBeGreaterThanOrEqual(2);
+    expect(response.topImprovements.every((item) => item.target.document === 'coverLetter')).toBe(
+      true
+    );
+  });
+
+  it('builds prompt conditionally when one document is missing', async () => {
+    mockSend.mockResolvedValue(buildBedrockResponse({}));
+
+    await handler({
+      arguments: {
+        ...validArguments,
+        coverLetterText: '',
+      },
+    });
+
+    const cvOnlyPrompt = extractUserPromptFromFirstCall();
+    expect(cvOnlyPrompt).toContain('CV text:');
+    expect(cvOnlyPrompt).not.toContain('Cover letter text:');
+
+    vi.clearAllMocks();
+    mockSend.mockResolvedValue(buildBedrockResponse({}));
+
+    await handler({
+      arguments: {
+        ...validArguments,
+        cvText: '',
+        coverLetterText: 'Cover letter content',
+      },
+    });
+
+    const coverOnlyPrompt = extractUserPromptFromFirstCall();
+    expect(coverOnlyPrompt).toContain('Cover letter text:');
+    expect(coverOnlyPrompt).not.toContain('CV text:');
   });
 });

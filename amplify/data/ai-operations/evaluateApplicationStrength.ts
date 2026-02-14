@@ -12,8 +12,7 @@ import type { JobDescription } from './types/schema-types';
 
 const SYSTEM_PROMPT = `You are an application evaluator. You assess how strong a candidate's application is for a specific job, using ONLY:
 - the structured job description fields provided
-- the CV text provided
-- the optional cover letter text provided
+- one or more provided application materials (CV text and/or cover letter text)
 
 Return ONLY valid JSON with no markdown wrappers.
 
@@ -29,7 +28,7 @@ SCORING RULES (0..100):
 Provide dimension scores and an overallScore.
 Scores must be justified by the provided texts:
 - If evidence is missing, score lower and add missingSignals + improvements.
-- If coverLetterText is missing, do not penalize letter-specific dimensions; adapt rationale accordingly.
+- If one document is not provided, do not penalize for missing content from that document type; adapt rationale accordingly.
 
 EVALUATION DIMENSIONS:
 1) atsReadiness: likelihood the document passes automated screening based on structure + keyword signals.
@@ -102,6 +101,10 @@ const PROMPT_INDENT_SPACES = 2;
 type DecisionLabel = 'strong' | 'borderline' | 'risky';
 type Impact = 'high' | 'medium' | 'low';
 type TargetDocument = 'cv' | 'coverLetter';
+type MaterialAvailability = {
+  hasCv: boolean;
+  hasCoverLetter: boolean;
+};
 
 export interface EvaluateApplicationStrengthInput {
   job: JobDescription;
@@ -156,11 +159,24 @@ function sanitizeImpact(value: unknown): Impact {
   return value === 'high' || value === 'medium' || value === 'low' ? value : 'medium';
 }
 
-function sanitizeDocument(value: unknown, hasCoverLetter: boolean): TargetDocument {
-  if (value === 'coverLetter' && hasCoverLetter) {
+function resolveDefaultDocument(options: MaterialAvailability): TargetDocument {
+  if (options.hasCv) {
+    return 'cv';
+  }
+  if (options.hasCoverLetter) {
     return 'coverLetter';
   }
   return 'cv';
+}
+
+function sanitizeDocument(value: unknown, options: MaterialAvailability): TargetDocument {
+  if (value === 'coverLetter' && options.hasCoverLetter) {
+    return 'coverLetter';
+  }
+  if (value === 'cv' && options.hasCv) {
+    return 'cv';
+  }
+  return resolveDefaultDocument(options);
 }
 
 function sanitizeAnchor(value: unknown): string {
@@ -169,7 +185,7 @@ function sanitizeAnchor(value: unknown): string {
 
 function sanitizeImprovements(
   value: unknown,
-  options: { hasCoverLetter: boolean }
+  options: MaterialAvailability
 ): ApplicationImprovement[] {
   if (!Array.isArray(value)) {
     return [];
@@ -198,7 +214,7 @@ function sanitizeImprovements(
         action || 'Refine wording to better match role requirements and add concrete evidence.',
       impact: sanitizeImpact(candidate?.impact),
       target: {
-        document: sanitizeDocument(candidate?.target?.document, options.hasCoverLetter),
+        document: sanitizeDocument(candidate?.target?.document, options),
         anchor: sanitizeAnchor(candidate?.target?.anchor),
       },
     });
@@ -247,7 +263,7 @@ function deriveDecision(
 
 function finalizeOutput(
   raw: ModelResponse,
-  options: { hasCoverLetter: boolean }
+  options: MaterialAvailability
 ): EvaluateApplicationStrengthOutput {
   const dimensionScores = {
     atsReadiness: clampScore(raw.dimensionScores?.atsReadiness),
@@ -287,6 +303,7 @@ function finalizeOutput(
   const topImprovements = ensureMinImprovements(
     sanitizeImprovements(raw.topImprovements, options),
     {
+      hasCv: options.hasCv,
       hasCoverLetter: options.hasCoverLetter,
       min: MIN_IMPROVEMENTS,
     }
@@ -311,17 +328,30 @@ function finalizeOutput(
 
 function buildUserPrompt(input: EvaluateApplicationStrengthInput): string {
   const jobJson = JSON.stringify(input.job, null, PROMPT_INDENT_SPACES);
+  const hasCv = input.cvText.trim().length > 0;
+  const hasCoverLetter = input.coverLetterText.trim().length > 0;
+  const materialSections: string[] = [];
+  const importantRules: string[] = [];
+
+  if (hasCv) {
+    materialSections.push(`CV text:\n${input.cvText}`);
+  }
+  if (hasCoverLetter) {
+    materialSections.push(`Cover letter text:\n${input.coverLetterText}`);
+  }
+  if (!hasCv) {
+    importantRules.push('- CV text not provided: avoid CV-specific criticism.');
+  }
+  if (!hasCoverLetter) {
+    importantRules.push('- Cover letter text not provided: avoid cover-letter-specific criticism.');
+  }
 
   return `Evaluate the strength of this application for the given job.
 
 Job (structured):
 ${jobJson}
 
-CV text:
-${input.cvText}
-
-Cover letter text (optional; may be empty string):
-${input.coverLetterText}
+${materialSections.join('\n\n')}
 
 Output language: ${input.language}
 
@@ -329,8 +359,9 @@ Return a JSON object with this exact structure:
 ${OUTPUT_SCHEMA}
 
 Important:
-- Use only explicit evidence from the provided CV/cover letter text.
-- If coverLetterText is empty: set document targets to "cv" and avoid letter-only criticism.
+- Use only explicit evidence from the provided application material text.
+- Target improvements only to documents that were provided.
+${importantRules.join('\n')}
 - rationaleBullets: 2 to 5 bullets, concise.
 - topImprovements: at least 2 items, preferably 3.
 - anchor should be a common section label when possible (e.g., "summary", "skills", "experience", "education", "projects", "coverLetterBody", "general").
@@ -338,7 +369,7 @@ Important:
 - Keep output text in the requested language.`;
 }
 
-function buildFallbackOutput(hasCoverLetter: boolean): EvaluateApplicationStrengthOutput {
+function buildFallbackOutput(options: MaterialAvailability): EvaluateApplicationStrengthOutput {
   return finalizeOutput(
     {
       overallScore: 0,
@@ -364,7 +395,7 @@ function buildFallbackOutput(hasCoverLetter: boolean): EvaluateApplicationStreng
         humanReaderNotes: ['Run evaluation again to get role-specific recommendations.'],
       },
     },
-    { hasCoverLetter }
+    options
   );
 }
 
@@ -381,7 +412,12 @@ export const handler = async (event: HandlerEvent): Promise<EvaluateApplicationS
     'evaluateApplicationStrength',
     { arguments: event.arguments },
     async (args) => {
+      const hasCv = args.cvText.trim().length > 0;
       const hasCoverLetter = args.coverLetterText.trim().length > 0;
+      if (!hasCv && !hasCoverLetter) {
+        throw new Error('At least one document is required (cvText or coverLetterText).');
+      }
+      const materialAvailability: MaterialAvailability = { hasCv, hasCoverLetter };
       const userPrompt = buildUserPrompt(args);
 
       try {
@@ -389,14 +425,14 @@ export const handler = async (event: HandlerEvent): Promise<EvaluateApplicationS
           systemPrompt: SYSTEM_PROMPT,
           userPrompt,
           outputSchema: OUTPUT_SCHEMA,
-          validate: (raw) => finalizeOutput(raw ?? {}, { hasCoverLetter }),
+          validate: (raw) => finalizeOutput(raw ?? {}, materialAvailability),
           operationName: 'evaluateApplicationStrength',
         });
       } catch (error) {
         console.error('evaluateApplicationStrength fallback triggered', {
           reason: (error as Error).message,
         });
-        return buildFallbackOutput(hasCoverLetter);
+        return buildFallbackOutput(materialAvailability);
       }
     },
     (args) => ({

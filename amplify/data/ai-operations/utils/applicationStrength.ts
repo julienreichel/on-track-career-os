@@ -55,14 +55,28 @@ export function truncateBullet(value: unknown, maxLength: number = MAX_BULLET_LE
 
 export function ensureMinImprovements(
   improvements: ApplicationImprovement[],
-  options: { hasCoverLetter: boolean; min?: number } = { hasCoverLetter: false }
+  options: { hasCv?: boolean; hasCoverLetter: boolean; min?: number } = {
+    hasCv: true,
+    hasCoverLetter: false,
+  }
 ): ApplicationImprovement[] {
   const min = options.min ?? MIN_IMPROVEMENTS;
   const normalized = [...improvements];
+  const hasCv = options.hasCv !== false;
+  const defaultDocument: 'cv' | 'coverLetter' = hasCv
+    ? 'cv'
+    : options.hasCoverLetter
+      ? 'coverLetter'
+      : 'cv';
 
-  if (!options.hasCoverLetter) {
+  if (!hasCv || !options.hasCoverLetter) {
     for (const item of normalized) {
-      item.target.document = 'cv';
+      if (
+        (item.target.document === 'cv' && !hasCv) ||
+        (item.target.document === 'coverLetter' && !options.hasCoverLetter)
+      ) {
+        item.target.document = defaultDocument;
+      }
       if (!item.target.anchor) {
         item.target.anchor = 'general';
       }
@@ -83,7 +97,7 @@ export function ensureMinImprovements(
         ...fallback,
         target: {
           ...fallback.target,
-          document: options.hasCoverLetter ? fallback.target.document : 'cv',
+          document: defaultDocument,
         },
       });
     }
