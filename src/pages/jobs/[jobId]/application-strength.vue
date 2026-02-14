@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { useApplicationStrengthPage } from '@/composables/useApplicationStrengthPage';
 import ApplicationStrengthInputCard from '@/components/application-strength/ApplicationStrengthInputCard.vue';
 import ApplicationStrengthResultsCard from '@/components/application-strength/ApplicationStrengthResultsCard.vue';
@@ -10,6 +11,7 @@ import type { PageHeaderLink } from '@/types/ui';
 definePageMeta({
   breadcrumbLabel: 'Application Strength',
 });
+const { t } = useI18n();
 
 const route = useRoute();
 const jobId = computed(() => route.params.jobId as string);
@@ -22,12 +24,12 @@ const page = useApplicationStrengthPage(jobId.value);
 
 const headerLinks = computed<PageHeaderLink[]>(() => [
   {
-    label: 'Back to jobs',
+    label: t('applicationStrength.page.backToJobs'),
     icon: 'i-heroicons-arrow-left',
     to: '/jobs',
   },
   {
-    label: 'Back to job',
+    label: t('applicationStrength.page.backToJob'),
     icon: 'i-heroicons-briefcase',
     to: `/jobs/${jobId.value}`,
   },
@@ -64,8 +66,8 @@ onMounted(async () => {
 <template>
   <UPage>
     <UPageHeader
-      :title="page.job.value?.title || 'Application Strength'"
-      description="Evaluate your CV and optional cover letter against this role."
+      :title="page.job.value?.title || t('applicationStrength.page.titleFallback')"
+      :description="t('applicationStrength.page.description')"
       :links="headerLinks"
     />
 
@@ -75,7 +77,7 @@ onMounted(async () => {
         color="error"
         variant="soft"
         icon="i-heroicons-exclamation-triangle"
-        title="Unable to evaluate application strength"
+        :title="t('applicationStrength.page.errorTitle')"
         :description="errorMessage"
         class="mb-6"
       />
@@ -104,13 +106,13 @@ onMounted(async () => {
       />
 
       <UCard v-if="!hasEvaluation && !page.showInput.value">
-        <UEmpty title="No evaluation yet" icon="i-heroicons-chart-bar" />
+        <UEmpty :title="t('applicationStrength.page.noEvaluationYet')" icon="i-heroicons-chart-bar" />
       </UCard>
 
       <div v-if="hasEvaluation" class="space-y-6" data-testid="application-strength-results">
         <div class="flex justify-end">
           <UButton
-            label="Clear"
+            :label="t('applicationStrength.page.clear')"
             color="neutral"
             variant="outline"
             icon="i-heroicons-arrow-path"

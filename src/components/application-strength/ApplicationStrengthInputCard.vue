@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
 const props = withDefaults(
   defineProps<{
     selectedFile: File | null;
@@ -19,6 +22,7 @@ const props = withDefaults(
     validationErrors: () => [],
   }
 );
+const { t } = useI18n();
 
 const emit = defineEmits<{
   'update:pastedText': [value: string];
@@ -29,6 +33,18 @@ const emit = defineEmits<{
 function handleFileChange(file: File | null | undefined) {
   emit('uploadFile', file ?? undefined);
 }
+
+const extractedTypeLabel = computed(() =>
+  props.extractedType === 'cv'
+    ? t('applicationStrength.input.detectedTypeCv')
+    : t('applicationStrength.input.detectedTypeCoverLetter')
+);
+
+const pastedTypeLabel = computed(() =>
+  props.pastedType === 'cv'
+    ? t('applicationStrength.input.detectedTypeCv')
+    : t('applicationStrength.input.detectedTypeCoverLetter')
+);
 </script>
 
 <template>
@@ -38,8 +54,8 @@ function handleFileChange(file: File | null | undefined) {
         <UFileUpload
           v-if="!props.extractedText"
           :model-value="props.selectedFile"
-          label="Upload application document"
-          description="Upload one CV or cover letter file (PDF or TXT)."
+          :label="t('applicationStrength.input.uploadLabel')"
+          :description="t('applicationStrength.input.uploadDescription')"
           accept=".pdf,.txt"
           :clearable="false"
           :disabled="props.isExtracting"
@@ -50,12 +66,12 @@ function handleFileChange(file: File | null | undefined) {
         <div v-if="props.isExtracting" class="space-y-2">
           <USkeleton class="h-20 rounded-lg animate-pulse" />
           <USkeleton class="h-12 rounded-lg animate-pulse" />
-          <p class="text-sm text-gray-500">Extracting text from uploaded file...</p>
+          <p class="text-sm text-gray-500">{{ t('applicationStrength.input.extracting') }}</p>
         </div>
 
         <UAlert
           v-else-if="props.selectedFile"
-          :title="`File uploaded: ${props.selectedFile.name}`"
+          :title="t('applicationStrength.input.fileUploaded', { fileName: props.selectedFile.name })"
           color="primary"
         />
 
@@ -63,11 +79,13 @@ function handleFileChange(file: File | null | undefined) {
           v-if="props.extractedType"
           color="neutral"
           variant="soft"
-          :description="`Detected uploaded file as ${props.extractedType === 'cv' ? 'CV' : 'cover letter'}.`"
+          :description="t('applicationStrength.input.detectedUploadedAs', { type: extractedTypeLabel })"
         />
 
         <details v-if="props.extractedText" class="rounded border border-default p-3">
-          <summary class="cursor-pointer text-sm font-medium">Extracted text preview</summary>
+          <summary class="cursor-pointer text-sm font-medium">
+            {{ t('applicationStrength.input.extractedPreview') }}
+          </summary>
           <p class="mt-2 whitespace-pre-wrap text-sm text-default">
             {{ props.extractedText }}
           </p>
@@ -75,19 +93,19 @@ function handleFileChange(file: File | null | undefined) {
       </div>
     </UCard>
 
-    <USeparator label="Or paste application text" />
+    <USeparator :label="t('applicationStrength.input.separator')" />
 
     <UCard>
       <UFormField
-        label="Paste application text"
-        description="Paste either CV content or cover letter text. Type is detected automatically."
+        :label="t('applicationStrength.input.pasteLabel')"
+        :description="t('applicationStrength.input.pasteDescription')"
         class="w-full"
       >
         <UTextarea
           :model-value="props.pastedText"
           class="w-full"
           :rows="8"
-          placeholder="Paste CV or cover letter here..."
+          :placeholder="t('applicationStrength.input.pastePlaceholder')"
           data-testid="application-strength-paste-text"
           :disabled="props.loading || props.isExtracting"
           @update:model-value="emit('update:pastedText', ($event as string) || '')"
@@ -99,7 +117,7 @@ function handleFileChange(file: File | null | undefined) {
         color="neutral"
         variant="soft"
         class="mt-4"
-        :description="`Detected pasted text as ${props.pastedType === 'cv' ? 'CV' : 'cover letter'}.`"
+        :description="t('applicationStrength.input.detectedPastedAs', { type: pastedTypeLabel })"
       />
 
       <UAlert
@@ -107,7 +125,7 @@ function handleFileChange(file: File | null | undefined) {
         color="error"
         variant="soft"
         class="mt-4"
-        title="File extraction error"
+        :title="t('applicationStrength.input.fileExtractionError')"
         :description="props.extractionError"
       />
 
@@ -126,7 +144,7 @@ function handleFileChange(file: File | null | undefined) {
           <UButton
             color="primary"
             icon="i-heroicons-sparkles"
-            label="Evaluate"
+            :label="t('applicationStrength.input.evaluate')"
             data-testid="application-strength-evaluate"
             :loading="props.loading"
             :disabled="!props.canEvaluate || props.loading || props.isExtracting"

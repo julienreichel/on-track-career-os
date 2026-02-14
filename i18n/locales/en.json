@@ -986,6 +986,64 @@
       "tailoring": "Application Tailoring Tips"
     }
   },
+  "applicationStrength": {
+    "page": {
+      "titleFallback": "Application Strength",
+      "description": "Evaluate your CV and optional cover letter against this role.",
+      "backToJobs": "Back to jobs",
+      "backToJob": "Back to job",
+      "errorTitle": "Unable to evaluate application strength",
+      "noEvaluationYet": "No evaluation yet",
+      "clear": "Clear"
+    },
+    "input": {
+      "uploadLabel": "Upload application document",
+      "uploadDescription": "Upload one CV or cover letter file (PDF or TXT).",
+      "extracting": "Extracting text from uploaded file...",
+      "fileUploaded": "File uploaded: {fileName}",
+      "detectedTypeCv": "CV",
+      "detectedTypeCoverLetter": "cover letter",
+      "detectedUploadedAs": "Detected uploaded file as {type}.",
+      "extractedPreview": "Extracted text preview",
+      "separator": "Or paste application text",
+      "pasteLabel": "Paste application text",
+      "pasteDescription": "Paste either CV content or cover letter text. Type is detected automatically.",
+      "pastePlaceholder": "Paste CV or cover letter here...",
+      "detectedPastedAs": "Detected pasted text as {type}.",
+      "fileExtractionError": "File extraction error",
+      "evaluate": "Evaluate"
+    },
+    "results": {
+      "overallScore": "Overall score",
+      "decisionLabels": {
+        "strong": "strong",
+        "borderline": "borderline",
+        "risky": "risky"
+      },
+      "decisionReady": "ready to apply",
+      "decisionNotReady": "not ready",
+      "decisionRationale": "Decision rationale",
+      "missingSignals": "Missing signals",
+      "noMissingSignals": "No major missing signals detected.",
+      "dimensions": {
+        "atsReadiness": "ATS readiness",
+        "keywordCoverage": "Keyword coverage",
+        "clarityFocus": "Clarity and focus",
+        "targetedFitSignals": "Targeted fit signals",
+        "evidenceStrength": "Evidence strength"
+      }
+    },
+    "improvements": {
+      "title": "Top improvements",
+      "description": "Priority suggestions to improve your application quality.",
+      "target": "Target: {document} / {anchor}",
+      "impact": {
+        "high": "high",
+        "medium": "medium",
+        "low": "low"
+      }
+    }
+  },
   "progress": {
     "phaseLabel": "Current phase",
     "phaseLabels": {

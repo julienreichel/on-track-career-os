@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ApplicationStrengthImprovementsCard from '@/components/application-strength/ApplicationStrengthImprovementsCard.vue';
+import { createTestI18n } from '../../../utils/createTestI18n';
 
 const stubs = {
   UCard: {
@@ -37,6 +38,7 @@ describe('ApplicationStrengthImprovementsCard', () => {
         ],
       },
       global: {
+        plugins: [createTestI18n()],
         stubs,
       },
     });
