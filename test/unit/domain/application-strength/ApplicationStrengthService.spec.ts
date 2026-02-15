@@ -40,12 +40,27 @@ describe('ApplicationStrengthService', () => {
     ).rejects.toThrow('Job title is required');
   });
 
-  it('throws on missing cv text', async () => {
+  it('throws when both cv text and cover letter text are empty', async () => {
     const repo = { evaluate: vi.fn() } as unknown as ApplicationStrengthRepository;
     const service = new ApplicationStrengthService(repo);
 
-    await expect(service.evaluate({ ...validInput, cvText: '' } as never)).rejects.toThrow(
-      'CV text cannot be empty'
-    );
+    await expect(
+      service.evaluate({ ...validInput, cvText: '', coverLetterText: '' } as never)
+    ).rejects.toThrow('At least one document is required (cvText or coverLetterText).');
+  });
+
+  it('accepts cover-letter-only input', async () => {
+    const repo = {
+      evaluate: vi.fn().mockResolvedValue({ overallScore: 0 }),
+    } as unknown as ApplicationStrengthRepository;
+    const service = new ApplicationStrengthService(repo);
+
+    await service.evaluate({ ...validInput, cvText: '', coverLetterText: 'Cover letter content' } as never);
+
+    expect((repo.evaluate as ReturnType<typeof vi.fn>)).toHaveBeenCalledWith({
+      ...validInput,
+      cvText: '',
+      coverLetterText: 'Cover letter content',
+    });
   });
 });

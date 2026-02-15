@@ -469,8 +469,8 @@ export class AiOperationsService {
     if (!input?.job?.title?.trim()) {
       throw new Error('Job title is required');
     }
-    if (!input?.cvText?.trim()) {
-      throw new Error('CV text cannot be empty');
+    if (!input?.cvText?.trim() && !input?.coverLetterText?.trim()) {
+      throw new Error('At least one document is required (cvText or coverLetterText).');
     }
     if (!input?.language?.trim()) {
       throw new Error('Language cannot be empty');

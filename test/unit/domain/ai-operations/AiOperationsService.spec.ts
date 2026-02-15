@@ -1006,11 +1006,32 @@ describe('AiOperationsService', () => {
       expect(mockRepo.evaluateApplicationStrength).not.toHaveBeenCalled();
     });
 
-    it('throws when cvText is empty', async () => {
+    it('throws when both cvText and coverLetterText are empty', async () => {
       await expect(
-        service.evaluateApplicationStrength({ ...validInput, cvText: '' } as never)
-      ).rejects.toThrow('CV text cannot be empty');
+        service.evaluateApplicationStrength({
+          ...validInput,
+          cvText: '',
+          coverLetterText: '',
+        } as never)
+      ).rejects.toThrow('At least one document is required (cvText or coverLetterText).');
       expect(mockRepo.evaluateApplicationStrength).not.toHaveBeenCalled();
+    });
+
+    it('accepts cover-letter-only input', async () => {
+      mockRepo.evaluateApplicationStrength.mockResolvedValue(validResult);
+
+      const result = await service.evaluateApplicationStrength({
+        ...validInput,
+        cvText: '',
+        coverLetterText: 'Strong cover letter content.',
+      } as never);
+
+      expect(result).toEqual(validResult);
+      expect(mockRepo.evaluateApplicationStrength).toHaveBeenCalledWith({
+        ...validInput,
+        cvText: '',
+        coverLetterText: 'Strong cover letter content.',
+      });
     });
 
     it('throws when language is missing', async () => {
