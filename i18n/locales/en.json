@@ -1027,7 +1027,6 @@
       "noMissingSignals": "No major missing signals detected.",
       "dimensions": {
         "atsReadiness": "ATS readiness",
-        "keywordCoverage": "Keyword coverage",
         "clarityFocus": "Clarity and focus",
         "targetedFitSignals": "Targeted fit signals",
         "evidenceStrength": "Evidence strength"

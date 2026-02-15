@@ -33,7 +33,6 @@ describe('ai.evaluateApplicationStrength', () => {
     overallScore: number;
     dimensionScores: {
       atsReadiness: number;
-      keywordCoverage: number;
       clarityFocus: number;
       targetedFitSignals: number;
       evidenceStrength: number;
@@ -123,7 +122,6 @@ describe('ai.evaluateApplicationStrength', () => {
         overallScore: 82,
         dimensionScores: {
           atsReadiness: 80,
-          keywordCoverage: 81,
           clarityFocus: 82,
           targetedFitSignals: 83,
           evidenceStrength: 84,
@@ -158,7 +156,7 @@ describe('ai.evaluateApplicationStrength', () => {
     const response = await handler({ arguments: validArguments });
 
     expect(response.overallScore).toBe(82);
-    expect(response.dimensionScores.keywordCoverage).toBe(81);
+    expect(response.dimensionScores.clarityFocus).toBe(82);
     expect(response.decision.label).toBe('strong');
     expect(response.topImprovements.length).toBeGreaterThanOrEqual(2);
   });
@@ -169,7 +167,6 @@ describe('ai.evaluateApplicationStrength', () => {
         overallScore: 999,
         dimensionScores: {
           atsReadiness: -25,
-          keywordCoverage: 200,
           clarityFocus: 49.7,
           targetedFitSignals: '101',
           evidenceStrength: null,
@@ -185,7 +182,6 @@ describe('ai.evaluateApplicationStrength', () => {
 
     expect(response.overallScore).toBe(100);
     expect(response.dimensionScores.atsReadiness).toBe(0);
-    expect(response.dimensionScores.keywordCoverage).toBe(100);
     expect(response.dimensionScores.clarityFocus).toBe(50);
     expect(response.dimensionScores.targetedFitSignals).toBe(100);
     expect(response.dimensionScores.evidenceStrength).toBe(0);
@@ -199,7 +195,6 @@ describe('ai.evaluateApplicationStrength', () => {
     expect(response.overallScore).toBe(0);
     expect(response.dimensionScores).toEqual({
       atsReadiness: 0,
-      keywordCoverage: 0,
       clarityFocus: 0,
       targetedFitSignals: 0,
       evidenceStrength: 0,
@@ -216,7 +211,6 @@ describe('ai.evaluateApplicationStrength', () => {
         overallScore: 60,
         dimensionScores: {
           atsReadiness: 60,
-          keywordCoverage: 60,
           clarityFocus: 60,
           targetedFitSignals: 60,
           evidenceStrength: 60,
@@ -246,7 +240,6 @@ describe('ai.evaluateApplicationStrength', () => {
         overallScore: 58,
         dimensionScores: {
           atsReadiness: 58,
-          keywordCoverage: 58,
           clarityFocus: 58,
           targetedFitSignals: 58,
           evidenceStrength: 58,
@@ -282,7 +275,6 @@ describe('ai.evaluateApplicationStrength', () => {
         overallScore: 63,
         dimensionScores: {
           atsReadiness: 63,
-          keywordCoverage: 63,
           clarityFocus: 63,
           targetedFitSignals: 63,
           evidenceStrength: 63,

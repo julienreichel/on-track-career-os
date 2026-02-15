@@ -28,13 +28,6 @@ const dimensions = computed(() => [
     testId: 'application-strength-dimension-atsReadiness',
   },
   {
-    key: 'keywordCoverage',
-    label: t('applicationStrength.results.dimensions.keywordCoverage'),
-    value: props.evaluation.dimensionScores.keywordCoverage,
-    max: 100,
-    testId: 'application-strength-dimension-keywordCoverage',
-  },
-  {
     key: 'clarityFocus',
     label: t('applicationStrength.results.dimensions.clarityFocus'),
     value: props.evaluation.dimensionScores.clarityFocus,
@@ -77,7 +70,7 @@ const decisionReadinessLabel = computed(() =>
       :badge-color="decisionColor"
       :badge-label="`${decisionLabel} · ${decisionReadinessLabel}`"
       :metrics="dimensions"
-      metrics-grid-class="md:grid-cols-5"
+      metrics-grid-class="md:grid-cols-4"
       test-id="application-strength-results-overview"
     />
 

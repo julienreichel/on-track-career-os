@@ -44,7 +44,7 @@ Senior product manager with 9 years of experience leading cross-functional launc
     await expect(page.locator('[data-testid="application-strength-results"]')).toBeVisible({
       timeout: 60000,
     });
-    await expect(page.locator('[data-testid^="application-strength-dimension-"]')).toHaveCount(5, {
+    await expect(page.locator('[data-testid^="application-strength-dimension-"]')).toHaveCount(4, {
       timeout: 20000,
     });
     const improvements = page.locator('[data-testid^="application-strength-improvement-"]');

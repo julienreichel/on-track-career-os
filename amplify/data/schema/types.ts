@@ -215,7 +215,6 @@ export const schemaTypes = {
     overallScore: a.integer().required(),
     dimensionScores: a.customType({
       atsReadiness: a.integer().required(),
-      keywordCoverage: a.integer().required(),
       clarityFocus: a.integer().required(),
       targetedFitSignals: a.integer().required(),
       evidenceStrength: a.integer().required(),

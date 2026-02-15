@@ -252,7 +252,6 @@ describe('useAiOperations', () => {
       overallScore: 70,
       dimensionScores: {
         atsReadiness: 72,
-        keywordCoverage: 68,
         clarityFocus: 69,
         targetedFitSignals: 70,
         evidenceStrength: 71,
@@ -358,7 +357,6 @@ describe('useAiOperations', () => {
       overallScore: 0,
       dimensionScores: {
         atsReadiness: 0,
-        keywordCoverage: 0,
         clarityFocus: 0,
         targetedFitSignals: 0,
         evidenceStrength: 0,

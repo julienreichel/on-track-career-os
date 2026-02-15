@@ -14,7 +14,6 @@ describe('useApplicationStrengthEvaluator', () => {
       overallScore: 80,
       dimensionScores: {
         atsReadiness: 80,
-        keywordCoverage: 82,
         clarityFocus: 78,
         targetedFitSignals: 79,
         evidenceStrength: 81,

@@ -728,7 +728,6 @@ describe('AiOperationsRepository', () => {
       overallScore: 72,
       dimensionScores: {
         atsReadiness: 74,
-        keywordCoverage: 69,
         clarityFocus: 70,
         targetedFitSignals: 71,
         evidenceStrength: 75,

@@ -49,7 +49,7 @@ describe('ApplicationStrengthRepository', () => {
     });
 
     expect(result.overallScore).toBe(88);
-    expect(result.dimensionScores.keywordCoverage).toBe(0);
+    expect(result.dimensionScores.clarityFocus).toBe(0);
     expect(Array.isArray(result.missingSignals)).toBe(true);
     expect(Array.isArray(result.notes.atsNotes)).toBe(true);
     expect(result.topImprovements[0]?.target.anchor).toBe('general');
@@ -61,7 +61,6 @@ describe('ApplicationStrengthRepository', () => {
         overallScore: 60,
         dimensionScores: {
           atsReadiness: 60,
-          keywordCoverage: 60,
           clarityFocus: 60,
           targetedFitSignals: 60,
           evidenceStrength: 60,

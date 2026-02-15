@@ -32,10 +32,9 @@ Scores must be justified by the provided texts:
 
 EVALUATION DIMENSIONS:
 1) atsReadiness: likelihood the document passes automated screening based on structure + keyword signals.
-2) keywordCoverage: presence of job-required skills/terms reflected in the materials (exact or close synonyms).
-3) clarityFocus: clarity, specificity, and low fluff; easy to scan; role-focused.
-4) targetedFitSignals: tailoring to this role (title alignment, relevant highlights, role vocabulary, job pains addressed).
-5) evidenceStrength: measurable outcomes, concrete impact, credible proof (metrics when present, otherwise specific outcomes).
+2) clarityFocus: clarity, specificity, and low fluff; easy to scan; role-focused.
+3) targetedFitSignals: tailoring to this role (title alignment, relevant highlights, role vocabulary, job pains addressed).
+4) evidenceStrength: measurable outcomes, concrete impact, credible proof (metrics when present, otherwise specific outcomes).
 
 DECISION GATE:
 Return a decision label:
@@ -60,7 +59,6 @@ const OUTPUT_SCHEMA = `{
   "overallScore": [0-100],
   "dimensionScores": {
     "atsReadiness": [0-100],
-    "keywordCoverage": [0-100],
     "clarityFocus": [0-100],
     "targetedFitSignals": [0-100],
     "evidenceStrength": [0-100]
@@ -95,7 +93,7 @@ const ANCHOR_MAX_LENGTH = 80;
 const DECISION_STRONG_SCORE_MIN = 75;
 const DECISION_STRONG_WEAKEST_MIN = 55;
 const DECISION_BORDERLINE_SCORE_MIN = 50;
-const DIMENSION_COUNT = 5;
+const DIMENSION_COUNT = 4;
 const PROMPT_INDENT_SPACES = 2;
 
 type DecisionLabel = 'strong' | 'borderline' | 'risky';
@@ -117,7 +115,6 @@ export interface EvaluateApplicationStrengthOutput {
   overallScore: number;
   dimensionScores: {
     atsReadiness: number;
-    keywordCoverage: number;
     clarityFocus: number;
     targetedFitSignals: number;
     evidenceStrength: number;
@@ -231,7 +228,7 @@ function ensureRationaleBullets(value: string[]): string[] {
   }
 
   const fallback = [
-    'Keyword coverage and evidence depth are limiting current application strength.',
+    'Evidence depth and role alignment are limiting current application strength.',
     'Targeted edits can improve clarity and role alignment before applying.',
   ];
 
@@ -267,7 +264,6 @@ function finalizeOutput(
 ): EvaluateApplicationStrengthOutput {
   const dimensionScores = {
     atsReadiness: clampScore(raw.dimensionScores?.atsReadiness),
-    keywordCoverage: clampScore(raw.dimensionScores?.keywordCoverage),
     clarityFocus: clampScore(raw.dimensionScores?.clarityFocus),
     targetedFitSignals: clampScore(raw.dimensionScores?.targetedFitSignals),
     evidenceStrength: clampScore(raw.dimensionScores?.evidenceStrength),
@@ -275,7 +271,6 @@ function finalizeOutput(
 
   const weakestDimension = Math.min(
     dimensionScores.atsReadiness,
-    dimensionScores.keywordCoverage,
     dimensionScores.clarityFocus,
     dimensionScores.targetedFitSignals,
     dimensionScores.evidenceStrength
@@ -283,7 +278,6 @@ function finalizeOutput(
 
   const averageDimensionScore = Math.round(
     (dimensionScores.atsReadiness +
-      dimensionScores.keywordCoverage +
       dimensionScores.clarityFocus +
       dimensionScores.targetedFitSignals +
       dimensionScores.evidenceStrength) /
@@ -375,7 +369,6 @@ function buildFallbackOutput(options: MaterialAvailability): EvaluateApplication
       overallScore: 0,
       dimensionScores: {
         atsReadiness: 0,
-        keywordCoverage: 0,
         clarityFocus: 0,
         targetedFitSignals: 0,
         evidenceStrength: 0,

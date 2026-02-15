@@ -55,7 +55,7 @@ describe('ApplicationStrengthEvaluation', () => {
 
     expect(dto.overallScore).toBe(100);
     expect(dto.dimensionScores.atsReadiness).toBe(0);
-    expect(dto.dimensionScores.keywordCoverage).toBe(0);
+    expect(dto.dimensionScores.clarityFocus).toBe(0);
     expect(dto.decision.label).toBe('risky');
     expect(Array.isArray(dto.decision.rationaleBullets)).toBe(true);
     expect(Array.isArray(dto.missingSignals)).toBe(true);

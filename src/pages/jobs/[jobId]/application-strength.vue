@@ -24,7 +24,7 @@ const page = useApplicationStrengthPage(jobId.value);
 
 const headerLinks = computed<PageHeaderLink[]>(() => [
   {
-    label: t('applicationStrength.page.backToJobs'),
+    label: t('common.backToList'),
     icon: 'i-heroicons-arrow-left',
     to: '/jobs',
   },
@@ -106,7 +106,10 @@ onMounted(async () => {
       />
 
       <UCard v-if="!hasEvaluation && !page.showInput.value">
-        <UEmpty :title="t('applicationStrength.page.noEvaluationYet')" icon="i-heroicons-chart-bar" />
+        <UEmpty
+          :title="t('applicationStrength.page.noEvaluationYet')"
+          icon="i-heroicons-chart-bar"
+        />
       </UCard>
 
       <div v-if="hasEvaluation" class="space-y-6" data-testid="application-strength-results">
@@ -121,7 +124,9 @@ onMounted(async () => {
           />
         </div>
         <ApplicationStrengthResultsCard :evaluation="page.evaluator.evaluation.value!" />
-        <ApplicationStrengthImprovementsCard :improvements="page.evaluator.evaluation.value!.topImprovements" />
+        <ApplicationStrengthImprovementsCard
+          :improvements="page.evaluator.evaluation.value!.topImprovements"
+        />
       </div>
     </UPageBody>
   </UPage>

@@ -956,7 +956,6 @@ describe('AiOperationsService', () => {
       overallScore: 70,
       dimensionScores: {
         atsReadiness: 72,
-        keywordCoverage: 68,
         clarityFocus: 69,
         targetedFitSignals: 70,
         evidenceStrength: 71,

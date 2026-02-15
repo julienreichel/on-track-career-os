@@ -31,7 +31,6 @@ export type ApplicationStrengthEvaluation = {
   overallScore: number;
   dimensionScores: {
     atsReadiness: number;
-    keywordCoverage: number;
     clarityFocus: number;
     targetedFitSignals: number;
     evidenceStrength: number;
@@ -217,7 +216,6 @@ function normalizeDimensionScores(
 ): ApplicationStrengthEvaluation['dimensionScores'] {
   return {
     atsReadiness: clampScore(value?.atsReadiness),
-    keywordCoverage: clampScore(value?.keywordCoverage),
     clarityFocus: clampScore(value?.clarityFocus),
     targetedFitSignals: clampScore(value?.targetedFitSignals),
     evidenceStrength: clampScore(value?.evidenceStrength),

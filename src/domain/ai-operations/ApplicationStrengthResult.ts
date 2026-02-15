@@ -26,7 +26,6 @@ function hasValidDimensions(value: ApplicationStrengthResult['dimensionScores'] 
   return Boolean(
     value &&
       hasIntegerScore(value.atsReadiness) &&
-      hasIntegerScore(value.keywordCoverage) &&
       hasIntegerScore(value.clarityFocus) &&
       hasIntegerScore(value.targetedFitSignals) &&
       hasIntegerScore(value.evidenceStrength)
