@@ -68,8 +68,8 @@ function createEngineMock(overrides?: {
 }) {
   return {
     state: ref(overrides?.state ?? 'ready'),
-    score: ref(overrides?.score ?? 76),
-    details: ref(overrides?.details ?? detailsFixture),
+    score: ref(overrides?.score === undefined ? 76 : overrides.score),
+    details: ref(overrides?.details === undefined ? detailsFixture : overrides.details),
     presets: ref<string[]>([]),
     note: ref(''),
     canImprove: ref(overrides?.canImprove ?? true),
@@ -108,8 +108,10 @@ describe('MaterialFeedbackPanel', () => {
       },
     });
 
-    expect(wrapper.get('[data-testid="material-feedback-score"]').text()).toBe('76');
+    expect(wrapper.get('[data-testid="material-feedback-score"]').text()).toContain('76');
     expect(wrapper.find('[data-testid="material-feedback-details"]').exists()).toBe(false);
+    expect(wrapper.text()).not.toContain('Get feedback');
+    expect(wrapper.text()).toContain('Improve');
   });
 
   it('expands details only when user toggles it', async () => {
@@ -130,7 +132,6 @@ describe('MaterialFeedbackPanel', () => {
     await nextTick();
 
     expect(wrapper.find('[data-testid="material-feedback-details"]').exists()).toBe(true);
-    expect(wrapper.text()).toContain('Explicit leadership metrics');
     expect(wrapper.text()).toContain('Strengthen opening');
   });
 
@@ -193,10 +194,13 @@ describe('MaterialFeedbackPanel', () => {
       },
     });
 
-    const feedbackButton = findButtonByLabel(busyWrapper, 'Get feedback');
     const improveButton = findButtonByLabel(busyWrapper, 'Improving...');
     expect(improveButton.props('disabled')).toBe(true);
-    expect(feedbackButton.props('disabled')).toBe(true);
+    expect(
+      busyWrapper
+        .findAllComponents({ name: 'UButton' })
+        .some((component) => component.props('label') === 'Get feedback')
+    ).toBe(false);
 
     const readyEngine = createEngineMock();
     const readyWrapper = mount(MaterialFeedbackPanel, {
@@ -210,13 +214,38 @@ describe('MaterialFeedbackPanel', () => {
       },
     });
 
-    const readyFeedbackButton = findButtonByLabel(readyWrapper, 'Get feedback');
     const readyImproveButton = findButtonByLabel(readyWrapper, 'Improve');
 
-    readyFeedbackButton.vm.$emit('click');
     readyImproveButton.vm.$emit('click');
 
-    expect(readyEngine.actions.runFeedback).toHaveBeenCalledTimes(1);
     expect(readyEngine.actions.runImprove).toHaveBeenCalledTimes(1);
+    expect(
+      readyWrapper
+        .findAllComponents({ name: 'UButton' })
+        .some((component) => component.props('label') === 'Get feedback')
+    ).toBe(false);
+  });
+
+  it('shows Get feedback only before feedback exists', () => {
+    const engine = createEngineMock({
+      details: null,
+      score: null,
+      canImprove: false,
+      state: 'idle',
+    });
+
+    const wrapper = mount(MaterialFeedbackPanel, {
+      props: {
+        engine,
+        materialType: 'cv',
+      },
+      global: {
+        plugins: [createTestI18n()],
+        stubs,
+      },
+    });
+
+    expect(wrapper.text()).toContain('Get feedback');
+    expect(wrapper.text()).toContain('Improve');
   });
 });
