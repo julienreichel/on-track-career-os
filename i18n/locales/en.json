@@ -1052,6 +1052,68 @@
       "evaluationFailed": "We couldn't evaluate application strength right now. Please retry."
     }
   },
+  "materialImprovement": {
+    "panel": {
+      "title": "Material improvement",
+      "description": "Review your score, pick rewrite presets, and improve your {materialType}.",
+      "materialType": {
+        "cv": "CV",
+        "coverLetter": "cover letter"
+      },
+      "scoreLabel": "Current score",
+      "scoreUnavailable": "--",
+      "getFeedback": "Get feedback",
+      "getFeedbackLoading": "Analyzing...",
+      "improve": "Improve",
+      "improveLoading": "Improving...",
+      "showDetails": "Show details",
+      "hideDetails": "Hide details",
+      "presetsPlaceholder": "Select improvement presets",
+      "presetsHint": "Choose one or more rewrite priorities.",
+      "notePlaceholder": "Optional note for the rewrite...",
+      "missingSignalsTitle": "Missing signals",
+      "topActionsTitle": "Top actions",
+      "noMissingSignals": "No major missing signals detected.",
+      "state": {
+        "idle": "idle",
+        "analyzing": "analyzing",
+        "ready": "ready",
+        "improving": "improving",
+        "error": "error"
+      }
+    },
+    "presets": {
+      "items": {
+        "target-role-alignment": {
+          "label": "Align to target role"
+        },
+        "quantified-impact": {
+          "label": "Emphasize measurable impact"
+        },
+        "clarity-and-conciseness": {
+          "label": "Improve clarity and conciseness"
+        },
+        "ats-keyword-coverage": {
+          "label": "Strengthen ATS keyword coverage"
+        },
+        "stronger-openings": {
+          "label": "Strengthen section openings"
+        },
+        "tone-and-confidence": {
+          "label": "Upgrade tone and confidence"
+        }
+      }
+    },
+    "errors": {
+      "feedbackValidation": "Please review the feedback inputs and try again.",
+      "feedbackFailed": "We couldn't generate feedback right now. Please retry.",
+      "feedbackRequired": "Get feedback before improving this material.",
+      "emptyMarkdown": "The current document is empty. Add content before improving.",
+      "invalidPayload": "We couldn't prepare this improvement request. Please retry.",
+      "invalidOutput": "The improved result was invalid. Please retry.",
+      "improveFailed": "We couldn't improve this material right now. Please retry."
+    }
+  },
   "progress": {
     "phaseLabel": "Current phase",
     "phaseLabels": {
