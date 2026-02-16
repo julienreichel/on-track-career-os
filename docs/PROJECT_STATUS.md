@@ -1,7 +1,7 @@
 # Project Status — On Track Career
 
-**Last Updated:** 2026-02-06  
-**Version:** v0.12.0 (post-0.11.0) — 98% MVP Complete
+**Last Updated:** 2026-02-16  
+**Version:** v0.13.0 — MVP stable with A2 application-strength reliability updates
 
 ---
 
@@ -11,7 +11,7 @@
 
 ### Key Metrics
 
-- ✅ **12/12 AI operations** implemented
+- ✅ **13/13 AI operations** implemented
 - ✅ **18 GraphQL models** (13 MVP + 5 V1)
 - ✅ **11 domain modules** with full layers
 - ✅ **1526+ tests** across 190+ suites
@@ -29,6 +29,11 @@
 - Reduced redundant GraphQL calls (progress/badges/loading optimizations)
 - i18n consolidation and coverage tests for missing keys
 - Layout normalization (UPage as root, consistent margins)
+- Application-strength evaluator (`ai.evaluateApplicationStrength`) with strict schema validation
+- Typed frontend evaluator states (`idle|loading|success|error`) and deterministic i18n error keys
+- Unified page-level error pattern: `useErrorDisplay` + reusable `ErrorStateCard`
+- Application-strength retry telemetry events in PostHog
+- Application-strength scoring simplified to 4 dimensions (keyword coverage removed to reduce noise)
 
 ---
 
@@ -47,10 +52,11 @@
 | **5A** | Job Description Analysis  | ✅ 100% | 1/1    | Upload, parse, structured extraction  |
 | **5B** | Company Analysis & Canvas | ✅ 100% | 2/2    | Company info, BMC generation          |
 | **5C** | User-Job-Company Matching | ✅ 100% | 1/1    | Fit score, recommendations, tailoring |
+| **A2** | Application Strength Gate | ✅ 95%  | 1/1    | CV/letter quality scoring + retry UX  |
 | **6**  | Tailored Materials        | ✅ 100% | 3/3    | Job-specific CV/letter/speech         |
 | **F2** | Onboarding & Guidance     | ✅ 100% | -      | 5-phase progress, badges, guidance    |
 
-**Overall Progress:** 98% MVP | 12 of 13 EPICs complete
+**Overall Progress:** 98% MVP | 13 of 14 EPICs complete
 
 ---
 
@@ -76,7 +82,7 @@
 
 ---
 
-## 🎨 Frontend (35 Pages in 4 Zones)
+## 🎨 Frontend (40+ Pages in 4 Zones)
 
 ### Auth & Home (3)
 
@@ -86,9 +92,9 @@
 
 `/profile`, `/profile/canvas`, `/profile/experiences`, `/profile/experiences/new`, `/profile/experiences/:id/edit`, `/profile/experiences/:id/stories`, `/profile/experiences/:id/stories/:storyId`, `/cv-upload`
 
-### Jobs & Companies (8)
+### Jobs & Companies
 
-`/jobs`, `/jobs/new`, `/jobs/:id`, `/jobs/:id/match`, `/companies`, `/companies/new`, `/companies/:companyId`, `/applications`
+`/jobs`, `/jobs/new`, `/jobs/:id`, `/jobs/:id/match`, `/jobs/:id/application-strength`, `/companies`, `/companies/new`, `/companies/:companyId`, `/applications`
 
 ### Applications (14)
 
@@ -104,7 +110,7 @@
 
 ---
 
-## 🤖 AI Operations (12/12)
+## 🤖 AI Operations (13/13)
 
 ### Identity & Discovery (4)
 
@@ -121,6 +127,10 @@
 ### Materials (4)
 
 `ai.generateCv`, `ai.generateCoverLetter`, `ai.generateSpeech`, `ai.tailorCv` (merged into generateCv)
+
+### Application Quality (1)
+
+`ai.evaluateApplicationStrength`
 
 ---
 
@@ -199,6 +209,13 @@
 **Features:** 0-100 score, strengths/gaps/opportunities breakdown, tailoring recommendations  
 **AI:** `generateMatchingSummary` with context synthesis  
 **Pages:** `/jobs/:id/match` (dedicated tab)
+
+### ✅ EPIC A2: Application Strength Gate (95%)
+
+**Core:** Application-strength decision gate using job + CV and/or cover letter content  
+**Features:** Overall score, 4-dimension breakdown, decision label, missing signals, top improvements  
+**AI:** `evaluateApplicationStrength` with strict schema normalization and fallback output  
+**Pages:** `/jobs/:id/application-strength`
 
 ### ✅ EPIC 6: Tailored Application Materials (100%)
 

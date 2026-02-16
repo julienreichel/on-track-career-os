@@ -585,20 +585,19 @@ project-root/
 
 ## Frontend Pattern
 
-For each AI action:
+Use a layered pattern:
 
-- Show loading state
-- On error:
-  - `<UAlert color="red">`
-  - Example:
-    **“We couldn’t process this request right now. Please try again.”**
-  - Retry button
+- **State management:** `useErrorDisplay()` for page-level errors (`pageError`, `pageErrorMessageKey`) and action toasts.
+- **Rendering:** `ErrorStateCard` for retryable page errors; `UAlert` for inline/non-blocking warnings.
+- **Evaluator flows:** typed status and error keys (`idle|loading|success|error`, `errorCode`, `errorMessageKey`) to avoid exposing raw internal error objects.
+- **Retry UX:** explicit retry button for recoverable failures (page load / AI evaluation).
 
 ## Error Types
 
-- AI errors → “Problem contacting our AI assistant.”
-- Validation errors → field-level messages
-- Backend errors → “Something went wrong. Your data is safe.”
+- AI operation failures → deterministic i18n message keys (for example `applicationStrength.errors.evaluationFailed`)
+- Validation errors → field-level or inline keyed messages (for example `applicationStrength.errors.missingMaterial`)
+- Parsing/extraction errors → non-blocking fallback guidance (for example PDF extraction failure + paste fallback)
+- Backend errors → generic safe copy; raw details only in logs
 
 ---
 
@@ -615,8 +614,9 @@ For each AI action:
 
 ## Frontend
 
-- For MVP: no external tracking
-- Future: add Sentry
+- Sanitized logging via `logError()` / `logWarn()` (PII redaction, stack truncation).
+- PostHog event tracking via `useAnalytics()` for key product flows and retry signals.
+- Raw stack traces are never displayed to users; UI consumes deterministic message keys.
 
 ---
 

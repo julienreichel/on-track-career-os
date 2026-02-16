@@ -125,6 +125,7 @@ User-scoped data access enforced at GraphQL layer
 `useActiveJobsDashboard()` — Active job states for dashboard  
 `useBreadcrumbMapping()` — Dynamic breadcrumbs  
 `useAnalytics()` — PostHog event capture + page naming
+`useErrorDisplay()` — Page-level error state + i18n message keys + action toasts
 
 ---
 
@@ -152,6 +153,7 @@ User-scoped data access enforced at GraphQL layer
 `/jobs` — Job list with search, status filters  
 `/jobs/:id` — 5-tab detail view (info, analysis, company, match, materials)  
 `/jobs/:id/match` — Matching summary with fit score  
+`/jobs/:id/application-strength` — Application strength evaluation with retryable error states  
 `/companies` — Company list with search  
 `/companies/:id` — Company detail with canvas
 
@@ -173,7 +175,7 @@ User-scoped data access enforced at GraphQL layer
 
 ---
 
-## 6. AI Operations (12 Total)
+## 6. AI Operations (13 Total)
 
 All AI operations are Lambda functions with strict JSON I/O contracts:
 
@@ -185,12 +187,16 @@ All AI operations are Lambda functions with strict JSON I/O contracts:
 **Identity & Discovery (4):** parseCvText, extractExperienceBlocks, generatePersonalCanvas, generateStarStory  
 **Job & Company (3):** parseJobDescription, analyzeCompany, generateCompanyCanvas  
 **Matching (1):** generateMatchingSummary  
-**Materials (4):** generateCv, generateCoverLetter, generateSpeech, tailorCv
+**Materials (4):** generateCv, generateCoverLetter, generateSpeech, tailorCv  
+**Application Quality (1):** evaluateApplicationStrength
 
 ### Error Handling
 
-Structured error codes: `AI_SCHEMA_ERROR`, `AI_PROVIDER_ERROR`, `AI_TIMEOUT`, `AI_INVALID_INPUT`  
-No silent failures, errors bubble to composable layer for UI feedback
+Structured error codes remain backend-facing; frontend uses deterministic i18n keys for user messages.  
+Current frontend pattern:
+- `useErrorDisplay()` for page-level state and toasts
+- `ErrorStateCard` for retryable page failures
+- `logError()` / `logWarn()` for sanitized diagnostics only (no raw stack traces in UI)
 
 ---
 

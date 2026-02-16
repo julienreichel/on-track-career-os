@@ -1,6 +1,6 @@
 # Analytics Tracking Implementation Status
 
-## ✅ Implemented (14/14 events)
+## ✅ Implemented (18/18 events)
 
 ### Onboarding Flow
 
@@ -28,9 +28,16 @@
 13. **speech_created** - `src/pages/applications/speech/new.vue` (generateSpeech function, after successful speech block creation)
 14. **cv_template_created** - `src/application/cvtemplate/useCvTemplates.ts` (createTemplate method, after successful template creation)
 
+### Application Strength (A2)
+
+15. **application_strength_evaluation_started** - `src/composables/useApplicationStrengthEvaluator.ts` (before evaluation call)
+16. **application_strength_evaluation_succeeded** - `src/composables/useApplicationStrengthEvaluator.ts` (after successful evaluation)
+17. **application_strength_evaluation_failed** - `src/composables/useApplicationStrengthEvaluator.ts` and `src/composables/useApplicationStrengthPage.ts` (evaluation/page-load failures)
+18. **application_strength_retry_clicked** - `src/pages/jobs/[jobId]/application-strength.vue` (retry actions from error states)
+
 ## 🎉 All Events Tracked!
 
-All 14 analytics events have been successfully implemented following the established pattern:
+All 18 analytics events have been successfully implemented following the established pattern:
 
 1. Import `useAnalytics` from `@/composables/useAnalytics`
 2. Call `const { captureEvent } = useAnalytics();` where needed

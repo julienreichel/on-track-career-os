@@ -24,6 +24,13 @@ status and technical foundation references.
 - Strict JSON I/O for AI operations (no free text), with consistent error envelope:
   `{ success: boolean, data?: {}, error?: { code, message, details } }`
 
+## Error Handling Standard
+
+- Use `useErrorDisplay()` for page-level error state (`pageError`, `pageErrorMessageKey`) and action toasts.
+- Use `ErrorStateCard` for retryable page-level failures.
+- Use `logError()` / `logWarn()` for structured, redacted diagnostics only; never show raw stack traces in UI.
+- For AI-driven flows, expose deterministic UI error keys and keep raw error objects internal for logs.
+
 ## Code Quality
 
 - Complexity <= 16, nesting <= 4, function length <= 100 lines, params <= 4

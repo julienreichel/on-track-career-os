@@ -1398,7 +1398,7 @@ Return JSON with:
 Evaluate the **strength of an actual application** (CV and optional cover letter) for a **specific job description**, with focus on:
 
 - **ATS readiness** (structure, keyword coverage signals, scan-friendly formatting cues)
-- **Material quality** (clarity, focus, targeting, evidence)
+- **Material quality** (clarity, targeting, evidence)
 - **Decision gate** (“Ready to apply?”)
 - **Actionable improvements** that the UI can link to editing surfaces
 
@@ -1433,10 +1433,9 @@ Scores must be justified by the provided texts:
 
 EVALUATION DIMENSIONS:
 1) atsReadiness: likelihood the document passes automated screening based on structure + keyword signals.
-2) keywordCoverage: presence of job-required skills/terms reflected in the materials (exact or close synonyms).
-3) clarityFocus: clarity, specificity, and low fluff; easy to scan; role-focused.
-4) targetedFitSignals: tailoring to this role (title alignment, relevant highlights, role vocabulary, job pains addressed).
-5) evidenceStrength: measurable outcomes, concrete impact, credible proof (metrics when present, otherwise specific outcomes).
+2) clarityFocus: clarity, specificity, and low fluff; easy to scan; role-focused.
+3) targetedFitSignals: tailoring to this role (title alignment, relevant highlights, role vocabulary, job pains addressed).
+4) evidenceStrength: measurable outcomes, concrete impact, credible proof (metrics when present, otherwise specific outcomes).
 
 DECISION GATE:
 Return a decision label:
@@ -1468,18 +1467,14 @@ Evaluate the strength of this application for the given job.
 Job (structured):
 {{jobJson}}
 
-CV text:
-{{cvText}}
-
-Cover letter text (optional; may be empty string):
-{{coverLetterText}}
+{{conditionalMaterialSections}}
 
 Return a JSON object with this exact structure:
 {{Schema}}
 
 Important:
-- Use only explicit evidence from the provided CV/cover letter text.
-- If coverLetterText is empty: set document targets to "cv" and avoid letter-only criticism.
+- Use only explicit evidence from the provided application material text.
+- Only mention document-specific critiques for materials that were provided.
 - rationaleBullets: 2 to 5 bullets, concise.
 - topImprovements: at least 2 items, preferably 3.
 - anchor should be a common section label when possible (e.g., "summary", "skills", "experience", "education", "projects", "coverLetterBody", "general").
@@ -1494,7 +1489,8 @@ Important:
 {
   "job": "JobType",
   "cvText": "string",
-  "coverLetterText": "string"
+  "coverLetterText": "string",
+  "language": "string"
 }
 ```
 
@@ -1507,7 +1503,6 @@ Important:
   "overallScore": 0,
   "dimensionScores": {
     "atsReadiness": 0,
-    "keywordCoverage": 0,
     "clarityFocus": 0,
     "targetedFitSignals": 0,
     "evidenceStrength": 0
@@ -1528,7 +1523,11 @@ Important:
         "anchor": "string"
       }
     }
-  ]
+  ],
+  "notes": {
+    "atsNotes": ["string"],
+    "humanReaderNotes": ["string"]
+  }
 }
 ```
 

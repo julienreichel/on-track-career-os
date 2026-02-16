@@ -41,6 +41,7 @@ Cross-cutting concerns that enable product learning and user trust.
 
 - **Usage Signals** — Track user interaction patterns, feature adoption, and workflow completion rates
 - **Error Tracking** — Monitor system failures, AI operation errors, and user experience disruptions
+- **Error UX Consistency** — Shared error-state composables/components with deterministic i18n messaging and retry paths
 - **AI Feedback Collection** — Capture user edits, rejections, and improvements to AI suggestions
 - **UX Friction Detection** — Identify pain points, abandonment patterns, and usability issues
 
