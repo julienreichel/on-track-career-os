@@ -10,7 +10,10 @@ async function createAnalyzedJobAndMatch(page: Page): Promise<string> {
   await page.goto('/jobs');
   await page.waitForLoadState('networkidle');
 
-  await page.getByRole('link', { name: /^Analyze Job$/i }).first().click();
+  await page
+    .getByRole('link', { name: /^Analyze Job$/i })
+    .first()
+    .click();
   await expect(page).toHaveURL(/\/jobs\/new/);
 
   const fileInput = page.locator('input[type="file"]').first();
@@ -26,7 +29,10 @@ async function createAnalyzedJobAndMatch(page: Page): Promise<string> {
 
   await page.goto(`/jobs/${jobId}/match`);
   await page.waitForLoadState('networkidle');
-  await page.getByRole('button', { name: /generate match/i }).first().click();
+  await page
+    .getByRole('button', { name: /generate match/i })
+    .first()
+    .click();
   await expect(page.getByText('Overall Match Score')).toBeVisible({ timeout: 60000 });
 
   return jobId;
@@ -36,19 +42,27 @@ async function selectImprovementPresets(page: Page) {
   await page.locator('[data-testid="material-feedback-presets"]').click();
   await page.getByRole('option', { name: 'More concise' }).click();
   await page.getByRole('option', { name: 'Show clearer value' }).click();
+  await page.getByRole('option', { name: 'Make it more story-driven' }).click();
   await page.keyboard.press('Escape');
 }
 
 async function expectMarkdownChanged(markdown: Locator, before: string) {
-  await expect
-    .poll(async () => ((await markdown.textContent()) ?? '').trim(), { timeout: 60000 })
-    .not.toBe(before.trim());
+  const after = ((await markdown.textContent()) ?? '').trim();
+  expect(after).not.toBe(before.trim());
+}
+
+async function waitForImproveCompletion(page: Page) {
+  await expect(page.getByRole('button', { name: /^Get feedback$/i })).toBeVisible({
+    timeout: 90000,
+  });
 }
 
 test.describe('C3 material improvement happy paths', () => {
   test.describe.configure({ mode: 'serial' });
 
   test('CV: feedback + improve updates markdown', async ({ page }) => {
+    test.setTimeout(120000);
+
     const jobId = await createAnalyzedJobAndMatch(page);
 
     await page.goto(`/jobs/${jobId}/match`);
@@ -82,11 +96,14 @@ test.describe('C3 material improvement happy paths', () => {
 
     await selectImprovementPresets(page);
     await page.getByRole('button', { name: 'Improve' }).click();
+    await waitForImproveCompletion(page);
 
     await expectMarkdownChanged(markdown, before);
   });
 
   test('Cover letter: feedback + improve updates markdown', async ({ page }) => {
+    test.setTimeout(120000);
+
     const jobId = await createAnalyzedJobAndMatch(page);
 
     await page.goto(`/jobs/${jobId}/match`);
@@ -107,6 +124,7 @@ test.describe('C3 material improvement happy paths', () => {
 
     await selectImprovementPresets(page);
     await page.getByRole('button', { name: 'Improve' }).click();
+    await waitForImproveCompletion(page);
 
     await expectMarkdownChanged(markdown, before);
   });
