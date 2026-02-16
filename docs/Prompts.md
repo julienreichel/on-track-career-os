@@ -41,470 +41,406 @@ Output:
 
 ---
 
-## Master Prompt 1 — Add AI Operation: `ai.evaluateApplicationStrength` (Contract + Lambda + Registry)
+## **C3 Backend — Add `ai.improveMaterial` AI Operation (Markdown Output) + Contract Validation**
 
 ### Intro
 
-EPIC A2 adds a new evaluator layer that scores **actual materials** (CV + optional cover letter) against a **job description**, producing a decision gate + concrete improvements. Your stack already has deterministic AI ops with strict schema validation and fallbacks. This prompt exists to extend that AI-ops layer cleanly and safely.
+EPIC C3 adds an **editorial improvement loop** for **tailored CV + cover letter**. A2 already evaluates strength; C3 must **reuse A2 evaluation internally** but introduce a new AI operation that **rewrites an existing document** based on internal improvement priorities + user presets, returning **Markdown** (like existing `generateCv`/`generateCoverLetter`). This prompt exists to implement the backend operation in a deterministic, contract-driven way with robust fallbacks.
 
 ### Feature scope
 
-**Implement**
+**Implement:**
 
-- New AI operation `ai.evaluateApplicationStrength` in the AI ops registry.
-- Strict input/output schemas + normalization + fallback strategy.
-- Lambda implementation (or handler) consistent with existing AI ops (same validation utilities, error handling, logging conventions).
+- New AI op `ai.improveMaterial` in the AI-ops Lambda layer
+- Strict input schema validation (Zod or existing contract validator)
+- Strict output validation: **must be Markdown string**, non-empty, no JSON
+- Retry + fallback behavior (return original markdown unchanged on failure)
 
-**Out of scope**
+**Out of scope:**
 
-- UI page, routing, PDF parsing in frontend, storage/persistence of evaluations.
-- Any “auto-rewrite” of CV/letter content (correction engine remains suggestions only in V1).
-- Any dependency on MatchingSummary (A2 is parallel to match).
-
-### Composables / services / repositories / domain modules
-
-- Update the AI operations domain module (whatever you use today: e.g., `AiOperationsService`, `AiOperationsRepository`, `useAiOperations()`).
-- Add a typed client wrapper method like `evaluateApplicationStrength(input)` returning a strictly validated output type.
-- Ensure operation is registered in the “AI operations registry” in the same way as existing ops (naming, routing, model selection).
-
-### Components to create or update
-
-- None (AI layer only). If you need a small internal helper: a shared `clampScore(0..100)` and `ensureMinImprovements(>=2)` utility in the AI ops layer.
-
-### Pages/routes
-
-- None.
-
-### AI operations impact
-
-**Operation**
-
-- Name: `ai.evaluateApplicationStrength`
-- Inputs (strict):
-  - `job`: structured JobDescription fields (title, seniorityLevel, roleSummary, responsibilities[], requiredSkills[], behaviours[], successCriteria[], explicitPains[])
-  - `cvText`: string
-  - `coverLetterText`: string (may be empty)
-  - `language`: string (output language)
-
-- Output (strict):
-  - `overallScore` (0–100 integer)
-  - `dimensionScores`:
-    - `atsReadiness`, `keywordCoverage`, `clarityFocus`, `targetedFitSignals`, `evidenceStrength` (0–100 int)
-
-  - `decision`: `{ label: strong|borderline|risky, readyToApply: boolean, rationaleBullets: string[] (2–5) }`
-  - `missingSignals`: string[]
-  - `topImprovements`: array length ≥ 2 (prefer 3), each:
-    - `title`, `action`, `impact: high|medium|low`
-    - `target: { document: cv|coverLetter, anchor: string }`
-
-  - `notes`: `{ atsNotes: string[], humanReaderNotes: string[] }`
-    **Validation + fallback**
-
-- Never return null; fill empty values with `""` or `[]`.
-- Clamp scores to 0..100.
-- If cover letter empty: do not produce cover-letter-only criticism; improvements default to CV targets.
-- If `topImprovements` < 2: inject safe generic improvements targeting CV (`summary`, `skills`, `experience` or `general`).
-- Enforce max length of bullets (e.g., ≤160 chars) at validation or post-processing.
-
-**Where called from**
-
-- Future caller: frontend `useApplicationStrength()` composable on `/jobs/[jobId]/application-strength`.
-
-### Testing requirements
-
-**Vitest (AI layer)**
-
-- Schema validation tests:
-  - accepts valid output
-  - clamps invalid scores
-  - fills missing keys
-  - enforces at least 2 improvements
-  - coverLetter empty path does not create coverLetter-only targets
-
-- Repository/service tests:
-  - correct operation name routed
-  - request payload matches schema (including language)
-
-**Playwright**
-
-- None in this prompt.
-
-### Acceptance criteria
-
-- [ ] Operation exists in registry and is callable via existing AI ops infrastructure.
-- [ ] Input and output schemas are defined and enforced.
-- [ ] Fallback rules are implemented and covered by tests.
-- [ ] No free-form AI text reaches the app except the provided CV/letter strings.
-- [ ] Code matches existing AI ops patterns (naming, validation, error handling).
-
----
-
-## Master Prompt 2 — Domain + Types: “Application Strength Evaluation” DTOs and Anchors (Frontend-safe, Ephemeral)
-
-### Intro
-
-EPIC A2 needs a clean typed representation of the evaluation output and “edit jump targets” without introducing persistence yet. This prompt creates the minimal domain/types needed to integrate the evaluator end-to-end while keeping everything ephemeral.
-
-### Feature scope
-
-**Implement**
-
-- Domain types/DTOs for `ApplicationStrengthEvaluation` and `ImprovementTarget`.
-- Anchor naming conventions and mapping strategy (for “jump to editor section”).
-- A thin domain service interface used by UI composables.
-
-**Out of scope**
-
-- New GraphQL models (evaluation is ephemeral in V1).
-- Any modifications to existing CVDocument / CoverLetter storage schemas.
+- New evaluation/scoring logic (reuse existing evaluation op)
+- Token/pricing limits
+- Versioning/history of improvements (overwrite happens on frontend/model update)
 
 ### Composables / services / repositories / domain modules
 
-Create or update:
+**Backend only:**
 
-- `src/domain/application-strength/`
-  - `ApplicationStrengthEvaluation.ts` (types + helpers)
-  - `ApplicationStrengthService.ts` (interface)
-  - `ApplicationStrengthRepository.ts` (calls AiOperationsRepository)
-
-- Update `src/application/ai-operations/useAiOperations.ts` (or equivalent) to expose the new method via the domain service.
-
-Add helpers:
-
-- `normalizeAnchor(anchor: string): AnchorId`
-- `isAnchorSupported(anchor: string): boolean`
-- `defaultAnchorForImprovementType(...)` (optional)
+- Add handler under `amplify/data/ai-operations/improveMaterial/handler.ts`
+- Register in `amplify/data/resource.ts` (or wherever AI ops registry lives)
+- Add/update contract definition in `docs/AI_Interaction_Contract.md` (new section only; keep existing ops unchanged)
+- Create internal helper to build a **model prompt** that **does not mention A2 by name**; use a generic `improvementContext` summary
 
 ### Components to create or update
 
-- None.
-
-### Pages/routes
-
-- None.
-
-### AI operations impact
-
-- Consumes output of `ai.evaluateApplicationStrength`.
-- Define **canonical anchors** for V1:
-  - CV anchors: `summary`, `skills`, `experience`, `education`, `projects`, `general`
-  - Cover letter anchors: `coverLetterBody`, `opening`, `closing`, `general`
-
-- Ensure repository normalizes unknown anchors to `general` (never break UI navigation).
-
-### Testing requirements
-
-**Vitest**
-
-- Type-level and runtime tests for:
-  - anchor normalization
-  - unknown anchors → `general`
-  - evaluation DTO guards (no nulls, arrays always present)
-
-- Repository tests:
-  - converts AI op response into domain DTO safely
-  - stable defaults when fields missing
-
-**Playwright**
-
-- None.
-
-### Acceptance criteria
-
-- [ ] Domain module exists with clear DTO types and anchor normalization.
-- [ ] No persistence added; evaluation remains in memory.
-- [ ] Unknown/unsupported anchors never crash navigation (normalized).
-- [ ] Unit tests cover normalization + DTO safety.
-
----
-
-## Master Prompt 3 — Frontend Page: `/jobs/[jobId]/application-strength` (Inputs, Run Evaluation, Results)
-
-### Intro
-
-This is the user-facing EPIC A2 entry point. It must work **without running matching** and support both generated documents and user-provided materials (paste text + PDF→text). The page follows your Nuxt UI scaffold, composable-first logic, and “card” patterns.
-
-### Feature scope
-
-**Implement**
-
-- New route page `/jobs/[jobId]/application-strength`
-- Load job data by `jobId`
-- Material input panel:
-  - Select existing CVDocument (optional)
-  - Select existing CoverLetter (optional)
-  - Paste CV text (required if no CVDocument selected)
-  - Paste cover letter text (optional)
-  - Upload PDF for CV and/or letter → convert to text in frontend (reuse job upload PDF→text logic)
-
-- “Evaluate” action that calls the domain service and shows results.
-
-**Out of scope**
-
-- Persist evaluation results.
-- Auto-rewrite functionality.
-- Any requirement to run MatchingSummary before evaluation.
-
-### Composables / services / repositories / domain modules
-
-Create:
-
-- `useApplicationStrengthPage(jobId)` (or split):
-  - `useApplicationStrengthInputs()` (material state + validation + pdf-to-text)
-  - `useApplicationStrengthEvaluator()` (calls domain service + manages loading/errors)
-
-- Reuse existing:
-  - `useJobAnalysis()` to fetch JobDescription (read-only)
-  - `useCvDocuments()` and `useCoverLetters()` (or whatever list composables exist)
-  - Shared file-to-text utilities already used in job upload flow
-
-State requirements:
-
-- Form state with “source mode” per document: `selectedExisting | pastedText | pdfUpload`
-- Derived `canEvaluate` boolean with clear UX errors (missing cv text, missing job)
-
-### Components to create or update
-
-Create components (Nuxt UI-based, card patterns):
-
-- `ApplicationStrengthInputCard`
-  - CV source selection
-  - optional cover letter source selection
-  - PDF upload area + “extracted text preview” (collapsed)
-  - Paste text fields with char count
-
-- `ApplicationStrengthResultsCard`
-  - Overall score + decision label
-  - Dimension breakdown cards
-  - Missing signals list
-
-- `ApplicationStrengthImprovementsCard`
-  - List of top improvements (clickable)
-  - Each item shows impact badge + target document + anchor
-
-Reuse patterns:
-
-- Use existing `TagInput` style for lists (missing signals, rationale bullets) but display-only is fine.
+- None (backend-only)
 
 ### Pages/routes to create or update
 
-Create:
-
-- `/jobs/[jobId]/application-strength`
-  Navigation:
-- Entry link from `/jobs/[jobId]` (job detail page) in a “Tools” or “Actions” card.
-- Breadcrumb:
-  - Jobs → Job Title → Application Strength
-
-- Provide “Back to Job” button.
+- None (backend-only)
 
 ### AI operations impact
 
-- Call `ai.evaluateApplicationStrength` via domain repository.
-- Inputs must be **pure strings** for cvText/coverLetterText; job is structured.
-- Ensure language is passed (use job language or user profile language default; if ambiguous, use app default but be consistent).
-- Enforce client-side pre-validation:
-  - if cvText empty → block and show error
-  - if coverLetter missing → allowed
+**Operation:** `ai.improveMaterial`
+**Inputs (must validate strictly):**
+
+- `language`, `materialType: "cv" | "coverLetter"`, `currentMarkdown`
+- `instructions: { presets: string[], note?: string }`
+- `improvementContext: { overallScore, weakDimensions, missingSignals, priorityActions, readerNotes? }`
+- Grounding context: `profile`, `experiences`, optional `stories`, optional `jobDescription`, optional `matchingSummary`, optional `company`
+
+**Output:**
+
+- **Markdown string only** (full rewritten doc)
+- Validation rules:
+  - string, length threshold (e.g., >200 chars)
+  - must not parse as JSON object/array
+  - must not contain “```json” fences or “{” as first non-whitespace (guardrails; be pragmatic)
+
+- Fallback:
+  - Retry once with stricter “Markdown only” instruction
+  - If still invalid: return **original** `currentMarkdown` unchanged and surface an AI-op error code (deterministic) to frontend
+
+**Where called from:**
+
+- CV page and Cover Letter page improvement panel (frontend will call op after it already has evaluation result)
 
 ### Testing requirements
 
-**Vitest**
+- Backend unit tests for:
+  - Input schema validation (missing fields, wrong types, empty markdown)
+  - Output validation (JSON-like output rejected)
+  - Fallback path returns original markdown
+  - Prompt builder redacts internal naming (no “A2” string in prompt)
 
-- Page-level test: renders with job loaded, shows empty state before evaluation.
+- Contract tests (if you have a suite): ensure op is registered and callable in sandbox
+
+### Acceptance criteria
+
+- [ ] `ai.improveMaterial` exists, registered, and callable in local sandbox
+- [ ] Strict input validation rejects invalid payloads deterministically
+- [ ] Output is always Markdown string; invalid outputs trigger retry then fallback
+- [ ] No mention of “A2” in the model prompt content
+- [ ] Error codes are deterministic and map cleanly to i18n keys on frontend
+
+---
+
+## 2) Title
+
+**C3 Frontend — Create a Shared “Material Improvement Engine” (Composable + Service) Reusing Existing Error/State Patterns**
+
+### Intro
+
+C3 is a **user-triggered** loop: “Get feedback → choose presets → Improve.” You already have typed evaluator states and `useErrorDisplay` / `ErrorStateCard` patterns from A2. This prompt exists to implement the orchestration cleanly and DRY so CV and letter pages share the same improvement logic.
+
+### Feature scope
+
+**Implement:**
+
+- A shared composable to:
+  - Trigger evaluation (reuse existing evaluation flow/op)
+  - Hold evaluation summary (score + optional expanded details)
+  - Trigger improvement (`ai.improveMaterial`)
+  - Maintain deterministic UI state: `idle | analyzing | ready | improving | error`
+  - Provide a single `runFeedback()` + `runImprove()` API
+
+**Out of scope:**
+
+- New stores/frameworks (no Pinia unless already used)
+- Persisting feedback results as new models (use local state; overwrite markdown in existing doc models)
+
+### Composables / services / repositories / domain modules
+
+Create or update (names are suggestions—keep consistent with your repo):
+
+- `src/application/materials/materialImprovementService.ts`
+  - Pure orchestration: builds payloads, calls repositories, maps errors to deterministic keys
+
+- `src/data/repositories/aiImproveMaterialRepository.ts`
+  - Calls Amplify function/op for `ai.improveMaterial`
+
+- `src/composables/useMaterialImprovementEngine.ts`
+  - Unified engine for both CV + cover letter
+  - Accepts parameters: material type, current doc ID, job context IDs, and getters/setters for markdown
+  - Reuses `useErrorDisplay()` and analytics capture patterns (if present)
+
+### Components to create or update
+
+- None required in this prompt (UI panel is next prompt), but ensure composable returns:
+  - `state`, `score`, `details`, `presets`, `note`, `canImprove`, `actions`
+
+### Pages/routes to create or update
+
+- None in this prompt; integration happens in later prompts
+
+### AI operations impact
+
+- Calls **existing evaluator** op/service to compute feedback (do not re-implement scoring)
+- Calls `ai.improveMaterial` with:
+  - current markdown
+  - instruction presets + optional note
+  - improvementContext derived from evaluation output (internal mapping)
+  - grounding context payload similar to existing generation ops
+
+### Testing requirements
+
+Vitest:
+
+- Unit test `materialImprovementService` payload builders:
+  - improvementContext mapping from evaluation output
+  - instruction presets mapping
+
 - Composable tests:
-  - pdf→text populates text field
-  - `canEvaluate` rules
-  - evaluation call sets loading and stores result
+  - state transitions
+  - error mapping to deterministic keys
+  - overwrite behavior: returned markdown replaces current markdown via injected setter
 
-- Component tests:
-  - improvements render and emit `onJump` with correct target/anchor
-
-**Playwright (single happy path)**
-
-- Flow:
-  1. Create/upload a job (or use seeded fixture)
-  2. Open job page → click “Application Strength”
-  3. Paste CV text → click Evaluate
-  4. Assert overall score visible, 5 dimension cards visible
-  5. Assert at least 2 improvements shown
+Playwright (define the single happy path later; here just ensure composable is testable/mocked)
 
 ### Acceptance criteria
 
-- [ ] Page accessible from job page without running matching.
-- [ ] Supports pasted CV text and CV PDF upload → text extraction.
-- [ ] Cover letter optional (no blocking).
-- [ ] Shows decision gate (Strong/Borderline/Risky + readyToApply).
-- [ ] Shows at least 2 improvements and missing signals.
-- [ ] UI uses standard scaffold + existing card patterns.
-- [ ] No persistence added.
+- [ ] One composable powers both CV + letter improvement
+- [ ] No duplicated orchestration logic between pages
+- [ ] Deterministic state machine + deterministic error keys
+- [ ] Improvement overwrites markdown via a single pathway (no forks)
+- [ ] Payload builders are covered by unit tests
 
 ---
 
-## Master Prompt 4 — “Jump to Edit” Actions (Deep Links + Anchor Handling)
+## 3) Title
+
+**C3 UI — Build `MaterialFeedbackPanel` (Nuxt UI) With Presets Multi-Select + “Score First, Expand for Details”**
 
 ### Intro
 
-A2 must behave like a correction engine: improvements must be clickable and take the user to the right place to fix issues. Because inputs can be either existing in-app documents or external text, we need a robust navigation strategy with graceful fallback.
+C3 lives inside existing CV and cover letter pages. We need a reusable Nuxt UI panel that shows **score by default**, allows expanding details, provides a **shared preset multi-select**, and triggers “Improve” on demand. This prompt exists to implement UI cleanly and consistently with your card patterns and i18n rules.
 
 ### Feature scope
 
-**Implement**
+**Implement:**
 
-- Clickable improvements that “jump” the user to:
-  - CV editor (`/applications/cv/:id`) with anchor, when a CVDocument was selected
-  - Cover letter editor (`/applications/cover-letters/:id`) with anchor, when selected
-  - If pasted/PDF text mode: jump within the A2 page to the relevant textarea section (CV or cover letter) and highlight it.
+- A single reusable component `MaterialFeedbackPanel.vue`
+- Default view: score badge + “Get feedback”
+- Expand/collapse details (missing signals, top actions) only when user requests
+- Presets multi-select (shared set) + optional note input
+- Primary CTA “Improve” (disabled until feedback exists and not busy)
+- Uses injected engine/composable (no direct repository calls in component)
 
-**Out of scope**
+**Out of scope:**
 
-- Automated rewriting / applying fixes.
-- Persisting improvement completion status.
+- Inline diff viewer
+- Section-level suggestions / click-to-jump anchors
+- Auto-trigger feedback on page load
 
 ### Composables / services / repositories / domain modules
+
+- Consume `useMaterialImprovementEngine` from prompt #2
+- Store preset list in a single shared module (e.g., `src/domain/materials/improvementPresets.ts`) and map to i18n labels
+
+### Components to create or update
 
 Create:
 
-- `useImprovementNavigation()`
-  - `jumpToTarget(improvement, context)` handles:
-    - route navigation to existing editor pages
-    - intra-page scrolling for pasted text mode
+- `src/components/materials/MaterialFeedbackPanel.vue`
+  - Built with Nuxt UI: `UCard`, `UButton`, `UBadge`, `UAccordion` or `UCollapsible`, `USelectMenu`/chips, `UTextarea`, `USkeleton`
+  - Follow “UContainer → UPage → UPageHeader/UPageBody” page patterns (panel itself is a card)
 
-  - map anchors → editor UI section IDs
+Update (optional):
 
-Update:
+- Re-use `ApplicationStrengthResultsCard`/`ApplicationStrengthImprovementsCard`/ `ScoreSummaryCard`
 
-- CV editor page and Cover Letter editor page (only if needed) to support hash anchors or query param like `?anchor=skills`.
-  - Keep minimal; prefer existing patterns for scroll-to-section if any exist.
+### Pages/routes to create or update
 
-### Components to create or update
-
-Update:
-
-- `ApplicationStrengthImprovementsCard` to emit `improvementClick`.
-
-Update (minimal):
-
-- CV editor/cover letter editor components: add `id` attributes for key sections and implement scroll-on-mount if `anchor` present.
-
-### Pages/routes
-
-- Update navigation from A2 page to include `anchor` (hash or query).
-- Ensure breadcrumbs remain consistent when navigating back.
+- None in this prompt; integration happens next prompts
 
 ### AI operations impact
 
-- No changes. Only consumes `target.document` and `target.anchor`.
-- Must handle unknown anchors by treating as `general`.
+- None directly (component calls `engine.runFeedback()` and `engine.runImprove()`)
 
 ### Testing requirements
 
-**Vitest**
+Vitest component tests:
 
-- `useImprovementNavigation` unit tests:
-  - selected CVDocument → navigate to correct route with anchor param
-  - pasted text mode → scroll within A2 page (mock scrolling)
-  - unknown anchor → `general`
+- Renders score-only state by default
+- Expand toggles show details
+- Presets multi-select updates engine state
+- “Improve” disabled when:
+  - no feedback yet
+  - engine busy
 
-- Component test:
-  - clicking improvement triggers navigation method with correct params
-
-**Playwright**
-
-- Extend the single EPIC happy path:
-  - After evaluation, click first improvement
-  - If using pasted text mode, assert focus/scroll to the CV textarea section
-  - (Optional secondary assertion) If selecting an existing CVDocument fixture, assert navigation to editor page occurs
+- Emits/executes callbacks correctly (use mocks)
 
 ### Acceptance criteria
 
-- [ ] Clicking an improvement always results in a meaningful navigation (no dead clicks).
-- [ ] Works for both “existing document” and “pasted/PDF text” workflows.
-- [ ] Unknown anchors don’t break UX (fallback to general).
-- [ ] Minimal, consistent changes to existing editors.
+- [ ] Single component reusable on CV + letter pages
+- [ ] Score is visible by default; details are opt-in
+- [ ] Presets are multi-select and shared set
+- [ ] No hard-coded strings (full i18n)
+- [ ] Component is dumb: no direct API calls
 
 ---
 
-## Master Prompt 5 — Cross-Cutting Quality: Error Handling, Telemetry, and Test Fixtures
+## 4) Title
+
+**C3 Integration — Add Feedback + Improve Loop to Tailored CV Page (Overwrite Markdown)**
 
 ### Intro
 
-A2 is a “decision gate” feature. It must be reliable, debuggable, and testable with minimal flaky dependencies. This prompt ensures clean DX, stable tests, and consistent UX errors.
+CV is one of the two target material types. This prompt exists to integrate the panel and engine into the **existing CV editor page**, ensuring the improvement overwrites current markdown and keeps navigation/breadcrumbs consistent with your app scaffolding.
 
 ### Feature scope
 
-**Implement**
+**Implement:**
 
-- Frontend error handling states:
-  - job not found
-  - AI op failure / validation failure
-  - pdf text extraction failure
+- Add the feedback panel to the tailored CV page (where job context exists)
+- Wire:
+  - “Get feedback” → existing evaluator call (job + current CV markdown)
+  - “Improve” → `ai.improveMaterial` → overwrite markdown in the current CVDocument
 
-- Deterministic UX messaging (i18n keys if applicable).
-- Add minimal PostHog events, consistent with existing usage.
+- Ensure the overwrite is persisted (existing save/update flow for markdown)
 
-**Out of scope**
+**Out of scope:**
 
-- Fancy analytics dashboards
-- Persisting evaluation history
+- Creating new CVDocument versions
+- New routes
+- Auto-refresh feedback after improvement (optional; if included, keep it manual by default)
 
 ### Composables / services / repositories / domain modules
 
 Update:
 
-- `useApplicationStrengthEvaluator` to produce:
-  - `status: idle|loading|success|error`
-  - `errorCode` (typed) and `errorMessageKey` (i18n)
-  - keep raw error only for logs (not UI)
+- CV page composable (whatever currently loads/saves markdown) to expose:
+  - current markdown getter/setter
+  - save method / debounced save hook (reuse existing)
+    Add:
 
-Add:
-
-- Fixtures utility for tests:
-  - sample job JSON
-  - sample CV text blocks
-  - optional cover letter text
+- Instantiate `useMaterialImprovementEngine` with:
+  - `materialType: "cv"`
+  - current markdown
+  - job + matching context references
 
 ### Components to create or update
 
-- `ErrorStateCard` (if you don’t already have one) reused across pages.
-- Ensure consistent loading skeleton / disabled buttons.
+Update:
 
-### Pages/routes
+- CV editor page layout to include `MaterialFeedbackPanel` in a consistent place:
+  - either a right column panel (if layout supports)
+  - or above/below editor in `UPageBody` as a `UCard`
 
-- Ensure `/jobs/[jobId]/application-strength` handles:
-  - direct URL entry
-  - missing job
-  - empty cvText
+### Pages/routes to create or update
+
+Update existing route (do not add new):
+
+- `/applications/cv/:id` (or wherever tailored CV editing happens)
+  Navigation/breadcrumbs:
+- Ensure existing breadcrumbs remain correct
+- Add a breadcrumb node only if your pattern already supports it (avoid UX churn)
 
 ### AI operations impact
 
-- Ensure AI op response validation failures surface as typed error in UI and log detailed failure for debugging.
-- Fallback strategy should prevent most validation failures; still handle worst-case.
+- Uses existing evaluation op for feedback
+- Calls `ai.improveMaterial` on Improve
+- Ensure improvement payload includes job context for tailored docs
 
 ### Testing requirements
 
-**Vitest**
+Vitest page tests:
 
-- Error-path tests:
-  - missing job → shows error state
-  - AI failure → shows retry button
-  - pdf parse failure → shows extraction error but allows paste fallback
+- Panel renders and can trigger mocked feedback and improve
+- Markdown overwrite occurs in editor state
 
-- Snapshot/DOM tests for consistent card structure.
-
-**Playwright**
-
-- Happy path remains single.
-- Add one assertion for “retry works” only if it’s stable; otherwise keep it Vitest-only.
+Playwright E2E (partial; final single happy path is defined in prompt #6 if you choose 6 prompts—here keep to unit-level or reuse later)
 
 ### Acceptance criteria
 
-- [ ] User never sees raw stack traces or internal error objects.
-- [ ] Evaluation failures are recoverable (retry).
-- [ ] Tests include stable fixtures and avoid network flakiness.
-- [ ] UX remains consistent with Nuxt UI scaffold and existing patterns.
+- [ ] User can run feedback on-demand from CV page
+- [ ] User can select presets + note and improve
+- [ ] Improved markdown overwrites current markdown and is persisted
+- [ ] Errors show via existing `useErrorDisplay`/`ErrorStateCard` pattern
+- [ ] No duplicated CV-specific logic in engine/panel
 
 ---
+
+## 5) Title
+
+**C3 Integration + E2E — Add Feedback + Improve Loop to Cover Letter Page and Ship One End-to-End Happy Path**
+
+### Intro
+
+Cover letter is the second target. This prompt exists to replicate the CV integration using the same shared engine + panel, then add **one Playwright happy path** covering the full C3 loop end-to-end.
+
+### Feature scope
+
+**Implement:**
+
+- Integrate `MaterialFeedbackPanel` into cover letter editor page
+- Wire it to:
+  - on-demand feedback
+  - on-demand improvement
+  - overwrite markdown persistently
+
+- Add **one** Playwright E2E happy path test for C3 (CV or letter; pick one and keep it stable)
+
+**Out of scope:**
+
+- Multiple E2E flows
+- Visual diffs
+- Auto re-analysis after improvement
+
+### Composables / services / repositories / domain modules
+
+Update:
+
+- Cover letter page’s markdown load/save composable to allow engine injection
+- Instantiate `useMaterialImprovementEngine` with `materialType: "coverLetter"`
+
+### Components to create or update
+
+- No new component: reuse `MaterialFeedbackPanel`
+
+### Pages/routes to create or update
+
+Update existing route:
+
+- `/applications/cover-letters/:id` (or current cover letter editor route)
+  Breadcrumbs:
+- Keep existing structure; do not introduce a new breadcrumb system
+
+### AI operations impact
+
+- Same as CV integration:
+  - evaluator op used for feedback
+  - `ai.improveMaterial` used for rewrite
+
+### Testing requirements
+
+Vitest:
+
+- Cover letter page integration test (mock engine; ensure overwrite)
+
+Playwright (single happy path for EPIC):
+
+- Scenario:
+  1. Navigate to a known tailored material page (prefer one with job context available)
+  2. Click “Get feedback”
+  3. Assert score appears (default view)
+  4. Select 1–2 presets (multi-select)
+  5. Click “Improve”
+  6. Assert markdown content changes (simple string change assertion)
+  7. Optional: open “details” and ensure it renders (no deep content assertions)
+
+Keep it deterministic:
+
+- mock AI ops at network layer if your E2E already does
+- or use sandbox fixtures with stable responses
+
+### Acceptance criteria
+
+- [ ] Cover letter page has the same C3 UX as CV page
+- [ ] Improvement overwrites existing markdown and persists
+- [ ] Only one shared preset list is used across both materials
+- [ ] One Playwright happy path passes reliably in CI
+- [ ] No new models, no new routes, no duplicated logic
 
 ---
 
