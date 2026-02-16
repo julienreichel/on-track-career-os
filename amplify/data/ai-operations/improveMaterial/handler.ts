@@ -51,6 +51,12 @@ Do not return JSON.
 Do not include explanations or commentary.
 Do not wrap output in code fences.
 
+PRIORITY ORDER (STRICT):
+1) Obey USER IMPROVEMENT INSTRUCTIONS exactly.
+2) Preserve factual accuracy (no invention).
+3) Apply improvement context and grounding context.
+4) Maintain coherent language and structure.
+
 HARD RULES:
 - Never invent facts.
 - Do not create new roles, employers, dates, tools, skills, achievements, metrics, or education.
@@ -356,8 +362,11 @@ function buildImprovementContextSummary(context?: EvaluateApplicationStrengthOut
 
 export function buildUserPrompt(input: ImproveMaterialInput): string {
   const note = input.instructions.note?.trim() ?? '';
-  const formattedInstructions = input.instructions.presets.map((instruction) => `- ${instruction}`).join('\n');
-  const noteSection = note.length > 0 ? `USER NOTE:\n${note}\n\n` : '';
+  const instructionItems = [...input.instructions.presets, ...(note.length > 0 ? [note] : [])];
+  const formattedInstructions = instructionItems.map((instruction) => `- ${instruction}`).join('\n');
+  const enforcementChecklist = instructionItems
+    .map((instruction, index) => `${index + 1}. ${instruction}`)
+    .join('\n');
   const groundingContext = formatAiInputContext({
     language: input.language,
     profile: input.profile,
@@ -375,7 +384,7 @@ ${input.language}
 MATERIAL TYPE:
 ${input.materialType}
 
-USER IMPROVEMENT INSTRUCTIONS:
+MANDATORY USER IMPROVEMENT INSTRUCTIONS (HIGHEST PRIORITY):
 ${formattedInstructions}
 
 IMPROVEMENT CONTEXT (INTERNAL SUMMARY):
@@ -389,7 +398,9 @@ ${input.currentMarkdown}
 GROUNDING CONTEXT:
 ${groundingContext}
 
-${noteSection}
+MANDATORY COMPLIANCE CHECK (MUST SATISFY ALL):
+${enforcementChecklist}
+
 Rewrite the document accordingly and return only the final Markdown.
 `.trim();
 }
