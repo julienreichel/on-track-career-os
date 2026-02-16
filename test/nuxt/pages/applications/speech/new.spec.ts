@@ -20,6 +20,22 @@ vi.mock('@/composables/useAuthUser', () => ({
   }),
 }));
 
+vi.mock('@/domain/speech-block/SpeechBlockService', () => ({
+  SpeechBlockService: vi.fn().mockImplementation(() => ({
+    createDraftSpeechBlock: vi.fn().mockReturnValue({
+      userId: 'user-1',
+      elevatorPitch: '',
+      careerStory: '',
+      whyMe: '',
+    }),
+    createSpeechBlock: vi.fn(),
+    listSpeechBlocksByUser: vi.fn(),
+    getFullSpeechBlock: vi.fn(),
+    updateSpeechBlock: vi.fn(),
+    deleteSpeechBlock: vi.fn(),
+  })),
+}));
+
 // Mock composables that use repositories to avoid Amplify client instantiation
 vi.mock('@/application/speech-block/useSpeechBlocks', () => ({
   useSpeechBlocks: () => ({
