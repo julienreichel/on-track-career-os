@@ -1,7 +1,7 @@
 # Project Status — On Track Career
 
 **Last Updated:** 2026-02-16  
-**Version:** v0.13.0 — MVP stable with A2 application-strength reliability updates
+**Version:** v0.15.0 — EPIC C3 delivered (material feedback + improvement loop)
 
 ---
 
@@ -11,7 +11,7 @@
 
 ### Key Metrics
 
-- ✅ **13/13 AI operations** implemented
+- ✅ **14/14 AI operations** implemented
 - ✅ **18 GraphQL models** (13 MVP + 5 V1)
 - ✅ **11 domain modules** with full layers
 - ✅ **1526+ tests** across 190+ suites
@@ -34,6 +34,9 @@
 - Unified page-level error pattern: `useErrorDisplay` + reusable `ErrorStateCard`
 - Application-strength retry telemetry events in PostHog
 - Application-strength scoring simplified to 4 dimensions (keyword coverage removed to reduce noise)
+- Material improvement AI op (`ai.improveMaterial`) with strict input/output validation and deterministic fallback
+- Shared C3 frontend engine (`useMaterialImprovementEngine`) + reusable `MaterialFeedbackPanel`
+- CV and cover-letter editor integration: feedback + improve loop with markdown overwrite/persist
 
 ---
 
@@ -53,10 +56,9 @@
 | **5B** | Company Analysis & Canvas | ✅ 100% | 2/2    | Company info, BMC generation          |
 | **5C** | User-Job-Company Matching | ✅ 100% | 1/1    | Fit score, recommendations, tailoring |
 | **A2** | Application Strength Gate | ✅ 95%  | 1/1    | CV/letter quality scoring + retry UX  |
+| **C3** | Material Improvement Loop | ✅ 100% | 1/1    | Feedback panel + guided AI rewrite    |
 | **6**  | Tailored Materials        | ✅ 100% | 3/3    | Job-specific CV/letter/speech         |
 | **F2** | Onboarding & Guidance     | ✅ 100% | -      | 5-phase progress, badges, guidance    |
-
-**Overall Progress:** 98% MVP | 13 of 14 EPICs complete
 
 ---
 
@@ -110,11 +112,11 @@
 
 ---
 
-## 🤖 AI Operations (13/13)
+## 🤖 AI Operations (14/14)
 
-### Identity & Discovery (4)
+### Identity & Discovery (5)
 
-`ai.parseCvText`, `ai.extractExperienceBlocks`, `ai.generatePersonalCanvas`, `ai.generateStarStory`
+`ai.parseCvText`, `ai.extractExperienceBlocks`, `ai.generatePersonalCanvas`, `ai.generateStarStory`, `ai.generateAchievementsAndKpis`
 
 ### Job & Company (3)
 
@@ -126,7 +128,7 @@
 
 ### Materials (4)
 
-`ai.generateCv`, `ai.generateCoverLetter`, `ai.generateSpeech`, `ai.tailorCv` (merged into generateCv)
+`ai.generateCv`, `ai.generateCoverLetter`, `ai.generateSpeech`, `ai.improveMaterial`
 
 ### Application Quality (1)
 
@@ -216,6 +218,13 @@
 **Features:** Overall score, 4-dimension breakdown, decision label, missing signals, top improvements  
 **AI:** `evaluateApplicationStrength` with strict schema normalization and fallback output  
 **Pages:** `/jobs/:id/application-strength`
+
+### ✅ EPIC C3: AI Feedback on Materials (100%)
+
+**Core:** Shared feedback + improvement workflow for tailored CV and cover letter editors  
+**Features:** On-demand feedback, score/details panel, guided instruction presets, optional user note, deterministic error keys  
+**AI:** `improveMaterial` with strict input contract, markdown-only output validation, retry-on-invalid-output, and unchanged-markdown fallback  
+**Pages:** `/applications/cv/:id`, `/applications/cover-letters/:id`
 
 ### ✅ EPIC 6: Tailored Application Materials (100%)
 

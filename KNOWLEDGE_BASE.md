@@ -115,7 +115,8 @@ User-scoped data access enforced at GraphQL layer
 `useCoverLetterGeneration()` — Letter generation, job targeting  
 `useSpeechGeneration()` — Speech block generation  
 `useCVTemplates()` — Template library management  
-`useCVSettings()` — User defaults management
+`useCVSettings()` — User defaults management  
+`useMaterialImprovementEngine()` — Shared C3 feedback/improve orchestration for CV + cover letter
 
 ### System
 
@@ -165,8 +166,10 @@ User-scoped data access enforced at GraphQL layer
 `/applications/cv/:id/print` — Print-optimized view  
 `/applications/cover-letters` — Letter library  
 `/applications/cover-letters/new` — Cover letter generation  
+`/applications/cover-letters/:id` — Cover letter editor (markdown + C3 feedback/improve panel)  
 `/applications/speech` — Speech library  
-`/applications/speech/new` — Speech generation
+`/applications/speech/new` — Speech generation  
+`/applications/speech/:id` — Speech editor
 
 ### Settings
 
@@ -175,7 +178,7 @@ User-scoped data access enforced at GraphQL layer
 
 ---
 
-## 6. AI Operations (13 Total)
+## 6. AI Operations (14 Total)
 
 All AI operations are Lambda functions with strict JSON I/O contracts:
 
@@ -184,10 +187,10 @@ All AI operations are Lambda functions with strict JSON I/O contracts:
 
 ### Categories
 
-**Identity & Discovery (4):** parseCvText, extractExperienceBlocks, generatePersonalCanvas, generateStarStory  
-**Job & Company (3):** parseJobDescription, analyzeCompany, generateCompanyCanvas  
+**Identity & Discovery (5):** parseCvText, extractExperienceBlocks, generatePersonalCanvas, generateStarStory, generateAchievementsAndKpis  
+**Job & Company (3):** parseJobDescription, analyzeCompanyInfo, generateCompanyCanvas  
 **Matching (1):** generateMatchingSummary  
-**Materials (4):** generateCv, generateCoverLetter, generateSpeech, tailorCv  
+**Materials (4):** generateCv, generateCoverLetter, generateSpeech, improveMaterial  
 **Application Quality (1):** evaluateApplicationStrength
 
 ### Error Handling
@@ -282,6 +285,7 @@ npm run test:coverage # Coverage report
 **Job Analysis:** PDF upload, AI parsing, company research, BMC generation  
 **Matching:** Fit score (0-100), strengths/gaps analysis, tailoring recommendations  
 **Material Generation:** Job-specific CVs, cover letters, speeches with markdown editing  
+**Material Improvement (C3):** On-demand feedback + guided rewrite loop for tailored CV/cover letter  
 **Customization:** Template library (3 system + user templates), CV defaults, section toggles  
 **Onboarding:** 5-phase progress system, milestone badges, contextual guidance
 

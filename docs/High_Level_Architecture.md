@@ -1,7 +1,7 @@
 # High-Level Architecture Overview
 
-**Status:** 98% Implemented (EPICs 1A–6, F2 complete)  
-**Last Updated:** 2026-02-06
+**Status:** EPICs 1A–6, A2, C3, F2 delivered
+**Last Updated:** 2026-02-16
 
 Your system is composed of **five major layers**, each offering functional modules:
 
