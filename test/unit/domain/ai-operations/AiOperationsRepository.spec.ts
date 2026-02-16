@@ -9,6 +9,7 @@ import type { GenerateCvInput } from '@/domain/ai-operations/types/generateCv';
 import type { CompanyAnalysisResult } from '@/domain/ai-operations/CompanyAnalysis';
 import type { GeneratedCompanyCanvas } from '@/domain/ai-operations/CompanyCanvasResult';
 import type { EvaluateApplicationStrengthInput } from '@/domain/ai-operations/ApplicationStrengthResult';
+import type { ImproveMaterialInput } from '@/domain/ai-operations/ImproveMaterial';
 
 // Mock gqlOptions
 vi.mock('@/data/graphql/options', () => ({
@@ -35,6 +36,7 @@ describe('AiOperationsRepository', () => {
     generateSpeech: ReturnType<typeof vi.fn>;
     generateCoverLetter: ReturnType<typeof vi.fn>;
     evaluateApplicationStrength: ReturnType<typeof vi.fn>;
+    improveMaterial: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -53,6 +55,7 @@ describe('AiOperationsRepository', () => {
       generateSpeech: vi.fn(),
       generateCoverLetter: vi.fn(),
       evaluateApplicationStrength: vi.fn(),
+      improveMaterial: vi.fn(),
     };
 
     // Inject the mocks via constructor (dependency injection)
@@ -794,6 +797,94 @@ describe('AiOperationsRepository', () => {
       await expect(
         repository.evaluateApplicationStrength(applicationStrengthInput)
       ).rejects.toThrow('AI operation returned no data');
+    });
+  });
+
+  describe('improveMaterial', () => {
+    const improveMaterialInput: ImproveMaterialInput = {
+      language: 'en',
+      materialType: 'cv',
+      currentMarkdown: '# Existing markdown',
+      instructions: {
+        presets: ['impact-first'],
+      },
+      improvementContext: {
+        overallScore: 72,
+        dimensionScores: {
+          atsReadiness: 74,
+          clarityFocus: 70,
+          targetedFitSignals: 71,
+          evidenceStrength: 75,
+        },
+        decision: {
+          label: 'borderline',
+          readyToApply: false,
+          rationaleBullets: ['Needs stronger quantified impact'],
+        },
+        missingSignals: ['Explicit ownership metrics'],
+        topImprovements: [
+          {
+            title: 'Add measurable impact',
+            action: 'Include metrics in recent experience bullets.',
+            impact: 'high',
+            target: { document: 'cv', anchor: 'experience' },
+          },
+        ],
+        notes: {
+          atsNotes: ['Good keyword presence.'],
+          humanReaderNotes: ['Tighten targeting language.'],
+        },
+      },
+      profile: { fullName: 'Alex Candidate' },
+      experiences: [],
+    };
+
+    it('returns markdown when operation succeeds', async () => {
+      mockClient.improveMaterial.mockResolvedValue({
+        data: '# Improved markdown',
+        errors: undefined,
+      });
+
+      const result = await repository.improveMaterial(improveMaterialInput);
+
+      expect(result).toBe('# Improved markdown');
+      expect(mockClient.improveMaterial).toHaveBeenCalledWith(
+        improveMaterialInput,
+        expect.objectContaining({ authMode: 'userPool' })
+      );
+    });
+
+    it('throws when AI returns errors', async () => {
+      mockClient.improveMaterial.mockResolvedValue({
+        data: null,
+        errors: [{ message: 'bad' }],
+      });
+
+      await expect(repository.improveMaterial(improveMaterialInput)).rejects.toThrow(
+        'AI operation failed'
+      );
+    });
+
+    it('throws when no data returned', async () => {
+      mockClient.improveMaterial.mockResolvedValue({
+        data: null,
+        errors: undefined,
+      });
+
+      await expect(repository.improveMaterial(improveMaterialInput)).rejects.toThrow(
+        'AI operation returned no data'
+      );
+    });
+
+    it('throws deterministic error when markdown is empty', async () => {
+      mockClient.improveMaterial.mockResolvedValue({
+        data: '   ',
+        errors: undefined,
+      });
+
+      await expect(repository.improveMaterial(improveMaterialInput)).rejects.toThrow(
+        'ERR_MATERIAL_IMPROVEMENT_INVALID_MARKDOWN'
+      );
     });
   });
 });

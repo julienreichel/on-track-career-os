@@ -14,6 +14,7 @@ import type {
   ApplicationStrengthResult,
   EvaluateApplicationStrengthInput,
 } from './ApplicationStrengthResult';
+import { isImprovedMaterialMarkdown, type ImproveMaterialInput } from './ImproveMaterial';
 
 /**
  * Repository interface for AI operations
@@ -98,6 +99,7 @@ export interface IAiOperationsRepository {
   evaluateApplicationStrength(
     input: EvaluateApplicationStrengthInput
   ): Promise<ApplicationStrengthResult>;
+  improveMaterial(input: ImproveMaterialInput): Promise<string>;
 }
 
 /**
@@ -167,6 +169,11 @@ export type AmplifyAiOperations = {
 
   generateCv: (
     input: GenerateCvInput,
+    options?: Record<string, unknown>
+  ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
+
+  improveMaterial: (
+    input: ImproveMaterialInput,
     options?: Record<string, unknown>
   ) => Promise<{ data: unknown | null; errors?: unknown[] }>;
 };
@@ -412,5 +419,23 @@ export class AiOperationsRepository implements IAiOperationsRepository {
     }
 
     return data as ApplicationStrengthResult;
+  }
+
+  async improveMaterial(input: ImproveMaterialInput): Promise<string> {
+    const { data, errors } = await this.client.improveMaterial(input, gqlOptions());
+
+    if (errors && errors.length > 0) {
+      throw new Error(`AI operation failed: ${JSON.stringify(errors)}`);
+    }
+
+    if (!data) {
+      throw new Error('AI operation returned no data');
+    }
+
+    if (!isImprovedMaterialMarkdown(data)) {
+      throw new Error('ERR_MATERIAL_IMPROVEMENT_INVALID_MARKDOWN');
+    }
+
+    return data;
   }
 }
