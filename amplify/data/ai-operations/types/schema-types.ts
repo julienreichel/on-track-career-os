@@ -118,3 +118,8 @@ export type SpeechStory = {
   result?: string;
   achievements?: string[];
 };
+
+export type ImproveMaterialInstructions = {
+  presets: string[];
+  note?: string;
+};

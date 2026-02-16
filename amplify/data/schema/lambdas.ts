@@ -139,6 +139,16 @@ export const evaluateApplicationStrengthFunction = defineFunction({
   timeoutSeconds: 60,
 });
 
+export const improveMaterialFunction = defineFunction({
+  entry: '../ai-operations/improveMaterial/handler.ts',
+  environment: {
+    MODEL_ID,
+    POSTHOG_API_KEY,
+    POSTHOG_HOST,
+  },
+  timeoutSeconds: 60,
+});
+
 export const schemaLambdas = {
   // =====================================================
   // AI OPERATIONS (Custom Queries)
@@ -317,9 +327,28 @@ export const schemaLambdas = {
       coverLetterText: a.string().required(),
       language: a.string().required(),
     })
-    .returns(a.ref('EvaluateApplicationStrengthOutputType'))
+    .returns(a.ref('EvaluateApplicationStrengthType'))
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(evaluateApplicationStrengthFunction)),
+
+  improveMaterial: a
+    .query()
+    .arguments({
+      language: a.string().required(),
+      materialType: a.enum(['cv', 'coverLetter']),
+      currentMarkdown: a.string().required(),
+      instructions: a.ref('ImproveMaterialInstructionsType').required(),
+      improvementContext: a.ref('EvaluateApplicationStrengthType').required(),
+      profile: a.ref('ProfileType').required(),
+      experiences: a.ref('ExperienceType').array().required(),
+      stories: a.ref('SpeechStoryType').array(),
+      jobDescription: a.ref('JobType'),
+      matchingSummary: a.ref('MatchingSummaryContextType'),
+      company: a.ref('CompanyType'),
+    })
+    .returns(a.string())
+    .authorization((allow) => [allow.authenticated()])
+    .handler(a.handler.function(improveMaterialFunction)),
 
   // =====================================================
   // UTILITY FUNCTIONS (Custom Queries)

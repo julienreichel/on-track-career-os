@@ -211,7 +211,7 @@ export const schemaTypes = {
     humanReaderNotes: a.string().array().required(),
   }),
 
-  EvaluateApplicationStrengthOutputType: a.customType({
+  EvaluateApplicationStrengthType: a.customType({
     overallScore: a.integer().required(),
     dimensionScores: a.customType({
       atsReadiness: a.integer().required(),
@@ -223,5 +223,10 @@ export const schemaTypes = {
     missingSignals: a.string().array().required(),
     topImprovements: a.ref('EvaluateApplicationStrengthImprovementType').array().required(),
     notes: a.ref('EvaluateApplicationStrengthNotesType').required(),
+  }),
+
+  ImproveMaterialInstructionsType: a.customType({
+    presets: a.string().array().required(),
+    note: a.string(),
   }),
 };
