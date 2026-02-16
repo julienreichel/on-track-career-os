@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { createTestI18n } from '../../utils/createTestI18n';
+import { createTestI18n } from '../../../utils/createTestI18n';
 import SettingsPage from '@/pages/settings/index.vue';
 
 vi.mock('@/composables/useAccountDeletion', () => ({
@@ -20,8 +20,9 @@ describe('settings/index page', () => {
           UPage: { template: '<div class="page"><slot /></div>' },
           UPageHeader: { template: '<div class="header" />' },
           UPageBody: { template: '<div class="body"><slot /></div>' },
-          UPageCard: { template: '<div class="card"><slot /></div>' },
-          DeleteAccountCard: { template: '<div class="delete-card" />' },
+          UCard: { template: '<div class="card"><slot /></div>' },
+          UButton: { template: '<button><slot /></button>' },
+          SettingsDeleteAccountCard: { template: '<div class="delete-card" />' },
         },
       },
     });
