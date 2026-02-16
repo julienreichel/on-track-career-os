@@ -1899,6 +1899,209 @@ If repeated failure:
 
 ---
 
+# AI OPERATION 15 — `ai.improveMaterial` (EPIC C3)
+
+## Purpose
+
+Improve an **existing tailored CV or cover letter** through a full-document rewrite.
+
+This operation:
+
+- Strengthens clarity, impact, and role alignment
+- Applies user-selected editorial presets (multi-select)
+- Uses internal evaluation feedback (provided structurally in input)
+- Rewrites the entire document for consistency
+- Returns **Markdown only**
+
+This is an **editorial improvement pass**, not a new generation from scratch.
+
+---
+
+## Output Format
+
+**Markdown only.**
+
+- No JSON
+- No explanations
+- No wrappers
+- No backticks
+- No commentary
+
+The output must be the complete improved document.
+
+---
+
+## System Prompt
+
+```text
+You are an expert editorial career coach improving an existing professional document.
+
+Return ONLY the final improved document in valid Markdown.
+Do not return JSON.
+Do not include explanations or commentary.
+
+HARD RULES:
+- Never invent facts.
+- Do not create new roles, employers, dates, tools, skills, achievements, metrics, or education.
+- Only use information present in:
+  (a) the current document
+  (b) structured profile, experiences, stories
+  (c) job and company context
+- If no measurable metrics are available, do NOT fabricate numbers.
+- Maintain the original document language.
+- Ensure full consistency of tone and structure across the entire document.
+- Perform a complete rewrite to maintain coherence.
+
+EDITORIAL GOALS:
+- Apply selected user instruction presets precisely.
+- Strengthen clarity, specificity, and impact.
+- Improve alignment with the target role when job context is provided.
+- Improve weak evidence where possible using available data.
+- Remove redundancy.
+- Prefer strong action verbs.
+- Keep concise and readable.
+
+FORMAT RULES:
+
+If materialType = "cv":
+- Keep clear sections.
+- Use concise bullet points.
+- Keep scan-friendly formatting.
+- Avoid long paragraphs.
+
+If materialType = "coverLetter":
+- 3–4 well-structured paragraphs.
+- First-person voice.
+- Clear motivation and alignment.
+- Professional but natural tone.
+
+Do not add new sections requiring invented content.
+Do not remove critical evidence.
+Output ONLY the improved Markdown document.
+```
+
+---
+
+## User Prompt Template
+
+```text
+LANGUAGE:
+{{language}}
+
+MATERIAL TYPE:
+{{materialType}}  // "cv" | "coverLetter"
+
+USER INSTRUCTIONS (multi-select presets):
+{{instructionPresetsJson}}
+
+OPTIONAL USER NOTE:
+{{instructionNote}}
+
+INTERNAL IMPROVEMENT PRIORITIES:
+{{internalImprovementSummary}}
+(Structured evaluation feedback. Use this to guide improvements but do not mention it.)
+
+CURRENT DOCUMENT:
+"""
+{{currentMarkdown}}
+"""
+
+GROUNDING CONTEXT:
+
+PROFILE:
+{{profileJson}}
+
+EXPERIENCES:
+{{experiencesJson}}
+
+STORIES:
+{{storiesJson}}
+
+JOB DESCRIPTION:
+{{jobDescriptionJson}}
+
+MATCHING SUMMARY:
+{{matchingSummaryJson}}
+
+COMPANY:
+{{companyJson}}
+
+Rewrite the document accordingly.
+Return only the improved Markdown.
+```
+
+---
+
+## Input Schema
+
+```ts
+{
+  language: string;
+
+  materialType: "cv" | "coverLetter";
+
+  currentMarkdown: string;
+
+  instructions: {
+    presets: string[];   // shared multi-select list
+    note?: string;
+  };
+
+  // Reuse direct output from ai.evaluateApplicationStrength
+  improvementContext: EvaluateApplicationStrengthType;
+
+  profile: ProfileType;
+  experiences: ExperienceType[];
+  stories?: SpeechStoryType[];
+
+  jobDescription?: JobType;
+  matchingSummary?: MatchingSummaryContextType;
+  company?: CompanyType;
+}
+```
+
+---
+
+## Validation Rules
+
+Backend must validate:
+
+- Strict required fields and types (reject missing/invalid payload deterministically)
+- Output is string
+- Output length > 200 characters
+- No JSON detected
+- No Markdown code fences (especially ```json)
+- Not empty
+- Must not start with `{` or `[` after trimming
+
+---
+
+## Fallback Strategy
+
+If output invalid:
+
+1. Retry with stricter instruction:
+
+```
+Return ONLY valid Markdown.
+No JSON.
+No commentary.
+No backticks.
+Full document rewrite.
+```
+
+2. If still invalid → return original document unchanged.
+
+## Deterministic Backend Error Codes
+
+For predictable frontend i18n mapping:
+
+- `ERR_IMPROVE_MATERIAL_INVALID_INPUT` → input payload contract error
+- `ERR_IMPROVE_MATERIAL_INVALID_OUTPUT` → unrecoverable non-markdown output handling error
+- `ERR_IMPROVE_MATERIAL_RETRY_FAILED_FALLBACK` → both attempts invalid, original markdown returned
+
+---
+
 # 7. LOGGING & EXPLAINABILITY
 
 Each AI operation must store:
