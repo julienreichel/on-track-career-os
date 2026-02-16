@@ -20,6 +20,41 @@ vi.mock('@/composables/useAuthUser', () => ({
   }),
 }));
 
+// Mock composables that use repositories to avoid Amplify client instantiation
+vi.mock('@/application/speech-block/useSpeechBlocks', () => ({
+  useSpeechBlocks: () => ({
+    items: ref([]),
+    loading: ref(false),
+    error: ref(null),
+    loadAll: vi.fn(),
+    createSpeechBlock: vi.fn(),
+    deleteSpeechBlock: vi.fn(),
+  }),
+}));
+
+vi.mock('@/composables/useSpeechEngine', () => ({
+  useSpeechEngine: () => ({
+    isGenerating: ref(false),
+    error: ref(null),
+    load: vi.fn(),
+    generate: vi.fn(),
+  }),
+}));
+
+vi.mock('@/application/tailoring/useTailoredMaterials', () => ({
+  useTailoredMaterials: () => ({
+    items: ref([]),
+    loading: ref(false),
+    error: ref(null),
+  }),
+}));
+
+vi.mock('@/composables/useAnalytics', () => ({
+  useAnalytics: () => ({
+    captureEvent: vi.fn(),
+  }),
+}));
+
 describe('applications/speech/new page', () => {
   const i18n = createTestI18n();
 
