@@ -57,75 +57,92 @@ async function waitForImproveCompletion(page: Page) {
   });
 }
 
-test.describe('C3 material improvement happy paths', () => {
-  test.describe.configure({ mode: 'serial' });
+async function openTailoredCvFromMatch(page: Page, jobId: string): Promise<Locator> {
+  await page.goto(`/jobs/${jobId}/match`);
+  const generateCvButton = page.getByRole('button', { name: /generate tailored cv/i });
+  await expect(generateCvButton).toBeVisible();
+  await generateCvButton.click();
 
-  test('CV: feedback + improve updates markdown', async ({ page }) => {
-    test.setTimeout(120000);
+  await Promise.race([
+    page.waitForURL(/\/applications\/cv\/[0-9a-f-]+$/i, { timeout: 60000 }),
+    page.waitForURL(/\/applications\/cv\/new\?jobId=/i, { timeout: 60000 }),
+  ]);
 
-    const jobId = await createAnalyzedJobAndMatch(page);
+  if (/\/applications\/cv\/new\?jobId=/i.test(page.url())) {
+    const continueGenerateButton = page.getByRole('button', { name: /^generate cv$/i });
+    await expect(continueGenerateButton).toBeVisible();
+    await continueGenerateButton.click();
+    await page.waitForURL(/\/applications\/cv\/[0-9a-f-]+$/i, { timeout: 60000 });
+  }
 
-    await page.goto(`/jobs/${jobId}/match`);
-    const generateCvButton = page.getByRole('button', { name: /generate tailored cv/i });
-    await expect(generateCvButton).toBeVisible();
-    await generateCvButton.click();
+  const markdown = page.locator('.doc-markdown');
+  await expect(markdown).toBeVisible();
+  return markdown;
+}
 
-    await Promise.race([
-      page.waitForURL(/\/applications\/cv\/[0-9a-f-]+$/i, { timeout: 60000 }),
-      page.waitForURL(/\/applications\/cv\/new\?jobId=/i, { timeout: 60000 }),
-    ]);
+async function openTailoredCoverLetterFromMatch(page: Page, jobId: string): Promise<Locator> {
+  await page.goto(`/jobs/${jobId}/match`);
+  await page.getByRole('button', { name: /generate cover letter/i }).click();
+  await page.waitForURL(/\/applications\/cover-letters\/[0-9a-f-]+$/i, { timeout: 60000 });
 
-    if (/\/applications\/cv\/new\?jobId=/i.test(page.url())) {
-      const continueGenerateButton = page.getByRole('button', { name: /^generate cv$/i });
-      await expect(continueGenerateButton).toBeVisible();
-      await continueGenerateButton.click();
-      await page.waitForURL(/\/applications\/cv\/[0-9a-f-]+$/i, { timeout: 60000 });
-    }
+  const markdown = page.locator('.doc-markdown');
+  await expect(markdown).toBeVisible();
+  return markdown;
+}
 
-    const markdown = page.locator('.doc-markdown');
-    await expect(markdown).toBeVisible();
-    const before = (await markdown.textContent()) ?? '';
-
+async function runFeedbackFlow(page: Page) {
+  await test.step('Generate feedback', async () => {
     await page.getByRole('button', { name: 'Get feedback' }).click();
     await expect(page.locator('[data-testid="material-feedback-score"]')).toBeVisible({
       timeout: 20000,
     });
-
-    await page.getByRole('button', { name: 'Show details' }).click();
-    await expect(page.locator('[data-testid="material-feedback-details"]')).toBeVisible();
-
-    await selectImprovementPresets(page);
-    await page.getByRole('button', { name: 'Improve' }).click();
-    await waitForImproveCompletion(page);
-
-    await expectMarkdownChanged(markdown, before);
   });
 
-  test('Cover letter: feedback + improve updates markdown', async ({ page }) => {
-    test.setTimeout(120000);
-
-    const jobId = await createAnalyzedJobAndMatch(page);
-
-    await page.goto(`/jobs/${jobId}/match`);
-    await page.getByRole('button', { name: /generate cover letter/i }).click();
-    await page.waitForURL(/\/applications\/cover-letters\/[0-9a-f-]+$/i, { timeout: 60000 });
-
-    const markdown = page.locator('.doc-markdown');
-    await expect(markdown).toBeVisible();
-    const before = (await markdown.textContent()) ?? '';
-
-    await page.getByRole('button', { name: 'Get feedback' }).click();
-    await expect(page.locator('[data-testid="material-feedback-score"]')).toBeVisible({
-      timeout: 20000,
-    });
-
+  await test.step('Expand feedback details', async () => {
     await page.getByRole('button', { name: 'Show details' }).click();
     await expect(page.locator('[data-testid="material-feedback-details"]')).toBeVisible();
+  });
+}
 
+async function runImprovementFlow(page: Page, markdown: Locator, before: string) {
+  await test.step('Select improvement presets', async () => {
     await selectImprovementPresets(page);
+  });
+
+  await test.step('Generate improvement', async () => {
     await page.getByRole('button', { name: 'Improve' }).click();
     await waitForImproveCompletion(page);
+  });
 
+  await test.step('Verify markdown updated', async () => {
     await expectMarkdownChanged(markdown, before);
+  });
+}
+
+test.describe('C3 material improvement happy paths', () => {
+  test('CV + cover letter: feedback + improve updates markdown', async ({ page }) => {
+    test.setTimeout(120000);
+
+    const jobId = await test.step('Setup: create analyzed job and match once', async () =>
+      createAnalyzedJobAndMatch(page)
+    );
+
+    await test.step('CV flow', async () => {
+      const markdown = await test.step('Setup: open tailored CV editor', async () =>
+        openTailoredCvFromMatch(page, jobId)
+      );
+      const before = (await markdown.textContent()) ?? '';
+      await runFeedbackFlow(page);
+      await runImprovementFlow(page, markdown, before);
+    });
+
+    await test.step('Cover letter flow', async () => {
+      const markdown = await test.step('Setup: open tailored cover letter editor', async () =>
+        openTailoredCoverLetterFromMatch(page, jobId)
+      );
+      const before = (await markdown.textContent()) ?? '';
+      await runFeedbackFlow(page);
+      await runImprovementFlow(page, markdown, before);
+    });
   });
 });
