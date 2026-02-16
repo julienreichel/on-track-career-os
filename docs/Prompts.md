@@ -125,9 +125,7 @@ EPIC C3 adds an **editorial improvement loop** for **tailored CV + cover letter*
 
 ---
 
-## 2) Title
-
-**C3 Frontend — Create a Shared “Material Improvement Engine” (Composable + Service) Reusing Existing Error/State Patterns**
+## **C3 Frontend — Create a Shared “Material Improvement Engine” (Composable + Service) Reusing Existing Error/State Patterns**
 
 ### Intro
 
@@ -207,9 +205,7 @@ Playwright (define the single happy path later; here just ensure composable is t
 
 ---
 
-## 3) Title
-
-**C3 UI — Build `MaterialFeedbackPanel` (Nuxt UI) With Presets Multi-Select + “Score First, Expand for Details”**
+## **C3 UI — Build `MaterialFeedbackPanel` (Nuxt UI) With Presets Multi-Select + “Score First, Expand for Details”**
 
 ### Intro
 
@@ -280,9 +276,7 @@ Vitest component tests:
 
 ---
 
-## 4) Title
-
-**C3 Integration — Add Feedback + Improve Loop to Tailored CV Page (Overwrite Markdown)**
+## **C3 Integration — Add Feedback + Improve Loop to Tailored CV Page (Overwrite Markdown)**
 
 ### Intro
 
@@ -361,9 +355,7 @@ Playwright E2E (partial; final single happy path is defined in prompt #6 if you 
 
 ---
 
-## 5) Title
-
-**C3 Integration + E2E — Add Feedback + Improve Loop to Cover Letter Page and Ship One End-to-End Happy Path**
+## **C3 Integration + E2E — Add Feedback + Improve Loop to Cover Letter Page and Ship One End-to-End Happy Path**
 
 ### Intro
 
