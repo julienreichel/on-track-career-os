@@ -8,6 +8,7 @@ import { createTestI18n } from '../../../../utils/createTestI18n';
 const pageStateMock = {
   loading: ref(false),
   pageError: ref<string | null>(null),
+  pageErrorMessageKey: ref<string | null>(null),
   job: ref({
     id: 'job-1',
     title: 'Senior Product Manager',
@@ -24,12 +25,14 @@ const pageStateMock = {
     pastedType: ref<'cv' | 'coverLetter' | null>(null),
     isExtracting: ref(false),
     validationErrors: ref([]),
-    extractionError: ref<string | null>(null),
+    extractionErrorMessageKey: ref<string | null>(null),
     handleFileUpload: vi.fn(),
   },
   evaluator: {
-    loading: ref(false),
-    error: ref<string | null>(null),
+    status: ref<'idle' | 'loading' | 'success' | 'error'>('idle'),
+    errorCode: ref<string | null>(null),
+    errorMessageKey: ref<string | null>(null),
+    rawError: ref<unknown>(null),
     evaluation: ref(null),
   },
   load: vi.fn().mockResolvedValue(undefined),
@@ -70,6 +73,11 @@ const stubs = {
   ApplicationStrengthImprovementsCard: {
     template: '<section class="improvements-card"></section>',
   },
+  ErrorStateCard: {
+    props: ['title', 'description', 'retryLabel'],
+    template:
+      '<section class="error-state"><h2>{{ title }}</h2><p>{{ description }}</p><button @click="$emit(\'retry\')">{{ retryLabel }}</button></section>',
+  },
 };
 
 const i18n = createTestI18n();
@@ -79,7 +87,10 @@ describe('Application strength page', () => {
     pageStateMock.evaluator.evaluation.value = null;
     pageStateMock.showInput.value = true;
     pageStateMock.pageError.value = null;
+    pageStateMock.pageErrorMessageKey.value = null;
     pageStateMock.loading.value = false;
+    pageStateMock.evaluator.status.value = 'idle';
+    pageStateMock.evaluator.errorMessageKey.value = null;
     vi.clearAllMocks();
   });
 
@@ -100,5 +111,44 @@ describe('Application strength page', () => {
     expect(wrapper.text()).toContain('Senior Product Manager');
     expect(wrapper.find('.input-card').exists()).toBe(true);
     expect(wrapper.find('.results-card').exists()).toBe(false);
+  });
+
+  it('shows missing-job error state when job is not found', async () => {
+    pageStateMock.pageErrorMessageKey.value = 'applicationStrength.errors.jobNotFound';
+    router.push('/jobs/job-1/application-strength');
+    await router.isReady();
+
+    const wrapper = mount(ApplicationStrengthPage, {
+      global: {
+        plugins: [router, i18n],
+        stubs,
+      },
+    });
+
+    await Promise.resolve();
+
+    expect(wrapper.find('.error-state').exists()).toBe(true);
+    expect(wrapper.find('.input-card').exists()).toBe(false);
+  });
+
+  it('shows evaluator error state and retries evaluation', async () => {
+    pageStateMock.evaluator.status.value = 'error';
+    pageStateMock.evaluator.errorMessageKey.value = 'applicationStrength.errors.evaluationFailed';
+    router.push('/jobs/job-1/application-strength');
+    await router.isReady();
+
+    const wrapper = mount(ApplicationStrengthPage, {
+      global: {
+        plugins: [router, i18n],
+        stubs,
+      },
+    });
+
+    await Promise.resolve();
+
+    const retryButton = wrapper.find('.error-state button');
+    expect(retryButton.exists()).toBe(true);
+    await retryButton.trigger('click');
+    expect(pageStateMock.evaluate).toHaveBeenCalled();
   });
 });

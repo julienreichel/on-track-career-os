@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 import { PDFParse } from 'pdf-parse';
 import { useApplicationStrengthInputs } from '@/composables/useApplicationStrengthInputs';
+import { allowConsoleOutput } from '../../setup/console-guard';
 
 vi.mock('pdf-parse', () => ({
   PDFParse: Object.assign(
@@ -27,7 +28,9 @@ describe('useApplicationStrengthInputs', () => {
     const state = useApplicationStrengthInputs({ candidateFullName });
     const file = new File(['pdf bytes'], 'cv.pdf', { type: 'application/pdf' });
 
-    await state.handleFileUpload(file);
+    await allowConsoleOutput(async () => {
+      await state.handleFileUpload(file);
+    });
 
     expect(PDFParse).toHaveBeenCalled();
     expect(state.extractedText.value).toBe('Extracted PDF text');
@@ -62,5 +65,28 @@ describe('useApplicationStrengthInputs', () => {
       'Profile\nExperienced engineer\nEmail: test@example.com\nPhone: +33 6 12 34 56 78';
 
     expect(state.pastedType.value).toBe('cv');
+  });
+
+  it('handles pdf extraction failure and allows paste fallback', async () => {
+    vi.mocked(PDFParse).mockImplementationOnce(
+      () =>
+        ({
+          getText: vi.fn().mockRejectedValue(new Error('parse failed')),
+          destroy: vi.fn().mockResolvedValue(undefined),
+        }) as never
+    );
+
+    const state = useApplicationStrengthInputs({ candidateFullName });
+    const file = new File(['pdf bytes'], 'cv.pdf', { type: 'application/pdf' });
+
+    await allowConsoleOutput(async () => {
+      await state.handleFileUpload(file);
+    });
+
+    expect(state.extractionErrorMessageKey.value).toBe('applicationStrength.errors.pdfExtractionFailed');
+    expect(state.canEvaluate.value).toBe(false);
+
+    state.pastedText.value = 'Candidate Name\ncandidate@example.com\nExperience';
+    expect(state.canEvaluate.value).toBe(true);
   });
 });

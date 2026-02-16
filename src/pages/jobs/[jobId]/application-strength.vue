@@ -2,16 +2,19 @@
 import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { useAnalytics } from '@/composables/useAnalytics';
 import { useApplicationStrengthPage } from '@/composables/useApplicationStrengthPage';
 import ApplicationStrengthInputCard from '@/components/application-strength/ApplicationStrengthInputCard.vue';
 import ApplicationStrengthResultsCard from '@/components/application-strength/ApplicationStrengthResultsCard.vue';
 import ApplicationStrengthImprovementsCard from '@/components/application-strength/ApplicationStrengthImprovementsCard.vue';
+import ErrorStateCard from '@/components/common/ErrorStateCard.vue';
 import type { PageHeaderLink } from '@/types/ui';
 
 definePageMeta({
   breadcrumbLabel: 'Application Strength',
 });
 const { t } = useI18n();
+const { captureEvent } = useAnalytics();
 
 const route = useRoute();
 const jobId = computed(() => route.params.jobId as string);
@@ -37,8 +40,10 @@ const headerLinks = computed<PageHeaderLink[]>(() => [
 
 const hasEvaluation = computed(() => Boolean(page.evaluator.evaluation.value));
 const pageBusy = computed(() => page.loading.value || page.inputs.isExtracting.value);
-
-const errorMessage = computed(() => page.pageError.value || page.evaluator.error.value);
+const showJobError = computed(() => Boolean(page.pageErrorMessageKey.value));
+const showEvaluationError = computed(
+  () => page.evaluator.status.value === 'error' && Boolean(page.evaluator.errorMessageKey.value)
+);
 
 function isPdfFile(file: File | null | undefined): boolean {
   if (!file) {
@@ -58,6 +63,16 @@ async function handleUploadFile(file: File | null | undefined) {
   await page.evaluate();
 }
 
+async function retryPageLoad() {
+  captureEvent('application_strength_retry_clicked', { source: 'page_error' });
+  await page.load();
+}
+
+async function retryEvaluation() {
+  captureEvent('application_strength_retry_clicked', { source: 'evaluation_error' });
+  await page.evaluate();
+}
+
 onMounted(async () => {
   await page.load();
 });
@@ -72,14 +87,24 @@ onMounted(async () => {
     />
 
     <UPageBody>
-      <UAlert
-        v-if="errorMessage"
-        color="error"
-        variant="soft"
-        icon="i-heroicons-exclamation-triangle"
+      <ErrorStateCard
+        v-if="showJobError"
         :title="t('applicationStrength.page.errorTitle')"
-        :description="errorMessage"
+        :description="t(page.pageErrorMessageKey.value!)"
+        :retry-label="t('common.retry')"
+        test-id="application-strength-page-error"
         class="mb-6"
+        @retry="retryPageLoad"
+      />
+
+      <ErrorStateCard
+        v-else-if="showEvaluationError"
+        :title="t('applicationStrength.page.errorTitle')"
+        :description="t(page.evaluator.errorMessageKey.value!)"
+        :retry-label="t('common.retry')"
+        test-id="application-strength-evaluation-error"
+        class="mb-6"
+        @retry="retryEvaluation"
       />
 
       <UCard v-if="pageBusy" class="mb-6">
@@ -88,17 +113,17 @@ onMounted(async () => {
       </UCard>
 
       <ApplicationStrengthInputCard
-        v-if="page.showInput.value"
+        v-if="page.showInput.value && !showJobError"
         :selected-file="page.inputs.selectedFile.value"
         :pasted-text="page.inputs.pastedText.value"
         :extracted-text="page.inputs.extractedText.value"
         :extracted-type="page.inputs.extractedType.value"
         :pasted-type="page.inputs.pastedType.value"
         :can-evaluate="page.canEvaluate.value"
-        :loading="page.evaluator.loading.value"
+        :loading="page.evaluator.status.value === 'loading'"
         :is-extracting="page.inputs.isExtracting.value"
-        :validation-errors="page.inputs.validationErrors.value"
-        :extraction-error="page.inputs.extractionError.value"
+        :validation-error-keys="page.inputs.validationErrors.value"
+        :extraction-error-message-key="page.inputs.extractionErrorMessageKey.value"
         class="mb-6"
         @update:pasted-text="page.inputs.pastedText.value = $event"
         @upload-file="handleUploadFile($event)"

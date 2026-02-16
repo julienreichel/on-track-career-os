@@ -12,14 +12,14 @@ const props = withDefaults(
     canEvaluate: boolean;
     loading?: boolean;
     isExtracting?: boolean;
-    extractionError?: string | null;
-    validationErrors?: string[];
+    extractionErrorMessageKey?: string | null;
+    validationErrorKeys?: string[];
   }>(),
   {
     loading: false,
     isExtracting: false,
-    extractionError: null,
-    validationErrors: () => [],
+    extractionErrorMessageKey: null,
+    validationErrorKeys: () => [],
   }
 );
 const { t } = useI18n();
@@ -121,22 +121,22 @@ const pastedTypeLabel = computed(() =>
       />
 
       <UAlert
-        v-if="props.extractionError"
+        v-if="props.extractionErrorMessageKey"
         color="error"
         variant="soft"
         class="mt-4"
         :title="t('applicationStrength.input.fileExtractionError')"
-        :description="props.extractionError"
+        :description="t(props.extractionErrorMessageKey)"
       />
 
       <UAlert
-        v-for="(error, index) in props.validationErrors"
+        v-for="(errorKey, index) in props.validationErrorKeys"
         :key="`input-error-${index}`"
         color="warning"
         variant="soft"
         icon="i-heroicons-exclamation-triangle"
         class="mt-4"
-        :description="error"
+        :description="t(errorKey)"
       />
 
       <template #footer>

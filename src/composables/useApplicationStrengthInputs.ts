@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue';
 import type { Ref } from 'vue';
 import { PDFParse } from 'pdf-parse';
+import { logError } from '@/utils/logError';
 
 PDFParse.setWorker(
   'https://cdn.jsdelivr.net/npm/pdf-parse@latest/dist/pdf-parse/web/pdf.worker.mjs'
@@ -86,7 +87,8 @@ export function useApplicationStrengthInputs(options: UseApplicationStrengthInpu
   const extractedText = ref('');
   const selectedFile = ref<File | null>(null);
   const isExtracting = ref(false);
-  const extractionError = ref<string | null>(null);
+  const extractionErrorMessageKey = ref<string | null>(null);
+  const rawExtractionError = ref<unknown>(null);
 
   const uploadedType = computed<DetectedType | null>(() => {
     if (!extractedText.value.trim()) {
@@ -134,7 +136,7 @@ export function useApplicationStrengthInputs(options: UseApplicationStrengthInpu
     if (hasAnyMaterial.value) {
       return [];
     }
-    return ['Upload or paste at least one document (CV or cover letter).'];
+    return ['applicationStrength.errors.missingMaterial'];
   });
 
   async function handleFileUpload(file: File | null | undefined) {
@@ -143,13 +145,19 @@ export function useApplicationStrengthInputs(options: UseApplicationStrengthInpu
     }
 
     selectedFile.value = file;
-    extractionError.value = null;
+    extractionErrorMessageKey.value = null;
+    rawExtractionError.value = null;
     isExtracting.value = true;
 
     try {
       extractedText.value = (await extractTextFromFile(file)).trim();
     } catch (error) {
-      extractionError.value = error instanceof Error ? error.message : 'Unable to extract file text.';
+      rawExtractionError.value = error;
+      extractionErrorMessageKey.value = 'applicationStrength.errors.pdfExtractionFailed';
+      logError('Failed to extract application-strength upload text', error, {
+        fileName: file.name,
+        mimeType: file.type,
+      });
       selectedFile.value = null;
     } finally {
       isExtracting.value = false;
@@ -160,7 +168,8 @@ export function useApplicationStrengthInputs(options: UseApplicationStrengthInpu
     pastedText.value = '';
     extractedText.value = '';
     selectedFile.value = null;
-    extractionError.value = null;
+    extractionErrorMessageKey.value = null;
+    rawExtractionError.value = null;
     isExtracting.value = false;
   }
 
@@ -175,7 +184,8 @@ export function useApplicationStrengthInputs(options: UseApplicationStrengthInpu
     canEvaluate,
     validationErrors,
     isExtracting,
-    extractionError,
+    extractionErrorMessageKey,
+    rawExtractionError,
     handleFileUpload,
     reset,
   };

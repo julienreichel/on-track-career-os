@@ -1041,6 +1041,15 @@
         "medium": "medium",
         "low": "low"
       }
+    },
+    "errors": {
+      "jobNotFound": "We couldn't find this job. Try reloading from the jobs list.",
+      "loadFailed": "Application strength is temporarily unavailable. Please retry.",
+      "missingMaterial": "Upload or paste at least one document (CV or cover letter).",
+      "pdfExtractionFailed": "We couldn't extract text from this file. You can paste text instead.",
+      "validation": "Please review your inputs and try again.",
+      "aiValidation": "We couldn't validate the evaluation result. Please retry.",
+      "evaluationFailed": "We couldn't evaluate application strength right now. Please retry."
     }
   },
   "progress": {

@@ -1,10 +1,12 @@
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useAnalytics } from '@/composables/useAnalytics';
 import { useJobAnalysis } from '@/composables/useJobAnalysis';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useApplicationStrengthInputs } from '@/composables/useApplicationStrengthInputs';
 import { useApplicationStrengthEvaluator } from '@/composables/useApplicationStrengthEvaluator';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
+import { logError } from '@/utils/logError';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import type { EvaluateApplicationStrengthInput } from '@/domain/ai-operations/ApplicationStrengthResult';
 
@@ -31,8 +33,10 @@ function mapJobToOperationInput(job: JobDescription): JobOperationInput {
   };
 }
 
+// eslint-disable-next-line max-lines-per-function
 export function useApplicationStrengthPage(jobId: string) {
   const { locale } = useI18n();
+  const { captureEvent } = useAnalytics();
   const jobAnalysis = useJobAnalysis();
   const auth = useAuthUser();
   const profileService = new UserProfileService();
@@ -40,6 +44,7 @@ export function useApplicationStrengthPage(jobId: string) {
 
   const loading = ref(false);
   const pageError = ref<string | null>(null);
+  const pageErrorMessageKey = ref<string | null>(null);
   const forceHideInput = ref(false);
   const candidateFullName = ref('');
 
@@ -71,14 +76,16 @@ export function useApplicationStrengthPage(jobId: string) {
 
   const evaluate = async () => {
     pageError.value = null;
+    pageErrorMessageKey.value = null;
 
     if (!job.value) {
-      pageError.value = 'Job not found.';
+      pageErrorMessageKey.value = 'applicationStrength.errors.jobNotFound';
       return null;
     }
 
     if (!inputs.canEvaluate.value) {
-      pageError.value = inputs.validationErrors.value[0] ?? 'Please provide CV text.';
+      pageErrorMessageKey.value =
+        inputs.validationErrors.value[0] ?? 'applicationStrength.errors.missingMaterial';
       return null;
     }
 
@@ -89,9 +96,14 @@ export function useApplicationStrengthPage(jobId: string) {
       language: locale.value || 'en',
     };
 
-    const result = await evaluator.evaluate(input);
-    forceHideInput.value = true;
-    return result;
+    try {
+      const result = await evaluator.evaluate(input);
+      forceHideInput.value = true;
+      return result;
+    } catch {
+      forceHideInput.value = false;
+      return null;
+    }
   };
 
   const clear = () => {
@@ -99,16 +111,26 @@ export function useApplicationStrengthPage(jobId: string) {
     inputs.reset();
     forceHideInput.value = false;
     pageError.value = null;
+    pageErrorMessageKey.value = null;
   };
 
   const load = async () => {
     loading.value = true;
     pageError.value = null;
+    pageErrorMessageKey.value = null;
 
     try {
       await Promise.all([jobAnalysis.loadJobWithRelations(jobId), resolveCandidateName()]);
+      if (!jobAnalysis.selectedJob.value) {
+        pageErrorMessageKey.value = 'applicationStrength.errors.jobNotFound';
+      }
     } catch (error) {
+      pageErrorMessageKey.value = 'applicationStrength.errors.loadFailed';
       pageError.value = error instanceof Error ? error.message : 'Failed to load page.';
+      logError('Failed to load application strength page', error, { jobId });
+      captureEvent('application_strength_evaluation_failed', {
+        error_code: 'page_load_failed',
+      });
     } finally {
       loading.value = false;
     }
@@ -117,6 +139,7 @@ export function useApplicationStrengthPage(jobId: string) {
   return {
     loading,
     pageError,
+    pageErrorMessageKey,
     job,
     hasJob,
     canEvaluate,
