@@ -121,10 +121,10 @@ describe('useMaterialImprovementEngine', () => {
     expect(engine.canImprove.value).toBe(true);
   });
 
-  it('maps improve errors to deterministic message keys and sets error state', async () => {
+  it('runs improve without feedback when instructions are valid', async () => {
     const service = {
       runFeedback: vi.fn().mockResolvedValue(evaluationFixture),
-      runImprove: vi.fn().mockRejectedValue(new Error('ERR_MATERIAL_IMPROVEMENT_FEEDBACK_REQUIRED')),
+      runImprove: vi.fn().mockResolvedValue('# Improved letter'),
     } as unknown as MaterialImprovementService;
 
     const errorDisplay = buildErrorDisplayStub();
@@ -162,11 +162,16 @@ describe('useMaterialImprovementEngine', () => {
       },
     });
 
-    await engine.actions.runFeedback();
-    await expect(engine.actions.runImprove()).rejects.toThrow('ERR_MATERIAL_IMPROVEMENT_FEEDBACK_REQUIRED');
+    expect(engine.canImprove.value).toBe(true);
+    await engine.actions.runImprove();
 
-    expect(engine.state.value).toBe('error');
-    expect(errorDisplay.pageErrorMessageKey.value).toBe('materialImprovement.errors.feedbackRequired');
+    expect(service.runImprove).toHaveBeenCalledWith(
+      expect.objectContaining({
+        evaluation: null,
+      })
+    );
+    expect(engine.state.value).toBe('idle');
+    expect(errorDisplay.pageErrorMessageKey.value).toBeNull();
   });
 
   it('resets form values on improve trigger while using captured instructions', async () => {

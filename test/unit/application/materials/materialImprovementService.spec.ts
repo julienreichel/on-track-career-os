@@ -68,4 +68,26 @@ describe('materialImprovementService payload builders', () => {
     expect(payload.instructions.presets).toEqual(['More concise', 'focus on measurable outcomes']);
     expect(payload.improvementContext.overallScore).toBe(64);
   });
+
+  it('builds improve payload without feedback context', () => {
+    const payload = buildImproveMaterialPayload({
+      materialType: 'coverLetter',
+      currentMarkdown: 'Dear team,\n\nI can help.',
+      evaluation: null,
+      instructions: {
+        presets: ['More professional'],
+      },
+      grounding: {
+        language: 'en',
+        profile: {
+          fullName: 'Alex Candidate',
+        },
+        experiences: [],
+      },
+    });
+
+    expect(payload.materialType).toBe('coverLetter');
+    expect(payload.instructions.presets).toEqual(['More professional']);
+    expect(payload.improvementContext).toBeUndefined();
+  });
 });

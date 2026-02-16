@@ -31,7 +31,7 @@ export interface ImproveMaterialInput {
   materialType: MaterialType;
   currentMarkdown: string;
   instructions: ImproveMaterialInstructions;
-  improvementContext: EvaluateApplicationStrengthOutput;
+  improvementContext?: EvaluateApplicationStrengthOutput;
   profile: Profile;
   experiences: Experience[];
   stories?: SpeechStory[];
@@ -247,7 +247,10 @@ function validateInputShape(input: unknown): ImproveMaterialInput {
     throw new Error(`${IMPROVE_MATERIAL_ERROR_CODES.INVALID_INPUT}:instructions.presets`);
   }
 
-  const improvementContext = normalizeImprovementContext(input.improvementContext);
+  const improvementContext =
+    input.improvementContext === undefined || input.improvementContext === null
+      ? undefined
+      : normalizeImprovementContext(input.improvementContext);
 
   if (!isObject(input.profile)) {
     throw new Error(`${IMPROVE_MATERIAL_ERROR_CODES.INVALID_INPUT}:profile`);
@@ -265,7 +268,7 @@ function validateInputShape(input: unknown): ImproveMaterialInput {
       presets,
       note: sanitizeText(instructions.note) || undefined,
     },
-    improvementContext,
+    ...(improvementContext ? { improvementContext } : {}),
     profile: input.profile as Profile,
     experiences: input.experiences as Experience[],
     stories: Array.isArray(input.stories) ? (input.stories as SpeechStory[]) : undefined,
@@ -285,7 +288,17 @@ function validateInputShape(input: unknown): ImproveMaterialInput {
   return normalizedInput;
 }
 
-function toImprovementSummary(context: EvaluateApplicationStrengthOutput): ImprovementSummary {
+function toImprovementSummary(context?: EvaluateApplicationStrengthOutput): ImprovementSummary {
+  if (!context) {
+    return {
+      overallScore: 0,
+      weakDimensions: [],
+      missingSignals: [],
+      priorityActions: ['Apply the user improvement instructions while preserving factual accuracy.'],
+      readerNotes: [],
+    };
+  }
+
   const dimensionEntries = [
     { key: 'atsReadiness', value: context.dimensionScores.atsReadiness },
     { key: 'clarityFocus', value: context.dimensionScores.clarityFocus },
@@ -317,7 +330,7 @@ function toImprovementSummary(context: EvaluateApplicationStrengthOutput): Impro
   };
 }
 
-function buildImprovementContextSummary(context: EvaluateApplicationStrengthOutput): string {
+function buildImprovementContextSummary(context?: EvaluateApplicationStrengthOutput): string {
   const summary = toImprovementSummary(context);
   const score = Number.isFinite(summary.overallScore) ? Math.round(summary.overallScore) : 0;
   const weakDimensions = summary.weakDimensions.length

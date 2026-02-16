@@ -1085,36 +1085,52 @@
       }
     },
     "presets": {
+      "groups": {
+        "tone": "Tone",
+        "impact": "Impact",
+        "clarity": "Clarity",
+        "personality": "Personality",
+        "custom": "Custom"
+      },
       "items": {
         "moreProfessional": {
-          "label": "Tone: More professional"
+          "label": "More professional"
         },
         "moreHuman": {
-          "label": "Tone: More human"
+          "label": "More human"
         },
         "moreConfident": {
-          "label": "Tone: More confident"
+          "label": "More confident"
         },
         "moreFormal": {
-          "label": "Tone: More formal"
+          "label": "More formal"
         },
         "lessFormal": {
-          "label": "Tone: Less formal"
+          "label": "Less formal"
         },
         "moreResultsFocused": {
-          "label": "Impact: More results-focused"
+          "label": "More results-focused"
         },
         "highlightAchievements": {
-          "label": "Impact: Highlight achievements"
+          "label": "Highlight achievements"
         },
         "showClearerValue": {
-          "label": "Impact: Show clearer value"
+          "label": "Show clearer value"
         },
         "moreConcise": {
-          "label": "Clarity: More concise"
+          "label": "More concise"
         },
         "improveFlow": {
-          "label": "Clarity: Improve flow"
+          "label": "Improve flow"
+        },
+        "moreStoryDriven": {
+          "label": "Make it more story-driven"
+        },
+        "strongerPersonalMotivation": {
+          "label": "Add stronger personal motivation"
+        },
+        "moreEngagingIntroduction": {
+          "label": "Make the introduction more engaging"
         },
         "other": {
           "label": "Other"

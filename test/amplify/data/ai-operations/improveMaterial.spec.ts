@@ -148,6 +148,20 @@ TypeScript, AWS, Leadership, Architecture, Product collaboration.`;
     ).toThrow('ERR_IMPROVE_MATERIAL_INVALID_INPUT:instructions.presets');
   });
 
+  it('accepts payload without improvementContext', async () => {
+    mockSend.mockResolvedValueOnce(buildBedrockResponse(currentMarkdown));
+
+    const response = await handler({
+      arguments: {
+        ...validArguments,
+        improvementContext: undefined,
+      },
+    });
+
+    expect(typeof response).toBe('string');
+    expect(response.length).toBeGreaterThan(0);
+  });
+
   it('rejects JSON-like output during markdown validation', () => {
     expect(testables.isMarkdownOutputValid('{"markdown": "no"}')).toBe(false);
     expect(testables.isMarkdownOutputValid('```json\n{"a":1}\n```')).toBe(false);

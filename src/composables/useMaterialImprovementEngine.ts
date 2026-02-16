@@ -189,7 +189,7 @@ export function useMaterialImprovementEngine(options: UseMaterialImprovementEngi
     () => hasNonOtherPreset.value || (hasOtherPreset.value && hasCustomInstruction.value)
   );
   const canImprove = computed(
-    () => state.value === 'ready' && details.value !== null && hasValidInstructions.value
+    () => state.value !== 'analyzing' && state.value !== 'improving' && hasValidInstructions.value
   );
 
   const clearError = () => {

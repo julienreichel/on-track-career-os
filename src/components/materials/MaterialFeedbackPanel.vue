@@ -6,7 +6,7 @@ import type { MaterialImprovementState } from '@/composables/useMaterialImprovem
 import type { ImproveMaterialType } from '@/domain/ai-operations/ImproveMaterial';
 import {
   MATERIAL_IMPROVEMENT_OTHER_PRESET,
-  MATERIAL_IMPROVEMENT_PRESET_OPTIONS,
+  MATERIAL_IMPROVEMENT_PRESET_GROUPS,
 } from '@/domain/materials/improvementPresets';
 import ScoreSummaryCard from '@/components/common/ScoreSummaryCard.vue';
 import ApplicationStrengthImprovementsCard from '@/components/application-strength/ApplicationStrengthImprovementsCard.vue';
@@ -50,13 +50,30 @@ const noteValue = computed<string>({
   set: (value) => props.engine.actions.setNote(value),
 });
 
-const presetOptions = computed(() =>
-  MATERIAL_IMPROVEMENT_PRESET_OPTIONS.map((preset) => ({
-    value: preset.value,
-    label: t(preset.labelKey),
-  }))
+type PresetOptionItem = {
+  value: string;
+  label: string;
+};
+type PresetGroupLabelItem = {
+  type: 'label';
+  label: string;
+};
+
+const presetOptions = computed<Array<Array<PresetOptionItem | PresetGroupLabelItem>>>(() =>
+  MATERIAL_IMPROVEMENT_PRESET_GROUPS.map((group) => [
+    {
+      type: 'label',
+      label: t(group.labelKey),
+    },
+    ...group.options.map((preset) => ({
+      value: preset.value,
+      label: t(preset.labelKey),
+    })),
+  ])
 );
-const showOtherInput = computed(() => selectedPresets.value.includes(MATERIAL_IMPROVEMENT_OTHER_PRESET));
+const showOtherInput = computed(() =>
+  selectedPresets.value.includes(MATERIAL_IMPROVEMENT_OTHER_PRESET)
+);
 
 watch(
   showOtherInput,
@@ -72,12 +89,18 @@ const scoreValue = computed(() => props.engine.details.value?.overallScore ?? 0)
 
 const improveDisabled = computed(() => isBusy.value || !props.engine.canImprove.value);
 const feedbackButtonLabel = computed(() =>
-  isAnalyzing.value ? t('materialImprovement.panel.getFeedbackLoading') : t('materialImprovement.panel.getFeedback')
+  isAnalyzing.value
+    ? t('materialImprovement.panel.getFeedbackLoading')
+    : t('materialImprovement.panel.getFeedback')
 );
 const improveButtonLabel = computed(() =>
-  isImproving.value ? t('materialImprovement.panel.improveLoading') : t('materialImprovement.panel.improve')
+  isImproving.value
+    ? t('materialImprovement.panel.improveLoading')
+    : t('materialImprovement.panel.improve')
 );
-const materialTypeLabel = computed(() => t(`materialImprovement.panel.materialType.${props.materialType}`));
+const materialTypeLabel = computed(() =>
+  t(`materialImprovement.panel.materialType.${props.materialType}`)
+);
 const decisionColor = computed(() => {
   const label = props.engine.details.value?.decision.label;
   if (label === 'strong') {
@@ -158,7 +181,9 @@ async function handleRunImprove() {
     <UCard>
       <div class="space-y-3">
         <div class="space-y-1">
-          <h3 class="text-lg font-semibold">{{ t('materialImprovement.panel.feedbackSectionTitle') }}</h3>
+          <h3 class="text-lg font-semibold">
+            {{ t('materialImprovement.panel.feedbackSectionTitle') }}
+          </h3>
           <p class="text-sm text-dimmed">
             {{ t('materialImprovement.panel.description', { materialType: materialTypeLabel }) }}
           </p>
@@ -208,7 +233,9 @@ async function handleRunImprove() {
               class="space-y-4"
               data-testid="material-feedback-details"
             >
-              <ApplicationStrengthImprovementsCard :improvements="props.engine.details.value.topImprovements" />
+              <ApplicationStrengthImprovementsCard
+                :improvements="props.engine.details.value.topImprovements"
+              />
             </div>
           </template>
         </template>
@@ -217,7 +244,9 @@ async function handleRunImprove() {
 
     <UCard>
       <div class="space-y-3">
-        <h3 class="text-lg font-semibold">{{ t('materialImprovement.panel.improvementSectionTitle') }}</h3>
+        <h3 class="text-lg font-semibold">
+          {{ t('materialImprovement.panel.improvementSectionTitle') }}
+        </h3>
         <div class="space-y-2">
           <USelectMenu
             v-model="selectedPresets"
@@ -226,6 +255,7 @@ async function handleRunImprove() {
             multiple
             :placeholder="t('materialImprovement.panel.presetsPlaceholder')"
             data-testid="material-feedback-presets"
+            class="w-sm"
           />
           <p class="text-xs text-dimmed">
             {{ t('materialImprovement.panel.presetsHint') }}

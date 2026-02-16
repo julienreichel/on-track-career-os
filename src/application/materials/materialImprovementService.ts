@@ -25,13 +25,11 @@ import { MATERIAL_IMPROVEMENT_OTHER_PRESET } from '@/domain/materials/improvemen
 export type MaterialImprovementErrorKey =
   | 'materialImprovement.errors.feedbackValidation'
   | 'materialImprovement.errors.feedbackFailed'
-  | 'materialImprovement.errors.feedbackRequired'
   | 'materialImprovement.errors.emptyMarkdown'
   | 'materialImprovement.errors.invalidPayload'
   | 'materialImprovement.errors.invalidOutput'
   | 'materialImprovement.errors.improveFailed';
 
-const FEEDBACK_REQUIRED_CODE = 'ERR_MATERIAL_IMPROVEMENT_FEEDBACK_REQUIRED';
 const EMPTY_MARKDOWN_CODE = 'ERR_MATERIAL_IMPROVEMENT_EMPTY_MARKDOWN';
 const INVALID_MARKDOWN_CODE = 'ERR_MATERIAL_IMPROVEMENT_INVALID_MARKDOWN';
 
@@ -127,10 +125,6 @@ export function buildImproveMaterialPayload(input: ImproveMaterialRequest): Impr
     throw new Error(EMPTY_MARKDOWN_CODE);
   }
 
-  if (!input.evaluation) {
-    throw new Error(FEEDBACK_REQUIRED_CODE);
-  }
-
   const instructions = sanitizeInstructions(input.instructions);
   if (instructions.presets.length === 0) {
     throw new Error('ERR_IMPROVE_MATERIAL_INVALID_INPUT:instructions.presets');
@@ -141,7 +135,7 @@ export function buildImproveMaterialPayload(input: ImproveMaterialRequest): Impr
     materialType: input.materialType,
     currentMarkdown: markdown,
     instructions,
-    improvementContext: mapEvaluationToImprovementContext(input.evaluation),
+    ...(input.evaluation ? { improvementContext: mapEvaluationToImprovementContext(input.evaluation) } : {}),
     profile: input.grounding.profile,
     experiences: input.grounding.experiences,
     ...(input.grounding.stories ? { stories: input.grounding.stories } : {}),
@@ -167,10 +161,6 @@ export function resolveMaterialImprovementErrorKey(
     }
 
     return 'materialImprovement.errors.feedbackFailed';
-  }
-
-  if (message.includes(FEEDBACK_REQUIRED_CODE)) {
-    return 'materialImprovement.errors.feedbackRequired';
   }
 
   if (message.includes(EMPTY_MARKDOWN_CODE)) {
