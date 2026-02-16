@@ -279,7 +279,11 @@ function clearJobsError() {
         <UCard>
           <template v-if="isEditing">
             <div class="space-y-6">
-              <CompanyForm v-model="form" :disabled="disableActions" />
+              <CompanyForm
+                :model-value="form"
+                :disabled="disableActions"
+                @update:model-value="(value) => Object.assign(form, value)"
+              />
               <CompanyNotesInput v-model="rawNotes" :disabled="disableActions" />
             </div>
           </template>
