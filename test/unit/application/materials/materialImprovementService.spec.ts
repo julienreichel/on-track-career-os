@@ -1,16 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   buildImproveMaterialPayload,
   mapEvaluationToImprovementContext,
-  resolveMaterialImprovementErrorKey,
-  MaterialImprovementService,
 } from '@/application/materials/materialImprovementService';
 import type { ApplicationStrengthEvaluation } from '@/domain/application-strength/ApplicationStrengthEvaluation';
-import { ApplicationStrengthService } from '@/domain/application-strength/ApplicationStrengthService';
-import { AiOperationsRepository } from '@/domain/ai-operations/AiOperationsRepository';
-
-vi.mock('@/domain/application-strength/ApplicationStrengthService');
-vi.mock('@/domain/ai-operations/AiOperationsRepository');
 
 const evaluationFixture: ApplicationStrengthEvaluation = {
   overallScore: 64,
