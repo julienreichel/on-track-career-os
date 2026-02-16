@@ -13,6 +13,7 @@ import type {
 } from '../types/schema-types';
 
 const MIN_MARKDOWN_LENGTH = 200;
+const BOUNDARY_MARKERS = new Set(['"""', '---']);
 
 export const IMPROVE_MATERIAL_ERROR_CODES = {
   INVALID_INPUT: 'ERR_IMPROVE_MATERIAL_INVALID_INPUT',
@@ -386,6 +387,20 @@ function isMarkdownOutputValid(value: unknown): value is string {
   return true;
 }
 
+function sanitizeMarkdownOutput(value: string): string {
+  const lines = value.trim().split(/\r?\n/);
+
+  while (lines.length > 0 && BOUNDARY_MARKERS.has(lines[0]?.trim() ?? '')) {
+    lines.shift();
+  }
+
+  while (lines.length > 0 && BOUNDARY_MARKERS.has(lines[lines.length - 1]?.trim() ?? '')) {
+    lines.pop();
+  }
+
+  return lines.join('\n').trim();
+}
+
 async function invokeImprovementPrompt(userPrompt: string): Promise<string> {
   return invokeBedrock({
     systemPrompt: SYSTEM_PROMPT,
@@ -397,14 +412,16 @@ async function invokeImprovementPrompt(userPrompt: string): Promise<string> {
 async function improveMarkdownWithRetry(input: ImproveMaterialInput): Promise<string> {
   const prompt = buildUserPrompt(input);
   const first = await invokeImprovementPrompt(prompt);
+  const sanitizedFirst = sanitizeMarkdownOutput(first);
 
-  if (isMarkdownOutputValid(first)) {
-    return first.trim();
+  if (isMarkdownOutputValid(sanitizedFirst)) {
+    return sanitizedFirst;
   }
 
   const retry = await invokeImprovementPrompt(`${prompt}${STRICT_MARKDOWN_RETRY_APPENDIX}`);
-  if (isMarkdownOutputValid(retry)) {
-    return retry.trim();
+  const sanitizedRetry = sanitizeMarkdownOutput(retry);
+  if (isMarkdownOutputValid(sanitizedRetry)) {
+    return sanitizedRetry;
   }
 
   console.error('[improveMaterial] Falling back to original markdown after invalid model output', {
@@ -444,5 +461,6 @@ export const handler = async (event: HandlerEvent): Promise<string> => {
 export const __testables = {
   validateInputShape,
   isMarkdownOutputValid,
+  sanitizeMarkdownOutput,
   buildImprovementContextSummary,
 };
