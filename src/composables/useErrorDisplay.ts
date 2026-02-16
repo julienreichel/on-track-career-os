@@ -8,13 +8,16 @@ type ActionErrorOptions = {
 export const useErrorDisplay = () => {
   const toast = useToast();
   const pageError = ref<string | null>(null);
+  const pageErrorMessageKey = ref<string | null>(null);
 
-  const setPageError = (message: string) => {
+  const setPageError = (message: string, messageKey?: string) => {
     pageError.value = message;
+    pageErrorMessageKey.value = messageKey ?? null;
   };
 
   const clearPageError = () => {
     pageError.value = null;
+    pageErrorMessageKey.value = null;
   };
 
   const notifyActionError = (options: ActionErrorOptions) => {
@@ -27,6 +30,7 @@ export const useErrorDisplay = () => {
 
   return {
     pageError,
+    pageErrorMessageKey,
     setPageError,
     clearPageError,
     notifyActionError,

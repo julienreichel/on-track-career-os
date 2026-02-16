@@ -27,13 +27,18 @@ describe('useErrorDisplay', () => {
   });
 
   it('tracks and clears page errors', () => {
-    const { pageError, setPageError, clearPageError } = useErrorDisplay();
+    const { pageError, pageErrorMessageKey, setPageError, clearPageError } = useErrorDisplay();
 
     expect(pageError.value).toBeNull();
+    expect(pageErrorMessageKey.value).toBeNull();
     setPageError('Load failed');
     expect(pageError.value).toBe('Load failed');
+    expect(pageErrorMessageKey.value).toBeNull();
+    setPageError('Load failed', 'applicationStrength.errors.loadFailed');
+    expect(pageErrorMessageKey.value).toBe('applicationStrength.errors.loadFailed');
     clearPageError();
     expect(pageError.value).toBeNull();
+    expect(pageErrorMessageKey.value).toBeNull();
   });
 
   it('notifies action errors via toast', () => {
