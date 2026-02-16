@@ -95,7 +95,7 @@ function findButtonByLabel(wrapper: ReturnType<typeof mount>, label: string) {
 }
 
 describe('MaterialFeedbackPanel', () => {
-  it('renders score-only view by default and keeps details collapsed', () => {
+  it('renders feedback score view when feedback already exists and keeps details collapsed', () => {
     const engine = createEngineMock();
     const wrapper = mount(MaterialFeedbackPanel, {
       props: {
@@ -247,5 +247,6 @@ describe('MaterialFeedbackPanel', () => {
 
     expect(wrapper.text()).toContain('Get feedback');
     expect(wrapper.text()).toContain('Improve');
+    expect(wrapper.find('[data-testid="material-feedback-score"]').exists()).toBe(false);
   });
 });

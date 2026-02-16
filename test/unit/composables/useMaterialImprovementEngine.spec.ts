@@ -169,12 +169,18 @@ describe('useMaterialImprovementEngine', () => {
     expect(errorDisplay.pageErrorMessageKey.value).toBe('materialImprovement.errors.feedbackRequired');
   });
 
-  it('overwrites markdown through injected setter on successful improve', async () => {
+  it('resets form values on improve trigger while using captured instructions', async () => {
     const setMarkdown = vi.fn();
+    let resolveImprove: ((value: string) => void) | null = null;
 
     const service = {
       runFeedback: vi.fn().mockResolvedValue(evaluationFixture),
-      runImprove: vi.fn().mockResolvedValue('# Updated markdown'),
+      runImprove: vi.fn(
+        () =>
+          new Promise<string>((resolve) => {
+            resolveImprove = resolve;
+          })
+      ),
     } as unknown as MaterialImprovementService;
 
     const engine = useMaterialImprovementEngine({
@@ -203,6 +209,7 @@ describe('useMaterialImprovementEngine', () => {
         experiences: [],
       }),
       initialPresets: ['impact-first'],
+      initialNote: 'Focus on measurable outcomes',
       dependencies: {
         service,
         analytics: { captureEvent: vi.fn() },
@@ -211,9 +218,26 @@ describe('useMaterialImprovementEngine', () => {
     });
 
     await engine.actions.runFeedback();
-    await engine.actions.runImprove();
+    const pendingImprove = engine.actions.runImprove();
+
+    expect(engine.presets.value).toEqual([]);
+    expect(engine.note.value).toBe('');
+    expect(service.runImprove).toHaveBeenCalledWith(
+      expect.objectContaining({
+        instructions: {
+          presets: ['impact-first'],
+          note: 'Focus on measurable outcomes',
+        },
+      })
+    );
+
+    resolveImprove?.('# Updated markdown');
+    await pendingImprove;
 
     expect(setMarkdown).toHaveBeenCalledWith('# Updated markdown');
-    expect(engine.state.value).toBe('ready');
+    expect(engine.state.value).toBe('idle');
+    expect(engine.details.value).toBeNull();
+    expect(engine.score.value).toBeNull();
+    expect(engine.canImprove.value).toBe(false);
   });
 });

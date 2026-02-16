@@ -115,11 +115,15 @@ function createRunImprove(context: EngineContext) {
   return async () => {
     context.clearError();
     context.state.value = 'improving';
+    const selectedPresets = [...context.presets.value];
+    const noteValue = context.note.value;
+    context.presets.value = [];
+    context.note.value = '';
 
     context.deps.analytics.captureEvent('material_improvement_started', {
       material_type: context.options.materialType,
       document_id: resolveMaybeRef(context.options.currentDocumentId) ?? undefined,
-      preset_count: context.presets.value.length,
+      preset_count: selectedPresets.length,
     });
 
     try {
@@ -128,14 +132,16 @@ function createRunImprove(context: EngineContext) {
         currentMarkdown: context.options.getCurrentMarkdown(),
         evaluation: context.details.value,
         instructions: {
-          presets: [...context.presets.value],
-          note: context.note.value,
+          presets: selectedPresets,
+          note: noteValue,
         },
         grounding: context.options.getGroundingContext(),
       });
 
       await context.options.setCurrentMarkdown(improvedMarkdown);
-      context.state.value = 'ready';
+      // Improvement invalidates prior feedback because the document content changed.
+      context.details.value = null;
+      context.state.value = 'idle';
 
       context.deps.analytics.captureEvent('material_improvement_succeeded', {
         material_type: context.options.materialType,

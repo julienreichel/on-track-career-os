@@ -140,64 +140,70 @@ async function handleRunImprove() {
 </script>
 
 <template>
-  <UCard data-testid="material-feedback-panel">
-    <template #header>
-      <div class="space-y-1">
-        <h3 class="text-lg font-semibold">{{ t('materialImprovement.panel.title') }}</h3>
-        <p class="text-sm text-dimmed">
-          {{ t('materialImprovement.panel.description', { materialType: materialTypeLabel }) }}
-        </p>
-      </div>
-    </template>
-
-    <div class="space-y-4">
-      <ScoreSummaryCard
-        :title="t('applicationStrength.results.overallScore')"
-        :overall-score="scoreValue"
-        :overall-max="100"
-        :badge-color="decisionColor"
-        :badge-label="scoreBadgeLabel"
-        :metrics="scoreMetrics"
-        metrics-grid-class="md:grid-cols-4"
-        test-id="material-feedback-score"
-      />
-
-      <USkeleton v-if="isAnalyzing" class="h-16 w-full" />
-
-      <div v-else class="space-y-3">
-        <div class="flex flex-wrap gap-2">
-          <UButton
-            v-if="!hasFeedback"
-            color="primary"
-            :loading="isAnalyzing"
-            :disabled="isBusy"
-            :label="feedbackButtonLabel"
-            data-testid="material-feedback-run-feedback"
-            @click="handleRunFeedback"
-          />
-          <UButton
-            :color="hasFeedback ? 'primary' : 'neutral'"
-            :variant="hasFeedback ? 'solid' : 'soft'"
-            :loading="isImproving"
-            :disabled="improveDisabled"
-            :label="improveButtonLabel"
-            data-testid="material-feedback-run-improve"
-            @click="handleRunImprove"
-          />
-          <UButton
-            color="neutral"
-            variant="ghost"
-            :disabled="!hasFeedback"
-            :label="
-              canShowDetails
-                ? t('materialImprovement.panel.hideDetails')
-                : t('materialImprovement.panel.showDetails')
-            "
-            data-testid="material-feedback-toggle-details"
-            @click="detailsExpanded = !detailsExpanded"
-          />
+  <div class="space-y-4" data-testid="material-feedback-panel">
+    <UCard>
+      <div class="space-y-3">
+        <div class="space-y-1">
+          <h3 class="text-lg font-semibold">{{ t('materialImprovement.panel.feedbackSectionTitle') }}</h3>
+          <p class="text-sm text-dimmed">
+            {{ t('materialImprovement.panel.description', { materialType: materialTypeLabel }) }}
+          </p>
         </div>
+        <USkeleton v-if="isAnalyzing" class="h-16 w-full" />
 
+        <template v-else>
+          <div v-if="!hasFeedback" class="flex justify-end">
+            <UButton
+              color="primary"
+              :loading="isAnalyzing"
+              :disabled="isBusy"
+              :label="feedbackButtonLabel"
+              data-testid="material-feedback-run-feedback"
+              @click="handleRunFeedback"
+            />
+          </div>
+
+          <template v-else>
+            <ScoreSummaryCard
+              :title="t('applicationStrength.results.overallScore')"
+              :overall-score="scoreValue"
+              :overall-max="100"
+              :badge-color="decisionColor"
+              :badge-label="scoreBadgeLabel"
+              :metrics="scoreMetrics"
+              metrics-grid-class="md:grid-cols-4"
+              test-id="material-feedback-score"
+            />
+
+            <div class="flex justify-end">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                :label="
+                  canShowDetails
+                    ? t('materialImprovement.panel.hideDetails')
+                    : t('materialImprovement.panel.showDetails')
+                "
+                data-testid="material-feedback-toggle-details"
+                @click="detailsExpanded = !detailsExpanded"
+              />
+            </div>
+
+            <div
+              v-if="canShowDetails && props.engine.details.value"
+              class="space-y-4"
+              data-testid="material-feedback-details"
+            >
+              <ApplicationStrengthImprovementsCard :improvements="props.engine.details.value.topImprovements" />
+            </div>
+          </template>
+        </template>
+      </div>
+    </UCard>
+
+    <UCard>
+      <div class="space-y-3">
+        <h3 class="text-lg font-semibold">{{ t('materialImprovement.panel.improvementSectionTitle') }}</h3>
         <div class="space-y-2">
           <USelectMenu
             v-model="selectedPresets"
@@ -219,11 +225,19 @@ async function handleRunImprove() {
           :placeholder="t('materialImprovement.panel.notePlaceholder')"
           data-testid="material-feedback-note"
         />
-      </div>
 
-      <div v-if="canShowDetails && props.engine.details.value" class="space-y-4" data-testid="material-feedback-details">
-        <ApplicationStrengthImprovementsCard :improvements="props.engine.details.value.topImprovements" />
+        <div class="flex justify-end">
+          <UButton
+            :color="hasFeedback ? 'primary' : 'neutral'"
+            :variant="hasFeedback ? 'solid' : 'soft'"
+            :loading="isImproving"
+            :disabled="improveDisabled"
+            :label="improveButtonLabel"
+            data-testid="material-feedback-run-improve"
+            @click="handleRunImprove"
+          />
+        </div>
       </div>
-    </div>
-  </UCard>
+    </UCard>
+  </div>
 </template>
