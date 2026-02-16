@@ -697,6 +697,7 @@ const handleRegenerateTailored = async () => {
         const shouldShow = reloadedDocument.showProfilePhoto ?? true;
         showProfilePhotoSetting.value = shouldShow;
         originalShowProfilePhoto.value = shouldShow;
+        materialImprovementEngine.actions.reset();
         toast.add({ title: t('tailoredMaterials.toast.cvRegenerated'), color: 'primary' });
       }
     }

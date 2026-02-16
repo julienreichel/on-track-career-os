@@ -180,6 +180,7 @@ describe('CV Detail Page (index.vue)', () => {
     materialImprovementOptions = null;
     mockMaterialImprovementEngine.actions.runFeedback.mockClear();
     mockMaterialImprovementEngine.actions.runImprove.mockClear();
+    mockMaterialImprovementEngine.actions.reset.mockClear();
 
     const { CVDocumentService } = await import('@/domain/cvdocument/CVDocumentService');
     vi.mocked(CVDocumentService).mockImplementation(() => mockCVDocumentService as any);
@@ -554,6 +555,7 @@ describe('CV Detail Page (index.vue)', () => {
         },
       });
       expect(wrapper.vm.document).toEqual(regeneratedDoc);
+      expect(mockMaterialImprovementEngine.actions.reset).toHaveBeenCalledTimes(1);
     });
 
     it('handleRegenerateTailored does nothing when context missing', async () => {
