@@ -20,6 +20,7 @@ import type {
   Profile,
   SpeechStory,
 } from '@amplify/data/ai-operations/types/schema-types';
+import { MATERIAL_IMPROVEMENT_OTHER_PRESET } from '@/domain/materials/improvementPresets';
 
 export type MaterialImprovementErrorKey =
   | 'materialImprovement.errors.feedbackValidation'
@@ -75,11 +76,15 @@ function sanitizeStringArray(value: unknown): string[] {
 }
 
 function sanitizeInstructions(instructions: ImproveMaterialRequest['instructions']): ImproveMaterialInstructions {
-  const presets = sanitizeStringArray(instructions.presets);
+  const note = sanitizeText(instructions.note);
+  const selected = sanitizeStringArray(instructions.presets);
+  const presets = selected.filter((preset) => preset !== MATERIAL_IMPROVEMENT_OTHER_PRESET);
+  if (selected.includes(MATERIAL_IMPROVEMENT_OTHER_PRESET) && note.length > 0) {
+    presets.push(note);
+  }
 
   return {
     presets,
-    ...(sanitizeText(instructions.note) && { note: sanitizeText(instructions.note) }),
   };
 }
 

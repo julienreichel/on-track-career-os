@@ -71,7 +71,7 @@ Engineer with strong delivery background and measurable impact in SaaS products.
 ## Skills
 TypeScript, AWS, Leadership, Architecture, Product collaboration.`,
       instructions: {
-        presets: ['impact-first', 'concise-bullets'],
+        presets: ['More results-focused', 'More concise'],
         note: 'Strengthen role targeting while preserving facts.',
       },
       improvementContext: {

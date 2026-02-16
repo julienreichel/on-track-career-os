@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, type Ref } from 'vue';
+import { computed, ref, watch, type Ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { ApplicationStrengthEvaluation } from '@/domain/application-strength/ApplicationStrengthEvaluation';
 import type { MaterialImprovementState } from '@/composables/useMaterialImprovementEngine';
 import type { ImproveMaterialType } from '@/domain/ai-operations/ImproveMaterial';
-import { MATERIAL_IMPROVEMENT_PRESETS } from '@/domain/materials/improvementPresets';
+import {
+  MATERIAL_IMPROVEMENT_OTHER_PRESET,
+  MATERIAL_IMPROVEMENT_PRESET_OPTIONS,
+} from '@/domain/materials/improvementPresets';
 import ScoreSummaryCard from '@/components/common/ScoreSummaryCard.vue';
 import ApplicationStrengthImprovementsCard from '@/components/application-strength/ApplicationStrengthImprovementsCard.vue';
 
@@ -48,10 +51,21 @@ const noteValue = computed<string>({
 });
 
 const presetOptions = computed(() =>
-  MATERIAL_IMPROVEMENT_PRESETS.map((preset) => ({
-    value: preset as string,
-    label: t(`materialImprovement.presets.items.${preset}.label`),
+  MATERIAL_IMPROVEMENT_PRESET_OPTIONS.map((preset) => ({
+    value: preset.value,
+    label: t(preset.labelKey),
   }))
+);
+const showOtherInput = computed(() => selectedPresets.value.includes(MATERIAL_IMPROVEMENT_OTHER_PRESET));
+
+watch(
+  showOtherInput,
+  (enabled) => {
+    if (!enabled && noteValue.value.length > 0) {
+      noteValue.value = '';
+    }
+  },
+  { immediate: true }
 );
 
 const scoreValue = computed(() => props.engine.details.value?.overallScore ?? 0);
@@ -219,6 +233,7 @@ async function handleRunImprove() {
         </div>
 
         <UTextarea
+          v-if="showOtherInput"
           v-model="noteValue"
           :rows="3"
           class="w-full"

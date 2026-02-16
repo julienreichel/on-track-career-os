@@ -54,7 +54,7 @@ TypeScript, AWS, Leadership, Architecture, Product collaboration.`;
     materialType: 'cv',
     currentMarkdown,
     instructions: {
-      presets: ['impact-first', 'concise-bullets'],
+      presets: ['More results-focused', 'More concise'],
       note: 'Focus on role alignment and clarity.',
     },
     improvementContext: {

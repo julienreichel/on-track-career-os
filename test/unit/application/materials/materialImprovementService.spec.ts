@@ -52,7 +52,7 @@ describe('materialImprovementService payload builders', () => {
       currentMarkdown: '  # CV\n\ncontent  ',
       evaluation: evaluationFixture,
       instructions: {
-        presets: ['impact-first', '', '   ', 'concise-bullets'],
+        presets: ['More concise', '', '   ', '__other__'],
         note: '  focus on measurable outcomes  ',
       },
       grounding: {
@@ -65,8 +65,7 @@ describe('materialImprovementService payload builders', () => {
     });
 
     expect(payload.currentMarkdown).toBe('# CV\n\ncontent');
-    expect(payload.instructions.presets).toEqual(['impact-first', 'concise-bullets']);
-    expect(payload.instructions.note).toBe('focus on measurable outcomes');
+    expect(payload.instructions.presets).toEqual(['More concise', 'focus on measurable outcomes']);
     expect(payload.improvementContext.overallScore).toBe(64);
   });
 });

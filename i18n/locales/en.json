@@ -1072,7 +1072,7 @@
       "improvementSectionTitle": "Improvement",
       "presetsPlaceholder": "Select improvement presets",
       "presetsHint": "Choose one or more rewrite priorities.",
-      "notePlaceholder": "Optional note for the rewrite...",
+      "notePlaceholder": "Add your custom improvement sentence(s)...",
       "missingSignalsTitle": "Missing signals",
       "topActionsTitle": "Top actions",
       "noMissingSignals": "No major missing signals detected.",
@@ -1086,23 +1086,38 @@
     },
     "presets": {
       "items": {
-        "target-role-alignment": {
-          "label": "Align to target role"
+        "moreProfessional": {
+          "label": "Tone: More professional"
         },
-        "quantified-impact": {
-          "label": "Emphasize measurable impact"
+        "moreHuman": {
+          "label": "Tone: More human"
         },
-        "clarity-and-conciseness": {
-          "label": "Improve clarity and conciseness"
+        "moreConfident": {
+          "label": "Tone: More confident"
         },
-        "ats-keyword-coverage": {
-          "label": "Strengthen ATS keyword coverage"
+        "moreFormal": {
+          "label": "Tone: More formal"
         },
-        "stronger-openings": {
-          "label": "Strengthen section openings"
+        "lessFormal": {
+          "label": "Tone: Less formal"
         },
-        "tone-and-confidence": {
-          "label": "Upgrade tone and confidence"
+        "moreResultsFocused": {
+          "label": "Impact: More results-focused"
+        },
+        "highlightAchievements": {
+          "label": "Impact: Highlight achievements"
+        },
+        "showClearerValue": {
+          "label": "Impact: Show clearer value"
+        },
+        "moreConcise": {
+          "label": "Clarity: More concise"
+        },
+        "improveFlow": {
+          "label": "Clarity: Improve flow"
+        },
+        "other": {
+          "label": "Other"
         }
       }
     },

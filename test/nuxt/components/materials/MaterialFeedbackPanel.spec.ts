@@ -66,18 +66,25 @@ function createEngineMock(overrides?: {
   details?: ApplicationStrengthEvaluation | null;
   canImprove?: boolean;
 }) {
+  const presets = ref<string[]>([]);
+  const note = ref('');
+
   return {
     state: ref(overrides?.state ?? 'ready'),
     score: ref(overrides?.score === undefined ? 76 : overrides.score),
     details: ref(overrides?.details === undefined ? detailsFixture : overrides.details),
-    presets: ref<string[]>([]),
-    note: ref(''),
+    presets,
+    note,
     canImprove: ref(overrides?.canImprove ?? true),
     actions: {
       runFeedback: vi.fn().mockResolvedValue(undefined),
       runImprove: vi.fn().mockResolvedValue(undefined),
-      setPresets: vi.fn(),
-      setNote: vi.fn(),
+      setPresets: vi.fn((value: string[]) => {
+        presets.value = value;
+      }),
+      setNote: vi.fn((value: string) => {
+        note.value = value;
+      }),
     },
   };
 }
@@ -150,10 +157,11 @@ describe('MaterialFeedbackPanel', () => {
 
     wrapper
       .findComponent({ name: 'USelectMenu' })
-      .vm.$emit('update:modelValue', ['quantified-impact']);
+      .vm.$emit('update:modelValue', ['__other__']);
+    await nextTick();
     await wrapper.find('textarea').setValue('focus on concise bullets');
 
-    expect(engine.actions.setPresets).toHaveBeenCalledWith(['quantified-impact']);
+    expect(engine.actions.setPresets).toHaveBeenCalledWith(['__other__']);
     expect(engine.actions.setNote).toHaveBeenCalledWith('focus on concise bullets');
   });
 

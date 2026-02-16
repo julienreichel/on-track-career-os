@@ -101,7 +101,7 @@ describe('useMaterialImprovementEngine', () => {
         profile: { fullName: 'Alex' },
         experiences: [],
       }),
-      initialPresets: ['impact-first'],
+      initialPresets: ['More concise'],
       dependencies: {
         service,
         analytics: { captureEvent: vi.fn() },
@@ -154,7 +154,7 @@ describe('useMaterialImprovementEngine', () => {
         profile: { fullName: 'Alex' },
         experiences: [],
       }),
-      initialPresets: ['tone-tighten'],
+      initialPresets: ['More professional'],
       dependencies: {
         service,
         analytics: { captureEvent: vi.fn() },
@@ -208,7 +208,7 @@ describe('useMaterialImprovementEngine', () => {
         profile: { fullName: 'Alex' },
         experiences: [],
       }),
-      initialPresets: ['impact-first'],
+      initialPresets: ['More concise'],
       initialNote: 'Focus on measurable outcomes',
       dependencies: {
         service,
@@ -225,7 +225,7 @@ describe('useMaterialImprovementEngine', () => {
     expect(service.runImprove).toHaveBeenCalledWith(
       expect.objectContaining({
         instructions: {
-          presets: ['impact-first'],
+          presets: ['More concise'],
           note: 'Focus on measurable outcomes',
         },
       })

@@ -9,6 +9,7 @@ import {
 import type { ApplicationStrengthEvaluationInput } from '@/domain/application-strength/ApplicationStrengthEvaluation';
 import type { ImproveMaterialType } from '@/domain/ai-operations/ImproveMaterial';
 import { logError } from '@/utils/logError';
+import { MATERIAL_IMPROVEMENT_OTHER_PRESET } from '@/domain/materials/improvementPresets';
 
 export type MaterialImprovementState = 'idle' | 'analyzing' | 'ready' | 'improving' | 'error';
 
@@ -177,8 +178,18 @@ export function useMaterialImprovementEngine(options: UseMaterialImprovementEngi
   const note = ref(options.initialNote ?? '');
 
   const score = computed(() => details.value?.overallScore ?? null);
+  const hasCustomInstruction = computed(() => note.value.trim().length > 0);
+  const hasNonOtherPreset = computed(() =>
+    presets.value.some(
+      (preset) => preset.trim().length > 0 && preset !== MATERIAL_IMPROVEMENT_OTHER_PRESET
+    )
+  );
+  const hasOtherPreset = computed(() => presets.value.includes(MATERIAL_IMPROVEMENT_OTHER_PRESET));
+  const hasValidInstructions = computed(
+    () => hasNonOtherPreset.value || (hasOtherPreset.value && hasCustomInstruction.value)
+  );
   const canImprove = computed(
-    () => state.value === 'ready' && details.value !== null && presets.value.length > 0
+    () => state.value === 'ready' && details.value !== null && hasValidInstructions.value
   );
 
   const clearError = () => {

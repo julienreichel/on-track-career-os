@@ -109,11 +109,7 @@ type ImprovementSummary = {
   readerNotes: string[];
 };
 
-type DimensionKey =
-  | 'atsReadiness'
-  | 'clarityFocus'
-  | 'targetedFitSignals'
-  | 'evidenceStrength';
+type DimensionKey = 'atsReadiness' | 'clarityFocus' | 'targetedFitSignals' | 'evidenceStrength';
 
 function sanitizeDecisionLabel(value: unknown): 'strong' | 'borderline' | 'risky' {
   return value === 'strong' || value === 'borderline' || value === 'risky' ? value : 'risky';
@@ -141,7 +137,9 @@ function normalizeImprovementContext(value: unknown): EvaluateApplicationStrengt
 
   const overallScore = sanitizeNumber(context.overallScore);
   if (overallScore === null) {
-    throw new Error(`${IMPROVE_MATERIAL_ERROR_CODES.INVALID_INPUT}:improvementContext.overallScore`);
+    throw new Error(
+      `${IMPROVE_MATERIAL_ERROR_CODES.INVALID_INPUT}:improvementContext.overallScore`
+    );
   }
 
   const dimensionScoresRaw = isObject(context.dimensionScores) ? context.dimensionScores : null;
@@ -344,9 +342,10 @@ function buildImprovementContextSummary(context: EvaluateApplicationStrengthOutp
 }
 
 export function buildUserPrompt(input: ImproveMaterialInput): string {
-  const note = input.instructions.note?.trim() || 'none';
-
-  return `LANGUAGE:\n${input.language}\n\nMATERIAL TYPE:\n${input.materialType}\n\nUSER INSTRUCTIONS (PRESETS):\n${JSON.stringify(input.instructions.presets)}\n\nOPTIONAL USER NOTE:\n${note}\n\nIMPROVEMENT CONTEXT (INTERNAL SUMMARY):\n${buildImprovementContextSummary(input.improvementContext)}\n\nCURRENT DOCUMENT:\n"""\n${input.currentMarkdown}\n"""\n\nGROUNDING CONTEXT:\n${formatAiInputContext({
+  const note = input.instructions.note?.trim() ?? '';
+  const formattedInstructions = input.instructions.presets.map((instruction) => `- ${instruction}`).join('\n');
+  const noteSection = note.length > 0 ? `USER NOTE:\n${note}\n\n` : '';
+  const groundingContext = formatAiInputContext({
     language: input.language,
     profile: input.profile,
     experiences: input.experiences,
@@ -354,7 +353,32 @@ export function buildUserPrompt(input: ImproveMaterialInput): string {
     jobDescription: input.jobDescription,
     matchingSummary: input.matchingSummary,
     company: input.company,
-  })}\n\nRewrite the document accordingly and return only the final Markdown.`;
+  });
+
+  return `
+LANGUAGE:
+${input.language}
+
+MATERIAL TYPE:
+${input.materialType}
+
+USER IMPROVEMENT INSTRUCTIONS:
+${formattedInstructions}
+
+IMPROVEMENT CONTEXT (INTERNAL SUMMARY):
+${buildImprovementContextSummary(input.improvementContext)}
+
+CURRENT DOCUMENT:
+"""
+${input.currentMarkdown}
+"""
+
+GROUNDING CONTEXT:
+${groundingContext}
+
+${noteSection}
+Rewrite the document accordingly and return only the final Markdown.
+`.trim();
 }
 
 function isMarkdownOutputValid(value: unknown): value is string {

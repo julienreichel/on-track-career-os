@@ -806,7 +806,7 @@ describe('AiOperationsRepository', () => {
       materialType: 'cv',
       currentMarkdown: '# Existing markdown',
       instructions: {
-        presets: ['impact-first'],
+        presets: ['More concise'],
       },
       improvementContext: {
         overallScore: 72,
