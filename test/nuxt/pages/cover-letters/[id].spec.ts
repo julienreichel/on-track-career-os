@@ -21,6 +21,9 @@ vi.mock('@/domain/cover-letter/CoverLetterService', () => ({
     deleteCoverLetter: vi.fn(),
   })),
 }));
+vi.mock('@/domain/user-profile/UserProfileService');
+vi.mock('@/domain/company/CompanyService');
+vi.mock('@/composables/useMaterialImprovementEngine');
 
 const itemRef = ref<CoverLetter | null>(null);
 const loadingRef = ref(false);
@@ -65,6 +68,12 @@ vi.mock('@/application/tailoring/useTailoredMaterials', () => ({
 const jobServiceMock = {
   getJobSummary: vi.fn().mockResolvedValue({ id: 'job-1', title: 'Lead Engineer' }),
 };
+const userProfileServiceMock = {
+  getProfileForTailoring: vi.fn(),
+};
+const companyServiceMock = {
+  getCompany: vi.fn(),
+};
 
 vi.mock('@/domain/job-description/JobDescriptionService', () => ({
   JobDescriptionService: vi.fn().mockImplementation(() => jobServiceMock),
@@ -85,6 +94,23 @@ vi.mock('#app', () => ({
 const mockToast = {
   add: vi.fn(),
 };
+const mockMaterialImprovementEngine = {
+  state: { value: 'ready' },
+  score: { value: 78 },
+  details: { value: null },
+  presets: { value: [] as string[] },
+  note: { value: '' },
+  canImprove: { value: true },
+  actions: {
+    runFeedback: vi.fn().mockResolvedValue(undefined),
+    runImprove: vi.fn().mockResolvedValue(undefined),
+    setPresets: vi.fn(),
+    setNote: vi.fn(),
+    clearError: vi.fn(),
+    reset: vi.fn(),
+  },
+};
+let materialImprovementOptions: any = null;
 
 const i18n = createTestI18n();
 
@@ -153,6 +179,12 @@ const stubs = {
     template:
       '<div class="u-card"><div class="u-card-body"><slot /></div><div class="u-card-footer"><slot name="footer" /></div></div>',
   },
+  MaterialFeedbackPanel: {
+    props: ['engine'],
+    template:
+      '<div data-testid="material-feedback-panel"><button data-testid="material-feedback-trigger" @click="engine.actions.runFeedback()">feedback</button><button data-testid="material-improve-trigger" @click="engine.actions.runImprove()">improve</button></div>',
+  },
+  ErrorStateCard: true,
   USkeleton: { template: '<div class="u-skeleton"></div>' },
   UFormField: {
     props: ['label', 'name'],
@@ -183,7 +215,7 @@ async function mountPage() {
 }
 
 describe('Cover letter detail page', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     itemRef.value = {
       id: 'cl-1',
       userId: 'user-1',
@@ -201,6 +233,26 @@ describe('Cover letter detail page', () => {
     tailoredMaterialsMock.isGenerating.value = false;
     tailoredMaterialsMock.error.value = null;
     matchingSummaryMock.getByContext.mockResolvedValue({ id: 'summary-1' });
+    userProfileServiceMock.getProfileForTailoring.mockResolvedValue({
+      id: 'user-1',
+      fullName: 'Alex Candidate',
+      experiences: [],
+      canvas: null,
+    });
+    companyServiceMock.getCompany.mockResolvedValue(null);
+    materialImprovementOptions = null;
+    mockMaterialImprovementEngine.actions.runFeedback.mockClear();
+    mockMaterialImprovementEngine.actions.runImprove.mockClear();
+    mockMaterialImprovementEngine.actions.reset.mockClear();
+    const { UserProfileService } = await import('@/domain/user-profile/UserProfileService');
+    vi.mocked(UserProfileService).mockImplementation(() => userProfileServiceMock as any);
+    const { CompanyService } = await import('@/domain/company/CompanyService');
+    vi.mocked(CompanyService).mockImplementation(() => companyServiceMock as any);
+    const { useMaterialImprovementEngine } = await import('@/composables/useMaterialImprovementEngine');
+    vi.mocked(useMaterialImprovementEngine).mockImplementation((options: any) => {
+      materialImprovementOptions = options;
+      return mockMaterialImprovementEngine as any;
+    });
   });
 
   it('loads cover letter and renders view mode content', async () => {
@@ -299,4 +351,51 @@ describe('Cover letter detail page', () => {
 
   // Note: Generate button and profile validation have been removed from detail page
   // These validations now happen during the creation flow
+
+  it('renders panel and triggers feedback and improve actions', async () => {
+    itemRef.value = {
+      ...(itemRef.value as CoverLetter),
+      jobId: 'job-1',
+    };
+    const wrapper = await mountPage();
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="material-feedback-panel"]').exists()).toBe(true);
+    await wrapper.get('[data-testid="material-feedback-trigger"]').trigger('click');
+    await wrapper.get('[data-testid="material-improve-trigger"]').trigger('click');
+
+    expect(mockMaterialImprovementEngine.actions.runFeedback).toHaveBeenCalledTimes(1);
+    expect(mockMaterialImprovementEngine.actions.runImprove).toHaveBeenCalledTimes(1);
+  });
+
+  it('overwrites markdown through engine setter', async () => {
+    itemRef.value = {
+      ...(itemRef.value as CoverLetter),
+      jobId: 'job-1',
+    };
+    const updatedCoverLetter = {
+      ...(itemRef.value as CoverLetter),
+      content: '# Improved letter',
+    };
+    mockSave.mockResolvedValue(updatedCoverLetter);
+    const wrapper = await mountPage();
+    await flushPromises();
+
+    expect(materialImprovementOptions).toBeTruthy();
+    await materialImprovementOptions.setCurrentMarkdown('# Improved letter');
+    await flushPromises();
+
+    expect(mockSave).toHaveBeenCalledWith({
+      id: 'cl-1',
+      name: 'Test Cover Letter',
+      content: '# Improved letter',
+    });
+    expect(itemRef.value?.content).toBe('# Improved letter');
+    const setupState = (wrapper.vm.$ as any).setupState as {
+      editContent: string;
+      originalContent: string;
+    };
+    expect(setupState.editContent).toBe('# Improved letter');
+    expect(setupState.originalContent).toBe('# Improved letter');
+  });
 });

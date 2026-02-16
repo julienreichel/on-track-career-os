@@ -9,6 +9,7 @@ import {
 import type { ApplicationStrengthEvaluationInput } from '@/domain/application-strength/ApplicationStrengthEvaluation';
 import type { ImproveMaterialType } from '@/domain/ai-operations/ImproveMaterial';
 import { logError } from '@/utils/logError';
+import { MATERIAL_IMPROVEMENT_OTHER_PRESET } from '@/domain/materials/improvementPresets';
 
 export type MaterialImprovementState = 'idle' | 'analyzing' | 'ready' | 'improving' | 'error';
 
@@ -115,11 +116,15 @@ function createRunImprove(context: EngineContext) {
   return async () => {
     context.clearError();
     context.state.value = 'improving';
+    const selectedPresets = [...context.presets.value];
+    const noteValue = context.note.value;
+    context.presets.value = [];
+    context.note.value = '';
 
     context.deps.analytics.captureEvent('material_improvement_started', {
       material_type: context.options.materialType,
       document_id: resolveMaybeRef(context.options.currentDocumentId) ?? undefined,
-      preset_count: context.presets.value.length,
+      preset_count: selectedPresets.length,
     });
 
     try {
@@ -128,14 +133,16 @@ function createRunImprove(context: EngineContext) {
         currentMarkdown: context.options.getCurrentMarkdown(),
         evaluation: context.details.value,
         instructions: {
-          presets: [...context.presets.value],
-          note: context.note.value,
+          presets: selectedPresets,
+          note: noteValue,
         },
         grounding: context.options.getGroundingContext(),
       });
 
       await context.options.setCurrentMarkdown(improvedMarkdown);
-      context.state.value = 'ready';
+      // Improvement invalidates prior feedback because the document content changed.
+      context.details.value = null;
+      context.state.value = 'idle';
 
       context.deps.analytics.captureEvent('material_improvement_succeeded', {
         material_type: context.options.materialType,
@@ -171,8 +178,18 @@ export function useMaterialImprovementEngine(options: UseMaterialImprovementEngi
   const note = ref(options.initialNote ?? '');
 
   const score = computed(() => details.value?.overallScore ?? null);
+  const hasCustomInstruction = computed(() => note.value.trim().length > 0);
+  const hasNonOtherPreset = computed(() =>
+    presets.value.some(
+      (preset) => preset.trim().length > 0 && preset !== MATERIAL_IMPROVEMENT_OTHER_PRESET
+    )
+  );
+  const hasOtherPreset = computed(() => presets.value.includes(MATERIAL_IMPROVEMENT_OTHER_PRESET));
+  const hasValidInstructions = computed(
+    () => hasNonOtherPreset.value || (hasOtherPreset.value && hasCustomInstruction.value)
+  );
   const canImprove = computed(
-    () => state.value === 'ready' && details.value !== null && presets.value.length > 0
+    () => state.value !== 'analyzing' && state.value !== 'improving' && hasValidInstructions.value
   );
 
   const clearError = () => {

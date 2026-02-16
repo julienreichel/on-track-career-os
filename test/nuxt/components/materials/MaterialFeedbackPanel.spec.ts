@@ -1,0 +1,260 @@
+import { describe, it, expect, vi } from 'vitest';
+import { mount } from '@vue/test-utils';
+import { nextTick, ref } from 'vue';
+import MaterialFeedbackPanel from '@/components/materials/MaterialFeedbackPanel.vue';
+import type { ApplicationStrengthEvaluation } from '@/domain/application-strength/ApplicationStrengthEvaluation';
+import { createTestI18n } from '../../../utils/createTestI18n';
+
+const detailsFixture: ApplicationStrengthEvaluation = {
+  overallScore: 76,
+  dimensionScores: {
+    atsReadiness: 80,
+    clarityFocus: 70,
+    targetedFitSignals: 74,
+    evidenceStrength: 78,
+  },
+  decision: {
+    label: 'borderline',
+    readyToApply: false,
+    rationaleBullets: ['Good core fit'],
+  },
+  missingSignals: ['Explicit leadership metrics'],
+  topImprovements: [
+    {
+      title: 'Strengthen opening',
+      action: 'Lead with the most relevant role outcomes.',
+      impact: 'high',
+      target: {
+        document: 'cv',
+        anchor: 'summary',
+      },
+    },
+  ],
+  notes: {
+    atsNotes: ['Add role keywords'],
+    humanReaderNotes: ['Tighten long lines'],
+  },
+};
+
+const stubs = {
+  UCard: { template: '<div class="u-card"><slot name="header" /><slot /></div>' },
+  UBadge: { template: '<span class="u-badge"><slot /></span>' },
+  USkeleton: { template: '<div class="u-skeleton"></div>' },
+  UButton: {
+    name: 'UButton',
+    props: ['label', 'disabled', 'loading'],
+    template:
+      '<button type="button" :disabled="disabled || loading" @click="$emit(\'click\')" v-bind="$attrs">{{ label }}</button>',
+  },
+  USelectMenu: {
+    name: 'USelectMenu',
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    template: '<div class="u-select-menu"></div>',
+  },
+  UTextarea: {
+    name: 'UTextarea',
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
+    template: '<textarea class="u-textarea" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+  },
+};
+
+function createEngineMock(overrides?: {
+  state?: 'idle' | 'analyzing' | 'ready' | 'improving' | 'error';
+  score?: number | null;
+  details?: ApplicationStrengthEvaluation | null;
+  canImprove?: boolean;
+}) {
+  const presets = ref<string[]>([]);
+  const note = ref('');
+
+  return {
+    state: ref(overrides?.state ?? 'ready'),
+    score: ref(overrides?.score === undefined ? 76 : overrides.score),
+    details: ref(overrides?.details === undefined ? detailsFixture : overrides.details),
+    presets,
+    note,
+    canImprove: ref(overrides?.canImprove ?? true),
+    actions: {
+      runFeedback: vi.fn().mockResolvedValue(undefined),
+      runImprove: vi.fn().mockResolvedValue(undefined),
+      setPresets: vi.fn((value: string[]) => {
+        presets.value = value;
+      }),
+      setNote: vi.fn((value: string) => {
+        note.value = value;
+      }),
+    },
+  };
+}
+
+function findButtonByLabel(wrapper: ReturnType<typeof mount>, label: string) {
+  const button = wrapper
+    .findAllComponents({ name: 'UButton' })
+    .find((component) => component.props('label') === label);
+
+  if (!button) {
+    throw new Error(`Expected button with label: ${label}`);
+  }
+
+  return button;
+}
+
+describe('MaterialFeedbackPanel', () => {
+  it('renders feedback score view when feedback already exists and keeps details collapsed', () => {
+    const engine = createEngineMock();
+    const wrapper = mount(MaterialFeedbackPanel, {
+      props: {
+        engine,
+        materialType: 'cv',
+      },
+      global: {
+        plugins: [createTestI18n()],
+        stubs,
+      },
+    });
+
+    expect(wrapper.get('[data-testid="material-feedback-score"]').text()).toContain('76');
+    expect(wrapper.find('[data-testid="material-feedback-details"]').exists()).toBe(false);
+    expect(wrapper.text()).not.toContain('Get feedback');
+    expect(wrapper.text()).toContain('Improve');
+  });
+
+  it('expands details only when user toggles it', async () => {
+    const engine = createEngineMock();
+    const wrapper = mount(MaterialFeedbackPanel, {
+      props: {
+        engine,
+        materialType: 'cv',
+      },
+      global: {
+        plugins: [createTestI18n()],
+        stubs,
+      },
+    });
+
+    const toggleButton = findButtonByLabel(wrapper, 'Show details');
+    toggleButton.vm.$emit('click');
+    await nextTick();
+
+    expect(wrapper.find('[data-testid="material-feedback-details"]').exists()).toBe(true);
+    expect(wrapper.text()).toContain('Strengthen opening');
+  });
+
+  it('updates presets and note through engine actions', async () => {
+    const engine = createEngineMock();
+    const wrapper = mount(MaterialFeedbackPanel, {
+      props: {
+        engine,
+        materialType: 'coverLetter',
+      },
+      global: {
+        plugins: [createTestI18n()],
+        stubs,
+      },
+    });
+
+    wrapper
+      .findComponent({ name: 'USelectMenu' })
+      .vm.$emit('update:modelValue', ['__other__']);
+    await nextTick();
+    await wrapper.find('textarea').setValue('focus on concise bullets');
+
+    expect(engine.actions.setPresets).toHaveBeenCalledWith(['__other__']);
+    expect(engine.actions.setNote).toHaveBeenCalledWith('focus on concise bullets');
+  });
+
+  it('disables improve when no feedback or when busy, and executes callbacks', async () => {
+    const noFeedbackEngine = createEngineMock({
+      details: null,
+      score: null,
+      canImprove: false,
+      state: 'idle',
+    });
+
+    const noFeedbackWrapper = mount(MaterialFeedbackPanel, {
+      props: {
+        engine: noFeedbackEngine,
+        materialType: 'cv',
+      },
+      global: {
+        plugins: [createTestI18n()],
+        stubs,
+      },
+    });
+
+    const noFeedbackImproveButton = findButtonByLabel(noFeedbackWrapper, 'Improve');
+    expect(noFeedbackImproveButton.props('disabled')).toBe(true);
+
+    const busyEngine = createEngineMock({
+      state: 'improving',
+      canImprove: true,
+    });
+    const busyWrapper = mount(MaterialFeedbackPanel, {
+      props: {
+        engine: busyEngine,
+        materialType: 'cv',
+      },
+      global: {
+        plugins: [createTestI18n()],
+        stubs,
+      },
+    });
+
+    const improveButton = findButtonByLabel(busyWrapper, 'Improving...');
+    expect(improveButton.props('disabled')).toBe(true);
+    expect(
+      busyWrapper
+        .findAllComponents({ name: 'UButton' })
+        .some((component) => component.props('label') === 'Get feedback')
+    ).toBe(false);
+
+    const readyEngine = createEngineMock();
+    const readyWrapper = mount(MaterialFeedbackPanel, {
+      props: {
+        engine: readyEngine,
+        materialType: 'cv',
+      },
+      global: {
+        plugins: [createTestI18n()],
+        stubs,
+      },
+    });
+
+    const readyImproveButton = findButtonByLabel(readyWrapper, 'Improve');
+
+    readyImproveButton.vm.$emit('click');
+
+    expect(readyEngine.actions.runImprove).toHaveBeenCalledTimes(1);
+    expect(
+      readyWrapper
+        .findAllComponents({ name: 'UButton' })
+        .some((component) => component.props('label') === 'Get feedback')
+    ).toBe(false);
+  });
+
+  it('shows Get feedback only before feedback exists', () => {
+    const engine = createEngineMock({
+      details: null,
+      score: null,
+      canImprove: false,
+      state: 'idle',
+    });
+
+    const wrapper = mount(MaterialFeedbackPanel, {
+      props: {
+        engine,
+        materialType: 'cv',
+      },
+      global: {
+        plugins: [createTestI18n()],
+        stubs,
+      },
+    });
+
+    expect(wrapper.text()).toContain('Get feedback');
+    expect(wrapper.text()).toContain('Improve');
+    expect(wrapper.find('[data-testid="material-feedback-score"]').exists()).toBe(false);
+  });
+});

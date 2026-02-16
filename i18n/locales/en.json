@@ -1052,6 +1052,101 @@
       "evaluationFailed": "We couldn't evaluate application strength right now. Please retry."
     }
   },
+  "materialImprovement": {
+    "panel": {
+      "title": "Material improvement",
+      "description": "Review your score, pick rewrite presets, and improve your {materialType}.",
+      "materialType": {
+        "cv": "CV",
+        "coverLetter": "cover letter"
+      },
+      "scoreLabel": "Current score",
+      "scoreUnavailable": "--",
+      "getFeedback": "Get feedback",
+      "getFeedbackLoading": "Analyzing...",
+      "improve": "Improve",
+      "improveLoading": "Improving...",
+      "showDetails": "Show details",
+      "hideDetails": "Hide details",
+      "feedbackSectionTitle": "Feedback",
+      "improvementSectionTitle": "Improvement",
+      "presetsPlaceholder": "Select improvement presets",
+      "presetsHint": "Choose one or more rewrite priorities.",
+      "notePlaceholder": "Add your custom improvement sentence(s)...",
+      "missingSignalsTitle": "Missing signals",
+      "topActionsTitle": "Top actions",
+      "noMissingSignals": "No major missing signals detected.",
+      "state": {
+        "idle": "idle",
+        "analyzing": "analyzing",
+        "ready": "ready",
+        "improving": "improving",
+        "error": "error"
+      }
+    },
+    "presets": {
+      "groups": {
+        "tone": "Tone",
+        "impact": "Impact",
+        "clarity": "Clarity",
+        "personality": "Personality",
+        "custom": "Custom"
+      },
+      "items": {
+        "moreProfessional": {
+          "label": "More professional"
+        },
+        "moreHuman": {
+          "label": "More human"
+        },
+        "moreConfident": {
+          "label": "More confident"
+        },
+        "moreFormal": {
+          "label": "More formal"
+        },
+        "lessFormal": {
+          "label": "Less formal"
+        },
+        "moreResultsFocused": {
+          "label": "More results-focused"
+        },
+        "highlightAchievements": {
+          "label": "Highlight achievements"
+        },
+        "showClearerValue": {
+          "label": "Show clearer value"
+        },
+        "moreConcise": {
+          "label": "More concise"
+        },
+        "improveFlow": {
+          "label": "Improve flow"
+        },
+        "moreStoryDriven": {
+          "label": "Make it more story-driven"
+        },
+        "strongerPersonalMotivation": {
+          "label": "Add stronger personal motivation"
+        },
+        "moreEngagingIntroduction": {
+          "label": "Make the introduction more engaging"
+        },
+        "other": {
+          "label": "Other"
+        }
+      }
+    },
+    "errors": {
+      "feedbackValidation": "Please review the feedback inputs and try again.",
+      "feedbackFailed": "We couldn't generate feedback right now. Please retry.",
+      "feedbackRequired": "Get feedback before improving this material.",
+      "emptyMarkdown": "The current document is empty. Add content before improving.",
+      "invalidPayload": "We couldn't prepare this improvement request. Please retry.",
+      "invalidOutput": "The improved result was invalid. Please retry.",
+      "improveFailed": "We couldn't improve this material right now. Please retry."
+    }
+  },
   "progress": {
     "phaseLabel": "Current phase",
     "phaseLabels": {

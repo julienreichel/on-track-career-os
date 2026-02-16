@@ -12,8 +12,10 @@ import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary'
 vi.mock('@/domain/cvdocument/CVDocumentService');
 vi.mock('@/domain/user-profile/UserProfileService');
 vi.mock('@/domain/user-profile/ProfilePhotoService');
+vi.mock('@/domain/company/CompanyService');
 vi.mock('@/composables/useAuthUser');
 vi.mock('@/application/tailoring/useTailoredMaterials');
+vi.mock('@/composables/useMaterialImprovementEngine');
 
 const mockToast = {
   add: vi.fn(),
@@ -78,10 +80,14 @@ const mockCVDocumentService = {
 
 const mockUserProfileService = {
   getFullUserProfile: vi.fn(),
+  getProfileForTailoring: vi.fn(),
 };
 
 const mockProfilePhotoService = {
   getSignedUrl: vi.fn(),
+};
+const mockCompanyService = {
+  getCompany: vi.fn(),
 };
 
 const mockTailoredMaterials = {
@@ -93,6 +99,24 @@ const mockTailoredMaterials = {
   error: { value: null },
 };
 
+const mockMaterialImprovementEngine = {
+  state: { value: 'ready' },
+  score: { value: 78 },
+  details: { value: null },
+  presets: { value: [] as string[] },
+  note: { value: '' },
+  canImprove: { value: true },
+  actions: {
+    runFeedback: vi.fn().mockResolvedValue(undefined),
+    runImprove: vi.fn().mockResolvedValue(undefined),
+    setPresets: vi.fn(),
+    setNote: vi.fn(),
+    clearError: vi.fn(),
+    reset: vi.fn(),
+  },
+};
+let materialImprovementOptions: any = null;
+
 const mountPage = async (props = {}, routeParams = { id: 'cv-123' }) => {
   await mockRouter.push(`/applications/cv/${routeParams.id}`);
 
@@ -101,9 +125,9 @@ const mountPage = async (props = {}, routeParams = { id: 'cv-123' }) => {
     global: {
       plugins: [createTestI18n(), mockRouter],
       stubs: {
-        UPage: true,
+        UPage: { template: '<div><slot /></div>' },
         UPageHeader: true,
-        UPageBody: true,
+        UPageBody: { template: '<div><slot /></div>' },
         UCard: true,
         UAlert: true,
         UIcon: true,
@@ -112,6 +136,12 @@ const mountPage = async (props = {}, routeParams = { id: 'cv-123' }) => {
         UTextarea: true,
         USwitch: true,
         TailoredJobBanner: true,
+        MaterialFeedbackPanel: {
+          props: ['engine'],
+          template:
+            '<div data-testid="material-feedback-panel"><button data-testid="material-feedback-trigger" @click="engine.actions.runFeedback()">feedback</button><button data-testid="material-improve-trigger" @click="engine.actions.runImprove()">improve</button></div>',
+        },
+        ErrorStateCard: true,
         MarkdownContent: true,
         UnsavedChangesModal: true,
       },
@@ -127,13 +157,30 @@ describe('CV Detail Page (index.vue)', () => {
     vi.clearAllMocks();
     mockToast.add.mockClear();
     mockCVDocumentService.getFullCVDocument.mockResolvedValue(mockCvDocument);
+    mockCVDocumentService.updateCVDocument.mockImplementation(async (input: any) => ({
+      ...mockCvDocument,
+      ...input,
+      content: input.content ?? mockCvDocument.content,
+    }));
     mockUserProfileService.getFullUserProfile.mockResolvedValue({ profilePhotoKey: 'photo-key' });
+    mockUserProfileService.getProfileForTailoring.mockResolvedValue({
+      ...mockCvDocument,
+      id: 'user-123',
+      fullName: 'John Doe',
+      experiences: [],
+      canvas: null,
+    });
     mockProfilePhotoService.getSignedUrl.mockResolvedValue('https://example.com/photo.jpg');
+    mockCompanyService.getCompany.mockResolvedValue(null);
     mockTailoredMaterials.loadTailoringContext.mockResolvedValue({
       ok: true,
       job: mockJob,
       matchingSummary: mockMatchingSummary,
     });
+    materialImprovementOptions = null;
+    mockMaterialImprovementEngine.actions.runFeedback.mockClear();
+    mockMaterialImprovementEngine.actions.runImprove.mockClear();
+    mockMaterialImprovementEngine.actions.reset.mockClear();
 
     const { CVDocumentService } = await import('@/domain/cvdocument/CVDocumentService');
     vi.mocked(CVDocumentService).mockImplementation(() => mockCVDocumentService as any);
@@ -144,11 +191,20 @@ describe('CV Detail Page (index.vue)', () => {
     const { ProfilePhotoService } = await import('@/domain/user-profile/ProfilePhotoService');
     vi.mocked(ProfilePhotoService).mockImplementation(() => mockProfilePhotoService as any);
 
+    const { CompanyService } = await import('@/domain/company/CompanyService');
+    vi.mocked(CompanyService).mockImplementation(() => mockCompanyService as any);
+
     const { useAuthUser } = await import('@/composables/useAuthUser');
     vi.mocked(useAuthUser).mockReturnValue({ userId: { value: 'user-123' } } as any);
 
     const { useTailoredMaterials } = await import('@/application/tailoring/useTailoredMaterials');
     vi.mocked(useTailoredMaterials).mockReturnValue(mockTailoredMaterials as any);
+
+    const { useMaterialImprovementEngine } = await import('@/composables/useMaterialImprovementEngine');
+    vi.mocked(useMaterialImprovementEngine).mockImplementation((options: any) => {
+      materialImprovementOptions = options;
+      return mockMaterialImprovementEngine as any;
+    });
   });
 
   describe('Component Lifecycle', () => {
@@ -499,6 +555,7 @@ describe('CV Detail Page (index.vue)', () => {
         },
       });
       expect(wrapper.vm.document).toEqual(regeneratedDoc);
+      expect(mockMaterialImprovementEngine.actions.reset).toHaveBeenCalledTimes(1);
     });
 
     it('handleRegenerateTailored does nothing when context missing', async () => {
@@ -559,6 +616,40 @@ describe('CV Detail Page (index.vue)', () => {
     it('manages cancel confirmation modal state', async () => {
       const wrapper = await mountPage();
       expect(wrapper.vm.showCancelConfirm).toBe(false);
+    });
+  });
+
+  describe('Material Improvement Integration', () => {
+    it('renders panel and triggers feedback and improve actions', async () => {
+      const wrapper = await mountPage();
+      await flushPromises();
+
+      expect(wrapper.find('[data-testid="material-feedback-panel"]').exists()).toBe(true);
+
+      await wrapper.get('[data-testid="material-feedback-trigger"]').trigger('click');
+      await wrapper.get('[data-testid="material-improve-trigger"]').trigger('click');
+
+      expect(mockMaterialImprovementEngine.actions.runFeedback).toHaveBeenCalledTimes(1);
+      expect(mockMaterialImprovementEngine.actions.runImprove).toHaveBeenCalledTimes(1);
+    });
+
+    it('overwrites markdown and persists through engine setter', async () => {
+      const wrapper = await mountPage();
+      await flushPromises();
+
+      expect(materialImprovementOptions).toBeTruthy();
+
+      await materialImprovementOptions.setCurrentMarkdown('# Improved CV');
+      await flushPromises();
+
+      expect(mockCVDocumentService.updateCVDocument).toHaveBeenCalledWith({
+        id: 'cv-123',
+        content: '# Improved CV',
+        showProfilePhoto: true,
+      });
+      expect(wrapper.vm.document.content).toBe('# Improved CV');
+      expect(wrapper.vm.editContent).toBe('# Improved CV');
+      expect(wrapper.vm.originalContent).toBe('# Improved CV');
     });
   });
 

@@ -18,6 +18,7 @@ describe('ai.improveMaterial', () => {
   let testables: {
     validateInputShape: (input: unknown) => unknown;
     isMarkdownOutputValid: (value: unknown) => boolean;
+    sanitizeMarkdownOutput: (value: string) => string;
   };
   let buildUserPrompt: (input: unknown) => string;
   let mockSend: ReturnType<typeof vi.fn>;
@@ -53,7 +54,7 @@ TypeScript, AWS, Leadership, Architecture, Product collaboration.`;
     materialType: 'cv',
     currentMarkdown,
     instructions: {
-      presets: ['impact-first', 'concise-bullets'],
+      presets: ['More results-focused', 'More concise'],
       note: 'Focus on role alignment and clarity.',
     },
     improvementContext: {
@@ -147,6 +148,20 @@ TypeScript, AWS, Leadership, Architecture, Product collaboration.`;
     ).toThrow('ERR_IMPROVE_MATERIAL_INVALID_INPUT:instructions.presets');
   });
 
+  it('accepts payload without improvementContext', async () => {
+    mockSend.mockResolvedValueOnce(buildBedrockResponse(currentMarkdown));
+
+    const response = await handler({
+      arguments: {
+        ...validArguments,
+        improvementContext: undefined,
+      },
+    });
+
+    expect(typeof response).toBe('string');
+    expect(response.length).toBeGreaterThan(0);
+  });
+
   it('rejects JSON-like output during markdown validation', () => {
     expect(testables.isMarkdownOutputValid('{"markdown": "no"}')).toBe(false);
     expect(testables.isMarkdownOutputValid('```json\n{"a":1}\n```')).toBe(false);
@@ -176,5 +191,21 @@ TypeScript, AWS, Leadership, Architecture, Product collaboration.`;
     const prompt = buildUserPrompt(validArguments as unknown);
     expect(prompt).toContain('IMPROVEMENT CONTEXT');
     expect(prompt).not.toContain('A2');
+  });
+
+  it('strips boundary wrapper markers from model markdown output', async () => {
+    const improvedMarkdown = `${currentMarkdown}\n\n## Tailoring\n- Prioritized role-relevant impact statements.`;
+    const wrapped = `"""\n---\n${improvedMarkdown}\n---\n"""`;
+    mockSend.mockResolvedValueOnce(buildBedrockResponse(wrapped));
+
+    const response = await handler({ arguments: validArguments as unknown });
+
+    expect(response).toBe(improvedMarkdown);
+    expect(mockSend).toHaveBeenCalledTimes(1);
+  });
+
+  it('sanitizes leading and trailing marker-only lines', () => {
+    const raw = `\n"""\n---\n# Title\nContent\n---\n"""\n`;
+    expect(testables.sanitizeMarkdownOutput(raw)).toBe('# Title\nContent');
   });
 });

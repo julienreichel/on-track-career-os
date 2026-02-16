@@ -20,17 +20,16 @@ import type {
   Profile,
   SpeechStory,
 } from '@amplify/data/ai-operations/types/schema-types';
+import { MATERIAL_IMPROVEMENT_OTHER_PRESET } from '@/domain/materials/improvementPresets';
 
 export type MaterialImprovementErrorKey =
   | 'materialImprovement.errors.feedbackValidation'
   | 'materialImprovement.errors.feedbackFailed'
-  | 'materialImprovement.errors.feedbackRequired'
   | 'materialImprovement.errors.emptyMarkdown'
   | 'materialImprovement.errors.invalidPayload'
   | 'materialImprovement.errors.invalidOutput'
   | 'materialImprovement.errors.improveFailed';
 
-const FEEDBACK_REQUIRED_CODE = 'ERR_MATERIAL_IMPROVEMENT_FEEDBACK_REQUIRED';
 const EMPTY_MARKDOWN_CODE = 'ERR_MATERIAL_IMPROVEMENT_EMPTY_MARKDOWN';
 const INVALID_MARKDOWN_CODE = 'ERR_MATERIAL_IMPROVEMENT_INVALID_MARKDOWN';
 
@@ -75,11 +74,15 @@ function sanitizeStringArray(value: unknown): string[] {
 }
 
 function sanitizeInstructions(instructions: ImproveMaterialRequest['instructions']): ImproveMaterialInstructions {
-  const presets = sanitizeStringArray(instructions.presets);
+  const note = sanitizeText(instructions.note);
+  const selected = sanitizeStringArray(instructions.presets);
+  const presets = selected.filter((preset) => preset !== MATERIAL_IMPROVEMENT_OTHER_PRESET);
+  if (selected.includes(MATERIAL_IMPROVEMENT_OTHER_PRESET) && note.length > 0) {
+    presets.push(note);
+  }
 
   return {
     presets,
-    ...(sanitizeText(instructions.note) && { note: sanitizeText(instructions.note) }),
   };
 }
 
@@ -122,10 +125,6 @@ export function buildImproveMaterialPayload(input: ImproveMaterialRequest): Impr
     throw new Error(EMPTY_MARKDOWN_CODE);
   }
 
-  if (!input.evaluation) {
-    throw new Error(FEEDBACK_REQUIRED_CODE);
-  }
-
   const instructions = sanitizeInstructions(input.instructions);
   if (instructions.presets.length === 0) {
     throw new Error('ERR_IMPROVE_MATERIAL_INVALID_INPUT:instructions.presets');
@@ -136,7 +135,7 @@ export function buildImproveMaterialPayload(input: ImproveMaterialRequest): Impr
     materialType: input.materialType,
     currentMarkdown: markdown,
     instructions,
-    improvementContext: mapEvaluationToImprovementContext(input.evaluation),
+    ...(input.evaluation ? { improvementContext: mapEvaluationToImprovementContext(input.evaluation) } : {}),
     profile: input.grounding.profile,
     experiences: input.grounding.experiences,
     ...(input.grounding.stories ? { stories: input.grounding.stories } : {}),
@@ -162,10 +161,6 @@ export function resolveMaterialImprovementErrorKey(
     }
 
     return 'materialImprovement.errors.feedbackFailed';
-  }
-
-  if (message.includes(FEEDBACK_REQUIRED_CODE)) {
-    return 'materialImprovement.errors.feedbackRequired';
   }
 
   if (message.includes(EMPTY_MARKDOWN_CODE)) {

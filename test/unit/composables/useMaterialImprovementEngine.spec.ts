@@ -101,7 +101,7 @@ describe('useMaterialImprovementEngine', () => {
         profile: { fullName: 'Alex' },
         experiences: [],
       }),
-      initialPresets: ['impact-first'],
+      initialPresets: ['More concise'],
       dependencies: {
         service,
         analytics: { captureEvent: vi.fn() },
@@ -121,10 +121,10 @@ describe('useMaterialImprovementEngine', () => {
     expect(engine.canImprove.value).toBe(true);
   });
 
-  it('maps improve errors to deterministic message keys and sets error state', async () => {
+  it('runs improve without feedback when instructions are valid', async () => {
     const service = {
       runFeedback: vi.fn().mockResolvedValue(evaluationFixture),
-      runImprove: vi.fn().mockRejectedValue(new Error('ERR_MATERIAL_IMPROVEMENT_FEEDBACK_REQUIRED')),
+      runImprove: vi.fn().mockResolvedValue('# Improved letter'),
     } as unknown as MaterialImprovementService;
 
     const errorDisplay = buildErrorDisplayStub();
@@ -154,7 +154,7 @@ describe('useMaterialImprovementEngine', () => {
         profile: { fullName: 'Alex' },
         experiences: [],
       }),
-      initialPresets: ['tone-tighten'],
+      initialPresets: ['More professional'],
       dependencies: {
         service,
         analytics: { captureEvent: vi.fn() },
@@ -162,19 +162,30 @@ describe('useMaterialImprovementEngine', () => {
       },
     });
 
-    await engine.actions.runFeedback();
-    await expect(engine.actions.runImprove()).rejects.toThrow('ERR_MATERIAL_IMPROVEMENT_FEEDBACK_REQUIRED');
+    expect(engine.canImprove.value).toBe(true);
+    await engine.actions.runImprove();
 
-    expect(engine.state.value).toBe('error');
-    expect(errorDisplay.pageErrorMessageKey.value).toBe('materialImprovement.errors.feedbackRequired');
+    expect(service.runImprove).toHaveBeenCalledWith(
+      expect.objectContaining({
+        evaluation: null,
+      })
+    );
+    expect(engine.state.value).toBe('idle');
+    expect(errorDisplay.pageErrorMessageKey.value).toBeNull();
   });
 
-  it('overwrites markdown through injected setter on successful improve', async () => {
+  it('resets form values on improve trigger while using captured instructions', async () => {
     const setMarkdown = vi.fn();
+    let resolveImprove: ((value: string) => void) | null = null;
 
     const service = {
       runFeedback: vi.fn().mockResolvedValue(evaluationFixture),
-      runImprove: vi.fn().mockResolvedValue('# Updated markdown'),
+      runImprove: vi.fn(
+        () =>
+          new Promise<string>((resolve) => {
+            resolveImprove = resolve;
+          })
+      ),
     } as unknown as MaterialImprovementService;
 
     const engine = useMaterialImprovementEngine({
@@ -202,7 +213,8 @@ describe('useMaterialImprovementEngine', () => {
         profile: { fullName: 'Alex' },
         experiences: [],
       }),
-      initialPresets: ['impact-first'],
+      initialPresets: ['More concise'],
+      initialNote: 'Focus on measurable outcomes',
       dependencies: {
         service,
         analytics: { captureEvent: vi.fn() },
@@ -211,9 +223,26 @@ describe('useMaterialImprovementEngine', () => {
     });
 
     await engine.actions.runFeedback();
-    await engine.actions.runImprove();
+    const pendingImprove = engine.actions.runImprove();
+
+    expect(engine.presets.value).toEqual([]);
+    expect(engine.note.value).toBe('');
+    expect(service.runImprove).toHaveBeenCalledWith(
+      expect.objectContaining({
+        instructions: {
+          presets: ['More concise'],
+          note: 'Focus on measurable outcomes',
+        },
+      })
+    );
+
+    resolveImprove?.('# Updated markdown');
+    await pendingImprove;
 
     expect(setMarkdown).toHaveBeenCalledWith('# Updated markdown');
-    expect(engine.state.value).toBe('ready');
+    expect(engine.state.value).toBe('idle');
+    expect(engine.details.value).toBeNull();
+    expect(engine.score.value).toBeNull();
+    expect(engine.canImprove.value).toBe(false);
   });
 });

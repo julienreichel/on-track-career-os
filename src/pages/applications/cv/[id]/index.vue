@@ -199,6 +199,22 @@
           :title="$t('applications.cvs.display.notFound')"
           :description="$t('applications.cvs.display.notFoundDescription')"
         />
+
+        <ErrorStateCard
+          v-if="showMaterialImprovementError"
+          class="mt-6"
+          :title="$t('common.error')"
+          :description="materialImprovementErrorMessage"
+          :retry-label="$t('common.retry')"
+          @retry="retryMaterialFeedback"
+        />
+
+        <MaterialFeedbackPanel
+          v-if="document && hasJobContext"
+          class="mt-6"
+          :engine="materialImprovementEngine"
+          material-type="cv"
+        />
       </UPageBody>
     </UPage>
 
@@ -215,13 +231,28 @@ import MarkdownContent from '@/components/MarkdownContent.vue';
 import { CVDocumentService } from '@/domain/cvdocument/CVDocumentService';
 import { UserProfileService } from '@/domain/user-profile/UserProfileService';
 import { ProfilePhotoService } from '@/domain/user-profile/ProfilePhotoService';
+import { CompanyService } from '@/domain/company/CompanyService';
 import { useAuthUser } from '@/composables/useAuthUser';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import TailoredJobBanner from '@/components/tailoring/TailoredJobBanner.vue';
+import MaterialFeedbackPanel from '@/components/materials/MaterialFeedbackPanel.vue';
+import ErrorStateCard from '@/components/common/ErrorStateCard.vue';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
+import { useMaterialImprovementEngine } from '@/composables/useMaterialImprovementEngine';
+import { buildSpeechInput } from '@/composables/useSpeechEngine';
 import { formatDetailDate } from '@/utils/formatDetailDate';
 import type { CVDocument } from '@/domain/cvdocument/CVDocument';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
+import type { Company } from '@/domain/company/Company';
+import type { UserProfile } from '@/domain/user-profile/UserProfile';
+import type { Experience } from '@/domain/experience/Experience';
+import type { STARStory } from '@/domain/starstory/STARStory';
+import type {
+  JobDescription as JobDescriptionContext,
+  MatchingSummaryContext,
+  CompanyProfile,
+} from '@amplify/data/ai-operations/types/schema-types';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -232,14 +263,20 @@ const cvId = computed(() => route.params.id as string);
 const service = new CVDocumentService();
 const userProfileService = new UserProfileService();
 const profilePhotoService = new ProfilePhotoService();
+const companyService = new CompanyService();
 const auth = useAuthUser();
 const tailoredMaterials = useTailoredMaterials({ auth });
+const materialImprovementErrorDisplay = useErrorDisplay();
 const document = ref<CVDocument | null>(null);
 const loading = ref(false);
 const saving = ref(false);
 const error = ref<string | null>(null);
 const targetJob = ref<JobDescription | null>(null);
 const matchingSummary = ref<MatchingSummary | null>(null);
+const companyContext = ref<Company | null>(null);
+const groundingProfile = ref<UserProfile | null>(null);
+const groundingExperiences = ref<Experience[]>([]);
+const groundingStories = ref<STARStory[]>([]);
 
 const isEditing = ref(false);
 const editContent = ref('');
@@ -275,6 +312,17 @@ const regenerateError = computed(() => tailoredMaterials.error.value);
 const missingSummary = computed(() =>
   Boolean(document.value?.jobId && targetJob.value && !matchingSummary.value)
 );
+const showMaterialImprovementError = computed(
+  () =>
+    Boolean(materialImprovementErrorDisplay.pageErrorMessageKey.value) ||
+    Boolean(materialImprovementErrorDisplay.pageError.value)
+);
+const materialImprovementErrorMessage = computed(() => {
+  if (materialImprovementErrorDisplay.pageErrorMessageKey.value) {
+    return t(materialImprovementErrorDisplay.pageErrorMessageKey.value);
+  }
+  return materialImprovementErrorDisplay.pageError.value ?? t('materialImprovement.errors.improveFailed');
+});
 
 const previewShowsPhoto = computed(() => {
   const enabled = isEditing.value
@@ -291,6 +339,211 @@ const hasChanges = computed(() => {
 });
 
 const formattedUpdatedAt = computed(() => formatDetailDate(document.value?.updatedAt));
+
+const normalizeString = (value: unknown): string =>
+  typeof value === 'string' ? value.trim() : '';
+
+const normalizeStringArray = (value: unknown): string[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value
+    .map((item) => normalizeString(item))
+    .filter((item) => item.length > 0);
+};
+
+const normalizeJobContext = (job: JobDescription): JobDescriptionContext => {
+  return {
+    title: normalizeString(job.title),
+    seniorityLevel: normalizeString(job.seniorityLevel),
+    roleSummary: normalizeString(job.roleSummary),
+    responsibilities: normalizeStringArray(job.responsibilities),
+    requiredSkills: normalizeStringArray(job.requiredSkills),
+    behaviours: normalizeStringArray(job.behaviours),
+    successCriteria: normalizeStringArray(job.successCriteria),
+    explicitPains: normalizeStringArray(job.explicitPains),
+    atsKeywords: normalizeStringArray(job.atsKeywords),
+  };
+};
+
+const normalizeMatchingSummaryContext = (
+  summary: MatchingSummary | null
+): MatchingSummaryContext | undefined => {
+  if (!summary) {
+    return undefined;
+  }
+
+  const recommendation = summary.recommendation;
+  const scoreBreakdownCandidate =
+    summary.scoreBreakdown &&
+    typeof summary.scoreBreakdown === 'object' &&
+    !Array.isArray(summary.scoreBreakdown)
+      ? (summary.scoreBreakdown as Partial<Record<'skillFit' | 'experienceFit' | 'interestFit' | 'edge', unknown>>)
+      : {};
+
+  return {
+    overallScore: typeof summary.overallScore === 'number' ? summary.overallScore : 0,
+    scoreBreakdown: {
+      skillFit: typeof scoreBreakdownCandidate.skillFit === 'number' ? scoreBreakdownCandidate.skillFit : 0,
+      experienceFit:
+        typeof scoreBreakdownCandidate.experienceFit === 'number'
+          ? scoreBreakdownCandidate.experienceFit
+          : 0,
+      interestFit:
+        typeof scoreBreakdownCandidate.interestFit === 'number' ? scoreBreakdownCandidate.interestFit : 0,
+      edge: typeof scoreBreakdownCandidate.edge === 'number' ? scoreBreakdownCandidate.edge : 0,
+    },
+    recommendation:
+      recommendation === 'apply' || recommendation === 'maybe' || recommendation === 'skip'
+        ? recommendation
+        : 'maybe',
+    reasoningHighlights: normalizeStringArray(summary.reasoningHighlights),
+    strengthsForThisRole: normalizeStringArray(summary.strengthsForThisRole),
+    skillMatch: normalizeStringArray(summary.skillMatch),
+    riskyPoints: normalizeStringArray(summary.riskyPoints),
+    impactOpportunities: normalizeStringArray(summary.impactOpportunities),
+    tailoringTips: normalizeStringArray(summary.tailoringTips),
+  };
+};
+
+const normalizeCompanyContext = (company: Company | null): CompanyProfile | undefined => {
+  if (!company) {
+    return undefined;
+  }
+
+  return {
+    companyName: normalizeString(company.companyName),
+    industry: normalizeString(company.industry),
+    sizeRange: normalizeString(company.sizeRange),
+    website: normalizeString(company.website),
+    description: normalizeString(company.description),
+    productsServices: normalizeStringArray(company.productsServices),
+    targetMarkets: normalizeStringArray(company.targetMarkets),
+    customerSegments: normalizeStringArray(company.customerSegments),
+    rawNotes: normalizeString(company.rawNotes),
+  };
+};
+
+const extractGroundingContext = (profile: UserProfile) => {
+  const profileWithRelations = profile as UserProfile & {
+    experiences?: (Experience & { stories?: (STARStory | null)[] | null } | null)[] | null;
+  };
+
+  const experiences = (profileWithRelations.experiences ?? []).filter(
+    (item): item is Experience & { stories?: (STARStory | null)[] | null } => Boolean(item)
+  );
+
+  const stories = experiences
+    .flatMap((experience) => experience.stories ?? [])
+    .filter((item): item is STARStory => Boolean(item));
+
+  groundingExperiences.value = experiences;
+  groundingStories.value = stories;
+};
+
+const loadMaterialImprovementGrounding = async () => {
+  const userId = document.value?.userId;
+  if (!userId) {
+    groundingProfile.value = null;
+    groundingExperiences.value = [];
+    groundingStories.value = [];
+    companyContext.value = null;
+    return;
+  }
+
+  const profile = await userProfileService.getProfileForTailoring(userId);
+  groundingProfile.value = profile;
+  if (profile) {
+    extractGroundingContext(profile);
+  } else {
+    groundingExperiences.value = [];
+    groundingStories.value = [];
+  }
+
+  const companyId = targetJob.value?.companyId;
+  companyContext.value = companyId ? await companyService.getCompany(companyId) : null;
+};
+
+const getCurrentMarkdown = () =>
+  isEditing.value ? editContent.value : (document.value?.content ?? '');
+
+const persistImprovedMarkdown = async (markdown: string) => {
+  if (!document.value) {
+    throw new Error('CV document is missing');
+  }
+
+  saving.value = true;
+  try {
+    const updated = await service.updateCVDocument({
+      id: document.value.id,
+      content: markdown,
+      showProfilePhoto: document.value.showProfilePhoto ?? showProfilePhotoSetting.value,
+    });
+
+    if (!updated) {
+      throw new Error('Failed to persist improved markdown');
+    }
+
+    document.value = updated;
+    editContent.value = markdown;
+    originalContent.value = markdown;
+    toast.add({
+      title: t('applications.cvs.display.toast.saved'),
+      color: 'primary',
+    });
+  } finally {
+    saving.value = false;
+  }
+};
+
+const materialImprovementEngine = useMaterialImprovementEngine({
+  materialType: 'cv',
+  currentDocumentId: cvId,
+  jobId: computed(() => targetJob.value?.id ?? null),
+  companyId: computed(() => targetJob.value?.companyId ?? null),
+  getCurrentMarkdown,
+  setCurrentMarkdown: persistImprovedMarkdown,
+  getFeedbackInput: () => {
+    if (!targetJob.value) {
+      throw new Error('Job context is required for CV feedback');
+    }
+    return {
+      job: normalizeJobContext(targetJob.value),
+      cvText: getCurrentMarkdown(),
+      coverLetterText: '',
+      language: 'en',
+    };
+  },
+  getGroundingContext: () => {
+    if (!groundingProfile.value) {
+      throw new Error('User profile is required for CV improvement');
+    }
+
+    const speechInput = buildSpeechInput({
+      profile: groundingProfile.value,
+      experiences: groundingExperiences.value,
+      stories: groundingStories.value,
+      tailoring: {
+        jobDescription: targetJob.value ? normalizeJobContext(targetJob.value) : undefined,
+        matchingSummary: normalizeMatchingSummaryContext(matchingSummary.value),
+        company: normalizeCompanyContext(companyContext.value),
+      },
+    });
+
+    return {
+      language: 'en' as const,
+      profile: speechInput.profile,
+      experiences: speechInput.experiences,
+      ...(speechInput.stories ? { stories: speechInput.stories } : {}),
+      ...(speechInput.jobDescription ? { jobDescription: speechInput.jobDescription } : {}),
+      ...(speechInput.matchingSummary ? { matchingSummary: speechInput.matchingSummary } : {}),
+      ...(speechInput.company ? { company: speechInput.company } : {}),
+    };
+  },
+  dependencies: {
+    errorDisplay: materialImprovementErrorDisplay,
+  },
+});
 
 const loadProfilePhoto = async (userId: string) => {
   profilePhotoLoading.value = true;
@@ -328,6 +581,7 @@ const load = async () => {
       originalShowProfilePhoto.value = shouldShow;
       await loadProfilePhoto(document.value.userId);
       await loadTailoringContext(document.value.jobId);
+      await loadMaterialImprovementGrounding();
     }
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load CV';
@@ -406,11 +660,14 @@ const loadTailoringContext = async (jobId?: string | null) => {
   if (result.ok) {
     targetJob.value = result.job;
     matchingSummary.value = result.matchingSummary;
+    const companyId = result.job.companyId;
+    companyContext.value = companyId ? await companyService.getCompany(companyId) : null;
     return;
   }
 
   targetJob.value = null;
   matchingSummary.value = null;
+  companyContext.value = null;
 };
 
 const handleRegenerateTailored = async () => {
@@ -440,6 +697,7 @@ const handleRegenerateTailored = async () => {
         const shouldShow = reloadedDocument.showProfilePhoto ?? true;
         showProfilePhotoSetting.value = shouldShow;
         originalShowProfilePhoto.value = shouldShow;
+        materialImprovementEngine.actions.reset();
         toast.add({ title: t('tailoredMaterials.toast.cvRegenerated'), color: 'primary' });
       }
     }
@@ -455,6 +713,22 @@ watch(
     void loadTailoringContext(jobId);
   }
 );
+
+watch(
+  () => [document.value?.userId, targetJob.value?.companyId],
+  () => {
+    void loadMaterialImprovementGrounding();
+  }
+);
+
+const retryMaterialFeedback = async () => {
+  materialImprovementErrorDisplay.clearPageError();
+  try {
+    await materialImprovementEngine.actions.runFeedback();
+  } catch (err) {
+    logError('[cvDisplay] Failed to retry material feedback', err);
+  }
+};
 
 onMounted(() => {
   void load();

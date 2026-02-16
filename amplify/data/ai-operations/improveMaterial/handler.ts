@@ -13,6 +13,7 @@ import type {
 } from '../types/schema-types';
 
 const MIN_MARKDOWN_LENGTH = 200;
+const BOUNDARY_MARKERS = new Set(['"""', '---']);
 
 export const IMPROVE_MATERIAL_ERROR_CODES = {
   INVALID_INPUT: 'ERR_IMPROVE_MATERIAL_INVALID_INPUT',
@@ -30,7 +31,7 @@ export interface ImproveMaterialInput {
   materialType: MaterialType;
   currentMarkdown: string;
   instructions: ImproveMaterialInstructions;
-  improvementContext: EvaluateApplicationStrengthOutput;
+  improvementContext?: EvaluateApplicationStrengthOutput;
   profile: Profile;
   experiences: Experience[];
   stories?: SpeechStory[];
@@ -49,6 +50,12 @@ Return ONLY the final improved document in valid Markdown.
 Do not return JSON.
 Do not include explanations or commentary.
 Do not wrap output in code fences.
+
+PRIORITY ORDER (STRICT):
+1) Obey USER IMPROVEMENT INSTRUCTIONS exactly.
+2) Preserve factual accuracy (no invention).
+3) Apply improvement context and grounding context.
+4) Maintain coherent language and structure.
 
 HARD RULES:
 - Never invent facts.
@@ -108,11 +115,7 @@ type ImprovementSummary = {
   readerNotes: string[];
 };
 
-type DimensionKey =
-  | 'atsReadiness'
-  | 'clarityFocus'
-  | 'targetedFitSignals'
-  | 'evidenceStrength';
+type DimensionKey = 'atsReadiness' | 'clarityFocus' | 'targetedFitSignals' | 'evidenceStrength';
 
 function sanitizeDecisionLabel(value: unknown): 'strong' | 'borderline' | 'risky' {
   return value === 'strong' || value === 'borderline' || value === 'risky' ? value : 'risky';
@@ -140,7 +143,9 @@ function normalizeImprovementContext(value: unknown): EvaluateApplicationStrengt
 
   const overallScore = sanitizeNumber(context.overallScore);
   if (overallScore === null) {
-    throw new Error(`${IMPROVE_MATERIAL_ERROR_CODES.INVALID_INPUT}:improvementContext.overallScore`);
+    throw new Error(
+      `${IMPROVE_MATERIAL_ERROR_CODES.INVALID_INPUT}:improvementContext.overallScore`
+    );
   }
 
   const dimensionScoresRaw = isObject(context.dimensionScores) ? context.dimensionScores : null;
@@ -248,7 +253,10 @@ function validateInputShape(input: unknown): ImproveMaterialInput {
     throw new Error(`${IMPROVE_MATERIAL_ERROR_CODES.INVALID_INPUT}:instructions.presets`);
   }
 
-  const improvementContext = normalizeImprovementContext(input.improvementContext);
+  const improvementContext =
+    input.improvementContext === undefined || input.improvementContext === null
+      ? undefined
+      : normalizeImprovementContext(input.improvementContext);
 
   if (!isObject(input.profile)) {
     throw new Error(`${IMPROVE_MATERIAL_ERROR_CODES.INVALID_INPUT}:profile`);
@@ -266,7 +274,7 @@ function validateInputShape(input: unknown): ImproveMaterialInput {
       presets,
       note: sanitizeText(instructions.note) || undefined,
     },
-    improvementContext,
+    ...(improvementContext ? { improvementContext } : {}),
     profile: input.profile as Profile,
     experiences: input.experiences as Experience[],
     stories: Array.isArray(input.stories) ? (input.stories as SpeechStory[]) : undefined,
@@ -286,7 +294,17 @@ function validateInputShape(input: unknown): ImproveMaterialInput {
   return normalizedInput;
 }
 
-function toImprovementSummary(context: EvaluateApplicationStrengthOutput): ImprovementSummary {
+function toImprovementSummary(context?: EvaluateApplicationStrengthOutput): ImprovementSummary {
+  if (!context) {
+    return {
+      overallScore: 0,
+      weakDimensions: [],
+      missingSignals: [],
+      priorityActions: ['Apply the user improvement instructions while preserving factual accuracy.'],
+      readerNotes: [],
+    };
+  }
+
   const dimensionEntries = [
     { key: 'atsReadiness', value: context.dimensionScores.atsReadiness },
     { key: 'clarityFocus', value: context.dimensionScores.clarityFocus },
@@ -318,7 +336,7 @@ function toImprovementSummary(context: EvaluateApplicationStrengthOutput): Impro
   };
 }
 
-function buildImprovementContextSummary(context: EvaluateApplicationStrengthOutput): string {
+function buildImprovementContextSummary(context?: EvaluateApplicationStrengthOutput): string {
   const summary = toImprovementSummary(context);
   const score = Number.isFinite(summary.overallScore) ? Math.round(summary.overallScore) : 0;
   const weakDimensions = summary.weakDimensions.length
@@ -343,9 +361,13 @@ function buildImprovementContextSummary(context: EvaluateApplicationStrengthOutp
 }
 
 export function buildUserPrompt(input: ImproveMaterialInput): string {
-  const note = input.instructions.note?.trim() || 'none';
-
-  return `LANGUAGE:\n${input.language}\n\nMATERIAL TYPE:\n${input.materialType}\n\nUSER INSTRUCTIONS (PRESETS):\n${JSON.stringify(input.instructions.presets)}\n\nOPTIONAL USER NOTE:\n${note}\n\nIMPROVEMENT CONTEXT (INTERNAL SUMMARY):\n${buildImprovementContextSummary(input.improvementContext)}\n\nCURRENT DOCUMENT:\n"""\n${input.currentMarkdown}\n"""\n\nGROUNDING CONTEXT:\n${formatAiInputContext({
+  const note = input.instructions.note?.trim() ?? '';
+  const instructionItems = [...input.instructions.presets, ...(note.length > 0 ? [note] : [])];
+  const formattedInstructions = instructionItems.map((instruction) => `- ${instruction}`).join('\n');
+  const enforcementChecklist = instructionItems
+    .map((instruction, index) => `${index + 1}. ${instruction}`)
+    .join('\n');
+  const groundingContext = formatAiInputContext({
     language: input.language,
     profile: input.profile,
     experiences: input.experiences,
@@ -353,7 +375,34 @@ export function buildUserPrompt(input: ImproveMaterialInput): string {
     jobDescription: input.jobDescription,
     matchingSummary: input.matchingSummary,
     company: input.company,
-  })}\n\nRewrite the document accordingly and return only the final Markdown.`;
+  });
+
+  return `
+LANGUAGE:
+${input.language}
+
+MATERIAL TYPE:
+${input.materialType}
+
+MANDATORY USER IMPROVEMENT INSTRUCTIONS (HIGHEST PRIORITY):
+${formattedInstructions}
+
+IMPROVEMENT CONTEXT (INTERNAL SUMMARY):
+${buildImprovementContextSummary(input.improvementContext)}
+
+CURRENT DOCUMENT:
+"""
+${input.currentMarkdown}
+"""
+
+GROUNDING CONTEXT:
+${groundingContext}
+
+MANDATORY COMPLIANCE CHECK (MUST SATISFY ALL):
+${enforcementChecklist}
+
+Rewrite the document accordingly and return only the final Markdown.
+`.trim();
 }
 
 function isMarkdownOutputValid(value: unknown): value is string {
@@ -386,6 +435,20 @@ function isMarkdownOutputValid(value: unknown): value is string {
   return true;
 }
 
+function sanitizeMarkdownOutput(value: string): string {
+  const lines = value.trim().split(/\r?\n/);
+
+  while (lines.length > 0 && BOUNDARY_MARKERS.has(lines[0]?.trim() ?? '')) {
+    lines.shift();
+  }
+
+  while (lines.length > 0 && BOUNDARY_MARKERS.has(lines[lines.length - 1]?.trim() ?? '')) {
+    lines.pop();
+  }
+
+  return lines.join('\n').trim();
+}
+
 async function invokeImprovementPrompt(userPrompt: string): Promise<string> {
   return invokeBedrock({
     systemPrompt: SYSTEM_PROMPT,
@@ -397,14 +460,16 @@ async function invokeImprovementPrompt(userPrompt: string): Promise<string> {
 async function improveMarkdownWithRetry(input: ImproveMaterialInput): Promise<string> {
   const prompt = buildUserPrompt(input);
   const first = await invokeImprovementPrompt(prompt);
+  const sanitizedFirst = sanitizeMarkdownOutput(first);
 
-  if (isMarkdownOutputValid(first)) {
-    return first.trim();
+  if (isMarkdownOutputValid(sanitizedFirst)) {
+    return sanitizedFirst;
   }
 
   const retry = await invokeImprovementPrompt(`${prompt}${STRICT_MARKDOWN_RETRY_APPENDIX}`);
-  if (isMarkdownOutputValid(retry)) {
-    return retry.trim();
+  const sanitizedRetry = sanitizeMarkdownOutput(retry);
+  if (isMarkdownOutputValid(sanitizedRetry)) {
+    return sanitizedRetry;
   }
 
   console.error('[improveMaterial] Falling back to original markdown after invalid model output', {
@@ -444,5 +509,6 @@ export const handler = async (event: HandlerEvent): Promise<string> => {
 export const __testables = {
   validateInputShape,
   isMarkdownOutputValid,
+  sanitizeMarkdownOutput,
   buildImprovementContextSummary,
 };

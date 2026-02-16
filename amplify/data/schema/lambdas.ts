@@ -338,7 +338,7 @@ export const schemaLambdas = {
       materialType: a.enum(['cv', 'coverLetter']),
       currentMarkdown: a.string().required(),
       instructions: a.ref('ImproveMaterialInstructionsType').required(),
-      improvementContext: a.ref('EvaluateApplicationStrengthType').required(),
+      improvementContext: a.ref('EvaluateApplicationStrengthType'),
       profile: a.ref('ProfileType').required(),
       experiences: a.ref('ExperienceType').array().required(),
       stories: a.ref('SpeechStoryType').array(),

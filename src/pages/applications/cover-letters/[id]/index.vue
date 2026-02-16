@@ -10,11 +10,27 @@ import { useAuthUser } from '@/composables/useAuthUser';
 import { useTailoredMaterials } from '@/application/tailoring/useTailoredMaterials';
 import TailoredJobBanner from '@/components/tailoring/TailoredJobBanner.vue';
 import MarkdownContent from '@/components/MarkdownContent.vue';
+import MaterialFeedbackPanel from '@/components/materials/MaterialFeedbackPanel.vue';
+import ErrorStateCard from '@/components/common/ErrorStateCard.vue';
+import { useErrorDisplay } from '@/composables/useErrorDisplay';
+import { useMaterialImprovementEngine } from '@/composables/useMaterialImprovementEngine';
+import { buildSpeechInput } from '@/composables/useSpeechEngine';
 import { formatDetailDate } from '@/utils/formatDetailDate';
 import type { PageHeaderLink } from '@/types/ui';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 import type { MatchingSummary } from '@/domain/matching-summary/MatchingSummary';
 import { JobDescriptionService } from '@/domain/job-description/JobDescriptionService';
+import { CompanyService } from '@/domain/company/CompanyService';
+import { UserProfileService } from '@/domain/user-profile/UserProfileService';
+import type { Company } from '@/domain/company/Company';
+import type { UserProfile } from '@/domain/user-profile/UserProfile';
+import type { Experience } from '@/domain/experience/Experience';
+import type { STARStory } from '@/domain/starstory/STARStory';
+import type {
+  JobDescription as JobDescriptionContext,
+  MatchingSummaryContext,
+  CompanyProfile,
+} from '@amplify/data/ai-operations/types/schema-types';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -26,9 +42,16 @@ const { item, loading, error, load, save, remove } = useCoverLetter(coverLetterI
 const auth = useAuthUser();
 const tailoredMaterials = useTailoredMaterials({ auth });
 const jobService = new JobDescriptionService();
+const companyService = new CompanyService();
+const userProfileService = new UserProfileService();
+const materialImprovementErrorDisplay = useErrorDisplay();
 const targetJob = ref<JobDescription | null>(null);
 const matchingSummary = ref<MatchingSummary | null>(null);
 const hasLoadedContext = ref(false);
+const companyContext = ref<Company | null>(null);
+const groundingProfile = ref<UserProfile | null>(null);
+const groundingExperiences = ref<Experience[]>([]);
+const groundingStories = ref<STARStory[]>([]);
 
 // View/Edit state
 const isEditing = ref(false);
@@ -68,6 +91,19 @@ const regenerateError = computed(() => tailoredMaterials.error.value);
 const missingSummary = computed(
   () => hasLoadedContext.value && Boolean(item.value?.jobId && !matchingSummary.value)
 );
+const showMaterialImprovementError = computed(
+  () =>
+    Boolean(materialImprovementErrorDisplay.pageErrorMessageKey.value) ||
+    Boolean(materialImprovementErrorDisplay.pageError.value)
+);
+const materialImprovementErrorMessage = computed(() => {
+  if (materialImprovementErrorDisplay.pageErrorMessageKey.value) {
+    return t(materialImprovementErrorDisplay.pageErrorMessageKey.value);
+  }
+  return (
+    materialImprovementErrorDisplay.pageError.value ?? t('materialImprovement.errors.improveFailed')
+  );
+});
 
 const headerLinks: PageHeaderLink[] = [
   {
@@ -81,6 +117,206 @@ const displayTitle = computed(() => {
   return name.trim() || t('applications.coverLetters.display.untitled');
 });
 const formattedUpdatedAt = computed(() => formatDetailDate(item.value?.updatedAt));
+
+const normalizeString = (value: unknown): string =>
+  typeof value === 'string' ? value.trim() : '';
+
+const normalizeStringArray = (value: unknown): string[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value
+    .map((entry) => normalizeString(entry))
+    .filter((entry) => entry.length > 0);
+};
+
+const normalizeJobContext = (job: JobDescription): JobDescriptionContext => {
+  return {
+    title: normalizeString(job.title),
+    seniorityLevel: normalizeString(job.seniorityLevel),
+    roleSummary: normalizeString(job.roleSummary),
+    responsibilities: normalizeStringArray(job.responsibilities),
+    requiredSkills: normalizeStringArray(job.requiredSkills),
+    behaviours: normalizeStringArray(job.behaviours),
+    successCriteria: normalizeStringArray(job.successCriteria),
+    explicitPains: normalizeStringArray(job.explicitPains),
+    atsKeywords: normalizeStringArray(job.atsKeywords),
+  };
+};
+
+const normalizeMatchingSummaryContext = (
+  summary: MatchingSummary | null
+): MatchingSummaryContext | undefined => {
+  if (!summary) {
+    return undefined;
+  }
+
+  const recommendation = summary.recommendation;
+  const scoreBreakdownCandidate =
+    summary.scoreBreakdown &&
+    typeof summary.scoreBreakdown === 'object' &&
+    !Array.isArray(summary.scoreBreakdown)
+      ? (summary.scoreBreakdown as Partial<Record<'skillFit' | 'experienceFit' | 'interestFit' | 'edge', unknown>>)
+      : {};
+
+  return {
+    overallScore: typeof summary.overallScore === 'number' ? summary.overallScore : 0,
+    scoreBreakdown: {
+      skillFit: typeof scoreBreakdownCandidate.skillFit === 'number' ? scoreBreakdownCandidate.skillFit : 0,
+      experienceFit:
+        typeof scoreBreakdownCandidate.experienceFit === 'number'
+          ? scoreBreakdownCandidate.experienceFit
+          : 0,
+      interestFit:
+        typeof scoreBreakdownCandidate.interestFit === 'number' ? scoreBreakdownCandidate.interestFit : 0,
+      edge: typeof scoreBreakdownCandidate.edge === 'number' ? scoreBreakdownCandidate.edge : 0,
+    },
+    recommendation:
+      recommendation === 'apply' || recommendation === 'maybe' || recommendation === 'skip'
+        ? recommendation
+        : 'maybe',
+    reasoningHighlights: normalizeStringArray(summary.reasoningHighlights),
+    strengthsForThisRole: normalizeStringArray(summary.strengthsForThisRole),
+    skillMatch: normalizeStringArray(summary.skillMatch),
+    riskyPoints: normalizeStringArray(summary.riskyPoints),
+    impactOpportunities: normalizeStringArray(summary.impactOpportunities),
+    tailoringTips: normalizeStringArray(summary.tailoringTips),
+  };
+};
+
+const normalizeCompanyContext = (company: Company | null): CompanyProfile | undefined => {
+  if (!company) {
+    return undefined;
+  }
+
+  return {
+    companyName: normalizeString(company.companyName),
+    industry: normalizeString(company.industry),
+    sizeRange: normalizeString(company.sizeRange),
+    website: normalizeString(company.website),
+    description: normalizeString(company.description),
+    productsServices: normalizeStringArray(company.productsServices),
+    targetMarkets: normalizeStringArray(company.targetMarkets),
+    customerSegments: normalizeStringArray(company.customerSegments),
+    rawNotes: normalizeString(company.rawNotes),
+  };
+};
+
+const extractGroundingContext = (profile: UserProfile) => {
+  const profileWithRelations = profile as UserProfile & {
+    experiences?: (Experience & { stories?: (STARStory | null)[] | null } | null)[] | null;
+  };
+
+  const experiences = (profileWithRelations.experiences ?? []).filter(
+    (entry): entry is Experience & { stories?: (STARStory | null)[] | null } => Boolean(entry)
+  );
+  const stories = experiences
+    .flatMap((experience) => experience.stories ?? [])
+    .filter((entry): entry is STARStory => Boolean(entry));
+
+  groundingExperiences.value = experiences;
+  groundingStories.value = stories;
+};
+
+const loadMaterialImprovementGrounding = async () => {
+  const userId = item.value?.userId;
+  if (!userId) {
+    groundingProfile.value = null;
+    groundingExperiences.value = [];
+    groundingStories.value = [];
+    companyContext.value = null;
+    return;
+  }
+
+  const profile = await userProfileService.getProfileForTailoring(userId);
+  groundingProfile.value = profile;
+  if (profile) {
+    extractGroundingContext(profile);
+  } else {
+    groundingExperiences.value = [];
+    groundingStories.value = [];
+  }
+
+  const companyId = targetJob.value?.companyId;
+  companyContext.value = companyId ? await companyService.getCompany(companyId) : null;
+};
+
+const getCurrentMarkdown = () => (isEditing.value ? editContent.value : (item.value?.content ?? ''));
+
+const persistImprovedMarkdown = async (markdown: string) => {
+  if (!item.value?.id) {
+    throw new Error('Cover letter is missing');
+  }
+
+  const updated = await save({
+    id: item.value.id,
+    name: item.value.name ?? '',
+    content: markdown,
+  });
+
+  if (!updated) {
+    throw new Error('Failed to persist improved cover letter markdown');
+  }
+
+  item.value = updated;
+  editContent.value = markdown;
+  originalContent.value = markdown;
+  isEditing.value = false;
+  toast.add({
+    title: t('applications.coverLetters.display.toast.saved'),
+    color: 'primary',
+  });
+};
+
+const materialImprovementEngine = useMaterialImprovementEngine({
+  materialType: 'coverLetter',
+  currentDocumentId: coverLetterId,
+  jobId: computed(() => targetJob.value?.id ?? null),
+  companyId: computed(() => targetJob.value?.companyId ?? null),
+  getCurrentMarkdown,
+  setCurrentMarkdown: persistImprovedMarkdown,
+  getFeedbackInput: () => {
+    if (!targetJob.value) {
+      throw new Error('Job context is required for cover letter feedback');
+    }
+
+    return {
+      job: normalizeJobContext(targetJob.value),
+      cvText: '',
+      coverLetterText: getCurrentMarkdown(),
+      language: 'en',
+    };
+  },
+  getGroundingContext: () => {
+    if (!groundingProfile.value) {
+      throw new Error('User profile is required for cover letter improvement');
+    }
+
+    const speechInput = buildSpeechInput({
+      profile: groundingProfile.value,
+      experiences: groundingExperiences.value,
+      stories: groundingStories.value,
+      tailoring: {
+        jobDescription: targetJob.value ? normalizeJobContext(targetJob.value) : undefined,
+        matchingSummary: normalizeMatchingSummaryContext(matchingSummary.value),
+        company: normalizeCompanyContext(companyContext.value),
+      },
+    });
+
+    return {
+      language: 'en' as const,
+      profile: speechInput.profile,
+      experiences: speechInput.experiences,
+      ...(speechInput.stories ? { stories: speechInput.stories } : {}),
+      ...(speechInput.jobDescription ? { jobDescription: speechInput.jobDescription } : {}),
+      ...(speechInput.matchingSummary ? { matchingSummary: speechInput.matchingSummary } : {}),
+      ...(speechInput.company ? { company: speechInput.company } : {}),
+    };
+  },
+  dependencies: {
+    errorDisplay: materialImprovementErrorDisplay,
+  },
+});
 
 const toggleEdit = () => {
   if (isEditing.value) {
@@ -188,11 +424,14 @@ const loadTailoringContext = async (jobId?: string | null) => {
   if (result.ok) {
     targetJob.value = result.job;
     matchingSummary.value = result.matchingSummary;
+    const companyId = result.job.companyId;
+    companyContext.value = companyId ? await companyService.getCompany(companyId) : null;
     return;
   }
 
   targetJob.value = null;
   matchingSummary.value = null;
+  companyContext.value = null;
 };
 
 const handleRegenerateTailored = async () => {
@@ -228,6 +467,7 @@ const handleRegenerateTailored = async () => {
       editContent.value = updated.content || '';
       originalContent.value = editContent.value;
       isEditing.value = false;
+      materialImprovementEngine.actions.reset();
       toast.add({ title: t('tailoredMaterials.toast.coverLetterRegenerated'), color: 'primary' });
     }
   } catch (err) {
@@ -240,6 +480,8 @@ onMounted(async () => {
   isInitializing.value = true;
   try {
     await load();
+    await loadTailoringContext(item.value?.jobId);
+    await loadMaterialImprovementGrounding();
   } finally {
     isInitializing.value = false;
   }
@@ -258,6 +500,29 @@ watch(item, (newValue) => {
     void loadJobSummary(newValue.jobId);
   }
 });
+
+watch(
+  () => item.value?.jobId,
+  (jobId) => {
+    void loadTailoringContext(jobId);
+  }
+);
+
+watch(
+  () => [item.value?.userId, targetJob.value?.companyId],
+  () => {
+    void loadMaterialImprovementGrounding();
+  }
+);
+
+const retryMaterialFeedback = async () => {
+  materialImprovementErrorDisplay.clearPageError();
+  try {
+    await materialImprovementEngine.actions.runFeedback();
+  } catch (err) {
+    logError('[coverLetterDisplay] Failed to retry material feedback', err);
+  }
+};
 </script>
 
 <template>
@@ -411,6 +676,22 @@ watch(item, (newValue) => {
             :description="t('applications.coverLetters.display.states.notFoundDescription')"
           />
         </UCard>
+
+        <ErrorStateCard
+          v-if="showMaterialImprovementError"
+          class="mt-6"
+          :title="$t('common.error')"
+          :description="materialImprovementErrorMessage"
+          :retry-label="$t('common.retry')"
+          @retry="retryMaterialFeedback"
+        />
+
+        <MaterialFeedbackPanel
+          v-if="item && hasJobContext"
+          class="mt-6"
+          :engine="materialImprovementEngine"
+          material-type="coverLetter"
+        />
       </UPageBody>
     </UPage>
 

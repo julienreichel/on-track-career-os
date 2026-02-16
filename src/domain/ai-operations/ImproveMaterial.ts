@@ -16,7 +16,7 @@ export type ImproveMaterialInput = {
   materialType: ImproveMaterialType;
   currentMarkdown: string;
   instructions: ImproveMaterialInstructions;
-  improvementContext: ApplicationStrengthResult;
+  improvementContext?: ApplicationStrengthResult;
   profile: Profile;
   experiences: Experience[];
   stories?: SpeechStory[];
