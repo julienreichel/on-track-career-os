@@ -102,28 +102,17 @@ export const useKanbanBoard = (options: UseKanbanBoardOptions = {}) => {
       return targetJob;
     }
 
-    jobs.value = jobs.value.map((job) =>
-      job.id === jobId
-        ? {
-            ...job,
-            kanbanStatus: toStageKey,
-          }
-        : job
-    );
+    targetJob.kanbanStatus = toStageKey;
+    jobs.value = [...jobs.value];
 
     try {
       const updated = await jobService.updateJob(jobId, { kanbanStatus: toStageKey });
-      jobs.value = jobs.value.map((job) => (job.id === jobId ? updated : job));
+      targetJob.kanbanStatus = updated.kanbanStatus ?? toStageKey;
+      jobs.value = [...jobs.value];
       return updated;
     } catch (err) {
-      jobs.value = jobs.value.map((job) =>
-        job.id === jobId
-          ? {
-              ...job,
-              kanbanStatus: previousKanbanStatus,
-            }
-          : job
-      );
+      targetJob.kanbanStatus = previousKanbanStatus ?? undefined;
+      jobs.value = [...jobs.value];
       throw err;
     }
   };

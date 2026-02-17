@@ -32,14 +32,26 @@ const companyName = computed(
 );
 
 const score = computed(() => {
-  const summaries = relatedJob.value.matchingSummaries ?? [];
-  const best = summaries
-    .filter((summary): summary is NonNullable<(typeof summaries)[number]> => Boolean(summary))
-    .sort((a, b) => {
-      const aTs = new Date(a.updatedAt ?? a.generatedAt ?? a.createdAt ?? 0).getTime();
-      const bTs = new Date(b.updatedAt ?? b.generatedAt ?? b.createdAt ?? 0).getTime();
-      return bTs - aTs;
-    })[0];
+  const rawSummaries = relatedJob.value.matchingSummaries;
+  const summaries: MatchingSummaryLite[] = [];
+  if (Array.isArray(rawSummaries)) {
+    for (const summary of rawSummaries) {
+      if (summary) {
+        summaries.push(summary as MatchingSummaryLite);
+      }
+    }
+  }
+
+  const best = summaries.reduce<MatchingSummaryLite | null>((latest, summary) => {
+    if (!latest) {
+      return summary;
+    }
+    const latestTs = new Date(latest.updatedAt ?? latest.generatedAt ?? latest.createdAt ?? 0).getTime();
+    const summaryTs = new Date(
+      summary.updatedAt ?? summary.generatedAt ?? summary.createdAt ?? 0
+    ).getTime();
+    return summaryTs > latestTs ? summary : latest;
+  }, null);
 
   if (!best || typeof best.overallScore !== 'number') {
     return null;

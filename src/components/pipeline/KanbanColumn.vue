@@ -50,6 +50,14 @@ const allowDrop = (event: DragEvent) => {
       <p v-else class="text-sm text-dimmed" :data-testid="`kanban-empty-${stage.key}`">
         {{ t('pipeline.column.empty') }}
       </p>
+
+      <div
+        v-if="hasJobs"
+        class="h-24 rounded-md border border-dashed border-muted/60 bg-muted/10"
+        :data-testid="`kanban-drop-tail-${stage.key}`"
+        @dragover.stop.prevent="allowDrop"
+        @drop.stop="handleDrop"
+      />
     </div>
   </UCard>
 </template>

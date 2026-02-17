@@ -30,4 +30,27 @@ describe('KanbanJobCard', () => {
     expect(wrapper.text()).toContain('Acme');
     expect(wrapper.text()).toContain('Created');
   });
+
+  it('does not crash when matching summaries is not an array', () => {
+    const wrapper = mount(KanbanJobCard, {
+      props: {
+        job: {
+          id: 'job-2',
+          title: 'Engineer',
+          createdAt: '2025-01-01T10:00:00Z',
+          matchingSummaries: {} as any,
+        },
+      },
+      global: {
+        plugins: [i18n],
+        stubs: {
+          UCard: { template: '<div><slot /></div>' },
+          UBadge: { template: '<span><slot /></span>' },
+          NuxtLink: { template: '<a><slot /></a>' },
+        },
+      },
+    });
+
+    expect(wrapper.text()).toContain('Engineer');
+  });
 });

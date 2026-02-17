@@ -82,4 +82,46 @@ describe('useKanbanBoard', () => {
     expect(board.columns.value[0]?.jobs.map((job) => job.id)).toEqual(['job-1']);
     expect(board.columns.value[1]?.jobs).toEqual([]);
   });
+
+  it('preserves job relation fields when update response is partial', async () => {
+    const job = {
+      id: 'job-1',
+      title: 'A',
+      kanbanStatus: 'todo',
+    } as JobDescription;
+    Object.defineProperty(job, 'company', {
+      value: { companyName: 'Acme' },
+      enumerable: false,
+      configurable: true,
+      writable: true,
+    });
+    Object.defineProperty(job, 'matchingSummaries', {
+      value: [{ overallScore: 84 }],
+      enumerable: false,
+      configurable: true,
+      writable: true,
+    });
+
+    listJobs.mockResolvedValue([job]);
+    updateJob.mockResolvedValue({
+      id: 'job-1',
+      kanbanStatus: 'applied',
+    } as JobDescription);
+
+    const board = useKanbanBoard({
+      auth,
+      jobService,
+      kanbanSettings,
+    });
+    await board.load();
+    await board.moveJob('job-1', 'applied');
+
+    const movedJob = board.columns.value[1]?.jobs[0] as JobDescription & {
+      company?: { companyName?: string };
+      matchingSummaries?: Array<{ overallScore?: number }>;
+    };
+    expect(movedJob.company?.companyName).toBe('Acme');
+    expect(Array.isArray(movedJob.matchingSummaries)).toBe(true);
+    expect(movedJob.matchingSummaries[0]?.overallScore).toBe(84);
+  });
 });
