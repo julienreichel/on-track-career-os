@@ -13,6 +13,7 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const hasJobs = computed(() => props.jobs.length > 0);
 
 const handleDrop = (event: DragEvent) => {
   event.preventDefault();
@@ -43,9 +44,10 @@ const allowDrop = (event: DragEvent) => {
       @dragover="allowDrop"
       @drop="handleDrop"
     >
-      <KanbanJobCard v-for="job in jobs" :key="job.id" :job="job" />
-
-      <p v-if="jobs.length === 0" class="text-sm text-dimmed">
+      <template v-if="hasJobs">
+        <KanbanJobCard v-for="job in jobs" :key="job.id" :job="job" />
+      </template>
+      <p v-else class="text-sm text-dimmed" :data-testid="`kanban-empty-${stage.key}`">
         {{ t('pipeline.column.empty') }}
       </p>
     </div>
