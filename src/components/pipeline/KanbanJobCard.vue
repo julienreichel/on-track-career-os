@@ -37,7 +37,7 @@ const score = computed(() => {
   if (Array.isArray(rawSummaries)) {
     for (const summary of rawSummaries) {
       if (summary) {
-        summaries.push(summary as MatchingSummaryLite);
+        summaries.push(summary);
       }
     }
   }

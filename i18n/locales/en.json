@@ -943,6 +943,10 @@
     "title": "Pipeline",
     "description": "Track all job applications by stage and move cards as you progress.",
     "empty": "No stages configured yet.",
+    "search": {
+      "placeholder": "Search by title, seniority, summary, or status",
+      "noResults": "No jobs match your search yet"
+    },
     "errors": {
       "load": "Unable to load pipeline.",
       "move": "Unable to move this job right now."
