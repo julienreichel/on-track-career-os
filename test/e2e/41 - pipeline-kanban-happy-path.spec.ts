@@ -56,8 +56,12 @@ test.describe('Pipeline kanban happy path', () => {
     await expect(appliedColumn.getByRole('link', { name: uniqueTitle })).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.getByText(/Moved to Applied\. Add a note\?/i)).toBeVisible({ timeout: 10000 });
-    await page.getByRole('button', { name: /^Add note$/i }).first().click();
+    const notifications = page.getByRole('region', { name: /Notifications/i });
+    const appliedToast = notifications.getByRole('alert').filter({
+      hasText: 'Moved to Applied. Add a note?',
+    });
+    await expect(appliedToast).toBeVisible({ timeout: 10000 });
+    await appliedToast.getByRole('button', { name: /^Add note$/i }).click();
 
     await expect(page.getByTestId('kanban-note-textarea')).toBeVisible({ timeout: 10000 });
     await page.getByTestId('kanban-note-textarea').fill(appliedNote);
@@ -74,9 +78,10 @@ test.describe('Pipeline kanban happy path', () => {
     const doneDropzone = page.getByTestId('kanban-dropzone-done');
     await appliedCard.dragTo(doneDropzone);
 
-    await expect(page.getByText(/Moved to Done\. Capture the outcome\?/i)).toBeVisible({
-      timeout: 10000,
+    const doneToast = notifications.getByRole('alert').filter({
+      hasText: 'Moved to Done. Capture the outcome?',
     });
+    await expect(doneToast).toBeVisible({ timeout: 10000 });
     await expect(page.getByTestId('kanban-note-textarea')).toBeVisible({ timeout: 10000 });
     await page.getByTestId('kanban-note-textarea').fill(doneNote);
     await page.getByTestId('kanban-note-save').click();
