@@ -31,6 +31,30 @@ const normalizeKey = (value: string): string =>
     .replace(/^-+|-+$/g, '')
     .replace(/-{2,}/g, '-');
 
+const DEFAULT_CUSTOM_STAGE_KEY = 'stage';
+
+export const createUniqueStageKey = (
+  name: string,
+  existingKeys: ReadonlyArray<string | null | undefined>
+): string => {
+  const normalizedBase = normalizeKey(name);
+  const base = normalizedBase || DEFAULT_CUSTOM_STAGE_KEY;
+  const used = new Set(existingKeys.filter((key): key is string => Boolean(key)));
+
+  if (!used.has(base)) {
+    return base;
+  }
+
+  let suffix = 2;
+  let candidate = `${base}-${suffix}`;
+  while (used.has(candidate)) {
+    suffix += 1;
+    candidate = `${base}-${suffix}`;
+  }
+
+  return candidate;
+};
+
 const toStageName = (key: string): string =>
   key
     .split('-')
@@ -65,44 +89,24 @@ export const sanitizeStages = (stages: ReadonlyArray<KanbanStageInput>): KanbanS
 
 export const ensureSystemStages = (stages: ReadonlyArray<KanbanStageInput>): KanbanStage[] => {
   const sanitized = sanitizeStages(stages);
-  const withSystemDefaults = sanitized.map((stage) => {
-    if (stage.key === 'todo') {
-      return {
-        key: 'todo',
-        name: SYSTEM_STAGE_NAMES.todo,
-        isSystemDefault: true,
-      } satisfies KanbanStage;
-    }
-
-    if (stage.key === 'done') {
-      return {
-        key: 'done',
-        name: SYSTEM_STAGE_NAMES.done,
-        isSystemDefault: true,
-      } satisfies KanbanStage;
-    }
-
-    return {
+  const customStages = sanitized
+    .filter((stage) => stage.key !== 'todo' && stage.key !== 'done')
+    .map((stage) => ({
       ...stage,
       isSystemDefault: false,
-    } satisfies KanbanStage;
-  });
+    }));
 
-  if (!withSystemDefaults.some((stage) => stage.key === 'todo')) {
-    withSystemDefaults.unshift({
+  return [
+    {
       key: 'todo',
       name: SYSTEM_STAGE_NAMES.todo,
       isSystemDefault: true,
-    });
-  }
-
-  if (!withSystemDefaults.some((stage) => stage.key === 'done')) {
-    withSystemDefaults.push({
+    },
+    ...customStages,
+    {
       key: 'done',
       name: SYSTEM_STAGE_NAMES.done,
       isSystemDefault: true,
-    });
-  }
-
-  return withSystemDefaults;
+    },
+  ];
 };

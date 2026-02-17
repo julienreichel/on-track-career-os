@@ -51,8 +51,8 @@ describe('kanbanStages', () => {
 
     expect(ensured).toEqual([
       { key: 'todo', name: 'ToDo', isSystemDefault: true },
-      { key: 'done', name: 'Done', isSystemDefault: true },
       { key: 'interview', name: 'Interview', isSystemDefault: false },
+      { key: 'done', name: 'Done', isSystemDefault: true },
     ]);
   });
 });

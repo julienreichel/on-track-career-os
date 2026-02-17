@@ -14,7 +14,7 @@
           variant="ghost"
           icon="i-heroicons-cog-6-tooth"
           :label="t('navigation.settings')"
-          to="/settings/cv"
+          to="/settings"
           class="hidden sm:flex"
         />
         <UButton variant="ghost" @click="handleSignOut">
@@ -155,6 +155,7 @@ const getSegmentLabel = (segment: string): string => {
     'cv-upload': t('ingestion.cv.upload.title'),
     experiences: t('navigation.experiences'),
     settings: t('navigation.settings'),
+    kanban: t('settings.kanban.breadcrumb'),
     jobs: t('navigation.jobs'),
     companies: t('navigation.companies'),
     applications: t('navigation.applications'),

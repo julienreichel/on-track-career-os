@@ -33,6 +33,20 @@ const handleDeleteAccount = async () => {
           </div>
         </UCard>
 
+        <UCard>
+          <div class="space-y-2">
+            <h2 class="text-lg font-semibold text-default">{{ t('settings.kanban.title') }}</h2>
+            <p class="text-sm text-dimmed">{{ t('settings.kanban.description') }}</p>
+            <UButton
+              color="primary"
+              variant="outline"
+              icon="i-heroicons-arrow-right"
+              :label="t('settings.kanban.action')"
+              to="/settings/kanban"
+            />
+          </div>
+        </UCard>
+
         <SettingsDeleteAccountCard :loading="deleting" @confirm="handleDeleteAccount" />
       </div>
     </UPageBody>

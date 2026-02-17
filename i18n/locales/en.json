@@ -903,6 +903,31 @@
       "description": "Set your default template, sections, and experiences.",
       "action": "Open CV settings"
     },
+    "kanban": {
+      "title": "Kanban settings",
+      "description": "Manage your global board stages for job tracking.",
+      "action": "Open Kanban settings",
+      "breadcrumb": "Kanban",
+      "editor": {
+        "title": "Pipeline stages",
+        "description": "Reorder, rename, add, or remove custom stages. ToDo and Done are required.",
+        "addLabel": "Add stage",
+        "addPlaceholder": "Enter a stage name",
+        "actions": {
+          "moveUp": "Move stage up",
+          "moveDown": "Move stage down",
+          "remove": "Remove stage",
+          "add": "Add stage"
+        }
+      },
+      "toast": {
+        "saved": "Kanban settings saved.",
+        "saveFailed": "Failed to save Kanban settings."
+      },
+      "errors": {
+        "load": "Unable to load Kanban settings."
+      }
+    },
     "accountDeletion": {
       "title": "Delete account",
       "description": "Permanently delete your account and all associated data.",
