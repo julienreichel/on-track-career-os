@@ -948,7 +948,8 @@
       "move": "Unable to move this job right now."
     },
     "column": {
-      "empty": "No jobs in this stage."
+      "empty": "No jobs in this stage.",
+      "showMore": "Show more"
     },
     "card": {
       "noCompany": "No company linked",

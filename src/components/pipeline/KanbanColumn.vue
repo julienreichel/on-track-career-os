@@ -14,6 +14,22 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const hasJobs = computed(() => props.jobs.length > 0);
+const PAGE_SIZE = 5;
+const visibleCount = ref(PAGE_SIZE);
+const visibleJobs = computed(() => props.jobs.slice(0, visibleCount.value));
+const hasMoreJobs = computed(() => props.jobs.length > visibleCount.value);
+
+watch(
+  () => props.jobs.length,
+  () => {
+    if (visibleCount.value < PAGE_SIZE) {
+      visibleCount.value = PAGE_SIZE;
+    }
+    if (visibleCount.value > props.jobs.length) {
+      visibleCount.value = Math.max(PAGE_SIZE, props.jobs.length);
+    }
+  }
+);
 
 const handleDrop = (event: DragEvent) => {
   event.preventDefault();
@@ -45,7 +61,16 @@ const allowDrop = (event: DragEvent) => {
       @drop="handleDrop"
     >
       <template v-if="hasJobs">
-        <KanbanJobCard v-for="job in jobs" :key="job.id" :job="job" />
+        <KanbanJobCard v-for="job in visibleJobs" :key="job.id" :job="job" />
+
+        <UButton
+          v-if="hasMoreJobs"
+          color="neutral"
+          variant="outline"
+          :label="t('pipeline.column.showMore')"
+          :data-testid="`kanban-show-more-${stage.key}`"
+          @click="visibleCount += PAGE_SIZE"
+        />
       </template>
       <p v-else class="text-sm text-dimmed" :data-testid="`kanban-empty-${stage.key}`">
         {{ t('pipeline.column.empty') }}

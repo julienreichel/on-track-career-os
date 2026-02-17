@@ -52,6 +52,32 @@ describe('useKanbanBoard', () => {
     expect(board.columns.value[1]?.jobs.map((job) => job.id)).toEqual(['job-1']);
   });
 
+  it('sorts jobs in each column by most recently modified first', async () => {
+    listJobs.mockResolvedValue([
+      {
+        id: 'job-older',
+        title: 'Older',
+        kanbanStatus: 'todo',
+        updatedAt: '2025-01-01T00:00:00.000Z',
+      },
+      {
+        id: 'job-newer',
+        title: 'Newer',
+        kanbanStatus: 'todo',
+        updatedAt: '2025-02-01T00:00:00.000Z',
+      },
+    ] as JobDescription[]);
+
+    const board = useKanbanBoard({
+      auth,
+      jobService,
+      kanbanSettings,
+    });
+    await board.load();
+
+    expect(board.columns.value[0]?.jobs.map((job) => job.id)).toEqual(['job-newer', 'job-older']);
+  });
+
   it('falls back unknown status to todo', async () => {
     listJobs.mockResolvedValue([{ id: 'job-1', title: 'A', kanbanStatus: 'mystery' }] as JobDescription[]);
 

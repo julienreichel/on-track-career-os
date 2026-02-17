@@ -22,6 +22,14 @@ export type KanbanColumn = {
   jobs: JobDescription[];
 };
 
+const toTimestamp = (value?: string | null): number => {
+  if (!value) {
+    return 0;
+  }
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
 const resolveFallbackStageKey = (stages: readonly KanbanStage[]): string =>
   stages.find((stage) => stage.key === 'todo')?.key ?? stages[0]?.key ?? 'todo';
 
@@ -59,10 +67,18 @@ export const useKanbanBoard = (options: UseKanbanBoardOptions = {}) => {
       }
     });
 
-    return stages.map((stage) => ({
-      stage,
-      jobs: grouped.get(stage.key) ?? [],
-    }));
+    return stages.map((stage) => {
+      const sortedJobs = [...(grouped.get(stage.key) ?? [])].sort((a, b) => {
+        const aTime = toTimestamp(a.updatedAt ?? a.createdAt);
+        const bTime = toTimestamp(b.updatedAt ?? b.createdAt);
+        return bTime - aTime;
+      });
+
+      return {
+        stage,
+        jobs: sortedJobs,
+      };
+    });
   });
 
   const isLoading = computed(() => loadingJobs.value || kanbanSettings.state.isLoading.value);

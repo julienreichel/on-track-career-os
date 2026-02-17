@@ -17,6 +17,7 @@ describe('KanbanColumn', () => {
         stubs: {
           UCard: { template: '<div><slot name="header" /><slot /></div>' },
           UBadge: { template: '<span><slot /></span>' },
+          UButton: { template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>' },
           KanbanJobCard: { template: '<div class="job-card"></div>' },
         },
       },
@@ -43,6 +44,7 @@ describe('KanbanColumn', () => {
         stubs: {
           UCard: { template: '<div><slot name="header" /><slot /></div>' },
           UBadge: { template: '<span><slot /></span>' },
+          UButton: { template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>' },
           KanbanJobCard: { template: '<div class="job-card"></div>' },
         },
       },
@@ -59,5 +61,41 @@ describe('KanbanColumn', () => {
     });
 
     expect(wrapper.emitted('drop')).toEqual([[{ jobId: 'job-2', toStageKey: 'applied' }]]);
+  });
+
+  it('shows 5 cards initially and reveals 5 more per click', async () => {
+    const jobs = Array.from({ length: 12 }, (_, index) => ({
+      id: `job-${index + 1}`,
+      title: `Role ${index + 1}`,
+    }));
+
+    const wrapper = mount(KanbanColumn, {
+      props: {
+        stage: { key: 'applied', name: 'Applied', isSystemDefault: false },
+        jobs: jobs as any,
+      },
+      global: {
+        plugins: [i18n],
+        stubs: {
+          UCard: { template: '<div><slot name="header" /><slot /></div>' },
+          UBadge: { template: '<span><slot /></span>' },
+          UButton: {
+            template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>',
+            emits: ['click'],
+          },
+          KanbanJobCard: { template: '<div class="job-card"></div>' },
+        },
+      },
+    });
+
+    expect(wrapper.findAll('.job-card')).toHaveLength(5);
+    expect(wrapper.find('[data-testid="kanban-show-more-applied"]').exists()).toBe(true);
+
+    await wrapper.find('[data-testid="kanban-show-more-applied"]').trigger('click');
+    expect(wrapper.findAll('.job-card')).toHaveLength(10);
+
+    await wrapper.find('[data-testid="kanban-show-more-applied"]').trigger('click');
+    expect(wrapper.findAll('.job-card')).toHaveLength(12);
+    expect(wrapper.find('[data-testid="kanban-show-more-applied"]').exists()).toBe(false);
   });
 });
