@@ -126,6 +126,8 @@ describe('JobDescriptionRepository', () => {
           'rawText',
           'owner',
           'title',
+          'kanbanStatus',
+          'notes',
           'company.*',
           'matchingSummaries.*',
           'cvs.*',

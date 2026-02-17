@@ -36,6 +36,7 @@ export const schemaModels = {
       speechBlocks: a.hasMany('SpeechBlock', 'userId'),
       cvTemplates: a.hasMany('CVTemplate', 'userId'),
       cvSettings: a.hasOne('CVSettings', 'userId'),
+      kanbanSettings: a.hasOne('KanbanSettings', 'userId'),
       matchingSummaries: a.hasMany('MatchingSummary', 'userId'),
     })
     .authorization((allow) => [allow.owner()]),
@@ -135,6 +136,8 @@ export const schemaModels = {
       explicitPains: a.string().array(),
       atsKeywords: a.string().array(),
       status: a.enum(['draft', 'analyzed', 'complete']),
+      kanbanStatus: a.string().default('todo'),
+      notes: a.string().default(''),
 
       companyId: a.id(),
       company: a.belongsTo('Company', 'companyId'),
@@ -256,6 +259,15 @@ export const schemaModels = {
       defaultExcludedExperienceIds: a.string().array(),
       defaultDisabledSections: a.string().array(),
       showProfilePhoto: a.boolean().default(true),
+
+      userId: a.id().required(),
+      user: a.belongsTo('UserProfile', 'userId'),
+    })
+    .authorization((allow) => [allow.owner()]),
+
+  KanbanSettings: a
+    .model({
+      stages: a.ref('KanbanStageType').array().required(),
 
       userId: a.id().required(),
       user: a.belongsTo('UserProfile', 'userId'),

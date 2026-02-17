@@ -159,6 +159,12 @@ export const schemaTypes = {
     atsKeywords: a.string().array().required(),
   }),
 
+  KanbanStageType: a.customType({
+    key: a.string().required(),
+    name: a.string().required(),
+    isSystemDefault: a.boolean().required(),
+  }),
+
   CompanyType: a.customType({
     companyName: a.string().required(),
     industry: a.string().required(),

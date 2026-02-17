@@ -84,6 +84,8 @@ export class JobDescriptionService {
       explicitPains: parsedPayload.explicitPains || [],
       atsKeywords: parsedPayload.atsKeywords || [],
       status: parsedPayload.status || 'complete',
+      kanbanStatus: 'todo',
+      notes: '',
     };
 
     const created = await this.repo.create(input);

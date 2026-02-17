@@ -175,6 +175,8 @@ describe('JobDescriptionService', () => {
           rawText: 'Job text',
           title: parsed.title,
           status: 'complete',
+          kanbanStatus: 'todo',
+          notes: '',
         })
       );
       expect(result?.title).toBe(parsed.title);
