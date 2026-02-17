@@ -8,6 +8,7 @@
     "experiences": "Experiences",
     "personalCanvas": "Personal Canvas",
     "jobs": "Jobs",
+    "pipeline": "Pipeline",
     "companies": "Companies",
     "applications": "Applications",
     "coverLetters": "Cover Letters",
@@ -936,6 +937,23 @@
       "confirmDescription": "This action is permanent. All your profile data, documents, and progress will be removed.",
       "confirmAction": "Yes, delete everything",
       "deleteFailed": "Account deletion failed. Please try again."
+    }
+  },
+  "pipeline": {
+    "title": "Pipeline",
+    "description": "Track all job applications by stage and move cards as you progress.",
+    "empty": "No stages configured yet.",
+    "errors": {
+      "load": "Unable to load pipeline.",
+      "move": "Unable to move this job right now."
+    },
+    "column": {
+      "empty": "No jobs in this stage."
+    },
+    "card": {
+      "noCompany": "No company linked",
+      "createdAt": "Created {date}",
+      "matchScore": "{score}%"
     }
   },
   "tailoredMaterials": {

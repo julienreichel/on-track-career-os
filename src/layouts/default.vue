@@ -113,6 +113,11 @@ const navigationItems = computed<NavigationMenuItem[]>(() => [
         description: t('features.jobs.description'),
       },
       {
+        label: t('navigation.pipeline'),
+        to: '/pipeline',
+        description: t('pipeline.description'),
+      },
+      {
         label: t('navigation.companies'),
         to: '/companies',
         description: t('companies.page.description'),
@@ -156,6 +161,7 @@ const getSegmentLabel = (segment: string): string => {
     experiences: t('navigation.experiences'),
     settings: t('navigation.settings'),
     kanban: t('settings.kanban.breadcrumb'),
+    pipeline: t('navigation.pipeline'),
     jobs: t('navigation.jobs'),
     companies: t('navigation.companies'),
     applications: t('navigation.applications'),
