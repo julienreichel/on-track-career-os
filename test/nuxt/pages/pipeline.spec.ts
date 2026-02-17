@@ -13,17 +13,68 @@ const columnsRef = ref<KanbanColumn[]>([]);
 const isLoadingRef = ref(false);
 const mockLoad = vi.fn(async () => jobsRef.value);
 const mockMoveJob = vi.fn();
+const boardOptionsRef = ref<Record<string, unknown> | null>(null);
 
 vi.mock('@/application/kanban/useKanbanBoard', () => ({
-  useKanbanBoard: () => ({
-    jobs: jobsRef,
-    columns: columnsRef,
-    isLoading: isLoadingRef,
-    error: ref(null),
-    load: mockLoad,
-    moveJob: mockMoveJob,
+  useKanbanBoard: (options?: Record<string, unknown>) => {
+    boardOptionsRef.value = options ?? null;
+    return {
+      jobs: jobsRef,
+      columns: columnsRef,
+      isLoading: isLoadingRef,
+      error: ref(null),
+      load: mockLoad,
+      moveJob: mockMoveJob,
+      requestNoteForMove: vi.fn(),
+    };
+  },
+}));
+
+const notesIsOpenRef = ref(false);
+const notesJobIdRef = ref<string | null>(null);
+const notesDraftRef = ref('');
+const notesSavingRef = ref(false);
+const notesErrorRef = ref<string | null>(null);
+const notesContextRef = ref<{
+  stageName?: string;
+  reason?: 'moved_to_done' | 'moved_stage' | 'manual';
+} | null>(null);
+const mockOpenNoteEditor = vi.fn(
+  (
+    jobId: string,
+    payload: { initialNotes?: string; stageName?: string; reason?: 'moved_to_done' | 'moved_stage' | 'manual' } = {}
+  ) => {
+    notesIsOpenRef.value = true;
+    notesJobIdRef.value = jobId;
+    notesDraftRef.value = payload.initialNotes ?? '';
+    notesContextRef.value = {
+      stageName: payload.stageName,
+      reason: payload.reason ?? 'manual',
+    };
+  }
+);
+const mockCloseNoteEditor = vi.fn(() => {
+  notesIsOpenRef.value = false;
+});
+const mockSaveNotes = vi.fn();
+
+vi.mock('@/application/kanban/useKanbanNotes', () => ({
+  useKanbanNotes: () => ({
+    state: {
+      isOpen: notesIsOpenRef,
+      jobId: notesJobIdRef,
+      draft: notesDraftRef,
+      isSaving: notesSavingRef,
+      error: notesErrorRef,
+      context: notesContextRef,
+    },
+    openNoteEditor: mockOpenNoteEditor,
+    closeNoteEditor: mockCloseNoteEditor,
+    saveNotes: mockSaveNotes,
   }),
 }));
+
+const toastAdd = vi.fn();
 
 const pageErrorRef = ref<string | null>(null);
 const pageErrorMessageKeyRef = ref<string | null>(null);
@@ -74,9 +125,19 @@ const setupBoardData = () => {
 describe('pipeline page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal('useToast', () => ({
+      add: toastAdd,
+    }));
+    boardOptionsRef.value = null;
     pageErrorRef.value = null;
     pageErrorMessageKeyRef.value = null;
     isLoadingRef.value = false;
+    notesIsOpenRef.value = false;
+    notesJobIdRef.value = null;
+    notesDraftRef.value = '';
+    notesSavingRef.value = false;
+    notesErrorRef.value = null;
+    notesContextRef.value = null;
     setupBoardData();
   });
 
@@ -102,6 +163,7 @@ describe('pipeline page', () => {
             props: ['columns'],
             template: '<div class="board">{{ columns.flatMap((column) => column.jobs).length }}</div>',
           },
+          KanbanNoteEditor: { template: '<div class="note-editor-stub" />' },
         },
       },
     });
@@ -140,6 +202,7 @@ describe('pipeline page', () => {
             props: ['columns'],
             template: '<div class="board">{{ columns.length }}</div>',
           },
+          KanbanNoteEditor: { template: '<div class="note-editor-stub" />' },
         },
       },
     });
@@ -149,5 +212,57 @@ describe('pipeline page', () => {
 
     expect(wrapper.find('.board').exists()).toBe(false);
     expect(wrapper.find('.empty').text()).toContain(i18n.global.t('pipeline.search.noResults'));
+  });
+
+  it('opens note editor automatically for done-stage move prompt', async () => {
+    mockMoveJob.mockImplementation(async () => {
+      const callback = boardOptionsRef.value?.onMoveSuccess as
+        | ((payload: {
+            jobId: string;
+            fromStageKey: string;
+            toStageKey: string;
+            toStageName?: string;
+            reason: 'moved_to_done' | 'moved_stage';
+          }) => void)
+        | undefined;
+      callback?.({
+        jobId: 'job-1',
+        fromStageKey: 'applied',
+        toStageKey: 'done',
+        toStageName: 'Done',
+        reason: 'moved_to_done',
+      });
+    });
+
+    const wrapper = mount(PipelinePage, {
+      global: {
+        plugins: [i18n],
+        stubs: {
+          UPage: { template: '<div><slot /></div>' },
+          UPageHeader: { template: '<div><slot /></div>' },
+          UPageBody: { template: '<div><slot /></div>' },
+          UCard: { template: '<div><slot /></div>' },
+          UEmpty: { template: '<div class="empty"><slot /></div>' },
+          UInput: { template: '<input />' },
+          ErrorStateCard: { template: '<div class="error-state" />' },
+          ListSkeletonCards: { template: '<div class="skeleton" />' },
+          KanbanBoard: {
+            emits: ['move'],
+            template:
+              '<button class="move-trigger" @click="$emit(\'move\', { jobId: \'job-1\', toStageKey: \'done\' })">move</button>',
+          },
+          KanbanNoteEditor: { template: '<div class="note-editor-stub" />' },
+        },
+      },
+    });
+
+    await flushPromises();
+    await wrapper.find('.move-trigger').trigger('click');
+    await flushPromises();
+
+    expect(mockOpenNoteEditor).toHaveBeenCalledWith(
+      'job-1',
+      expect.objectContaining({ stageName: 'Done', reason: 'moved_to_done' })
+    );
   });
 });

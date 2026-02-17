@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { useKanbanBoard } from '@/application/kanban/useKanbanBoard';
+import {
+  useKanbanBoard,
+  type KanbanMoveNoteRequest,
+} from '@/application/kanban/useKanbanBoard';
+import { useKanbanNotes } from '@/application/kanban/useKanbanNotes';
 import KanbanBoard from '@/components/pipeline/KanbanBoard.vue';
+import KanbanNoteEditor from '@/components/pipeline/KanbanNoteEditor.vue';
 import ErrorStateCard from '@/components/common/ErrorStateCard.vue';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
 import { useErrorDisplay } from '@/composables/useErrorDisplay';
@@ -9,10 +14,81 @@ import type { JobDescription } from '@/domain/job-description/JobDescription';
 defineOptions({ name: 'PipelinePage' });
 
 const { t } = useI18n();
+const toast = useToast();
 const { pageError, pageErrorMessageKey, setPageError, clearPageError, notifyActionError } =
   useErrorDisplay();
-const board = useKanbanBoard();
 const searchQuery = ref('');
+const kanbanNotes = useKanbanNotes();
+
+const getJobById = (jobId: string) => board.jobs.value.find((job) => job.id === jobId);
+
+const openNoteEditor = (
+  jobId: string,
+  context: { stageName?: string; reason?: 'moved_to_done' | 'moved_stage' | 'manual' } = {}
+) => {
+  const job = getJobById(jobId);
+  if (!job) {
+    return;
+  }
+  kanbanNotes.openNoteEditor(jobId, {
+    initialNotes: job.notes ?? '',
+    stageName: context.stageName,
+    reason: context.reason ?? 'manual',
+  });
+};
+
+const buildMoveNoteContextLine = (
+  context: { stageName?: string; reason?: 'moved_to_done' | 'moved_stage' | 'manual' } | null
+) => {
+  if (!context?.stageName) {
+    return '';
+  }
+  if (context.reason === 'moved_to_done') {
+    return t('pipeline.notes.editor.contextDone', { stage: context.stageName });
+  }
+  if (context.reason === 'moved_stage') {
+    return t('pipeline.notes.editor.contextMoved', { stage: context.stageName });
+  }
+  return '';
+};
+
+const handleMoveSuccess = (payload: KanbanMoveNoteRequest) => {
+  const titleKey =
+    payload.reason === 'moved_to_done'
+      ? 'pipeline.notes.toast.movedDone'
+      : 'pipeline.notes.toast.moved';
+
+  const isDoneMove = payload.reason === 'moved_to_done';
+
+  toast.add({
+    title: t(titleKey, { stage: payload.toStageName ?? payload.toStageKey }),
+    color: 'primary',
+    actions: isDoneMove
+      ? undefined
+      : [
+          {
+            label: t('pipeline.notes.toast.addAction'),
+            onClick: () => {
+              openNoteEditor(payload.jobId, {
+                stageName: payload.toStageName,
+                reason: payload.reason,
+              });
+            },
+          },
+        ],
+  });
+
+  if (isDoneMove) {
+    openNoteEditor(payload.jobId, {
+      stageName: payload.toStageName,
+      reason: payload.reason,
+    });
+  }
+};
+
+const board = useKanbanBoard({
+  onMoveSuccess: handleMoveSuccess,
+});
 
 const filteredColumns = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
@@ -59,6 +135,25 @@ const moveJob = async (payload: { jobId: string; toStageKey: string }) => {
   }
 };
 
+const saveNotes = async () => {
+  try {
+    const updated = await kanbanNotes.saveNotes();
+    const job = getJobById(updated.id);
+    if (job) {
+      job.notes = updated.notes ?? '';
+      board.jobs.value = [...board.jobs.value];
+    }
+    toast.add({
+      title: t('pipeline.notes.toast.saved'),
+      color: 'primary',
+    });
+  } catch {
+    notifyActionError({
+      title: t('pipeline.notes.toast.saveFailed'),
+    });
+  }
+};
+
 onMounted(() => {
   void load();
 });
@@ -101,7 +196,23 @@ onMounted(() => {
         </UEmpty>
       </UCard>
 
-      <KanbanBoard v-else :columns="filteredColumns" @move="moveJob" />
+      <KanbanBoard
+        v-else
+        :columns="filteredColumns"
+        @move="moveJob"
+        @open-note="openNoteEditor($event.jobId)"
+      />
+
+      <KanbanNoteEditor
+        :open="kanbanNotes.state.isOpen.value"
+        :draft="kanbanNotes.state.draft.value"
+        :is-saving="kanbanNotes.state.isSaving.value"
+        :error="kanbanNotes.state.error.value"
+        :context-line="buildMoveNoteContextLine(kanbanNotes.state.context.value)"
+        @update:open="(value) => (value ? null : kanbanNotes.closeNoteEditor())"
+        @update:draft="(value) => (kanbanNotes.state.draft.value = value)"
+        @save="saveNotes"
+      />
     </UPageBody>
   </UPage>
 </template>

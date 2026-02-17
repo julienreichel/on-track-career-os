@@ -958,7 +958,26 @@
     "card": {
       "noCompany": "No company linked",
       "createdAt": "Created {date}",
-      "matchScore": "{score}%"
+      "matchScore": "{score}%",
+      "addNote": "Add note",
+      "editNote": "Edit note"
+    },
+    "notes": {
+      "toast": {
+        "moved": "Moved to {stage}. Add a note?",
+        "movedDone": "Moved to {stage}. Capture the outcome?",
+        "addAction": "Add note",
+        "saved": "Note saved.",
+        "saveFailed": "Unable to save note."
+      },
+      "editor": {
+        "title": "Job note",
+        "label": "Notes",
+        "placeholder": "Add interview feedback, follow-ups, or outcome context...",
+        "errorTitle": "Unable to save note",
+        "contextMoved": "Note for move to: {stage}",
+        "contextDone": "Add an outcome note"
+      }
     }
   },
   "tailoredMaterials": {

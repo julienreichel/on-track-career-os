@@ -121,6 +121,18 @@ export class JobDescriptionService {
     return updated;
   }
 
+  async updateJobNotes(jobId: string, notes: string): Promise<JobDescription> {
+    if (!jobId) {
+      throw new Error('Job ID is required');
+    }
+
+    const updated = await this.repo.updateJobNotes(jobId, notes);
+    if (!updated) {
+      throw new Error('Failed to update job description');
+    }
+    return updated;
+  }
+
   async attachParsedJobDescription(
     jobId: string,
     parsed: ParsedJobDescription

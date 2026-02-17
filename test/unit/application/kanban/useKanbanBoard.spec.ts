@@ -150,4 +150,48 @@ describe('useKanbanBoard', () => {
     expect(Array.isArray(movedJob.matchingSummaries)).toBe(true);
     expect(movedJob.matchingSummaries[0]?.overallScore).toBe(84);
   });
+
+  it('triggers post-move note prompt hook after successful move', async () => {
+    const onMoveSuccess = vi.fn();
+    listJobs.mockResolvedValue([{ id: 'job-1', title: 'A', kanbanStatus: 'todo' }] as JobDescription[]);
+    updateJob.mockResolvedValue({ id: 'job-1', kanbanStatus: 'applied' } as JobDescription);
+
+    const board = useKanbanBoard({
+      auth,
+      jobService,
+      kanbanSettings,
+      onMoveSuccess,
+    });
+    await board.load();
+    await board.moveJob('job-1', 'applied');
+
+    expect(onMoveSuccess).toHaveBeenCalledWith({
+      jobId: 'job-1',
+      fromStageKey: 'todo',
+      toStageKey: 'applied',
+      fromStageName: 'ToDo',
+      toStageName: 'Applied',
+      reason: 'moved_stage',
+    });
+  });
+
+  it('marks move request as moved_to_done for done stage', async () => {
+    listJobs.mockResolvedValue([{ id: 'job-1', title: 'A', kanbanStatus: 'applied' }] as JobDescription[]);
+
+    const board = useKanbanBoard({
+      auth,
+      jobService,
+      kanbanSettings,
+    });
+    await board.load();
+
+    const request = board.requestNoteForMove({
+      jobId: 'job-1',
+      fromStageKey: 'applied',
+      toStageKey: 'done',
+    });
+
+    expect(request.reason).toBe('moved_to_done');
+    expect(request.toStageName).toBe('Done');
+  });
 });

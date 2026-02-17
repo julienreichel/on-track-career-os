@@ -15,11 +15,21 @@ type UseKanbanBoardOptions = {
   auth?: AuthDependency;
   jobService?: JobServiceDependency;
   kanbanSettings?: KanbanSettingsDependency;
+  onMoveSuccess?: (payload: KanbanMoveNoteRequest) => void | Promise<void>;
 };
 
 export type KanbanColumn = {
   stage: KanbanStage;
   jobs: JobDescription[];
+};
+
+export type KanbanMoveNoteRequest = {
+  jobId: string;
+  fromStageKey: string;
+  toStageKey: string;
+  fromStageName?: string;
+  toStageName?: string;
+  reason: 'moved_stage' | 'moved_to_done';
 };
 
 const toTimestamp = (value?: string | null): number => {
@@ -43,6 +53,73 @@ export const normalizeJobStatus = (
     return fallback;
   }
   return job.kanbanStatus;
+};
+
+const buildMoveNoteRequest = (
+  stages: readonly KanbanStage[],
+  payload: { jobId: string; toStageKey: string; fromStageKey: string }
+): KanbanMoveNoteRequest => {
+  const fromStage = stages.find((stage) => stage.key === payload.fromStageKey);
+  const toStage = stages.find((stage) => stage.key === payload.toStageKey);
+  return {
+    ...payload,
+    fromStageName: fromStage?.name,
+    toStageName: toStage?.name,
+    reason: payload.toStageKey === 'done' ? 'moved_to_done' : 'moved_stage',
+  };
+};
+
+const createMoveJob = (params: {
+  jobs: { value: JobDescription[] };
+  kanbanSettings: KanbanSettingsDependency;
+  jobService: JobServiceDependency;
+  onMoveSuccess?: (payload: KanbanMoveNoteRequest) => void | Promise<void>;
+  requestNoteForMove: (payload: {
+    jobId: string;
+    toStageKey: string;
+    fromStageKey: string;
+  }) => KanbanMoveNoteRequest;
+}) => {
+  return async (jobId: string, toStageKey: string) => {
+    const stages = params.kanbanSettings.state.stages.value;
+    const validStageKeys = new Set(stages.map((stage) => stage.key));
+    if (!validStageKeys.has(toStageKey)) {
+      throw new Error('Invalid stage key');
+    }
+
+    const targetJob = params.jobs.value.find((job) => job.id === jobId);
+    if (!targetJob) {
+      throw new Error('Job not found');
+    }
+
+    const previousKanbanStatus = targetJob.kanbanStatus ?? null;
+    const currentStageKey = normalizeJobStatus(targetJob, stages);
+    if (currentStageKey === toStageKey) {
+      return targetJob;
+    }
+
+    targetJob.kanbanStatus = toStageKey;
+    params.jobs.value = [...params.jobs.value];
+
+    try {
+      const updated = await params.jobService.updateJob(jobId, { kanbanStatus: toStageKey });
+      targetJob.kanbanStatus = updated.kanbanStatus ?? toStageKey;
+      params.jobs.value = [...params.jobs.value];
+      const noteRequest = params.requestNoteForMove({
+        jobId,
+        fromStageKey: currentStageKey,
+        toStageKey,
+      });
+      if (params.onMoveSuccess) {
+        await params.onMoveSuccess(noteRequest);
+      }
+      return updated;
+    } catch (err) {
+      targetJob.kanbanStatus = previousKanbanStatus ?? undefined;
+      params.jobs.value = [...params.jobs.value];
+      throw err;
+    }
+  };
 };
 
 export const useKanbanBoard = (options: UseKanbanBoardOptions = {}) => {
@@ -100,38 +177,19 @@ export const useKanbanBoard = (options: UseKanbanBoardOptions = {}) => {
     }
   };
 
-  const moveJob = async (jobId: string, toStageKey: string) => {
-    const stages = kanbanSettings.state.stages.value;
-    const validStageKeys = new Set(stages.map((stage) => stage.key));
-    if (!validStageKeys.has(toStageKey)) {
-      throw new Error('Invalid stage key');
-    }
+  const requestNoteForMove = (payload: {
+    jobId: string;
+    toStageKey: string;
+    fromStageKey: string;
+  }): KanbanMoveNoteRequest => buildMoveNoteRequest(kanbanSettings.state.stages.value, payload);
 
-    const targetJob = jobs.value.find((job) => job.id === jobId);
-    if (!targetJob) {
-      throw new Error('Job not found');
-    }
-
-    const previousKanbanStatus = targetJob.kanbanStatus ?? null;
-    const currentStageKey = normalizeJobStatus(targetJob, stages);
-    if (currentStageKey === toStageKey) {
-      return targetJob;
-    }
-
-    targetJob.kanbanStatus = toStageKey;
-    jobs.value = [...jobs.value];
-
-    try {
-      const updated = await jobService.updateJob(jobId, { kanbanStatus: toStageKey });
-      targetJob.kanbanStatus = updated.kanbanStatus ?? toStageKey;
-      jobs.value = [...jobs.value];
-      return updated;
-    } catch (err) {
-      targetJob.kanbanStatus = previousKanbanStatus ?? undefined;
-      jobs.value = [...jobs.value];
-      throw err;
-    }
-  };
+  const moveJob = createMoveJob({
+    jobs,
+    kanbanSettings,
+    jobService,
+    onMoveSuccess: options.onMoveSuccess,
+    requestNoteForMove,
+  });
 
   return {
     jobs,
@@ -140,6 +198,7 @@ export const useKanbanBoard = (options: UseKanbanBoardOptions = {}) => {
     error,
     load,
     moveJob,
+    requestNoteForMove,
     normalizeJobStatus: (job: Pick<JobDescription, 'kanbanStatus'>) =>
       normalizeJobStatus(job, kanbanSettings.state.stages.value),
   };

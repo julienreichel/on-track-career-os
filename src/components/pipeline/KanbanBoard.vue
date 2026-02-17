@@ -8,6 +8,7 @@ defineProps<{
 
 const emit = defineEmits<{
   move: [payload: { jobId: string; toStageKey: string }];
+  'open-note': [payload: { jobId: string }];
 }>();
 </script>
 
@@ -20,7 +21,12 @@ const emit = defineEmits<{
         class="w-[20rem] shrink-0"
         :data-testid="`kanban-board-column-${column.stage.key}`"
       >
-        <KanbanColumn :stage="column.stage" :jobs="column.jobs" @drop="emit('move', $event)" />
+        <KanbanColumn
+          :stage="column.stage"
+          :jobs="column.jobs"
+          @drop="emit('move', $event)"
+          @open-note="emit('open-note', $event)"
+        />
       </div>
     </div>
   </div>

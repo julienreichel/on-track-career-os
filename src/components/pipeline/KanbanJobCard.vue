@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { JobDescription } from '@/domain/job-description/JobDescription';
-import { formatListDate } from '@/utils/formatListDate';
 
 const { t } = useI18n();
 
@@ -11,6 +10,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   dragstart: [jobId: string];
   dragend: [];
+  'open-note': [payload: { jobId: string }];
 }>();
 
 type MatchingSummaryLite = {
@@ -26,10 +26,11 @@ type JobWithRelations = JobDescription & {
 };
 
 const relatedJob = computed<JobWithRelations>(() => props.job as JobWithRelations);
-const createdDate = computed(() => formatListDate(props.job.createdAt));
 const companyName = computed(
   () => relatedJob.value.company?.companyName ?? t('pipeline.card.noCompany')
 );
+const hasNotes = computed(() => Boolean(props.job.notes?.trim()));
+const notesPreview = computed(() => props.job.notes?.trim() ?? '');
 
 const score = computed(() => {
   const rawSummaries = relatedJob.value.matchingSummaries;
@@ -67,6 +68,10 @@ const handleDragStart = (event: DragEvent) => {
   }
   emit('dragstart', props.job.id);
 };
+
+const handleOpenNote = () => {
+  emit('open-note', { jobId: props.job.id });
+};
 </script>
 
 <template>
@@ -89,9 +94,26 @@ const handleDragStart = (event: DragEvent) => {
 
       <p class="text-sm text-dimmed">{{ companyName }}</p>
 
-      <p v-if="createdDate" class="text-xs text-dimmed">
-        {{ t('pipeline.card.createdAt', { date: createdDate }) }}
+      <p
+        v-if="hasNotes"
+        class="line-clamp-2 text-xs text-toned"
+        :data-testid="`kanban-note-preview-${job.id}`"
+      >
+        {{ notesPreview }}
       </p>
+
+      <div class="flex justify-end pt-1">
+        <UButton
+          color="neutral"
+          variant="outline"
+          size="xs"
+          icon="i-heroicons-chat-bubble-left-right"
+          :title="hasNotes ? t('pipeline.card.editNote') : t('pipeline.card.addNote')"
+          :aria-label="hasNotes ? t('pipeline.card.editNote') : t('pipeline.card.addNote')"
+          :data-testid="`kanban-note-button-${job.id}`"
+          @click.stop="handleOpenNote"
+        />
+      </div>
     </div>
   </UCard>
 </template>

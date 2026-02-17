@@ -95,6 +95,20 @@ describe('JobDescriptionRepository', () => {
     expect(result).toEqual(updated);
   });
 
+  it('should update job notes', async () => {
+    const updated = { id: 'job-update', notes: 'Follow up next week' } as JobDescription;
+    mockModel.update.mockResolvedValue({ data: updated });
+
+    const repo = buildRepository();
+    const result = await repo.updateJobNotes('job-update', 'Follow up next week');
+
+    expect(mockModel.update).toHaveBeenCalledWith(
+      { id: 'job-update', notes: 'Follow up next week' },
+      expect.any(Object)
+    );
+    expect(result).toEqual(updated);
+  });
+
   it('should delete a job description', async () => {
     mockModel.delete.mockResolvedValue({ data: null });
     const repo = buildRepository();

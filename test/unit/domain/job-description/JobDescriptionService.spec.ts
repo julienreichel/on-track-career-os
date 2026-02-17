@@ -34,6 +34,7 @@ describe('JobDescriptionService', () => {
       listByOwner: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      updateJobNotes: vi.fn(),
       delete: vi.fn(),
     } as unknown as ReturnType<typeof vi.mocked<JobDescriptionRepository>>;
     mockAiService = {
@@ -229,6 +230,23 @@ describe('JobDescriptionService', () => {
         })
       );
       expect(result).toEqual(mockUpdated);
+    });
+  });
+
+  describe('updateJobNotes', () => {
+    it('updates notes through repository', async () => {
+      const updated = { id: 'job-1', notes: 'Updated notes' } as JobDescription;
+      mockRepository.updateJobNotes.mockResolvedValue(updated);
+
+      const result = await service.updateJobNotes('job-1', 'Updated notes');
+
+      expect(mockRepository.updateJobNotes).toHaveBeenCalledWith('job-1', 'Updated notes');
+      expect(result).toEqual(updated);
+    });
+
+    it('throws when jobId is missing', async () => {
+      await expect(service.updateJobNotes('', 'Notes')).rejects.toThrow('Job ID is required');
+      expect(mockRepository.updateJobNotes).not.toHaveBeenCalled();
     });
   });
 

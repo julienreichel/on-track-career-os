@@ -145,6 +145,11 @@ export class JobDescriptionRepository {
     return data;
   }
 
+  async updateJobNotes(id: string, notes: string) {
+    const { data } = await this.model.update({ id, notes }, gqlOptions());
+    return data;
+  }
+
   async delete(id: string) {
     await this.model.delete({ id }, gqlOptions());
   }

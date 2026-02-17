@@ -10,6 +10,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   drop: [payload: { jobId: string; toStageKey: string }];
+  'open-note': [payload: { jobId: string }];
 }>();
 
 const { t } = useI18n();
@@ -61,7 +62,12 @@ const allowDrop = (event: DragEvent) => {
       @drop="handleDrop"
     >
       <template v-if="hasJobs">
-        <KanbanJobCard v-for="job in visibleJobs" :key="job.id" :job="job" />
+        <KanbanJobCard
+          v-for="job in visibleJobs"
+          :key="job.id"
+          :job="job"
+          @open-note="emit('open-note', $event)"
+        />
 
         <UButton
           v-if="hasMoreJobs"
