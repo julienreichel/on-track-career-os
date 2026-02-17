@@ -478,3 +478,337 @@ Playwright single happy path:
 - [ ] One Playwright test proves job match → add skill → add proof story → coverage improves → profile reflects updates.
 - [ ] Tests are stable (no timing flakiness): use deterministic mocks for AI and consistent seeded fixtures.
 - [ ] CI passes with strict TypeScript and linting.
+
+---
+
+---
+
+---
+
+## Master Prompt 1 — GraphQL Model Extensions + Data Defaults (JobDescription + KanbanSettings)
+
+1. **Title**
+   B0-1: Extend GraphQL models for Kanban tracking (JobDescription.kanbanStatus + notes) and user KanbanSettings
+
+2. **Intro (context + why)**
+   EPIC B0 V1 introduces a global Kanban board where each card is a `JobDescription`. We must add a separate `kanbanStatus` (do not replace existing `JobDescription.status` lifecycle) and add `notes` directly on the job. We also need per-user Kanban stage configuration, similar in spirit to existing settings models (e.g., CVSettings). The goal is minimal but solid schema changes that unblock UI while keeping YAGNI.
+
+3. **Feature scope**
+   Implement:
+   - Add `kanbanStatus` field to `JobDescription` (string key referencing a stage).
+   - Add `notes` field to `JobDescription` (string).
+   - Add new model `KanbanSettings` (1 per user) containing a stages array of `{ key, name, isSystemDefault }`.
+   - Provide defaults:
+     - New/imported jobs default `kanbanStatus = "todo"`.
+     - KanbanSettings default stages: `todo`, `applied`, `interview`, `done` with ToDo/Done locked.
+       Explicitly out of scope:
+
+   - No reminders, no checklists, no analytics, no per-stage notes.
+   - No forward-only constraints.
+   - No AI ops.
+
+4. **Composables / services / repositories / domain modules**
+   Update/create domain modules consistent with current clean layering:
+   - `job` domain: update JobDescription repository to read/write `kanbanStatus` and `notes`.
+   - `settings` domain (or new `kanban` domain): create repository for `KanbanSettings` with:
+     - `getOrCreateKanbanSettings(userId)`
+     - `updateKanbanStages(userId, stages[])`
+     - `ensureSystemStages(stages)` helper (enforce todo/done presence).
+       Ensure DRY with existing settings patterns (reuse base repository helpers if present).
+
+5. **Components**
+   None required in this prompt.
+
+6. **Pages/routes**
+   None required in this prompt.
+
+7. **AI operations impact**
+   None. Confirm no new AI operations are added.
+
+8. **Testing requirements**
+   Vitest (unit):
+   - `ensureSystemStages` guarantees `todo` and `done` exist and are marked system defaults.
+   - `sanitizeStages` (if created) ensures stage keys are unique and stable.
+   - `getOrCreateKanbanSettings` returns defaults when missing.
+   - Default job creation sets `kanbanStatus = "todo"`.
+     No Playwright in this prompt.
+
+9. **Acceptance criteria (checklist)**
+   - [ ] `JobDescription` schema includes `kanbanStatus` and `notes` with sensible defaults.
+   - [ ] `KanbanSettings` schema exists and persists `stages[]` objects.
+   - [ ] Deterministic default stages created if settings missing.
+   - [ ] System stages `todo` and `done` cannot be removed at repository/service level (guardrails).
+   - [ ] All changes compile in TS strict mode; GraphQL types updated; tests pass.
+
+---
+
+## Master Prompt 2 — Kanban Stage Settings UI (Settings Page + TagInput-like List Editing)
+
+1. **Title**
+   B0-2: Build Kanban stage settings (add/remove/reorder/rename) with locked system stages
+
+2. **Intro (context + why)**
+   EPIC B0 V1 allows users to customize their Kanban board stages globally. We need a settings UI that follows existing “list editing” UX patterns (TagInput-based editing, DRY card layout, deterministic validation). ToDo and Done must always exist and cannot be removed. This page is foundational for the Kanban board rendering.
+
+3. **Feature scope**
+   Implement:
+   - New settings page to edit `KanbanSettings.stages`.
+   - Features:
+     - Reorder stages
+     - Rename stage display name
+     - Add a new custom stage (generate unique stable `key`)
+     - Remove a stage (except `todo` and `done`)
+
+   - Persist changes via repository/service.
+     Explicitly out of scope:
+   - Per-stage checklists, reminders, analytics.
+   - Stage colors or advanced styling.
+   - Bulk migration of existing jobs across renamed keys (avoid key renames; allow name edits only).
+
+4. **Composables / services / repositories / domain modules**
+   Create composable aligned with project patterns:
+   - `useKanbanSettings()`:
+     - `state: { stages, isLoading, error }`
+     - `load()`, `save(stages)`
+     - `addStage(name)`, `removeStage(key)`, `moveStage(from,to)`, `renameStage(key,name)`
+     - enforce invariants via shared helpers (`ensureSystemStages`)
+
+   - If you already have `useSettingsEngine`/`useCanvasEngine` style abstractions, reuse the same “load/save/error” shape.
+
+5. **Components**
+   Create reusable settings components:
+   - `KanbanStageListEditorCard` (Nuxt UI Card pattern)
+     - list rows with drag handles (if existing sortable pattern exists, reuse it)
+     - rename inline (UInput)
+     - delete button disabled for system stages
+
+   - Keep UI consistent: `UPageHeader`, `UPageBody`, `UCard`, `UButton`, `UInput`, `UFormGroup`.
+
+6. **Pages/routes**
+   Create:
+   - `/settings/kanban` (or `/settings/pipeline` — pick the convention used in repo)
+     Navigation/breadcrumbs:
+   - Add to existing settings nav.
+   - Ensure breadcrumb/title consistent with current “breadcrumb-driven page titles” system .
+
+7. **AI operations impact**
+   None.
+
+8. **Testing requirements**
+   Vitest:
+   - Component tests for editor behaviors:
+     - cannot delete `todo`/`done`
+     - add stage generates unique key
+     - reorder updates list deterministically
+
+   - Page test:
+     - loads default settings if none exist
+     - persists and reloads correctly
+       Playwright (single happy path for this prompt only if you prefer splitting; otherwise defer to final EPIC E2E):
+
+   - Visit settings page → add custom stage → save → refresh → stage persists.
+
+9. **Acceptance criteria**
+   - [ ] Settings page exists and is reachable via navigation.
+   - [ ] Users can add/remove/reorder/rename stage **names**.
+   - [ ] `todo` and `done` are always present and cannot be removed.
+   - [ ] Stage keys remain stable; renaming does not change keys.
+   - [ ] Errors handled via existing error pattern (`useErrorDisplay` / `ErrorStateCard` if applicable) .
+   - [ ] TS strict, lint, unit tests pass.
+
+---
+
+## Master Prompt 3 — Kanban Board Page (Drag & Drop + Persist kanbanStatus)
+
+1. **Title**
+   B0-3: Implement global Kanban board page for JobDescriptions with drag & drop between columns
+
+2. **Intro (context + why)**
+   The Kanban is the “heartbeat” operational view: one board per user, cards represent `JobDescription`, and column membership is driven by `JobDescription.kanbanStatus`. This prompt implements the core UX: render stages from settings, show job cards, allow drag-and-drop across columns, and persist status changes. Keep it simple and deterministic.
+
+3. **Feature scope**
+   Implement:
+   - New Kanban page displaying columns based on `KanbanSettings.stages` order.
+   - Fetch all JobDescriptions for user (existing jobs list query patterns).
+   - Group by `kanbanStatus` → render cards.
+   - Drag & drop a card from any column to any column:
+     - update local state optimistically
+     - persist `kanbanStatus` on the JobDescription
+     - handle failure with rollback + toast/error UI (existing pattern)
+
+   - Fallback behavior:
+     - if a job has unknown `kanbanStatus` → treat as `todo`
+       Explicitly out of scope:
+
+   - No WIP limits, no swimlanes, no filtering/search (unless trivial and already available).
+   - No auto stage transitions.
+   - No reminders, checklists, analytics.
+
+4. **Composables / services / repositories / domain modules**
+   Create composables aligned with existing “engine” patterns:
+   - `useKanbanBoard()`:
+     - dependencies: `useKanbanSettings()`, `useJobsRepository()`
+     - `columns: { stage, jobs[] }[]` computed
+     - `moveJob(jobId, toStageKey)` action with optimistic update + persistence
+     - `normalizeJobStatus(job, stages)` helper
+
+   - Ensure DRY: if there’s an existing jobs list composable used in `/jobs`, reuse it rather than re-querying.
+
+5. **Components**
+   - `KanbanBoard` (layout wrapper)
+   - `KanbanColumn` (renders stage header + droppable area)
+   - `KanbanJobCard` (reusable card pattern)
+     - shows title, company, created date, optional strength badge (see separate prompt)
+       Use Nuxt UI components for structure. For drag & drop, use an existing library already in repo; if none exists, implement minimal native HTML5 DnD with clean TS typing (no new frameworks).
+
+6. **Pages/routes**
+   Create:
+   - `/pipeline` or `/applications` (choose the canonical route; project status mentions `/applications` exists but might be materials-related—be consistent)
+     Navigation/breadcrumbs:
+   - Add to main nav.
+   - Breadcrumb shows “Pipeline” (or chosen name).
+   - Ensure page title is set through the breadcrumb/title system.
+
+7. **AI operations impact**
+   None. Do not call AI ops from this page.
+
+8. **Testing requirements**
+   Vitest:
+   - `useKanbanBoard` unit tests:
+     - grouping by stages
+     - unknown status fallback → todo
+     - optimistic update + rollback on repo failure (mock)
+
+   - Component test for `KanbanJobCard` rendering required fields.
+     Playwright (EPIC-level happy path can be done here or final prompt):
+   - Create/import job → appears in ToDo
+   - Drag to Applied → persists after refresh
+
+9. **Acceptance criteria**
+   - [ ] Board renders columns in user-configured order.
+   - [ ] Cards = JobDescriptions; unknown status falls back to ToDo.
+   - [ ] Drag & drop moves card and persists `kanbanStatus`.
+   - [ ] Failure handling is deterministic (rollback + visible error).
+   - [ ] No AI ops invoked; performance acceptable (no excessive GraphQL calls).
+   - [ ] Tests pass (unit + component + E2E baseline as planned).
+
+---
+
+## Master Prompt 4 — Job Notes Field (Edit + Persist on JobDescription)
+
+1. **Title**
+   B0-4: Add free-text notes on JobDescription (simple string) and integrate into job detail UX
+
+2. **Intro (context + why)**
+   EPIC B0 V1 requires simple global notes per job (not stage-dependent). Notes support “rejection reason”, follow-ups, and interview feedback without introducing a new note entity. This should be a small, safe enhancement integrated into existing job detail/edit flows.
+
+3. **Feature scope**
+   Implement:
+   - `notes: string` display and editing UI on JobDescription detail page (or an existing edit form).
+   - Persist changes to GraphQL.
+   - Ensure notes are accessible from Kanban navigation (card click leads to job details).
+     Explicitly out of scope:
+   - No per-stage notes, no note history/timestamps, no rich text.
+   - No AI summarization or extraction.
+
+4. **Composables / services / repositories / domain modules**
+   Update job repository and job detail composable:
+   - Add `updateJobNotes(jobId, notes)` method.
+   - Reuse existing `useJobDetails()` / `useJobEditor()` patterns if present.
+   - Add minimal validation (max length if you already have a standard; otherwise keep simple).
+
+5. **Components**
+   - Update existing Job detail page card:
+     - `UTextarea` bound to notes
+     - Save button or auto-save pattern (prefer existing conventions in app)
+
+   - Reuse existing `Card` and error patterns.
+
+6. **Pages/routes**
+   Update:
+   - `/jobs/:id` (or whichever job details route exists)
+     Ensure navigation from Kanban card lands here.
+
+7. **AI operations impact**
+   None.
+
+8. **Testing requirements**
+   Vitest:
+   - repository update method called with correct payload
+   - page/component test: notes field renders and persists
+     Playwright:
+   - From Kanban → open a job → edit notes → save → refresh → notes persist
+
+9. **Acceptance criteria**
+   - [ ] Notes field exists on JobDescription and can be edited.
+   - [ ] Notes persist reliably with deterministic error handling.
+   - [ ] Notes are accessible via Kanban → job detail navigation.
+   - [ ] No new models or AI ops added.
+   - [ ] Tests pass.
+
+---
+
+## Master Prompt 5 — Strength Score Badge on Kanban Card (Read-Only, No New Computation)
+
+1. **Title**
+   B0-5: Show Application Strength badge on Kanban cards (read-only) without triggering evaluation
+
+2. **Intro (context + why)**
+   You want the Kanban card to optionally display a strength score badge if available. EPIC A2 already exists with application strength evaluation and a dedicated page . For B0 V1, we must keep Kanban fast and deterministic: show the latest known score if it exists, but do not compute or refresh it here.
+
+3. **Feature scope**
+   Implement:
+   - Display a small badge on `KanbanJobCard` if a score is already stored/available in the data model.
+   - If no score exists, render nothing (no placeholder).
+     Explicitly out of scope:
+   - No calling `ai.evaluateApplicationStrength` from Kanban.
+   - No “strength vs outcome” analytics.
+   - No background refresh.
+
+4. **Composables / services / repositories / domain modules**
+   - Identify the current persistence location for strength evaluation results (existing model/page state from A2).
+   - Add a lightweight selector:
+     - `getLatestStrengthScore(jobId)` or enrich job list query if the score is denormalized.
+
+   - Keep it DRY: do not duplicate A2 evaluation logic; only consume stored results.
+
+5. **Components**
+   - Update `KanbanJobCard`:
+     - add `UBadge` (or existing badge component)
+     - show score + optional label (e.g., “Strength 72” or a short category)
+
+   - Ensure consistent formatting with existing score UI in `/jobs/:id/application-strength` .
+
+6. **Pages/routes**
+   None required, but card click should still navigate to job detail (or strength page if you already link it elsewhere—do not change behavior without a clear pattern).
+
+7. **AI operations impact**
+   None. Explicitly verify no AI ops invoked.
+
+8. **Testing requirements**
+   Vitest:
+   - card renders badge when score present
+   - no badge when missing
+   - no calls to A2 evaluation op from Kanban context
+     Playwright (optional if already covered):
+   - Ensure badge visible for a job with known score
+
+9. **Acceptance criteria**
+   - [ ] Strength badge displays only when existing data is available.
+   - [ ] No computation/evaluation triggered from Kanban.
+   - [ ] UI remains performant; no extra GraphQL calls per card beyond an approved query shape.
+   - [ ] Tests pass.
+
+---
+
+### Recommended EPIC-Level Playwright Happy Path (single test)
+
+If you want **one** E2E to cover EPIC B0 V1 end-to-end, implement:
+
+1. Ensure user has default Kanban settings
+2. Import/create a job → verify it appears in **ToDo**
+3. Drag job ToDo → Applied → refresh → persists
+4. Open job detail → add notes → refresh → persists
+5. (Optional) If fixture has strength score, verify badge appears
+
+This aligns with your “single happy path” philosophy and keeps E2E stable .
