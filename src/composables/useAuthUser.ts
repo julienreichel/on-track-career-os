@@ -12,6 +12,12 @@ export const useAuthUser = () => {
   const error = ref<string | null>(null);
 
   const loadUserId = async () => {
+    if (!import.meta.client) {
+      userId.value = null;
+      error.value = null;
+      return;
+    }
+
     loading.value = true;
     error.value = null;
 

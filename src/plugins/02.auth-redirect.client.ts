@@ -9,7 +9,7 @@ export default defineNuxtPlugin({
   name: 'AmplifyAuthRedirect',
   enforce: 'pre',
   setup() {
-    if (isTestEnvironment) {
+    if (isTestEnvironment || import.meta.server) {
       return;
     }
 
