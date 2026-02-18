@@ -19,6 +19,10 @@ const PAGE_SIZE = 5;
 const visibleCount = ref(PAGE_SIZE);
 const visibleJobs = computed(() => props.jobs.slice(0, visibleCount.value));
 const hasMoreJobs = computed(() => props.jobs.length > visibleCount.value);
+const showBottomDropZone = computed(() => !hasJobs.value || !hasMoreJobs.value);
+const bottomDropZoneTestId = computed(() =>
+  hasJobs.value ? `kanban-drop-tail-${props.stage.key}` : `kanban-drop-empty-${props.stage.key}`
+);
 
 watch(
   () => props.jobs.length,
@@ -47,7 +51,10 @@ const allowDrop = (event: DragEvent) => {
 </script>
 
 <template>
-  <UCard class="min-h-[16rem]" :data-testid="`kanban-column-${stage.key}`">
+  <UCard
+    class="min-h-[16rem]"
+    :data-testid="`kanban-column-${stage.key}`"
+  >
     <template #header>
       <div class="flex items-center justify-between gap-2">
         <h2 class="font-semibold text-highlighted">{{ stage.name }}</h2>
@@ -83,9 +90,9 @@ const allowDrop = (event: DragEvent) => {
       </p>
 
       <div
-        v-if="hasJobs"
-        class="h-24 rounded-md border border-dashed border-muted/60 bg-muted/10"
-        :data-testid="`kanban-drop-tail-${stage.key}`"
+        v-if="showBottomDropZone"
+        class="h-32 rounded-md border border-dashed border-muted/60 bg-muted/10"
+        :data-testid="bottomDropZoneTestId"
         @dragover.stop.prevent="allowDrop"
         @drop.stop="handleDrop"
       />

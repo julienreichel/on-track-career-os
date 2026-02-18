@@ -24,12 +24,14 @@ describe('KanbanColumn', () => {
     });
 
     expect(wrapper.find('[data-testid="kanban-empty-applied"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="kanban-drop-empty-applied"]').exists()).toBe(true);
 
     await wrapper.setProps({
       jobs: [{ id: 'job-1', title: 'Role' }] as any,
     });
 
     expect(wrapper.find('[data-testid="kanban-empty-applied"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="kanban-drop-empty-applied"]').exists()).toBe(false);
     expect(wrapper.find('.job-card').exists()).toBe(true);
   });
 
@@ -90,12 +92,15 @@ describe('KanbanColumn', () => {
 
     expect(wrapper.findAll('.job-card')).toHaveLength(5);
     expect(wrapper.find('[data-testid="kanban-show-more-applied"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="kanban-drop-tail-applied"]').exists()).toBe(false);
 
     await wrapper.find('[data-testid="kanban-show-more-applied"]').trigger('click');
     expect(wrapper.findAll('.job-card')).toHaveLength(10);
+    expect(wrapper.find('[data-testid="kanban-drop-tail-applied"]').exists()).toBe(false);
 
     await wrapper.find('[data-testid="kanban-show-more-applied"]').trigger('click');
     expect(wrapper.findAll('.job-card')).toHaveLength(12);
     expect(wrapper.find('[data-testid="kanban-show-more-applied"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="kanban-drop-tail-applied"]').exists()).toBe(true);
   });
 });
