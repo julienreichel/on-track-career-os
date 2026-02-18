@@ -5,8 +5,11 @@ import KanbanBoard from '@/components/pipeline/KanbanBoard.vue';
 import KanbanNoteEditor from '@/components/pipeline/KanbanNoteEditor.vue';
 import ErrorStateCard from '@/components/common/ErrorStateCard.vue';
 import ListSkeletonCards from '@/components/common/ListSkeletonCards.vue';
+import GuidanceBanner from '@/components/guidance/GuidanceBanner.vue';
 import { useErrorDisplay } from '@/composables/useErrorDisplay';
+import { useUserProgress } from '@/composables/useUserProgress';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
+import type { GuidanceBanner as GuidanceBannerModel } from '@/domain/onboarding';
 
 defineOptions({ name: 'PipelinePage' });
 
@@ -16,6 +19,7 @@ const { pageError, pageErrorMessageKey, setPageError, clearPageError, notifyActi
   useErrorDisplay();
 const searchQuery = ref('');
 const kanbanNotes = useKanbanNotes();
+const progress = useUserProgress();
 
 const getJobById = (jobId: string) => board.jobs.value.find((job) => job.id === jobId);
 
@@ -105,6 +109,20 @@ const hasFilteredJobs = computed(() =>
 );
 
 const hasJobs = computed(() => board.jobs.value.length > 0);
+const jobUploadBanner = computed<GuidanceBannerModel | null>(() => {
+  if (!progress.state.value?.phase3.missing.includes('jobUploaded')) {
+    return null;
+  }
+
+  return {
+    titleKey: 'guidance.applications.banner.job.title',
+    descriptionKey: 'guidance.applications.banner.job.description',
+    cta: {
+      labelKey: 'guidance.applications.banner.job.cta',
+      to: '/jobs/new',
+    },
+  };
+});
 
 const matchesJobSearch = (job: JobDescription, query: string): boolean => {
   const fields = [job.title, job.seniorityLevel, job.roleSummary, job.status];
@@ -154,6 +172,7 @@ const saveNotes = async () => {
 
 onMounted(() => {
   void load();
+  void progress.load();
 });
 </script>
 
@@ -162,6 +181,8 @@ onMounted(() => {
     <UPageHeader :title="t('pipeline.title')" :description="t('pipeline.description')" />
 
     <UPageBody>
+      <GuidanceBanner v-if="jobUploadBanner" :banner="jobUploadBanner" class="mb-6" />
+
       <div v-if="!board.isLoading.value && hasJobs" class="mb-6">
         <UInput
           v-model="searchQuery"

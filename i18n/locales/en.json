@@ -1018,6 +1018,12 @@
       "summaryErrorTitle": "Unable to load matching summary",
       "generateErrorTitle": "Unable to generate materials",
       "loadErrorTitle": "Unable to load materials"
+    },
+    "errors": {
+      "unauthenticated": "Sign in again to continue.",
+      "jobNotFound": "We couldn't find the linked job. Open this material from the jobs list.",
+      "loadContextFailed": "We couldn't load the job context. Please try again.",
+      "loadMaterialsFailed": "We couldn't load tailored materials right now. Please try again."
     }
   },
   "matching": {
