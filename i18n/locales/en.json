@@ -941,7 +941,7 @@
   },
   "pipeline": {
     "title": "Pipeline",
-    "description": "Track all job applications by stage and move cards as you progress.",
+    "description": "Track job applications by stage.",
     "empty": "No stages configured yet.",
     "search": {
       "placeholder": "Search by title, seniority, summary, or status",

@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import {
-  useKanbanBoard,
-  type KanbanMoveNoteRequest,
-} from '@/application/kanban/useKanbanBoard';
+import { useKanbanBoard, type KanbanMoveNoteRequest } from '@/application/kanban/useKanbanBoard';
 import { useKanbanNotes } from '@/application/kanban/useKanbanNotes';
 import KanbanBoard from '@/components/pipeline/KanbanBoard.vue';
 import KanbanNoteEditor from '@/components/pipeline/KanbanNoteEditor.vue';
@@ -68,6 +65,7 @@ const handleMoveSuccess = (payload: KanbanMoveNoteRequest) => {
       : [
           {
             label: t('pipeline.notes.toast.addAction'),
+            variant: 'outline',
             onClick: () => {
               openNoteEditor(payload.jobId, {
                 stageName: payload.toStageName,
