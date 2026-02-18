@@ -52,7 +52,7 @@ const allowDrop = (event: DragEvent) => {
 
 <template>
   <UCard
-    class="min-h-[16rem]"
+    class="h-full min-h-[16rem]"
     :data-testid="`kanban-column-${stage.key}`"
   >
     <template #header>
