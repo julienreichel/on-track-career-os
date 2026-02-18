@@ -238,6 +238,11 @@
 **Core:** 5-phase progress system with milestone tracking  
 **Features:** Phase detection (Complete profile → Create canvas → Document stories → Find opportunities → Apply), 7 badges, contextual guidance, dashboard cockpit  
 **Pages:** `/`, `/onboarding` (4-step wizard)  
+**Implementation references:**  
+- `src/domain/onboarding/progress.ts` — computes phase completion + missing gates (`jobUploaded`, `matchingSummary`, etc.)  
+- `src/domain/onboarding/nextAction.ts` — deterministic next-step routing from progress state  
+- `src/domain/onboarding/guidanceCatalog.ts` — route-aware guidance model (banner / empty state / locked features)  
+- `src/composables/useGuidance.ts` — page adapter wiring progress state to guidance catalog  
 **Impact:** User flow clarity, reduced abandonment
 
 ---

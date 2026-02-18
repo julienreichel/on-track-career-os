@@ -122,11 +122,29 @@ User-scoped data access enforced at GraphQL layer
 
 `useAuthUser()` — Authentication, user session  
 `useUserProgress()` — 5-phase progress tracking, guidance inputs, unlocks  
+`useGuidance()` — Route-level guidance resolver (banner / empty state / locked features)  
 `useBadges()` — Badge eligibility + toast notifications  
 `useActiveJobsDashboard()` — Active job states for dashboard  
 `useBreadcrumbMapping()` — Dynamic breadcrumbs  
 `useAnalytics()` — PostHog event capture + page naming
 `useErrorDisplay()` — Page-level error state + i18n message keys + action toasts
+
+### Onboarding Guidance Engine (Rule-based)
+
+`src/domain/onboarding/progress.ts`  
+- Computes `UserProgressState` across 5 phases.
+- Defines gate completeness and missing keys (for example `jobUploaded`, `matchingSummary`).
+
+`src/domain/onboarding/nextAction.ts`  
+- Maps progress state to deterministic next route/action.
+- Drives dashboard and onboarding recommendation continuity.
+
+`src/domain/onboarding/guidanceCatalog.ts`  
+- Maps `(routeKey, progress, context)` to UI guidance output:
+  - banner
+  - empty state
+  - locked features
+- Used by page-level guidance to keep messaging consistent across dedicated pages.
 
 ---
 

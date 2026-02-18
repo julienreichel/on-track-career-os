@@ -1,5 +1,13 @@
 # 🧭 EPIC ROADMAP — AI CAREER COACH EDITION
 
+## Existing platform baseline (guidance already shipped)
+
+- The product already includes rule-based onboarding guidance:
+  - `src/domain/onboarding/progress.ts` (5-phase progress + missing gates)
+  - `src/domain/onboarding/nextAction.ts` (deterministic next action routing)
+  - `src/domain/onboarding/guidanceCatalog.ts` (per-route banner/empty/locked guidance)
+- Roadmap items below related to guidance should be interpreted as **incremental scope** (adaptive coaching, richer signals, conversational UX), not first-time implementation of onboarding guidance.
+
 # 🚀 EPIC A1 — Clear Transformation & Outcome Framing
 
 ### **Problem**
@@ -642,7 +650,7 @@ Provide a **context-aware AI coach inside the product** that guides reflection a
 
 **Key Features**
 
-- Contextual guidance per screen (Profile, Strengths, Stories, Canvas, Jobs)
+- AI conversational guidance per screen, layered on top of existing rule-based guidance
 - Guided reflection questions
 - Field-level assistance (strengths, achievements, value proposition, direction)
 - Canvas translator (explains each block in practical career terms)
@@ -729,7 +737,7 @@ Builds on MatchingSummary already implemented
 ### Includes
 
 - Simple job search activity tracker (applications, networking, interviews)
-- “Next best action” nudges
+- Adaptive “next best action” nudges beyond current deterministic routing
 - Inactivity reminders
 
 ### Why V1
