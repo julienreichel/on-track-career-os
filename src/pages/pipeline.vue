@@ -104,10 +104,6 @@ const filteredColumns = computed(() => {
   }));
 });
 
-const hasFilteredJobs = computed(() =>
-  filteredColumns.value.some((column) => column.jobs.length > 0)
-);
-
 const hasJobs = computed(() => board.jobs.value.length > 0);
 const jobUploadBanner = computed<GuidanceBannerModel | null>(() => {
   if (!progress.state.value?.phase3.missing.includes('jobUploaded')) {
@@ -205,14 +201,6 @@ onMounted(() => {
 
       <UCard v-else-if="board.columns.value.length === 0">
         <p class="text-sm text-dimmed">{{ t('pipeline.empty') }}</p>
-      </UCard>
-
-      <UCard v-else-if="!hasFilteredJobs">
-        <UEmpty :title="t('pipeline.search.noResults')" icon="i-heroicons-magnifying-glass">
-          <p class="text-sm text-dimmed">
-            {{ t('pipeline.search.placeholder') }}
-          </p>
-        </UEmpty>
       </UCard>
 
       <KanbanBoard
