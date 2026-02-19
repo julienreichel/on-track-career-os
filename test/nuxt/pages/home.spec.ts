@@ -11,11 +11,6 @@ const mockBadges = {
   earnedBadgeDefinitions: ref([]),
   load: vi.fn(),
 };
-const mockActiveJobs = {
-  loading: ref(false),
-  states: ref([]),
-  load: vi.fn(),
-};
 const mockKanbanStages = ref<KanbanStage[]>([
   { key: 'todo', name: 'ToDo', isSystemDefault: true },
   { key: 'applied', name: 'Applied', isSystemDefault: false },
@@ -37,10 +32,6 @@ const mockProgress = {
 
 vi.mock('@/composables/useBadges', () => ({
   useBadges: () => mockBadges,
-}));
-
-vi.mock('@/composables/useActiveJobsDashboard', () => ({
-  useActiveJobsDashboard: () => mockActiveJobs,
 }));
 
 vi.mock('@/application/kanban-settings/useKanbanSettings', () => ({
@@ -100,10 +91,6 @@ const stubs = {
     template: '<div class="progress-guidance-section" />',
     props: ['progress'],
   },
-  ActiveJobsCard: {
-    template: '<div class="active-jobs-card" />',
-    props: ['states', 'loading'],
-  },
   PipelineSummaryBar: {
     template: '<div class="pipeline-summary-bar">{{ counts.todoCount }}-{{ counts.activeCount }}-{{ counts.doneCount }}</div>',
     props: ['counts', 'loading'],
@@ -134,8 +121,6 @@ async function mountPage() {
 describe('Home Page Component', () => {
   beforeEach(() => {
     mockBadges.earnedBadgeDefinitions.value = [];
-    mockActiveJobs.loading.value = false;
-    mockActiveJobs.states.value = [];
     mockLandingPipeline.isLoading.value = false;
     mockLandingPipeline.counts.value = { todoCount: 1, activeCount: 2, doneCount: 3 };
     mockLandingPipeline.focusJobs.value = [];
@@ -158,7 +143,7 @@ describe('Home Page Component', () => {
     expect(wrapper.text()).toContain(i18n.global.t('onboarding.actionBox.title'));
   });
 
-  it('shows progress guidance and active jobs when onboarding is complete', async () => {
+  it('shows progress guidance and pipeline dashboard when onboarding is complete', async () => {
     mockProgress.inputs.value = { experienceCount: 1 };
     mockLandingPipeline.focusJobs.value = [{ id: 'job-1' } as JobDescription];
     const wrapper = await mountPage();
@@ -166,7 +151,6 @@ describe('Home Page Component', () => {
     expect(wrapper.find('.progress-guidance-section').exists()).toBe(true);
     expect(wrapper.find('.pipeline-summary-bar').exists()).toBe(true);
     expect(wrapper.find('.focus-job-cards').exists()).toBe(true);
-    expect(wrapper.find('.active-jobs-card').exists()).toBe(false);
     expect(wrapper.text()).not.toContain(i18n.global.t('onboarding.actionBox.title'));
   });
 

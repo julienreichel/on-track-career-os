@@ -1281,28 +1281,6 @@
     }
   },
   "dashboard": {
-    "activeJobs": {
-      "title": "Active jobs",
-      "description": "Track match readiness and materials for your most recent roles.",
-      "empty": "No active jobs yet.",
-      "match": {
-        "value": "Match {score}%",
-        "naValue": "No match"
-      },
-      "materials": {
-        "cv": "CV",
-        "coverLetter": "Cover letter",
-        "speech": "Speech"
-      },
-      "cta": {
-        "viewJob": "View job",
-        "generateCv": "Generate CV",
-        "generateCoverLetter": "Generate cover letter",
-        "generateSpeech": "Generate speech",
-        "generateMatch": "Generate match",
-        "reviewMatch": "View match"
-      }
-    },
     "pipeline": {
       "summary": {
         "title": "Pipeline summary",
