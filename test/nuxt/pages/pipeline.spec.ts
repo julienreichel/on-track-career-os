@@ -95,6 +95,21 @@ vi.mock('@/composables/useErrorDisplay', () => ({
   }),
 }));
 
+vi.mock('@/composables/useUserProgress', () => ({
+  useUserProgress: () => ({
+    state: ref({
+      phase1: { isComplete: true, missing: [] },
+      phase2: { isComplete: true, missing: [] },
+      phase3: { isComplete: true, missing: [] },
+      phase4: { isComplete: true, missing: [] },
+      phase: 'bonus',
+    }),
+    loading: ref(false),
+    error: ref<string | null>(null),
+    load: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 const makeJob = (id: string, title: string): JobDescription => ({
   id,
   title,
