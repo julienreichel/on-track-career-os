@@ -26,11 +26,19 @@
 
       <ProgressGuidanceSection v-if="!showOnboarding" class="mb-6" :progress="progress" />
 
-      <ActiveJobsCard
-        v-if="!showOnboarding && showActiveJobs"
+      <PipelineSummaryBar
+        v-if="!showOnboarding && showPipelineDashboard"
         class="mb-6"
-        :states="activeJobs.states.value"
-        :loading="activeJobs.loading.value"
+        :counts="landingPipeline.counts.value"
+        :loading="landingPipeline.isLoading.value"
+      />
+
+      <FocusJobCards
+        v-if="!showOnboarding && showPipelineDashboard && showFocusToday"
+        class="mb-6"
+        :jobs="landingPipeline.focusJobs.value"
+        :stages="kanbanSettings.state.stages.value"
+        :loading="landingPipeline.isLoading.value"
       />
 
       <BadgeGridCard
@@ -69,11 +77,13 @@
 import { ref, watch, onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ProgressGuidanceSection from '@/components/onboarding/ProgressGuidanceSection.vue';
-import ActiveJobsCard from '@/components/dashboard/ActiveJobsCard.vue';
 import { useBadges } from '@/composables/useBadges';
 import BadgeGridCard from '@/components/badges/BadgeGridCard.vue';
-import { useActiveJobsDashboard } from '@/composables/useActiveJobsDashboard';
 import { useUserProgress } from '@/composables/useUserProgress';
+import PipelineSummaryBar from '@/components/dashboard/PipelineSummaryBar.vue';
+import FocusJobCards from '@/components/dashboard/FocusJobCards.vue';
+import { useKanbanSettings } from '@/application/kanban-settings/useKanbanSettings';
+import { useLandingPipelineDashboard } from '@/composables/useLandingPipelineDashboard';
 
 defineOptions({ name: 'HomePage' });
 
@@ -82,27 +92,22 @@ const { t } = useI18n();
 const showOnboarding = ref(false);
 const progress = useUserProgress();
 const badges = useBadges({ progress });
-const activeJobs = useActiveJobsDashboard({
-  materials: {
-    cvs: computed(() => progress.snapshot?.value?.cvs ?? []),
-    coverLetters: computed(() => progress.snapshot?.value?.coverLetters ?? []),
-    speechBlocks: computed(() => progress.snapshot?.value?.speechBlocks ?? []),
-  },
+const kanbanSettings = useKanbanSettings();
+const landingPipeline = useLandingPipelineDashboard({
+  kanbanSettings,
 });
 const welcomeName = computed(
   () => progress.profile.value?.fullName?.trim() || t('home.fallbackName')
 );
 
-const showActiveJobs = computed(() => {
-  if (progress.state.value?.phase !== 'bonus') {
-    return false;
-  }
-  return activeJobs.loading.value || activeJobs.states.value.length > 0;
-});
+const showPipelineDashboard = computed(() => progress.state.value?.phase === 'bonus');
+const showFocusToday = computed(
+  () => landingPipeline.isLoading.value || landingPipeline.focusJobs.value.length > 0
+);
 
 onMounted(() => {
   void badges.load();
-  void activeJobs.load();
+  void landingPipeline.load();
   void progress.load();
 });
 

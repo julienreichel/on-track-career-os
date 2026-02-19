@@ -1302,6 +1302,29 @@
         "generateMatch": "Generate match",
         "reviewMatch": "View match"
       }
+    },
+    "pipeline": {
+      "summary": {
+        "title": "Pipeline summary",
+        "description": "A quick view of where your applications stand.",
+        "todo": "To start",
+        "active": "Active",
+        "done": "Done"
+      },
+      "focus": {
+        "title": "Your focus today",
+        "description": "Top opportunities to move forward right now.",
+        "empty": "No focus jobs yet. Add or move jobs in your pipeline to get started.",
+        "noSummary": "No role summary yet.",
+        "unknownDate": "Unknown date",
+        "createdAt": "Created {date}",
+        "updatedAt": "Updated {date}",
+        "stage": "Stage: {stage}",
+        "cta": {
+          "openPipeline": "Open in Pipeline",
+          "viewJob": "View job"
+        }
+      }
     }
   },
   "badges": {

@@ -38,7 +38,7 @@ const byMostRecentStable = (jobs: ReadonlyArray<JobDescription>): JobDescription
     })
     .map((entry) => entry.job);
 
-const normalizeKanbanStatus = (
+export const normalizeKanbanStatus = (
   job: Pick<JobDescription, 'kanbanStatus'>,
   stages: ReadonlyArray<KanbanStage>
 ): string => {
@@ -53,6 +53,12 @@ const normalizeKanbanStatus = (
   }
 
   return rawStatus;
+};
+
+export const getStageLabel = (stageKey: string, stages: ReadonlyArray<KanbanStage>): string => {
+  const normalizedKey = normalizeKanbanStatus({ kanbanStatus: stageKey }, stages);
+  const stage = stages.find((entry) => entry.key === normalizedKey);
+  return stage?.name?.trim() || normalizedKey;
 };
 
 export const derivePipelineBuckets = (

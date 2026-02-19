@@ -4,6 +4,8 @@ import { createTestI18n } from '../../utils/createTestI18n';
 import { createRouter, createMemoryHistory } from 'vue-router';
 import { ref } from 'vue';
 import HomePage from '@/pages/home.vue';
+import type { JobDescription } from '@/domain/job-description/JobDescription';
+import type { KanbanStage } from '@/domain/kanban-settings/KanbanSettings';
 
 const mockBadges = {
   earnedBadgeDefinitions: ref([]),
@@ -12,6 +14,17 @@ const mockBadges = {
 const mockActiveJobs = {
   loading: ref(false),
   states: ref([]),
+  load: vi.fn(),
+};
+const mockKanbanStages = ref<KanbanStage[]>([
+  { key: 'todo', name: 'ToDo', isSystemDefault: true },
+  { key: 'applied', name: 'Applied', isSystemDefault: false },
+  { key: 'done', name: 'Done', isSystemDefault: true },
+]);
+const mockLandingPipeline = {
+  isLoading: ref(false),
+  counts: ref({ todoCount: 1, activeCount: 2, doneCount: 3 }),
+  focusJobs: ref<JobDescription[]>([]),
   load: vi.fn(),
 };
 const mockProgress = {
@@ -28,6 +41,21 @@ vi.mock('@/composables/useBadges', () => ({
 
 vi.mock('@/composables/useActiveJobsDashboard', () => ({
   useActiveJobsDashboard: () => mockActiveJobs,
+}));
+
+vi.mock('@/application/kanban-settings/useKanbanSettings', () => ({
+  useKanbanSettings: () => ({
+    state: {
+      stages: mockKanbanStages,
+      isLoading: ref(false),
+      error: ref<string | null>(null),
+    },
+    load: vi.fn(),
+  }),
+}));
+
+vi.mock('@/composables/useLandingPipelineDashboard', () => ({
+  useLandingPipelineDashboard: () => mockLandingPipeline,
 }));
 
 vi.mock('@/composables/useUserProgress', () => ({
@@ -76,6 +104,14 @@ const stubs = {
     template: '<div class="active-jobs-card" />',
     props: ['states', 'loading'],
   },
+  PipelineSummaryBar: {
+    template: '<div class="pipeline-summary-bar">{{ counts.todoCount }}-{{ counts.activeCount }}-{{ counts.doneCount }}</div>',
+    props: ['counts', 'loading'],
+  },
+  FocusJobCards: {
+    template: '<div class="focus-job-cards">{{ jobs.length }}</div>',
+    props: ['jobs', 'stages', 'loading'],
+  },
   BadgeGridCard: {
     template: '<div class="badge-grid-card" />',
     props: ['badges'],
@@ -100,6 +136,9 @@ describe('Home Page Component', () => {
     mockBadges.earnedBadgeDefinitions.value = [];
     mockActiveJobs.loading.value = false;
     mockActiveJobs.states.value = [];
+    mockLandingPipeline.isLoading.value = false;
+    mockLandingPipeline.counts.value = { todoCount: 1, activeCount: 2, doneCount: 3 };
+    mockLandingPipeline.focusJobs.value = [];
     mockProgress.state.value = { phase: 'bonus' };
     mockProgress.profile.value = { fullName: 'Ava Test' };
     mockProgress.inputs.value = null;
@@ -121,12 +160,25 @@ describe('Home Page Component', () => {
 
   it('shows progress guidance and active jobs when onboarding is complete', async () => {
     mockProgress.inputs.value = { experienceCount: 1 };
-    mockActiveJobs.states.value = [{ jobId: 'job-1' }];
+    mockLandingPipeline.focusJobs.value = [{ id: 'job-1' } as JobDescription];
     const wrapper = await mountPage();
 
     expect(wrapper.find('.progress-guidance-section').exists()).toBe(true);
-    expect(wrapper.find('.active-jobs-card').exists()).toBe(true);
+    expect(wrapper.find('.pipeline-summary-bar').exists()).toBe(true);
+    expect(wrapper.find('.focus-job-cards').exists()).toBe(true);
+    expect(wrapper.find('.active-jobs-card').exists()).toBe(false);
     expect(wrapper.text()).not.toContain(i18n.global.t('onboarding.actionBox.title'));
+  });
+
+  it('hides focus today block when there are no focus jobs', async () => {
+    mockProgress.inputs.value = { experienceCount: 1 };
+    mockLandingPipeline.focusJobs.value = [];
+    mockLandingPipeline.isLoading.value = false;
+
+    const wrapper = await mountPage();
+
+    expect(wrapper.find('.pipeline-summary-bar').exists()).toBe(true);
+    expect(wrapper.find('.focus-job-cards').exists()).toBe(false);
   });
 
   it('renders badge grid when badges are earned', async () => {
