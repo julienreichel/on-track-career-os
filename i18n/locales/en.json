@@ -1302,6 +1302,20 @@
           "openPipeline": "Open in Pipeline",
           "viewJob": "View job"
         }
+      },
+      "todoPreview": {
+        "title": "Opportunities waiting",
+        "description": "Roles in ToDo that are ready for the next step.",
+        "cta": {
+          "openPipeline": "View in Pipeline"
+        }
+      },
+      "stalled": {
+        "title": "Stalled opportunities",
+        "description": "Roles that have not moved recently and may need attention.",
+        "cta": {
+          "openPipeline": "View in Pipeline"
+        }
       }
     }
   },

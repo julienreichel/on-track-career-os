@@ -20,6 +20,8 @@ const mockLandingPipeline = {
   isLoading: ref(false),
   counts: ref({ todoCount: 1, activeCount: 2, doneCount: 3 }),
   focusJobs: ref<JobDescription[]>([]),
+  todoJobsPreview: ref<JobDescription[]>([]),
+  stalledJobsPreview: ref<JobDescription[]>([]),
   load: vi.fn(),
 };
 const mockProgress = {
@@ -99,6 +101,14 @@ const stubs = {
     template: '<div class="focus-job-cards">{{ jobs.length }}</div>',
     props: ['jobs', 'stages', 'loading'],
   },
+  TodoPreviewSection: {
+    template: '<div class="todo-preview-section">{{ jobs.length }}</div>',
+    props: ['jobs', 'stages', 'loading'],
+  },
+  StalledPreviewSection: {
+    template: '<div class="stalled-preview-section">{{ jobs.length }}</div>',
+    props: ['jobs', 'stages', 'loading'],
+  },
   BadgeGridCard: {
     template: '<div class="badge-grid-card" />',
     props: ['badges'],
@@ -124,6 +134,8 @@ describe('Home Page Component', () => {
     mockLandingPipeline.isLoading.value = false;
     mockLandingPipeline.counts.value = { todoCount: 1, activeCount: 2, doneCount: 3 };
     mockLandingPipeline.focusJobs.value = [];
+    mockLandingPipeline.todoJobsPreview.value = [];
+    mockLandingPipeline.stalledJobsPreview.value = [];
     mockProgress.state.value = { phase: 'bonus' };
     mockProgress.profile.value = { fullName: 'Ava Test' };
     mockProgress.inputs.value = null;
@@ -151,6 +163,8 @@ describe('Home Page Component', () => {
     expect(wrapper.find('.progress-guidance-section').exists()).toBe(true);
     expect(wrapper.find('.pipeline-summary-bar').exists()).toBe(true);
     expect(wrapper.find('.focus-job-cards').exists()).toBe(true);
+    expect(wrapper.find('.todo-preview-section').exists()).toBe(false);
+    expect(wrapper.find('.stalled-preview-section').exists()).toBe(false);
     expect(wrapper.text()).not.toContain(i18n.global.t('onboarding.actionBox.title'));
   });
 
@@ -163,6 +177,26 @@ describe('Home Page Component', () => {
 
     expect(wrapper.find('.pipeline-summary-bar').exists()).toBe(true);
     expect(wrapper.find('.focus-job-cards').exists()).toBe(false);
+  });
+
+  it('shows opportunities waiting section only when todo jobs exist', async () => {
+    mockProgress.inputs.value = { experienceCount: 1 };
+    mockLandingPipeline.counts.value = { todoCount: 2, activeCount: 0, doneCount: 0 };
+    mockLandingPipeline.todoJobsPreview.value = [{ id: 'todo-1' } as JobDescription];
+
+    const wrapper = await mountPage();
+
+    expect(wrapper.find('.todo-preview-section').exists()).toBe(true);
+    expect(wrapper.find('.stalled-preview-section').exists()).toBe(false);
+  });
+
+  it('shows stalled section only when stalled jobs exist', async () => {
+    mockProgress.inputs.value = { experienceCount: 1 };
+    mockLandingPipeline.stalledJobsPreview.value = [{ id: 'stalled-1' } as JobDescription];
+
+    const wrapper = await mountPage();
+
+    expect(wrapper.find('.stalled-preview-section').exists()).toBe(true);
   });
 
   it('renders badge grid when badges are earned', async () => {

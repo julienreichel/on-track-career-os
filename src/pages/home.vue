@@ -41,6 +41,22 @@
         :loading="landingPipeline.isLoading.value"
       />
 
+      <TodoPreviewSection
+        v-if="!showOnboarding && showPipelineDashboard && showTodoPreview"
+        class="mb-6"
+        :jobs="landingPipeline.todoJobsPreview.value"
+        :stages="kanbanSettings.state.stages.value"
+        :loading="landingPipeline.isLoading.value"
+      />
+
+      <StalledPreviewSection
+        v-if="!showOnboarding && showPipelineDashboard && showStalledPreview"
+        class="mb-6"
+        :jobs="landingPipeline.stalledJobsPreview.value"
+        :stages="kanbanSettings.state.stages.value"
+        :loading="landingPipeline.isLoading.value"
+      />
+
       <BadgeGridCard
         v-if="badges.earnedBadgeDefinitions.value.length > 0"
         class="mb-6"
@@ -82,6 +98,8 @@ import BadgeGridCard from '@/components/badges/BadgeGridCard.vue';
 import { useUserProgress } from '@/composables/useUserProgress';
 import PipelineSummaryBar from '@/components/dashboard/PipelineSummaryBar.vue';
 import FocusJobCards from '@/components/dashboard/FocusJobCards.vue';
+import TodoPreviewSection from '@/components/dashboard/TodoPreviewSection.vue';
+import StalledPreviewSection from '@/components/dashboard/StalledPreviewSection.vue';
 import { useKanbanSettings } from '@/application/kanban-settings/useKanbanSettings';
 import { useLandingPipelineDashboard } from '@/composables/useLandingPipelineDashboard';
 
@@ -103,6 +121,17 @@ const welcomeName = computed(
 const showPipelineDashboard = computed(() => progress.state.value?.phase === 'bonus');
 const showFocusToday = computed(
   () => landingPipeline.isLoading.value || landingPipeline.focusJobs.value.length > 0
+);
+const showTodoPreview = computed(
+  () =>
+    !landingPipeline.isLoading.value &&
+    landingPipeline.counts.value.todoCount > 0 &&
+    landingPipeline.todoJobsPreview.value.length > 0
+);
+const showStalledPreview = computed(
+  () =>
+    !landingPipeline.isLoading.value &&
+    landingPipeline.stalledJobsPreview.value.length > 0
 );
 
 onMounted(() => {
