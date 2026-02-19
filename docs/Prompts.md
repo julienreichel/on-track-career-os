@@ -485,330 +485,311 @@ Playwright single happy path:
 
 ---
 
-## Master Prompt 1 — GraphQL Model Extensions + Data Defaults (JobDescription + KanbanSettings)
+## Master Prompt 1 — Landing Data Model: Pipeline Dashboard Derivations (No New Schema)
 
 1. **Title**
-   B0-1: Extend GraphQL models for Kanban tracking (JobDescription.kanbanStatus + notes) and user KanbanSettings
+   LND-1: Implement “Pipeline Dashboard Mode” data derivations (todo/active/done/stalled + focus list)
 
-2. **Intro (context + why)**
-   EPIC B0 V1 introduces a global Kanban board where each card is a `JobDescription`. We must add a separate `kanbanStatus` (do not replace existing `JobDescription.status` lifecycle) and add `notes` directly on the job. We also need per-user Kanban stage configuration, similar in spirit to existing settings models (e.g., CVSettings). The goal is minimal but solid schema changes that unblock UI while keeping YAGNI.
+2. **Intro: context + why**
+   With EPIC B0, the Kanban becomes the heartbeat. The landing page must shift from “last modified jobs” to “what should I do next”, without showing the full board. Because users can rename stages, the landing must derive behavior from **stage keys** (`todo`, `done`) and treat everything else as “active”. This prompt creates a deterministic, testable derivation layer that powers the new landing sections.
 
 3. **Feature scope**
    Implement:
-   - Add `kanbanStatus` field to `JobDescription` (string key referencing a stage).
-   - Add `notes` field to `JobDescription` (string).
-   - Add new model `KanbanSettings` (1 per user) containing a stages array of `{ key, name, isSystemDefault }`.
-   - Provide defaults:
-     - New/imported jobs default `kanbanStatus = "todo"`.
-     - KanbanSettings default stages: `todo`, `applied`, `interview`, `done` with ToDo/Done locked.
-       Explicitly out of scope:
+   - Derivation logic from `JobDescription.kanbanStatus` and `KanbanSettings.stages`:
+     - `todoJobs` where status === `todo`
+     - `doneJobs` where status === `done`
+     - `activeJobs` where status !== `todo` && !== `done`
 
-   - No reminders, no checklists, no analytics, no per-stage notes.
-   - No forward-only constraints.
-   - No AI ops.
+   - “Focus Today” list:
+     - up to 3 jobs, prioritized: active first, then todo
+     - stable sort (e.g., by `updatedAt` desc; if not available use `createdAt` desc)
+
+   - “Stalled” list:
+     - jobs not done whose `updatedAt` (or equivalent) older than N days (e.g., 7), excluding brand-new jobs if needed
+
+   - Pipeline summary counts: { todoCount, activeCount, doneCount }
+     Explicitly out of scope:
+   - No new models or schema changes.
+   - No reminders or nudges (C5).
+   - No analytics dashboards.
+   - No AI operations.
 
 4. **Composables / services / repositories / domain modules**
-   Update/create domain modules consistent with current clean layering:
-   - `job` domain: update JobDescription repository to read/write `kanbanStatus` and `notes`.
-   - `settings` domain (or new `kanban` domain): create repository for `KanbanSettings` with:
-     - `getOrCreateKanbanSettings(userId)`
-     - `updateKanbanStages(userId, stages[])`
-     - `ensureSystemStages(stages)` helper (enforce todo/done presence).
-       Ensure DRY with existing settings patterns (reuse base repository helpers if present).
+   Create a composable + pure helper module:
+   - `useLandingPipelineDashboard()` (or `usePipelineDashboardSummary()`):
+     - loads `KanbanSettings` and job list using existing repositories/composables
+     - exposes computed arrays: `focusJobs`, `todoJobsPreview`, `activeJobsPreview`, `stalledJobsPreview`, `counts`
+     - exposes a deterministic “view state” enum: `empty|todoOnly|active|allDone`
 
-5. **Components**
-   None required in this prompt.
+   - Pure helpers (unit-testable):
+     - `derivePipelineBuckets(jobs, stages)` (handles unknown status fallback to todo)
+     - `rankFocusJobs(buckets)` (stable ordering)
+     - `computeStalled(jobs, now, thresholdDays)`
+       Reuse existing job list fetching (avoid duplicating GraphQL queries used in `/jobs` or pipeline page).
 
-6. **Pages/routes**
-   None required in this prompt.
+5. **Components to create or update**
+   None required in this prompt (derivation layer only), aside from possibly a minimal “loading state card” if the composable demands it (prefer existing patterns).
+
+6. **Pages/routes to create or update**
+   None.
 
 7. **AI operations impact**
-   None. Confirm no new AI operations are added.
+   None. Confirm no AI ops are added or invoked.
 
 8. **Testing requirements**
-   Vitest (unit):
-   - `ensureSystemStages` guarantees `todo` and `done` exist and are marked system defaults.
-   - `sanitizeStages` (if created) ensures stage keys are unique and stable.
-   - `getOrCreateKanbanSettings` returns defaults when missing.
-   - Default job creation sets `kanbanStatus = "todo"`.
-     No Playwright in this prompt.
+   Vitest unit tests for helpers:
+   - Unknown kanbanStatus → falls back to `todo`
+   - Correct bucketing counts for varied job sets
+   - Focus ranking is stable and respects priority order
+   - Stalled logic based on threshold days
+     Vitest composable tests:
+   - `useLandingPipelineDashboard` returns correct `viewState` for each scenario (no jobs / todo-only / active / all-done)
 
-9. **Acceptance criteria (checklist)**
-   - [ ] `JobDescription` schema includes `kanbanStatus` and `notes` with sensible defaults.
-   - [ ] `KanbanSettings` schema exists and persists `stages[]` objects.
-   - [ ] Deterministic default stages created if settings missing.
-   - [ ] System stages `todo` and `done` cannot be removed at repository/service level (guardrails).
-   - [ ] All changes compile in TS strict mode; GraphQL types updated; tests pass.
+9. **Acceptance criteria**
+   - [ ] Deterministic bucketing and focus ranking implemented with pure helper tests.
+   - [ ] Uses stage keys (`todo`, `done`), not stage names, so renaming is safe.
+   - [ ] No schema changes; no AI ops; no extra GraphQL calls beyond reusing existing data access patterns.
+   - [ ] TS strict + Vitest pass.
 
 ---
 
-## Master Prompt 2 — Kanban Stage Settings UI (Settings Page + TagInput-like List Editing)
+## Master Prompt 2 — Landing UI: Pipeline Summary Bar + Focus Today Section
 
 1. **Title**
-   B0-2: Build Kanban stage settings (add/remove/reorder/rename) with locked system stages
+   LND-2: Replace post-onboarding landing “Active jobs” with Pipeline Summary Bar + Focus Today cards
 
-2. **Intro (context + why)**
-   EPIC B0 V1 allows users to customize their Kanban board stages globally. We need a settings UI that follows existing “list editing” UX patterns (TagInput-based editing, DRY card layout, deterministic validation). ToDo and Done must always exist and cannot be removed. This page is foundational for the Kanban board rendering.
+2. **Intro: context + why**
+   Current landing shows last modified jobs and actions to generate materials. With Kanban now the heartbeat, landing should present a compact pipeline view and “Focus Today” to drive momentum. This prompt introduces the two highest-value sections without showing full Kanban.
 
 3. **Feature scope**
    Implement:
-   - New settings page to edit `KanbanSettings.stages`.
-   - Features:
-     - Reorder stages
-     - Rename stage display name
-     - Add a new custom stage (generate unique stable `key`)
-     - Remove a stage (except `todo` and `done`)
+   - A compact “Pipeline Summary Bar” (counts only): To Start / Active / Done
+   - “Your Focus Today” section:
+     - up to 3 cards from `focusJobs`
+     - each card shows: Job title, Company, Created date, current stage display name
+     - primary CTA: “Open in Pipeline” (navigate to pipeline page)
+     - optional secondary CTA: “View job” (only if consistent with your nav)
+       Explicitly out of scope:
 
-   - Persist changes via repository/service.
-     Explicitly out of scope:
-   - Per-stage checklists, reminders, analytics.
-   - Stage colors or advanced styling.
-   - Bulk migration of existing jobs across renamed keys (avoid key renames; allow name edits only).
+   - No full Kanban on landing.
+   - No drag and drop here.
+   - No per-card material generation actions on landing (keep those in job/app flows).
 
 4. **Composables / services / repositories / domain modules**
-   Create composable aligned with project patterns:
-   - `useKanbanSettings()`:
-     - `state: { stages, isLoading, error }`
-     - `load()`, `save(stages)`
-     - `addStage(name)`, `removeStage(key)`, `moveStage(from,to)`, `renameStage(key,name)`
-     - enforce invariants via shared helpers (`ensureSystemStages`)
+   - Consume `useLandingPipelineDashboard()` from LND-1.
+   - If you have shared “Card list” patterns (e.g., for jobs list), reuse them.
+   - Add an adapter function: `getStageLabel(stageKey, settingsStages)` to display renamed stage names.
 
-   - If you already have `useSettingsEngine`/`useCanvasEngine` style abstractions, reuse the same “load/save/error” shape.
-
-5. **Components**
-   Create reusable settings components:
-   - `KanbanStageListEditorCard` (Nuxt UI Card pattern)
-     - list rows with drag handles (if existing sortable pattern exists, reuse it)
-     - rename inline (UInput)
-     - delete button disabled for system stages
-
-   - Keep UI consistent: `UPageHeader`, `UPageBody`, `UCard`, `UButton`, `UInput`, `UFormGroup`.
-
-6. **Pages/routes**
+5. **Components to create or update**
    Create:
-   - `/settings/kanban` (or `/settings/pipeline` — pick the convention used in repo)
-     Navigation/breadcrumbs:
-   - Add to existing settings nav.
-   - Ensure breadcrumb/title consistent with current “breadcrumb-driven page titles” system .
+   - `PipelineSummaryBarCard` (or `PipelineSummaryBar`):
+     - simple row of count badges (Nuxt UI `UBadge` or equivalent)
+
+   - `FocusJobCards` section component:
+     - wraps card list rendering
+       Update:
+
+   - Replace existing “Active jobs” landing section with these components.
+     Keep scaffold: `UContainer → UPage → UPageHeader/UPageBody`.
+
+6. **Pages/routes to create or update**
+   Update the landing page (`/`):
+   - Post-onboarding mode: show Summary + Focus Today
+     Breadcrumb behavior:
+   - Home should remain “Home” (or “Dashboard”), consistent with existing breadcrumb-driven titles .
+     Navigation:
+   - “Open in Pipeline” should route to the pipeline page (existing B0 route).
+
+7. **AI operations impact**
+   None.
+
+8. **Testing requirements**
+   Vitest component/page tests:
+   - summary counts render correctly for each `viewState`
+   - focus list renders max 3 cards, correct stage labels even if renamed
+   - CTA navigates to pipeline route (mock router)
+     Playwright (defer to final EPIC E2E prompt or include here if you prefer one):
+   - post-onboarding user sees Summary + Focus Today and can click to pipeline.
+
+9. **Acceptance criteria**
+   - [ ] Landing no longer displays “last modified 3 jobs” section.
+   - [ ] Landing shows pipeline counts and focus jobs derived by keys, not names.
+   - [ ] Navigation to pipeline works and is consistent with breadcrumb system.
+   - [ ] No DnD on landing; no AI ops.
+
+---
+
+## Master Prompt 3 — Landing UI: Ready to Move + Stalled Sections (Momentum Without C5)
+
+1. **Title**
+   LND-3: Add “Opportunities waiting” (ToDo preview) and “Stalled” sections to landing
+
+2. **Intro: context + why**
+   Users need direction, not a grid. Beyond “Focus Today”, the landing should highlight (1) jobs waiting in ToDo and (2) jobs that haven’t moved in a while. This provides momentum support without implementing reminders or full coaching (C5).
+
+3. **Feature scope**
+   Implement:
+   - “Opportunities waiting” section:
+     - only shown if `todoCount > 0`
+     - show 1–2 job previews + “View in Pipeline” CTA
+
+   - “Stalled” section:
+     - only shown if `stalledJobs.length > 0`
+     - show 1–2 job previews + CTA
+
+   - Keep copy and tone gentle.
+     Explicitly out of scope:
+   - No notifications/reminders.
+   - No forced actions or modals.
+   - No scoring analytics.
+
+4. **Composables / services / repositories / domain modules**
+   - Consume `todoJobsPreview` and `stalledJobsPreview` from `useLandingPipelineDashboard()`.
+   - Ensure the stalled heuristic uses a single constant threshold (e.g., 7 days) defined in one place (no magic numbers scattered).
+
+5. **Components to create or update**
+   Create:
+   - `TodoPreviewSection`
+   - `StalledPreviewSection`
+     Both should reuse a shared `JobPreviewCard` component if one exists; otherwise create a single shared “job mini card” variant used in both.
+
+6. **Pages/routes to create or update**
+   Update `/` landing:
+   - Render these sections below “Focus Today”
+   - Keep layout balanced (avoid very long page)
+   - Ensure empty states don’t create awkward whitespace
+
+7. **AI operations impact**
+   None.
+
+8. **Testing requirements**
+   Vitest page/component tests:
+   - “Opportunities waiting” appears only when todo > 0
+   - “Stalled” appears only when stalled > 0
+   - Stage label shown is derived from settings name
+     Playwright happy path is covered in the final EPIC E2E.
+
+9. **Acceptance criteria**
+   - [ ] Landing shows ToDo + Stalled previews only when relevant.
+   - [ ] CTAs route to pipeline.
+   - [ ] No new data models; no AI ops; deterministic logic.
+
+---
+
+## Master Prompt 4 — View States + Empty States (No Jobs / Todo Only / Active / All Done)
+
+1. **Title**
+   LND-4: Implement landing “view states” and empty-state messaging aligned with gentle coach tone
+
+2. **Intro: context + why**
+   Landing should feel alive and contextual. Users may have no jobs, only todo jobs, active jobs, or all done. This prompt makes landing respond to these states with clear messaging and the right primary CTA, improving “feel of control” and retention.
+
+3. **Feature scope**
+   Implement:
+   - `viewState` mapping (from LND-1): `empty|todoOnly|active|allDone`
+   - Show a top-of-page banner/card:
+     - `empty`: prompt “Analyze your first job”
+     - `todoOnly`: “You have opportunities waiting—move one forward”
+     - `active`: “You have active opportunities—keep momentum”
+     - `allDone`: “Pipeline is empty—add new opportunities”
+
+   - Primary CTA always visible and consistent: “Analyze job” or “Open pipeline”
+     Explicitly out of scope:
+   - No reminders.
+   - No gamification beyond simple copy.
+
+4. **Composables / services / repositories / domain modules**
+   - Use `viewState` from `useLandingPipelineDashboard()`.
+   - Reuse existing CTA patterns and button components (avoid duplicating “Analyze job” logic).
+
+5. **Components to create or update**
+   Create:
+   - `LandingNextStepBannerCard`
+     - includes message + primary CTA
+     - optionally shows counts
+       Keep copy short; match existing tone and i18n patterns.
+
+6. **Pages/routes to create or update**
+   Update `/` landing:
+   - Banner at top of `UPageBody` above summary/focus sections.
+   - Hook “Analyze job” CTA to existing job creation/analyze entry route (`/jobs/new` or current flow).
 
 7. **AI operations impact**
    None.
 
 8. **Testing requirements**
    Vitest:
-   - Component tests for editor behaviors:
-     - cannot delete `todo`/`done`
-     - add stage generates unique key
-     - reorder updates list deterministically
-
-   - Page test:
-     - loads default settings if none exist
-     - persists and reloads correctly
-       Playwright (single happy path for this prompt only if you prefer splitting; otherwise defer to final EPIC E2E):
-
-   - Visit settings page → add custom stage → save → refresh → stage persists.
+   - banner content switches correctly by viewState
+   - CTA targets correct route
+     i18n coverage test updates if you add new keys.
 
 9. **Acceptance criteria**
-   - [ ] Settings page exists and is reachable via navigation.
-   - [ ] Users can add/remove/reorder/rename stage **names**.
-   - [ ] `todo` and `done` are always present and cannot be removed.
-   - [ ] Stage keys remain stable; renaming does not change keys.
-   - [ ] Errors handled via existing error pattern (`useErrorDisplay` / `ErrorStateCard` if applicable) .
-   - [ ] TS strict, lint, unit tests pass.
+   - [ ] Landing displays the correct banner for each state.
+   - [ ] Primary CTA always available.
+   - [ ] i18n keys added and covered by existing key coverage tests .
 
 ---
 
-## Master Prompt 3 — Kanban Board Page (Drag & Drop + Persist kanbanStatus)
+## Master Prompt 5 — End-to-End: Replace Old Landing Section + Single E2E Happy Path
 
 1. **Title**
-   B0-3: Implement global Kanban board page for JobDescriptions with drag & drop between columns
+   LND-5: Integrate new landing pipeline dashboard end-to-end + one Playwright happy path
 
-2. **Intro (context + why)**
-   The Kanban is the “heartbeat” operational view: one board per user, cards represent `JobDescription`, and column membership is driven by `JobDescription.kanbanStatus`. This prompt implements the core UX: render stages from settings, show job cards, allow drag-and-drop across columns, and persist status changes. Keep it simple and deterministic.
+2. **Intro: context + why**
+   This ties everything together: the old landing “Active jobs / last modified jobs + generate materials” flow is replaced by the new pipeline-centric sections. We must ensure we didn’t regress onboarding behavior and that the landing works reliably regardless of stage renaming.
 
 3. **Feature scope**
    Implement:
-   - New Kanban page displaying columns based on `KanbanSettings.stages` order.
-   - Fetch all JobDescriptions for user (existing jobs list query patterns).
-   - Group by `kanbanStatus` → render cards.
-   - Drag & drop a card from any column to any column:
-     - update local state optimistically
-     - persist `kanbanStatus` on the JobDescription
-     - handle failure with rollback + toast/error UI (existing pattern)
-
-   - Fallback behavior:
-     - if a job has unknown `kanbanStatus` → treat as `todo`
-       Explicitly out of scope:
-
-   - No WIP limits, no swimlanes, no filtering/search (unless trivial and already available).
-   - No auto stage transitions.
-   - No reminders, checklists, analytics.
-
-4. **Composables / services / repositories / domain modules**
-   Create composables aligned with existing “engine” patterns:
-   - `useKanbanBoard()`:
-     - dependencies: `useKanbanSettings()`, `useJobsRepository()`
-     - `columns: { stage, jobs[] }[]` computed
-     - `moveJob(jobId, toStageKey)` action with optimistic update + persistence
-     - `normalizeJobStatus(job, stages)` helper
-
-   - Ensure DRY: if there’s an existing jobs list composable used in `/jobs`, reuse it rather than re-querying.
-
-5. **Components**
-   - `KanbanBoard` (layout wrapper)
-   - `KanbanColumn` (renders stage header + droppable area)
-   - `KanbanJobCard` (reusable card pattern)
-     - shows title, company, created date, optional strength badge (see separate prompt)
-       Use Nuxt UI components for structure. For drag & drop, use an existing library already in repo; if none exists, implement minimal native HTML5 DnD with clean TS typing (no new frameworks).
-
-6. **Pages/routes**
-   Create:
-   - `/pipeline` or `/applications` (choose the canonical route; project status mentions `/applications` exists but might be materials-related—be consistent)
-     Navigation/breadcrumbs:
-   - Add to main nav.
-   - Breadcrumb shows “Pipeline” (or chosen name).
-   - Ensure page title is set through the breadcrumb/title system.
-
-7. **AI operations impact**
-   None. Do not call AI ops from this page.
-
-8. **Testing requirements**
-   Vitest:
-   - `useKanbanBoard` unit tests:
-     - grouping by stages
-     - unknown status fallback → todo
-     - optimistic update + rollback on repo failure (mock)
-
-   - Component test for `KanbanJobCard` rendering required fields.
-     Playwright (EPIC-level happy path can be done here or final prompt):
-   - Create/import job → appears in ToDo
-   - Drag to Applied → persists after refresh
-
-9. **Acceptance criteria**
-   - [ ] Board renders columns in user-configured order.
-   - [ ] Cards = JobDescriptions; unknown status falls back to ToDo.
-   - [ ] Drag & drop moves card and persists `kanbanStatus`.
-   - [ ] Failure handling is deterministic (rollback + visible error).
-   - [ ] No AI ops invoked; performance acceptable (no excessive GraphQL calls).
-   - [ ] Tests pass (unit + component + E2E baseline as planned).
-
----
-
-## Master Prompt 4 — Job Notes Field (Edit + Persist on JobDescription)
-
-1. **Title**
-   B0-4: Add free-text notes on JobDescription (simple string) and integrate into job detail UX
-
-2. **Intro (context + why)**
-   EPIC B0 V1 requires simple global notes per job (not stage-dependent). Notes support “rejection reason”, follow-ups, and interview feedback without introducing a new note entity. This should be a small, safe enhancement integrated into existing job detail/edit flows.
-
-3. **Feature scope**
-   Implement:
-   - `notes: string` display and editing UI on JobDescription detail page (or an existing edit form).
-   - Persist changes to GraphQL.
-   - Ensure notes are accessible from Kanban navigation (card click leads to job details).
+   - Remove/disable the old post-onboarding landing jobs section and material CTAs.
+   - Ensure onboarding landing experience remains intact for users still in onboarding mode.
+   - Ensure stage renaming affects labels displayed, but does not break bucketing/logic.
      Explicitly out of scope:
-   - No per-stage notes, no note history/timestamps, no rich text.
-   - No AI summarization or extraction.
+   - No new onboarding features.
+   - No new analytics dashboards.
 
 4. **Composables / services / repositories / domain modules**
-   Update job repository and job detail composable:
-   - Add `updateJobNotes(jobId, notes)` method.
-   - Reuse existing `useJobDetails()` / `useJobEditor()` patterns if present.
-   - Add minimal validation (max length if you already have a standard; otherwise keep simple).
+   - Ensure the landing composes:
+     - onboarding mode logic (existing)
+     - pipeline dashboard mode logic (new)
 
-5. **Components**
-   - Update existing Job detail page card:
-     - `UTextarea` bound to notes
-     - Save button or auto-save pattern (prefer existing conventions in app)
+   - Avoid double fetching jobs/settings (centralize fetch in one composable and pass down).
 
-   - Reuse existing `Card` and error patterns.
+5. **Components to create or update**
+   - Update landing page composition:
+     - `LandingNextStepBannerCard`
+     - `PipelineSummaryBar`
+     - `FocusTodaySection`
+     - `TodoPreviewSection`
+     - `StalledPreviewSection`
+       Ensure consistent spacing and skeleton/loading states (reuse existing loading components).
 
-6. **Pages/routes**
-   Update:
-   - `/jobs/:id` (or whichever job details route exists)
-     Ensure navigation from Kanban card lands here.
+6. **Pages/routes to create or update**
+   - Update `/` landing
+   - Ensure breadcrumbs and page titles remain correct and consistent with existing breadcrumb-driven system .
+   - Ensure navigation links to `/pipeline` (or chosen route) and `/jobs/new` are correct.
 
 7. **AI operations impact**
    None.
 
 8. **Testing requirements**
    Vitest:
-   - repository update method called with correct payload
-   - page/component test: notes field renders and persists
-     Playwright:
-   - From Kanban → open a job → edit notes → save → refresh → notes persist
+   - Landing page test cases for:
+     - onboarding mode still shows onboarding next steps
+     - post-onboarding mode shows pipeline dashboard sections
+     - stage rename changes label display but not counts/bucketing
+       Playwright (single happy path):
+
+   - Setup: user is post-onboarding and has KanbanSettings with renamed stages (e.g., `applied` name changed to “Sent”).
+   - Steps:
+     1. Visit `/` landing → verify Summary counts appear
+     2. Verify “Focus Today” shows a job in an active stage and displays renamed stage name
+     3. Click “Open in Pipeline” → lands on pipeline page
+     4. Return to `/` → verify still consistent
+        Keep it stable: no drag/drop required in this E2E (B0 covers DnD); this EPIC validates landing correctness.
 
 9. **Acceptance criteria**
-   - [ ] Notes field exists on JobDescription and can be edited.
-   - [ ] Notes persist reliably with deterministic error handling.
-   - [ ] Notes are accessible via Kanban → job detail navigation.
-   - [ ] No new models or AI ops added.
-   - [ ] Tests pass.
-
----
-
-## Master Prompt 5 — Strength Score Badge on Kanban Card (Read-Only, No New Computation)
-
-1. **Title**
-   B0-5: Show Application Strength badge on Kanban cards (read-only) without triggering evaluation
-
-2. **Intro (context + why)**
-   You want the Kanban card to optionally display a strength score badge if available. EPIC A2 already exists with application strength evaluation and a dedicated page . For B0 V1, we must keep Kanban fast and deterministic: show the latest known score if it exists, but do not compute or refresh it here.
-
-3. **Feature scope**
-   Implement:
-   - Display a small badge on `KanbanJobCard` if a score is already stored/available in the data model.
-   - If no score exists, render nothing (no placeholder).
-     Explicitly out of scope:
-   - No calling `ai.evaluateApplicationStrength` from Kanban.
-   - No “strength vs outcome” analytics.
-   - No background refresh.
-
-4. **Composables / services / repositories / domain modules**
-   - Identify the current persistence location for strength evaluation results (existing model/page state from A2).
-   - Add a lightweight selector:
-     - `getLatestStrengthScore(jobId)` or enrich job list query if the score is denormalized.
-
-   - Keep it DRY: do not duplicate A2 evaluation logic; only consume stored results.
-
-5. **Components**
-   - Update `KanbanJobCard`:
-     - add `UBadge` (or existing badge component)
-     - show score + optional label (e.g., “Strength 72” or a short category)
-
-   - Ensure consistent formatting with existing score UI in `/jobs/:id/application-strength` .
-
-6. **Pages/routes**
-   None required, but card click should still navigate to job detail (or strength page if you already link it elsewhere—do not change behavior without a clear pattern).
-
-7. **AI operations impact**
-   None. Explicitly verify no AI ops invoked.
-
-8. **Testing requirements**
-   Vitest:
-   - card renders badge when score present
-   - no badge when missing
-   - no calls to A2 evaluation op from Kanban context
-     Playwright (optional if already covered):
-   - Ensure badge visible for a job with known score
-
-9. **Acceptance criteria**
-   - [ ] Strength badge displays only when existing data is available.
-   - [ ] No computation/evaluation triggered from Kanban.
-   - [ ] UI remains performant; no extra GraphQL calls per card beyond an approved query shape.
-   - [ ] Tests pass.
-
----
-
-### Recommended EPIC-Level Playwright Happy Path (single test)
-
-If you want **one** E2E to cover EPIC B0 V1 end-to-end, implement:
-
-1. Ensure user has default Kanban settings
-2. Import/create a job → verify it appears in **ToDo**
-3. Drag job ToDo → Applied → refresh → persists
-4. Open job detail → add notes → refresh → persists
-5. (Optional) If fixture has strength score, verify badge appears
-
-This aligns with your “single happy path” philosophy and keeps E2E stable .
+   - [ ] Old post-onboarding landing “last modified jobs + generate materials” is removed/replaced.
+   - [ ] New landing shows summary + focus + todo/stalled sections as appropriate.
+   - [ ] Logic depends on stage keys (`todo`, `done`) not names; renaming stages updates labels only.
+   - [ ] Onboarding mode remains unchanged.
+   - [ ] One Playwright happy path passes; Vitest coverage added; TS strict & lint pass.
