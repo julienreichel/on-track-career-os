@@ -26,13 +26,6 @@
 
       <ProgressGuidanceSection v-if="!showOnboarding" class="mb-6" :progress="progress" />
 
-      <PipelineSummaryBar
-        v-if="!showOnboarding && showPipelineDashboard"
-        class="mb-6"
-        :counts="landingPipeline.counts.value"
-        :loading="landingPipeline.isLoading.value"
-      />
-
       <FocusJobCards
         v-if="!showOnboarding && showPipelineDashboard && showFocusToday"
         class="mb-6"
@@ -96,7 +89,6 @@ import ProgressGuidanceSection from '@/components/onboarding/ProgressGuidanceSec
 import { useBadges } from '@/composables/useBadges';
 import BadgeGridCard from '@/components/badges/BadgeGridCard.vue';
 import { useUserProgress } from '@/composables/useUserProgress';
-import PipelineSummaryBar from '@/components/dashboard/PipelineSummaryBar.vue';
 import FocusJobCards from '@/components/dashboard/FocusJobCards.vue';
 import TodoPreviewSection from '@/components/dashboard/TodoPreviewSection.vue';
 import StalledPreviewSection from '@/components/dashboard/StalledPreviewSection.vue';

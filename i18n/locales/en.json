@@ -1282,13 +1282,6 @@
   },
   "dashboard": {
     "pipeline": {
-      "summary": {
-        "title": "Pipeline summary",
-        "description": "A quick view of where your applications stand.",
-        "todo": "To start",
-        "active": "Active",
-        "done": "Done"
-      },
       "focus": {
         "title": "Your focus today",
         "description": "Top opportunities to move forward right now.",

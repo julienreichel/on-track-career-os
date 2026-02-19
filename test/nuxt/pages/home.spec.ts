@@ -93,10 +93,6 @@ const stubs = {
     template: '<div class="progress-guidance-section" />',
     props: ['progress'],
   },
-  PipelineSummaryBar: {
-    template: '<div class="pipeline-summary-bar">{{ counts.todoCount }}-{{ counts.activeCount }}-{{ counts.doneCount }}</div>',
-    props: ['counts', 'loading'],
-  },
   FocusJobCards: {
     template: '<div class="focus-job-cards">{{ jobs.length }}</div>',
     props: ['jobs', 'stages', 'loading'],
@@ -161,7 +157,6 @@ describe('Home Page Component', () => {
     const wrapper = await mountPage();
 
     expect(wrapper.find('.progress-guidance-section').exists()).toBe(true);
-    expect(wrapper.find('.pipeline-summary-bar').exists()).toBe(true);
     expect(wrapper.find('.focus-job-cards').exists()).toBe(true);
     expect(wrapper.find('.todo-preview-section').exists()).toBe(false);
     expect(wrapper.find('.stalled-preview-section').exists()).toBe(false);
@@ -175,7 +170,6 @@ describe('Home Page Component', () => {
 
     const wrapper = await mountPage();
 
-    expect(wrapper.find('.pipeline-summary-bar').exists()).toBe(true);
     expect(wrapper.find('.focus-job-cards').exists()).toBe(false);
   });
 
