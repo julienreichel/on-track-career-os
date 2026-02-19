@@ -17,6 +17,8 @@ vi.mock('vue', async () => {
 });
 
 describe('useAuthUser', () => {
+  const createAuthUser = () => useAuthUser({ isClient: true });
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -24,7 +26,7 @@ describe('useAuthUser', () => {
   it('should initialize with null userId', () => {
     vi.mocked(fetchUserAttributes).mockResolvedValue({ sub: 'user-123' } as never);
 
-    const { userId, error } = useAuthUser();
+    const { userId, error } = createAuthUser();
 
     expect(userId.value).toBeNull();
     expect(error.value).toBeNull();
@@ -35,7 +37,7 @@ describe('useAuthUser', () => {
     const mockAttributes = { sub: 'user-123' };
     vi.mocked(fetchUserAttributes).mockResolvedValue(mockAttributes as never);
 
-    const { userId, ownerId, loading } = useAuthUser();
+    const { userId, ownerId, loading } = createAuthUser();
 
     // Wait for async operation
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -50,7 +52,7 @@ describe('useAuthUser', () => {
     const mockAttributes = { email: 'test@example.com' };
     vi.mocked(fetchUserAttributes).mockResolvedValue(mockAttributes as never);
 
-    const { userId } = useAuthUser();
+    const { userId } = createAuthUser();
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -62,7 +64,7 @@ describe('useAuthUser', () => {
     vi.mocked(fetchUserAttributes).mockRejectedValue(mockError);
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const { userId, error, loading } = useAuthUser();
+    const { userId, error, loading } = createAuthUser();
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -85,7 +87,7 @@ describe('useAuthUser', () => {
 
     vi.mocked(fetchUserAttributes).mockReturnValue(promise);
 
-    const { loading } = useAuthUser();
+    const { loading } = createAuthUser();
 
     // Should be loading immediately
     expect(loading.value).toBe(true);
@@ -103,7 +105,7 @@ describe('useAuthUser', () => {
       .mockResolvedValueOnce({ sub: 'user-123' } as never)
       .mockResolvedValueOnce({ sub: 'user-456' } as never);
 
-    const { userId, ownerId, loadUserId } = useAuthUser();
+    const { userId, ownerId, loadUserId } = createAuthUser();
 
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(userId.value).toBe('user-123');
@@ -119,7 +121,7 @@ describe('useAuthUser', () => {
   it('should build owner id via helper', () => {
     vi.mocked(fetchUserAttributes).mockResolvedValue({ sub: 'user-123' } as never);
 
-    const { buildOwnerId } = useAuthUser();
+    const { buildOwnerId } = createAuthUser();
 
     expect(buildOwnerId('user-1')).toBe('user-1::user-1');
   });
@@ -127,7 +129,7 @@ describe('useAuthUser', () => {
   it('should load owner id via loadOwnerId', async () => {
     vi.mocked(fetchUserAttributes).mockResolvedValue({ sub: 'user-123' } as never);
 
-    const { loadOwnerId } = useAuthUser();
+    const { loadOwnerId } = createAuthUser();
 
     const owner = await loadOwnerId();
 
@@ -137,7 +139,7 @@ describe('useAuthUser', () => {
   it('should resolve owner id via getOwnerIdOrThrow', async () => {
     vi.mocked(fetchUserAttributes).mockResolvedValue({ sub: 'user-123' } as never);
 
-    const { getOwnerIdOrThrow } = useAuthUser();
+    const { getOwnerIdOrThrow } = createAuthUser();
 
     const owner = await getOwnerIdOrThrow();
 
@@ -150,7 +152,7 @@ describe('useAuthUser', () => {
       .mockResolvedValueOnce({ sub: 'user-123' } as never);
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const { error, loadUserId } = useAuthUser();
+    const { error, loadUserId } = createAuthUser();
 
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(error.value).toBe('Failed to load user information');

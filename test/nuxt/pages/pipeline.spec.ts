@@ -177,7 +177,7 @@ describe('pipeline page', () => {
     expect(wrapper.find('.board').text()).toBe('1');
   });
 
-  it('shows no-results empty state when search has no matches', async () => {
+  it('keeps board visible when search has no matches', async () => {
     const wrapper = mount(PipelinePage, {
       global: {
         plugins: [i18n],
@@ -186,10 +186,6 @@ describe('pipeline page', () => {
           UPageHeader: { template: '<div><slot /></div>' },
           UPageBody: { template: '<div><slot /></div>' },
           UCard: { template: '<div><slot /></div>' },
-          UEmpty: {
-            props: ['title'],
-            template: '<div class="empty">{{ title }}</div>',
-          },
           UInput: {
             props: ['modelValue'],
             emits: ['update:modelValue'],
@@ -200,7 +196,7 @@ describe('pipeline page', () => {
           ListSkeletonCards: { template: '<div class="skeleton" />' },
           KanbanBoard: {
             props: ['columns'],
-            template: '<div class="board">{{ columns.length }}</div>',
+            template: '<div class="board">{{ columns.flatMap((column) => column.jobs).length }}</div>',
           },
           KanbanNoteEditor: { template: '<div class="note-editor-stub" />' },
         },
@@ -210,8 +206,8 @@ describe('pipeline page', () => {
     await flushPromises();
     await wrapper.find('.search-input').setValue('no-match-query');
 
-    expect(wrapper.find('.board').exists()).toBe(false);
-    expect(wrapper.find('.empty').text()).toContain(i18n.global.t('pipeline.search.noResults'));
+    expect(wrapper.find('.board').exists()).toBe(true);
+    expect(wrapper.find('.board').text()).toBe('0');
   });
 
   it('opens note editor automatically for done-stage move prompt', async () => {
