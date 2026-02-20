@@ -41,13 +41,11 @@ describe('FocusJobCards', () => {
         plugins: [i18n],
         stubs: {
           UCard: { template: '<div><slot name="header" /><slot /></div>' },
-          ItemCard: {
-            props: ['title', 'subtitle'],
-            template:
-              '<div class="item-card"><div>{{ title }}</div><div>{{ subtitle }}</div><slot name="badges" /><slot /><slot name="actions" /></div>',
+          JobPreviewMiniCard: {
+            props: ['job'],
+            template: '<div class="job-preview">{{ job.kanbanStatus }}</div>',
           },
           USkeleton: { template: '<div class="skeleton" />' },
-          UBadge: { template: '<span class="badge"><slot /></span>' },
           UButton: {
             props: ['to', 'label'],
             template: '<a class="btn" :href="to">{{ label }}</a>',
@@ -57,7 +55,7 @@ describe('FocusJobCards', () => {
     });
 
     expect(wrapper.findAll('[data-testid^="focus-job-card-"]')).toHaveLength(3);
-    expect(wrapper.text()).toContain('Sent');
+    expect(wrapper.text()).toContain('applied');
   });
 
   it('renders one pipeline link in header and job detail links per card', () => {
@@ -70,13 +68,11 @@ describe('FocusJobCards', () => {
         plugins: [i18n],
         stubs: {
           UCard: { template: '<div><slot name="header" /><slot /></div>' },
-          ItemCard: {
-            props: ['title', 'subtitle'],
-            template:
-              '<div class="item-card"><div>{{ title }}</div><div>{{ subtitle }}</div><slot name="badges" /><slot /><slot name="actions" /></div>',
+          JobPreviewMiniCard: {
+            props: ['job'],
+            template: '<a class="btn" :href="`/jobs/${job.id}`">View</a>',
           },
           USkeleton: { template: '<div class="skeleton" />' },
-          UBadge: { template: '<span class="badge"><slot /></span>' },
           UButton: {
             props: ['to', 'label'],
             template: '<a class="btn" :href="to">{{ label }}</a>',

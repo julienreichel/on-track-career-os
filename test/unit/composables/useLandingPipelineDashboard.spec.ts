@@ -22,6 +22,12 @@ const buildJob = (overrides: Partial<JobDescription>): JobDescription =>
 
 const createDashboard = (jobs: JobDescription[]) => {
   const listJobs = vi.fn().mockResolvedValue(jobs);
+  const updateJob = vi.fn().mockImplementation(async (jobId: string, patch: { kanbanStatus?: string }) => ({
+    id: jobId,
+    ...jobs.find((job) => job.id === jobId),
+    kanbanStatus: patch.kanbanStatus ?? 'todo',
+    updatedAt: '2026-02-21T00:00:00.000Z',
+  }));
   const loadKanban = vi.fn().mockResolvedValue(stages);
 
   return {
@@ -29,6 +35,7 @@ const createDashboard = (jobs: JobDescription[]) => {
       jobAnalysis: {
         jobs: ref(jobs),
         listJobs,
+        updateJob,
         error: ref<string | null>(null),
       },
       kanbanSettings: {
@@ -43,6 +50,7 @@ const createDashboard = (jobs: JobDescription[]) => {
       stalledThresholdDays: 7,
     }),
     listJobs,
+    updateJob,
     loadKanban,
   };
 };
@@ -75,5 +83,15 @@ describe('useLandingPipelineDashboard', () => {
 
     expect(loadKanban).toHaveBeenCalledTimes(1);
     expect(listJobs).toHaveBeenCalledTimes(1);
+  });
+
+  it('moves a job to another stage and updates local state', async () => {
+    const { dashboard, updateJob } = createDashboard([buildJob({ id: 'job-1', kanbanStatus: 'todo' })]);
+
+    await dashboard.moveJobToStage('job-1', 'done');
+
+    expect(updateJob).toHaveBeenCalledWith('job-1', { kanbanStatus: 'done' });
+    expect(dashboard.todoJobsPreview.value).toHaveLength(0);
+    expect(dashboard.counts.value.doneCount).toBe(1);
   });
 });

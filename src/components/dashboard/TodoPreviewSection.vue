@@ -12,6 +12,9 @@ const props = defineProps<{
   stages: KanbanStage[];
   loading?: boolean;
 }>();
+const emit = defineEmits<{
+  moveToStage: [payload: { jobId: string; toStageKey: string }];
+}>();
 
 const { t } = useI18n();
 const previewJobs = computed(() => props.jobs.slice(0, PREVIEW_LIMIT));
@@ -47,7 +50,9 @@ const previewJobs = computed(() => props.jobs.slice(0, PREVIEW_LIMIT));
         :key="job.id"
         :job="job"
         :stages="stages"
+        :enable-workflow-actions="true"
         :data-testid="`todo-preview-job-${job.id}`"
+        @move-to-stage="emit('moveToStage', $event)"
       />
     </div>
   </UCard>

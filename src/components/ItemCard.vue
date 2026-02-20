@@ -81,9 +81,9 @@ const handleDelete = (event: Event) => {
     <template #footer>
       <div class="space-y-3 [&_a]:cursor-pointer [&_button]:cursor-pointer">
         <!-- Action Buttons Row -->
-        <div class="flex items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <!-- Left Side Actions -->
-          <div v-if="slots.actions" class="flex gap-2">
+          <div v-if="slots.actions" class="flex flex-wrap gap-2">
             <slot name="actions" />
           </div>
 

@@ -10,7 +10,10 @@ import {
 } from '@/domain/kanban-settings/pipelineDashboard';
 import type { JobDescription } from '@/domain/job-description/JobDescription';
 
-type JobAnalysisDependency = Pick<ReturnType<typeof useJobAnalysis>, 'jobs' | 'listJobs' | 'error'>;
+type JobAnalysisDependency = Pick<
+  ReturnType<typeof useJobAnalysis>,
+  'jobs' | 'listJobs' | 'updateJob' | 'error'
+>;
 type KanbanSettingsDependency = Pick<ReturnType<typeof useKanbanSettings>, 'state' | 'load'>;
 
 export type LandingPipelineViewState = 'empty' | 'todoOnly' | 'active' | 'allDone';
@@ -87,6 +90,23 @@ export const useLandingPipelineDashboard = (options: UseLandingPipelineDashboard
     }
   };
 
+  const moveJobToStage = async (jobId: string, toStageKey: string) => {
+    const nextKey = toStageKey?.trim();
+    if (!jobId || !nextKey) {
+      throw new Error('Invalid move payload');
+    }
+
+    const updated = await jobAnalysis.updateJob(jobId, { kanbanStatus: nextKey });
+    const target = jobAnalysis.jobs.value.find((job) => job.id === jobId);
+    if (!target) {
+      return updated;
+    }
+
+    target.kanbanStatus = updated.kanbanStatus ?? nextKey;
+    jobAnalysis.jobs.value = [...jobAnalysis.jobs.value];
+    return updated;
+  };
+
   return {
     isLoading,
     error,
@@ -97,5 +117,6 @@ export const useLandingPipelineDashboard = (options: UseLandingPipelineDashboard
     stalledJobsPreview,
     viewState,
     load,
+    moveJobToStage,
   };
 };

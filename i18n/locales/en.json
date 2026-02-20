@@ -1296,6 +1296,14 @@
           "viewJob": "View job"
         }
       },
+      "actions": {
+        "generateCv": "Generate CV",
+        "generateCoverLetter": "Generate cover letter",
+        "generateSpeech": "Generate speech",
+        "moveToStage": "Move to {stage}",
+        "moveSuccess": "Moved to {stage}",
+        "moveFailed": "Unable to move job right now"
+      },
       "todoPreview": {
         "title": "Opportunities waiting",
         "description": "Roles in ToDo that are ready for the next step.",

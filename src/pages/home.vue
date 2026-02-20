@@ -32,6 +32,7 @@
         :jobs="landingPipeline.focusJobs.value"
         :stages="kanbanSettings.state.stages.value"
         :loading="landingPipeline.isLoading.value"
+        @move-to-stage="handleMoveToStage"
       />
 
       <TodoPreviewSection
@@ -40,6 +41,7 @@
         :jobs="landingPipeline.todoJobsPreview.value"
         :stages="kanbanSettings.state.stages.value"
         :loading="landingPipeline.isLoading.value"
+        @move-to-stage="handleMoveToStage"
       />
 
       <StalledPreviewSection
@@ -94,11 +96,13 @@ import TodoPreviewSection from '@/components/dashboard/TodoPreviewSection.vue';
 import StalledPreviewSection from '@/components/dashboard/StalledPreviewSection.vue';
 import { useKanbanSettings } from '@/application/kanban-settings/useKanbanSettings';
 import { useLandingPipelineDashboard } from '@/composables/useLandingPipelineDashboard';
+import { getStageLabel } from '@/domain/kanban-settings/pipelineDashboard';
 
 defineOptions({ name: 'HomePage' });
 
 // Home page - requires authentication
 const { t } = useI18n();
+const toast = useToast();
 const showOnboarding = ref(false);
 const progress = useUserProgress();
 const badges = useBadges({ progress });
@@ -125,6 +129,27 @@ const showStalledPreview = computed(
     !landingPipeline.isLoading.value &&
     landingPipeline.stalledJobsPreview.value.length > 0
 );
+
+type MoveToStagePayload = {
+  jobId: string;
+  toStageKey: string;
+};
+
+const handleMoveToStage = async (payload: MoveToStagePayload) => {
+  const stageName = getStageLabel(payload.toStageKey, kanbanSettings.state.stages.value);
+  try {
+    await landingPipeline.moveJobToStage(payload.jobId, payload.toStageKey);
+    toast.add({
+      title: t('dashboard.pipeline.actions.moveSuccess', { stage: stageName }),
+      color: 'primary',
+    });
+  } catch {
+    toast.add({
+      title: t('dashboard.pipeline.actions.moveFailed'),
+      color: 'error',
+    });
+  }
+};
 
 onMounted(() => {
   void badges.load();
