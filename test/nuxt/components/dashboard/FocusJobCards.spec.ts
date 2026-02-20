@@ -58,7 +58,7 @@ describe('FocusJobCards', () => {
     expect(wrapper.text()).toContain('applied');
   });
 
-  it('renders one pipeline link in header and job detail links per card', () => {
+  it('renders header links and job detail links per card', () => {
     const wrapper = mount(FocusJobCards, {
       props: {
         jobs: [makeJob('abc', 'Role A', 'todo')],
@@ -82,6 +82,7 @@ describe('FocusJobCards', () => {
     });
 
     const links = wrapper.findAll('a.btn').map((link) => link.attributes('href'));
+    expect(links.filter((href) => href === '/jobs/new')).toHaveLength(1);
     expect(links.filter((href) => href === '/pipeline')).toHaveLength(1);
     expect(links).toContain('/jobs/abc');
   });

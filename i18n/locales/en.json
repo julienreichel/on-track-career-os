@@ -1292,6 +1292,7 @@
         "updatedAt": "Updated {date}",
         "stage": "Stage: {stage}",
         "cta": {
+          "addJob": "Add job",
           "openPipeline": "Open in Pipeline",
           "viewJob": "View job"
         }

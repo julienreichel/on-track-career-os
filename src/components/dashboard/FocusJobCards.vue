@@ -30,14 +30,24 @@ const hasJobs = computed(() => previewJobs.value.length > 0);
           <h2 class="text-lg font-semibold">{{ t('dashboard.pipeline.focus.title') }}</h2>
           <p class="text-sm text-dimmed">{{ t('dashboard.pipeline.focus.description') }}</p>
         </div>
-        <UButton
-          :label="t('dashboard.pipeline.focus.cta.openPipeline')"
-          to="/pipeline"
-          color="neutral"
-          variant="outline"
-          size="sm"
-          data-testid="focus-open-pipeline-link"
-        />
+        <div class="ml-auto flex items-center justify-end gap-2">
+          <UButton
+            :label="t('dashboard.pipeline.focus.cta.addJob')"
+            to="/jobs/new"
+            color="neutral"
+            variant="outline"
+            size="sm"
+            data-testid="focus-add-job-link"
+          />
+          <UButton
+            :label="t('dashboard.pipeline.focus.cta.openPipeline')"
+            to="/pipeline"
+            color="neutral"
+            variant="outline"
+            size="sm"
+            data-testid="focus-open-pipeline-link"
+          />
+        </div>
       </div>
     </template>
 

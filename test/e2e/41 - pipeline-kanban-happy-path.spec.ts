@@ -53,14 +53,15 @@ test.describe('Pipeline kanban happy path', () => {
     const appliedDropzone = page.getByTestId('kanban-dropzone-applied');
     await todoCard.dragTo(appliedDropzone);
 
+    const notifications = page.getByRole('region', { name: /Notifications/i });
+    const appliedToast = notifications
+      .getByRole('alert')
+      .filter({ hasText: /Moved to .+\. Add a note\?/i })
+      .first();
+    await expect(appliedToast).toBeVisible({ timeout: 10000 });
     await expect(appliedColumn.getByRole('link', { name: uniqueTitle })).toBeVisible({
       timeout: 10000,
     });
-    const notifications = page.getByRole('region', { name: /Notifications/i });
-    const appliedToast = notifications.getByRole('alert').filter({
-      hasText: 'Moved to Applied. Add a note?',
-    });
-    await expect(appliedToast).toBeVisible({ timeout: 10000 });
     await appliedToast.getByRole('button', { name: /^Add note$/i }).click();
 
     await expect(page.getByTestId('kanban-note-textarea')).toBeVisible({ timeout: 10000 });

@@ -53,6 +53,29 @@ describe('pipelineDashboard helpers', () => {
     });
   });
 
+  it('keeps counts stable when stage names are renamed', () => {
+    const renamedStages: KanbanStage[] = [
+      { key: 'todo', name: 'To start', isSystemDefault: true },
+      { key: 'applied', name: 'Sent', isSystemDefault: false },
+      { key: 'done', name: 'Closed', isSystemDefault: true },
+    ] as KanbanStage[];
+
+    const buckets = derivePipelineBuckets(
+      [
+        buildJob({ id: 'todo-1', kanbanStatus: 'todo' }),
+        buildJob({ id: 'active-1', kanbanStatus: 'applied' }),
+        buildJob({ id: 'done-1', kanbanStatus: 'done' }),
+      ],
+      renamedStages
+    );
+
+    expect(toPipelineCounts(buckets)).toEqual({
+      todoCount: 1,
+      activeCount: 1,
+      doneCount: 1,
+    });
+  });
+
   it('ranks focus jobs with active first and stable ordering', () => {
     const buckets = derivePipelineBuckets(
       [

@@ -94,7 +94,7 @@ const stubs = {
     props: ['progress'],
   },
   FocusJobCards: {
-    template: '<div class="focus-job-cards">{{ jobs.length }}</div>',
+    template: '<div class="focus-job-cards">{{ jobs.length }}-{{ stages[1]?.name }}</div>',
     props: ['jobs', 'stages', 'loading'],
   },
   TodoPreviewSection: {
@@ -132,6 +132,11 @@ describe('Home Page Component', () => {
     mockLandingPipeline.focusJobs.value = [];
     mockLandingPipeline.todoJobsPreview.value = [];
     mockLandingPipeline.stalledJobsPreview.value = [];
+    mockKanbanStages.value = [
+      { key: 'todo', name: 'ToDo', isSystemDefault: true },
+      { key: 'applied', name: 'Applied', isSystemDefault: false },
+      { key: 'done', name: 'Done', isSystemDefault: true },
+    ];
     mockProgress.state.value = { phase: 'bonus' };
     mockProgress.profile.value = { fullName: 'Ava Test' };
     mockProgress.inputs.value = null;
@@ -199,5 +204,27 @@ describe('Home Page Component', () => {
     const wrapper = await mountPage();
 
     expect(wrapper.find('.badge-grid-card').exists()).toBe(true);
+  });
+
+  it('hides pipeline summary while onboarding action box is shown', async () => {
+    mockProgress.inputs.value = { experienceCount: 0 };
+    const wrapper = await mountPage();
+
+    expect(wrapper.find('.focus-job-cards').exists()).toBe(false);
+  });
+
+  it('reflects renamed stage labels in focus section', async () => {
+    mockProgress.inputs.value = { experienceCount: 1 };
+    mockLandingPipeline.focusJobs.value = [{ id: 'job-1' } as JobDescription];
+    mockLandingPipeline.counts.value = { todoCount: 1, activeCount: 2, doneCount: 3 };
+    mockKanbanStages.value = [
+      { key: 'todo', name: 'ToDo', isSystemDefault: true },
+      { key: 'applied', name: 'Sent', isSystemDefault: false },
+      { key: 'done', name: 'Done', isSystemDefault: true },
+    ];
+
+    const wrapper = await mountPage();
+
+    expect(wrapper.find('.focus-job-cards').text()).toContain('Sent');
   });
 });

@@ -114,7 +114,15 @@ const welcomeName = computed(
   () => progress.profile.value?.fullName?.trim() || t('home.fallbackName')
 );
 
-const showPipelineDashboard = computed(() => progress.state.value?.phase === 'bonus');
+const totalPipelineJobs = computed(
+  () =>
+    landingPipeline.counts.value.todoCount +
+    landingPipeline.counts.value.activeCount +
+    landingPipeline.counts.value.doneCount
+);
+const showPipelineDashboard = computed(
+  () => progress.state.value?.phase === 'bonus' || totalPipelineJobs.value > 0
+);
 const showFocusToday = computed(
   () => landingPipeline.isLoading.value || landingPipeline.focusJobs.value.length > 0
 );
@@ -164,7 +172,9 @@ watch(
     if (!inputs) {
       return;
     }
-    showOnboarding.value = inputs.experienceCount === 0;
+    const experienceCount = inputs.experienceCount ?? 0;
+    const jobCount = inputs.jobCount ?? 0;
+    showOnboarding.value = experienceCount === 0 && jobCount === 0;
   },
   { immediate: true }
 );
