@@ -1297,6 +1297,7 @@
         }
       },
       "actions": {
+        "computeMatch": "Compute match",
         "generateCv": "Generate CV",
         "generateCoverLetter": "Generate cover letter",
         "generateSpeech": "Generate speech",

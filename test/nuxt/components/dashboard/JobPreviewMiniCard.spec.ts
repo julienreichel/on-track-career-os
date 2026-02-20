@@ -18,6 +18,7 @@ const job = {
   title: 'Frontend Engineer',
   kanbanStatus: 'applied',
   updatedAt: '2026-02-11T00:00:00.000Z',
+  matchingSummaries: [{ id: 'ms-1' }],
   company: {
     id: 'company-1',
     companyName: 'Acme',
@@ -93,6 +94,7 @@ describe('JobPreviewMiniCard', () => {
           ...job,
           id: 'job-2',
           kanbanStatus: 'todo',
+          matchingSummaries: [{ id: 'ms-2' }],
         },
         stages,
         enableWorkflowActions: true,
@@ -130,6 +132,7 @@ describe('JobPreviewMiniCard', () => {
           ...job,
           id: 'job-2b',
           kanbanStatus: 'todo',
+          matchingSummaries: [{ id: 'ms-2b' }],
           coverLetters: [{ id: 'cl-1' }],
         },
         stages,
@@ -167,6 +170,7 @@ describe('JobPreviewMiniCard', () => {
           ...job,
           id: 'job-3',
           kanbanStatus: 'todo',
+          matchingSummaries: [{ id: 'ms-3' }],
           cvs: [{ id: 'cv-1' }],
           coverLetters: [{ id: 'cl-1' }],
           speechBlocks: [{ id: 'sb-1' }],
@@ -198,6 +202,45 @@ describe('JobPreviewMiniCard', () => {
     expect(targets).not.toContain('/applications/cv/new?jobId=job-3');
     expect(targets).not.toContain('/applications/cover-letters/new?jobId=job-3');
     expect(targets).not.toContain('/applications/speech/new?jobId=job-3');
+  });
+
+  it('shows compute match action and hides generation actions when match is missing', () => {
+    const wrapper = mount(JobPreviewMiniCard, {
+      props: {
+        job: {
+          ...job,
+          id: 'job-5',
+          kanbanStatus: 'todo',
+          matchingSummaries: [],
+        },
+        stages,
+        enableWorkflowActions: true,
+      },
+      global: {
+        plugins: [i18n],
+        stubs: {
+          ItemCard: {
+            props: ['title', 'subtitle'],
+            template:
+              '<div><div class="title">{{ title }}</div><div class="subtitle">{{ subtitle }}</div><slot name="badges" /><slot /><slot name="actions" /></div>',
+          },
+          UBadge: {
+            template: '<span class="badge"><slot /></span>',
+          },
+          UButton: {
+            props: ['to', 'label'],
+            emits: ['click'],
+            template: '<button class="btn" :data-to="to" @click="$emit(\'click\')">{{ label }}</button>',
+          },
+        },
+      },
+    });
+
+    const targets = wrapper.findAll('button.btn').map((link) => link.attributes('data-to'));
+    expect(targets).toContain('/jobs/job-5/match');
+    expect(targets).not.toContain('/applications/cv/new?jobId=job-5');
+    expect(targets).not.toContain('/applications/cover-letters/new?jobId=job-5');
+    expect(targets).not.toContain('/applications/speech/new?jobId=job-5');
   });
 
   it('emits moveToStage when move action is clicked', async () => {

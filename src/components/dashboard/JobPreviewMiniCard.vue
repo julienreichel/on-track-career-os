@@ -11,6 +11,7 @@ type JobWithRelations = JobDescription & {
   cvs?: unknown;
   coverLetters?: unknown;
   speechBlocks?: unknown;
+  matchingSummaries?: unknown;
 };
 
 const props = defineProps<{
@@ -78,12 +79,23 @@ const hasCoverLetter = computed(() =>
   hasMaterialRelation((props.job as JobWithRelations).coverLetters)
 );
 const hasSpeech = computed(() => hasMaterialRelation((props.job as JobWithRelations).speechBlocks));
+const hasMatchingSummary = computed(() =>
+  hasMaterialRelation((props.job as JobWithRelations).matchingSummaries)
+);
+const showComputeMatch = computed(
+  () => props.enableWorkflowActions === true && !isDone.value && !hasMatchingSummary.value
+);
 const showGenerateCoverLetter = computed(
-  () => props.enableWorkflowActions === true && isTodo.value && !hasCoverLetter.value
+  () =>
+    props.enableWorkflowActions === true &&
+    hasMatchingSummary.value &&
+    isTodo.value &&
+    !hasCoverLetter.value
 );
 const showGenerateCv = computed(
   () =>
     props.enableWorkflowActions === true &&
+    hasMatchingSummary.value &&
     isTodo.value &&
     !hasCv.value &&
     hasCoverLetter.value
@@ -140,6 +152,15 @@ const updatedLabel = computed(() => {
 
     <template #actions>
       <UButton
+        v-if="showComputeMatch"
+        color="neutral"
+        variant="outline"
+        size="xs"
+        :label="t('dashboard.pipeline.actions.computeMatch')"
+        :to="`/jobs/${job.id}/match`"
+        :data-testid="`preview-compute-match-link-${job.id}`"
+      />
+      <UButton
         v-if="showGenerateCv"
         color="neutral"
         variant="outline"
@@ -158,7 +179,7 @@ const updatedLabel = computed(() => {
         :data-testid="`preview-generate-cover-letter-link-${job.id}`"
       />
       <UButton
-        v-if="enableWorkflowActions && isActive && !hasSpeech"
+        v-if="enableWorkflowActions && hasMatchingSummary && isActive && !hasSpeech"
         color="neutral"
         variant="outline"
         size="xs"
