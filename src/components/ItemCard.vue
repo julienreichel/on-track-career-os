@@ -11,6 +11,10 @@ const props = withDefaults(
      */
     title: string;
     /**
+     * Optional route for rendering the title as a link.
+     */
+    titleTo?: string;
+    /**
      * Optional subtitle displayed below the title in header
      */
     subtitle?: string;
@@ -23,6 +27,7 @@ const props = withDefaults(
   }>(),
   {
     subtitle: '',
+    titleTo: '',
     showDelete: true,
   }
 );
@@ -60,7 +65,16 @@ const handleDelete = (event: Event) => {
       <div class="space-y-2">
         <!-- Title -->
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">
-          {{ title }}
+          <NuxtLink
+            v-if="props.titleTo"
+            :to="props.titleTo"
+            class="text-primary hover:underline"
+          >
+            {{ title }}
+          </NuxtLink>
+          <template v-else>
+            {{ title }}
+          </template>
         </h3>
         <!-- Optional Subtitle -->
         <div v-if="subtitle" class="text-sm font-medium text-gray-700 dark:text-gray-300">

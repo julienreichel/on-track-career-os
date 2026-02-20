@@ -22,6 +22,11 @@ const stubs = {
     props: ['label', 'icon', 'size', 'color', 'variant', 'ariaLabel'],
     template: '<button @click="$emit(\'click\')">{{ label || ariaLabel }}</button>',
   },
+  NuxtLink: {
+    name: 'NuxtLink',
+    props: ['to'],
+    template: '<a :href="to"><slot /></a>',
+  },
 };
 
 function mountItemCard(props: any = {}, slots: any = {}) {
@@ -187,6 +192,14 @@ describe('ItemCard', () => {
       const heading = wrapper.find('h3');
       expect(heading.exists()).toBe(true);
       expect(heading.text()).toBe('Test Heading');
+    });
+
+    it('renders title as link when titleTo is provided', () => {
+      const wrapper = mountItemCard({ title: 'Test Heading', titleTo: '/jobs/123' });
+      const link = wrapper.find('h3 a');
+      expect(link.exists()).toBe(true);
+      expect(link.attributes('href')).toBe('/jobs/123');
+      expect(link.text()).toBe('Test Heading');
     });
   });
 

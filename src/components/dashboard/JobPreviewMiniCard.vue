@@ -120,6 +120,7 @@ const updatedLabel = computed(() => {
 <template>
   <ItemCard
     :title="job.title || t('jobs.list.card.noTitle')"
+    :title-to="`/jobs/${job.id}`"
     :subtitle="companyName"
     :show-delete="false"
   >
@@ -138,14 +139,6 @@ const updatedLabel = computed(() => {
     </p>
 
     <template #actions>
-      <UButton
-        color="neutral"
-        variant="outline"
-        size="xs"
-        :label="t('dashboard.pipeline.focus.cta.viewJob')"
-        :to="`/jobs/${job.id}`"
-        :data-testid="`preview-view-job-link-${job.id}`"
-      />
       <UButton
         v-if="showGenerateCv"
         color="neutral"
