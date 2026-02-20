@@ -9,13 +9,13 @@ import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 import { defineNuxtPlugin } from 'nuxt/app';
 
-// generate your data client using the Schema from your backend
-const client = generateClient<Schema>();
-
 export default defineNuxtPlugin({
   name: 'AmplifyAPIs',
   enforce: 'pre',
   setup() {
+    // Create the GraphQL client at runtime after Amplify configuration plugin setup.
+    const client = generateClient<Schema>();
+
     return {
       provide: {
         // You can call the API by via the composable `useNuxtApp()`. For example:
