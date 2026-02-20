@@ -9,7 +9,7 @@ import { AUTHENTICATED_HOME } from '@/utils/authRouting';
 import { useAuthState } from '@/composables/useAuthState';
 import { useSeoMetaDefaults } from '@/composables/useSeoMetaDefaults';
 import { buildAbsoluteUrl } from '@/utils/url';
-import '@aws-amplify/ui-vue/styles.css';
+import amplifyUiStylesHref from '@aws-amplify/ui-vue/styles.css?url';
 
 definePageMeta({
   layout: 'public',
@@ -28,7 +28,10 @@ const ogImageUrl = buildAbsoluteUrl(baseUrl, ogImage);
 
 useHead({
   titleTemplate,
-  link: [{ rel: 'canonical', href: canonicalUrl }],
+  link: [
+    { rel: 'canonical', href: canonicalUrl },
+    { rel: 'stylesheet', href: amplifyUiStylesHref, key: 'amplify-ui-styles' },
+  ],
 });
 
 useSeoMeta({
