@@ -47,6 +47,7 @@ const previewJobs = computed(() => props.jobs.slice(0, PREVIEW_LIMIT));
         :key="job.id"
         :job="job"
         :stages="stages"
+        :enable-workflow-actions="true"
         :data-testid="`stalled-preview-job-${job.id}`"
       />
     </div>
