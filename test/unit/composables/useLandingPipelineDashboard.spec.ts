@@ -94,4 +94,49 @@ describe('useLandingPipelineDashboard', () => {
     expect(dashboard.todoJobsPreview.value).toHaveLength(0);
     expect(dashboard.counts.value.doneCount).toBe(1);
   });
+
+  it('assigns jobs exclusively across stalled, focus, and todo sections', () => {
+    const { dashboard } = createDashboard([
+      buildJob({
+        id: 'stalled-active',
+        kanbanStatus: 'applied',
+        updatedAt: '2026-02-01T00:00:00.000Z',
+      }),
+      buildJob({
+        id: 'stalled-todo',
+        kanbanStatus: 'todo',
+        updatedAt: '2026-02-02T00:00:00.000Z',
+      }),
+      buildJob({
+        id: 'focus-active',
+        kanbanStatus: 'applied',
+        updatedAt: '2026-02-19T00:00:00.000Z',
+      }),
+      buildJob({
+        id: 'focus-todo',
+        kanbanStatus: 'todo',
+        updatedAt: '2026-02-18T00:00:00.000Z',
+      }),
+      buildJob({
+        id: 'focus-todo-2',
+        kanbanStatus: 'todo',
+        updatedAt: '2026-02-17T00:00:00.000Z',
+      }),
+      buildJob({
+        id: 'todo-only',
+        kanbanStatus: 'todo',
+        updatedAt: '2026-02-16T00:00:00.000Z',
+      }),
+    ]);
+
+    const stalledIds = dashboard.stalledJobsPreview.value.map((job) => job.id);
+    const focusIds = dashboard.focusJobs.value.map((job) => job.id);
+    const todoIds = dashboard.todoJobsPreview.value.map((job) => job.id);
+    const allIds = [...stalledIds, ...focusIds, ...todoIds];
+
+    expect(new Set(allIds).size).toBe(allIds.length);
+    expect(stalledIds).toEqual(['stalled-todo', 'stalled-active']);
+    expect(focusIds).toEqual(['focus-active', 'focus-todo', 'focus-todo-2']);
+    expect(todoIds).toEqual(['todo-only']);
+  });
 });

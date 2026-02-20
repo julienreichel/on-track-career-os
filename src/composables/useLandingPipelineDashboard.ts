@@ -23,21 +23,29 @@ type UseLandingPipelineDashboardOptions = {
   kanbanSettings?: KanbanSettingsDependency;
   now?: () => Date;
   stalledThresholdDays?: number;
-  previewLimit?: number;
 };
 
 const DEFAULT_STALLED_THRESHOLD_DAYS = 7;
-const DEFAULT_PREVIEW_LIMIT = 3;
+const FOCUS_PREVIEW_LIMIT = 3;
+const TODO_PREVIEW_LIMIT = 2;
+const STALLED_PREVIEW_LIMIT = 2;
 
 const takePreview = (jobs: ReadonlyArray<JobDescription>, limit: number): JobDescription[] =>
   jobs.slice(0, Math.max(0, limit));
+
+const toIdSet = (jobs: ReadonlyArray<JobDescription>): Set<string> =>
+  new Set(jobs.map((job) => job.id));
+
+const excludeJobsByIds = (
+  jobs: ReadonlyArray<JobDescription>,
+  excludedIds: ReadonlySet<string>
+): JobDescription[] => jobs.filter((job) => !excludedIds.has(job.id));
 
 export const useLandingPipelineDashboard = (options: UseLandingPipelineDashboardOptions = {}) => {
   const jobAnalysis = options.jobAnalysis ?? useJobAnalysis();
   const kanbanSettings = options.kanbanSettings ?? useKanbanSettings();
   const now = options.now ?? (() => new Date());
   const stalledThresholdDays = options.stalledThresholdDays ?? DEFAULT_STALLED_THRESHOLD_DAYS;
-  const previewLimit = options.previewLimit ?? DEFAULT_PREVIEW_LIMIT;
 
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -48,15 +56,26 @@ export const useLandingPipelineDashboard = (options: UseLandingPipelineDashboard
 
   const counts = computed<PipelineCounts>(() => toPipelineCounts(buckets.value));
 
-  const focusJobs = computed(() => rankFocusJobs(buckets.value, previewLimit));
-
   const stalledJobs = computed(() =>
     computeStalled([...buckets.value.activeJobs, ...buckets.value.todoJobs], now(), stalledThresholdDays)
   );
 
-  const todoJobsPreview = computed(() => takePreview(buckets.value.todoJobs, previewLimit));
-  const activeJobsPreview = computed(() => takePreview(buckets.value.activeJobs, previewLimit));
-  const stalledJobsPreview = computed(() => takePreview(stalledJobs.value, previewLimit));
+  const stalledJobsPreview = computed(() => takePreview(stalledJobs.value, STALLED_PREVIEW_LIMIT));
+  const stalledPreviewIds = computed(() => toIdSet(stalledJobsPreview.value));
+
+  const focusCandidates = computed(() =>
+    rankFocusJobs(buckets.value, buckets.value.activeJobs.length + buckets.value.todoJobs.length)
+  );
+  const focusJobs = computed(() =>
+    takePreview(excludeJobsByIds(focusCandidates.value, stalledPreviewIds.value), FOCUS_PREVIEW_LIMIT)
+  );
+  const focusJobIds = computed(() => toIdSet(focusJobs.value));
+
+  const todoExcludedIds = computed(() => new Set([...stalledPreviewIds.value, ...focusJobIds.value]));
+  const todoJobsPreview = computed(() =>
+    takePreview(excludeJobsByIds(buckets.value.todoJobs, todoExcludedIds.value), TODO_PREVIEW_LIMIT)
+  );
+  const activeJobsPreview = computed(() => takePreview(buckets.value.activeJobs, FOCUS_PREVIEW_LIMIT));
 
   const viewState = computed<LandingPipelineViewState>(() => {
     const total = counts.value.todoCount + counts.value.activeCount + counts.value.doneCount;
