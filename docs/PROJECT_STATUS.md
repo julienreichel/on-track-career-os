@@ -1,18 +1,18 @@
 # Project Status — On Track Career
 
-**Last Updated:** 2026-02-16  
-**Version:** v0.15.0 — EPIC C3 delivered (material feedback + improvement loop)
+**Last Updated:** 2026-02-26  
+**Version:** v0.16.0 — EPIC B0 V1 delivered (kanban pipeline + stage settings + landing previews)
 
 ---
 
 ## 📊 Current State
 
-**Production-Ready MVP** with comprehensive testing, CV customization, matching, and onboarding.
+**Production-Ready MVP + V1 Pipeline Layer** with comprehensive testing, CV customization, matching, onboarding, and kanban execution tracking.
 
 ### Key Metrics
 
 - ✅ **14/14 AI operations** implemented
-- ✅ **18 GraphQL models** (13 MVP + 5 V1)
+- ✅ **19 GraphQL models** (13 MVP + 6 V1)
 - ✅ **11 domain modules** with full layers
 - ✅ **1526+ tests** across 190+ suites
 - ✅ **40+ pages** with full functionality
@@ -37,6 +37,10 @@
 - Material improvement AI op (`ai.improveMaterial`) with strict input/output validation and deterministic fallback
 - Shared C3 frontend engine (`useMaterialImprovementEngine`) + reusable `MaterialFeedbackPanel`
 - CV and cover-letter editor integration: feedback + improve loop with markdown overwrite/persist
+- EPIC B0 V1 data layer: `JobDescription.kanbanStatus`, `JobDescription.notes`, and `KanbanSettings`
+- New pipeline kanban page with drag-drop status transitions and persisted notes
+- Stage settings UI with locked `todo/done`, add/remove/reorder, and default stage guards
+- Landing dashboard focus areas for Todo/Stalled pipeline actions and prioritized match generation
 
 ---
 
@@ -57,12 +61,13 @@
 | **5C** | User-Job-Company Matching | ✅ 100% | 1/1    | Fit score, recommendations, tailoring |
 | **A2** | Application Strength Gate | ✅ 95%  | 1/1    | CV/letter quality scoring + retry UX  |
 | **C3** | Material Improvement Loop | ✅ 100% | 1/1    | Feedback panel + guided AI rewrite    |
+| **B0** | Pipeline Kanban V1        | ✅ 100% | -      | Global kanban, notes, stage settings  |
 | **6**  | Tailored Materials        | ✅ 100% | 3/3    | Job-specific CV/letter/speech         |
 | **F2** | Onboarding & Guidance     | ✅ 100% | -      | 5-phase progress, badges, guidance    |
 
 ---
 
-## 📦 Domain Models (13 MVP + 5 V1)
+## 📦 Domain Models (13 MVP + 6 V1)
 
 ### Core MVP Models (13)
 
@@ -81,34 +86,35 @@
 | SpeechBlock     | Materials      | Speech blocks                 | 3 sections: pitch, story, why-me      |
 | CVTemplate      | Materials (3C) | CV markdown templates         | System/user, markdown exemplars       |
 | CVSettings      | Materials (3C) | User CV defaults              | Template, sections, experiences       |
+| KanbanSettings  | Pipeline (B0)  | User pipeline stage settings  | Ordered stages, locked todo/done keys |
 
 ---
 
-## 🎨 Frontend (40+ Pages in 4 Zones)
+## 🎨 Frontend (40+ Pages in 5 Zones)
 
-### Auth & Home (3)
+### Auth & Home (4)
 
-`/login`, `/`, `/onboarding`
+`/login`, `/`, `/home`, `/onboarding`
 
 ### Profile Zone (8)
 
-`/profile`, `/profile/canvas`, `/profile/experiences`, `/profile/experiences/new`, `/profile/experiences/:id/edit`, `/profile/experiences/:id/stories`, `/profile/experiences/:id/stories/:storyId`, `/cv-upload`
+`/profile`, `/profile/full`, `/profile/canvas`, `/profile/cv-upload`, `/profile/experiences`, `/profile/experiences/:experienceId`, `/profile/experiences/:experienceId/stories`, `/profile/experiences/:experienceId/stories/:storyId`
 
 ### Jobs & Companies
 
-`/jobs`, `/jobs/new`, `/jobs/:id`, `/jobs/:id/match`, `/jobs/:id/application-strength`, `/companies`, `/companies/new`, `/companies/:companyId`, `/applications`
+`/jobs`, `/jobs/new`, `/jobs/:id`, `/jobs/:id/match`, `/jobs/:id/application-strength`, `/companies`, `/companies/new`, `/companies/:companyId`, `/applications`, `/pipeline`
 
-### Applications (14)
+### Applications (11)
 
-**CV & Templates (9):** `/applications/cv`, `/applications/cv/new`, `/applications/cv/:id`, `/applications/cv/:id/print`, `/settings/cv`, `/settings/cv/:id`
+**CV & Templates (6):** `/applications/cv`, `/applications/cv/new`, `/applications/cv/:id`, `/applications/cv/:id/print`, `/settings/cv`, `/settings/cv/:id`
 
 **Cover Letters (3):** `/applications/cover-letters`, `/applications/cover-letters/new`, `/applications/cover-letters/:id`
 
-**Speech (2):** `/applications/speech`, `/applications/speech/:id`
+**Speech (3):** `/applications/speech`, `/applications/speech/new`, `/applications/speech/:id`
 
-### Settings (2)
+### Settings (4)
 
-`/settings/cv`, `/settings/cv/:id`
+`/settings`, `/settings/cv`, `/settings/cv/:id`, `/settings/kanban`
 
 ---
 
@@ -225,6 +231,13 @@
 **Features:** On-demand feedback, score/details panel, guided instruction presets, optional user note, deterministic error keys  
 **AI:** `improveMaterial` with strict input contract, markdown-only output validation, retry-on-invalid-output, and unchanged-markdown fallback  
 **Pages:** `/applications/cv/:id`, `/applications/cover-letters/:id`
+
+### ✅ EPIC B0 V1: Pipeline Kanban (100%)
+
+**Core:** Global user kanban board based on `JobDescription` with per-job `kanbanStatus` and `notes`  
+**Settings:** User-level `KanbanSettings` with reorder/add/remove stage management and protected `todo` / `done` system stages  
+**Features:** Drag-and-drop stage transitions, invalid-status fallback handling, column pagination, search filter, and landing dashboard focus/stalled sections  
+**Pages:** `/pipeline`, `/settings/kanban`, `/home` (pipeline preview sections)
 
 ### ✅ EPIC 6: Tailored Application Materials (100%)
 
