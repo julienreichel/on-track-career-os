@@ -10,6 +10,8 @@ PDFParse.setWorker(
 
 const MIN_TEXT_LENGTH = 400;
 const MAX_NAME_LENGTH = 80;
+const SUPPORTED_MIME_TYPES = new Set(['application/pdf', 'text/plain']);
+const SUPPORTED_EXTENSIONS = new Set(['pdf', 'txt']);
 
 async function extractPdfText(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
@@ -21,6 +23,28 @@ async function extractPdfText(file: File): Promise<string> {
 
 async function extractTextFromFile(file: File): Promise<string> {
   return file.text();
+}
+
+function getFileExtension(file: File): string {
+  return file.name.split('.').pop()?.toLowerCase() ?? '';
+}
+
+function isPdfFile(file: File): boolean {
+  return file.type === 'application/pdf' || getFileExtension(file) === 'pdf';
+}
+
+function isSupportedFileType(file: File): boolean {
+  if (SUPPORTED_MIME_TYPES.has(file.type)) {
+    return true;
+  }
+  return SUPPORTED_EXTENSIONS.has(getFileExtension(file));
+}
+
+async function extractTextFromCompanyFile(file: File): Promise<string> {
+  if (isPdfFile(file)) {
+    return await extractPdfText(file);
+  }
+  return await extractTextFromFile(file);
 }
 
 function deriveCompanyName(file: File, rawText: string, fallback: string) {
@@ -55,14 +79,16 @@ export function useCompanyUpload() {
   });
 
   async function processFile(file: File): Promise<Company> {
+    if (!isSupportedFileType(file)) {
+      selectedFile.value = null;
+      throw new Error(t('companies.upload.errors.unsupportedFileType'));
+    }
+
     selectedFile.value = file;
     errorMessage.value = null;
     status.value = 'extracting';
 
-    const rawText =
-      file.type === 'application/pdf'
-        ? await extractPdfText(file)
-        : await extractTextFromFile(file);
+    const rawText = await extractTextFromCompanyFile(file);
     const sanitized = rawText?.trim();
 
     if (!sanitized || sanitized.length < MIN_TEXT_LENGTH) {
@@ -106,7 +132,9 @@ export function useCompanyUpload() {
     try {
       const company = await processFile(file);
       return company;
-    } catch {
+    } catch (error) {
+      errorMessage.value =
+        error instanceof Error ? error.message : t('companies.upload.errors.generic');
       return null;
     }
   }

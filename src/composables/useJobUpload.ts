@@ -10,6 +10,8 @@ PDFParse.setWorker(
 );
 
 const MIN_TEXT_LENGTH = 400;
+const SUPPORTED_MIME_TYPES = new Set(['application/pdf', 'text/plain']);
+const SUPPORTED_EXTENSIONS = new Set(['pdf', 'txt']);
 
 type UploadStatus = 'idle' | 'extracting' | 'analyzing';
 
@@ -46,6 +48,28 @@ export function useJobUpload() {
     return file.text();
   }
 
+  function getFileExtension(file: File): string {
+    return file.name.split('.').pop()?.toLowerCase() ?? '';
+  }
+
+  function isPdfFile(file: File): boolean {
+    return file.type === 'application/pdf' || getFileExtension(file) === 'pdf';
+  }
+
+  function isSupportedFileType(file: File): boolean {
+    if (SUPPORTED_MIME_TYPES.has(file.type)) {
+      return true;
+    }
+    return SUPPORTED_EXTENSIONS.has(getFileExtension(file));
+  }
+
+  async function extractTextFromJobFile(file: File): Promise<string> {
+    if (isPdfFile(file)) {
+      return await extractPdfText(file);
+    }
+    return await extractTextFromFile(file);
+  }
+
   async function analyzeRawText(rawText: string): Promise<JobDescription> {
     const sanitized = rawText?.trim();
     if (!sanitized || sanitized.length < MIN_TEXT_LENGTH) {
@@ -72,14 +96,16 @@ export function useJobUpload() {
   }
 
   async function processFile(file: File): Promise<JobDescription> {
+    if (!isSupportedFileType(file)) {
+      selectedFile.value = null;
+      throw new Error(t('ingestion.job.upload.errors.unsupportedFileType'));
+    }
+
     selectedFile.value = file;
     errorMessage.value = null;
     status.value = 'extracting';
 
-    const rawText =
-      file.type === 'application/pdf'
-        ? await extractPdfText(file)
-        : await extractTextFromFile(file);
+    const rawText = await extractTextFromJobFile(file);
 
     return analyzeRawText(rawText);
   }

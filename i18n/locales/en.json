@@ -72,6 +72,7 @@
         },
         "errors": {
           "tooShort": "The job description is too short. Please upload a complete document.",
+          "unsupportedFileType": "Unsupported file type. Please upload a PDF or TXT file.",
           "generic": "Unable to analyze this job description."
         }
       }
@@ -276,6 +277,7 @@
       "errors": {
         "title": "Upload error",
         "tooShort": "We could not extract enough content from this file. Try another document.",
+        "unsupportedFileType": "Unsupported file type. Please upload a PDF or TXT file.",
         "generic": "Something went wrong while analyzing this file."
       },
       "fileUploaded": "File uploaded: {fileName}",
@@ -1120,6 +1122,7 @@
       "jobNotFound": "We couldn't find this job. Try reloading from the jobs list.",
       "loadFailed": "Application strength is temporarily unavailable. Please retry.",
       "missingMaterial": "Upload or paste at least one document (CV or cover letter).",
+      "unsupportedFileType": "Unsupported file type. Please upload a PDF or TXT file.",
       "pdfExtractionFailed": "We couldn't extract text from this file. You can paste text instead.",
       "validation": "Please review your inputs and try again.",
       "aiValidation": "We couldn't validate the evaluation result. Please retry.",

@@ -55,6 +55,8 @@ describe('useJobUpload', () => {
 
   const createTextFile = (content: string) =>
     new File([content], 'job.txt', { type: 'text/plain' });
+  const createUnsupportedFile = () =>
+    new File(['{"role":"Engineer"}'], 'job.json', { type: 'application/json' });
 
   it('processes a PDF file and returns analyzed job', async () => {
     mockGetText.mockResolvedValueOnce({ text: 'A'.repeat(500) });
@@ -89,6 +91,17 @@ describe('useJobUpload', () => {
     expect(job).toBeNull();
     expect(jobUpload.errorMessage.value).toBe('ingestion.job.upload.errors.tooShort');
     expect(jobUpload.selectedFile.value).toBeNull();
+  });
+
+  it('rejects unsupported file types', async () => {
+    const jobUpload = useJobUpload();
+    const job = await jobUpload.handleFileSelected(createUnsupportedFile());
+
+    expect(job).toBeNull();
+    expect(jobUpload.errorMessage.value).toBe('ingestion.job.upload.errors.unsupportedFileType');
+    expect(jobUpload.selectedFile.value).toBeNull();
+    expect(mockGetText).not.toHaveBeenCalled();
+    expect(mockCreateJob).not.toHaveBeenCalled();
   });
 
   it('captures errors from analysis', async () => {

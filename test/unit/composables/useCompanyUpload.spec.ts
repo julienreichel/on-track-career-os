@@ -48,6 +48,8 @@ describe('useCompanyUpload', () => {
   const createPdfFile = () => new File(['dummy pdf'], 'company.pdf', { type: 'application/pdf' });
   const createTextFile = (content: string) =>
     new File([content], 'company.txt', { type: 'text/plain' });
+  const createUnsupportedFile = () =>
+    new File(['{}'], 'company.json', { type: 'application/json' });
 
   it('processes a PDF file and creates a company', async () => {
     mockGetText.mockResolvedValueOnce({ text: 'A'.repeat(500) });
@@ -92,6 +94,17 @@ describe('useCompanyUpload', () => {
     expect(result).toBeNull();
     expect(upload.errorMessage.value).toBe('companies.upload.errors.tooShort');
     expect(upload.selectedFile.value).toBeNull();
+  });
+
+  it('rejects unsupported file types', async () => {
+    const upload = useCompanyUpload();
+    const result = await upload.handleFileSelected(createUnsupportedFile());
+
+    expect(result).toBeNull();
+    expect(upload.errorMessage.value).toBe('companies.upload.errors.unsupportedFileType');
+    expect(upload.selectedFile.value).toBeNull();
+    expect(mockGetText).not.toHaveBeenCalled();
+    expect(mockCreateCompany).not.toHaveBeenCalled();
   });
 
   it('captures errors from CompanyService', async () => {

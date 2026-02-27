@@ -89,4 +89,18 @@ describe('useApplicationStrengthInputs', () => {
     state.pastedText.value = 'Candidate Name\ncandidate@example.com\nExperience';
     expect(state.canEvaluate.value).toBe(true);
   });
+
+  it('rejects unsupported upload file types', async () => {
+    const state = useApplicationStrengthInputs({ candidateFullName });
+    const file = new File(['{}'], 'application.json', { type: 'application/json' });
+
+    await state.handleFileUpload(file);
+
+    expect(state.extractionErrorMessageKey.value).toBe(
+      'applicationStrength.errors.unsupportedFileType'
+    );
+    expect(state.selectedFile.value).toBeNull();
+    expect(state.extractedText.value).toBe('');
+    expect(PDFParse).not.toHaveBeenCalled();
+  });
 });

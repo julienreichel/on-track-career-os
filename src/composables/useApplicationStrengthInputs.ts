@@ -17,6 +17,8 @@ const BEGIN_LINE_LIMIT = 2;
 const END_LINE_LIMIT = 2;
 const EMAIL_REGEX = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
 const PHONE_REGEX = /(?:\+?\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?)?\d{3,4}[\s.-]?\d{3,4}/;
+const SUPPORTED_MIME_TYPES = new Set(['application/pdf', 'text/plain']);
+const SUPPORTED_EXTENSIONS = new Set(['pdf', 'txt']);
 
 async function extractPdfText(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
@@ -31,6 +33,17 @@ async function extractTextFromFile(file: File): Promise<string> {
     return extractPdfText(file);
   }
   return file.text();
+}
+
+function getFileExtension(file: File): string {
+  return file.name.split('.').pop()?.toLowerCase() ?? '';
+}
+
+function isSupportedFileType(file: File): boolean {
+  if (SUPPORTED_MIME_TYPES.has(file.type)) {
+    return true;
+  }
+  return SUPPORTED_EXTENSIONS.has(getFileExtension(file));
 }
 
 function getNameLineIndexes(text: string, fullName: string): { first: number; last: number; total: number } {
@@ -82,6 +95,7 @@ function detectMaterialType(text: string, fullName: string): DetectedType {
   return 'coverLetter';
 }
 
+// eslint-disable-next-line max-lines-per-function
 export function useApplicationStrengthInputs(options: UseApplicationStrengthInputsOptions) {
   const pastedText = ref('');
   const extractedText = ref('');
@@ -141,6 +155,13 @@ export function useApplicationStrengthInputs(options: UseApplicationStrengthInpu
 
   async function handleFileUpload(file: File | null | undefined) {
     if (!file) {
+      return;
+    }
+
+    if (!isSupportedFileType(file)) {
+      selectedFile.value = null;
+      extractionErrorMessageKey.value = 'applicationStrength.errors.unsupportedFileType';
+      rawExtractionError.value = null;
       return;
     }
 
