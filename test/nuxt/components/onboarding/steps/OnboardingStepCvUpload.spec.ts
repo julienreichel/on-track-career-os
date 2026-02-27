@@ -76,7 +76,7 @@ describe('OnboardingStepCvUpload', () => {
 
     it('displays hint text', () => {
       const wrapper = mountOnboardingStepCvUpload();
-      expect(wrapper.text()).toContain('Upload a PDF or Word document');
+      expect(wrapper.text()).toContain('Upload a PDF');
     });
 
     it('hint has text-sm text-dimmed classes', () => {
@@ -234,7 +234,7 @@ describe('OnboardingStepCvUpload', () => {
 
     it('uses correct hint translation key', () => {
       const wrapper = mountOnboardingStepCvUpload();
-      expect(wrapper.text()).toContain('Upload a PDF or Word document');
+      expect(wrapper.text()).toContain('Upload a PDF');
     });
   });
 

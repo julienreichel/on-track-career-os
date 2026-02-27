@@ -42,6 +42,7 @@
           "genericTitle": "An error occurred",
           "noTextExtracted": "No text could be extracted from the file.",
           "unknown": "An unknown error occurred",
+          "unsupportedFileType": "Unsupported file type. Please upload a PDF or TXT file.",
           "notCvDescription": "This document doesn't look like a CV. Please upload a CV or resume.",
           "tooManyPagesDescription": "Documents longer than 5 pages are not supported for CV parsing.",
           "parsingFailed": "Failed to parse CV. Please try again or enter experiences manually.",
@@ -1368,7 +1369,7 @@
       "cvUpload": {
         "title": "Upload your CV",
         "description": "Import your CV",
-        "hint": "Upload a PDF or Word document for best results."
+        "hint": "Upload a PDF or TXT file for best results."
       },
       "experienceReview": {
         "title": "Experiences",
@@ -1399,6 +1400,8 @@
     "errors": {
       "title": "Onboarding issue",
       "missingUser": "We couldn't identify your account. Please sign in again.",
+      "parseFailed": "We couldn't parse your CV. Please upload a PDF or TXT file and try again.",
+      "importFailed": "We couldn't import your experiences. Please try again.",
       "saveFailed": "We couldn't save your profile basics.",
       "fullNameRequired": "Please add your full name to continue.",
       "validationFailed": "Please fix the highlighted fields before continuing."

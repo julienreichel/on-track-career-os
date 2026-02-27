@@ -20,6 +20,8 @@ export function useCvParsing() {
   const aiOps = useAiOperations();
   const MAX_PDF_PAGES = 5;
   const NON_CV_ERROR_CODE = 'ERR_NON_CV_DOCUMENT';
+  const SUPPORTED_MIME_TYPES = new Set(['application/pdf', 'text/plain']);
+  const SUPPORTED_EXTENSIONS = new Set(['pdf', 'txt']);
 
   const extractedText = ref<string>('');
   const extractedExperiences = ref<ExtractedExperience[]>([]);
@@ -56,6 +58,33 @@ export function useCvParsing() {
     });
   }
 
+  function getFileExtension(file: File): string {
+    return file.name.split('.').pop()?.toLowerCase() ?? '';
+  }
+
+  function isPdfFile(file: File): boolean {
+    return file.type === 'application/pdf' || getFileExtension(file) === 'pdf';
+  }
+
+  function isSupportedFileType(file: File): boolean {
+    if (SUPPORTED_MIME_TYPES.has(file.type)) {
+      return true;
+    }
+    return SUPPORTED_EXTENSIONS.has(getFileExtension(file));
+  }
+
+  async function extractTextFromCvFile(file: File): Promise<string> {
+    if (!isPdfFile(file)) {
+      return await extractTextFileContent(file);
+    }
+
+    const parsed = await extractPdfText(file);
+    if (parsed.pageCount > MAX_PDF_PAGES) {
+      throw new Error(t('ingestion.cv.upload.errors.tooManyPagesDescription'));
+    }
+    return parsed.text;
+  }
+
   /**
    * Extract experiences from a section (work or education)
    */
@@ -90,17 +119,11 @@ export function useCvParsing() {
   }
 
   async function parseFile(file: File): Promise<void> {
-    // Extract text based on file type
-    let text = '';
-    if (file.type === 'application/pdf') {
-      const parsed = await extractPdfText(file);
-      if (parsed.pageCount > MAX_PDF_PAGES) {
-        throw new Error(t('ingestion.cv.upload.errors.tooManyPagesDescription'));
-      }
-      text = parsed.text;
-    } else {
-      text = await extractTextFileContent(file);
+    if (!isSupportedFileType(file)) {
+      throw new Error(t('ingestion.cv.upload.errors.unsupportedFileType'));
     }
+
+    const text = await extractTextFromCvFile(file);
 
     if (!text || text.trim().length === 0) {
       throw new Error(t('ingestion.cv.upload.errors.noTextExtracted'));
